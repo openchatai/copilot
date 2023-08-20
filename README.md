@@ -11,7 +11,7 @@
 <img alt="Discord" src="https://img.shields.io/discord/1110910277110743103?label=Discord&logo=discord&logoColor=white&style=plastic&color=d7b023)](https://discord.gg/Q8hHfdav" />
 </p>
 
-![image](https://github.com/openchatai/OpenCopilot/assets/32633162/e0704daa-71f2-4f98-a4e4-83c7b6e78231)
+<img width="1166" alt="OpenCopilot" src="https://github.com/openchatai/OpenCopilot/assets/32633162/8b49328a-e7c5-4359-9a89-7c54eb026b08">
 
 
 ------
@@ -32,7 +32,8 @@ OpenCopilot allows you to have your own product's AI copilot. It integrates with
 **You can try it out on [opencopilot.so](http://opencopilot.so/)**
 
 
-https://github.com/openchatai/OpenCopilot/assets/32633162/57d31a59-8f15-42ad-bab1-19bbeea10d41
+https://github.com/openchatai/OpenCopilot/assets/32633162/3bf5c24d-572c-4a42-9e45-40f05e5a16b2
+
 
 
 
