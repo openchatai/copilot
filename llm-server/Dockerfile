@@ -17,7 +17,7 @@ COPY . /app/
 EXPOSE 5000
 
 # Define environment variable
-ENV OPENAI_API_KEY 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
+ENV OPENAI_API_KEY YOU_TOKEN_HERE
 
 # Run app.py when the container launches
 CMD ["python", "app.py"]
