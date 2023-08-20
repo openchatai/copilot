@@ -25,6 +25,9 @@ Route::post('chat/send', [MessageController::class, 'sendChat']);
 
 /**
  * Pet demo API
+ * These APIs are used for the demo copilot. some of them are hardcoded.
+ *
+ * In real life scenarios these APIs will heavily rely on DB calls to fetch and store data.
  */
 Route::get('pets/data/analytics', [DemoPetController::class, 'analytics']);
 Route::get('pets/data/search', [DemoPetController::class, 'searchPetInAllFields']);
