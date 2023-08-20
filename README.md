@@ -87,9 +87,9 @@ We love hearing from you! Got any cool ideas or requests? We're all ears! So, if
 git clone git@github.com:openchatai/OpenCopilot.git
 ```
 
-- Update common.env with your keys:
+- Update llm-server/Dockerfile with your `OPENAI_API_KEY` key:
 ```
-OPENAI_API_KEY=# you can get it from your account in openai.com
+ENV OPENAI_API_KEY YOUR_TOKEN_HERE
 ```
 
 - Navigate to the repository folder and run the following command (for MacOS or Linux):
