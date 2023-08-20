@@ -1,0 +1,59 @@
+version: '3'
+services:
+  dashboard:
+    restart: unless-stopped
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - llm-server
+      - mysql
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=opencopilot
+      - DB_USERNAME=dbuser
+      - DB_PASSWORD=dbpass
+    volumes:
+      - shared_data:/app/shared_data
+      - application:/app
+      - ./dashboard:/var/www/html/dashboard
+    networks:
+      - opencopilot_network
+
+  llm-server:
+    restart: unless-stopped
+    build:
+      context: ./llm-server
+      dockerfile: Dockerfile
+    volumes:
+      - shared_data:/app/shared_data
+    networks:
+      - opencopilot_network
+
+  mysql:
+    restart: unless-stopped
+    platform: linux/x86_64
+    image: "mysql:5.7"
+    ports:
+      - "3307:3306"
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: opencopilot
+      MYSQL_USER: dbuser
+      MYSQL_PASSWORD: dbpass
+    volumes:
+      - database:/var/lib/mysql
+    networks:
+      - opencopilot_network
+
+networks:
+  opencopilot_network:
+
+volumes:
+  shared_data:
+  application:
+  database:
