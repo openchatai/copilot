@@ -52,6 +52,7 @@ def handle():
     try:
         json_output = try_to_match_and_call_api_endpoint(swagger_spec, text, headers)
     except Exception as e:
+        warnings.warn(str(e))
         json_output = None
 
     llm = ChatOpenAI(model="gpt-3.5-turbo-0613", temperature=0)

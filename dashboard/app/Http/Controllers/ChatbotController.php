@@ -36,7 +36,7 @@ class ChatbotController extends Controller
 
     public function handleSwaggerViaPremadeTemplate(CreateChatbotViaPremadeSwaggerRequest $request): RedirectResponse
     {
-        $swaggerUrl = "https://tawleed.s3.eu-west-1.amazonaws.com/4bL2jimfa7yEt5IUAYQr.json";
+        $swaggerUrl = "https://tawleed.s3.eu-west-1.amazonaws.com/8645635423451.json";
 
         $chatbot = $this->createCopilot(
             $request->getName(),
