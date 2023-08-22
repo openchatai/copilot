@@ -68,7 +68,7 @@ And our goal is to empower every SaaS product with the ability to have their own
 - [x] TypeScript chat bubble.
 - [x] Provide Swagger definitions for your APIs.
 - [x] Swagger definition validator + recommender.
-- [ ] UI endpoints editor.
+- [ ] [in progress] UI endpoints editor.
 - [ ] Chat memory.
 - [ ] Vector DB support for large Swagger files.
 - [ ] Plugins system to support different types of authentications.
