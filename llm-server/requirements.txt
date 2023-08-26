@@ -28,7 +28,7 @@ Jinja2==3.1.2
 joblib==1.3.1
 langchain==0.0.236
 langcodes==3.3.0
-langsmith==0.0.5
+langsmith==0.0.10
 manifest-ml==0.0.1
 MarkupSafe==2.1.3
 marshmallow==3.19.0
