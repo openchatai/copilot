@@ -11,7 +11,7 @@
 <img alt="Discord" src="https://img.shields.io/discord/1110910277110743103?label=Discord&logo=discord&logoColor=white&style=plastic&color=d7b023)](https://discord.gg/Q8hHfdav" />
 </p>
 
-<img width="1166" alt="OpenCopilot" src="https://github.com/openchatai/OpenCopilot/assets/32633162/8b49328a-e7c5-4359-9a89-7c54eb026b08">
+![image](https://github.com/openchatai/OpenCopilot/assets/32633162/a0cdc888-d2de-46b7-8c0b-96e876050b6e)
 
 
 ------
