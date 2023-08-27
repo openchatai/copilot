@@ -1,8 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @tailwind base;
 @tailwind utilities;
 @tailwind components;
-
 
 @keyframes fade-in-bottom {
   0% {
@@ -27,7 +26,7 @@
   --opencopilot-primary-light-clr: rgba(0, 87, 255, 0.1);
 }
 
-#chat-bubble-container>* {
+#chat-bubble-container > * {
   @apply opencopilot-scroll-smooth;
 }
 
@@ -63,16 +62,6 @@
 
 .fade-in {
   animation: fade-in 1.2s cubic-bezier(0.39, 0.575, 0.565, 1) both;
-}
-
-em-emoji-picker {
-  --background-rgb: 85, 170, 255;
-  --border-radius: 10px;
-  --category-icon-size: 24px;
-  --font-family: inherit;
-  --font-size: 14px;
-  min-height: 250px;
-  max-height: 300px;
 }
 
 .PopoverContent {

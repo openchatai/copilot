@@ -15,10 +15,10 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: cd copilot-widget / && npm install
+        run: cd copilot-widget/ && npm install
 
       - name: Build copilot-widget
-        run: cd copilot-widget / && npm run build
+        run: cd copilot-widget/ && npm run build
 
       - name: Upload embed as artifact.
         uses: actions/upload-artifact@v3
