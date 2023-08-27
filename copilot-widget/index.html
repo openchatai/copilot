@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Openchat AI-Copilot</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1,maximum-scale=1"
+    />
+  </head>
+  <body>
+    <div class="opencopilot-w-full">
+      <header
+        class="opencopilot-w-full opencopilot-shadow-lg opencopilot-flex opencopilot-justify-between opencopilot-items-center"
+      >
+        <div
+          class="opencopilot-container opencopilot-mx-auto opencopilot-px-3 opencopilot-py-5"
+        >
+          <div
+            class="opencopilot-font-sans opencopilot-text-black opencopilot-font-semibold opencopilot-text-lg"
+          >
+            Chat bubble
+          </div>
+        </div>
+        <div>
+          <button id="triggerSelector">toggle the chat widget</button>
+        </div>
+      </header>
+      <div
+        class="opencopilot-flex opencopilot-items-start opencopilot-gap-1 opencopilot-h-full opencopilot-min-h-full opencopilot-max-h-[80vh]"
+      >
+        <main class="opencopilot-flex-1 opencopilot-mt-5">page content</main>
+        <div id="chat-widget" class="opencopilot-h-full opencopilot-max-h-full"></div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      window.onload = () => {
+        initAiCoPilot({
+          initialMessage: "Hi Sir",
+          token: "1RuzS7w5ceGaN6CiK0J7",
+          triggerSelector: "#triggerSelector",
+          apiUrl:"https://cloud.openchat.so/api",
+          headers: {
+            Authorization: "Bearer your_auth_token_goes_here",
+          },
+        });
+      };
+    </script>
+  </body>
+</html>
