@@ -3,7 +3,7 @@ on:
     branches:
       - main
     paths:
-      - "sidekick/**"
+      - "copilot-widget/**"
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
@@ -15,13 +15,13 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: cd sidekick/ && npm install
+        run: cd copilot-widget / && npm install
 
-      - name: Build sidekick
-        run: cd sidekick/ && npm run build
+      - name: Build copilot-widget
+        run: cd copilot-widget / && npm run build
 
       - name: Upload embed as artifact.
         uses: actions/upload-artifact@v3
         with:
-          name: sidekick@latest
-          path: sidekick/dist
+          name: copilot-widget@latest
+          path: copilot-widget/dist
