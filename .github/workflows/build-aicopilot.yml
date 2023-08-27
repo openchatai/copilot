@@ -1,0 +1,27 @@
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "sidekick/**"
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: cd sidekick/ && npm install
+
+      - name: Build sidekick
+        run: cd sidekick/ && npm run build
+
+      - name: Upload embed as artifact.
+        uses: actions/upload-artifact@v3
+        with:
+          name: sidekick@latest
+          path: sidekick/dist
