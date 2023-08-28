@@ -6,14 +6,13 @@ import { DoubleCheckButton } from "@/ui/components/DoubleCheckButton";
 import { Input } from "@/ui/components/inputs/BaseInput";
 import { FormField } from "@/ui/components/inputs/FormInput";
 import { Separator } from "@/ui/components/Separator";
-import { Switch } from "@/ui/components/Switch";
 import ChangeBotContext from "@/ui/partials/ChangeBotContext";
 import DescriptiveHeading from "@/ui/partials/DescriptiveHeading";
-import { useBotData } from "@/ui/providers/BotDataProvider";
 import { Formiz, useForm } from "@formiz/core";
 import { useRouter } from "next/navigation";
 import axiosInstance from "utils/axiosInstance";
 import { replaceTemplateString } from "utils/repalceTemplateString";
+import { useBotData } from "../../../_providers/BotDataProvider";
 
 async function deleteBot(botId: string) {
   return axiosInstance.delete(

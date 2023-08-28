@@ -1,6 +1,5 @@
-/** @type {import('tailwindcss').Config} */
-
-module.exports = {
+import type { Config } from "tailwindcss";
+const config: Config = {
   content: ["./ui/**/*.{js,ts,jsx,tsx,mdx}", "./app/**/*.{js,ts,jsx,tsx,mdx}"],
   future: { hoverOnlyWhenSupported: true },
   darkMode: "class",
@@ -46,12 +45,12 @@ module.exports = {
       },
       keyframes: {
         slideDown: {
-          from: { height: 0 },
+          from: { height: '0' },
           to: { height: "var(--radix-accordion-content-height)" },
         },
         slideUp: {
           from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: 0 },
+          to: { height: '0' },
         },
       },
       animation: {
@@ -68,3 +67,4 @@ module.exports = {
     }),
   ],
 };
+export default config

@@ -1,5 +1,3 @@
-import DashboardCard01 from "@/ui/charts/line-charts/dashboard-charts/DashboardLinechart1";
-import DashboardCard02 from "@/ui/charts/line-charts/dashboard-charts/DashboardLinechart2";
 import { Heading } from "@/ui/components/Heading";
 import WelcomeBanner from "@/ui/partials/WelcomeBanner";
 import { Link } from "@/ui/router-events";

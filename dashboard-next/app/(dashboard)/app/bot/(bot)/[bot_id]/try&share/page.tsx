@@ -1,16 +1,10 @@
 "use client";
 import React from "react";
 import { Input } from "@/ui/components/inputs/BaseInput";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/ui/components/AccordionAlt";
 import CodeBlock from "@/ui/components/CodeBlock";
 import { Heading } from "@/ui/components/Heading";
-import { useBotData } from "@/ui/providers/BotDataProvider";
 import Banner2 from "@/ui/components/Banner";
+import { useBotData } from "../../_providers/BotDataProvider";
 export default function BotTryAndShare() {
   const { bot } = useBotData();
   return (

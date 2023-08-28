@@ -6,7 +6,6 @@ import ThemeProvider from "@/ui/providers/ThemeProvider";
 import { SWRConfigProvider } from "@/ui/providers/SWRConfigProvider";
 import { RouterEventsProvider } from "@/ui/router-events";
 import { TopLoader } from "@/ui/partials/TopLoader";
-import UserService from "services/userService";
 import { OnlineProvider } from "@/ui/providers/OnlineStateProvider";
 import type { Metadata } from "next";
 
@@ -55,23 +54,20 @@ export default function RootLayout({
     <OnlineProvider>
       <RouterEventsProvider>
         <SWRConfigProvider>
-          <UserService>
-            <html lang="en" suppressHydrationWarning>
-              <body
-                className={cn(
-                  inter.variable,
-                  "font-inter antialiased bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 min-h-screen min-w-full"
-                )}
-              >
-                <ThemeProvider>
-                  {/* <NextTopLoader showSpinner={false} color="#6366f1" crawl /> */}
-                  <TopLoader color="#6366f1" />
-                  {children}
-                </ThemeProvider>
-                <Toaster />
-              </body>
-            </html>
-          </UserService>
+          <html lang="en" suppressHydrationWarning>
+            <body
+              className={cn(
+                inter.variable,
+                "font-inter antialiased bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 min-h-screen min-w-full"
+              )}
+            >
+              <ThemeProvider>
+                <TopLoader color="#6366f1" />
+                {children}
+              </ThemeProvider>
+              <Toaster />
+            </body>
+          </html>
         </SWRConfigProvider>
       </RouterEventsProvider>
     </OnlineProvider>
