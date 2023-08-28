@@ -1,0 +1,12 @@
+@keyframes rotate-in {
+  0% {
+    transform: rotate(-45deg);
+  }
+  100% {
+    transform: rotate(0);
+  }
+}
+
+.rotate-in {
+  animation: rotate-in 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
