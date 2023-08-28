@@ -1,0 +1,27 @@
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "copilot-widget/**"
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: cd copilot-widget/ && npm install
+
+      - name: Build copilot-widget
+        run: cd copilot-widget/ && npm run build
+
+      - name: Upload embed as artifact.
+        uses: actions/upload-artifact@v3
+        with:
+          name: copilot-widget@latest
+          path: copilot-widget/dist

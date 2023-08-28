@@ -1,0 +1,47 @@
+{
+  "name": "@openchatai/copilot-widget",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "rm -rf ./dist && tsc && vite build",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@radix-ui/react-popover": "^1.0.6",
+    "@radix-ui/react-tooltip": "^1.0.6",
+    "axios": "^1.4.0",
+    "react": "^18.x",
+    "react-dom": "^18.x",
+    "react-icons": "^4.10.1",
+    "react-loader-spinner": "^5.3.4",
+    "react-markdown": "^8.0.7",
+    "react-textarea-autosize": "^8.5.3",
+    "remark-gfm": "^3.0.1",
+    "tailwind-merge": "^1.13.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.9",
+    "@types/node": "^20.4.7",
+    "@types/react": "^18.x",
+    "@types/react-dom": "^18.x",
+    "@typescript-eslint/eslint-plugin": "^5.59.0",
+    "@typescript-eslint/parser": "^5.59.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "autoprefixer": "^10.4.14",
+    "eslint": "^8.38.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.3.4",
+    "postcss": "^8.4.24",
+    "postcss-prefix-selector": "^1.16.0",
+    "prettier": "^2.8.8",
+    "tailwind-scrollbar": "^3.0.4",
+    "tailwindcss": "^3.3.3",
+    "tailwindcss-animate": "^1.0.6",
+    "timeago.js": "^4.0.2",
+    "typescript": "^5.0.2",
+    "vite": "^4.3.9"
+  }
+}
