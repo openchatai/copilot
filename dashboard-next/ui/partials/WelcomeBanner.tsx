@@ -1,10 +1,4 @@
-"use client";
-import { useUserService } from "services/userService";
-import { Skeleton } from "../components/Skeleton";
-
 export default function WelcomeBanner() {
-  const { loading, user } = useUserService();
-  const name = user?.name.split(" ")[0] || user?.name;
   return (
     <div className="relative bg-indigo-200 dark:bg-indigo-500 p-4 sm:p-6 rounded-sm overflow-hidden mb-8">
       <div
@@ -70,12 +64,7 @@ export default function WelcomeBanner() {
       </div>
       <div className="relative">
         <h1 className="text-2xl md:text-3xl text-slate-800 dark:text-slate-100 font-bold mb-1">
-          Good afternoon,{" "}
-          {loading ? (
-            <Skeleton className="h-8 w-20 rounded inline-block -mb-2" />
-          ) : (
-            name
-          )}
+          Good afternoon
         </h1>
         <p className="dark:text-indigo-200">
           Here is what's happening with your bots today.

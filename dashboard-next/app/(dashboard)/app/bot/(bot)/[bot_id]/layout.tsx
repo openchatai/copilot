@@ -1,6 +1,6 @@
 import React, { type ReactNode } from "react";
-import { BotDataProvider } from "@/ui/providers/BotDataProvider";
 import { Nav } from "./_parts/BotLayoutNavLink";
+import { BotDataProvider } from "../_providers/BotDataProvider";
 
 export default function BotLayout({
   children,

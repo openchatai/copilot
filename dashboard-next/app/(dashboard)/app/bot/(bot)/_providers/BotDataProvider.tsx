@@ -1,13 +1,13 @@
 "use client";
 import React from "react";
-import { createSafeContext } from "../utils/createSafeContext";
 import useSWR from "swr";
 import axiosInstance from "utils/axiosInstance";
 import { type Bot } from "schemas";
-import EmptyState from "../partials/EmptyState";
-import { Button } from "../components/Button";
-import { Loading } from "../components/Loading";
-import { useRouter } from "../router-events";
+import { useRouter } from "@/ui/router-events";
+import { createSafeContext } from "@/ui/utils/createSafeContext";
+import EmptyState from "@/ui/partials/EmptyState";
+import { Button } from "@/ui/components/Button";
+import { Loading } from "@/ui/components/Loading";
 const [BotDataSafeProvider, useBotData] = createSafeContext<{
   bot: Bot;
 }>("BotLayout");
