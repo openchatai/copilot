@@ -52,7 +52,18 @@ class OnboardingController extends Controller
             // Parse the JSON content using SwaggerParser
             $parser = new SwaggerParser(json_decode($swaggerContent, true));
         } catch (Exception $e) {
+            if (request()->wantsJson()) {
+                return response()->json([
+                    'error' => 'invalid_swagger_file'
+                ], 400);
+            }
             return redirect()->route('onboarding.002-step-swagger')->with('error', 'invalid_swagger_file');
+        }
+
+        if (request()->wantsJson()) {
+            return response()->json([
+                'parser' => $parser
+            ]);
         }
 
         return view('onboarding.003-step-validator', ['parser' => $parser]);
