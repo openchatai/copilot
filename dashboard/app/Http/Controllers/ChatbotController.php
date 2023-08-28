@@ -6,6 +6,7 @@ use App\Http\Events\ChatbotWasCreated;
 use App\Http\Requests\CreateChatbotViaPremadeSwaggerRequest;
 use App\Http\Requests\CreateChatbotViaSwaggerRequest;
 use App\Models\Chatbot;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
@@ -14,12 +15,16 @@ class ChatbotController extends Controller
 {
     public function index()
     {
-        return view('index', [
-            'chatbots' => Chatbot::all()
-        ]);
+        $chatbots = Chatbot::all();
+
+        if (request()->wantsJson()) {
+            return response()->json($chatbots->toArray());
+        }
+
+        return view('index', ['chatbots' => $chatbots]);
     }
 
-    public function handleSwaggerFile(CreateChatbotViaSwaggerRequest $request): RedirectResponse
+    public function handleSwaggerFile(CreateChatbotViaSwaggerRequest $request): RedirectResponse|JsonResponse
     {
         $fileName = Str::random(20) . ".json";
         $request->getSwaggerFile()->storeAs($fileName, ['disk' => 'shared_volume']);
@@ -31,10 +36,17 @@ class ChatbotController extends Controller
             $request->getWebsite(),
         );
 
+        if (request()->wantsJson()) {
+            return response()->json([
+                'file_name' => $fileName,
+                'chatbot' => $chatbot->toArray()
+            ]);
+        }
+
         return redirect()->route('onboarding.003-step-validator', ['id' => $chatbot->getId()->toString()]);
     }
 
-    public function handleSwaggerViaPremadeTemplate(CreateChatbotViaPremadeSwaggerRequest $request): RedirectResponse
+    public function handleSwaggerViaPremadeTemplate(CreateChatbotViaPremadeSwaggerRequest $request): RedirectResponse|JsonResponse
     {
         $swaggerUrl = "https://tawleed.s3.eu-west-1.amazonaws.com/8645635423451.json";
 
@@ -45,6 +57,13 @@ class ChatbotController extends Controller
             $request->getWebsite(),
             true
         );
+
+        if (request()->wantsJson()) {
+            return response()->json([
+                'swagger_url' => $swaggerUrl,
+                'chatbot' => $chatbot->toArray()
+            ]);
+        }
 
         return redirect()->route('onboarding.003-step-validator', ['id' => $chatbot->getId()->toString()]);
     }

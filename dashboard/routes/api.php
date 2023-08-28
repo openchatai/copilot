@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Api\Controllers\MessageController;
+use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\ChatbotSettingController;
 use App\Http\Controllers\DemoPetController;
+use App\Http\Controllers\OnboardingController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,6 +23,13 @@ use Illuminate\Support\Facades\Route;
  */
 Route::get('chat/init', [MessageController::class, 'initChat']);
 Route::post('chat/send', [MessageController::class, 'sendChat']);
+
+
+Route::get('/copilot/{id}', [ChatbotSettingController::class, 'generalSettings']);
+Route::delete('/copilot/{id}', [ChatbotSettingController::class, 'deleteBot']);
+Route::post('/copilot/{id}', [ChatbotSettingController::class, 'generalSettingsUpdate']);
+Route::get('/copilot/{id}/validator', [OnboardingController::class, 'validator']);
+Route::get('/copilot/swagger/pre-made', [ChatbotController::class, 'handleSwaggerViaPremadeTemplate']);
 
 
 
