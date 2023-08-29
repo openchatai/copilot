@@ -1,12 +1,12 @@
 version: '3'
 services:
-  dashboard:
+  backend:
     restart: unless-stopped
     build:
-      context: ./dashboard
+      context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "5000:5000"
     depends_on:
       - llm-server
       - mysql
@@ -28,6 +28,18 @@ services:
     build:
       context: ./llm-server
       dockerfile: Dockerfile
+    volumes:
+      - shared_data:/app/shared_data
+    networks:
+      - opencopilot_network
+
+  dashboard:
+    restart: unless-stopped
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
     volumes:
       - shared_data:/app/shared_data
     networks:
