@@ -20,7 +20,8 @@ const CreateBot = dynamic(() => import("@/ui/partials/CreateBot"), {
 });
 
 async function DashboardIndex() {
-  const response = await instance.get<Bot[] | []>("/bots");
+  const response = {}
+  // const response = await instance.get<Bot[] | []>("/bots");
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8 max-w-[96rem] mx-auto">
@@ -63,7 +64,7 @@ async function DashboardIndex() {
         </div>
         <div className="w-full max-w-full">
           <div className="grid grid-cols-12 gap-6">
-            <Map
+            {/* <Map
               data={response?.data}
               render={(bot, i) => <ChatBotCard {...bot} key={i} />}
               fallback={
@@ -83,7 +84,7 @@ async function DashboardIndex() {
                   </Button>
                 </EmptyState>
               }
-            />
+            /> */}
           </div>
         </div>
       </section>

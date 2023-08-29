@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 
 interface MapProps<T> {
-  data: T[] | null;
+  data: T[] | null | [];
   render: (item: T, index: number) => ReactNode;
   fallback?: ReactNode;
 }

@@ -1,2 +1,1 @@
-export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
-export const REGISTER_URL = BASE_URL + "/register"
+export const BASE_URL = "http://127.0.0.1:8000/api"
