@@ -12,6 +12,5 @@ function subscribe(callback: (ev: Event) => void) {
 }
 export function useOnline() {
     const online = useSyncExternalStore<boolean>(subscribe, getSnapshot, () => true)
-    console.log('online', online)
     return online
 }
