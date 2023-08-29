@@ -34,6 +34,7 @@ def create_workflow():
         warnings.warn(warning_message, UserWarning)
     
     add_workflow_data_to_qdrant(qdrant_client, namespace, workflow_id, workflow_data)
+
     return jsonify({'message': 'Workflow created', 'workflow_id': str(workflow_id)}), 201
 
 @bp.route('/workflow/<workflow_id>', methods=['PUT'])
@@ -59,11 +60,42 @@ def delete_workflow(workflow_id):
     mongo.db.workflows.delete_one({'_id': workflow_id})
     return jsonify({'message': 'Workflow deleted'}), 200
 
+@bp.route('/run_workflow', methods=['POST'])
+@handle_exceptions_and_errors
+def run_workflow():
+    """
+    Run a workflow based on text input and a namespace.
 
-def add_workflow_data_to_qdrant(qdrant_client, namespace, workflow_id, workflow_data, embedding_provider):
+    This API endpoint receives a JSON payload containing 'text' and 'namespace'.
+    It queries Qdrant for relevant records using the input text, retrieves metadata
+    from MongoDB based on Qdrant results, and then iterates over workflow items
+    to print their information.
+    """
+    data = request.json
+    text = data.get("text")
+    namespace = data.get("namespace")
+
+    qdrant_client = QdrantVectorDBClient()
+    # Query Qdrant for relevant records
+    qdrant_results = qdrant_client.perform_search(namespace, text)
+
+    # Retrieve metadata from MongoDB using Qdrant results
+    relevant_workflow_ids = [result["meta"]["workflow_id"] for result in qdrant_results]
+    relevant_records = mongo.db.workflows.find({"_id": {"$in": relevant_workflow_ids}})
+
+    # Iterate over relevant records and print workflow items
+    for record in relevant_records:
+        print(f"Workflow Name: {record.get('name')}")
+        for flow in record.get("flows", []):
+            print(f"Flow Description: {flow.get('description')}")
+            # Print other relevant flow data as needed
+
+    return jsonify({"message": "Workflow run completed"}), 200
+
+
+def add_workflow_data_to_qdrant(qdrant_client: QdrantVectorDBClient, namespace, workflow_id, workflow_data, embedding_provider):
     embedding_provider = get_embeddings()
     for flow in workflow_data["flows"]:
         vectors = embedding_provider.embed_query(flow["description"])
         meta = {"workflow_id": str(workflow_id), "workflow_name": workflow_data.get("name")}
         qdrant_client.add_data_with_meta(namespace, vectors, meta)
-

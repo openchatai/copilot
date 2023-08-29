@@ -10,3 +10,8 @@ Looking to implement a system where a user's input prompt is used to perform a M
 
 4. **Execute Workflow:**
    Execute the steps of the most similar workflow. This might involve running API calls, functions, or any other kind of automated task that the workflow involves.
+
+
+
+---
+Tomorrow's strategy is about making things smoother. After you pinpoint the workflow you need, you can pick out the right APIs from the Swagger specification. Think of it like sorting out puzzle pieces of different colors and shapes. Once you have this organized, you can hand it over to the agent to work with. Remember, Swagger is like a collection of instructions in a colorful and clear picture book. You're just choosing the pages you need and giving them to the agent to follow.
