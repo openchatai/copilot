@@ -33,23 +33,26 @@ install:
 	@sleep 20
 
 	@echo "$(COLOR_BOLD)=== Clearing backend server config cache ===$(COLOR_RESET)"
-	$(DOCKER_COMPOSE) exec dashboard php artisan cache:clear
-	$(DOCKER_COMPOSE) exec dashboard php artisan config:cache
-	$(DOCKER_COMPOSE) exec dashboard php artisan migrate
-	$(DOCKER_COMPOSE) exec dashboard php artisan key:generate
+	$(DOCKER_COMPOSE) exec backend php artisan cache:clear
+	$(DOCKER_COMPOSE) exec backend php artisan config:cache
+	$(DOCKER_COMPOSE) exec backend php artisan migrate
+	$(DOCKER_COMPOSE) exec backend php artisan key:generate
 
 	@echo "$(COLOR_BOLD)=== Run backend server migrations ===$(COLOR_RESET)"
-	$(DOCKER_COMPOSE) exec dashboard php artisan storage:link
+	$(DOCKER_COMPOSE) exec backend php artisan storage:link
 
 	@echo "$(COLOR_BOLD)=== Installation completed ===$(COLOR_RESET)"
 	@echo "$(COLOR_BOLD)=== 🔥🔥 You can now access the dashboard at -> http://localhost:8000 ===$(COLOR_RESET)"
 	@echo "$(COLOR_BOLD)=== Enjoy! ===$(COLOR_RESET)"
 
 db-setup:
-	$(DOCKER_COMPOSE) exec dashboard php artisan migrate:fresh --seed
+	$(DOCKER_COMPOSE) exec backend php artisan migrate:fresh --seed
 
 down:
 	$(DOCKER_COMPOSE) down --remove-orphans
+
+exec-backend:
+	$(DOCKER_COMPOSE) exec backend bash
 
 exec-dashboard:
 	$(DOCKER_COMPOSE) exec dashboard bash

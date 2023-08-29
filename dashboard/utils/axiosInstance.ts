@@ -1,11 +1,11 @@
 import axios, { AxiosInstance } from "axios";
-import { BASE_URL } from "./endpoints";
+import {BASE_BACKEND_URL} from "./endpoints";
 /**
  * @description Axios instance with interceptors 
  */
 function ApiClient(): AxiosInstance {
     const instance = axios.create({
-        baseURL: BASE_URL,
+        baseURL: BASE_BACKEND_URL + "/api",
         headers: {
             Accept: "application/json",
         }
