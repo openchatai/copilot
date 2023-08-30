@@ -19,7 +19,7 @@ app = Flask(__name__)
 app.config['MONGO_URI'] = os.getenv('MONGODB_URL', 'mongodb://localhost:27017/opencopilot')
 mongo = PyMongo(app)
 
-app.register_blueprint(workflow)
+app.register_blueprint(workflow, url_prefix="/workflow")
 
 ## TODO: Implement caching for the swagger file content (no need to load it everytime)
 @app.route('/handle', methods=['POST', 'OPTIONS'])
@@ -78,4 +78,7 @@ def handle():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8002)
+    app.run(host='0.0.0.0', port=8002)    
+    with app.app_context():
+        for rule in app.url_map.iter_rules():
+            print(rule)
