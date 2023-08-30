@@ -25,6 +25,7 @@ Route::get('chat/init', [MessageController::class, 'initChat']);
 Route::post('chat/send', [MessageController::class, 'sendChat']);
 
 
+Route::get('/copilots', [ChatbotController::class, 'index']);
 Route::get('/copilot/{id}', [ChatbotSettingController::class, 'generalSettings']);
 Route::delete('/copilot/{id}', [ChatbotSettingController::class, 'deleteBot']);
 Route::post('/copilot/{id}', [ChatbotSettingController::class, 'generalSettingsUpdate']);
