@@ -1,6 +1,5 @@
 import { Avatar, AvatarFallback } from "../components/Avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/Popover";
-import HeaderUpgradePlan from "./HeaderUpgradePlan";
 import { MdKeyboardArrowDown } from "react-icons/md";
 
 export default function ProfilePopover() {
@@ -8,11 +7,11 @@ export default function ProfilePopover() {
     <Popover>
       <PopoverTrigger className="inline-flex justify-center items-center group">
         <Avatar size={2}>
-          <AvatarFallback className="uppercase">OC</AvatarFallback>
+          <AvatarFallback className="uppercase">LU</AvatarFallback>
         </Avatar>
         <div className="flex items-center truncate">
           <span className="truncate ml-2 text-sm font-medium dark:text-slate-300 group-hover:text-slate-800 dark:group-hover:text-slate-200">
-            admin
+            Local User
           </span>
           <MdKeyboardArrowDown
             size={18}
@@ -32,7 +31,7 @@ export default function ProfilePopover() {
             </div>
           </div>
           <div className="flex w-full items-start flex-col gap-1">
-            <HeaderUpgradePlan />
+            {/* <HeaderUpgradePlan /> */}
           </div>
         </div>
       </PopoverContent>
