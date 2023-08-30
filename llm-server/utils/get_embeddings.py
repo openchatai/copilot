@@ -55,6 +55,7 @@ def choose_embedding_provider():
     
 
     else:
+        # instead of throwing error, we can probably use a default like spaCy embeddings
         available_providers = ", ".join([service.value for service in EmbeddingProvider])
         raise ValueError(
             f"Embedding service '{embedding_provider}' is not currently available. "

@@ -12,13 +12,11 @@ from api_caller.base import try_to_match_and_call_api_endpoint
 from models.models import AiResponseFormat
 from prompts.base import non_api_base_prompt, api_base_prompt
 from flask_pymongo import PyMongo
+import os
 
 app = Flask(__name__)
-app.config['MONGO_URI'] = 'mongodb://localhost:27017/myworkflowdb'
+app.config['MONGO_URI'] = os.getenv('MONGODB_URL', 'mongodb://localhost:27017/opencopilot')
 mongo = PyMongo(app)
-
-from app import routes
-
 
 ## TODO: Implement caching for the swagger file content (no need to load it everytime)
 @app.route('/handle', methods=['POST', 'OPTIONS'])
