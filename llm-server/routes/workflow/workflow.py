@@ -89,21 +89,25 @@ def run_workflow():
     namespace = data.get("namespace")
 
     vector_store = get_vector_store(StoreOptions(namespace))
-    # Query Qdrant for relevant records
-    documents = vector_store.similarity_search(text, 1)
+    documents = vector_store.similarity_search(text)
 
-    # Retrieve metadata from MongoDB using Qdrant results
-    relevant_workflow_ids = [result["meta"]["workflow_id"] for result in documents]
+    relevant_workflow_ids = []
+    for index, doc in enumerate(documents):
+        relevant_workflow_ids.append(ObjectId(doc.metadata["workflow_id"]))
+        
     relevant_records = mongo.workflows.find({"_id": {"$in": relevant_workflow_ids}})
 
     # Iterate over relevant records and print workflow items
     record = relevant_records[0]
     print(f"Workflow Name: {record.get('name')}")
     for flow in record.get("flows", []):
-        print(f"Flow Description: {flow.get('description')}")
-        # Print other relevant flow data as needed
+        for step in flow.get("steps"):
+            print(step.get("open_api_operation_id"))
+            # Take this operation id and the data provided in the request to call the api with the given open_api_operation_id
+            # The store the response of that api to call the next api, we have to think as to how this response gets stored
 
-    return jsonify({"message": "Workflow run completed"}), 200
+    record = json_util.dumps(record)
+    return record, 200, {'Content-Type': 'application/json'}
 
 
 
