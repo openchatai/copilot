@@ -4,15 +4,10 @@ import FeedBackModal from "./FeedBackModal";
 import ProfilePopover from "./HeaderPopover";
 import Logo from "./Logo";
 import { Bots } from "./DashboardHeaderBotsList";
-import dynamic from "next/dynamic";
 import { useParams, useSelectedLayoutSegments } from "next/navigation";
 import cn from "../utils/cn";
 import { Link } from "../router-events";
 import { useIsOnline } from "../providers/OnlineStateProvider";
-
-const ThemeSwitch = dynamic(() => import("../components/ThemeSwitch"), {
-  ssr: false,
-});
 
 export function Header() {
   const { bot_id } = useParams();
@@ -38,7 +33,6 @@ export function Header() {
             )}
           </div>
           <div className="actions flex items-center gap-3">
-            <ThemeSwitch />
             <FeedBackModal />
             <Separator
               orientation="vertical"

@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { VariantProps, tv } from "tailwind-variants";
 import cn from "../utils/cn";
-import { RiCloseLine } from "react-icons/ri";
 
 const banner2Variants = tv({
   base: "px-4 py-2 rounded-sm text-sm border data-[level='2']:dark:!border-transparent",
