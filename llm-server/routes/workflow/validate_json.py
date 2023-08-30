@@ -9,5 +9,6 @@ def validate_json(schema):
                 return func(*args, **kwargs)
             except ValidationError as e:
                 return jsonify({"error": "Validation error", "message": str(e)}), 400
+        wrapper.__name__ = func.__name__
         return wrapper
     return decorator
