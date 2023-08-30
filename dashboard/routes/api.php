@@ -30,6 +30,7 @@ Route::get('/copilot/{id}', [ChatbotSettingController::class, 'generalSettings']
 Route::delete('/copilot/{id}', [ChatbotSettingController::class, 'deleteBot']);
 Route::post('/copilot/{id}', [ChatbotSettingController::class, 'generalSettingsUpdate']);
 Route::get('/copilot/{id}/validator', [OnboardingController::class, 'validator']);
+Route::post('/copilot/swagger', [ChatbotController::class, 'handleSwaggerFile']);
 Route::get('/copilot/swagger/pre-made', [ChatbotController::class, 'handleSwaggerViaPremadeTemplate']);
 
 
