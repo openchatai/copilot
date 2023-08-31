@@ -1,6 +1,6 @@
 # Security Policy
 
-This document outlines the security policy for the OpenChat GitHub repository. It aims to establish guidelines and best practices to ensure the security and integrity of the project.
+This document outlines the security policy for the OpenCopilot GitHub repository. It aims to establish guidelines and best practices to ensure the security and integrity of the project.
 
 ## Reporting Security Issues
 
