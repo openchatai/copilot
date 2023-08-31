@@ -8,7 +8,7 @@ import { AiOutlinePlus } from "react-icons/ai";
 import { Map } from "@/ui/helper-components";
 import { getCopilots } from "api/copilots";
 
-
+export const dynamic = "force-dynamic";
 async function DashboardIndex() {
   const response = await getCopilots();
   return (

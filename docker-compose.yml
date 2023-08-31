@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   backend:
     restart: unless-stopped
@@ -44,6 +44,8 @@ services:
       - shared_data:/app/shared_data
     networks:
       - opencopilot_network
+    depends_on:
+      - backend
 
   mysql:
     restart: unless-stopped
