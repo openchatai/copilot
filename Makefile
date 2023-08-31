@@ -55,7 +55,7 @@ exec-backend:
 	$(DOCKER_COMPOSE) exec backend bash
 
 exec-dashboard:
-	$(DOCKER_COMPOSE) exec dashboard bash
+	$(DOCKER_COMPOSE) exec dashboard /bin/sh
 
 exec-llm-server:
 	$(DOCKER_COMPOSE) exec llm-server bash
