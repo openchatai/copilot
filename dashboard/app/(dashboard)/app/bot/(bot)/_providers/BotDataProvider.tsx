@@ -1,16 +1,15 @@
 "use client";
 import React from "react";
 import useSWR from "swr";
-import axiosInstance from "utils/axiosInstance";
-import { type Bot } from "schemas";
 import { useRouter } from "@/ui/router-events";
 import { createSafeContext } from "@/ui/utils/createSafeContext";
 import EmptyState from "@/ui/partials/EmptyState";
 import { Button } from "@/ui/components/Button";
 import { Loading } from "@/ui/components/Loading";
+import { Copilot, getCopilot } from "api/copilots";
 const [BotDataSafeProvider, useBotData] = createSafeContext<{
-  bot: Bot;
-}>("BotLayout");
+  bot: Copilot;
+}>("useBotData should be used within BotDataSafeProvider");
 
 function BotDataProvider({
   children,
@@ -21,9 +20,9 @@ function BotDataProvider({
 }) {
   const { refresh, back } = useRouter();
   const { data: bot_data, isLoading } = useSWR(bot_id, () =>
-    axiosInstance.get<Bot>(`/bots/${bot_id}`)
+    getCopilot(bot_id)
   );
-  // no data and not loading
+
   if (!bot_data?.data && !isLoading)
     return (
       <div className="w-full h-full p-5 grid place-content-center">
@@ -66,7 +65,7 @@ function BotDataProvider({
     return (
       <BotDataSafeProvider
         value={{
-          bot: bot_data.data,
+          bot: bot_data.data.chatbot,
         }}
       >
         {children}

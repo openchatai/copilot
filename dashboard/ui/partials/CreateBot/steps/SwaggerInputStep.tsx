@@ -9,15 +9,28 @@ import {
   DialogTrigger,
 } from "@/ui/components/headless/Dialog";
 import { FileInput } from "@/ui/components/inputs/FileField";
+import { useStatus } from "@/ui/hooks";
 import { Form, FormizStep } from "@formiz/core";
+import { DemoCopilot } from "api/copilots";
 import Link from "next/link";
-import { ComponentProps, ElementRef, forwardRef } from "react";
+import { ComponentProps, ElementRef, forwardRef, useState } from "react";
 import { megabytesToBytes } from "utils/misc";
-
+import { createDemoCopilot } from "api/copilots";
+import { Loading } from "@/ui/components/Loading";
+import cn from "@/ui/utils/cn";
+import { BsCheck2Circle } from "react-icons/bs";
 export const UploadSwaggerStep = forwardRef<
   ElementRef<"div">,
   ComponentProps<"div"> & { form: Form }
 >(({ form, ...props }, _ref) => {
+  const [demoCopilot, setDemoCopilot] = useState<DemoCopilot | undefined>();
+  const [status, setStatus, is] = useStatus();
+  async function createDemoBot() {
+    setStatus("pending");
+    const data = await createDemoCopilot();
+    setDemoCopilot(data.data);
+    setStatus("resolved");
+  }
   return (
     <FormizStep name="swagger_file">
       <div>
@@ -67,7 +80,16 @@ export const UploadSwaggerStep = forwardRef<
                 store SaaS system)
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="relative">
+              {is("resolved") && demoCopilot?.chatbot && (
+                <div className="absolute inset-0 backdrop-blur-sm z-30">
+                  <div className="w-full h-full flex items-center justify-center">
+                    <BsCheck2Circle className="text-8xl text-emerald-500 fill-current" />
+                    <Link href={"/app/bot/" + demoCopilot.chatbot.id}></Link>
+                  </div>
+                </div>
+              )}
+
               <DialogHeader className="text-4xl flex items-center justify-center w-full border-none">
                 <span>🐶🐕</span>
               </DialogHeader>
@@ -83,7 +105,18 @@ export const UploadSwaggerStep = forwardRef<
                 </p>
               </div>
               <DialogFooter className="mt-4">
-                <Button variant={{ intent: "success" }}>Let's do it</Button>
+                <Button
+                  loading={is("pending")}
+                  variant={{ intent: "success" }}
+                  onClick={createDemoBot}
+                >
+                  <span className={cn(is("pending") && "opacity-0")}>
+                    Let's do it
+                  </span>
+                  {is("pending") && (
+                    <Loading size={20} wrapperClassName="inset-0 absolute" />
+                  )}
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>

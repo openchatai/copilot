@@ -2,19 +2,14 @@
 
 import { Heading } from "@/ui/components/Heading";
 import Roadmap from "@/ui/components/Roadmap";
-import { FormField } from "@/ui/components/inputs/FormInput";
 import { Form, FormizStep } from "@formiz/core";
-import axios from "axios";
 import { forwardRef, type ElementRef, type ComponentProps } from "react";
 
 export const IntroStep = forwardRef<
   ElementRef<"div">,
   ComponentProps<"div"> & { form: Form }
 >(({ form, ...props }, _ref) => {
-  async function getName() {
-    const name = await (await axios.get("/api/cool-name")).data.name;
-    if (name) form.setFieldsValues({ bot_name: name });
-  }
+
   return (
     <FormizStep name="intro">
       <div ref={_ref} className="fade-in-0 animate-in">
@@ -44,14 +39,7 @@ export const IntroStep = forwardRef<
               },
             ]}
           />
-          <FormField
-            label="Bot Name"
-            wrapperClassName="mt-4"
-            name="bot_name"
-            type="text"
-            required
-            onFocus={() => !form.fields.bot_name.value && getName()}
-          />
+ 
         </div>
       </div>
     </FormizStep>

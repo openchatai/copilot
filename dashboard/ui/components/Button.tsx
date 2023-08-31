@@ -57,7 +57,15 @@ export interface ButtonProps extends ComponentPropsWithoutRef<"button"> {
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { className, variant, loading, asChild, type = "button", ...props },
+    {
+      className,
+      variant,
+      loading,
+      asChild,
+      disabled,
+      type = "button",
+      ...props
+    },
     _ref
   ) => {
     const Comp = asChild ? Slot : "button";
@@ -68,6 +76,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         type={type}
         {...props}
         data-loading={loading}
+        disabled={loading || disabled}
         className={cn(buttonVariants(variant), className)}
       />
     );

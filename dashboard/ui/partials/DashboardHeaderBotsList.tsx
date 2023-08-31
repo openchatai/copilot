@@ -4,8 +4,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "../components/Popover";
 import NavLink from "../components/NavLink";
 import { ScrollArea } from "../components/ScrollArea";
 import { Input } from "../components/inputs/BaseInput";
-import axiosInstance from "utils/axiosInstance";
-import { Bot } from "schemas";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import EmptyState from "./EmptyState";
@@ -16,13 +14,15 @@ import { CgSpinnerAlt } from "react-icons/cg";
 import { HiStar } from "react-icons/hi";
 import { BiSearchAlt } from "react-icons/bi";
 import { HiChevronUpDown } from "react-icons/hi2";
+import { getCopilots } from "api/copilots";
 
 export function Bots() {
   const { bot_id } = useParams();
   const [search, setSearch] = useState("");
-  const { data, error, isLoading, isValidating, mutate } = useSWR("/bots", () =>
-    axiosInstance.get<Bot[]>("/bots")
-  );
+  const { data, error, isLoading, mutate } = useSWR("/copilots", getCopilots, {
+    revalidateIfStale: true,
+    refreshInterval: 1000,
+  });
   const bots = data?.data;
   const activeBot = bots?.find((bot) => bot.id === bot_id);
   const filteredBots = bots?.filter((bot) =>

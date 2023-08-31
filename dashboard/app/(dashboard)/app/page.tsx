@@ -14,14 +14,14 @@ import EmptyState from "@/ui/partials/EmptyState";
 import dynamic from "next/dynamic";
 import { AiOutlinePlus } from "react-icons/ai";
 import { Map } from "@/ui/helper-components";
+import { getCopilots } from "api/copilots";
 
 const CreateBot = dynamic(() => import("@/ui/partials/CreateBot"), {
   ssr: false,
 });
 
 async function DashboardIndex() {
-  const response = {};
-  // const response = await instance.get<Bot[] | []>("/bots");
+  const response = await getCopilots();
 
   return (
     <div className="w-full max-w-[96rem] mx-auto">
@@ -50,27 +50,27 @@ async function DashboardIndex() {
           </div>
           <div className="w-full max-w-full">
             <div className="grid grid-cols-12 gap-6">
-              {/* <Map
-              data={response?.data}
-              render={(bot, i) => <ChatBotCard {...bot} key={i} />}
-              fallback={
-                <EmptyState
-                  label="There is no Copilots Right now"
-                  description="start by creating new one"
-                  className="col-span-full"
-                >
-                  <Button
-                    asChild
-                    variant={{
-                      intent: "primary",
-                      size: "sm",
-                    }}
+              <Map
+                data={response?.data}
+                render={(bot, i) => <ChatBotCard {...bot} key={i} />}
+                fallback={
+                  <EmptyState
+                    label="There is no Copilots Right now"
+                    description="start by creating new one"
+                    className="col-span-full"
                   >
-                    <Link href="/app/bot/new">Create Copilot</Link>
-                  </Button>
-                </EmptyState>
-              }
-            /> */}
+                    <Button
+                      asChild
+                      variant={{
+                        intent: "primary",
+                        size: "sm",
+                      }}
+                    >
+                      <Link href="/app/bot/new">Create Copilot</Link>
+                    </Button>
+                  </EmptyState>
+                }
+              />
             </div>
           </div>
         </section>

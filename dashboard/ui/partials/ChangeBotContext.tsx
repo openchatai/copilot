@@ -1,19 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Textarea } from "@/ui/components/TextArea";
 import { Button } from "../components/Button";
+import { useField } from "@formiz/core";
 
 const data = [
-  {
-    label: "default",
-    context: `You are a helpful AI co-pilot. job is to support and help the user
-    in managing their pets store, you should be as sidekick that provide support.
-    you should be expressive and provide information and hidden trends from data and api calls, you should spot the
-    things that a normal human would oversight.
-    sometimes you might need to call some API endpoints to get the data you need to answer the user's question.
-    you will be given a context and a question, you need to answer the question based on the context.
-    always present your answers in nice markdown format to ease reading`,
-  },
   {
     label: "General Copilot 🤖",
     context: `You are a helpful AI co-pilot.
@@ -57,23 +48,48 @@ const data = [
   },
 ];
 
-function ChangeBotContext() {
-  const [context, setContext] = useState(data[0].context);
+function ChangeBotContext({
+  onChange,
+  defaultContext,
+  name,
+}: {
+  onChange?: (context: string) => void;
+  defaultContext: string;
+  name: string;
+}) {
+  const [context, setContext] = useState<string>(defaultContext);
+  const { value, setValue } = useField({ name, defaultValue: defaultContext });
+  useEffect(() => {
+    onChange?.(context);
+    setValue(context);
+  }, [context, onChange, setValue]);
   return (
     <div className="mt-5 grid w-full lg:grid-cols-6 grid-cols-1 gap-4">
       <div className="lg:col-span-3">
         <Textarea
           minRows={5}
-          value={context}
+          defaultValue={context}
           maxRows={8}
           required
           aria-required
+          value={context}
+          onChange={(e) => {
+            setContext(e.target.value);
+          }}
         />
       </div>
       <div className="flex flex-col items-center justify-center lg:col-span-1">
         <span>✨or ✨</span>
       </div>
       <div className="flex flex-wrap items-center justify-start h-fit gap-1 lg:col-span-2">
+        <Button
+          onClick={() => {
+            setContext(defaultContext);
+          }}
+          variant={{ intent: "secondary" }}
+        >
+          default
+        </Button>
         {data.map((item, index) => (
           <Button
             key={index}

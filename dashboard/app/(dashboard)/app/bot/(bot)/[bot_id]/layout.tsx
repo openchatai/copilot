@@ -21,7 +21,7 @@ export default function BotLayout({
             {/* py-2 controls the offset => -bottom-2 in Nav */}
             <div className="flex items-center gap-2 py-2 w-full max-w-full overflow-x-scroll relative no-scrollbar whitespace-nowrap flex-nowrap">
               {/* <Nav href={`/app/bot/${params.bot_id}`}>Overview</Nav> */}
-              <Nav href={`/app/bot/${params.bot_id}/try&share`}>
+              <Nav href={`/app/bot/${params.bot_id}`}>
                 Try & Share
               </Nav>
               <Nav

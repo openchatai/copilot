@@ -2,20 +2,21 @@
 import Badge from "@/ui/components/Badge";
 import { CardWrapper } from "../components/wrappers/CardWrapper";
 import { Link } from "@/ui/router-events";
-import { Output } from "valibot";
-import { botSchema } from "schemas";
 import { FaRobot } from "react-icons/fa";
 import { BiLinkExternal } from "react-icons/bi";
+import type { Copilot } from "api/copilots";
+
 export function ChatBotCard({
   id,
   name,
-}: Output<typeof botSchema> & {
+  status,
+}: Copilot & {
   className?: string;
 }) {
   return (
     <CardWrapper className="group col-span-full sm:col-span-6 xl:col-span-4 relative after:absolute after:z-[5] hover:after:opacity-100 after:inset-0 after:rounded-[inherit] after:opacity-0 after:transition-opacity after:duration-500 after:[background:_radial-gradient(600px_circle_at_top_right,theme(colors.slate.100),transparent)] dark:after:[background:_radial-gradient(600px_circle_at_top_right,theme(colors.slate.700),transparent)]">
       <Link
-        href={`/app/bot/${id}/try&share`}
+        href={`/app/bot/${id}/`}
         className="dark:bg-slate-700 dark:text-white bg-slate-200 text-slate-800 opacity-0 group-hover:opacity-100 transition-all rounded-full p-1.5 text-lg absolute top-0 right-0 z-[6] translate-x-1/2 -translate-y-1/2"
       >
         <span>
@@ -36,14 +37,23 @@ export function ChatBotCard({
             <h2 className="text-xl leading-snug font-semibold">{name}</h2>
           </Link>
         </div>
-        {/* <footer className="mt-1">
+        <footer className="mt-1">
           <div className="flex justify-between items-center">
             <div className="space-x-2">
-              <Badge intent="success">active</Badge>
-              <Badge intent="info">working</Badge>
+              <Badge
+                intent={
+                  status === "archived"
+                    ? "warning"
+                    : status === "draft"
+                    ? "info"
+                    : "success"
+                }
+              >
+                {status}
+              </Badge>
             </div>
           </div>
-        </footer> */}
+        </footer>
       </div>
     </CardWrapper>
   );

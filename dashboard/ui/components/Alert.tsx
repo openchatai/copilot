@@ -60,7 +60,9 @@ function Alert({
         <div className="flex-1 shrink-0">
           <AlertDialogHeader>
             <AlertDialogTitle>{title}</AlertDialogTitle>
-            <AlertDialogDescription asChild={asChild}>{children}</AlertDialogDescription>
+            <AlertDialogDescription asChild={asChild}>
+              {children}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel asChild>

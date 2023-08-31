@@ -9,18 +9,10 @@ import { Separator } from "@/ui/components/Separator";
 import ChangeBotContext from "@/ui/partials/ChangeBotContext";
 import DescriptiveHeading from "@/ui/partials/DescriptiveHeading";
 import { Formiz, useForm } from "@formiz/core";
-import { useRouter } from "next/navigation";
-import axiosInstance from "utils/axiosInstance";
-import { replaceTemplateString } from "utils/repalceTemplateString";
 import { useBotData } from "../../../_providers/BotDataProvider";
-
-async function deleteBot(botId: string) {
-  return axiosInstance.delete(
-    replaceTemplateString("/bots/:id", {
-      id: botId,
-    })
-  );
-}
+import { deleteCopilot, updateCopilot } from "api/copilots";
+import { useRouter } from "@/ui/router-events";
+import { toast } from "@/ui/components/headless/toast/use-toast";
 
 export default function ChatBotDetailedViewGeneralSettings({
   params: { bot_id },
@@ -34,10 +26,30 @@ export default function ChatBotDetailedViewGeneralSettings({
   const { bot: botData } = useBotData();
   const initialValues = {
     bot_name: botData?.name,
+    bot_context: botData?.prompt_message,
   };
+  async function onSubmit(values: { bot_name: string; bot_context: string }) {
+    const response = await updateCopilot(bot_id, {
+      name: values.bot_name,
+      prompt_message: values.bot_context,
+    });
+    if (response.status === 200) {
+      refresh();
+      toast({
+        title: "Bot updated successfully",
+        description: "Bot settings updated successfully",
+        intent: "success",
+      });
+    }
+  }
   return (
     <div>
-      <Formiz autoForm connect={settingsForm} initialValues={initialValues}>
+      <Formiz
+        autoForm
+        connect={settingsForm}
+        initialValues={initialValues}
+        onValidSubmit={onSubmit}
+      >
         <section>
           <DescriptiveHeading heading={"General Settings"}>
             Control your copilot settings and prompts
@@ -53,7 +65,10 @@ export default function ChatBotDetailedViewGeneralSettings({
             You can change your copilot initial context / prompt from here. also
             you can change the copilot response language.
           </DescriptiveHeading>
-          <ChangeBotContext />
+          <ChangeBotContext
+            name="bot_context"
+            defaultContext={botData.prompt_message}
+          />
         </section>
 
         <Separator orientation="horizontal" />
@@ -78,7 +93,12 @@ export default function ChatBotDetailedViewGeneralSettings({
                 <DoubleCheckButton
                   variant={{ intent: "danger", size: "xs" }}
                   onClick={async () => {
-                    await deleteBot(bot_id);
+                    await deleteCopilot(bot_id);
+                    toast({
+                      title: "Bot deleted successfully",
+                      description: "Bot deleted successfully",
+                      intent: "success",
+                    });
                     push("/app");
                   }}
                 >
@@ -97,10 +117,16 @@ export default function ChatBotDetailedViewGeneralSettings({
       <footer className="mt-4">
         <div className="flex flex-col py-5 border-t border-slate-200 dark:border-slate-700">
           <div className="flex items-center justify-end gap-3">
-            <Button variant={{ intent: "secondary", size: "base" }}>
+            <Button
+              onClick={() => settingsForm.reset()}
+              variant={{ intent: "secondary", size: "base" }}
+            >
               Cancel
             </Button>
-            <Button variant={{ intent: "primary", size: "base" }}>
+            <Button
+              variant={{ intent: "primary", size: "base" }}
+              onClick={() => settingsForm.submit()}
+            >
               Save Changes
             </Button>
           </div>
