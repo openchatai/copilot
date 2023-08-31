@@ -61,8 +61,16 @@ class OnboardingController extends Controller
         }
 
         if (request()->wantsJson()) {
+            $endpoints = $parser->getEndpoints();
             return response()->json([
-                'parser' => $parser
+                'chatbot_id' => $bot->getId(),
+                'all_endpoints' => $endpoints,
+                'validations' => [
+                    'endpoints_without_operation_id' => $parser->getEndpointsWithoutOperationId($endpoints),
+                    'endpoints_without_description' => $parser->getEndpointsWithoutDescription($endpoints),
+                    'endpoints_without_name' => $parser->getEndpointsWithoutName($endpoints),
+                    'auth_type' => $parser->getAuthorizationType()
+                ]
             ]);
         }
 
