@@ -30,7 +30,7 @@ RUN composer install --no-plugins --no-scripts
 RUN php artisan key:generate
 
 # Expose the container's port 8000 (default for `php artisan serve`)
-EXPOSE 8000
+EXPOSE 5000
 
 # Start the Laravel development server
 CMD php artisan serve --host=0.0.0.0 --port=5000
