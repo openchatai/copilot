@@ -35,7 +35,21 @@ export async function deleteCopilot(id: string) {
     return axiosInstance.delete(`/copilot/${id}`)
 }
 
-export async function createCopilot(copilot: Copilot) { }
+export async function createCopilot({
+    swagger_file,
+}: {
+    swagger_file: File
+}) {
+    const data = new FormData()
+    data.append("swagger_file", swagger_file)
+    return axiosInstance.post<{
+        chatbot: Copilot
+    }>("/copilot/swagger", data, {
+        headers:{
+            "Content-Type": "multipart/form-data"
+        }
+    })
+}
 
 
 export const demoCopilotSchema = v.object({
@@ -45,8 +59,6 @@ export const demoCopilotSchema = v.object({
 export type DemoCopilot = v.Output<typeof demoCopilotSchema>
 
 export async function createDemoCopilot() {
-    // create some delay
-    await new Promise(resolve => setTimeout(resolve, 2000))
     return axiosInstance.get<DemoCopilot>("/copilot/swagger/pre-made")
 }
 

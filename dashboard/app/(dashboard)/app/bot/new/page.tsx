@@ -12,7 +12,7 @@ export default function CreateNewBot() {
   return (
     <div>
       <div className="container md:p-6 p-3">
-        <CardWrapper className="max-w-2xl p-6 mx-auto">
+        <CardWrapper className="max-w-2xl p-6 mx-auto relative">
           <CreateBot />
         </CardWrapper>
       </div>

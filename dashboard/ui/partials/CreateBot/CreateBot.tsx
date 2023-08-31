@@ -11,31 +11,38 @@ import { useStatus } from "@/ui/hooks";
 import { BiCheckCircle } from "react-icons/bi";
 import { Button } from "@/ui/components/Button";
 import { Link } from "@/ui/router-events";
+import { Copilot, createCopilot } from "api/copilots";
 
 export default function CreateBot({ intro = true }: { intro?: boolean }) {
   const form = useForm();
   const introRef = useRef<HTMLDivElement>(null);
-  const [createdBot, setCreatedBot] = useState<{
-    id: string;
-  }>();
-  const [status, setSt, is] = useStatus();
+  const [createdBot, setCreatedBot] = useState<Copilot | undefined>();
+  const [, setSt, is] = useStatus();
 
   const handleSubmit = async (values: unknown) => {
     setCreatedBot(undefined);
-    console.info("values on submit", values);
     const dataSafe = v.safeParse(CreateBotSchema, values);
-
     if (dataSafe.success) {
-      const data = dataSafe.data;
-      data.json_files;
       setSt("pending");
+      const data = dataSafe.data;
+      const res = createCopilot({
+        swagger_file: data.json_files[0],
+      })
+        .then((response) => {
+          console.log(response);
+          setCreatedBot(response.data.chatbot);
+        })
+        .catch((c) => {
+          console.log(c);
+          setSt("rejected");
+        });
     } else {
       console.log(dataSafe.error.issues);
     }
     setSt("resolved");
   };
   return (
-    <div className="w-full relative z-[1] overflow-hidden">
+    <div className="w-full z-[1] overflow-hidden">
       <Formiz connect={form} onValidSubmit={handleSubmit} autoForm>
         {intro && <IntroStep form={form} ref={introRef} />}
         <UploadSwaggerStep form={form} />
