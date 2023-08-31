@@ -1,28 +1,16 @@
 import { Heading } from "@/ui/components/Heading";
 import WelcomeBanner from "@/ui/partials/WelcomeBanner";
 import { Link } from "@/ui/router-events";
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from "@/ui/components/headless/Dialog";
 import { ChatBotCard } from "@/ui/partials/ChatBotCard";
 import { Button } from "@/ui/components/Button";
-import instance from "utils/axiosInstance";
-import { type Bot } from "schemas";
 import EmptyState from "@/ui/partials/EmptyState";
-import dynamic from "next/dynamic";
 import { AiOutlinePlus } from "react-icons/ai";
 import { Map } from "@/ui/helper-components";
 import { getCopilots } from "api/copilots";
 
-const CreateBot = dynamic(() => import("@/ui/partials/CreateBot"), {
-  ssr: false,
-});
 
 async function DashboardIndex() {
   const response = await getCopilots();
-
   return (
     <div className="w-full max-w-[96rem] mx-auto">
       <WelcomeBanner />
