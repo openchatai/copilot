@@ -19,7 +19,7 @@ services:
     volumes:
       - shared_data:/app/shared_data
       - application:/app
-      - ./dashboard:/var/www/html/dashboard
+      - ./backend:/var/www/html/backend
     networks:
       - opencopilot_network
 
