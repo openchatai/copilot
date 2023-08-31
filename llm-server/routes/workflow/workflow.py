@@ -87,6 +87,9 @@ def run_workflow():
     data = request.json
     text = data.get("text")
     namespace = data.get("namespace")
+    
+    # this context can be passed to llm chain to execute a post request if available
+    context = data.get("context")
 
     vector_store = get_vector_store(StoreOptions(namespace))
     documents = vector_store.similarity_search(text)
