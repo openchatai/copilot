@@ -11,7 +11,7 @@ def run_openapi_agent(spec_file_path: str, prompt: str) -> None:
         data = yaml.load(f, Loader=yaml.FullLoader)
     json_spec = JsonSpec(dict_=data, max_value_length=4000)
 
-    headers = {"Authorization": f"Bearer {os.getenv('OPENAI_API_KEY')}"}
+    headers = {"Authorization": f"Bearer {os.getenv('API_KEY')}"}
     openai_requests_wrapper = RequestsWrapper(headers=headers)
 
     openapi_toolkit = OpenAPIToolkit.from_llm(
@@ -25,3 +25,9 @@ def run_openapi_agent(spec_file_path: str, prompt: str) -> None:
 
 # Example usage
 # run_openapi_agent("openai_openapi.yaml", "Make a post request to openai /completions. The prompt should be 'tell me a joke.'")
+
+
+# ---
+# Next task is to chain the apis, such that output of last api can be used as the input to next api call. The llm should be able to parse
+# necessary information from last api and pass it to the next api call if required. We will need openapi function to get the output
+# in structured manner to be passed to next api
