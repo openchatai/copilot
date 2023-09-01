@@ -6,7 +6,7 @@ from langchain.requests import RequestsWrapper
 from langchain.tools.json.tool import JsonSpec
 import os
 
-def run_openapi_agent_from_json(spec_json: dict, prompt: str) -> None:
+def run_openapi_agent_from_json(spec_json: dict, prompt: str, prev_api_response) -> None:
     json_spec = JsonSpec(dict_=spec_json, max_value_length=4000)
 
     headers = {"Authorization": f"Bearer {os.getenv('API_KEY')}"}

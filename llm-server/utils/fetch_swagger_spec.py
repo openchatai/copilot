@@ -2,8 +2,6 @@ import json
 import requests
 from langchain.utilities.openapi import OpenAPISpec
 
-
-
 def fetch_swagger_spec(swagger_url=None) -> OpenAPISpec:
     if not swagger_url:
         return json.dumps({"error": "swagger_url is required"}), 400
