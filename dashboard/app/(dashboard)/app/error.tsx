@@ -10,7 +10,7 @@ export default function ErrorComponent({ reset }: { reset: () => void }) {
         <div>
           <BsExclamationTriangle size={50} className="text-rose-500" />
         </div>
-        <div>Error Occured</div>
+        <div>Error Occurred - Please <a href="https://github.com/openchatai/OpenCopilot/issues/new">open a GitHub issue</a> and we will make sure your problem get solved</div>
         <div className="space-x-2">
           <Button
             variant={{
