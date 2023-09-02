@@ -1,9 +1,6 @@
 <?php
 
 use App\Http\Controllers\ChatbotController;
-use App\Http\Controllers\ChatbotSettingController;
-use App\Http\Controllers\MarketingWebsiteController;
-use App\Http\Controllers\OnboardingController;
 use Illuminate\Support\Facades\Route;
 
 /*
