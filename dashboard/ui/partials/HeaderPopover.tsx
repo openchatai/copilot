@@ -1,6 +1,5 @@
 import { Avatar, AvatarFallback } from "../components/Avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/Popover";
-import { MdKeyboardArrowDown } from "react-icons/md";
 
 export default function ProfilePopover() {
   return (
@@ -11,12 +10,8 @@ export default function ProfilePopover() {
         </Avatar>
         <div className="flex items-center truncate">
           <span className="truncate ml-2 text-sm font-medium dark:text-slate-300 group-hover:text-slate-800 dark:group-hover:text-slate-200">
-            Local User
+            Local
           </span>
-          <MdKeyboardArrowDown
-            size={18}
-            className="transition-transform shrink-0 ml-1 fill-current text-slate-400 group-data-[state=open]:rotate-180"
-          />
         </div>
       </PopoverTrigger>
 
@@ -24,7 +19,7 @@ export default function ProfilePopover() {
         <div>
           <div className="pt-0.5 pb-2 px-3 mb-1 border-b border-slate-200 dark:border-slate-700">
             <div className="font-medium text-slate-800 dark:text-slate-100">
-              admin
+              Local
             </div>
             <div className="text-xs text-slate-500 dark:text-slate-400 italic">
               Administrator
