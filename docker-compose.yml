@@ -5,8 +5,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    ports:
-      - "5000:5000"
     depends_on:
       - llm-server
       - mysql
@@ -38,8 +36,6 @@ services:
     build:
       context: ./dashboard
       dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
     volumes:
       - shared_data:/app/shared_data
     networks:
@@ -63,6 +59,21 @@ services:
       - database:/var/lib/mysql
     networks:
       - opencopilot_network
+
+  nginx:
+    image: nginx
+    restart: unless-stopped
+    ports:
+      - "8888:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - opencopilot_network
+    depends_on:
+      - dashboard
+      - llm-server
+      - backend
+      - mysql
 
 networks:
   opencopilot_network:
