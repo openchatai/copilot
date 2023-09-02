@@ -29,7 +29,7 @@ install:
 	cp common.env llm-server/.env 2>/dev/null || true
 	$(DOCKER_COMPOSE) build #--no-cache
 	$(DOCKER_COMPOSE) up -d #--force-recreate
-	@echo "$(COLOR_BOLD)=== Waiting for services to start (~20 skeconds) ===$(COLOR_RESET)"
+	@echo "$(COLOR_BOLD)=== Waiting for services to start (~20 seconds) ===$(COLOR_RESET)"
 	@sleep 20
 
 	@echo "$(COLOR_BOLD)=== Clearing backend server config cache ===$(COLOR_RESET)"
