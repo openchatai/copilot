@@ -1,6 +1,5 @@
 "use client";
 import { Separator } from "../components/Separator";
-import FeedBackModal from "./FeedBackModal";
 import ProfilePopover from "./HeaderPopover";
 import Logo from "./Logo";
 import { Bots } from "./DashboardHeaderBotsList";
@@ -17,7 +16,10 @@ export function Header() {
   return (
     <header
       id="dashboard-header"
-      className={cn("sticky max-h-[var(--header-height)] min-h-fit shrink-0 top-0 bg-white dark:bg-[#182235] border-b border-slate-200 dark:border-slate-700 z-30",isBotLayout && "border-b-0")}
+      className={cn(
+        "sticky max-h-[var(--header-height)] min-h-fit shrink-0 top-0 bg-white dark:bg-[#182235] border-b border-slate-200 dark:border-slate-700 z-30",
+        isBotLayout && "border-b-0"
+      )}
     >
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="w-full h-16 flex gap-5 items-center justify-between">
@@ -33,11 +35,6 @@ export function Header() {
             )}
           </div>
           <div className="actions flex items-center gap-3">
-            <FeedBackModal />
-            <Separator
-              orientation="vertical"
-              className="h-6 bg-slate-200 dark:bg-slate-700 border-none mx-0"
-            />
             <ProfilePopover />
             <div
               data-online={online}

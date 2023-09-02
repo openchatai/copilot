@@ -1,6 +1,6 @@
 export default function WelcomeBanner() {
   return (
-    <div className="relative bg-indigo-200 dark:bg-indigo-500 p-10 rounded-sm overflow-hidden mb-8">
+    <div className="relative bg-indigo-500 p-10 rounded-sm overflow-hidden mb-8 bg-[radial-gradient(circle_at_center,theme(colors.indigo.300),theme(colors.indigo.500))]">
       <div
         className="absolute right-0 top-0 -mt-4 mr-16 pointer-events-none hidden xl:block"
         aria-hidden="true"
@@ -63,7 +63,7 @@ export default function WelcomeBanner() {
         </svg>
       </div>
       <div className="relative">
-        <h1 className="text-2xl md:text-3xl text-slate-800 dark:text-slate-100 font-bold mb-1 text-center">
+        <h1 className="text-2xl md:text-3xl text-white dark:text-slate-100 font-bold mb-1 text-center">
           Welcome to OpenCopilot!👋
         </h1>
       </div>

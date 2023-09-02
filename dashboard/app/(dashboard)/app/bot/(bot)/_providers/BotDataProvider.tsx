@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import useSWR from "swr";
-import { useRouter } from "@/ui/router-events";
+import { Link, useRouter } from "@/ui/router-events";
 import { createSafeContext } from "@/ui/utils/createSafeContext";
 import EmptyState from "@/ui/partials/EmptyState";
 import { Button } from "@/ui/components/Button";
@@ -18,7 +18,7 @@ function BotDataProvider({
   children: React.ReactNode;
   bot_id: string;
 }) {
-  const { refresh, back } = useRouter();
+  const { refresh } = useRouter();
   const { data: bot_data, isLoading } = useSWR(bot_id, () =>
     getCopilot(bot_id)
   );
@@ -28,8 +28,8 @@ function BotDataProvider({
       <div className="w-full h-full p-5 grid place-content-center">
         <div className="">
           <EmptyState
-            label="Bot not found"
-            description="The bot you are looking for does not exist or you do not have permission to view it."
+            label="Copilot not found"
+            description="The Copilot you are looking for does not exist or you do not have permission to view it."
           >
             <div className="space-x-2">
               <Button
@@ -38,15 +38,15 @@ function BotDataProvider({
                   intent: "primary-ghost",
                 }}
               >
-                refresh
+                Refresh
               </Button>
               <Button
-                onClick={() => back()}
+                asChild
                 variant={{
                   intent: "primary",
                 }}
               >
-                navigate back
+                <Link href="/app">Index</Link>
               </Button>
             </div>
           </EmptyState>
