@@ -67,61 +67,59 @@ export const UploadSwaggerStep = forwardRef<
         <Separator
           className="mx-auto my-6"
           label="🪄 OR 🪄"
-          labelClassName="after:bg-white after:dark:bg-slate-800 after:text-slate-800 after:dark:text-slate-200 after:font-bold after:text-base"
+          labelClassName="after:bg-slate-100 after:dark:bg-slate-800 after:text-slate-800 after:dark:text-slate-200 after:font-bold after:text-base"
         />
-        <div>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                className="whitespace-normal"
-                variant={{ intent: "primary-ghost" }}
-              >
-                Use our pre-made demo swagger file to try it out quickly (🐶pet
-                store SaaS system)
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="relative">
-              {is("resolved") && demoCopilot?.chatbot && (
-                <div className="absolute inset-0 backdrop-blur-sm z-30">
-                  <div className="w-full h-full flex items-center justify-center">
-                    <BsCheck2Circle className="text-8xl text-emerald-500 fill-current" />
-                    <Link href={"/app/bot/" + demoCopilot.chatbot.id}></Link>
-                  </div>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              className="whitespace-normal"
+              variant={{ intent: "primary-ghost" }}
+            >
+              Use our pre-made demo swagger file to try it out quickly (🐶pet
+              store SaaS system)
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="relative">
+            {is("resolved") && demoCopilot?.chatbot && (
+              <div className="absolute inset-0 backdrop-blur-sm z-30">
+                <div className="w-full h-full flex items-center justify-center">
+                  <BsCheck2Circle className="text-8xl text-emerald-500 fill-current" />
+                  <Link href={"/app/bot/" + demoCopilot.chatbot.id}></Link>
                 </div>
-              )}
-
-              <DialogHeader className="text-4xl flex items-center justify-center w-full border-none">
-                <span>🐶🐕</span>
-              </DialogHeader>
-              <div className="mt-5 px-5">
-                <h2 className="text-center text-lg font-semibold">
-                  Pet Store Demo
-                </h2>
-                <p className="mt-2 text-center text-sm">
-                  In this pet store you can add, delete, update and view pets,
-                  you can also search and manage inventory, and finally you can
-                  place orders . We already configured the APIs and the backend,
-                  you can test it almost immediately.
-                </p>
               </div>
-              <DialogFooter className="mt-4">
-                <Button
-                  loading={is("pending")}
-                  variant={{ intent: "success" }}
-                  onClick={createDemoBot}
-                >
-                  <span className={cn(is("pending") && "opacity-0")}>
-                    Let's do it
-                  </span>
-                  {is("pending") && (
-                    <Loading size={20} wrapperClassName="inset-0 absolute" />
-                  )}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
-        <div className="flex items-center justify-between space-x-6 mb-8">
+            )}
+
+            <DialogHeader className="text-4xl flex items-center justify-center w-full border-none">
+              <span>🐶🐕</span>
+            </DialogHeader>
+            <div className="mt-5 px-5">
+              <h2 className="text-center text-lg font-semibold">
+                Pet Store Demo
+              </h2>
+              <p className="mt-2 text-center text-sm">
+                In this pet store you can add, delete, update and view pets, you
+                can also search and manage inventory, and finally you can place
+                orders . We already configured the APIs and the backend, you can
+                test it almost immediately.
+              </p>
+            </div>
+            <DialogFooter className="mt-4">
+              <Button
+                loading={is("pending")}
+                variant={{ intent: "success" }}
+                onClick={createDemoBot}
+              >
+                <span className={cn(is("pending") && "opacity-0")}>
+                  Let's do it
+                </span>
+                {is("pending") && (
+                  <Loading size={20} wrapperClassName="inset-0 absolute" />
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        <div className="flex items-center justify-between space-x-6 mb-8 mt-4">
           <div>
             <div className="font-medium text-slate-800 text-sm mb-1">
               Important Instructions

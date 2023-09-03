@@ -1,3 +1,4 @@
+import { BiChevronDown } from "react-icons/bi";
 import { Avatar, AvatarFallback } from "../components/Avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/Popover";
 
@@ -13,6 +14,7 @@ export default function ProfilePopover() {
             Local
           </span>
         </div>
+        <BiChevronDown className="text-xl group-data-[state=open]:rotate-180" />
       </PopoverTrigger>
 
       <PopoverContent align="end" className="origin-top-right min-w-[11rem]">

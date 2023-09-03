@@ -1,33 +1,35 @@
 import { Button } from "@/ui/components/Button";
 import { Form } from "@formiz/core";
 import React from "react";
+import { BsArrowRightShort } from "react-icons/bs";
 import { FaLongArrowAltLeft, FaLongArrowAltRight } from "react-icons/fa";
 export function Footer({ form }: { form: Form }) {
   return (
     <footer
       className={
-        "w-full flex items-center justify-between gap-5 pt-5 pb-0 mt-4 max-w-full"
+        "w-full flex items-center justify-between gap-5 pt-5 pb-0 max-w-full"
       }
     >
       {form.isFirstStep && (
         <Button
-          variant={{ intent: "primary", width: "fluid" }}
-          className="mx-2 flex-center gap-1"
+          variant={{ intent: "primary" }}
+          className="flex-center gap-1 justify-self-end"
           disabled={!form.steps?.at(0)?.isValid}
           onClick={() => form.submitStep()}
         >
-          OK,let's do it!
+          <span>OK,let's do it!</span>
+          <BsArrowRightShort />
         </Button>
       )}
 
       {!form.isFirstStep && (
         <Button
-          variant={{ intent: "secondary" }}
-          className="flex items-center justify-center gap-1"
+          variant={{ intent: "base" }}
+          className="flex items-center justify-center gap-1 underline"
           onClick={() => form.prevStep()}
         >
           <FaLongArrowAltLeft />
-          <span>back</span>
+          <span>Back</span>
         </Button>
       )}
 

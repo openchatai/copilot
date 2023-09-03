@@ -12,6 +12,7 @@ import { BiCheckCircle } from "react-icons/bi";
 import { Button } from "@/ui/components/Button";
 import { Link } from "@/ui/router-events";
 import { Copilot, createCopilot } from "api/copilots";
+import cn from "@/ui/utils/cn";
 
 export default function CreateBot({ intro = true }: { intro?: boolean }) {
   const form = useForm();
@@ -43,6 +44,30 @@ export default function CreateBot({ intro = true }: { intro?: boolean }) {
   };
   return (
     <div className="w-full z-[1] overflow-hidden">
+      <div className="max-w-md mx-auto w-full mb-16">
+        <div className="relative">
+          <div
+            className="absolute left-0 top-1/2 -mt-px w-full h-0.5 bg-slate-200"
+            aria-hidden="true"
+          ></div>
+          <ul className="relative flex justify-between w-full">
+            {form.steps?.map((step, i) => (
+              <li key={i}>
+                <span
+                  className={cn(
+                    "flex items-center justify-center w-6 h-6 rounded-full text-xs font-semibold transition animate-in",
+                    step.isCurrent
+                      ? "bg-indigo-500 text-white"
+                      : "bg-slate-100 text-slate-500"
+                  )}
+                >
+                  {step.index + 1}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
       <Formiz connect={form} onValidSubmit={handleSubmit} autoForm>
         {intro && <IntroStep form={form} ref={introRef} />}
         <UploadSwaggerStep form={form} />
