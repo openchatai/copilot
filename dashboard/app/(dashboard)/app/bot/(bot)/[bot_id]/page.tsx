@@ -4,7 +4,7 @@ import { Input } from "@/ui/components/inputs/BaseInput";
 import CodeBlock from "@/ui/components/CodeBlock";
 import { Heading } from "@/ui/components/Heading";
 import Banner2 from "@/ui/components/Banner";
-import { useBotData } from "../_providers/BotDataProvider";
+import { useBotData } from "@/ui/providers/BotDataProvider";
 
 export default function BotTryAndShare() {
   const { bot } = useBotData();

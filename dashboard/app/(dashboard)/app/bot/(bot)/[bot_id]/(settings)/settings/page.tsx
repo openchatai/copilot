@@ -9,10 +9,10 @@ import { Separator } from "@/ui/components/Separator";
 import ChangeBotContext from "@/ui/partials/ChangeBotContext";
 import DescriptiveHeading from "@/ui/partials/DescriptiveHeading";
 import { Formiz, useForm } from "@formiz/core";
-import { useBotData } from "../../../_providers/BotDataProvider";
 import { deleteCopilot, updateCopilot } from "api/copilots";
 import { useRouter } from "@/ui/router-events";
 import { toast } from "@/ui/components/headless/toast/use-toast";
+import { useBotData } from "@/ui/providers/BotDataProvider";
 
 export default function ChatBotDetailedViewGeneralSettings({
   params: { bot_id },

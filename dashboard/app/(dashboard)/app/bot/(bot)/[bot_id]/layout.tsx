@@ -1,7 +1,6 @@
 import React, { type ReactNode } from "react";
 import { Nav } from "./_parts/BotLayoutNavLink";
-import { BotDataProvider } from "../_providers/BotDataProvider";
-export const dynamic = "force-dynamic";
+import { BotDataProvider } from "@/ui/providers/BotDataProvider";
 
 export default function BotLayout({
   children,
