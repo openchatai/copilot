@@ -45,7 +45,7 @@ export async function createCopilot({
     return axiosInstance.post<{
         chatbot: Copilot
     }>("/copilot/swagger", data, {
-        headers:{
+        headers: {
             "Content-Type": "multipart/form-data"
         }
     })

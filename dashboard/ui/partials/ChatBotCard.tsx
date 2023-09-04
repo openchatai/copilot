@@ -1,9 +1,6 @@
-"use client";
-import Badge from "@/ui/components/Badge";
 import { CardWrapper } from "../components/wrappers/CardWrapper";
 import { Link } from "@/ui/router-events";
 import { FaRobot } from "react-icons/fa";
-import { BiLinkExternal } from "react-icons/bi";
 import type { Copilot } from "api/copilots";
 
 export function ChatBotCard({
@@ -31,7 +28,7 @@ export function ChatBotCard({
           </Link>
         </div>
         <footer className="mt-1">
-          <span>{created_at.toISOString()}</span>
+          <span>{new Date(created_at).toISOString()}</span>
         </footer>
       </div>
     </CardWrapper>

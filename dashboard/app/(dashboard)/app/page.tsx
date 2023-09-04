@@ -5,12 +5,13 @@ import { ChatBotCard } from "@/ui/partials/ChatBotCard";
 import { Button } from "@/ui/components/Button";
 import EmptyState from "@/ui/partials/EmptyState";
 import { AiOutlinePlus } from "react-icons/ai";
-import { Map } from "@/ui/helper-components";
 import { getCopilots } from "api/copilots";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 1;
 async function DashboardIndex() {
   const response = await getCopilots();
+  console.log(response);
   return (
     <>
       <WelcomeBanner />
@@ -38,7 +39,28 @@ async function DashboardIndex() {
             </div>
             <div className="w-full max-w-full">
               <div className="grid grid-cols-12 gap-6">
-                <Map
+                {response.data.length > 0 ? (
+                  response.data.map((bot, i) => (
+                    <ChatBotCard {...bot} key={i} />
+                  ))
+                ) : (
+                  <EmptyState
+                    label="There is no Copilots Right now"
+                    description="start by creating new one"
+                    className="col-span-full"
+                  >
+                    <Button
+                      asChild
+                      variant={{
+                        intent: "primary",
+                        size: "sm",
+                      }}
+                    >
+                      <Link href="/app/bot/new">Create Copilot</Link>
+                    </Button>
+                  </EmptyState>
+                )}
+                {/* <Map
                   data={response?.data}
                   render={(bot, i) => <ChatBotCard {...bot} key={i} />}
                   fallback={
@@ -58,7 +80,7 @@ async function DashboardIndex() {
                       </Button>
                     </EmptyState>
                   }
-                />
+                /> */}
               </div>
             </div>
           </section>
