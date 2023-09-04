@@ -4,6 +4,8 @@ from utils.vector_db.get_vector_store import get_vector_store
 from utils.vector_db.store_options import StoreOptions
 from routes.workflow.openapi_agent import run_openapi_agent_from_json
 from utils.fetch_swagger_spec import fetch_swagger_spec
+from routes.workflow.generate_openapi_payload import generate_openapi_payload
+from utils.make_api_call import make_api_request
 import json
 
 db_instance = Database()
@@ -39,10 +41,20 @@ def run_openapi_operations(record, swagger_spec, text):
     for flow in record.get("flows", []):
         for step in flow.get("steps"):
             operation_id = step.get("open_api_operation_id")
-            response = run_openapi_agent_from_json(spec_json=swagger_spec, prompt=text, prev_api_response)
+            api_payload = generate_openapi_payload(swagger_spec, text)
+            
+            api_response = make_api_request(
+                request_type = api_payload.request_type,
+                url = api_payload["url"],
+                body=api_payload["body"],
+                params=api_payload.params,
+                query_params=api_payload["query_params"],
+                headers={}
+            )
+            # response = run_openapi_agent_from_json(spec_json=swagger_spec, prompt=text, prev_api_response)
             # Take this operation id and the data provided in the request to call the API with the given open_api_operation_id
             # The store the response of that API to call the next API, we have to think about how this response gets stored
-            record_info[operation_id] = response  # Store the response for this operation_id
-            prev_api_response = response
+            record_info[operation_id] = api_response  # Store the response for this operation_id
+            prev_api_response = api_response
             
     return json.dumps(record_info)

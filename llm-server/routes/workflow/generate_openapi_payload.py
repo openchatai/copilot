@@ -18,6 +18,7 @@ from qdrant_client.models import Distance, VectorParams
 from langchain.prompts import PromptTemplate
 
 from langchain.chains import ConversationChain
+from abc import ABC, abstractmethod
 
 load_dotenv()
 
@@ -186,12 +187,13 @@ def generate_openapi_payload(openapi_file, user_action):
     payload = {
         "body": response.get("body", {}),
         "parameters": response.get("parameters", []),
-        "query_params": response.get("query_param", {})
+        "query_params": response.get("query_param", {}),
+        "method": method
     }
 
     return payload
 
 
-# usage
+# command line usage
 # r = generate_openapi_payload('../notebooks/openapi.yaml', 'add album 889234ssdfa')
 # print(r)
