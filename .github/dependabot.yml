@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: "pip" # For Python
+    directory: "/llm-server" # Location of Python package manifests
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "composer" # For PHP
+    directory: "/dashboard" # Location of PHP package manifests
+    schedule:
+      interval: "weekly"
