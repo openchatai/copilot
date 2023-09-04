@@ -1,8 +1,8 @@
-# copilot-widget
+# Copilot widget
 
-this is the widget for copilot users will interact with.
-simple react application built to be used in any webpage as a widget.
-to download the latest build of the widget, go to the actions tab and download the latest build artifact.
+This is the widget for your copilot, it's what your users will interact with.
+
+It's a simple react application built to be used in any webpage as a widget, to download the latest build of the widget, go to the actions tab and download the latest build artifact.
 
 ## How to install
 
@@ -19,7 +19,7 @@ to download the latest build of the widget, go to the actions tab and download t
    <script src="[some_js_file].js"></script>
    ```
 
-5. don't add the css file in your html file, instead,the script will inject the css file instead.
+5. don't add the css file in your html file, instead, the script will inject the css files dynamically.
 
 6. init the widget.
 
@@ -47,4 +47,5 @@ to download the latest build of the widget, go to the actions tab and download t
 
 2. type your message and press enter to send it.
 
-3. enjoy.
+<img width="394" alt="OpenCopilot widget" src="https://github.com/openchatai/OpenCopilot/assets/32633162/77b30faa-c59e-4a3a-821a-d14a61a49a65">
+
