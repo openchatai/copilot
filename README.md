@@ -103,6 +103,12 @@ make install
 Once the installation is complete, you can access the OpenCopilot console at: http://localhost:8000
 
 
+----
 
+### Important links
+- [OpenCopilot Flows Editor](https://editor.opencopilot.so)
+ 
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+
