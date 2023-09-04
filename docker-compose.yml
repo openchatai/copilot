@@ -16,8 +16,6 @@ services:
       - DB_PASSWORD=dbpass
     volumes:
       - shared_data:/app/shared_data
-      - application:/app
-      - ./backend:/var/www/html/backend
     networks:
       - opencopilot_network
 
@@ -80,5 +78,4 @@ networks:
 
 volumes:
   shared_data:
-  application:
   database:
