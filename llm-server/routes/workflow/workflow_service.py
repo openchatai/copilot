@@ -34,11 +34,11 @@ def run_workflow(data):
 
 def run_openapi_operations(record, swagger_src, text, headers, server_base_url):
     record_info = {"Workflow Name": record.get('name')}
-    prev_api_response = ""
+    api_response_cache = ""
     for flow in record.get("flows", []):
         for step in flow.get("steps"):
             operation_id = step.get("open_api_operation_id")
-            api_payload = generate_openapi_payload(swagger_src, text, operation_id)
+            api_payload = generate_openapi_payload(swagger_src, text, operation_id, api_response_cache)
             # api_payload = generate_openapi_payload()
             
             api_payload["path"] = f"{server_base_url}{api_payload['path']}"
@@ -56,4 +56,6 @@ def run_openapi_operations(record, swagger_src, text, headers, server_base_url):
             record_info[operation_id] = api_response  # Store the response for this operation_id
             prev_api_response = api_response
             
+            
+    api_response_cache = ""
     return json.dumps(record_info)
