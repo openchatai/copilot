@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/ui/components/Button";
 import { Heading } from "@/ui/components/Heading";
 import Roadmap from "@/ui/components/Roadmap";
 import { Form, FormizStep } from "@formiz/core";
@@ -9,7 +10,6 @@ export const IntroStep = forwardRef<
   ElementRef<"div">,
   ComponentProps<"div"> & { form: Form }
 >(({ form, ...props }, _ref) => {
-
   return (
     <FormizStep name="intro">
       <div ref={_ref} className="fade-in-0 animate-in">
@@ -39,8 +39,16 @@ export const IntroStep = forwardRef<
               },
             ]}
           />
- 
         </div>
+
+        <footer className="w-full flex items-center justify-end gap-5 pt-5 border-t border-t-slate-400">
+          <Button
+            variant={{ intent: "primary" }}
+            onClick={() => form.submitStep()}
+          >
+            OK,let's do it! {`->`}
+          </Button>
+        </footer>
       </div>
     </FormizStep>
   );

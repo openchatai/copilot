@@ -150,6 +150,20 @@ export const UploadSwaggerStep = forwardRef<
             </div>
           </div>
         </div>
+
+        <footer className="w-full flex items-center justify-between gap-5 pt-5 border-t border-t-slate-400">
+          <Button
+            variant={{ intent: "base" }}
+            className="flex items-center justify-center gap-1 underline"
+            onClick={() => form.prevStep()}
+          >
+            Back
+          </Button>
+
+          <Button variant={{ intent: "primary" }} onClick={() => form.submit()}>
+            Next Step {`->`}
+          </Button>
+        </footer>
       </div>
     </FormizStep>
   );

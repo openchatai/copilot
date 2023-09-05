@@ -1,3 +1,4 @@
+"use client";
 import { Heading } from "@/ui/components/Heading";
 import WelcomeBanner from "@/ui/partials/WelcomeBanner";
 import { Link } from "@/ui/router-events";
@@ -6,11 +7,13 @@ import { Button } from "@/ui/components/Button";
 import EmptyState from "@/ui/partials/EmptyState";
 import { AiOutlinePlus } from "react-icons/ai";
 import { getCopilots } from "api/copilots";
+import useSWR from "swr";
+import { Map } from "@/ui/helper-components";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 1;
-async function DashboardIndex() {
-  const response = await getCopilots();
+function DashboardIndex() {
+  const { data: response } = useSWR("copilots", getCopilots);
   console.log(response);
   return (
     <>
@@ -39,48 +42,29 @@ async function DashboardIndex() {
             </div>
             <div className="w-full max-w-full">
               <div className="grid grid-cols-12 gap-6">
-                {response.data.length > 0 ? (
-                  response.data.map((bot, i) => (
-                    <ChatBotCard {...bot} key={i} />
-                  ))
-                ) : (
-                  <EmptyState
-                    label="There is no Copilots Right now"
-                    description="start by creating new one"
-                    className="col-span-full"
-                  >
-                    <Button
-                      asChild
-                      variant={{
-                        intent: "primary",
-                        size: "sm",
-                      }}
-                    >
-                      <Link href="/app/bot/new">Create Copilot</Link>
-                    </Button>
-                  </EmptyState>
-                )}
-                {/* <Map
-                  data={response?.data}
-                  render={(bot, i) => <ChatBotCard {...bot} key={i} />}
-                  fallback={
-                    <EmptyState
-                      label="There is no Copilots Right now"
-                      description="start by creating new one"
-                      className="col-span-full"
-                    >
-                      <Button
-                        asChild
-                        variant={{
-                          intent: "primary",
-                          size: "sm",
-                        }}
+                {response?.data && (
+                  <Map
+                    data={response?.data}
+                    render={(bot, i) => <ChatBotCard {...bot} key={i} />}
+                    fallback={
+                      <EmptyState
+                        label="There is no Copilots Right now"
+                        description="start by creating new one"
+                        className="col-span-full"
                       >
-                        <Link href="/app/bot/new">Create Copilot</Link>
-                      </Button>
-                    </EmptyState>
-                  }
-                /> */}
+                        <Button
+                          asChild
+                          variant={{
+                            intent: "primary",
+                            size: "sm",
+                          }}
+                        >
+                          <Link href="/app/bot/new">Create Copilot</Link>
+                        </Button>
+                      </EmptyState>
+                    }
+                  />
+                )}
               </div>
             </div>
           </section>

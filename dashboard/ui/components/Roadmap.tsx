@@ -1,8 +1,9 @@
+import type { ReactNode } from "react";
 import { BsCheck } from "react-icons/bs";
 
 type Props = {
   items: {
-    label: string;
+    label: ReactNode;
     description: string;
   }[];
 };

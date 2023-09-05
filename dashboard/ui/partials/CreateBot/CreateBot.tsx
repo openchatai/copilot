@@ -1,20 +1,19 @@
 "use client";
 import { useForm, Formiz } from "@formiz/core";
 import { useRef, useState } from "react";
-import { Separator } from "../../components/Separator";
-import { IntroStep, UploadSwaggerStep } from "./steps";
-import { Footer } from "./Footer";
-import { Loading } from "@/ui/components/Loading";
+import {
+  FinishStep,
+  IntroStep,
+  UploadSwaggerStep,
+  ValidateSwaggerStep,
+} from "./steps";
 import * as v from "valibot";
 import { CreateBotSchema } from "schemas";
 import { useStatus } from "@/ui/hooks";
-import { BiCheckCircle } from "react-icons/bi";
-import { Button } from "@/ui/components/Button";
-import { Link } from "@/ui/router-events";
 import { Copilot, createCopilot } from "api/copilots";
 import cn from "@/ui/utils/cn";
 
-export default function CreateBot({ intro = true }: { intro?: boolean }) {
+export default function CreateBot() {
   const form = useForm();
   const introRef = useRef<HTMLDivElement>(null);
   const [createdBot, setCreatedBot] = useState<Copilot | undefined>();
@@ -26,12 +25,13 @@ export default function CreateBot({ intro = true }: { intro?: boolean }) {
     if (dataSafe.success) {
       setSt("pending");
       const data = dataSafe.data;
-      const res = createCopilot({
+      const res = await createCopilot({
         swagger_file: data.json_files[0],
       })
         .then((response) => {
           console.log(response);
           setCreatedBot(response.data.chatbot);
+          if (createdBot) form.nextStep();
         })
         .catch((c) => {
           console.log(c);
@@ -69,45 +69,11 @@ export default function CreateBot({ intro = true }: { intro?: boolean }) {
         </div>
       </div>
       <Formiz connect={form} onValidSubmit={handleSubmit} autoForm>
-        {intro && <IntroStep form={form} ref={introRef} />}
+        <IntroStep form={form} ref={introRef} />
         <UploadSwaggerStep form={form} />
-
-        {!introRef ? (
-          <Loading />
-        ) : (
-          <div>
-            <Separator className="dark:bg-slate-700" />
-            <Footer form={form} />
-          </div>
-        )}
+        <ValidateSwaggerStep form={form} createdBot={createdBot} />
+        <FinishStep form={form} createdBot={createdBot} />
       </Formiz>
-      {is("pending") && (
-        <div className="absolute animate-in fade-in inset-0 grid place-content-center z-[5] loading backdrop-blur-sm">
-          <div>
-            <Loading size={50} />
-          </div>
-        </div>
-      )}
-      {createdBot && is("resolved") && (
-        <div className="absolute animate-in fade-in inset-0 grid place-content-center z-[5] loading backdrop-blur-sm">
-          <div className="flex flex-col items-center justify-center gap-2">
-            <BiCheckCircle size={50} className="text-emerald-500" />
-            <div>
-              <Button
-                variant={{
-                  intent: "primary",
-                  size: "sm",
-                }}
-                asChild
-              >
-                <Link href={`/app/bot/${createdBot?.id}`}>
-                  OK,Let's view the bot
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

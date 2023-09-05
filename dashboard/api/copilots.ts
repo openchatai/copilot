@@ -22,7 +22,25 @@ export const CopilotSchema = v.object({
 })
 export type Copilot = v.Output<typeof CopilotSchema>
 
-
+type ValidatorResponse = {
+    chatbot_id: string
+    all_endpoints: {
+        operationId: string
+        type: string
+        name: string
+        description: string
+        requestBody: any
+        requestParameters: any
+        responseBody: any
+        path: string
+    }[],
+    validations: {
+        endpoints_without_operation_id: any[]
+        endpoints_without_description: any[]
+        endpoints_without_name: any[]
+        auth_type: any
+    }
+}
 export async function getCopilots() {
     return axiosInstance.get<Copilot[] | []>("/copilots")
 }
@@ -51,7 +69,9 @@ export async function createCopilot({
     })
 }
 
-
+export async function validateSwagger(bot_id: string) {
+    return axiosInstance.get<ValidatorResponse>(`/copilot/${bot_id}/validator`)
+}
 export const demoCopilotSchema = v.object({
     swagger_url: v.string(),
     chatbot: v.partial(CopilotSchema)
