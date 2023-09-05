@@ -1,45 +1,66 @@
+# %%
 from langchain.agents import create_openapi_agent
 from langchain.agents.agent_toolkits import OpenAPIToolkit
 from langchain.requests import TextRequestsWrapper
 from langchain.tools.json.tool import JsonSpec
 import json, yaml
 from dotenv import load_dotenv
-import re
-from langchain.llms.openai import OpenAI
-import os
-from langchain.memory import VectorStoreRetrieverMemory
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import Qdrant
-from langchain.docstore import InMemoryDocstore
-from langchain.embeddings.openai import OpenAIEmbeddings
-import qdrant_client
-from uuid import uuid4
-from qdrant_client.models import Distance, VectorParams
-from langchain.prompts import PromptTemplate
-
-from langchain.chains import ConversationChain
-from abc import ABC, abstractmethod
 
 load_dotenv()
 
-import qdrant_client
-# Define the default prompt template
-_DEFAULT_TEMPLATE = """You are an assistant helping me build an HTTP request. You will be given the following pieces of information: Access to our past conversation, a user query, and an excerpt from OpenAPI Swagger for generating the correct response. Your response MUST be a valid JSON. Use 'query_param' key to denote query parameters, 'body' key to denote the body, and 'route_parameter' to denote route parameters. Wrap the JSON inside three backticks.
+# %%
+def get_api_operation_by_id(json_spec, s_operation_id):
+    paths = json_spec.dict_.get("paths", {})
+    for path, methods in paths.items():
+        for method, operation in methods.items():
+            # Check if 'operation' is a dictionary
+            if isinstance(operation, dict):
+                operation_id = operation.get("operationId")
+                
+                if operation_id == s_operation_id:
+                    return operation, method
+            else:
+                # Handle the case where 'operation' is not a dictionary
+                # print(f"Skipping invalid operation: {operation}")
+                pass
 
-Previous conversations:
-{history}
 
-(You do not need to use these pieces of information if not relevant)
+# %%
+import re
 
-Human Input:
-Human: {input}
-The API payload is: """
+def resolve_refs(input_dict, json_spec):
+    # Check if the input_dict is a dictionary and contains a '$ref' key
+    if isinstance(input_dict, dict) and '$ref' in input_dict:
+        ref_value = input_dict['$ref']
+        
+        # Use regular expression to extract the schema name
+        match = re.match(r'#/components/schemas/(\w+)', ref_value)
+        if match:
+            schema_name = match.group(1)
+            
+            # Try to find the corresponding schema in the json_spec dictionary
+            schema = json_spec.dict_.get("components", {}).get("schemas", {}).get(schema_name)
+            
+            # If a matching schema is found, replace the '$ref' key with the schema
+            if schema:
+                return schema
+        
+    # Recursively process nested dictionaries and lists
+    if isinstance(input_dict, dict):
+        for key, value in input_dict.items():
+            input_dict[key] = resolve_refs(value, json_spec)
+    elif isinstance(input_dict, list):
+        for i, item in enumerate(input_dict):
+            input_dict[i] = resolve_refs(item, json_spec)
+    
+    return input_dict
 
-# Define the prompt template
-PROMPT = PromptTemplate(input_variables=["history", "input"], template=_DEFAULT_TEMPLATE)
+import re
 
-# Define the function to hydrate parameters
-def hydrate_params(json_spec, ref_list):
+# ref_list -> [{'$ref': '#/components/parameters/QueryAlbumIds'},
+#  {'$ref': '#/components/parameters/QueryMarket'}]
+
+def hydrateParams(json_spec, ref_list):
     last_portion_list = []
     
     for ref in ref_list:
@@ -53,7 +74,93 @@ def hydrate_params(json_spec, ref_list):
     
     return last_portion_list
 
-# Define the function to extract JSON payload
+# %%
+def process_api_operation(method, api_operation, json_spec):    
+    request_body = api_operation.get("requestBody")
+    
+    if not isinstance(request_body, dict):
+        return api_operation  # Return the request_schema if it's not a dictionary
+    
+    request_body = request_body["content"]["application/json"]["schema"]
+    request_body = resolve_refs(request_body, json_spec.dict_)
+    api_operation["request_body"] = request_body
+    return api_operation
+
+# %%
+with open("/Users/shanurrahman/Documents/openchat_all/OpenCopilot/llm-server/notebooks/openapi.yaml") as f:
+    data = yaml.load(f, Loader=yaml.FullLoader)
+json_spec = JsonSpec(dict_=data, max_value_length=4000)
+
+api_operation, method=get_api_operation_by_id(json_spec, "check-users-saved-albums")
+isolated_request = process_api_operation(method, api_operation, json_spec)
+
+if isolated_request and "parameters" in isolated_request:
+    isolated_request["parameters"] = hydrateParams(json_spec.dict_, isolated_request["parameters"])
+
+
+# %%
+from langchain.llms.openai import OpenAI
+import os
+
+openai_api_key = os.getenv("OPENAI_API_KEY")
+
+llm = OpenAI(openai_api_key=openai_api_key)
+from langchain.llms import OpenAI
+from langchain import PromptTemplate, LLMChain
+
+# %%
+from langchain.memory import VectorStoreRetrieverMemory
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.vectorstores import Qdrant
+from langchain.docstore import InMemoryDocstore
+from langchain.embeddings.openai import OpenAIEmbeddings
+import qdrant_client
+from uuid import uuid4
+from qdrant_client.models import Distance, VectorParams
+
+embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
+client = qdrant_client.QdrantClient(url="http://localhost:6333", prefer_grpc=True)
+temp_coll = "second_coll"
+client.delete_collection(temp_coll) # just for testing or maybe even for prod!!!
+client.create_collection(temp_coll, vectors_config=VectorParams(size=1536, distance=Distance.COSINE))
+vector_store = Qdrant(client, collection_name=temp_coll, embeddings=embeddings)
+
+
+# Create the VectorStoreRetrieverMemory
+retriever = vector_store.as_retriever()
+memory = VectorStoreRetrieverMemory(retriever=retriever)
+
+# %%
+from langchain.prompts import PromptTemplate
+
+from langchain.chains import ConversationChain
+
+_DEFAULT_TEMPLATE = """You are an assistant helping me build a http requests. You will be given the following pieces of information. Access to our past conversation. A user query and an excerpt from openapi swagger for generating the correct response. Your response MUST be a valid json, use query_param key to denote query parameter. Use body key to denote the body and route_parameter to denote the route params. Wrap the json inside three backticks
+
+Previous conversations:
+{history}
+
+(You do not need to use these pieces of information if not relevant)
+
+Human Input:
+Human: {input}
+The API payload is: """
+
+PROMPT = PromptTemplate(
+    input_variables=["history", "input"], template=_DEFAULT_TEMPLATE
+)
+conversation_with_summary = ConversationChain(
+    llm=llm, 
+    prompt=PROMPT,
+    memory=memory,
+    verbose=True
+)
+json_string = conversation_with_summary.predict(input=f"""I want to add album 889234ssdfa, the openapi schema is {isolated_request}
+""")
+
+
+# %%
+
 def extract_json_payload(input_string):
     try:
         # Find the start and end positions of the JSON payload
@@ -69,132 +176,10 @@ def extract_json_payload(input_string):
     except json.JSONDecodeError as e:
         return None, f"Error parsing JSON: {e}"
 
-def read_openapi_spec(openapi_file):
-    """Read and parse the OpenAPI specification from a YAML or JSON file."""
-    with open(openapi_file) as f:
-        if openapi_file.endswith('.json'):
-            data = json.load(f)
-        elif openapi_file.endswith('.yaml') or openapi_file.endswith('.yml'):
-            data = yaml.load(f, Loader=yaml.FullLoader)
-        else:
-            raise ValueError("Unsupported file format. Please provide a YAML or JSON file.")
-    return data
+# %%
+json_string
 
-def resolve_refs(input_dict, json_spec):
-    def resolve_reference(reference):
-        if not reference.startswith("#/components"):
-            # Return reference as is if it's not in the expected format
-            return reference
+response = extract_json_payload(json_string)
+vector_store.add_texts([json_string])
 
-        parts = reference.split('/')
-        current = json_spec
-        for part in parts[2:]:  # Skip the initial '#' and 'components' parts
-            current = current.get(part, {})
-            if not current:
-                # If any part of the reference is missing, return an empty dictionary
-                return {}
-        return current
-
-    def resolve_nested_dict(input_dict):
-        if not isinstance(input_dict, dict):
-            return input_dict
-
-        resolved_dict = {}
-        for key, value in input_dict.items():
-            if isinstance(value, dict):
-                resolved_dict[key] = resolve_nested_dict(value)
-            elif isinstance(value, list):
-                resolved_dict[key] = [resolve_nested_dict(item) for item in value]
-            elif key == '$ref':
-                resolved_value = resolve_reference(value)
-                if isinstance(resolved_value, dict):
-                    # If the resolved value is a dictionary, recursively resolve it
-                    resolved_dict[key] = resolve_nested_dict(resolved_value)
-                else:
-                    resolved_dict[key] = resolved_value
-            else:
-                resolved_dict[key] = value
-        return resolved_dict
-
-    return resolve_nested_dict(input_dict)
-
-
-def process_api_operation(method, api_operation, json_spec):    
-    request_body = api_operation.get("requestBody")
-    
-    if not isinstance(request_body, dict):
-        return api_operation  # Return the request_schema if it's not a dictionary
-    
-    if "application/json" in request_body.get("content", {}):
-        request_body = request_body["content"]["application/json"]["schema"]
-        request_body = resolve_refs(request_body, json_spec.dict_)
-        api_operation["request_body"] = request_body
-    else:
-        api_operation["request_body"] = {}  # No request body defined
-    
-    return api_operation
-
-def create_conversation_chain():
-    """Create a ConversationChain object with the necessary components."""
-    openai_api_key = os.getenv("OPENAI_API_KEY")
-    llm = OpenAI(openai_api_key=openai_api_key)
-
-    embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
-    client = qdrant_client.QdrantClient(url="http://localhost:6333", prefer_grpc=True)
-    temp_coll = "second_coll"
-    client.delete_collection(temp_coll)  # Just for testing or maybe even for prod!!!
-    client.create_collection(temp_coll, vectors_config=VectorParams(size=1536, distance=Distance.COSINE))
-    vector_store = Qdrant(client, collection_name=temp_coll, embeddings=embeddings)
-    retriever = vector_store.as_retriever()
-    memory = VectorStoreRetrieverMemory(retriever=retriever)
-
-    return ConversationChain(llm=llm, prompt=PROMPT, memory=memory, verbose=True)
-
-def get_api_operation_by_id(json_spec, s_operation_id):
-    paths = json_spec.dict_.get("paths", {})
-    
-    for path, methods in paths.items():
-        for method, operation in methods.items():
-            if isinstance(operation, dict):
-                operation_id = operation.get("operationId")
-                
-                if operation_id == s_operation_id:
-                    return operation, method, path
-    
-    # If the operation with the specified ID is not found, return None
-    return None, None, None
-
-def generate_openapi_payload(openapi_file, user_action):
-    """Generate a JSON payload using the OpenAPI specification and user action."""
-    data = read_openapi_spec(openapi_file)
-
-    json_spec = JsonSpec(dict_=data, max_value_length=4000)
-    api_operation, method, path = get_api_operation_by_id(json_spec, "check-users-saved-albums")
-    isolated_request = process_api_operation(method, api_operation, json_spec)
-
-    if isolated_request and "parameters" in isolated_request:
-        isolated_request["parameters"] = hydrate_params(json_spec.dict_, isolated_request["parameters"])
-
-    # Combine the user action with the OpenAPI schema
-    user_input = f"User input: {user_action}, the OpenAPI schema is {isolated_request}"
-
-    conversation_with_summary = create_conversation_chain()
-
-    json_string = conversation_with_summary.predict(input=user_input)
-
-    response = extract_json_payload(json_string)
-
-    payload = {
-        "body": response.get("body", {}),
-        "parameters": response.get("parameters", []),
-        "query_params": response.get("query_param", {}),
-        "method": method,
-        "path": path
-    }
-
-    return payload
-
-
-# command line usage
-# r = generate_openapi_payload('../notebooks/openapi.yaml', 'add album 889234ssdfa')
-# print(r)
+print(response)
