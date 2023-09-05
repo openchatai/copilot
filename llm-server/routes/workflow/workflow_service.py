@@ -41,7 +41,8 @@ def run_openapi_operations(record, swagger_spec, text, headers):
     for flow in record.get("flows", []):
         for step in flow.get("steps"):
             operation_id = step.get("open_api_operation_id")
-            api_payload = generate_openapi_payload(swagger_spec, text)
+            # api_payload = generate_openapi_payload(swagger_spec, text)
+            api_payload = generate_openapi_payload()
             
             api_response = make_api_request(
                 request_type = api_payload.request_type,
