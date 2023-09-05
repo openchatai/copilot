@@ -156,19 +156,19 @@ export function DropZone({
       <div
         data-active={!!isDragActive}
         {...getRootProps()}
-        className="group/root w-full min-h-[150px] h-fit border-2 rounded-lg border-dashed border-gray-100 transition-all active:border-gray-500 hover:border-gray-300 flex items-center justify-center cursor-pointer bg-slate-50 dark:bg-slate-900"
+        className="group/root w-full min-h-[150px] p-8 h-fit border-2 rounded-lg border-dashed border-slate-400 flex items-center justify-center cursor-pointer bg-slate-white dark:bg-slate-900"
       >
         <input {...getInputProps()} />
         <div>
           {isDragAccept && <p>All files will be accepted</p>}
           {isDragReject && <p>Some files will be rejected</p>}
           {!isDragActive && (
-            <div className="w-full flex flex-col items-center justify-center p-5">
+            <div className="w-full flex flex-col items-center justify-center">
               <span className="text-3xl">⬆️</span>
-              <span className="mb-4 font-semibold transition-all text-slate-400 group-active/root:text-slate-500 ">
+              <span className="mb-4 font-semibold text-slate-700">
                 Click to upload or drag & drop
               </span>
-              <span className="text-base text-center transition-all text-indigo-300 group-active/root:text-indigo-500 group-hover/root:text-indigo-400 font-normal">
+              <span className="text-base text-center transition-all text-indigo-600 font-normal">
                 You can upload one file only, please make sure to read the
                 instructions
               </span>

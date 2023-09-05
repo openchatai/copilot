@@ -42,7 +42,7 @@ function DashboardIndex() {
             </div>
             <div className="w-full max-w-full">
               <div className="grid grid-cols-12 gap-6">
-                {response?.data && (
+                {response?.data ? (
                   <Map
                     data={response?.data}
                     render={(bot, i) => <ChatBotCard {...bot} key={i} />}
@@ -64,6 +64,22 @@ function DashboardIndex() {
                       </EmptyState>
                     }
                   />
+                ) : (
+                  <EmptyState
+                    label="There is no Copilots Right now"
+                    description="start by creating new one"
+                    className="col-span-full"
+                  >
+                    <Button
+                      asChild
+                      variant={{
+                        intent: "primary",
+                        size: "sm",
+                      }}
+                    >
+                      <Link href="/app/bot/new">Create Copilot</Link>
+                    </Button>
+                  </EmptyState>
                 )}
               </div>
             </div>

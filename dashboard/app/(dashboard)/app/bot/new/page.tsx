@@ -1,4 +1,3 @@
-import { CardWrapper } from "@/ui/components/wrappers/CardWrapper";
 import CreateBot from "@/ui/partials/CreateBot";
 import { Metadata } from "next";
 

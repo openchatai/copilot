@@ -12,7 +12,8 @@ import { CreateBotSchema } from "schemas";
 import { useStatus } from "@/ui/hooks";
 import { Copilot, createCopilot } from "api/copilots";
 import cn from "@/ui/utils/cn";
-
+import { Loading } from "@/ui/components/Loading";
+import { motion, AnimatePresence } from "framer-motion";
 export default function CreateBot() {
   const form = useForm();
   const introRef = useRef<HTMLDivElement>(null);
@@ -29,9 +30,10 @@ export default function CreateBot() {
         swagger_file: data.json_files[0],
       })
         .then((response) => {
-          console.log(response);
+          console.log(response.data.chatbot);
           setCreatedBot(response.data.chatbot);
-          if (createdBot) form.nextStep();
+          console.log("created");
+          form.nextStep();
         })
         .catch((c) => {
           console.log(c);
@@ -43,13 +45,9 @@ export default function CreateBot() {
     setSt("resolved");
   };
   return (
-    <div className="w-full z-[1] overflow-hidden">
+    <div className="w-full z-[1] overflow-hidden relative">
       <div className="max-w-md mx-auto w-full mb-16">
-        <div className="relative">
-          <div
-            className="absolute left-0 top-1/2 -mt-px w-full h-0.5 bg-slate-200"
-            aria-hidden="true"
-          ></div>
+        <div>
           <ul className="relative flex justify-between w-full">
             {form.steps?.map((step, i) => (
               <li key={i}>
@@ -74,6 +72,17 @@ export default function CreateBot() {
         <ValidateSwaggerStep form={form} createdBot={createdBot} />
         <FinishStep form={form} createdBot={createdBot} />
       </Formiz>
+      <AnimatePresence>
+        {is("pending") && (
+          <motion.div
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute backdrop-blur-sm inset-0 bg-opacity-50 flex-center"
+          >
+            <Loading size={50} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

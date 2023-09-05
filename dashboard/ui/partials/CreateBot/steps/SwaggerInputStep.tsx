@@ -12,13 +12,13 @@ import { FileInput } from "@/ui/components/inputs/FileField";
 import { useStatus } from "@/ui/hooks";
 import { Form, FormizStep } from "@formiz/core";
 import { DemoCopilot } from "api/copilots";
-import Link from "next/link";
 import { ComponentProps, ElementRef, forwardRef, useState } from "react";
 import { megabytesToBytes } from "utils/misc";
 import { createDemoCopilot } from "api/copilots";
 import { Loading } from "@/ui/components/Loading";
 import cn from "@/ui/utils/cn";
 import { BsCheck2Circle } from "react-icons/bs";
+import { Link } from "@/ui/router-events";
 export const UploadSwaggerStep = forwardRef<
   ElementRef<"div">,
   ComponentProps<"div"> & { form: Form }
@@ -160,7 +160,11 @@ export const UploadSwaggerStep = forwardRef<
             Back
           </Button>
 
-          <Button variant={{ intent: "primary" }} onClick={() => form.submit()}>
+          <Button
+            variant={{ intent: "primary" }}
+            onClick={() => form.submit()}
+            disabled={form.isSubmitted}
+          >
             Next Step {`->`}
           </Button>
         </footer>

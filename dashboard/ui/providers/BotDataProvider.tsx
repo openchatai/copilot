@@ -19,12 +19,9 @@ function BotDataProvider({
   bot_id: string;
 }) {
   const { refresh } = useRouter();
-  const {
-    data: bot_data,
-    isLoading,
-    error,
-  } = useSWR("api/copilot/" + bot_id, () => getCopilot(bot_id));
-
+  console.log(bot_id);
+  const { data: bot_data, isLoading, error } = useSWR([bot_id], getCopilot);
+  console.log("bot Data, Error", bot_data, error);
   if ((!bot_data?.data?.chatbot || error) && !isLoading) {
     return (
       <div className="w-full h-full p-5 grid place-content-center">
