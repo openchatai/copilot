@@ -1,28 +1,20 @@
 # %%
-from langchain.agents import create_openapi_agent
-from langchain.agents.agent_toolkits import OpenAPIToolkit
-from langchain.requests import TextRequestsWrapper
 from langchain.tools.json.tool import JsonSpec
-import json, yaml
+import re, os, json
 from dotenv import load_dotenv
 from langchain.llms.openai import OpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import ConversationChain
 from langchain.llms import OpenAI
-from langchain import PromptTemplate, LLMChain
+from langchain import PromptTemplate
 
 from langchain.memory import VectorStoreRetrieverMemory
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Qdrant
-from langchain.docstore import InMemoryDocstore
 from langchain.embeddings.openai import OpenAIEmbeddings
 import qdrant_client
-from uuid import uuid4
 from qdrant_client.models import Distance, VectorParams
-import requests
-
-import os
-import re
+from routes.workflow.load_openapi_spec import load_openapi_spec
 
 load_dotenv()
 
@@ -106,41 +98,13 @@ def extract_json_payload(input_string):
     match = re.findall(r"{.+[:,].+}|\[.+[,:].+\]", input_string)
     return json.loads(match[0]) if match else None
 
-def generate_openapi_payload(spec_source, text: str):
-    if isinstance(spec_source, str):
-        if spec_source.startswith("http://") or spec_source.startswith("https://"):
-            # Fetch the OpenAPI spec from a URL
-            response = requests.get(spec_source)
-            if response.status_code == 200:
-                content_type = response.headers.get("content-type", "").lower()
-                if "json" in content_type:
-                    spec_dict = json.loads(response.text)
-                elif "yaml" in content_type:
-                    spec_dict = yaml.load(response.text, Loader=yaml.FullLoader)
-                    
-                elif "text/plain" in content_type:
-                    spec_dict = yaml.load(response.text, Loader=yaml.FullLoader)
-                else:
-                    raise Exception(f"Unsupported content type in response: {content_type}")
-            else:
-                raise Exception(f"Failed to fetch OpenAPI spec from URL: {spec_source}")
-        else:
-            # Assume it's a file path and try to load it
-            try:
-                with open(spec_source, "r") as file:
-                    spec_dict = yaml.load(file, Loader=yaml.FullLoader)
-            except Exception as e:
-                raise Exception(f"Failed to load OpenAPI spec from file: {spec_source}. Error: {e}")
-    elif isinstance(spec_source, dict):
-        # Use the provided dictionary as the spec
-        spec_dict = spec_source
-    else:
-        raise ValueError("Unsupported spec_source type. It should be a URL, file path, or dictionary.")
+def generate_openapi_payload(spec_source, text: str, _operation_id: str):
+    spec_dict = load_openapi_spec(spec_source)
 
     # Continue with the rest of the code
     json_spec = JsonSpec(dict_=spec_dict, max_value_length=4000)
 
-    api_operation, method, path = get_api_operation_by_id(json_spec, "check-users-saved-albums")
+    api_operation, method, path = get_api_operation_by_id(json_spec, _operation_id)
     isolated_request = process_api_operation(method, api_operation, json_spec)
 
     if isolated_request and "parameters" in isolated_request:
