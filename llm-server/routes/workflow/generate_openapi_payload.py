@@ -160,7 +160,7 @@ def generate_openapi_payload(spec_source, text: str):
     retriever = vector_store.as_retriever()
     memory = VectorStoreRetrieverMemory(retriever=retriever)
 
-    _DEFAULT_TEMPLATE = """You are an assistant helping me build a http requests. You will be given the following pieces of information. Access to our past conversation. A user query and an excerpt from openapi swagger for generating the correct response.  Wrap the json inside three backticks on both sides, use query_param key to denote query parameter. Use body key to denote the body and route_parameter to denote the route params.
+    _DEFAULT_TEMPLATE = """You are an assistant helping me build http requests. You will be given the following pieces of information. Access to our past conversation. A user query and an excerpt from openapi swagger for generating the correct api payload.  Wrap the json inside three backticks on both sides, use query_param key to denote query parameter. Use body key to denote the body and route_parameter to denote the route params. query_params for query parameters
 
     Previous conversations:
     {history}
