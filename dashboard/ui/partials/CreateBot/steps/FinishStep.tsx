@@ -1,8 +1,8 @@
 import { Button } from "@/ui/components/Button";
 import { Heading } from "@/ui/components/Heading";
-import { Link } from "@/ui/router-events";
 import { Form, FormizStep } from "@formiz/core";
 import { Copilot } from "api/copilots";
+import Link from "next/link";
 import { ComponentProps, ElementRef, forwardRef } from "react";
 import { BsCheck } from "react-icons/bs";
 export const FinishStep = forwardRef<

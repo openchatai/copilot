@@ -4,7 +4,7 @@ import { tv, VariantProps } from "tailwind-variants";
 import { Slot } from "@radix-ui/react-slot";
 
 const badge = tv({
-  base: "inline-flex font-medium px-2.5 py-1 text-white rounded-full text-center",
+  base: "badge inline-flex font-medium px-2.5 py-1 text-white rounded-full text-center",
   variants: {
     intent: {
       primary:

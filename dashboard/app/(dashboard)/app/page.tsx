@@ -22,7 +22,10 @@ function DashboardIndex() {
         <div className="px-4 sm:px-6 lg:px-8 pb-8">
           <section className="max-w-[96rem] w-full mt-5">
             <div className="w-full flex items-center justify-between mb-5">
-              <Heading level={3} className="font-bold">
+              <Heading
+                level={3}
+                className="font-bold text-2xl md:text-3xl text-slate-800"
+              >
                 My Copilots ✨
               </Heading>
               <div>
@@ -40,7 +43,7 @@ function DashboardIndex() {
                 </Button>
               </div>
             </div>
-            <div className="w-full max-w-full">
+            <div>
               <div className="grid grid-cols-12 gap-6">
                 {response?.data ? (
                   <Map

@@ -41,7 +41,7 @@ export const IntroStep = forwardRef<
           />
         </div>
 
-        <footer className="w-full flex items-center justify-end gap-5 pt-5 border-t border-t-slate-400">
+        <footer className="w-full flex items-center justify-end gap-5 pt-5">
           <Button
             variant={{ intent: "primary" }}
             onClick={() => form.submitStep()}

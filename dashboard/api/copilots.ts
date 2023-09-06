@@ -20,24 +20,25 @@ export const CopilotSchema = v.object({
     swagger_url: v.string(),
     is_premade_demo_template: v.boolean(),
 })
-export type Copilot = v.Output<typeof CopilotSchema>
+export type Copilot = Partial<v.Output<typeof CopilotSchema>>
+type Endpoint = {
+    operationId: string
+    type: string
+    name: string
+    description: string
+    requestBody: any
+    requestParameters: any
+    responseBody: any
+    path: string
+}
 
 type ValidatorResponse = {
     chatbot_id: string
-    all_endpoints: {
-        operationId: string
-        type: string
-        name: string
-        description: string
-        requestBody: any
-        requestParameters: any
-        responseBody: any
-        path: string
-    }[],
+    all_endpoints: Endpoint[],
     validations: {
-        endpoints_without_operation_id: any[]
-        endpoints_without_description: any[]
-        endpoints_without_name: any[]
+        endpoints_without_operation_id: Endpoint[]
+        endpoints_without_description: Endpoint[]
+        endpoints_without_name: Endpoint[]
         auth_type: any
     }
 }

@@ -5,6 +5,8 @@ import CodeBlock from "@/ui/components/CodeBlock";
 import { Heading } from "@/ui/components/Heading";
 import Banner2 from "@/ui/components/Banner";
 import { useBotData } from "@/ui/providers/BotDataProvider";
+import Link from "next/link";
+import { BASE_BACKEND_URL } from "utils/endpoints";
 
 export default function BotTryAndShare() {
   const { bot } = useBotData();
@@ -27,7 +29,7 @@ export default function BotTryAndShare() {
                 </Heading>
                 <div>
                   <CodeBlock
-                    code={`<script src="http://cloud.opencopilot.so/pilot.js"></script>
+                    code={`<script src="${BASE_BACKEND_URL}/pilot.js"></script>
 <script>
     initAiCoPilot({
         initialMessages: "how are you sir ?",
@@ -44,14 +46,13 @@ export default function BotTryAndShare() {
             </div>
 
             <div className="my-5">
-              <Input
-                copy
-                label="Try your copilot on our example dashboard"
-                readOnly
-                className="select-text cursor-pointer"
-                value={"https://cloud.opencopilot.so/demo/" + bot.token}
-                type="text"
-              />
+              <Link
+                target="_blank"
+                className="text-slate-800 dark:text-slate-400 block text-sm font-medium mb-1 select-none"
+                href={BASE_BACKEND_URL + "/demo/" + bot.token}
+              >
+                Try your copilot on our example dashboard
+              </Link>
             </div>
           </div>
         </div>

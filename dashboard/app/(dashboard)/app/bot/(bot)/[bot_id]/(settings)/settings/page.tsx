@@ -37,7 +37,7 @@ export default function ChatBotDetailedViewGeneralSettings({
       refresh();
       toast({
         title: "Bot updated successfully",
-        description: "Bot settings updated successfully",
+        description: "Copilot settings updated successfully",
         intent: "success",
       });
     }
@@ -67,7 +67,7 @@ export default function ChatBotDetailedViewGeneralSettings({
           </DescriptiveHeading>
           <ChangeBotContext
             name="bot_context"
-            defaultContext={botData.prompt_message}
+            defaultContext={botData.prompt_message || ""}
           />
         </section>
 

@@ -19,10 +19,8 @@ function BotDataProvider({
   bot_id: string;
 }) {
   const { refresh } = useRouter();
-  console.log(bot_id);
-  const { data: bot_data, isLoading, error } = useSWR([bot_id], getCopilot);
-  console.log("bot Data, Error", bot_data, error);
-  if ((!bot_data?.data?.chatbot || error) && !isLoading) {
+  const { data: bot_data, isLoading } = useSWR([bot_id], getCopilot);
+  if (!bot_data?.data.chatbot && !isLoading) {
     return (
       <div className="w-full h-full p-5 grid place-content-center">
         <div className="">
@@ -53,7 +51,6 @@ function BotDataProvider({
       </div>
     );
   }
-  // no data and loading so loading response
   if (!bot_data?.data?.chatbot && isLoading) {
     return (
       <div className="w-full">
@@ -61,9 +58,7 @@ function BotDataProvider({
       </div>
     );
   }
-
-  // data and not loading => ready to view the bot data
-  if (bot_data?.data?.chatbot && !isLoading) {
+  if (bot_data?.data.chatbot) {
     return (
       <BotDataSafeProvider
         value={{
