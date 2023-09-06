@@ -3,18 +3,16 @@ from langchain.tools.json.tool import JsonSpec
 import re, os, json
 from dotenv import load_dotenv
 from langchain.llms.openai import OpenAI
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
-from langchain import PromptTemplate
-
-from langchain.memory import VectorStoreRetrieverMemory
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import Qdrant, VectorStore
-import qdrant_client
-from qdrant_client.models import Distance, VectorParams
 from routes.workflow.load_openapi_spec import load_openapi_spec
+from routes.workflow.extractors.extract_body import extractBodyFromSchema
+from routes.workflow.extractors.extract_param import extractParamsFromSchema
+from routes.workflow.extractors.extract_feature_from_user_query import extract_feature_from_user_query
 
 load_dotenv()
+
+openai_api_key = os.getenv("OPENAI_API_KEY")
+llm = OpenAI(openai_api_key=openai_api_key)
+
 
 # %%
 def get_api_operation_by_id(json_spec, s_operation_id):
@@ -78,16 +76,39 @@ def hydrateParams(json_spec, ref_list):
 
     return last_portion_list
 
-# %%
+# %% Need to convert this to recursive function because body params also reference codebase
 def process_api_operation(method, api_operation, json_spec):    
-    request_body = api_operation.get("requestBody")
+    content_type = "application/json"
+    requestBody = api_operation.get("requestBody")
     
-    if not isinstance(request_body, dict):
+    if not isinstance(requestBody, dict):
         return api_operation  # Return the request_schema if it's not a dictionary
     
-    request_body = request_body["content"]["application/json"]["schema"]
-    request_body = resolve_refs(request_body, json_spec.dict_)
-    api_operation["request_body"] = request_body
+    content_types = requestBody["content"]
+    
+    # Check if the specified content type exists in the requestBody
+    if content_type in content_types:
+        content_type_schema = content_types[content_type]["schema"]
+        
+        # Check if the content type schema is a reference
+        if "$ref" in content_type_schema:
+            ref_path = content_type_schema["$ref"].split("/")[1:]
+            
+            # Navigate through the JSON spec using the reference path
+            schema_node = json_spec.dict_
+            for path_element in ref_path:
+                schema_node = schema_node[path_element]
+            
+            # Update the content type schema with the resolved schema
+            content_types[content_type]["schema"] = schema_node
+    
+    # remove other content types except application/json
+    # api_operation["requestBody"]["content"] = {content_type: schema_node}
+    # del api_operation["responses"]
+    # del api_operation["security"]
+    # del api_operation["tags"]
+    # del api_operation["summary"]
+    # del api_operation["description"]
     return api_operation
 
 def extract_json_payload(input_string):
@@ -99,7 +120,8 @@ def extract_json_payload(input_string):
 
 def generate_openapi_payload(spec_source, text: str, _operation_id: str, api_response_cache: str):
     spec_dict = load_openapi_spec(spec_source)
-
+    extracted_feature = extract_feature_from_user_query(text)
+    
     # Continue with the rest of the code
     json_spec = JsonSpec(dict_=spec_dict, max_value_length=4000)
 
@@ -108,51 +130,15 @@ def generate_openapi_payload(spec_source, text: str, _operation_id: str, api_res
 
     if isolated_request and "parameters" in isolated_request:
         isolated_request["parameters"] = hydrateParams(json_spec.dict_, isolated_request["parameters"])
-
-    openai_api_key = os.getenv("OPENAI_API_KEY")
-
-    llm = OpenAI(openai_api_key=openai_api_key)
-
-    client = qdrant_client.QdrantClient(url="http://localhost:6333", prefer_grpc=True)
-    temp_coll = "second_coll"
-    client.delete_collection(temp_coll)  # just for testing or maybe even for prod!!!
-    client.create_collection(temp_coll, vectors_config=VectorParams(size=1536, distance=Distance.COSINE))
-    # vector_store: VectorStore = Qdrant(client, collection_name=temp_coll, embeddings=embeddings)
-
-    # memory = VectorStoreRetrieverMemory(retriever=retriever)
-
-    _DEFAULT_TEMPLATE = """You are a highly skilled AI software engineer with expertise in OpenAPI Swagger. You will be provided with the following essential components: access to our historical API call responses (you can ignore previous responses if they are not required), a user query, and a relevant excerpt from the OpenAPI Swagger documentation to construct the correct API payload. Enclose the JSON payload within three backticks on both sides. Use 'query_param' to signify query parameters, 'body' to indicate the request body, and 'route_parameter' for route parameters. If a required parameter is missing, please substitute it with a mock value.
+        params = extractParamsFromSchema(isolated_request["parameters"], extracted_feature, api_response_cache);
     
-    ---
-    Historical API Responses:
-    {api_response_cache}
-    ---
+    body = extractBodyFromSchema(api_operation, extracted_feature, api_response_cache)
     
-    Swagger excerpt to build query_param, route_parameter and body: {swagger_excerpt}.
+    response = {"body": body, params: params}
     
-    ---
-    Input from the user: {input}
-    ---
-    
-    The API payload is as follows:"""
-
-    PROMPT = PromptTemplate(
-        input_variables=["api_response_cache", "swagger_excerpt", "input"], template=_DEFAULT_TEMPLATE
-    )
-    conversation_with_summary = LLMChain(
-        llm=llm,
-        prompt=PROMPT,
-        # memory=memory,
-        verbose=True
-    )
-    json_string = conversation_with_summary.predict(api_response_cache=api_response_cache, input=f"{text}", swagger_excerpt=isolated_request)
-
-    response = extract_json_payload(json_string)
-    # vector_store.add_texts([json_string])
     api_response_cache = f"{api_response_cache} \n ${json.dumps(response)}"
     print(f"cache:: {path}::{api_response_cache}")
 
     response["path"] = path
     response["request_type"] = method
-    return response
     
