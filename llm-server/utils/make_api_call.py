@@ -22,7 +22,7 @@ def replace_url_placeholders(url, values_dict):
 def make_api_request(request_type, url, body=None, params=None, headers=None):
     try:
         # Create a session and configure it with headers
-        replace_url_placeholders(url, params)
+        url = replace_url_placeholders(url, params)
         session = requests.Session()
         if headers:
             session.headers.update(headers)

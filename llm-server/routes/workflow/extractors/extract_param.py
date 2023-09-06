@@ -11,26 +11,36 @@ llm = OpenAI(openai_api_key=openai_api_key)
 
 
 def extractParamsFromSchema(param_schema: dict, extracted_features, prev_resp: str):
-    _DEFAULT_TEMPLATE = """You will receive the following essential components: responses from previous API calls, previously extracted features that may be necessary, and a schema for the JSON response I expect. Enclose the JSON payload with three backticks on both sides. If any required parameter is missing, kindly substitute it with a placeholder value.
+    _DEFAULT_TEMPLATE = """User: You will be provided with the following essential components: responses from previous API calls, previously extracted features that may be required, and a schema specifying the expected format for query parameters, including both type and route parameters.
+    
+    Previous API Responses: ```{prev_resp}```.
 
-    Previous API Responses: {prev_resp}.
+    Previously Extracted Features: ```{extracted_features}```.
 
-    Previously Extracted Features: {extracted_features}.
+    The Parameter schema is defined as follows: ```{param_schema}```.
 
-    JSON Response Schema: {param_schema}.
-
-    The API payload is as follows: """
+    Your response should consist of a json containing key-value pairs that adhere to the specified Parameter schema. Enclose the json within 3 backticks on both sides. \nAgent: """
 
     PROMPT = PromptTemplate(
         input_variables=["prev_resp", "extracted_features", "param_schema"], template=_DEFAULT_TEMPLATE
     )
+    
+    PROMPT.format(
+        prev_resp=prev_resp, 
+        extracted_features=extracted_features, 
+        param_schema=param_schema
+    )
+    
     chain = LLMChain(
         llm=llm,
         prompt=PROMPT,
         verbose=True
     )
-    json_string = chain.predict(
-        param_schema=param_schema, extracted_features=extracted_features, prev_resp=prev_resp)
+    json_string = chain.run({
+        "param_schema": param_schema,
+        "extracted_features": extracted_features,
+        "prev_resp": prev_resp
+    })
 
     response = extract_json_payload(json_string)
     return response

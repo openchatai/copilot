@@ -36,12 +36,12 @@ def run_workflow(data):
 
 def run_openapi_operations(record, swagger_src, text, headers, server_base_url):
     record_info = {"Workflow Name": record.get('name')}
-    api_response_cache = ""
     for flow in record.get("flows", []):
+        prev_api_response = ""
         for step in flow.get("steps"):
             operation_id = step.get("open_api_operation_id")
             api_payload = generate_openapi_payload(
-                swagger_src, text, operation_id, api_response_cache
+                swagger_src, text, operation_id, prev_api_response
             )
 
             api_payload["path"] = f"{server_base_url}{api_payload['path']}"
@@ -52,12 +52,7 @@ def run_openapi_operations(record, swagger_src, text, headers, server_base_url):
                 params=api_payload["params"],
                 headers=headers,
             )
-            # response = run_openapi_agent_from_json(spec_json=swagger_spec, prompt=text, prev_api_response)
-            # Take this operation id and the data provided in the request to call the API with the given open_api_operation_id
-            # The store the response of that API to call the next API, we have to think about how this response gets stored
-            # Store the response for this operation_id
             record_info[operation_id] = api_response.text
             prev_api_response = api_response.text
-
-    api_response_cache = ""
+        prev_api_response = ""
     return json.dumps(record_info)
