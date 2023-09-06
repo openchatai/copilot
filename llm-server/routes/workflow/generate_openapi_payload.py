@@ -38,18 +38,9 @@ def resolve_refs(input_dict, json_spec):
     # Check if the input_dict is a dictionary and contains a '$ref' key
     if isinstance(input_dict, dict) and '$ref' in input_dict:
         ref_value = input_dict['$ref']
-        
-        # Use regular expression to extract the schema name
-        match = re.match(r'#/components/schemas/(\w+)', ref_value)
-        if match:
-            schema_name = match.group(1)
-            
-            # Try to find the corresponding schema in the json_spec dictionary
-            schema = json_spec.dict_.get("components", {}).get("schemas", {}).get(schema_name)
-            
-            # If a matching schema is found, replace the '$ref' key with the schema
-            if schema:
-                return schema
+        paths = ref_value.split("/")[1:3]
+        if paths[0] in json_spec and paths[1] in json_spec[paths[0]]:
+            return json_spec[paths[0]][paths[1]]
         
     # Recursively process nested dictionaries and lists
     if isinstance(input_dict, dict):
@@ -122,7 +113,6 @@ def generate_openapi_payload(spec_source, text: str, _operation_id: str, api_res
 
     llm = OpenAI(openai_api_key=openai_api_key)
 
-    embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
     client = qdrant_client.QdrantClient(url="http://localhost:6333", prefer_grpc=True)
     temp_coll = "second_coll"
     client.delete_collection(temp_coll)  # just for testing or maybe even for prod!!!
@@ -131,17 +121,23 @@ def generate_openapi_payload(spec_source, text: str, _operation_id: str, api_res
 
     # memory = VectorStoreRetrieverMemory(retriever=retriever)
 
-    _DEFAULT_TEMPLATE = """You are a highly skilled AI software engineer with expertise in OpenAPI Swagger. You will be provided with the following essential components: access to our historical API calls, a user query, and a relevant excerpt from the OpenAPI Swagger documentation to construct the correct API payload. Enclose the JSON payload within three backticks on both sides. Use 'query_param' to signify query parameters, 'body' to indicate the request body, and 'route_parameter' for route parameters. If a required parameter is missing, please substitute it with a mock value.
-
+    _DEFAULT_TEMPLATE = """You are a highly skilled AI software engineer with expertise in OpenAPI Swagger. You will be provided with the following essential components: access to our historical API call responses (you can ignore previous responses if they are not required), a user query, and a relevant excerpt from the OpenAPI Swagger documentation to construct the correct API payload. Enclose the JSON payload within three backticks on both sides. Use 'query_param' to signify query parameters, 'body' to indicate the request body, and 'route_parameter' for route parameters. If a required parameter is missing, please substitute it with a mock value.
+    
+    ---
     Historical API Responses:
-    {api_call_responses}
-
-    User Input:
-    User Query: {input}
-    The API payload is: """
+    {api_response_cache}
+    ---
+    
+    Swagger excerpt to build query_param, route_parameter and body: {swagger_excerpt}.
+    
+    ---
+    Input from the user: {input}
+    ---
+    
+    The API payload is as follows:"""
 
     PROMPT = PromptTemplate(
-        input_variables=["api_call_responses", "input"], template=_DEFAULT_TEMPLATE
+        input_variables=["api_response_cache", "swagger_excerpt", "input"], template=_DEFAULT_TEMPLATE
     )
     conversation_with_summary = LLMChain(
         llm=llm,
@@ -149,13 +145,12 @@ def generate_openapi_payload(spec_source, text: str, _operation_id: str, api_res
         # memory=memory,
         verbose=True
     )
-    json_string = conversation_with_summary.predict(api_call_responses=api_response_cache, input=f"""{text}, the excerpt from openapi schema for this api is {isolated_request}
-    """)
+    json_string = conversation_with_summary.predict(api_response_cache=api_response_cache, input=f"{text}", swagger_excerpt=isolated_request)
 
     response = extract_json_payload(json_string)
     # vector_store.add_texts([json_string])
-    api_response_cache = f"{api_response_cache} \n ${json_string}"
-    print(api_response_cache)
+    api_response_cache = f"{api_response_cache} \n ${json.dumps(response)}"
+    print(f"cache:: {path}::{api_response_cache}")
 
     response["path"] = path
     response["request_type"] = method
