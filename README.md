@@ -99,6 +99,11 @@ ENV OPENAI_API_KEY YOUR_TOKEN_HERE
 make install
 ```
 
+Once the installation is complete, you can access the OpenCopilot console at: http://localhost:8888
+
+
+---
+
 If needed, you can also restart the local setup using:
 ```
 make restart
@@ -108,8 +113,6 @@ Also, you can see the complete list of commands using
 ```
 make help
 ```
-
-Once the installation is complete, you can access the OpenCopilot console at: http://localhost:8888
 
 
 ----
