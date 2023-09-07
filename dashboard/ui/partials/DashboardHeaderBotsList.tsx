@@ -26,7 +26,7 @@ export function Bots() {
   const bots = data?.data;
   const activeBot = bots?.find((bot) => bot.id === bot_id);
   const filteredBots = bots?.filter((bot) =>
-    bot.name.toLowerCase().includes(search.toLowerCase())
+    bot?.name?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
