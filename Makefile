@@ -62,6 +62,9 @@ exec-llm-server:
 
 restart:
 	$(DOCKER_COMPOSE) restart
+	@echo "$(COLOR_BOLD)=== Restart completed ===$(COLOR_RESET)"
+	@echo "$(COLOR_BOLD)=== 🔥🔥 You can now access the dashboard at -> http://localhost:8888 ===$(COLOR_RESET)"
+	@echo "$(COLOR_BOLD)=== Enjoy! ===$(COLOR_RESET)"
 
 logs:
 	$(DOCKER_COMPOSE) logs -f
