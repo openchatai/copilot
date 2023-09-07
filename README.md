@@ -13,6 +13,7 @@
 
 ![image](https://github.com/openchatai/OpenCopilot/assets/32633162/a0cdc888-d2de-46b7-8c0b-96e876050b6e)
 
+**Documentation [available here](https://docs.opencopilot.so)**
 
 ------
 # 🔥 OpenCopilot [early beta]
@@ -102,7 +103,12 @@ make install
 Once the installation is complete, you can access the OpenCopilot console at: http://localhost:8000
 
 
-Documentation [available here](https://docs.opencopilot.so)
+----
 
+### Important links
+- [OpenCopilot Flows Editor](https://editor.opencopilot.so)
+ 
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+
