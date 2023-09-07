@@ -1,13 +1,14 @@
+import os
+import threading
+import pinecone
+
 from langchain.docstore.document import Document
 from langchain.vectorstores.qdrant import Qdrant
 from utils.vector_db.store_type import StoreType
-from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.embeddings.openai import Embeddings
 from utils.vector_db.store_options import StoreOptions
-import pinecone
 from langchain.vectorstores.pinecone import Pinecone
 from dotenv import load_dotenv
-import os
-import threading
 
 init_lock = threading.Lock()
 
@@ -32,7 +33,7 @@ def initialize_pinecone():
 
 
 def init_vector_store(
-    docs: list[Document], embeddings: OpenAIEmbeddings, options: StoreOptions
+    docs: list[Document], embeddings: Embeddings, options: StoreOptions
 ) -> None:
     store_type = StoreType[os.environ["STORE"]]
 

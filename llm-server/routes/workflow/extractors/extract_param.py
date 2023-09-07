@@ -1,5 +1,4 @@
 import os
-from langchain.llms.openai import OpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from routes.workflow.extractors.extract_json import extract_json_payload

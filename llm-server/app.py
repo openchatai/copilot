@@ -4,7 +4,7 @@ from langchain.chains.openai_functions import create_structured_output_chain
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 
-from api_caller.base import try_to_match_and_call_api_endpoint
+from utils.base import try_to_match_and_call_api_endpoint
 from models.models import AiResponseFormat
 from flask_pymongo import PyMongo
 import os
@@ -14,8 +14,9 @@ import json
 import logging
 
 app = Flask(__name__)
-app.config['MONGO_URI'] = os.getenv(
-    'MONGODB_URL', 'mongodb://localhost:27017/opencopilot')
+app.config["MONGO_URI"] = os.getenv(
+    "MONGODB_URL", "mongodb://localhost:27017/opencopilot"
+)
 mongo = PyMongo(app)
 
 app.register_blueprint(workflow, url_prefix="/workflow")
@@ -23,13 +24,13 @@ app.register_blueprint(workflow, url_prefix="/workflow")
 # TODO: Implement caching for the swagger file content (no need to load it everytime)
 
 
-@app.route('/handle', methods=['POST', 'OPTIONS'])
+@app.route("/handle", methods=["POST", "OPTIONS"])
 def handle():
     data = request.get_json()
-    text = data.get('text')
-    swagger_url = data.get('swagger_url')
-    base_prompt = data.get('base_prompt')
-    headers = data.get('headers', {})
+    text = data.get("text")
+    swagger_url = data.get("swagger_url")
+    base_prompt = data.get("base_prompt")
+    headers = data.get("headers", {})
 
     if not text:
         return json.dumps({"error": "text is required"}), 400
@@ -40,8 +41,7 @@ def handle():
     swagger_spec = fetch_swagger_spec(swagger_url)
 
     try:
-        json_output = try_to_match_and_call_api_endpoint(
-            swagger_spec, text, headers)
+        json_output = try_to_match_and_call_api_endpoint(swagger_spec, text, headers)
     except Exception as e:
         warnings.warn(e)
         json_output = None
@@ -55,15 +55,16 @@ def handle():
         prompt_msgs = api_base_prompt(base_prompt, text, json_output)
 
     prompt = ChatPromptTemplate(messages=prompt_msgs)
-    chain = create_structured_output_chain(
-        AiResponseFormat, llm, prompt, verbose=False)
+    chain = create_structured_output_chain(AiResponseFormat, llm, prompt, verbose=False)
     chain_output = chain.run(question=text)
 
     return json.loads(json.dumps(chain_output.dict())), 200
 
 
 app.debug = True
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8002)
-    app.config['PROPAGATE_EXCEPTIONS'] = True
-    app.logger.setLevel(logging.DEBUG)  # Set log level to display all messages including debug
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8002)
+    app.config["PROPAGATE_EXCEPTIONS"] = True
+    app.logger.setLevel(
+        logging.DEBUG
+    )  # Set log level to display all messages including debug

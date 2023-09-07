@@ -28,13 +28,13 @@ def make_api_request(request_type, url, body=None, params=None, headers=None):
             session.headers.update(headers)
 
         # Perform the HTTP request based on the request type
-        if request_type.upper() == 'GET':
+        if request_type.upper() == "GET":
             response = session.get(url, params=params)
-        elif request_type.upper() == 'POST':
+        elif request_type.upper() == "POST":
             response = session.post(url, json=body, params=params)
-        elif request_type.upper() == 'PUT':
+        elif request_type.upper() == "PUT":
             response = session.put(url, json=body, params=params)
-        elif request_type.upper() == 'DELETE':
+        elif request_type.upper() == "DELETE":
             response = session.delete(url, params=params)
         else:
             raise ValueError("Invalid request type. Use GET, POST, PUT, or DELETE.")
