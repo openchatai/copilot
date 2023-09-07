@@ -2,7 +2,7 @@
 import { ComponentPropsWithoutRef, ElementRef, forwardRef } from "react";
 import { default as NextLink } from "next/link";
 import { useEvents } from "./Context";
-import { useParams, usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 type LinkProps = ComponentPropsWithoutRef<typeof NextLink> & {};
 export const Link = forwardRef<ElementRef<typeof NextLink>, LinkProps>(
   ({ onClick, ...props }, _ref) => {
@@ -17,7 +17,9 @@ export const Link = forwardRef<ElementRef<typeof NextLink>, LinkProps>(
       // detect if the href is external. if so => don't trigger change
       // detect if the href is the same as the current url. if so => don't trigger change
       const isExternal =
-        target === "_blank" || href?.toString().startsWith("http");
+        target === "_blank" ||
+        href?.toString().startsWith("http") ||
+        href.toString().startsWith("https");
       const isNewTab =
         target === "_blank" || ev.ctrlKey || ev.metaKey || ev.shiftKey;
       if (!isExternal && !isNewTab && !isSameUrl) {

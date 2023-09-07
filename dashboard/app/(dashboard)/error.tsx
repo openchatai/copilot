@@ -9,7 +9,7 @@ export default function ErrorComponent({
   error,
 }: {
   reset: () => void;
-  error: any;
+  error: Error;
 }) {
   console.log(error);
   return (
@@ -18,14 +18,17 @@ export default function ErrorComponent({
         <div>
           <BsExclamationTriangle size={50} className="text-rose-500" />
         </div>
-        <div className="max-w-xl w-full">
+        <div className="max-w-xl w-full overflow-auto">
           <CodeBlock language="shell" code={JSON.stringify(error.message)} />
         </div>
         <div>
-          Error Occurred - Please {" "}
-          <a className="underline font-semibold" href="https://github.com/openchatai/OpenCopilot/issues/new">
+          Error Occurred - Please{" "}
+          <Link
+            className="underline font-semibold"
+            href="https://github.com/openchatai/OpenCopilot/issues/new"
+          >
             open a GitHub issue
-          </a>{" "}
+          </Link>{" "}
           and we will make sure your problem get solved
         </div>
         <div className="space-x-2">

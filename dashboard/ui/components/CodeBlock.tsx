@@ -35,7 +35,7 @@ function CodeBlock({
             ...CodeBlockTheme,
             hljs: {
               ...CodeBlockTheme["hljs"],
-              overflow: "auto",
+              overflowX: "auto",
               overflowY: "hidden",
               padding: "1rem",
               borderRadius: "0.5rem",
