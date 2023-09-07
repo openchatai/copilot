@@ -9,7 +9,13 @@ import { useTheme } from "next-themes";
 import { FcCheckmark } from "react-icons/fc";
 import { BiCopy } from "react-icons/bi";
 
-function CodeBlock({ code }: { code: string }) {
+function CodeBlock({
+  code,
+  language = "html",
+}: {
+  code: string;
+  language?: string;
+}) {
   const [copied, copyFn] = useCopyToClipboard();
   const { theme } = useTheme();
   const CodeBlockTheme =
@@ -24,14 +30,16 @@ function CodeBlock({ code }: { code: string }) {
       </button>
       <div className="w-full">
         <SyntaxHighlighter
-          language="html"
+          language={language}
           style={{
             ...CodeBlockTheme,
             hljs: {
               ...CodeBlockTheme["hljs"],
               overflow: "auto",
+              overflowY: "hidden",
               padding: "1rem",
               borderRadius: "0.5rem",
+              minHeight: "4rem",
             },
           }}
         >
