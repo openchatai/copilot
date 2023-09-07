@@ -40,6 +40,7 @@ services:
       - opencopilot_network
     depends_on:
       - backend
+      - mysql
 
   mysql:
     restart: unless-stopped

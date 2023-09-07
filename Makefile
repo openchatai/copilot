@@ -69,4 +69,22 @@ restart:
 logs:
 	$(DOCKER_COMPOSE) logs -f
 
+# Define the help target
+help:
+	@echo "$(COLOR_BOLD)Usage: make [target]$(COLOR_RESET)"
+	@echo ""
+	@echo "$(COLOR_BOLD)Available Targets:$(COLOR_RESET)"
+	@echo ""
+	@echo "  $(COLOR_GREEN)install$(COLOR_RESET)            - Install and set up the Docker environment"
+	@echo "  $(COLOR_GREEN)db-setup$(COLOR_RESET)           - Set up the database (fresh migration with seeding)"
+	@echo "  $(COLOR_GREEN)down$(COLOR_RESET)               - Stop and remove all containers"
+	@echo "  $(COLOR_GREEN)exec-backend$(COLOR_RESET)      - Access the backend container's shell"
+	@echo "  $(COLOR_GREEN)exec-dashboard$(COLOR_RESET)    - Access the dashboard container's shell"
+	@echo "  $(COLOR_GREEN)exec-llm-server$(COLOR_RESET)   - Access the llm-server container's shell"
+	@echo "  $(COLOR_GREEN)restart$(COLOR_RESET)            - Restart all containers"
+	@echo "  $(COLOR_GREEN)logs$(COLOR_RESET)               - Show container logs"
+	@echo ""
+	@echo "  $(COLOR_YELLOW)help$(COLOR_RESET)               - Display this help message"
+	@echo ""
+
 .PHONY: install down
