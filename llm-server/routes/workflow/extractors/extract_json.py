@@ -1,8 +1,12 @@
 import re
 import json
+from custom_types.t_json import JsonData
+from typing import Optional
 
 
-def extract_json_payload(input_string):
+def extract_json_payload(
+    input_string: str,
+) -> Optional[JsonData]:
     # Remove all whitespace characters
     input_string = re.sub(r"\s", "", input_string)
 
