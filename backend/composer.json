@@ -22,7 +22,6 @@
         "mixpanel/mixpanel-php": "^2.11",
         "sentry/sentry-laravel": "^3.4",
         "spatie/laravel-webhook-server": "^3.4",
-        "stripe/stripe-php": "^10.15",
         "zircote/swagger-php": "^4.7",
         "ext-pdo": "*"
     },
