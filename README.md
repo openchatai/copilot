@@ -99,14 +99,25 @@ ENV OPENAI_API_KEY YOUR_TOKEN_HERE
 make install
 ```
 
+If needed, you can also restart the local setup using:
+```
+make restart
+```
 
-Once the installation is complete, you can access the OpenCopilot console at: http://localhost:8000
+Also, you can see the complete list of commands using 
+```
+make help
+```
+
+Once the installation is complete, you can access the OpenCopilot console at: http://localhost:8888
 
 
 ----
 
 ### Important links
 - [OpenCopilot Flows Editor](https://editor.opencopilot.so)
+- The backend server (API) is reacheable via http://localhost:8888/backend
+- The dashboard server is reachable via http://localhost:8888/ or http://localhost:8888/dashboard
  
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
