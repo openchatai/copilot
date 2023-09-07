@@ -167,17 +167,21 @@
 </main>
 
 
-<script src="/pilot.js?V1"></script>
+<script src="http://localhost:8888/backend/pilot.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    initAiCoPilot({
-        initialMessages: ["I can support you in managing your pets shop, how I can help you today?"],
-        token: "{{ $token }}",
-        triggerSelector: "#triggerSelector",
-        headers: {
-            Authorization: "Bearer your_auth_token_goes_here",
-        },
-    });
+    window.onload = () => {
+        initAiCoPilot({
+            initialMessage: "Hello, how I can help you?", // Initial message.
+            token: "{{ $token }}",
+            triggerSelector: "#triggerSelector", // The selector of the element that will trigger the widget on click.
+            apiUrl: "http://localhost:8888/backend/api", // The url of the copilot backend API.
+            headers: {
+                // Headers that you want to send with every message request to your backend.
+                Authorization: "Your backend auth token",
+            },
+        });
+    };
 </script>
 
 </body>

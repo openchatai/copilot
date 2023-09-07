@@ -31,14 +31,19 @@ export default function BotTryAndShare() {
                   <CodeBlock
                     code={`<script src="${BASE_BACKEND_URL}/pilot.js"></script>
 <script>
-    initAiCoPilot({
-        initialMessages: "how are you sir ?",
-        token: ${bot.token},
-        triggerSelector: "#triggerSelector",
-        headers: {
-            // custom headers will be sent over to your APIs with every message
-        },
-    });
+    // you should run it after window loads
+    window.onload = () => {
+       initAiCoPilot({
+           initialMessage: "Hello, how I can help you?", // Initial message.
+           token: "${bot.token}", // Your copilot token (automatically filled here).
+           triggerSelector: "#triggerSelector", // The selector of the element that will trigger the widget on click.
+           apiUrl: "${BASE_BACKEND_URL}/api", // The url of the copilot backend API.
+           headers: {
+             // Headers that you want to send with every message request to your backend.
+             Authorization: "Your backend auth token",
+           },
+       });
+    };
 </script>`}
                   />
                 </div>
