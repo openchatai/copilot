@@ -6,7 +6,6 @@ from langchain.embeddings.base import Embeddings
 from langchain.embeddings import LlamaCppEmbeddings
 
 load_dotenv()
-import os
 
 
 def get_embedding_provider():

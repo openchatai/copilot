@@ -1,4 +1,8 @@
-import yaml, json, requests, os
+import yaml
+import json
+import requests
+import os
+
 
 def load_openapi_spec(spec_source):
     if isinstance(spec_source, str):
@@ -9,7 +13,10 @@ def load_openapi_spec(spec_source):
     elif isinstance(spec_source, dict):
         return spec_source
     else:
-        raise ValueError("Unsupported spec_source type. It should be a URL, file path, or dictionary.")
+        raise ValueError(
+            "Unsupported spec_source type. It should be a URL, file path, or dictionary."
+        )
+
 
 def load_spec_from_url(url):
     response = requests.get(url)
@@ -25,6 +32,7 @@ def load_spec_from_url(url):
             raise Exception(f"Unsupported content type in response: {content_type}")
     else:
         raise Exception(f"Failed to fetch OpenAPI spec from URL: {url}")
+
 
 def load_spec_from_file(file_path):
     file_extension = os.path.splitext(file_path)[1].lower()

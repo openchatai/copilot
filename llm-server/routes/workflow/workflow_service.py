@@ -11,13 +11,12 @@ mongo = db_instance.get_db()
 
 
 def run_workflow(data):
-    text = data.get('text')
-    swagger_src = data.get('swagger_src')
-    base_prompt = data.get('base_prompt')
-    headers = data.get('headers', {})
+    text = data.get("text")
+    swagger_src = data.get("swagger_src")
+    headers = data.get("headers", {})
     # This will come from request payload later on when implementing multi-tenancy
     namespace = "workflows"
-    server_base_url = data.get('server_base_url')
+    server_base_url = data.get("server_base_url")
 
     if not text:
         return json.dumps({"error": "text is required"}), 400
@@ -25,17 +24,17 @@ def run_workflow(data):
     vector_store = get_vector_store(StoreOptions(namespace))
     documents = vector_store.similarity_search(text)
 
-    first_document_id = ObjectId(
-        documents[0].metadata["workflow_id"]) if documents else None
+    first_document_id = (
+        ObjectId(documents[0].metadata["workflow_id"]) if documents else None
+    )
     record = mongo.workflows.find_one({"_id": first_document_id})
 
-    result = run_openapi_operations(
-        record, swagger_src, text, headers, server_base_url)
-    return result, 200, {'Content-Type': 'application/json'}
+    result = run_openapi_operations(record, swagger_src, text, headers, server_base_url)
+    return result, 200, {"Content-Type": "application/json"}
 
 
 def run_openapi_operations(record, swagger_src, text, headers, server_base_url):
-    record_info = {"Workflow Name": record.get('name')}
+    record_info = {"Workflow Name": record.get("name")}
     for flow in record.get("flows", []):
         prev_api_response = ""
         for step in flow.get("steps"):

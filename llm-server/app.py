@@ -1,20 +1,17 @@
-import json, logging
-
-import requests
 import warnings
 from flask import Flask, request
 from langchain.chains.openai_functions import create_structured_output_chain
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
-from langchain.utilities.openapi import OpenAPISpec
 
 from api_caller.base import try_to_match_and_call_api_endpoint
 from models.models import AiResponseFormat
-from prompts.base import non_api_base_prompt, api_base_prompt
 from flask_pymongo import PyMongo
 import os
 from routes.workflow.workflow_controller import workflow
 from utils.fetch_swagger_spec import fetch_swagger_spec
+import json
+import logging
 
 app = Flask(__name__)
 app.config['MONGO_URI'] = os.getenv(
@@ -46,7 +43,7 @@ def handle():
         json_output = try_to_match_and_call_api_endpoint(
             swagger_spec, text, headers)
     except Exception as e:
-        warnings.warn(str(e))
+        warnings.warn(e)
         json_output = None
 
     llm = ChatOpenAI(model="gpt-3.5-turbo-0613", temperature=0)
@@ -67,6 +64,6 @@ def handle():
 
 app.debug = True
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8002, debug=True)
+    app.run(host='0.0.0.0', port=8002)
     app.config['PROPAGATE_EXCEPTIONS'] = True
     app.logger.setLevel(logging.DEBUG)  # Set log level to display all messages including debug

@@ -1,20 +1,24 @@
-from langchain.tools.json.tool import JsonSpec
 import re
 import os
 import json
+from langchain.tools.json.tool import JsonSpec
+from utils.get_llm import get_llm
 from dotenv import load_dotenv
-from langchain.llms.openai import OpenAI
 from routes.workflow.load_openapi_spec import load_openapi_spec
 from routes.workflow.extractors.extract_body import extractBodyFromSchema
 from routes.workflow.extractors.extract_param import extractParamsFromSchema
-from routes.workflow.extractors.extract_feature_from_user_query import extract_feature_from_user_query
-from routes.workflow.extractors.hydrate_params import hydrateParams, replace_ref_with_value
-import copy
+from routes.workflow.extractors.extract_feature_from_user_query import (
+    extract_feature_from_user_query,
+)
+from routes.workflow.extractors.hydrate_params import (
+    hydrateParams,
+    replace_ref_with_value,
+)
 
 load_dotenv()
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
-llm = OpenAI(openai_api_key=openai_api_key)
+llm = get_llm()
 
 
 def get_api_operation_by_id(json_spec, s_operation_id):
@@ -34,8 +38,8 @@ def get_api_operation_by_id(json_spec, s_operation_id):
 
 def resolve_refs(input_dict, json_spec):
     # Check if the input_dict is a dictionary and contains a '$ref' key
-    if isinstance(input_dict, dict) and '$ref' in input_dict:
-        ref_value = input_dict['$ref']
+    if isinstance(input_dict, dict) and "$ref" in input_dict:
+        ref_value = input_dict["$ref"]
         paths = ref_value.split("/")[1:3]
         if paths[0] in json_spec and paths[1] in json_spec[paths[0]]:
             return json_spec[paths[0]][paths[1]]
@@ -85,13 +89,15 @@ def process_api_operation(method, api_operation, json_spec):
 
 def extract_json_payload(input_string):
     # Remove all whitespace characters
-    input_string = re.sub(r'\s', '', input_string)
+    input_string = re.sub(r"\s", "", input_string)
 
     match = re.findall(r"{.+[:,].+}|\[.+[,:].+\]", input_string)
     return json.loads(match[0]) if match else None
 
 
-def generate_openapi_payload(spec_source, text: str, _operation_id: str, prev_api_response: str) -> dict:
+def generate_openapi_payload(
+    spec_source, text: str, _operation_id: str, prev_api_response: str
+) -> dict:
     params = {}
     body = {}
     spec_dict = load_openapi_spec(spec_source)
@@ -100,32 +106,33 @@ def generate_openapi_payload(spec_source, text: str, _operation_id: str, prev_ap
     # Continue with the rest of the code
     json_spec = JsonSpec(dict_=spec_dict, max_value_length=4000)
 
-    api_operation, method, path = get_api_operation_by_id(
-        json_spec, _operation_id)
+    api_operation, method, path = get_api_operation_by_id(json_spec, _operation_id)
     isolated_request = process_api_operation(method, api_operation, json_spec)
 
     if isolated_request and "parameters" in isolated_request:
         isolated_request["parameters"] = hydrateParams(
-            json_spec.dict_, isolated_request["parameters"])
+            json_spec.dict_, isolated_request["parameters"]
+        )
         params = extractParamsFromSchema(
-            isolated_request["parameters"],
-            extracted_feature,
-            prev_api_response
+            isolated_request["parameters"], extracted_feature, prev_api_response
         )
 
-    if "requestBody" in api_operation and "content" in api_operation["requestBody"] \
-            and "application/json" in api_operation["requestBody"]["content"] \
-            and "schema" in api_operation["requestBody"]["content"]["application/json"] \
-            and "properties" in api_operation["requestBody"]["content"]["application/json"]["schema"]:
-
-        body_schema = api_operation["requestBody"]["content"]["application/json"]["schema"]["properties"]
+    if (
+        "requestBody" in api_operation
+        and "content" in api_operation["requestBody"]
+        and "application/json" in api_operation["requestBody"]["content"]
+        and "schema" in api_operation["requestBody"]["content"]["application/json"]
+        and "properties"
+        in api_operation["requestBody"]["content"]["application/json"]["schema"]
+    ):
+        body_schema = api_operation["requestBody"]["content"]["application/json"][
+            "schema"
+        ]["properties"]
         replace_ref_with_value(body_schema, json_spec.dict_)
-        body = extractBodyFromSchema(
-            body_schema, extracted_feature, prev_api_response)
+        body = extractBodyFromSchema(body_schema, extracted_feature, prev_api_response)
     else:
         print("Some key is not present in the requestBody dictionary.")
 
-    response = {"body": body, "params": params,
-                "path": path, "request_type": method}
+    response = {"body": body, "params": params, "path": path, "request_type": method}
 
     return response
