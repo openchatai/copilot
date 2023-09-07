@@ -8,7 +8,7 @@
 <img alt="GitHub Issues" src="https://img.shields.io/github/issues/openchatai/opencopilot" />
 <img alt="GitHub Pull Requests" src="https://img.shields.io/github/issues-pr/openchatai/opencopilot" />
 <img alt="Github License" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
-<img alt="Discord" src="https://img.shields.io/discord/1110910277110743103?label=Discord&logo=discord&logoColor=white&style=plastic&color=d7b023)](https://discord.gg/Q8hHfdav" />
+<img alt="Discord" src="https://imgx.shields.io/discord/1110910277110743103?label=Discord&logo=discord&logoColor=white&style=plastic&color=d7b023)](https://discord.gg/Q8hHfdav" />
 </p>
 
 ![image](https://github.com/openchatai/OpenCopilot/assets/32633162/a0cdc888-d2de-46b7-8c0b-96e876050b6e)

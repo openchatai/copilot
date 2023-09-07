@@ -1,36 +1,44 @@
-# Use an official PHP runtime as the base image
-FROM php:8.1-cli
+FROM node:18-alpine AS base
+RUN corepack enable
+RUN corepack prepare pnpm@8.7.0 --activate
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    libpq-dev \
-    libzip-dev \
-    zip \
-    unzip \
-    git
+COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
+RUN pnpm i --frozen-lockfile
 
-RUN docker-php-ext-install pdo pdo_mysql
 
-# Set the working directory
-WORKDIR /var/www/html
-
-# Copy the project files to the container
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Copy the .env file (assuming it's in the same directory as the Dockerfile)
-COPY .env.example .env
+ENV NEXT_TELEMETRY_DISABLED 1
 
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# RUN yarn build
+RUN pnpm run build
 
-# Install Composer dependencies
-RUN composer install --no-plugins --no-scripts
+# Production image, copy all the files and run next
+FROM base AS runner
+WORKDIR /app
 
-# Generate the Laravel application key
-RUN php artisan key:generate
+ENV NODE_ENV production
 
-# Expose the container's port 8000 (default for `php artisan serve`)
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
 EXPOSE 8000
 
-# Start the Laravel development server
-CMD php artisan serve --host=0.0.0.0 --port=8000
+ENV PORT 8000
+ENV HOSTNAME "0.0.0.0"
+
+CMD ["node", "server.js"]

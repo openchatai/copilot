@@ -1,12 +1,10 @@
-version: '3'
+version: "3"
 services:
-  dashboard:
+  backend:
     restart: unless-stopped
     build:
-      context: ./dashboard
+      context: ./backend
       dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
     depends_on:
       - llm-server
       - mysql
@@ -18,8 +16,6 @@ services:
       - DB_PASSWORD=dbpass
     volumes:
       - shared_data:/app/shared_data
-      - application:/app
-      - ./dashboard:/var/www/html/dashboard
     networks:
       - opencopilot_network
 
@@ -32,6 +28,18 @@ services:
       - shared_data:/app/shared_data
     networks:
       - opencopilot_network
+
+  dashboard:
+    restart: unless-stopped
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    volumes:
+      - shared_data:/app/shared_data
+    networks:
+      - opencopilot_network
+    depends_on:
+      - backend
 
   mysql:
     restart: unless-stopped
@@ -50,10 +58,24 @@ services:
     networks:
       - opencopilot_network
 
+  nginx:
+    image: nginx
+    restart: unless-stopped
+    ports:
+      - "8888:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - opencopilot_network
+    depends_on:
+      - dashboard
+      - llm-server
+      - backend
+      - mysql
+
 networks:
   opencopilot_network:
 
 volumes:
   shared_data:
-  application:
   database:
