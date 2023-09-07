@@ -1,4 +1,3 @@
-from langchain.llms.openai import OpenAI
 import os
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
@@ -10,7 +9,7 @@ llm = get_llm()
 
 
 # This fits a chat model better
-def extract_feature_from_user_query(user_input: str):
+def extract_feature_from_user_query(user_input: str) -> str:
     _DEFAULT_TEMPLATE = """You will receive user input, and I need you to extract all pertinent features from it. \n\nUser Input: {input} \n Assistant: """
 
     _DEFAULT_TEMPLATE.format(input=input)

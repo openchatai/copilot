@@ -1,6 +1,3 @@
-from typing import Optional
-
-
 class StoreOptions:
-    def __init__(self, namespace: Optional[str] = None):
+    def __init__(self, namespace: str):
         self.namespace = namespace

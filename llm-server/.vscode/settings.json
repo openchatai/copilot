@@ -7,7 +7,8 @@
     "python.pythonPath": "~/anaconda3/envs/copilot/bin",
     "python.linting.enabled": true,
     "python.linting.pylintEnabled": false,
-    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Enabled": false,
     "python.linting.mypyEnabled": true,
-    "python.linting.mypyPath": "~/anaconda3/bin/mypy",
+    // "python.linting.mypyPath": "",
+    "mypy.configFile": "mypy.toml",
 }

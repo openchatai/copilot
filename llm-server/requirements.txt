@@ -49,8 +49,10 @@ manifest-ml==0.0.1
 MarkupSafe==2.1.3
 marshmallow==3.19.0
 marshmallow-enum==1.5.1
+mccabe @ file:///opt/conda/conda-bld/mccabe_1644221741721/work
 multidict==6.0.4
 murmurhash==1.0.9
+mypy @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_b7yrbsawof/croot/mypy_1668440220235/work
 mypy-extensions==0.4.3
 nltk==3.8.1
 numexpr==2.8.4
@@ -63,7 +65,10 @@ pinecone-client==2.2.2
 portalocker==2.7.0
 preshed==3.0.8
 protobuf==4.24.2
+psutil @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_1310b568-21f4-4cb0-b0e3-2f3d31e39728k9coaga5/croots/recipe/psutil_1656431280844/work
+pycodestyle @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_5b2mq44vl0/croot/pycodestyle_1674267228581/work
 pydantic==1.10.11
+pyflakes @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_d9_v8e0_nr/croot/pyflakes_1674165137080/work
 pymongo==4.5.0
 python-dateutil==2.8.2
 python-dotenv==1.0.0
@@ -79,7 +84,6 @@ six==1.16.0
 smart-open==6.3.0
 sniffio==1.3.0
 soupsieve==2.4.1
-spacy==3.6.0
 spacy-legacy==3.0.12
 spacy-loggers==1.0.4
 SQLAlchemy==1.4.49
@@ -89,10 +93,16 @@ tenacity==8.2.2
 thinc==8.1.10
 tiktoken==0.4.0
 tokenizers==0.13.3
+toml @ file:///tmp/build/80754af9/toml_1616166611790/work
+tomli @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_d0e5ffbf-5cf1-45be-8693-c5dff8108a2awhthtjlq/croots/recipe/tomli_1657175508477/work
 tqdm==4.65.0
 transformers==4.30.2
 typer==0.9.0
+types-PyYAML==6.0.12.11
+types-requests==2.31.0.2
+types-urllib3==1.26.25.14
 typing-inspect==0.9.0
+typing_extensions @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_1fdywrbp_3/croot/typing_extensions_1690297474455/work
 urllib3==1.26.16
 wasabi==1.1.2
 Werkzeug==2.3.6
