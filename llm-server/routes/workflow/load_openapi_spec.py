@@ -2,9 +2,10 @@ import yaml
 import json
 import requests
 import os
+from typing import Any, Dict, Union
 
 
-def load_openapi_spec(spec_source):
+def load_openapi_spec(spec_source: Union[str, Dict[str, Any]]) -> Any:
     if isinstance(spec_source, str):
         if spec_source.startswith(("http://", "https://")):
             return load_spec_from_url(spec_source)
@@ -18,7 +19,7 @@ def load_openapi_spec(spec_source):
         )
 
 
-def load_spec_from_url(url):
+def load_spec_from_url(url: str) -> Any:
     response = requests.get(url)
     if response.status_code == 200:
         content_type = response.headers.get("content-type", "").lower()
@@ -34,7 +35,7 @@ def load_spec_from_url(url):
         raise Exception(f"Failed to fetch OpenAPI spec from URL: {url}")
 
 
-def load_spec_from_file(file_path):
+def load_spec_from_file(file_path: str) -> Any:
     file_extension = os.path.splitext(file_path)[1].lower()
     if file_extension == ".json":
         with open(file_path, "r") as file:

@@ -5,7 +5,7 @@ import pinecone
 from langchain.docstore.document import Document
 from langchain.vectorstores.qdrant import Qdrant
 from utils.vector_db.store_type import StoreType
-from langchain.embeddings.openai import Embeddings
+from langchain.embeddings.base import Embeddings
 from utils.vector_db.store_options import StoreOptions
 from langchain.vectorstores.pinecone import Pinecone
 from dotenv import load_dotenv
@@ -59,7 +59,7 @@ def init_vector_store(
         )
 
     else:
-        valid_stores = ", ".join(StoreType._member_names())
+        valid_stores = ", ".join(e.name for e in StoreType)
         raise ValueError(
             f"Invalid STORE environment variable value: {os.environ['STORE']}. Valid values are: {valid_stores}"
         )

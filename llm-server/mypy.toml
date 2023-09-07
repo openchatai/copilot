@@ -1,4 +1,14 @@
-[mypy]
-strict=true
-show_error_codes=true
-exclude = requests
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+strict = true
+
+[[tool.mypy.overrides]]
+module = [
+    "langchain",
+    "flask_pymongo",
+    "pinecone"
+]
+ignore_missing_imports = true
+disallow_untyped_defs = true

@@ -1,13 +1,18 @@
-def hydrateParams(json_spec: dict, ref_list: dict):
-    last_portion_list = []
+from typing import Dict, Any, List, Union
+
+
+def hydrateParams(
+    json_spec: Dict[str, Any],
+    ref_list: List[Dict[str, Any]],
+) -> List[Union[Dict[str, Any], None]]:
+    last_portion_list: List[Union[Dict[str, Any], None]] = []
 
     for ref in ref_list:
-        if "$ref" in ref:  # Check if '$ref' exists in the dictionary
+        if "$ref" in ref:
             paths = ref["$ref"].split("/")[1:3]
             if paths[0] in json_spec and paths[1] in json_spec[paths[0]]:
                 last_portion_list.append(json_spec[paths[0]][paths[1]])
             else:
-                # Handle the case where the key is not present
                 last_portion_list.append(None)
 
         if "schema" in ref and "$ref" in ref["schema"]:
@@ -15,24 +20,24 @@ def hydrateParams(json_spec: dict, ref_list: dict):
             if paths[0] in json_spec and paths[1] in json_spec[paths[0]]:
                 last_portion_list.append(json_spec[paths[0]][paths[1]])
             else:
-                # Handle the case where the key is not present
                 last_portion_list.append(None)
         else:
-            # If '$ref' doesn't exist, add the reference as is
             last_portion_list.append(ref)
 
     return last_portion_list
 
 
-def replace_ref_with_value(input_dict, json_spec_dict):
-    def replace_ref_recursive(sub_dict):
+def replace_ref_with_value(
+    input_dict: Dict[str, Any], json_spec_dict: Dict[str, Any]
+) -> None:
+    def replace_ref_recursive(sub_dict: Dict[str, Any]) -> None:
         if isinstance(sub_dict, dict):
             if "$ref" in sub_dict:
-                ref_value = sub_dict["$ref"]
-                split_ref = ref_value.split("/")
+                ref_value: str = sub_dict["$ref"]
+                split_ref: List[str] = ref_value.split("/")
                 if len(split_ref) > 3:
-                    replacement_key = "/".join(split_ref[1:])
-                    replacement_value = get_nested_value(
+                    replacement_key: str = "/".join(split_ref[1:])
+                    replacement_value: Any = get_nested_value(
                         json_spec_dict, replacement_key
                     )
                     if replacement_value is not None:
@@ -42,7 +47,7 @@ def replace_ref_with_value(input_dict, json_spec_dict):
                 for _, value in sub_dict.items():
                     replace_ref_recursive(value)
 
-    def get_nested_value(d, key):
+    def get_nested_value(d: Dict[str, Any], key: str) -> Any:
         keys = key.split("/")
         for k in keys:
             if k in d:

@@ -2,14 +2,16 @@ from langchain.llms import AzureOpenAI, OpenAI
 import os
 from dotenv import load_dotenv
 from langchain.llms import LlamaCpp
+from langchain.llms.base import BaseLLM
 
 from langchain.callbacks.manager import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+from typing import Dict, Callable
 
 load_dotenv()
 
 
-def get_llama_llm():
+def get_llama_llm() -> BaseLLM:
     n_gpu_layers = 1  # Metal set to 1 is enough.
     n_batch = 512  # Should be between 1 and n_ctx, consider the amount of RAM of your Apple Silicon Chip.
 
@@ -30,7 +32,7 @@ def get_llama_llm():
 
 
 # Azure OpenAI Language Model client
-def get_azure_openai_llm():
+def get_azure_openai_llm() -> AzureOpenAI:
     """Returns AzureOpenAI instance configured from environment variables"""
 
     openai_api_type = os.environ["OPENAI_API_TYPE"]
@@ -52,7 +54,7 @@ def get_azure_openai_llm():
 
 
 # OpenAI Language Model client
-def get_openai_llm():
+def get_openai_llm() -> BaseLLM:
     """Returns OpenAI instance configured from environment variables"""
 
     openai_api_key = os.environ["OPENAI_API_KEY"]
@@ -60,10 +62,10 @@ def get_openai_llm():
     return OpenAI(temperature=0, openai_api_key=openai_api_key)
 
 
-def get_llm():
+def get_llm() -> BaseLLM:
     """Returns LLM client instance based on OPENAI_API_TYPE"""
 
-    clients = {
+    clients: Dict[str, Callable[[], BaseLLM]] = {
         "azure": get_azure_openai_llm,
         "openai": get_openai_llm,
         "llama2": get_llama_llm,

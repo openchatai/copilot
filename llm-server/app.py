@@ -12,6 +12,8 @@ from routes.workflow.workflow_controller import workflow
 from utils.fetch_swagger_spec import fetch_swagger_spec
 import json
 import logging
+from typing import Any
+from prompts.base import api_base_prompt, non_api_base_prompt
 
 app = Flask(__name__)
 app.config["MONGO_URI"] = os.getenv(
@@ -25,7 +27,7 @@ app.register_blueprint(workflow, url_prefix="/workflow")
 
 
 @app.route("/handle", methods=["POST", "OPTIONS"])
-def handle():
+def handle() -> Any:
     data = request.get_json()
     text = data.get("text")
     swagger_url = data.get("swagger_url")
@@ -43,7 +45,7 @@ def handle():
     try:
         json_output = try_to_match_and_call_api_endpoint(swagger_spec, text, headers)
     except Exception as e:
-        warnings.warn(e)
+        warnings.warn(str(e))
         json_output = None
 
     llm = ChatOpenAI(model="gpt-3.5-turbo-0613", temperature=0)

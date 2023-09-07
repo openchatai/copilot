@@ -14,6 +14,9 @@ from routes.workflow.extractors.hydrate_params import (
     hydrateParams,
     replace_ref_with_value,
 )
+from custom_types.t_json import JsonData
+from custom_types.swagger import ApiOperation
+from typing import Dict, Any, Optional, Union, Tuple
 
 load_dotenv()
 
@@ -21,22 +24,32 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
 
 
-def get_api_operation_by_id(json_spec, s_operation_id):
-    paths = json_spec.dict_.get("paths", {})
+from typing import Dict, Any, Optional, Union, List
+
+
+def get_api_operation_by_id(
+    json_spec: Any, op_id: str
+) -> Tuple[ApiOperation, str, str]:
+    paths: Dict[str, List[ApiOperation]] = json_spec.get("paths", {})
+
     for path, methods in paths.items():
-        for method, operation in methods.items():
-            # Check if 'operation' is a dictionary
-            if isinstance(operation, dict):
-                operation_id = operation.get("operationId")
-                if operation_id == s_operation_id:
-                    return operation, method, path
-            else:
-                # Handle the case where 'operation' is not a dictionary
-                # print(f"Skipping invalid operation: {operation}")
-                pass
+        if isinstance(methods, dict):
+            for method, operation in methods.items():
+                # Check if 'operation' is a dictionary
+                if isinstance(operation, dict):
+                    operation_id: Union[str, None] = operation.get("operationId")
+
+                    if operation_id == op_id:
+                        return operation, method, path
+
+                else:
+                    # Handle invalid operation
+                    pass
+
+    raise ValueError(f"Failed to find operation with id {op_id} in spec {json_spec}")
 
 
-def resolve_refs(input_dict, json_spec):
+def resolve_refs(input_dict: JsonData, json_spec: Dict[str, Any]) -> Any:
     # Check if the input_dict is a dictionary and contains a '$ref' key
     if isinstance(input_dict, dict) and "$ref" in input_dict:
         ref_value = input_dict["$ref"]
@@ -55,7 +68,9 @@ def resolve_refs(input_dict, json_spec):
     return input_dict
 
 
-def process_api_operation(method, api_operation, json_spec):
+def process_api_operation(
+    method: str, api_operation: ApiOperation, json_spec: Any
+) -> Any:
     content_type = "application/json"
     requestBody = api_operation.get("requestBody")
 
@@ -87,7 +102,7 @@ def process_api_operation(method, api_operation, json_spec):
     return api_operation
 
 
-def extract_json_payload(input_string):
+def extract_json_payload(input_string: str) -> Optional[Any]:
     # Remove all whitespace characters
     input_string = re.sub(r"\s", "", input_string)
 
@@ -96,18 +111,24 @@ def extract_json_payload(input_string):
 
 
 def generate_openapi_payload(
-    spec_source, text: str, _operation_id: str, prev_api_response: str
-) -> dict:
-    params = {}
-    body = {}
-    spec_dict = load_openapi_spec(spec_source)
+    spec_source: str, text: str, _operation_id: str, prev_api_response: str
+) -> Dict[str, Any]:
+    params: Optional[JsonData] = {}
+    body: Optional[Dict[str, Any]] = {}
+    spec_dict: Dict[str, Any] = load_openapi_spec(spec_source)
     extracted_feature = extract_feature_from_user_query(text)
 
     # Continue with the rest of the code
-    json_spec = JsonSpec(dict_=spec_dict, max_value_length=4000)
+    json_spec: JsonSpec = JsonSpec(dict_=spec_dict, max_value_length=4000)
 
+    api_operation: ApiOperation
+    method: str
+    path: str
     api_operation, method, path = get_api_operation_by_id(json_spec, _operation_id)
-    isolated_request = process_api_operation(method, api_operation, json_spec)
+
+    isolated_request: Dict[str, Any] = process_api_operation(
+        method, api_operation, json_spec
+    )
 
     if isolated_request and "parameters" in isolated_request:
         isolated_request["parameters"] = hydrateParams(
@@ -125,14 +146,19 @@ def generate_openapi_payload(
         and "properties"
         in api_operation["requestBody"]["content"]["application/json"]["schema"]
     ):
-        body_schema = api_operation["requestBody"]["content"]["application/json"][
-            "schema"
-        ]["properties"]
+        body_schema: Dict[str, Any] = api_operation["requestBody"]["content"][
+            "application/json"
+        ]["schema"]["properties"]
         replace_ref_with_value(body_schema, json_spec.dict_)
         body = extractBodyFromSchema(body_schema, extracted_feature, prev_api_response)
     else:
         print("Some key is not present in the requestBody dictionary.")
 
-    response = {"body": body, "params": params, "path": path, "request_type": method}
+    response = {
+        "body": body,
+        "params": params,
+        "path": path,
+        "request_type": method,
+    }
 
     return response
