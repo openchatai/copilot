@@ -78,7 +78,7 @@ export default function Banner2({
   level = 1,
 }: Banner2Props) {
   return (
-    <div className={cn(className, !open && "hidden")} role="alert">
+    <div className={cn(className)} role="alert">
       <div
         data-level={level}
         className={cn(banner2Variants(variant), 'data-[level="1"]:text-white')}

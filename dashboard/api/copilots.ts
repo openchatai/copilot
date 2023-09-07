@@ -20,7 +20,7 @@ export const CopilotSchema = v.object({
     swagger_url: v.string(),
     is_premade_demo_template: v.boolean(),
 })
-export type Copilot = Partial<v.Output<typeof CopilotSchema>>
+export type Copilot = v.Output<typeof CopilotSchema>
 type Endpoint = {
     operationId: string
     type: string
@@ -75,7 +75,7 @@ export async function validateSwagger(bot_id: string) {
 }
 export const demoCopilotSchema = v.object({
     swagger_url: v.string(),
-    chatbot: v.partial(CopilotSchema)
+    chatbot: CopilotSchema
 })
 export type DemoCopilot = v.Output<typeof demoCopilotSchema>
 

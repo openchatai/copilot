@@ -1,14 +1,19 @@
 import React, { type ReactNode } from "react";
 import { Nav } from "./_parts/BotLayoutNavLink";
 import { BotDataProvider } from "@/ui/providers/BotDataProvider";
+import { getCopilot } from "api/copilots";
+import { Button } from "@/ui/components/Button";
+import { Link } from "@/ui/router-events";
+import EmptyState from "@/ui/partials/EmptyState";
 
-export default function BotLayout({
+export default async function BotLayout({
   children,
   params,
 }: {
   children: ReactNode;
   params: { bot_id: string };
 }) {
+  const { data: copilot, status } = await getCopilot(params.bot_id);
   return (
     <>
       <div
@@ -36,7 +41,29 @@ export default function BotLayout({
           data-container="bot-layout"
           className="px-4 sm:px-6 lg:px-8 py-8 max-w-[96rem] mx-auto flex-1 grow w-full"
         >
-          <BotDataProvider bot_id={params.bot_id}>{children}</BotDataProvider>
+          {status === 200 ? (
+            <BotDataProvider copilot={copilot.chatbot}>
+              {children}
+            </BotDataProvider>
+          ) : (
+            <div>
+              <EmptyState
+                label="Copilot not found"
+                description="The Copilot you are looking for does not exist or you do not have permission to view it."
+              >
+                <div className="space-x-2">
+                  <Button
+                    asChild
+                    variant={{
+                      intent: "primary",
+                    }}
+                  >
+                    <Link href="/app">Index</Link>
+                  </Button>
+                </div>
+              </EmptyState>
+            </div>
+          )}
         </div>
       </div>
     </>

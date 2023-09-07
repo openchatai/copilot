@@ -1,4 +1,3 @@
-"use client";
 import { Heading } from "@/ui/components/Heading";
 import WelcomeBanner from "@/ui/partials/WelcomeBanner";
 import { Link } from "@/ui/router-events";
@@ -7,14 +6,13 @@ import { Button } from "@/ui/components/Button";
 import EmptyState from "@/ui/partials/EmptyState";
 import { AiOutlinePlus } from "react-icons/ai";
 import { getCopilots } from "api/copilots";
-import useSWR from "swr";
 import { Map } from "@/ui/helper-components";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 1;
-function DashboardIndex() {
-  const { data: response } = useSWR("copilots", getCopilots);
-  console.log(response);
+async function DashboardIndex() {
+  const { data: copilots } = await getCopilots();
+  
   return (
     <>
       <WelcomeBanner />
@@ -45,9 +43,9 @@ function DashboardIndex() {
             </div>
             <div>
               <div className="grid grid-cols-12 gap-6">
-                {response?.data ? (
+                {copilots ? (
                   <Map
-                    data={response?.data}
+                    data={copilots}
                     render={(bot, i) => <ChatBotCard {...bot} key={i} />}
                     fallback={
                       <EmptyState
