@@ -9,7 +9,8 @@ module = [
     "langchain",
     "flask_pymongo",
     "pinecone",
-    "jsonschema"
+    "jsonschema",
+    "faker"
 ]
 ignore_missing_imports = true
 disallow_untyped_defs = true
