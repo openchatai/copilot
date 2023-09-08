@@ -89,6 +89,7 @@ def process_api_operation(
 
         # Check if the content type schema is a reference
         if content_type_schema and "$ref" in content_type_schema:
+            # type: ignore
             ref_path = content_type_schema["$ref"].split("/")[1:]
 
             # Navigate through the JSON spec using the reference path

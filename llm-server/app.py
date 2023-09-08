@@ -60,7 +60,7 @@ def handle() -> Any:
     chain = create_structured_output_chain(AiResponseFormat, llm, prompt, verbose=False)
     chain_output = chain.run(question=text)
 
-    return json.loads(json.dumps(chain_output.dict())), 200
+    return chain_output, 200
 
 
 app.debug = True

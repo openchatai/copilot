@@ -6,17 +6,19 @@ from routes.workflow.generate_openapi_payload import generate_openapi_payload
 from utils.make_api_call import make_api_request
 import json
 
+from typing import Any, Dict, Optional, cast
+
 db_instance = Database()
 mongo = db_instance.get_db()
 
 
-def run_workflow(data):
+def run_workflow(data: Dict[str, Any]) -> Any:
     text = data.get("text")
-    swagger_src = data.get("swagger_src")
+    swagger_src = cast(str, data.get("swagger_src"))
     headers = data.get("headers", {})
     # This will come from request payload later on when implementing multi-tenancy
     namespace = "workflows"
-    server_base_url = data.get("server_base_url")
+    server_base_url = cast(str, data.get("server_base_url"))
 
     if not text:
         return json.dumps({"error": "text is required"}), 400
@@ -33,7 +35,13 @@ def run_workflow(data):
     return result, 200, {"Content-Type": "application/json"}
 
 
-def run_openapi_operations(record, swagger_src, text, headers, server_base_url):
+def run_openapi_operations(
+    record: Any,
+    swagger_src: str,
+    text: str,
+    headers: Any,
+    server_base_url: str,
+) -> str:
     record_info = {"Workflow Name": record.get("name")}
     for flow in record.get("flows", []):
         prev_api_response = ""

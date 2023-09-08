@@ -1,10 +1,11 @@
 from flask import request, jsonify
 from jsonschema import validate, ValidationError
+from typing import Callable, Any, Dict
 
 
-def validate_json(schema):
-    def decorator(func):
-        def wrapper(*args, **kwargs):
+def validate_json(schema: Dict[str, Any]) -> Callable[..., Any]:
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
             try:
                 validate(instance=request.json, schema=schema)
                 return func(*args, **kwargs)
