@@ -154,9 +154,8 @@ def generate_openapi_payload(
         # replace $ref recursively
         replace_ref_with_value(body_schema, json_spec.dict_)
         _example = generate_example_from_schema(api_operation)
-        print(
-            f"The output should conform to {_example}, we will use this later for few shot prompt"
-        )
+
+        print(f"Generator function output {_example}")
         body = extractBodyFromSchema(body_schema, extracted_feature, prev_api_response)
     else:
         print("Some key is not present in the requestBody dictionary.")
