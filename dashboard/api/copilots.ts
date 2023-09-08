@@ -47,6 +47,7 @@ export async function getCopilots() {
 }
 
 export async function getCopilot(id: string) {
+    if (!id) throw new Error("Copilot id is required")
     return axiosInstance.get<{ chatbot: Copilot }>(`/copilot/${id}`)
 }
 

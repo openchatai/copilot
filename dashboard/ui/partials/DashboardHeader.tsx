@@ -1,5 +1,4 @@
 "use client";
-import { Separator } from "../components/Separator";
 import ProfilePopover from "./HeaderPopover";
 import Logo from "./Logo";
 import { Bots } from "./DashboardHeaderBotsList";
