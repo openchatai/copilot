@@ -69,11 +69,5 @@ def internal_server_error(error: Any) -> Tuple[str, int]:
     print(error)
     return "Internal Server Error", 500
 
-
-app.debug = True
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8002)
-    app.config["PROPAGATE_EXCEPTIONS"] = True
-    app.logger.setLevel(
-        logging.DEBUG
-    )  # Set log level to display all messages including debug
