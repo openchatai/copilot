@@ -1,9 +1,10 @@
+# type: ignore
 from pymongo import MongoClient
 from pymongo.database import Database as PyMongoDatabase
 
 
 class Database:
-    _instance: MongoClient
+    _instance: MongoClient = None
 
     def __new__(cls, app=None):
         if cls._instance is None:
@@ -14,5 +15,6 @@ class Database:
             cls._instance.db = cls._instance.client.opencopilot
         return cls._instance
 
-    def get_db(self) -> PyMongoDatabase:
-        return self._instance.db  # Use _instance to access the shared instance
+    @staticmethod
+    def get_db() -> PyMongoDatabase:
+        return Database._instance.db  # Access _instance directly from the class
