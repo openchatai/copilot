@@ -117,7 +117,7 @@ def generate_openapi_payload(
     params: Optional[JsonData] = {}
     body: Optional[Dict[str, Any]] = {}
     spec_dict: Dict[str, Any] = load_openapi_spec(spec_source)
-    extracted_feature = extract_feature_from_user_query(text)
+    # extracted_feature = extract_feature_from_user_query(text)
 
     # Continue with the rest of the code
     json_spec: JsonSpec = JsonSpec(dict_=spec_dict, max_value_length=4000)
@@ -136,7 +136,7 @@ def generate_openapi_payload(
             json_spec.dict_, isolated_request["parameters"]
         )
         params = extractParamsFromSchema(
-            isolated_request["parameters"], extracted_feature, prev_api_response
+            isolated_request["parameters"], text, prev_api_response
         )
 
     if (
@@ -153,10 +153,10 @@ def generate_openapi_payload(
 
         # replace $ref recursively
         replace_ref_with_value(body_schema, json_spec.dict_)
-        _example = generate_example_from_schema(api_operation)
+        example = generate_example_from_schema(api_operation)
 
-        print(f"Generator function output {_example}")
-        body = extractBodyFromSchema(body_schema, extracted_feature, prev_api_response)
+        print(f"Generator function output {example}")
+        body = extractBodyFromSchema(body_schema, text, prev_api_response, example)
     else:
         print("Some key is not present in the requestBody dictionary.")
 

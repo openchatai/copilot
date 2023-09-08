@@ -98,4 +98,4 @@ def generate_example_json(
 # This function can be used to generate an example value for llm, incase the response is not correct
 def generate_example_from_schema(input: Any) -> Any:
     schema = input["requestBody"]["content"]["application/json"]["schema"]
-    return generate_example_json(schema)
+    return json.dumps(generate_example_json(schema))
