@@ -28,6 +28,8 @@ services:
       - shared_data:/app/shared_data
     networks:
       - opencopilot_network
+    env_file:
+      - llm-server/.env
     depends_on:
       - mongodb
       - qdrant
@@ -73,6 +75,15 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: dbpass
     networks:
       - opencopilot_network
+
+  # adminer:
+  #   image: adminer
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - mysql
+  #   networks:
+  #     - opencopilot_network
 
   qdrant:
     image: qdrant/qdrant

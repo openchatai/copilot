@@ -16,8 +16,5 @@ COPY . /app/
 # Make port 80 available to the world outside this container
 EXPOSE 5000
 
-# Define environment variable
-ENV OPENAI_API_KEY YOU_TOKEN_HERE
-
 # Run app.py when the container launches
 CMD ["python", "app.py"]
