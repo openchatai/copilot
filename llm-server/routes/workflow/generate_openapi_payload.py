@@ -7,9 +7,6 @@ from dotenv import load_dotenv
 from routes.workflow.load_openapi_spec import load_openapi_spec
 from routes.workflow.extractors.extract_body import extractBodyFromSchema
 from routes.workflow.extractors.extract_param import extractParamsFromSchema
-from routes.workflow.extractors.extract_feature_from_user_query import (
-    extract_feature_from_user_query,
-)
 from routes.workflow.extractors.hydrate_params import (
     hydrateParams,
     replace_ref_with_value,
