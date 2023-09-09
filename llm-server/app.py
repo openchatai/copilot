@@ -90,4 +90,4 @@ def internal_server_error(error: Any) -> Tuple[str, int]:
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8002)
+    app.run(host="0.0.0.0", port=8002, debug=True)
