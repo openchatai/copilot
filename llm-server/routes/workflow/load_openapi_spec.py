@@ -37,6 +37,7 @@ def load_spec_from_url(url: str) -> Any:
 
 def load_spec_from_file(file_path: str) -> Any:
     file_extension = os.path.splitext(file_path)[1].lower()
+    file_path = "/app/shared_data/" + file_path
     if file_extension == ".json":
         with open(file_path, "r") as file:
             return json.load(file)
