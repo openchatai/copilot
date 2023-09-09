@@ -31,6 +31,20 @@ from typing import Dict, Any, Optional, Union, List
 def get_api_operation_by_id(
     json_spec: Any, op_id: str
 ) -> Tuple[ApiOperation, str, str]:
+    """
+    Get an API operation by its operationId from a OpenAPI/Swagger specification.
+
+    Args:
+        json_spec: The OpenAPI/Swagger specification as a pydantic model.
+        op_id: The operationId to search for.
+
+    Returns:
+        A tuple containing the ApiOperation definition, HTTP method, and path
+        for the matching operation.
+
+    Raises:
+        ValueError: If no operation with the given op_id is found.
+    """
     paths: Dict[str, List[ApiOperation]] = json_spec.dict_.get("paths", {})
 
     for path, methods in paths.items():
@@ -51,6 +65,17 @@ def get_api_operation_by_id(
 
 
 def resolve_refs(input_dict: JsonData, json_spec: Dict[str, Any]) -> Any:
+    """
+    Recursively resolves JSON reference ($ref) fields in a dictionary/list structure.
+
+    Args:
+        input_dict: The dictionary or list to resolve references in.
+        json_spec: The full JSON specification containing reference definitions.
+
+    Returns:
+        input_dict with any $ref fields resolved to their referenced value.
+
+    """
     # Check if the input_dict is a dictionary and contains a '$ref' key
     if isinstance(input_dict, dict) and "$ref" in input_dict:
         ref_value = input_dict["$ref"]
@@ -69,9 +94,28 @@ def resolve_refs(input_dict: JsonData, json_spec: Dict[str, Any]) -> Any:
     return input_dict
 
 
-def process_api_operation(
+def resolve_request_body_schema_reference(
     method: str, api_operation: ApiOperation, json_spec: Any
 ) -> Any:
+    """
+    Resolves any JSON schema $ref pointers in the requestBody
+    of the given API operation against the given API spec.
+
+    Args:
+        request_method: The HTTP method of the API operation
+
+        api_operation: A dictionary containing a snippet of the API specification
+            in OpenAPI/Swagger format, describing a single operation of the API.
+            For example, this could be the schema for the request body of the
+            "addPet" operation.
+
+        api_spec: The full API specification dictionary containing
+            the complete OpenAPI/Swagger schema.
+
+    Returns:
+        The updated api_operation dictionary with any JSON reference pointers
+        resolved against the api_spec.
+    """
     content_type = "application/json"
     requestBody = api_operation.get("requestBody")
 
@@ -114,6 +158,22 @@ def extract_json_payload(input_string: str) -> Optional[Any]:
 def generate_openapi_payload(
     spec_source: str, text: str, _operation_id: str, prev_api_response: str
 ) -> Dict[str, Any]:
+    """Generates an API request payload based on an OpenAPI spec.
+    Args:
+        spec_source (str): The path or URL to the OpenAPI spec file.
+        text (str): The original user text query.
+        _operation_id (str): The ID of the OpenAPI operation to target.
+        prev_api_response (str): The response from a previous API request, if any.
+
+    Returns:
+        Dict[str, Any]: The generated request payload, containing keys for
+            "body", "params", "path", and "request_type".
+
+    This function parses the given OpenAPI spec and constructs a request payload
+    for the operation matching the provided _operation_id. It extracts parameters
+    from the user text and previous API response to populate the payload. The
+    payload can then be used to call the target API.
+    """
     params: Optional[JsonData] = {}
     body: Optional[Dict[str, Any]] = {}
     spec_dict: Dict[str, Any] = load_openapi_spec(spec_source)
@@ -127,7 +187,7 @@ def generate_openapi_payload(
     path: str
     api_operation, method, path = get_api_operation_by_id(json_spec, _operation_id)
 
-    isolated_request: Dict[str, Any] = process_api_operation(
+    isolated_request: Dict[str, Any] = resolve_request_body_schema_reference(
         method, api_operation, json_spec
     )
 
