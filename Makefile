@@ -17,7 +17,7 @@ install:
     endif
 
 	@echo "$(COLOR_BOLD)=== Putting the services down (if already running) ===$(COLOR_RESET)"
-	$(DOCKER_COMPOSE) down #--remove-orphans
+	$(DOCKER_COMPOSE) down --remove-orphans
 
 	@echo "$(COLOR_BOLD)=== Setting up Docker environment ===$(COLOR_RESET)"
     # Copy .env.example to .env for dashboard
@@ -25,8 +25,8 @@ install:
 	@echo "$(COLOR_BOLD)=== This will overwrite your .env files, you still have some time to abort ===$(COLOR_RESET)"
 	@sleep 5
 	@echo "$(COLOR_BOLD)=== Copying .env files ===$(COLOR_RESET)"
+	cp -n llm-server/.env.example llm-server/.env 2>/dev/null || true
 	cp -n dashboard/.env.example dashboard/.env 2>/dev/null || true
-	cp common.env llm-server/.env 2>/dev/null || true
 	$(DOCKER_COMPOSE) build #--no-cache
 	$(DOCKER_COMPOSE) up -d #--force-recreate
 	@echo "$(COLOR_BOLD)=== Waiting for services to start (~20 seconds) ===$(COLOR_RESET)"
