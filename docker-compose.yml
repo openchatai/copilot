@@ -28,6 +28,8 @@ services:
       - shared_data:/app/shared_data
     networks:
       - opencopilot_network
+    env_file:
+      - llm-server/.env
     depends_on:
       - mongodb
       - qdrant
