@@ -1,0 +1,30 @@
+version: "3"
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: dbuser
+      MONGO_INITDB_ROOT_PASSWORD: dbpass
+    networks:
+      - opencopilot_network
+
+  qdrant:
+    image: qdrant/qdrant
+    ports:
+      - 6333:6333
+      - 6334:6334
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    networks:
+      - opencopilot_network
+volumes:
+  mongodb_data:
+  qdrant_storage:
+
+networks:
+  opencopilot_network:

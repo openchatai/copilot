@@ -89,18 +89,23 @@ We love hearing from you! Got any cool ideas or requests? We're all ears! So, if
 git clone git@github.com:openchatai/OpenCopilot.git
 ```
 
-- Update llm-server/Dockerfile with your `OPENAI_API_KEY` key:
+- Update the `.env` file located in the `llm-server` directory with your `OPENAI_API_KEY`. You can use the `.env.example` file as a reference:
+
 ```
-ENV OPENAI_API_KEY YOUR_TOKEN_HERE
+ENV OPENAI_API_KEY=YOUR_TOKEN_HERE
 ```
 
-- Navigate to the repository folder and run the following command (for MacOS or Linux):
-```
+- After updating your API key, navigate to the repository folder and run the following command (for macOS or Linux):
+
+```bash
 make install
 ```
 
-Once the installation is complete, you can access the OpenCopilot console at: http://localhost:8888
+This will install the necessary dependencies and set up the environment for the OpenCopilot project.
+```
 
+Please make sure to replace `"YOUR_TOKEN_HERE"` with your actual OpenAI API key.
+Once the installation is complete, you can access the OpenCopilot console at: http://localhost:8888
 
 ---
 
@@ -116,7 +121,15 @@ make help
 
 
 ----
+## Known Issue
 
+### llm Server Requires Absolute URLs
+
+**Issue:** The llm server relies on absolute URLs to make API calls. However, some Swagger files only provide relative paths. This limitation prevents the server from functioning correctly because it needs a complete base URL to append endpoints.
+
+**Solution:** To address this issue, we need to ensure that all Swagger files contain a base URL. This modification will enable the llm server to work seamlessly by appending endpoints to the provided absolute URLs.
+
+---
 ### Important links
 - [OpenCopilot Flows Editor](https://editor.opencopilot.so)
 - The backend server (API) is reacheable via http://localhost:8888/backend

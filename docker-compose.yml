@@ -28,6 +28,11 @@ services:
       - shared_data:/app/shared_data
     networks:
       - opencopilot_network
+    env_file:
+      - llm-server/.env
+    depends_on:
+      - mongodb
+      - qdrant
 
   dashboard:
     restart: unless-stopped
@@ -58,6 +63,37 @@ services:
       - database:/var/lib/mysql
     networks:
       - opencopilot_network
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: dbuser
+      MONGO_INITDB_ROOT_PASSWORD: dbpass
+    networks:
+      - opencopilot_network
+
+  # adminer:
+  #   image: adminer
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - mysql
+  #   networks:
+  #     - opencopilot_network
+
+  qdrant:
+    image: qdrant/qdrant
+    ports:
+      - 6333:6333
+      - 6334:6334
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    networks:
+      - opencopilot_network
 
   nginx:
     image: nginx
@@ -80,3 +116,5 @@ networks:
 volumes:
   shared_data:
   database:
+  mongodb_data:
+  qdrant_storage:
