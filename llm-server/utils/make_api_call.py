@@ -1,44 +1,41 @@
 import requests
 
-def make_api_request(request_type, url, body=None, params=None, query_params=None, headers=None):
+
+def replace_url_placeholders(url, values_dict):
     """
-    Make an HTTP request to the specified URL with the given parameters.
+    Replace placeholders in a URL with values from a dictionary.
 
     Args:
-        request_type (str): The HTTP request type (GET, POST, PUT, DELETE, etc.).
-        url (str): The URL of the API endpoint.
-        body (dict, optional): The request body as a dictionary.
-        params (dict, optional): The request parameters as a dictionary.
-        query_params (dict, optional): The query parameters as a dictionary.
-        headers (dict, optional): The request headers as a dictionary.
+    url (str): The URL containing placeholders.
+    values_dict (dict): A dictionary containing key-value pairs for replacements.
 
     Returns:
-        requests.Response: The HTTP response object.
-    Example:
-        request_type = "GET"
-        url = "https://example.com/api"
-        body = {"key": "value"}
-        params = {"param_key": "param_value"}
-        query_params = {"query_key": "query_value"}
-        headers = {"Authorization": "Bearer YOUR_ACCESS_TOKEN"}
-
-        response = make_api_request(request_type, url, body, params, query_params, headers)
+    str: The URL with placeholders replaced by values.
     """
+    for key, value in values_dict.items():
+        placeholder = "{" + key + "}"
+        if placeholder in url:
+            url = url.replace(placeholder, str(value))
+    return url
+
+
+def make_api_request(request_type, url, body=None, params=None, headers=None):
     try:
         # Create a session and configure it with headers
+        replace_url_placeholders(url, params)
         session = requests.Session()
         if headers:
             session.headers.update(headers)
 
         # Perform the HTTP request based on the request type
         if request_type.upper() == 'GET':
-            response = session.get(url, params=query_params)
+            response = session.get(url, params=params)
         elif request_type.upper() == 'POST':
-            response = session.post(url, json=body, params=query_params)
+            response = session.post(url, json=body, params=params)
         elif request_type.upper() == 'PUT':
-            response = session.put(url, json=body, params=query_params)
+            response = session.put(url, json=body, params=params)
         elif request_type.upper() == 'DELETE':
-            response = session.delete(url, params=query_params)
+            response = session.delete(url, params=params)
         else:
             raise ValueError("Invalid request type. Use GET, POST, PUT, or DELETE.")
 
@@ -50,18 +47,3 @@ def make_api_request(request_type, url, body=None, params=None, query_params=Non
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
         return None
-
-# Example usage:
-# if __name__ == "__main__":
-#     request_type = "GET"
-#     url = "https://example.com/api"
-#     body = {"key": "value"}
-#     params = {"param_key": "param_value"}
-#     query_params = {"query_key": "query_value"}
-#     headers = {"Authorization": "Bearer YOUR_ACCESS_TOKEN"}
-
-#     response = make_api_request(request_type, url, body, params, query_params, headers)
-
-#     if response:
-#         print(f"Response status code: {response.status_code}")
-#         print(f"Response content: {response.text}")
