@@ -9,6 +9,8 @@ COLOR_YELLOW = \033[33m
 
 # Check if Docker is installed
 DOCKER_INSTALLED := $(shell command -v docker-compose 2> /dev/null)
+LLM_SERVER_ENV_EXISTS := $(shell [ -f llm-server/.env ] && echo "true" || echo "false")
+
 
 # Targets
 install:
@@ -20,13 +22,18 @@ install:
 	$(DOCKER_COMPOSE) down #--remove-orphans
 
 	@echo "$(COLOR_BOLD)=== Setting up Docker environment ===$(COLOR_RESET)"
+
+    # Check if llm-server/.env exists
+    ifeq ($(LLM_SERVER_ENV_EXISTS),false)
+	    $(error Please make sure to copy llm-server/.env.example to .env and fill it with the needed keys.)
+    endif
+
     # Copy .env.example to .env for dashboard
     # Show warning before continue, and wait for 10 seconds
 	@echo "$(COLOR_BOLD)=== This will overwrite your .env files, you still have some time to abort ===$(COLOR_RESET)"
 	@sleep 5
 	@echo "$(COLOR_BOLD)=== Copying .env files ===$(COLOR_RESET)"
 	cp -n dashboard/.env.example dashboard/.env 2>/dev/null || true
-	cp common.env llm-server/.env 2>/dev/null || true
 	$(DOCKER_COMPOSE) build #--no-cache
 	$(DOCKER_COMPOSE) up -d #--force-recreate
 	@echo "$(COLOR_BOLD)=== Waiting for services to start (~20 seconds) ===$(COLOR_RESET)"
@@ -86,5 +93,6 @@ help:
 	@echo ""
 	@echo "  $(COLOR_YELLOW)help$(COLOR_RESET)               - Display this help message"
 	@echo ""
+
 
 .PHONY: install down

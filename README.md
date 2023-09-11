@@ -8,7 +8,9 @@
 <img alt="GitHub Issues" src="https://img.shields.io/github/issues/openchatai/opencopilot" />
 <img alt="GitHub Pull Requests" src="https://img.shields.io/github/issues-pr/openchatai/opencopilot" />
 <img alt="Github License" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
-<img alt="Discord" src="https://imgx.shields.io/discord/1110910277110743103?label=Discord&logo=discord&logoColor=white&style=plastic&color=d7b023)](https://discord.gg/Q8hHfdav" />
+<a href="https://discord.gg/yjEgCgvefr"><img alt="Discord" src="https://img.shields.io/discord/1111357170504699954"></a>
+
+
 </p>
 
 ![image](https://github.com/openchatai/OpenCopilot/assets/32633162/a0cdc888-d2de-46b7-8c0b-96e876050b6e)
@@ -85,22 +87,25 @@ We love hearing from you! Got any cool ideas or requests? We're all ears! So, if
 
 - To begin, clone this Git repository:
 
-```bash
+```
 git clone git@github.com:openchatai/OpenCopilot.git
 ```
 
-- Update llm-server/Dockerfile with your `OPENAI_API_KEY` key:
+- Update the `.env` file located in the `llm-server` directory with your `OPENAI_API_KEY`. You can use the `.env.example` file as a reference:
+
 ```
-ENV OPENAI_API_KEY YOUR_TOKEN_HERE
+OPENAI_API_KEY=YOUR_TOKEN_HERE
 ```
 
-- Navigate to the repository folder and run the following command (for MacOS or Linux):
+- After updating your API key, navigate to the repository folder and run the following command (for macOS or Linux):
+
 ```
 make install
 ```
 
-Once the installation is complete, you can access the OpenCopilot console at: http://localhost:8888
+This will install the necessary dependencies and set up the environment for the OpenCopilot project.
 
+Once the installation is complete, you can access the OpenCopilot console at: http://localhost:8888
 
 ---
 
@@ -114,8 +119,6 @@ Also, you can see the complete list of commands using
 make help
 ```
 
-
-----
 
 ### Important links
 - [OpenCopilot Flows Editor](https://editor.opencopilot.so)

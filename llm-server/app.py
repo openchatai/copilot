@@ -1,28 +1,39 @@
-import json
+import warnings
 
 import requests
-import warnings
 from flask import Flask, request
 from langchain.chains.openai_functions import create_structured_output_chain
 from langchain.chat_models import ChatOpenAI, ChatLiteLLM
 from langchain.prompts import ChatPromptTemplate
-from langchain.utilities.openapi import OpenAPISpec
 
-from api_caller.base import try_to_match_and_call_api_endpoint
+from langchain.utilities.openapi import OpenAPISpec
+from utils.base import try_to_match_and_call_api_endpoint
 from models.models import AiResponseFormat
-from prompts.base import non_api_base_prompt, api_base_prompt
+from flask_pymongo import PyMongo
+import os
+from routes.workflow.workflow_controller import workflow
+import json
+import logging
+from typing import Any, Tuple
+from prompts.base import api_base_prompt, non_api_base_prompt
 
 app = Flask(__name__)
+app.config["MONGO_URI"] = os.getenv(
+    "MONGODB_URL", "mongodb://localhost:27017/opencopilot"
+)
+mongo = PyMongo(app)
+
+app.register_blueprint(workflow, url_prefix="/workflow")
 
 
 ## TODO: Implement caching for the swagger file content (no need to load it everytime)
-@app.route('/handle', methods=['POST', 'OPTIONS'])
+@app.route("/handle", methods=["POST", "OPTIONS"])
 def handle():
     data = request.get_json()
-    text = data.get('text')
-    swagger_url = data.get('swagger_url')
-    base_prompt = data.get('base_prompt')
-    headers = data.get('headers', {})
+    text = data.get("text")
+    swagger_url = data.get("swagger_url")
+    base_prompt = data.get("base_prompt")
+    headers = data.get("headers", {})
 
     if not text:
         return json.dumps({"error": "text is required"}), 400
@@ -43,7 +54,7 @@ def handle():
     else:
         full_url = "/app/shared_data/" + swagger_url
         try:
-            with open(full_url, 'r') as file:
+            with open(full_url, "r") as file:
                 swagger_text = file.read()
         except FileNotFoundError:
             return json.dumps({"error": "File not found"}), 404
@@ -71,5 +82,12 @@ def handle():
     return json.loads(json.dumps(chain_output.dict())), 200
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8002)
+@app.errorhandler(500)
+def internal_server_error(error: Any) -> Tuple[str, int]:
+    # Log the error to the console
+    print(error)
+    return "Internal Server Error", 500
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8002, debug=True)

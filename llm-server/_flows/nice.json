@@ -1,0 +1,43 @@
+{
+  "opencopilot": "0.1",
+  "info": {
+    "title": "My OpenCopilot definition",
+    "version": "1.0.0"
+  },
+  "flows": [
+    {
+      "name": "user registration",
+      "description": "The needed API flow to register a user into the system",
+      "requires_confirmation": false,
+      "steps": [
+        {
+          "stepId": "xxx",
+          "operation": "call",
+          "open_api_operation_id": "operationId1"
+        },
+        {
+          "stepId": "xxx",
+          "operation": "call",
+          "open_api_operation_id": "operationId2",
+          "parameters": {
+            "user_verification": "xx.response.some_key"
+          }
+        },
+        {
+          "operation": "call",
+          "open_api_operation_id": "operationId3"
+        }
+      ],
+      "on_success": [
+        {
+          "handler": "plotOutcomeJsFunction"
+        }
+      ],
+      "on_failure": [
+        {
+          "handler": "plotOutcomeJsFunction"
+        }
+      ]
+    }
+  ]
+}

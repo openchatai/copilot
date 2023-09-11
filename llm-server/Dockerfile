@@ -13,11 +13,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the current directory contents into the container at /app
 COPY . /app/
 
-# Make port 80 available to the world outside this container
-EXPOSE 5000
-
-# Define environment variable
-ENV OPENAI_API_KEY YOU_TOKEN_HERE
+EXPOSE 8002
 
 # Run app.py when the container launches
 CMD ["python", "app.py"]
