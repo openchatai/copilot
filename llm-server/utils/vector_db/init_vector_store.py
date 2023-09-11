@@ -19,7 +19,7 @@ VECTOR_STORE_INDEX_NAME = "temp"
 initialized = False
 
 
-def initialize_pinecone():
+def initialize_pinecone() -> None:
     global initialized
     # Only initialize Pinecone if the store type is Pinecone and the initialization lock is not acquired
     with init_lock:

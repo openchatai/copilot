@@ -4,11 +4,12 @@ from langchain.requests import RequestsWrapper
 from langchain.tools.json.tool import JsonSpec
 from utils.get_llm import get_llm
 import os
+from typing import Dict, Any
 
 
 def run_openapi_agent_from_json(
-    spec_json: dict, prompt: str, prev_api_response
-) -> None:
+    spec_json: Dict[str, Any], prompt: str, prev_api_response: str
+) -> str:
     json_spec = JsonSpec(dict_=spec_json, max_value_length=4000)
 
     headers = {"Authorization": f"Bearer {os.getenv('API_KEY')}"}
@@ -21,4 +22,4 @@ def run_openapi_agent_from_json(
         llm=get_llm(), toolkit=openapi_toolkit
     )
 
-    openapi_agent_executor.run(prompt)
+    return openapi_agent_executor.run(prompt)

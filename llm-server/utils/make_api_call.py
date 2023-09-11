@@ -1,7 +1,9 @@
 import requests
+from typing import Any, Dict
+from requests import Response
 
 
-def replace_url_placeholders(url, values_dict):
+def replace_url_placeholders(url: str, values_dict: Dict[str, Any]) -> str:
     """
     Replace placeholders in a URL with values from a dictionary.
 
@@ -19,7 +21,13 @@ def replace_url_placeholders(url, values_dict):
     return url
 
 
-def make_api_request(request_type, url, body=None, params=None, headers=None):
+def make_api_request(
+    request_type: str,
+    url: str,
+    body: Dict[str, Any] = {},
+    params: Dict[str, Any] = {},
+    headers: Dict[str, Any] = {},
+) -> Response:
     try:
         # Create a session and configure it with headers
         url = replace_url_placeholders(url, params)
@@ -46,4 +54,4 @@ def make_api_request(request_type, url, body=None, params=None, headers=None):
 
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
-        return None
+        raise (e)
