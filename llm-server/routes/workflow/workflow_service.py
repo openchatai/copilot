@@ -42,7 +42,7 @@ def run_openapi_operations(record, swagger_spec: OpenAPISpec, text, headers):
     for flow in record.get("flows", []):
         for step in flow.get("steps"):
             operation_id = step.get("open_api_operation_id")
-            api_payload = generate_openapi_payload(swagger_spec, text)
+            api_payload = generate_openapi_payload("https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/spotify.com/1.0.0/openapi.yaml", text)
             # api_payload = generate_openapi_payload()
             
             api_response = make_api_request(
