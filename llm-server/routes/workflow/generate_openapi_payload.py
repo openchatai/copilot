@@ -4,14 +4,12 @@ import re, os, json
 from dotenv import load_dotenv
 from langchain.llms.openai import OpenAI
 from langchain.prompts import PromptTemplate
-from langchain.chains import ConversationChain
-from langchain.llms import OpenAI
+from langchain.chains import LLMChain
 from langchain import PromptTemplate
 
 from langchain.memory import VectorStoreRetrieverMemory
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import Qdrant
-from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.vectorstores import Qdrant, VectorStore
 import qdrant_client
 from qdrant_client.models import Distance, VectorParams
 from routes.workflow.load_openapi_spec import load_openapi_spec
@@ -64,15 +62,17 @@ def resolve_refs(input_dict, json_spec):
     return input_dict
 
 
-
 def hydrateParams(json_spec, ref_list):
     last_portion_list = []
     
     for ref in ref_list:
         if '$ref' in ref:  # Check if '$ref' exists in the dictionary
-            match = re.search(r'/([^/]+)$', ref['$ref'])
-            if match:
-                last_portion_list.append(json_spec["components"]["parameters"][match.group(1)])
+            paths = ref['$ref'].split("/")[1:3]
+            last_portion_list.append(json_spec[paths[0]][paths[1]])
+        
+        if '$ref' in ref["schema"]:
+            paths = ref['schema']['$ref'].split("/")[1:3]
+            last_portion_list.append(json_spec[paths[0]][paths[1]])
         else:
             # If '$ref' doesn't exist, add the reference as is
             last_portion_list.append(ref)
@@ -119,38 +119,36 @@ def generate_openapi_payload(spec_source, text: str, _operation_id: str):
     temp_coll = "second_coll"
     client.delete_collection(temp_coll)  # just for testing or maybe even for prod!!!
     client.create_collection(temp_coll, vectors_config=VectorParams(size=1536, distance=Distance.COSINE))
-    vector_store = Qdrant(client, collection_name=temp_coll, embeddings=embeddings)
+    # vector_store: VectorStore = Qdrant(client, collection_name=temp_coll, embeddings=embeddings)
+    past_api_responses = ""
 
-    retriever = vector_store.as_retriever()
-    memory = VectorStoreRetrieverMemory(retriever=retriever)
+    # memory = VectorStoreRetrieverMemory(retriever=retriever)
 
-    _DEFAULT_TEMPLATE = """You are an assistant helping me build http requests. You will be given the following pieces of information. Access to our past conversation. A user query and an excerpt from openapi swagger for generating the correct api payload.  Wrap the json inside three backticks on both sides, use query_param key to denote query parameter. Use body key to denote the body and route_parameter to denote the route params. query_params for query parameters
+    _DEFAULT_TEMPLATE = """You are a highly skilled AI software engineer with expertise in OpenAPI Swagger. You will be provided with the following essential components: access to our historical API calls, a user query, and a relevant excerpt from the OpenAPI Swagger documentation to construct the correct API payload. Enclose the JSON payload within three backticks on both sides. Use 'query_param' to signify query parameters, 'body' to indicate the request body, and 'route_parameter' for route parameters. If a required parameter is missing, please substitute it with a mock value.
 
-    Previous conversations:
-    {history}
+    Historical API Responses:
+    {api_call_responses}
 
-    (You do not need to use these pieces of information if not relevant)
-
-    Human Input:
-    Human: {input}
+    User Input:
+    User Query: {input}
     The API payload is: """
 
     PROMPT = PromptTemplate(
-        input_variables=["history", "input"], template=_DEFAULT_TEMPLATE
+        input_variables=["api_call_responses", "input"], template=_DEFAULT_TEMPLATE
     )
-    conversation_with_summary = ConversationChain(
+    conversation_with_summary = LLMChain(
         llm=llm,
         prompt=PROMPT,
-        memory=memory,
+        # memory=memory,
         verbose=True
     )
-    json_string = conversation_with_summary.predict(input=f"""{text}, the openapi schema is {isolated_request}
+    json_string = conversation_with_summary.predict(api_call_responses=past_api_responses, input=f"""{text}, the openapi schema is {isolated_request}
     """)
 
-    print(json_string)
     response = extract_json_payload(json_string)
-    print(response)
-    vector_store.add_texts([json_string])
+    # vector_store.add_texts([json_string])
+    past_api_responses = f"{past_api_responses} \n ${json_string}"
+    print(past_api_responses)
 
     response["path"] = path
     response["request_type"] = method
