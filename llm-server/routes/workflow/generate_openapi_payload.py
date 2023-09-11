@@ -159,17 +159,17 @@ def get_api_operation_by_id(json_spec, s_operation_id):
                 operation_id = operation.get("operationId")
                 
                 if operation_id == s_operation_id:
-                    return operation, method
+                    return operation, method, path
     
     # If the operation with the specified ID is not found, return None
-    return None, None
+    return None, None, None
 
 def generate_openapi_payload(openapi_file, user_action):
     """Generate a JSON payload using the OpenAPI specification and user action."""
     data = read_openapi_spec(openapi_file)
 
     json_spec = JsonSpec(dict_=data, max_value_length=4000)
-    api_operation, method = get_api_operation_by_id(json_spec, "check-users-saved-albums")
+    api_operation, method, path = get_api_operation_by_id(json_spec, "check-users-saved-albums")
     isolated_request = process_api_operation(method, api_operation, json_spec)
 
     if isolated_request and "parameters" in isolated_request:
@@ -188,7 +188,8 @@ def generate_openapi_payload(openapi_file, user_action):
         "body": response.get("body", {}),
         "parameters": response.get("parameters", []),
         "query_params": response.get("query_param", {}),
-        "method": method
+        "method": method,
+        "path": path
     }
 
     return payload

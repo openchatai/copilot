@@ -35,7 +35,7 @@ def run_workflow(data):
     result = run_openapi_operations(record, swagger_spec, text)
     return result, 200, {'Content-Type': 'application/json'}
 
-def run_openapi_operations(record, swagger_spec, text):
+def run_openapi_operations(record, swagger_spec, text, headers):
     record_info = {"Workflow Name": record.get('name')}
     prev_api_response = ""
     for flow in record.get("flows", []):
@@ -45,9 +45,9 @@ def run_openapi_operations(record, swagger_spec, text):
             
             api_response = make_api_request(
                 request_type = api_payload.request_type,
-                url = api_payload["url"],
+                url = api_payload["path"],
                 body=api_payload["body"],
-                params=api_payload.params,
+                params=api_payload["params"],
                 query_params=api_payload["query_params"],
                 headers={}
             )
