@@ -1,6 +1,6 @@
 # qdrant_client.py
 from qdrant_client import QdrantClient
-from vector_db_interface import VectorDBInterface
+from utils.vector_db.vector_db_interface import VectorDBInterface
 from dotenv import load_dotenv
 import os
 
