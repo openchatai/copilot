@@ -21,8 +21,8 @@ def run_workflow(data):
     if not text:
         return json.dumps({"error": "text is required"}), 400
 
-    if not base_prompt:
-        return json.dumps({"error": "base_prompt is required"}), 400
+    # if not base_prompt:
+    #     return json.dumps({"error": "base_prompt is required"}), 400
 
     swagger_spec = fetch_swagger_spec(swagger_url)
     vector_store = get_vector_store(StoreOptions(namespace))
@@ -32,7 +32,7 @@ def run_workflow(data):
     relevant_records = mongo.workflows.find({"_id": {"$in": relevant_workflow_ids}})
 
     record = relevant_records[0]
-    result = run_openapi_operations(record, swagger_spec, text)
+    result = run_openapi_operations(record, swagger_spec, text, {})
     return result, 200, {'Content-Type': 'application/json'}
 
 def run_openapi_operations(record, swagger_spec, text, headers):
