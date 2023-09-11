@@ -14,6 +14,7 @@ from prompts.base import non_api_base_prompt, api_base_prompt
 from flask_pymongo import PyMongo
 import os
 from routes.workflow.workflow import workflow
+from utils.fetch_swagger_spec import fetch_swagger_spec
 
 app = Flask(__name__)
 app.config['MONGO_URI'] = os.getenv('MONGODB_URL', 'mongodb://localhost:27017/opencopilot')
@@ -33,28 +34,10 @@ def handle():
     if not text:
         return json.dumps({"error": "text is required"}), 400
 
-    if not swagger_url:
-        return json.dumps({"error": "swagger_url is required"}), 400
-
     if not base_prompt:
         return json.dumps({"error": "base_prompt is required"}), 400
-
-    if swagger_url.startswith("https://"):
-        full_url = swagger_url
-        response = requests.get(full_url)
-        if response.status_code == 200:
-            swagger_text = response.text
-        else:
-            return json.dumps({"error": "Failed to fetch Swagger content"}), 500
-    else:
-        full_url = "/app/shared_data/" + swagger_url
-        try:
-            with open(full_url, 'r') as file:
-                swagger_text = file.read()
-        except FileNotFoundError:
-            return json.dumps({"error": "File not found"}), 404
-
-    swagger_spec = OpenAPISpec.from_text(swagger_text)
+    
+    swagger_spec = fetch_swagger_spec(swagger_url)
 
     try:
         json_output = try_to_match_and_call_api_endpoint(swagger_spec, text, headers)

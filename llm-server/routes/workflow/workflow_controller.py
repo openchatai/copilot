@@ -10,7 +10,7 @@ from utils.vector_db.init_vector_store import init_vector_store
 from utils.vector_db.get_vector_store import get_vector_store
 from utils.vector_db.store_options import StoreOptions
 from langchain.docstore.document import Document
-
+from routes.workflow.workflow_service import run_workflow
 db_instance = Database()
 mongo = db_instance.get_db()
 
@@ -75,44 +75,10 @@ def delete_workflow(workflow_id):
 
 @workflow.route('/run_workflow', methods=['POST'])
 @handle_exceptions_and_errors
-def run_workflow():
-    """
-    Run a workflow based on text input and a namespace.
-
-    This API endpoint receives a JSON payload containing 'text' and 'namespace'.
-    It queries Qdrant for relevant records using the input text, retrieves metadata
-    from MongoDB based on Qdrant results, and then iterates over workflow items
-    to print their information.
-    """
-    data = request.json
-    text = data.get("text")
-    namespace = data.get("namespace")
-    
-    # this context can be passed to llm chain to execute a post request if available
-    context = data.get("context")
-
-    vector_store = get_vector_store(StoreOptions(namespace))
-    documents = vector_store.similarity_search(text)
-
-    relevant_workflow_ids = []
-    for index, doc in enumerate(documents):
-        relevant_workflow_ids.append(ObjectId(doc.metadata["workflow_id"]))
-        
-    relevant_records = mongo.workflows.find({"_id": {"$in": relevant_workflow_ids}})
-
-    # Iterate over relevant records and print workflow items
-    record = relevant_records[0]
-    print(f"Workflow Name: {record.get('name')}")
-    for flow in record.get("flows", []):
-        for step in flow.get("steps"):
-            print(step.get("open_api_operation_id"))
-            # Take this operation id and the data provided in the request to call the api with the given open_api_operation_id
-            # The store the response of that api to call the next api, we have to think as to how this response gets stored
-
-    record = json_util.dumps(record)
-    return record, 200, {'Content-Type': 'application/json'}
-
-
+def run_workflow_controller():
+    data = request.get_json()
+    result = run_workflow(data)
+    return result
 
 def add_workflow_data_to_qdrant(namespace: str, workflow_id: str, workflow_data):
     for flow in workflow_data["flows"]:

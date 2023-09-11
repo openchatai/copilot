@@ -6,16 +6,14 @@ from langchain.requests import RequestsWrapper
 from langchain.tools.json.tool import JsonSpec
 import os
 
-def run_openapi_agent(spec_file_path: str, prompt: str) -> None:
-    with open(spec_file_path) as f:
-        data = yaml.load(f, Loader=yaml.FullLoader)
-    json_spec = JsonSpec(dict_=data, max_value_length=4000)
+def run_openapi_agent_from_json(spec_json: dict, prompt: str) -> None:
+    json_spec = JsonSpec(dict_=spec_json, max_value_length=4000)
 
     headers = {"Authorization": f"Bearer {os.getenv('API_KEY')}"}
-    openai_requests_wrapper = RequestsWrapper(headers=headers)
+    openapi_requests_wrapper = RequestsWrapper(headers=headers)
 
     openapi_toolkit = OpenAPIToolkit.from_llm(
-        OpenAI(temperature=0), json_spec, openai_requests_wrapper, verbose=True
+        OpenAI(temperature=0), json_spec, openapi_requests_wrapper, verbose=True
     )
     openapi_agent_executor = create_openapi_agent(
         llm=OpenAI(temperature=0), toolkit=openapi_toolkit, verbose=True
