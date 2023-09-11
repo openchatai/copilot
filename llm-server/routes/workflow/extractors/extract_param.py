@@ -11,26 +11,24 @@ llm = get_llm()
 
 
 def extractParamsFromSchema(
-    param_schema: JsonData, extracted_features: str, prev_resp: str
+    param_schema: JsonData, text: str, prev_resp: str
 ) -> Optional[JsonData]:
-    _DEFAULT_TEMPLATE = """User: You will be provided with the following essential components: responses from previous API calls, previously extracted features that may be required, and a schema specifying the expected format for query parameters, including both type and route parameters.
-    
-    Previous API Responses: ```{prev_resp}```.
+    _DEFAULT_TEMPLATE = """In order to facilitate the sequential execution of a highly intelligent language model with a series of APIs, we furnish the vital information required for executing the next API call.
 
-    Previously Extracted Features: ```{extracted_features}```.
+    The initial input at the onset of the process: {text}
+    The responses obtained from previous API calls: {prev_resp}
+    A schema for request parameters that defines the expected format: {param_schema}
 
-    The Parameter schema is defined as follows: ```{param_schema}```.
-
-    Your response should consist of a json containing key-value pairs that adhere to the specified Parameter schema. Enclose the json within 3 backticks on both sides. \nAgent: """
+    The JSON payload, which is used to represent the query parameters and is constructed using the initial input and previous API responses, must be enclosed within triple backticks on both sides. It must strictly adhere to the specified "type/format" guidelines laid out in the schema, and the structure is as follows:"""
 
     PROMPT = PromptTemplate(
-        input_variables=["prev_resp", "extracted_features", "param_schema"],
+        input_variables=["prev_resp", "text", "param_schema"],
         template=_DEFAULT_TEMPLATE,
     )
 
     PROMPT.format(
         prev_resp=prev_resp,
-        extracted_features=extracted_features,
+        text=text,
         param_schema=param_schema,
     )
 
@@ -38,10 +36,11 @@ def extractParamsFromSchema(
     json_string = chain.run(
         {
             "param_schema": param_schema,
-            "extracted_features": extracted_features,
+            "text": text,
             "prev_resp": prev_resp,
         }
     )
 
     response = extract_json_payload(json_string)
+    print(f"Query params: {response}")
     return response
