@@ -27,6 +27,7 @@ def hydrateParams(
     return last_portion_list
 
 
+# recursively replace all $ref in json object
 def replace_ref_with_value(
     input_dict: Dict[str, Any], json_spec_dict: Dict[str, Any]
 ) -> None:

@@ -17,6 +17,7 @@ from routes.workflow.extractors.hydrate_params import (
 from custom_types.t_json import JsonData
 from custom_types.swagger import ApiOperation
 from typing import Dict, Any, Optional, Union, Tuple
+from .extractors.example_generator import generate_example_from_schema
 
 load_dotenv()
 
@@ -149,7 +150,13 @@ def generate_openapi_payload(
         body_schema: Dict[str, Any] = api_operation["requestBody"]["content"][
             "application/json"
         ]["schema"]["properties"]
+
+        # replace $ref recursively
         replace_ref_with_value(body_schema, json_spec.dict_)
+        _example = generate_example_from_schema(api_operation)
+        print(
+            f"The output should conform to {_example}, we will use this later for few shot prompt"
+        )
         body = extractBodyFromSchema(body_schema, extracted_feature, prev_api_response)
     else:
         print("Some key is not present in the requestBody dictionary.")
