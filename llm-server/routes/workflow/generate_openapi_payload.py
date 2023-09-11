@@ -30,7 +30,7 @@ from typing import Dict, Any, Optional, Union, List
 def get_api_operation_by_id(
     json_spec: Any, op_id: str
 ) -> Tuple[ApiOperation, str, str]:
-    paths: Dict[str, List[ApiOperation]] = json_spec.get("paths", {})
+    paths: Dict[str, List[ApiOperation]] = json_spec.dict_.get("paths", {})
 
     for path, methods in paths.items():
         if isinstance(methods, dict):
@@ -89,7 +89,6 @@ def process_api_operation(
 
         # Check if the content type schema is a reference
         if content_type_schema and "$ref" in content_type_schema:
-            # type: ignore
             ref_path = content_type_schema["$ref"].split("/")[1:]
 
             # Navigate through the JSON spec using the reference path

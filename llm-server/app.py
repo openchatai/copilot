@@ -12,7 +12,7 @@ from routes.workflow.workflow_controller import workflow
 from utils.fetch_swagger_spec import fetch_swagger_spec
 import json
 import logging
-from typing import Any
+from typing import Any, Tuple
 from prompts.base import api_base_prompt, non_api_base_prompt
 
 app = Flask(__name__)
@@ -61,6 +61,13 @@ def handle() -> Any:
     chain_output = chain.run(question=text)
 
     return chain_output, 200
+
+
+@app.errorhandler(500)
+def internal_server_error(error: Any) -> Tuple[str, int]:
+    # Log the error to the console
+    print(error)
+    return "Internal Server Error", 500
 
 
 app.debug = True
