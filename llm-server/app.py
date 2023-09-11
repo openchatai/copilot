@@ -3,7 +3,7 @@ import warnings
 import requests
 from flask import Flask, request
 from langchain.chains.openai_functions import create_structured_output_chain
-from langchain.chat_models import ChatOpenAI, ChatLiteLLM
+from langchain.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 
 from langchain.utilities.openapi import OpenAPISpec
@@ -67,7 +67,7 @@ def handle():
         warnings.warn(str(e))
         json_output = None
 
-    llm = ChatLiteLLM(model="gpt-3.5-turbo-0613", temperature=0)
+    llm = ChatOpenAI(model="gpt-3.5-turbo-0613", temperature=0)
 
     if json_output is None:
         prompt_msgs = non_api_base_prompt(base_prompt, text)
