@@ -8,13 +8,16 @@ from langchain.vectorstores.pinecone import Pinecone
 from dotenv import load_dotenv
 import os
 import threading
+
 init_lock = threading.Lock()
 
 # Load environment variables from .env file
 load_dotenv()
-VECTOR_STORE_INDEX_NAME="temp"
+VECTOR_STORE_INDEX_NAME = "temp"
 
 initialized = False
+
+
 def initialize_pinecone():
     global initialized
     # Only initialize Pinecone if the store type is Pinecone and the initialization lock is not acquired
@@ -27,20 +30,35 @@ def initialize_pinecone():
             )
             initialized = True
 
-def init_vector_store(docs: list[Document], embeddings: OpenAIEmbeddings, options: StoreOptions) -> None:
-    store_type = StoreType[os.environ['STORE']]
+
+def init_vector_store(
+    docs: list[Document], embeddings: OpenAIEmbeddings, options: StoreOptions
+) -> None:
+    store_type = StoreType[os.environ["STORE"]]
 
     if store_type == StoreType.PINECONE:
         initialize_pinecone()
 
         # Use the Pinecone vector store
         # docs, embeddings, VECTOR_STORE_INDEX_NAME, options.namespace, PINECONE_TEXT_KEY
-        Pinecone.from_documents(documents=docs, embedding=embeddings, index_name=VECTOR_STORE_INDEX_NAME, namespace=options.namespace)
+        Pinecone.from_documents(
+            documents=docs,
+            embedding=embeddings,
+            index_name=VECTOR_STORE_INDEX_NAME,
+            namespace=options.namespace,
+        )
 
     elif store_type == StoreType.QDRANT:
         print("called qdrant.from_documents")
-        Qdrant.from_documents(docs, embeddings, collection_name=options.namespace, url=os.environ['QDRANT_URL'])
+        Qdrant.from_documents(
+            docs,
+            embeddings,
+            collection_name=options.namespace,
+            url=os.environ["QDRANT_URL"],
+        )
 
     else:
         valid_stores = ", ".join(StoreType._member_names())
-        raise ValueError(f"Invalid STORE environment variable value: {os.environ['STORE']}. Valid values are: {valid_stores}")
+        raise ValueError(
+            f"Invalid STORE environment variable value: {os.environ['STORE']}. Valid values are: {valid_stores}"
+        )

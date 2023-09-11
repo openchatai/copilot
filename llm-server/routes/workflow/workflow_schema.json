@@ -1,101 +1,91 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "type": "object",
-    "properties": {
-        "opencopilot": {
-            "type": "string",
-            "pattern": "^\\d+\\.\\d+$"
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "opencopilot": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$"
+    },
+    "info": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
         },
-        "info": {
-            "type": "object",
-            "properties": {
-                "title": {
-                    "type": "string"
-                },
-                "version": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "title",
-                "version"
-            ]
-        },
-        "flows": {
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": ["title", "version"]
+    },
+    "flows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "requires_confirmation": {
+            "type": "boolean"
+          },
+          "steps": {
             "type": "array",
             "items": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "description": {
-                        "type": "string"
-                    },
-                    "requires_confirmation": {
-                        "type": "boolean"
-                    },
-                    "steps": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "stepId": {
-                                    "type": "string"
-                                },
-                                "operation": {
-                                    "type": "string"
-                                },
-                                "open_api_operation_id": {
-                                    "type": "string"
-                                },
-                                "parameters": {
-                                    "type": "object"
-                                }
-                            },
-                            "required": [
-                                "operation",
-                                "open_api_operation_id"
-                            ]
-                        }
-                    },
-                    "on_success": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "handler": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    },
-                    "on_failure": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "handler": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    }
+              "type": "object",
+              "properties": {
+                "stepId": {
+                  "type": "string"
                 },
-                "required": [
-                    "name",
-                    "description",
-                    "requires_confirmation",
-                    "steps",
-                    "on_success",
-                    "on_failure"
-                ]
+                "operation": {
+                  "type": "string"
+                },
+                "open_api_operation_id": {
+                  "type": "string"
+                },
+                "parameters": {
+                  "type": "object"
+                }
+              },
+              "required": ["operation", "open_api_operation_id"]
             }
-        }
-    },
-    "required": [
-        "opencopilot",
-        "info",
-        "flows"
-    ]
+          },
+          "on_success": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "handler": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "on_failure": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "handler": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "requires_confirmation",
+          "steps",
+          "on_success",
+          "on_failure"
+        ]
+      }
+    }
+  },
+  "required": ["opencopilot", "info", "flows"]
 }
