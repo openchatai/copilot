@@ -13,7 +13,7 @@ from models.models import AiResponseFormat
 from prompts.base import non_api_base_prompt, api_base_prompt
 from flask_pymongo import PyMongo
 import os
-from routes.workflow.workflow import workflow
+from routes.workflow.workflow_controller import workflow
 from utils.fetch_swagger_spec import fetch_swagger_spec
 
 app = Flask(__name__)
