@@ -13,6 +13,21 @@ llm = get_llm()
 def extractParamsFromSchema(
     param_schema: JsonData, text: str, prev_resp: str
 ) -> Optional[JsonData]:
+    """Extracts API parameters from a schema based on user text and previous response.
+
+    Args:
+        param_schema (JsonData): A snippet of the OpenAPI parameter schema relevant to this operation.
+        text (str): The original user text query.
+        prev_resp (str): The previous API response.
+
+    Returns:
+        Optional[JsonData]: The extracted JSON parameters, if successful.
+
+    This function constructs a prompt with the given inputs and passes it to
+    an LLM to generate a JSON string containing the parameters. It then parses
+    this to extract a JSON payload matching the schema structure.
+    """
+
     _DEFAULT_TEMPLATE = """In order to facilitate the sequential execution of a highly intelligent language model with a series of APIs, we furnish the vital information required for executing the next API call.
 
     The initial input at the onset of the process: {text}
