@@ -3,15 +3,14 @@ from langchain.vectorstores.pinecone import Pinecone
 
 from langchain.vectorstores.qdrant import Qdrant
 from langchain.vectorstores import VectorStore
-from store_type import StoreType
-from  config import VECTOR_STORE_INDEX_NAME, PINECONE_TEXT_KEY
-from store_options import StoreOptions
-from dotenv import load_dotenv
+from utils.vector_db.store_type import StoreType
+from  utils.vector_db.config import VECTOR_STORE_INDEX_NAME, PINECONE_TEXT_KEY
+from utils.vector_db.store_options import StoreOptions
 from utils.get_embeddings import get_embeddings
-from init_vector_store import initialize_pinecone
+from utils.vector_db.init_vector_store import initialize_pinecone
 import qdrant_client
 
-
+from dotenv import load_dotenv
 load_dotenv()
 
 def get_vector_store(options: StoreOptions) -> VectorStore:

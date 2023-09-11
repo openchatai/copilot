@@ -1,8 +1,8 @@
 from langchain.docstore.document import Document
 from langchain.vectorstores.qdrant import Qdrant
-from store_type import StoreType
+from utils.vector_db.store_type import StoreType
 from langchain.embeddings.openai import OpenAIEmbeddings
-from store_options import StoreOptions
+from utils.vector_db.store_options import StoreOptions
 import pinecone
 from langchain.vectorstores.pinecone import Pinecone
 from dotenv import load_dotenv
