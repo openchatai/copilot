@@ -64,19 +64,27 @@ def resolve_refs(input_dict, json_spec):
 
 def hydrateParams(json_spec, ref_list):
     last_portion_list = []
-    
+
     for ref in ref_list:
         if '$ref' in ref:  # Check if '$ref' exists in the dictionary
             paths = ref['$ref'].split("/")[1:3]
-            last_portion_list.append(json_spec[paths[0]][paths[1]])
+            if paths[0] in json_spec and paths[1] in json_spec[paths[0]]:
+                last_portion_list.append(json_spec[paths[0]][paths[1]])
+            else:
+                # Handle the case where the key is not present
+                last_portion_list.append(None)
         
-        if '$ref' in ref["schema"]:
+        if 'schema' in ref and '$ref' in ref["schema"]:
             paths = ref['schema']['$ref'].split("/")[1:3]
-            last_portion_list.append(json_spec[paths[0]][paths[1]])
+            if paths[0] in json_spec and paths[1] in json_spec[paths[0]]:
+                last_portion_list.append(json_spec[paths[0]][paths[1]])
+            else:
+                # Handle the case where the key is not present
+                last_portion_list.append(None)
         else:
             # If '$ref' doesn't exist, add the reference as is
             last_portion_list.append(ref)
-    
+
     return last_portion_list
 
 # %%
@@ -98,7 +106,7 @@ def extract_json_payload(input_string):
     match = re.findall(r"{.+[:,].+}|\[.+[,:].+\]", input_string)
     return json.loads(match[0]) if match else None
 
-def generate_openapi_payload(spec_source, text: str, _operation_id: str):
+def generate_openapi_payload(spec_source, text: str, _operation_id: str, api_response_cache: str):
     spec_dict = load_openapi_spec(spec_source)
 
     # Continue with the rest of the code
@@ -120,7 +128,6 @@ def generate_openapi_payload(spec_source, text: str, _operation_id: str):
     client.delete_collection(temp_coll)  # just for testing or maybe even for prod!!!
     client.create_collection(temp_coll, vectors_config=VectorParams(size=1536, distance=Distance.COSINE))
     # vector_store: VectorStore = Qdrant(client, collection_name=temp_coll, embeddings=embeddings)
-    past_api_responses = ""
 
     # memory = VectorStoreRetrieverMemory(retriever=retriever)
 
@@ -142,13 +149,13 @@ def generate_openapi_payload(spec_source, text: str, _operation_id: str):
         # memory=memory,
         verbose=True
     )
-    json_string = conversation_with_summary.predict(api_call_responses=past_api_responses, input=f"""{text}, the openapi schema is {isolated_request}
+    json_string = conversation_with_summary.predict(api_call_responses=api_response_cache, input=f"""{text}, the excerpt from openapi schema for this api is {isolated_request}
     """)
 
     response = extract_json_payload(json_string)
     # vector_store.add_texts([json_string])
-    past_api_responses = f"{past_api_responses} \n ${json_string}"
-    print(past_api_responses)
+    api_response_cache = f"{api_response_cache} \n ${json_string}"
+    print(api_response_cache)
 
     response["path"] = path
     response["request_type"] = method
