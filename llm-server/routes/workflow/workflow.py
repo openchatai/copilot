@@ -7,28 +7,27 @@ from utils.get_embeddings import get_embeddings
 from opencopilot_types.workflow_type import WorkflowDataType
 import warnings
 
-from app import app
-bp = Blueprint('workflow', __name__)
+workflow = Blueprint('workflow', __name__)
 
-app.register_blueprint(bp)
 import json
 import os
+from flask import current_app, jsonify
 
 json_file_path = os.path.join(os.getcwd(), 'routes', 'workflow', 'workflow_schema.json')
 with open(json_file_path, 'r') as workflow_schema_file:
     workflow_schema = json.load(workflow_schema_file)
 
-@bp.route('/workflow/<workflow_id>', methods=['GET'])
+@workflow.route('/<workflow_id>', methods=['GET'])
 def get_workflow(workflow_id):
-    workflow = app.mongo.db.workflows.find_one_or_404({'_id': workflow_id})
+    workflow = current_app.mongo.db.workflows.find_one_or_404({'_id': workflow_id})
     return jsonify(workflow), 200
 
-@bp.route('/workflow', methods=['POST'])
+@workflow.route('/', methods=['POST'])
 @validate_json(workflow_schema)
 @handle_exceptions_and_errors
 def create_workflow():
     workflow_data: WorkflowDataType = request.json
-    workflows = app.mongo.db.workflows
+    workflows = current_app.mongo.db.workflows
     workflow_id = workflows.insert_one(workflow_data).workflow_id
 
     qdrant_client = QdrantVectorDBClient()
@@ -42,12 +41,12 @@ def create_workflow():
 
     return jsonify({'message': 'Workflow created', 'workflow_id': str(workflow_id)}), 201
 
-@bp.route('/workflow/<workflow_id>', methods=['PUT'])
+@workflow.route('/<workflow_id>', methods=['PUT'])
 @validate_json(workflow_schema)
 @handle_exceptions_and_errors
 def update_workflow(workflow_id):
     workflow_data: WorkflowDataType = request.json
-    app.mongo.db.workflows.update_one({'_id': ObjectId(workflow_id)}, {'$set': workflow_data})
+    current_app.mongo.db.workflows.update_one({'_id': ObjectId(workflow_id)}, {'$set': workflow_data})
     qdrant_client = QdrantVectorDBClient()
     qdrant_client.delete_documents_by_workflow_id(workflow_id)
     namespace = "workflows"
@@ -60,12 +59,12 @@ def update_workflow(workflow_id):
 
     return jsonify({'message': 'Workflow updated'}), 200
 
-@bp.route('/workflow/<workflow_id>', methods=['DELETE'])
+@workflow.route('/<workflow_id>', methods=['DELETE'])
 def delete_workflow(workflow_id):
-    app.mongo.db.workflows.delete_one({'_id': workflow_id})
+    current_app.mongo.db.workflows.delete_one({'_id': workflow_id})
     return jsonify({'message': 'Workflow deleted'}), 200
 
-@bp.route('/run_workflow', methods=['POST'])
+@workflow.route('/run_workflow', methods=['POST'])
 @handle_exceptions_and_errors
 def run_workflow():
     """
@@ -86,7 +85,7 @@ def run_workflow():
 
     # Retrieve metadata from MongoDB using Qdrant results
     relevant_workflow_ids = [result["meta"]["workflow_id"] for result in qdrant_results]
-    relevant_records = app.mongo.db.workflows.find({"_id": {"$in": relevant_workflow_ids}})
+    relevant_records = current_app.mongo.db.workflows.find({"_id": {"$in": relevant_workflow_ids}})
 
     # Iterate over relevant records and print workflow items
     record = relevant_records[0]
