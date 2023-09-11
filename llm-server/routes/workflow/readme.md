@@ -14,4 +14,46 @@ Looking to implement a system where a user's input prompt is used to perform a M
 
 
 ---
-Tomorrow's strategy is about making things smoother. After you pinpoint the workflow you need, you can pick out the right APIs from the Swagger specification. Think of it like sorting out puzzle pieces of different colors and shapes. Once you have this organized, you can hand it over to the agent to work with. Remember, Swagger is like a collection of instructions in a colorful and clear picture book. You're just choosing the pages you need and giving them to the agent to follow.
+## Usage Guide
+from langchain.llms import OpenAI
+from langchain.retrievers.self_query.base import SelfQueryRetriever
+from langchain.chains.query_constructor.base import AttributeInfo
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.vectorstores import ElasticsearchStore
+
+# Create a list of documents with short strings and metadata
+docs = [
+    Document(
+        page_content="Your short string here",
+        metadata={"metadata_field1": "value1", "metadata_field2": "value2"},
+    ),
+    # Add more documents as needed
+]
+
+# Instantiate the vector store with the documents and embeddings library
+embeddings = OpenAIEmbeddings()
+vectorstore = ElasticsearchStore.from_documents(docs, embeddings, index_name="your_index_name", es_url="your_es_url")
+
+# Provide information about the metadata fields and document contents
+metadata_field_info = [
+    AttributeInfo(
+        name="metadata_field1",
+        description="Description of metadata_field1",
+        type="string or list[string]",
+    ),
+    AttributeInfo(
+        name="metadata_field2",
+        description="Description of metadata_field2",
+        type="string",
+    ),
+]
+document_content_description = "Description of the document contents"
+
+# Create the self-querying retriever
+llm = OpenAI(temperature=0)
+retriever = SelfQueryRetriever.from_llm(
+    llm, vectorstore, document_content_description, metadata_field_info, verbose=True
+)
+
+# Use the retriever to embed the short string with metadata into the vector store
+retriever.get_relevant_documents("Your query here")

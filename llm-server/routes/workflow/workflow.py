@@ -2,11 +2,13 @@ from flask import Blueprint, request, jsonify
 from routes.workflow.validate_json import validate_json
 from bson import ObjectId
 from copilot_exceptions.handle_exceptions_and_errors import handle_exceptions_and_errors 
-from utils.vector_db.qdrant import QdrantVectorDBClient
 from utils.get_embeddings import get_embeddings
 from opencopilot_types.workflow_type import WorkflowDataType
 import warnings
 from utils.db import Database
+from utils.vector_db.get_vector_store import get_vector_store
+from utils.vector_db.store_options import StoreOptions
+from langchain.docstore.document import Document
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -33,14 +35,12 @@ def create_workflow():
     workflows = mongo.db.workflows
     workflow_id = workflows.insert_one(workflow_data).inserted_id
 
-    qdrant_client = QdrantVectorDBClient()
     namespace = "workflows"
     # Check if the namespace is generic
     if namespace == "workflows":
         warning_message = "Warning: The 'namespace' variable is set to the generic value 'workflows'. You should replace it with a specific value for your org / user / account."
         warnings.warn(warning_message, UserWarning)
-    embedding = get_embeddings()
-    add_workflow_data_to_qdrant(qdrant_client, namespace, workflow_id, workflow_data, embedding)
+    add_workflow_data_to_qdrant(namespace, workflow_id, workflow_data)
 
     return jsonify({'message': 'Workflow created', 'workflow_id': str(workflow_id)}), 201
 
@@ -50,15 +50,15 @@ def create_workflow():
 def update_workflow(workflow_id):
     workflow_data: WorkflowDataType = request.json
     mongo.db.workflows.update_one({'_id': ObjectId(workflow_id)}, {'$set': workflow_data})
-    qdrant_client = QdrantVectorDBClient()
-    qdrant_client.delete_documents_by_workflow_id(workflow_id)
+    vector_store = get_vector_store(StoreOptions(namespace))
+    vector_store.delete(ids=[workflow_id])
     namespace = "workflows"
     # Check if the namespace is generic
     if namespace == "workflows":
         warning_message = "Warning: The 'namespace' variable is set to the generic value 'workflows'. You should replace it with a specific value for your org / user / account."
         warnings.warn(warning_message, UserWarning)
     
-    add_workflow_data_to_qdrant(qdrant_client, namespace, workflow_id, workflow_data)
+    add_workflow_data_to_qdrant(vector_store, namespace, workflow_id, workflow_data)
 
     return jsonify({'message': 'Workflow updated'}), 200
 
@@ -82,12 +82,12 @@ def run_workflow():
     text = data.get("text")
     namespace = data.get("namespace")
 
-    qdrant_client = QdrantVectorDBClient()
+    vector_store = get_vector_store(StoreOptions(namespace))
     # Query Qdrant for relevant records
-    qdrant_results = qdrant_client.perform_search(namespace, text)
+    documents = vector_store.similarity_search(text, 1)
 
     # Retrieve metadata from MongoDB using Qdrant results
-    relevant_workflow_ids = [result["meta"]["workflow_id"] for result in qdrant_results]
+    relevant_workflow_ids = [result["meta"]["workflow_id"] for result in documents]
     relevant_records = mongo.db.workflows.find({"_id": {"$in": relevant_workflow_ids}})
 
     # Iterate over relevant records and print workflow items
@@ -100,9 +100,14 @@ def run_workflow():
     return jsonify({"message": "Workflow run completed"}), 200
 
 
-def add_workflow_data_to_qdrant(qdrant_client: QdrantVectorDBClient, namespace, workflow_id, workflow_data, embedding_provider):
-    embedding_provider = get_embeddings()
+
+def add_workflow_data_to_qdrant(namespace: str, workflow_id: str, workflow_data):
     for flow in workflow_data["flows"]:
-        vectors = embedding_provider.embed_query(flow["description"])
-        meta = {"workflow_id": str(workflow_id), "workflow_name": workflow_data.get("name")}
-        qdrant_client.add_data_with_meta(namespace, vectors, meta)
+        docs = [
+            Document(
+                page_content=flow["description"],
+                metadata={"workflow_id": str(workflow_id), "workflow_name": workflow_data.get("name")},
+            )
+        ]
+        vector_store = get_vector_store(StoreOptions(namespace))
+        vector_store.add_documents(docs)

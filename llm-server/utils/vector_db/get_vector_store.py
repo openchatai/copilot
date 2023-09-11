@@ -3,8 +3,8 @@ from langchain.vectorstores.pinecone import Pinecone
 
 from langchain.vectorstores.qdrant import Qdrant
 from langchain.vectorstores import VectorStore
-from api.enums import StoreType
-from api.configs import VECTOR_STORE_INDEX_NAME, PINECONE_TEXT_KEY
+from store_type import StoreType
+from  config import VECTOR_STORE_INDEX_NAME, PINECONE_TEXT_KEY
 from store_options import StoreOptions
 from dotenv import load_dotenv
 from utils.get_embeddings import get_embeddings
