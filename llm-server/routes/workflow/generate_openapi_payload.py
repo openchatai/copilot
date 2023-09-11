@@ -9,6 +9,7 @@ from routes.workflow.extractors.extract_body import extractBodyFromSchema
 from routes.workflow.extractors.extract_param import extractParamsFromSchema
 from routes.workflow.extractors.extract_feature_from_user_query import extract_feature_from_user_query
 from routes.workflow.extractors.hydrate_params import hydrateParams, replace_ref_with_value
+import copy
 
 load_dotenv()
 
@@ -90,8 +91,9 @@ def extract_json_payload(input_string):
     return json.loads(match[0]) if match else None
 
 
-def generate_openapi_payload(spec_source, text: str, _operation_id: str, api_response_cache: str) -> dict:
+def generate_openapi_payload(spec_source, text: str, _operation_id: str, prev_api_response: str) -> dict:
     params = {}
+    body = {}
     spec_dict = load_openapi_spec(spec_source)
     extracted_feature = extract_feature_from_user_query(text)
 
@@ -102,30 +104,28 @@ def generate_openapi_payload(spec_source, text: str, _operation_id: str, api_res
         json_spec, _operation_id)
     isolated_request = process_api_operation(method, api_operation, json_spec)
 
-    try:
-        if isolated_request and "parameters" in isolated_request:
-            isolated_request["parameters"] = hydrateParams(
-                json_spec.dict_, isolated_request["parameters"])
-            params = extractParamsFromSchema(
-                isolated_request["parameters"],
-                extracted_feature,
-                api_response_cache
-            )
+    if isolated_request and "parameters" in isolated_request:
+        isolated_request["parameters"] = hydrateParams(
+            json_spec.dict_, isolated_request["parameters"])
+        params = extractParamsFromSchema(
+            isolated_request["parameters"],
+            extracted_feature,
+            prev_api_response
+        )
+
+    if "requestBody" in api_operation and "content" in api_operation["requestBody"] \
+            and "application/json" in api_operation["requestBody"]["content"] \
+            and "schema" in api_operation["requestBody"]["content"]["application/json"] \
+            and "properties" in api_operation["requestBody"]["content"]["application/json"]["schema"]:
 
         body_schema = api_operation["requestBody"]["content"]["application/json"]["schema"]["properties"]
         replace_ref_with_value(body_schema, json_spec.dict_)
         body = extractBodyFromSchema(
-            body_schema, extracted_feature, api_response_cache)
-    except KeyError as e:
-        # Handle the case where a key is not present
-        print(f"KeyError: {e}")
-        params = {}
-        body = {}
+            body_schema, extracted_feature, prev_api_response)
+    else:
+        print("Some key is not present in the requestBody dictionary.")
 
     response = {"body": body, "params": params,
                 "path": path, "request_type": method}
-
-    api_response_cache = f"{api_response_cache} \n ${json.dumps(response)}"
-    print(f"cache:: {path}::{api_response_cache}")
 
     return response
