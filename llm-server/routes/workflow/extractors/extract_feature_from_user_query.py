@@ -11,8 +11,6 @@ llm = OpenAI(openai_api_key=openai_api_key)
 
 # This fits a chat model better
 def extract_feature_from_user_query(user_input: str):
-    
-    # {'id': {'type': 'integer', 'format': 'int64', 'example': 10}, 'name': {'type': 'string', 'example': 'doggie'}, 'category': {'$ref': '#/components/schemas/Category'}, 'photoUrls': {'type': 'array', 'xml': {...}, 'items': {...}}, 'tags': {'type': 'array', 'xml': {...}, 'items': {...}}, 'status': {'type': 'string', 'description': 'pet status in the store', 'enum': [...]}}
     _DEFAULT_TEMPLATE = """You will receive user input, and I need you to extract all pertinent features from it. \n\nUser Input: {input} \n Assistant: """
 
     PROMPT = PromptTemplate(

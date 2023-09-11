@@ -1,4 +1,4 @@
-import json
+import json, logging
 
 import requests
 import warnings
@@ -17,12 +17,15 @@ from routes.workflow.workflow_controller import workflow
 from utils.fetch_swagger_spec import fetch_swagger_spec
 
 app = Flask(__name__)
-app.config['MONGO_URI'] = os.getenv('MONGODB_URL', 'mongodb://localhost:27017/opencopilot')
+app.config['MONGO_URI'] = os.getenv(
+    'MONGODB_URL', 'mongodb://localhost:27017/opencopilot')
 mongo = PyMongo(app)
 
 app.register_blueprint(workflow, url_prefix="/workflow")
 
-## TODO: Implement caching for the swagger file content (no need to load it everytime)
+# TODO: Implement caching for the swagger file content (no need to load it everytime)
+
+
 @app.route('/handle', methods=['POST', 'OPTIONS'])
 def handle():
     data = request.get_json()
@@ -36,11 +39,12 @@ def handle():
 
     if not base_prompt:
         return json.dumps({"error": "base_prompt is required"}), 400
-    
+
     swagger_spec = fetch_swagger_spec(swagger_url)
 
     try:
-        json_output = try_to_match_and_call_api_endpoint(swagger_spec, text, headers)
+        json_output = try_to_match_and_call_api_endpoint(
+            swagger_spec, text, headers)
     except Exception as e:
         warnings.warn(str(e))
         json_output = None
@@ -54,11 +58,15 @@ def handle():
         prompt_msgs = api_base_prompt(base_prompt, text, json_output)
 
     prompt = ChatPromptTemplate(messages=prompt_msgs)
-    chain = create_structured_output_chain(AiResponseFormat, llm, prompt, verbose=False)
+    chain = create_structured_output_chain(
+        AiResponseFormat, llm, prompt, verbose=False)
     chain_output = chain.run(question=text)
 
     return json.loads(json.dumps(chain_output.dict())), 200
 
+
 app.debug = True
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8002)
+    app.run(host='0.0.0.0', port=8002, debug=True)
+    app.config['PROPAGATE_EXCEPTIONS'] = True
+    app.logger.setLevel(logging.DEBUG)  # Set log level to display all messages including debug
