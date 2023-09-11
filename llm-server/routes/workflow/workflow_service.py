@@ -33,7 +33,7 @@ def run_workflow(data):
     relevant_records = mongo.workflows.find({"_id": {"$in": relevant_workflow_ids}})
 
     record = relevant_records[0]
-    result = run_openapi_operations(record, swagger_spec, text, {})
+    result = run_openapi_operations(record, swagger_spec, text, headers)
     return result, 200, {'Content-Type': 'application/json'}
 
 def run_openapi_operations(record, swagger_spec: OpenAPISpec, text, headers):
@@ -51,7 +51,7 @@ def run_openapi_operations(record, swagger_spec: OpenAPISpec, text, headers):
                 body=api_payload["body"],
                 params=api_payload["route_parameter"],
                 query_params=api_payload["query_param"],
-                headers={}
+                headers=headers
             )
             # response = run_openapi_agent_from_json(spec_json=swagger_spec, prompt=text, prev_api_response)
             # Take this operation id and the data provided in the request to call the API with the given open_api_operation_id
