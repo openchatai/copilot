@@ -59,7 +59,7 @@ def run_openapi_operations(
                 params=api_payload["params"],
                 headers=headers,
             )
-            record_info[operation_id] = api_response.text
+            record_info[operation_id] = json.loads(api_response.text)
             prev_api_response = api_response.text
         prev_api_response = ""
     return json.dumps(record_info)

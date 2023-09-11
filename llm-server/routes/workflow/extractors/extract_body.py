@@ -16,7 +16,13 @@ def extractBodyFromSchema(
     extracted_features: str,
     prev_api_response: str,
 ) -> Any:
-    _DEFAULT_TEMPLATE = """You will receive the following essential components: responses from previous API calls, previously extracted features that may be necessary, and a schema for the JSON response I expect. Enclose the JSON payload with three backticks on both sides. For missing required parameters, use dummy values of the same data type, like using a datetime for a datetime field, an integer for an integer field, and a string for a string field.
+    _DEFAULT_TEMPLATE = """Given the following key elements: 
+
+    1. Responses from prior API requests.
+    2. Extracted features from previous data.
+    3. A JSON response schema outlining the expected format.
+
+    Please encapsulate the JSON payload using triple backticks on both sides. In case of missing required parameters, employ placeholder values that strictly adhere to the specified "type/format" as defined in the schema. For instance, ensure correct date-time format for date fields and use integers for integer fields.
 
     Previous API Responses: {prev_api_response}.
 
