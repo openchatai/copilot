@@ -32,6 +32,10 @@ def make_api_request(
         # Create a session and configure it with headers
         url = replace_url_placeholders(url, params)
         session = requests.Session()
+
+        # Add the "Content-Type" header with the value "application/json" to the headers
+        headers["Content-Type"] = "application/json"
+
         if headers:
             session.headers.update(headers)
 
