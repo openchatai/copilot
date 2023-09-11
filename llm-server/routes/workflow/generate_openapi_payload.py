@@ -19,6 +19,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 import qdrant_client
 from uuid import uuid4
 from qdrant_client.models import Distance, VectorParams
+from langchain.utilities.openapi import OpenAPISpec
 
 import os
 import re
@@ -35,7 +36,7 @@ def get_api_operation_by_id(json_spec, s_operation_id):
                 operation_id = operation.get("operationId")
                 
                 if operation_id == s_operation_id:
-                    return operation, method
+                    return operation, method, path
             else:
                 # Handle the case where 'operation' is not a dictionary
                 # print(f"Skipping invalid operation: {operation}")
@@ -105,12 +106,12 @@ def extract_json_payload(input_string):
     match = re.findall(r"{.+[:,].+}|\[.+[,:].+\]", input_string)
     return json.loads(match[0]) if match else None
 
-def generate_openapi_payload():
-    with open("/Users/shanurrahman/Documents/openchat_all/OpenCopilot/llm-server/notebooks/openapi.yaml") as f:
+def generate_openapi_payload(swagger_spec: OpenAPISpec, text: str):
+    with open(f"notebooks/openapi.yaml") as f:
         data = yaml.load(f, Loader=yaml.FullLoader)
     json_spec = JsonSpec(dict_=data, max_value_length=4000)
 
-    api_operation, method = get_api_operation_by_id(json_spec, "check-users-saved-albums")
+    api_operation, method, path = get_api_operation_by_id(json_spec, "check-users-saved-albums")
     isolated_request = process_api_operation(method, api_operation, json_spec)
 
     if isolated_request and "parameters" in isolated_request:
@@ -150,7 +151,7 @@ def generate_openapi_payload():
         memory=memory,
         verbose=True
     )
-    json_string = conversation_with_summary.predict(input=f"""I want to add album 889234ssdfa, the openapi schema is {isolated_request}
+    json_string = conversation_with_summary.predict(input=f"""{text}, the openapi schema is {isolated_request}
     """)
 
     print(json_string)
@@ -158,5 +159,7 @@ def generate_openapi_payload():
     print(response)
     vector_store.add_texts([json_string])
 
+    response["path"] = path
+    response["request_type"] = method
     return response
     
