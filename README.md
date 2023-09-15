@@ -28,6 +28,46 @@ OpenCopilot allows you to have your own product's AI copilot. It integrates with
 
 
 
+
+## 🚀 Getting Started
+
+- Make sure you have docker installed. 
+
+- To begin, clone this Git repository:
+
+```
+git clone git@github.com:openchatai/OpenCopilot.git
+```
+
+- Update the `.env` file located in the `llm-server` directory with your `OPENAI_API_KEY`. You can use the `.env.example` file as a reference:
+
+```
+OPENAI_API_KEY=YOUR_TOKEN_HERE
+```
+
+- After updating your API key, navigate to the repository folder and run the following command (for macOS or Linux):
+
+```
+make install
+```
+
+This will install the necessary dependencies and set up the environment for the OpenCopilot project.
+
+Once the installation is complete, you can access the OpenCopilot console at: http://localhost:8888
+
+---
+
+If needed, you can also restart the local setup using:
+```
+make restart
+```
+
+Also, you can see the complete list of commands using 
+```
+make help
+```
+
+
 ## Try it out:
 **You can try it out on [opencopilot.so](http://opencopilot.so/)**
 
@@ -76,45 +116,6 @@ And our goal is to empower every SaaS product with the ability to have their own
 - [ ] Ability to ingest text data, PDF files, websites, and extra data sources.
 
 We love hearing from you! Got any cool ideas or requests? We're all ears! So, if you have something in mind, give us a shout! 
-
-
-## 🚀 Getting Started
-
-- Make sure you have docker installed. 
-
-- To begin, clone this Git repository:
-
-```
-git clone git@github.com:openchatai/OpenCopilot.git
-```
-
-- Update the `.env` file located in the `llm-server` directory with your `OPENAI_API_KEY`. You can use the `.env.example` file as a reference:
-
-```
-OPENAI_API_KEY=YOUR_TOKEN_HERE
-```
-
-- After updating your API key, navigate to the repository folder and run the following command (for macOS or Linux):
-
-```
-make install
-```
-
-This will install the necessary dependencies and set up the environment for the OpenCopilot project.
-
-Once the installation is complete, you can access the OpenCopilot console at: http://localhost:8888
-
----
-
-If needed, you can also restart the local setup using:
-```
-make restart
-```
-
-Also, you can see the complete list of commands using 
-```
-make help
-```
 
 
 ### Important links
