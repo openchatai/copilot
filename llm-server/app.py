@@ -18,10 +18,6 @@ from typing import Any, Tuple
 from prompts.base import api_base_prompt, non_api_base_prompt
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = os.getenv(
-    "MONGODB_URL", "mongodb://localhost:27017/opencopilot"
-)
-mongo = PyMongo(app)
 
 app.register_blueprint(workflow, url_prefix="/workflow")
 
