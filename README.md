@@ -87,9 +87,6 @@ https://github.com/openchatai/OpenCopilot/assets/32633162/3bf5c24d-572c-4a42-9e4
 
 And our goal is to empower every SaaS product with the ability to have their own AI copilots tailored for their unique products.
 
-## 📚 Developer Documentation
-- **💡 Building complex Api flows, refer [Apis Workflows Guide](llm-server/docs/2.define_apis_flows.md)**
-
 ## 🏁 What OpenCopilot can and can't do now?
 
 - It is capable of calling your underlying APIs.
