@@ -4,6 +4,7 @@ from utils.vector_db.get_vector_store import get_vector_store
 from utils.vector_db.store_options import StoreOptions
 from routes.workflow.generate_openapi_payload import generate_openapi_payload
 from utils.make_api_call import make_api_request
+from determine_followup_questions import determine_and_save_followup_context
 import json
 
 from typing import Any, Dict, Optional, cast
@@ -16,6 +17,7 @@ def run_workflow(data: Dict[str, Any]) -> Any:
     text = data.get("text")
     swagger_src = cast(str, data.get("swagger_src"))
     headers = data.get("headers", {})
+    resume_id = data.get("resume_id")
     # This will come from request payload later on when implementing multi-tenancy
     namespace = "workflows"
     server_base_url = cast(str, data.get("server_base_url"))
@@ -31,7 +33,9 @@ def run_workflow(data: Dict[str, Any]) -> Any:
     )
     record = mongo.workflows.find_one({"_id": first_document_id})
 
-    result = run_openapi_operations(record, swagger_src, text, headers, server_base_url)
+    result = run_openapi_operations(
+        record, swagger_src, text, headers, server_base_url, resume_id
+    )
     return result, 200, {"Content-Type": "application/json"}
 
 
@@ -41,15 +45,23 @@ def run_openapi_operations(
     text: str,
     headers: Any,
     server_base_url: str,
+    resume_id: Optional[str],
 ) -> str:
     record_info = {"Workflow Name": record.get("name")}
     for flow in record.get("flows", []):
         prev_api_response = ""
         for step in flow.get("steps"):
             operation_id = step.get("open_api_operation_id")
+
             api_payload = generate_openapi_payload(
                 swagger_src, text, operation_id, prev_api_response
             )
+
+            result_of_context_determination = determine_and_save_followup_context(
+                api_payload, text, record_info
+            )
+            if result_of_context_determination["followup_required"] == True:
+                return json.dumps(result_of_context_determination)
 
             api_payload["path"] = f"{server_base_url}{api_payload['path']}"
             api_response = make_api_request(
