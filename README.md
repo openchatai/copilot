@@ -77,6 +77,12 @@ https://github.com/openchatai/OpenCopilot/assets/32633162/3bf5c24d-572c-4a42-9e4
 
 
 
+Watch this video from Shopify:
+
+[![IMAGE ALT TEXT](https://github.com/openchatai/OpenCopilot/assets/32633162/edebbaa6-eba5-4f72-b88d-cf0d690fffa8)](http://www.youtube.com/watch?v=HVvbY7A7lIQ "Video Title")
+(OpenCopilot is not affliated with Shopify, and they do not use OpenCopilot, it's just a demo on what copilots are capable of)
+
+
 ## AI Copilot: growing trend
 
 - [Shopify is developing "Shopify Sidekick."](https://www.youtube.com/watch?v=HVvbY7A7lIQ&ab_channel=Shopify)
