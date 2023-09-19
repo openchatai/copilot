@@ -9,13 +9,12 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.utilities.openapi import OpenAPISpec
 from utils.base import try_to_match_and_call_api_endpoint
 from models.models import AiResponseFormat
-from flask_pymongo import PyMongo
-import os
 from routes.workflow.workflow_controller import workflow
 import json
-import logging
 from typing import Any, Tuple
 from prompts.base import api_base_prompt, non_api_base_prompt
+from routes.workflow.workflow_service import run_workflow
+from utils.detect_multiple_intents import hasMultipleIntents
 
 app = Flask(__name__)
 
@@ -30,6 +29,18 @@ def handle():
     swagger_url = data.get("swagger_url")
     base_prompt = data.get("base_prompt")
     headers = data.get("headers", {})
+    server_base_url = data.get("server_base_url")
+    # very simple fix to add routing, this should be done using vector similarity first, if correlance score is high use the flow
+    # else use the general route
+    if hasMultipleIntents(text):
+        run_workflow(
+            data={
+                "text": text,
+                "swagger_src": swagger_url,
+                "headers": headers,
+                "server_base_url": server_base_url,
+            }
+        )
 
     if not text:
         return json.dumps({"error": "text is required"}), 400

@@ -6,10 +6,28 @@ from routes.workflow.generate_openapi_payload import generate_openapi_payload
 from utils.make_api_call import make_api_request
 import json
 
-from typing import Any, Dict, Optional, cast
+from typing import Any, Dict, Optional, cast, Union
 
 db_instance = Database()
 mongo = db_instance.get_db()
+
+
+def get_valid_url(
+    api_payload: Dict[str, Union[str, None]], server_base_url: Optional[str]
+) -> str:
+    if "path" in api_payload:
+        path = api_payload["path"]
+
+        # Check if path is a valid URL
+        if path and path.startswith(("http://", "https://")):
+            return path
+        elif server_base_url and server_base_url.startswith(("http://", "https://")):
+            # Append server_base_url to path
+            return f"{server_base_url}{path}"
+        else:
+            raise ValueError("Invalid server_base_url")
+    else:
+        raise ValueError("Missing path parameter")
 
 
 def run_workflow(data: Dict[str, Any]) -> Any:
@@ -51,7 +69,7 @@ def run_openapi_operations(
                 swagger_src, text, operation_id, prev_api_response
             )
 
-            api_payload["path"] = f"{server_base_url}{api_payload['path']}"
+            api_payload["path"] = get_valid_url(api_payload, server_base_url)
             api_response = make_api_request(
                 request_type=api_payload["request_type"],
                 url=api_payload["path"],
