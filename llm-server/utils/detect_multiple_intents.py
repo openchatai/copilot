@@ -1,8 +1,7 @@
 import re
-import json
-from typing import Dict, List, Union
 
 
+# use spaCy or BERT for more accurate results
 def hasMultipleIntents(user_input: str) -> bool:
     # Keywords for multiple questions
     question_keywords = [

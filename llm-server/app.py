@@ -30,23 +30,22 @@ def handle():
     base_prompt = data.get("base_prompt")
     headers = data.get("headers", {})
     server_base_url = data.get("server_base_url")
-    # very simple fix to add routing, this should be done using vector similarity first, if correlance score is high use the flow
-    # else use the general route
-    if hasMultipleIntents(text):
-        run_workflow(
-            data={
-                "text": text,
-                "swagger_src": swagger_url,
-                "headers": headers,
-                "server_base_url": server_base_url,
-            }
-        )
 
     if not text:
         return json.dumps({"error": "text is required"}), 400
 
     if not swagger_url:
         return json.dumps({"error": "swagger_url is required"}), 400
+
+    if hasMultipleIntents(text):
+        return run_workflow(
+            data={
+                "text": text,
+                "swagger_url": swagger_url,
+                "headers": headers,
+                "server_base_url": server_base_url,
+            }
+        )
 
     if not base_prompt:
         return json.dumps({"error": "base_prompt is required"}), 400

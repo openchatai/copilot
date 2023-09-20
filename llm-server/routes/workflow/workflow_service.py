@@ -32,7 +32,7 @@ def get_valid_url(
 
 def run_workflow(data: Dict[str, Any]) -> Any:
     text = data.get("text")
-    swagger_src = cast(str, data.get("swagger_src"))
+    swagger_src = cast(str, data.get("swagger_url"))
     headers = data.get("headers", {})
     # This will come from request payload later on when implementing multi-tenancy
     namespace = "workflows"

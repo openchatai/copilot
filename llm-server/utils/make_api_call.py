@@ -1,6 +1,9 @@
 import requests
 from typing import Any, Dict
 from requests import Response
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def replace_url_placeholders(url: str, values_dict: Dict[str, Any]) -> str:
@@ -28,17 +31,16 @@ def make_api_request(
     params: Dict[str, Any] = {},
     headers: Dict[str, Any] = {},
 ) -> Response:
+    url = replace_url_placeholders(url, params)
+    # Create a session and configure it with headers
+    session = requests.Session()
+
+    # Add the "Content-Type" header with the value "application/json" to the headers
+    headers["Content-Type"] = "application/json"
+
+    if headers:
+        session.headers.update(headers)
     try:
-        # Create a session and configure it with headers
-        url = replace_url_placeholders(url, params)
-        session = requests.Session()
-
-        # Add the "Content-Type" header with the value "application/json" to the headers
-        headers["Content-Type"] = "application/json"
-
-        if headers:
-            session.headers.update(headers)
-
         # Perform the HTTP request based on the request type
         if request_type.upper() == "GET":
             response = session.get(url, params=params)
@@ -57,5 +59,14 @@ def make_api_request(
         return response
 
     except requests.exceptions.RequestException as e:
-        print(f"An error occurred: {e}")
+        logger.error(
+            "API request failed",
+            exc_info=e,
+            extra={
+                "headers": headers,
+                "url": url,
+                "params": params,
+                "request_type": request_type,
+            },
+        )
         raise (e)
