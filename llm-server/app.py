@@ -15,7 +15,7 @@ from typing import Any, Tuple
 from prompts.base import api_base_prompt, non_api_base_prompt
 from routes.workflow.workflow_service import run_workflow
 from routes.workflow.typings.run_workflow_input import WorkflowData
-from utils.detect_multiple_intents import hasMultipleIntents
+from utils.detect_multiple_intents import hasMultipleIntents, hasSingleIntent
 
 app = Flask(__name__)
 
@@ -38,7 +38,7 @@ def handle():
     if not swagger_url:
         return json.dumps({"error": "swagger_url is required"}), 400
 
-    if hasMultipleIntents(text):
+    if not hasSingleIntent(swagger_url, text):
         return run_workflow(WorkflowData(text, swagger_url, headers, server_base_url))
 
     if not base_prompt:
