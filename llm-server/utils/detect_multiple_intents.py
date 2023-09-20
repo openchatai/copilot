@@ -12,6 +12,8 @@ from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from utils.get_llm import get_llm
 
+from routes.workflow.generate_openapi_payload import extract_json_payload
+
 
 # use spaCy or BERT for more accurate results
 def hasMultipleIntents(user_input: str) -> bool:
@@ -77,14 +79,21 @@ def getSummaries(spec_source: str):
 
 
 def hasSingleIntent(spec_source: str, user_requirement: str) -> bool:
+    # The output of this function can also be used to find out the workflow by using the following query,
+    # and then filtering it based on vector search
+    # db.workflows.find( { 'flows.steps.open_api_operation_id': { $all: [ "findPetsByStatus", "placeOrder" ] } } )
     summaries = getSummaries(spec_source)
     _DEFAULT_TEMPLATE = """
-    User: Here is a list of API summaries:
+    User: Here is a list of API summaries: 
+
     {summaries}
 
-    Given the user requirement below, can this user be served using a single API call from the list above? Respond with either YES or NO. 
+    Given the user requirement below, Respond a json with the following keys:
 
-    User requirement: 
+    "number_of_apis_required": int, "apis_in_order": [str]
+
+    User requirement:  
+
     {user_requirement}
     """
     llm = get_llm()
@@ -105,9 +114,9 @@ def hasSingleIntent(spec_source: str, user_requirement: str) -> bool:
         {"summaries": "\n".join(summaries), "user_requirement": user_requirement}
     )
 
-    print(f"Summary call response: {response}")
-
-    if "yes" in response.lower():
+    j = extract_json_payload(response)
+    print(f"{j}")
+    if j and j["number_of_apis_required"] == 1:
         return True
     else:
         return False
