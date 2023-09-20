@@ -4,6 +4,7 @@ from utils.vector_db.get_vector_store import get_vector_store
 from utils.vector_db.store_options import StoreOptions
 from routes.workflow.generate_openapi_payload import generate_openapi_payload
 from utils.make_api_call import make_api_request
+from routes.workflow.typings.run_workflow_input import WorkflowData
 import json
 
 from typing import Any, Dict, Optional, cast, Union
@@ -30,13 +31,13 @@ def get_valid_url(
         raise ValueError("Missing path parameter")
 
 
-def run_workflow(data: Dict[str, Any]) -> Any:
-    text = data.get("text")
-    swagger_src = cast(str, data.get("swagger_url"))
-    headers = data.get("headers", {})
+def run_workflow(data: WorkflowData) -> Any:
+    text = data.text
+    swagger_src = data.swagger_url
+    headers = data.headers
     # This will come from request payload later on when implementing multi-tenancy
     namespace = "workflows"
-    server_base_url = cast(str, data.get("server_base_url"))
+    server_base_url = data.server_base_url
 
     if not text:
         return json.dumps({"error": "text is required"}), 400
