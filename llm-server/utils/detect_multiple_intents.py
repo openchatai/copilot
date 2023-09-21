@@ -82,7 +82,7 @@ def hasSingleIntent(spec_source: str, user_requirement: str) -> bool:
     User: Here is a list of API summaries:
     {summaries}
 
-    Given the user requirement below, can this user be served using a single API call from the list above? Respond with either YES or NO. 
+    Considering the user's request outlined below, is it possible to fulfill their requirement with just one of the API calls listed above? Please reply with either "YES" or "NO"
 
     User requirement: 
     {user_requirement}
