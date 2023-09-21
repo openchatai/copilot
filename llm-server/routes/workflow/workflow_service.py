@@ -48,15 +48,26 @@ def run_workflow(data: WorkflowData) -> Any:
         return json.dumps({"error": "text is required"}), 400
 
     vector_store = get_vector_store(StoreOptions(namespace))
-    documents = vector_store.similarity_search(text)
+    # documents = vector_store.similarity_search(text)
 
-    first_document_id = (
-        ObjectId(documents[0].metadata["workflow_id"]) if documents else None
-    )
-    record = mongo.workflows.find_one({"_id": first_document_id})
+    (document, score) = vector_store.similarity_search_with_relevance_scores(text)[0]
 
-    result = run_openapi_operations(record, swagger_src, text, headers, server_base_url)
-    return result, 200, {"Content-Type": "application/json"}
+    if score > 0.9:
+        print(
+            f"Record '{document}' is highly similar with a similarity score of {document}"
+        )
+        first_document_id = (
+            ObjectId(document.metadata["workflow_id"]) if document else None
+        )
+        record = mongo.workflows.find_one({"_id": first_document_id})
+
+        result = run_openapi_operations(
+            record, swagger_src, text, headers, server_base_url
+        )
+        return result, 200, {"Content-Type": "application/json"}
+    else:
+        # call openapi spec
+        raise Exception("Workflow not defined for this request, try using an agent")
 
 
 def run_openapi_operations(
