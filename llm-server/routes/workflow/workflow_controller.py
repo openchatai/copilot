@@ -15,6 +15,7 @@ from utils.vector_db.store_options import StoreOptions
 from langchain.docstore.document import Document
 from routes.workflow.workflow_service import run_workflow
 from typing import Any, cast
+from routes.workflow.typings.run_workflow_input import WorkflowData
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -88,7 +89,14 @@ def delete_workflow(workflow_id: str) -> Any:
 @handle_exceptions_and_errors
 def run_workflow_controller() -> Any:
     data = request.get_json()
-    result = run_workflow(data)
+    result = run_workflow(
+        WorkflowData(
+            text=data.get("text"),
+            swagger_url=data.get("swagger_url"),
+            headers=data.get("headers", {}),
+            server_base_url=data["server_base_url"],
+        )
+    )
     return result
 
 

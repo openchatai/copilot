@@ -9,13 +9,13 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.utilities.openapi import OpenAPISpec
 from utils.base import try_to_match_and_call_api_endpoint
 from models.models import AiResponseFormat
-from flask_pymongo import PyMongo
-import os
 from routes.workflow.workflow_controller import workflow
 import json
-import logging
 from typing import Any, Tuple
 from prompts.base import api_base_prompt, non_api_base_prompt
+from routes.workflow.workflow_service import run_workflow
+from routes.workflow.typings.run_workflow_input import WorkflowData
+from utils.detect_multiple_intents import hasMultipleIntents, hasSingleIntent
 
 app = Flask(__name__)
 
@@ -30,12 +30,16 @@ def handle():
     swagger_url = data.get("swagger_url")
     base_prompt = data.get("base_prompt")
     headers = data.get("headers", {})
+    server_base_url = data.get("server_base_url")
 
     if not text:
         return json.dumps({"error": "text is required"}), 400
 
     if not swagger_url:
         return json.dumps({"error": "swagger_url is required"}), 400
+
+    if not hasSingleIntent(swagger_url, text):
+        return run_workflow(WorkflowData(text, swagger_url, headers, server_base_url))
 
     if not base_prompt:
         return json.dumps({"error": "base_prompt is required"}), 400
