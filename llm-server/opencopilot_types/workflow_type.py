@@ -1,4 +1,4 @@
-from typing import TypedDict, List, Dict, Any
+from typing import TypedDict, List, Dict, Any, Optional
 
 
 class WorkflowStepType(TypedDict):
@@ -21,3 +21,24 @@ class WorkflowDataType(TypedDict):
     opencopilot: str
     info: Dict[str, Any]
     flows: List[WorkflowFlowType]
+
+
+class RunApiOperationsType:
+    def __init__(
+        self,
+        record: Any,
+        swagger_src: str,
+        text: str,
+        headers: Any,
+        server_base_url: str,
+        api_payload: Optional[Dict[str, Any]],
+    ):
+        self.record = record
+        self.swagger_src = swagger_src
+        self.text = text
+        self.headers = headers
+        self.server_base_url = server_base_url
+        self.api_payload = api_payload
+
+    def __str__(self) -> str:
+        return f"ApiRequest(record={self.record}, swagger_src={self.swagger_src}, text={self.text}, headers={self.headers}, server_base_url={self.server_base_url}, api_payload={self.api_payload})"

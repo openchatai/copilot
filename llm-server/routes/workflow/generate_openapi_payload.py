@@ -15,6 +15,10 @@ from custom_types.t_json import JsonData
 from custom_types.swagger import ApiOperation
 from typing import Dict, Any, Optional, Union, Tuple
 from .extractors.example_generator import generate_example_from_schema
+from routes.workflow.extractors.user_confirmation_form import (
+    generate_user_confirmation_form,
+    UserConfirmationForm,
+)
 
 load_dotenv()
 
@@ -154,7 +158,7 @@ def extract_json_payload(input_string: str) -> Optional[Any]:
 
 def generate_openapi_payload(
     spec_source: str, text: str, _operation_id: str, prev_api_response: str
-) -> Dict[str, Any]:
+) -> Union[Dict[str, Any], UserConfirmationForm]:
     """Generates an API request payload based on an OpenAPI spec.
     Args:
         spec_source (str): The path or URL to the OpenAPI spec file.
@@ -212,7 +216,16 @@ def generate_openapi_payload(
         replace_ref_with_value(body_schema, json_spec.dict_)
         example = generate_example_from_schema(api_operation)
 
-        print(f"Generator function output {example}")
+        user_confirmation_form = generate_user_confirmation_form(
+            body_schema=body_schema,
+            text=text,
+            prev_api_response=prev_api_response,
+            example=example,
+        )
+
+        if user_confirmation_form.form_data is not None:
+            return user_confirmation_form
+
         body = extractBodyFromSchema(body_schema, text, prev_api_response, example)
     else:
         print("Some key is not present in the requestBody dictionary.")
