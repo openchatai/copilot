@@ -14,6 +14,11 @@ from utils.get_llm import get_llm
 
 from routes.workflow.generate_openapi_payload import extract_json_payload
 
+from utils.db import Database
+
+db_instance = Database()
+mongo = db_instance.get_db()
+
 
 # use spaCy or BERT for more accurate results
 def hasMultipleIntents(user_input: str) -> bool:
@@ -73,7 +78,9 @@ def getSummaries(spec_source: str):
         operation = paths[path]
         for field in operation:
             if "summary" in operation[field]:
-                summaries.append(operation[field]["summary"])
+                summaries.append(
+                    f"{operation[field]['summary']} - {operation[field]['operationId']}"
+                )
 
     return summaries
 
@@ -84,13 +91,13 @@ def hasSingleIntent(spec_source: str, user_requirement: str) -> bool:
     # db.workflows.find( { 'flows.steps.open_api_operation_id': { $all: [ "findPetsByStatus", "placeOrder" ] } } )
     summaries = getSummaries(spec_source)
     _DEFAULT_TEMPLATE = """
-    User: Here is a list of API summaries: 
+    User: Here is a list of API summaries in the format summary - operationId:
 
     {summaries}
 
     Given the user requirement below, Respond a json with the following keys:
 
-    "number_of_apis_required": int, "apis_in_order": [str]
+    "number_of_apis_required": int, "operation_ids_in_order_of_execution": [str]
 
     User requirement:  
 
@@ -116,6 +123,16 @@ def hasSingleIntent(spec_source: str, user_requirement: str) -> bool:
 
     j = extract_json_payload(response)
     print(f"{j}")
+    operation_ids_in_order_of_execution = j and j["operation_ids_in_order_of_execution"]
+    # workflows = mongo.workflows.find_one(
+    #     {
+    #         "flows.steps.open_api_operation_id": {
+    #             "$all": operation_ids_in_order_of_execution
+    #         }
+    #     }
+    # )
+
+    # print(f"workflows from mongodb: {workflows}")
     if j and j["number_of_apis_required"] == 1:
         return True
     else:
