@@ -26,6 +26,7 @@ app.register_blueprint(workflow, url_prefix="/workflow")
 @app.route("/handle", methods=["POST", "OPTIONS"])
 def handle():
     data = request.get_json()
+    text = data.get("text")
     swagger_url = data.get("swagger_url")
     base_prompt = data.get("base_prompt")
     headers = data.get("headers", {})
@@ -34,13 +35,16 @@ def handle():
     if not base_prompt:
         return json.dumps({"error": "base_prompt is required"}), 400
 
+    if not text:
+        return json.dumps({"error": "text is required"}), 400
+
     if not swagger_url:
         return json.dumps({"error": "swagger_url is required"}), 400
 
     try:
-        if not hasSingleIntent(swagger_url, base_prompt):
+        if not hasSingleIntent(swagger_url, text):
             return run_workflow(
-                WorkflowData(base_prompt, swagger_url, headers, server_base_url)
+                WorkflowData(text, swagger_url, headers, server_base_url)
             )
     except Exception as e:
         print(f"Using agent: {e}")
