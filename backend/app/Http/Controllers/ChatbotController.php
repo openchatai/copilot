@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\View\View;
 use App\Http\Events\ChatbotWasCreated;
 use App\Http\Requests\CreateChatbotViaPremadeSwaggerRequest;
 use App\Http\Requests\CreateChatbotViaSwaggerRequest;
@@ -13,7 +14,7 @@ use Ramsey\Uuid\Uuid;
 
 class ChatbotController extends Controller
 {
-    public function index()
+    public function index(): View|JsonResponse
     {
         $chatbots = Chatbot::all();
 
@@ -68,8 +69,13 @@ class ChatbotController extends Controller
         return redirect()->route('onboarding.003-step-validator', ['id' => $chatbot->getId()->toString()]);
     }
 
-    private function createCopilot(string $name, string $swaggerUrl, string $promptMessage, string $website = "https://www.example.com", bool $isPreMadeDemo = false): Chatbot
-    {
+    private function createCopilot(
+        string $name,
+        string $swaggerUrl,
+        string $promptMessage,
+        string $website,
+        bool $isPreMadeDemo = false
+    ): Chatbot {
         $chatbot = new Chatbot();
         $chatbot->setId(Uuid::uuid4());
         $chatbot->setName($name);
@@ -83,7 +89,7 @@ class ChatbotController extends Controller
         event(new ChatbotWasCreated(
             $chatbot->getId(),
             $chatbot->getName(),
-            null,
+            $website,
             $chatbot->getPromptMessage(),
         ));
 

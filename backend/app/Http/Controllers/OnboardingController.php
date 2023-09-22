@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
+use Illuminate\Contracts\View\View;
 use App\Http\Services\SwaggerParser;
 use App\Models\Chatbot;
 use Exception;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Facades\Storage;
 
 class OnboardingController extends Controller
@@ -26,14 +30,12 @@ class OnboardingController extends Controller
         return view('onboarding.004-step-done');
     }
 
-    public function validator(Request $request)
+    public function validator(Request $request): Factory|View|JsonResponse|RedirectResponse
     {
-        $botId = $request->route('id');
-
         /**
          * @var Chatbot $bot
          */
-        $bot = Chatbot::findOrFail($botId);
+        $bot = Chatbot::query()->findOrFail($request->route('id'));
 
         try {
             $swaggerName = $bot->getSwaggerUrl();

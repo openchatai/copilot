@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Enums\ChatBotInitialPromptEnum;
+use Illuminate\Contracts\View\View;
+use App\Http\Requests\UpdateChatbotRequest;
 use App\Models\Chatbot;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 class ChatbotSettingController extends Controller
 {
-    public function generalSettings($id)
+    public function generalSettings($id): View|JsonResponse
     {
-        $bot = Chatbot::where('id', $id)->firstOrFail();
+        $bot = Chatbot::query()->findOrFail($id);
 
         if (request()->wantsJson()) {
             return response()->json([
@@ -28,8 +28,7 @@ class ChatbotSettingController extends Controller
 
     public function deleteBot($id): RedirectResponse|JsonResponse
     {
-        $bot = Chatbot::where('id', $id)->firstOrFail();
-        $bot->delete();
+        Chatbot::query()->findOrFail($id)->delete();
 
         if (request()->wantsJson()) {
             return response()->json([
@@ -43,19 +42,13 @@ class ChatbotSettingController extends Controller
     /**
      * @throws ValidationException
      */
-    public function generalSettingsUpdate(Request $request, $id)
+    public function generalSettingsUpdate(UpdateChatbotRequest $request, $id): JsonResponse|RedirectResponse
     {
-        /**
-         * @var Chatbot $bot
-         */
-        $bot = Chatbot::where('id', $id)->firstOrFail();
+        $bot = Chatbot::query()
+            ->findOrFail($id);
 
-        $this->validate($request, [
-            'name' => 'required',
-        ]);
-
-        $bot->setName($request->input('name'));
-        $bot->setPromptMessage($request->input('prompt_message', ChatBotInitialPromptEnum::AI_COPILOT_INITIAL_PROMPT));
+        $bot->setName($request->getName());
+        $bot->setPromptMessage($request->getPromptMessage());
         $bot->save();
 
         if (request()->wantsJson()) {
