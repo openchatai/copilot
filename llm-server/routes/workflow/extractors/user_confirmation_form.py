@@ -2,7 +2,7 @@ import os
 from langchain.prompts import PromptTemplate
 from utils.get_llm import get_llm
 
-from typing import Any
+from typing import Any, Optional
 from routes.workflow.extractors.extract_json import extract_json_payload
 from custom_types.t_json import JsonData
 from langchain.chat_models import ChatOpenAI
@@ -36,14 +36,21 @@ class UserConfirmationForm(object):
 
 
 class ApiFlowState:
-    def __init__(self, flow_index: int, step_index: int, form: UserConfirmationForm):
+    def __init__(
+        self,
+        flow_index: int,
+        step_index: int,
+        form: UserConfirmationForm,
+        msg,
+    ):
         self.flow_index = flow_index
         self.step_index = step_index
         self.form = form
+        self.msg = msg
         # self.uuid = uuid4()
 
     def __str__(self) -> str:
-        return f"ApiFlowState(flow_index={self.flow_index}, step_index={self.step_index}, form={self.form})"
+        return f"ApiFlowState(flow_index={self.flow_index}, step_index={self.step_index}, form={self.form}, msg={self.msg})"
 
     def toJSON(self) -> Any:
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)

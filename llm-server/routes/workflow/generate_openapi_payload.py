@@ -220,7 +220,7 @@ def generate_openapi_payload(
         # checks if llm needs more info before executing the flow, this will short circuit the flow
         # and save the state in the database + it will send this back to the frontend
         # short circuit
-        if os.getenv("copilot_mode") == "interactive":
+        if os.getenv("COPILOT_MODE") == "interactive":
             user_confirmation_form = generate_user_confirmation_form(
                 body_schema=body_schema,  # swagger schema
                 text=text,  # user initial input

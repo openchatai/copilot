@@ -85,7 +85,7 @@ def save_state_to_db(response: ApiFlowState) -> None:
 
 def run_openapi_operations(
     input: RunApiOperationsType,
-) -> str:
+) -> Any:
     i = 0
     j = 0
     record_info = {"Workflow Name": input.record.get("name")}
@@ -106,14 +106,24 @@ def run_openapi_operations(
 
             if isinstance(api_payload, UserConfirmationForm):
                 response = ApiFlowState(
-                    step_index=step_index, flow_index=flow_index, form=api_payload
+                    step_index=step_index,
+                    flow_index=flow_index,
+                    form=api_payload,
+                    msg=None,
                 )
 
                 # save_state_to_db(response)
                 return json.loads(response.toJSON())
 
             elif api_payload["confirmation_required"] == True:
-                return api_payload["msg"]
+                response = ApiFlowState(
+                    step_index=step_index,
+                    flow_index=flow_index,
+                    msg=api_payload["msg"],
+                    form=UserConfirmationForm(None, None, None, None),
+                )
+
+                return json.loads(response.toJSON())
 
             api_payload["path"] = get_api__base_url(api_payload, input.server_base_url)
             api_response = make_api_request(
