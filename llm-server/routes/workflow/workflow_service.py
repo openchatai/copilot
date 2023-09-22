@@ -6,9 +6,10 @@ from routes.workflow.generate_openapi_payload import generate_openapi_payload
 from opencopilot_types.workflow_type import RunApiOperationsType
 from utils.make_api_call import make_api_request
 from routes.workflow.extractors.user_confirmation_form import UserConfirmationForm
+from routes.workflow.typings.run_workflow_input import WorkflowData
 import json
 
-from typing import Any, Dict, cast
+from typing import Any, Dict, Union, Optional
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -48,6 +49,8 @@ def run_workflow(data: WorkflowData) -> Any:
 
     (document, score) = vector_store.similarity_search_with_relevance_scores(text)[0]
 
+    first_document_id = ObjectId(document.metadata["workflow_id"]) if document else None
+    record = mongo.workflows.find_one({"_id": first_document_id})
     result = run_openapi_operations(
         RunApiOperationsType(record, swagger_src, text, headers, server_base_url, None)
     )
