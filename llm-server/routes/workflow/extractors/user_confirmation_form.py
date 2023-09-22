@@ -9,6 +9,7 @@ from langchain.chat_models import ChatOpenAI
 
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 from uuid import uuid4
+import json
 
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -30,16 +31,22 @@ class UserConfirmationForm(object):
         self.prev_api_response = prev_api_response
         self.example = example
 
+    def toJSON(self) -> Any:
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+
 
 class ApiFlowState:
     def __init__(self, flow_index: int, step_index: int, form: UserConfirmationForm):
         self.flow_index = flow_index
         self.step_index = step_index
         self.form = form
-        self.uuid = uuid4()
+        # self.uuid = uuid4()
 
     def __str__(self) -> str:
         return f"ApiFlowState(flow_index={self.flow_index}, step_index={self.step_index}, form={self.form})"
+
+    def toJSON(self) -> Any:
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
 
 def generate_user_confirmation_form(
@@ -84,3 +91,41 @@ def generate_user_confirmation_form(
     )
 
     return response
+
+
+def generate_additional_data_msg(
+    body_schema: JsonData, text: str, prev_api_response: str, example: str
+) -> str:
+    """Generate a JSON payload for React JSONForms by asking an AI assistant for missing data.
+
+    Args:
+        body_schema (JsonData): JSON Schema defining expected fields
+        text (str): User input text
+        prev_api_response (str): Previous API responses
+        example (str): Example JSON payload
+
+    Returns:
+        Any: Generated JSON payload
+
+    This function chats with an AI assistant to get missing data needed
+    to generate a JSON payload that conforms to the provided schema.
+    The returned JSON is intended to be used by React JSONForms to
+    dynamically generate web forms.
+
+    It provides the assistant with the schema, user text, API logs,
+    and example JSON. The assistant's response is parsed to extract
+    the generated JSON data.
+    """
+
+    messages = [
+        SystemMessage(
+            content="""You are an AI assistant, You will have access to User input, Previous API logs and swagger schema. Your goal is to analyze the user input, API logs and swagger schema to determine if there is any information missing that would prevent you from confidently making the API call suggested by the user. If there is missing information, you will request clarification from the user otherwise you will respond by saying - 'ALL_GOOD' """
+        ),
+        HumanMessage(
+            content=f"Here is the required information - Swagger schema: {body_schema}, Api logs: {prev_api_response}, User input: {text};"
+        ),
+    ]
+
+    aiResponse = chat(messages)
+
+    return aiResponse.content

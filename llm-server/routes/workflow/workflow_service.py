@@ -52,14 +52,35 @@ def run_workflow(data: WorkflowData) -> Any:
 
     (document, score) = vector_store.similarity_search_with_relevance_scores(text)[0]
 
-    first_document_id = ObjectId(document.metadata["workflow_id"]) if document else None
-    record = mongo.workflows.find_one({"_id": first_document_id})
-    result = run_openapi_operations(
-        RunApiOperationsType(
-            record, swagger_src, text, headers, server_base_url, data.api_payload
+    if score > 0.9:
+        first_document_id = (
+            ObjectId(document.metadata["workflow_id"]) if document else None
         )
+        record = mongo.workflows.find_one({"_id": first_document_id})
+        result = run_openapi_operations(
+            RunApiOperationsType(
+                record, swagger_src, text, headers, server_base_url, data.api_payload
+            )
+        )
+        return result, 200, {"Content-Type": "application/json"}
+    else:
+        # call openapi spec
+        raise Exception("Workflow not defined for this request, try using an agent")
+
+
+def save_state_to_db(response: ApiFlowState) -> None:
+    mongo.paused_ops.insert_one(
+        {
+            "flow_index": response.flow_index,
+            "step_index": response.step_index,
+            "form": {
+                "form_data": response.form.form_data,
+                "json_schema": response.form.json_schema,
+                "prev_api_response": response.form.prev_api_response,
+                "example": response.form.example,
+            },
+        }
     )
-    return result, 200, {"Content-Type": "application/json"}
 
 
 def run_openapi_operations(
@@ -70,7 +91,7 @@ def run_openapi_operations(
     record_info = {"Workflow Name": input.record.get("name")}
 
     # resume a paused operation if exists
-    if input.api_payload is not None:
+    if input.api_payload and hasattr(input.api_payload, "flow_index"):
         i = input.api_payload.flow_index
         j = input.api_payload.step_index
 
@@ -88,8 +109,11 @@ def run_openapi_operations(
                     step_index=step_index, flow_index=flow_index, form=api_payload
                 )
 
-                mongo.paused_ops.insert_one(response)
-                return json.dumps(response)
+                # save_state_to_db(response)
+                return json.loads(response.toJSON())
+
+            elif api_payload["confirmation_required"] == True:
+                return api_payload["msg"]
 
             api_payload["path"] = get_api__base_url(api_payload, input.server_base_url)
             api_response = make_api_request(

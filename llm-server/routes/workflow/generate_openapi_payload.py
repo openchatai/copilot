@@ -17,6 +17,7 @@ from typing import Dict, Any, Optional, Union, Tuple
 from .extractors.example_generator import generate_example_from_schema
 from routes.workflow.extractors.user_confirmation_form import (
     generate_user_confirmation_form,
+    generate_additional_data_msg,
     UserConfirmationForm,
 )
 
@@ -218,16 +219,22 @@ def generate_openapi_payload(
 
         # checks if llm needs more info before executing the flow, this will short circuit the flow
         # and save the state in the database + it will send this back to the frontend
-        user_confirmation_form = generate_user_confirmation_form(
-            body_schema=body_schema,  # swagger schema
-            text=text,  # user initial input
-            prev_api_response=prev_api_response,  # Api log / prev api response
-            example=example,  # example json payload, can be used to prefill form
-        )
-
         # short circuit
-        if user_confirmation_form.form_data is not None:
-            return user_confirmation_form
+        if os.getenv("copilot_mode") == "interactive":
+            user_confirmation_form = generate_user_confirmation_form(
+                body_schema=body_schema,  # swagger schema
+                text=text,  # user initial input
+                prev_api_response=prev_api_response,  # Api log / prev api response
+                example=example,  # example json payload, can be used to prefill form
+            )
+            if user_confirmation_form.form_data is not None:
+                return user_confirmation_form
+        else:
+            response = generate_additional_data_msg(
+                body_schema, text, prev_api_response, example
+            )
+            if "ALL_GOOD" not in response.upper():
+                return {"confirmation_required": True, "msg": response}
 
         body = extractBodyFromSchema(body_schema, text, prev_api_response, example)
     else:

@@ -42,7 +42,7 @@ def handle():
         return json.dumps({"error": "swagger_url is required"}), 400
 
     try:
-        if not hasSingleIntent(swagger_url, text):
+        if True or not hasSingleIntent(swagger_url, text):
             return run_workflow(
                 WorkflowData(text, swagger_url, headers, server_base_url)
             )
