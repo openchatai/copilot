@@ -1,4 +1,5 @@
 from typing import TypedDict, List, Dict, Any, Optional
+from routes.workflow.extractors.user_confirmation_form import ApiFlowState
 
 
 class WorkflowStepType(TypedDict):
@@ -31,7 +32,7 @@ class RunApiOperationsType:
         text: str,
         headers: Any,
         server_base_url: str,
-        api_payload: Optional[Dict[str, Any]],
+        api_payload: ApiFlowState,
     ):
         self.record = record
         self.swagger_src = swagger_src

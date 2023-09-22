@@ -1,3 +1,6 @@
+from opencopilot_types.workflow_type import ApiFlowState
+
+
 class Headers:
     def __init__(self) -> None:
         self.data: dict[str, str] = {}
@@ -11,3 +14,4 @@ class WorkflowData:
         self.swagger_url = swagger_url
         self.headers = headers
         self.server_base_url = server_base_url
+        self.api_payload = ApiFlowState

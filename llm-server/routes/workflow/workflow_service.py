@@ -5,7 +5,10 @@ from utils.vector_db.store_options import StoreOptions
 from routes.workflow.generate_openapi_payload import generate_openapi_payload
 from opencopilot_types.workflow_type import RunApiOperationsType
 from utils.make_api_call import make_api_request
-from routes.workflow.extractors.user_confirmation_form import UserConfirmationForm
+from routes.workflow.extractors.user_confirmation_form import (
+    UserConfirmationForm,
+    ApiFlowState,
+)
 from routes.workflow.typings.run_workflow_input import WorkflowData
 import json
 
@@ -15,7 +18,7 @@ db_instance = Database()
 mongo = db_instance.get_db()
 
 
-def get_valid_url(
+def get_api__base_url(
     api_payload: Dict[str, Union[str, None]], server_base_url: Optional[str]
 ) -> str:
     if "path" in api_payload:
@@ -52,7 +55,9 @@ def run_workflow(data: WorkflowData) -> Any:
     first_document_id = ObjectId(document.metadata["workflow_id"]) if document else None
     record = mongo.workflows.find_one({"_id": first_document_id})
     result = run_openapi_operations(
-        RunApiOperationsType(record, swagger_src, text, headers, server_base_url, None)
+        RunApiOperationsType(
+            record, swagger_src, text, headers, server_base_url, data.api_payload
+        )
     )
     return result, 200, {"Content-Type": "application/json"}
 
@@ -60,35 +65,44 @@ def run_workflow(data: WorkflowData) -> Any:
 def run_openapi_operations(
     input: RunApiOperationsType,
 ) -> str:
+    i = 0
+    j = 0
     record_info = {"Workflow Name": input.record.get("name")}
-    for flow in input.record.get("flows", []):
+
+    # resume a paused operation if exists
+    if input.api_payload is not None:
+        i = input.api_payload.flow_index
+        j = input.api_payload.step_index
+
+    flows = input.record.get("flows", [])
+    for flow_index, flow in enumerate(flows[i:]):
         prev_api_response = ""
-        for step in flow.get("steps"):
+        for step_index, step in enumerate(flow.get("steps")[j:]):
             operation_id = step.get("open_api_operation_id")
+            api_payload = generate_openapi_payload(
+                input.swagger_src, input.text, operation_id, prev_api_response
+            )
 
-            if (
-                input.api_payload is not None
-            ):  # This can come from the frontend, because the user will fill in json form that we sent, which actually matches the api definition.
-                pass
-
-            else:
-                api_payload = generate_openapi_payload(
-                    input.swagger_src, input.text, operation_id, prev_api_response
+            if isinstance(api_payload, UserConfirmationForm):
+                response = ApiFlowState(
+                    step_index=step_index, flow_index=flow_index, form=api_payload
                 )
 
-                if isinstance(api_payload, UserConfirmationForm):
-                    return json.dumps(api_payload)
+                mongo.paused_ops.insert_one(response)
+                return json.dumps(response)
 
-                api_payload["path"] = f"{input.server_base_url}{api_payload['path']}"
-                api_response = make_api_request(
-                    request_type=api_payload["request_type"],
-                    url=api_payload["path"],
-                    body=api_payload["body"],
-                    params=api_payload["params"],
-                    headers=input.headers,
-                )
-                record_info[operation_id] = json.loads(api_response.text)
-                prev_api_response = api_response.text
+            api_payload["path"] = get_api__base_url(api_payload, input.server_base_url)
+            api_response = make_api_request(
+                request_type=api_payload["request_type"],
+                url=api_payload["path"],
+                body=api_payload["body"],
+                params=api_payload["params"],
+                headers=input.headers,
+            )
+            record_info[operation_id] = json.loads(api_response.text)
+            prev_api_response = api_response.text
+
         prev_api_response = ""
+        j = 0
 
     return json.dumps(record_info)

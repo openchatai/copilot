@@ -8,6 +8,7 @@ from custom_types.t_json import JsonData
 from langchain.chat_models import ChatOpenAI
 
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
+from uuid import uuid4
 
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -19,11 +20,26 @@ chat = ChatOpenAI()
 class UserConfirmationForm(object):
     """Response when form data is missing required info"""
 
-    def __init__(self, form_data: Any, json_schema: Any):
+    def __init__(
+        self, form_data: Any, json_schema: Any, prev_api_response: Any, example: Any
+    ):
         """Initialize with form data and schema"""
         super().__init__()
         self.form_data = form_data
         self.json_schema = json_schema
+        self.prev_api_response = prev_api_response
+        self.example = example
+
+
+class ApiFlowState:
+    def __init__(self, flow_index: int, step_index: int, form: UserConfirmationForm):
+        self.flow_index = flow_index
+        self.step_index = step_index
+        self.form = form
+        self.uuid = uuid4()
+
+    def __str__(self) -> str:
+        return f"ApiFlowState(flow_index={self.flow_index}, step_index={self.step_index}, form={self.form})"
 
 
 def generate_user_confirmation_form(
@@ -63,6 +79,8 @@ def generate_user_confirmation_form(
     response = UserConfirmationForm(
         form_data=extract_json_payload(aiResponse.content),
         json_schema={"properties": body_schema},
+        prev_api_response=prev_api_response,
+        example=example,
     )
 
     return response

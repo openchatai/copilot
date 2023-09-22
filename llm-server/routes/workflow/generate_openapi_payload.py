@@ -216,13 +216,16 @@ def generate_openapi_payload(
         replace_ref_with_value(body_schema, json_spec.dict_)
         example = generate_example_from_schema(api_operation)
 
+        # checks if llm needs more info before executing the flow, this will short circuit the flow
+        # and save the state in the database + it will send this back to the frontend
         user_confirmation_form = generate_user_confirmation_form(
-            body_schema=body_schema,
-            text=text,
-            prev_api_response=prev_api_response,
-            example=example,
+            body_schema=body_schema,  # swagger schema
+            text=text,  # user initial input
+            prev_api_response=prev_api_response,  # Api log / prev api response
+            example=example,  # example json payload, can be used to prefill form
         )
 
+        # short circuit
         if user_confirmation_form.form_data is not None:
             return user_confirmation_form
 
