@@ -229,7 +229,7 @@ def generate_openapi_payload(
             )
             if user_confirmation_form.form_data is not None:
                 return user_confirmation_form
-        else:
+        elif os.getenv("COPILOT_MODE") == "text":
             response = generate_additional_data_msg(
                 body_schema, text, prev_api_response, example
             )

@@ -126,10 +126,13 @@ def generate_additional_data_msg(
 
     messages = [
         SystemMessage(
-            content="""You are an AI assistant, You will have access to User input, Previous API logs and swagger schema. Your goal is to analyze the user input, API logs and swagger schema to determine if there is any information missing that would prevent you from confidently making the API call suggested by the user. If there is missing information, you will request clarification from the user otherwise you will respond by saying - 'ALL_GOOD' """
+            content="""As an AI assistant, your task is to assess user input alongside API logs and the Swagger schema. Your objective is to identify any missing data necessary for generating an API request body. If information is lacking, prompt the user about missing information, like this - I will want some additional information like ...., If you have enough information, respond with 'ALL_GOOD' """
         ),
         HumanMessage(
-            content=f"Here is the required information - Swagger schema: {body_schema}, Api logs: {prev_api_response}, User input: {text};"
+            content=f"""Here is the required information 
+            Swagger schema ({body_schema}), 
+            API logs ({prev_api_response}), 
+            and user input ({text})"""
         ),
     ]
 

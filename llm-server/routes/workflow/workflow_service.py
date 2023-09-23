@@ -91,9 +91,9 @@ def run_openapi_operations(
     record_info = {"Workflow Name": input.record.get("name")}
 
     # resume a paused operation if exists
-    if input.api_payload and hasattr(input.api_payload, "flow_index"):
-        i = input.api_payload.flow_index
-        j = input.api_payload.step_index
+    if input.flow_state and hasattr(input.flow_state, "flow_index"):
+        i = input.flow_state.flow_index
+        j = input.flow_state.step_index
 
     flows = input.record.get("flows", [])
     for flow_index, flow in enumerate(flows[i:]):
@@ -115,11 +115,11 @@ def run_openapi_operations(
                 # save_state_to_db(response)
                 return json.loads(response.toJSON())
 
-            elif api_payload["confirmation_required"] == True:
+            elif api_payload.get("confirmation_required") == True:
                 response = ApiFlowState(
                     step_index=step_index,
                     flow_index=flow_index,
-                    msg=api_payload["msg"],
+                    msg=f"{api_payload['msg']}",
                     form=UserConfirmationForm(None, None, None, None),
                 )
 

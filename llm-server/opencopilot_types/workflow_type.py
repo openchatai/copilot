@@ -32,14 +32,14 @@ class RunApiOperationsType:
         text: str,
         headers: Any,
         server_base_url: str,
-        api_payload: ApiFlowState,
+        flow_state: ApiFlowState,
     ):
         self.record = record
         self.swagger_src = swagger_src
         self.text = text
         self.headers = headers
         self.server_base_url = server_base_url
-        self.api_payload = api_payload
+        self.flow_state = flow_state
 
     def __str__(self) -> str:
         return f"ApiRequest(record={self.record}, swagger_src={self.swagger_src}, text={self.text}, headers={self.headers}, server_base_url={self.server_base_url}, api_payload={self.api_payload})"
