@@ -1,27 +1,30 @@
 'use client';
 import { useRouter as useNextRouter } from "next/navigation";
-import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context'
 import { useEvents } from "./Context";
+
+type AppRouterInstance = ReturnType<typeof useNextRouter>;
+
 export function useRouter(): AppRouterInstance {
-    const { push, back, forward, replace, ...funcs } = useNextRouter();
-    const { change } = useEvents()
+    const { push: originalPush, back, forward, replace, ...rest } = useNextRouter();
+    const { change } = useEvents();
+
     return {
-        push(...opts) {
-            change("changeStarted")
-            push(...opts)
+        ...rest,
+        push: (...args: Parameters<AppRouterInstance['push']>) => {
+            change("changeStarted");
+            originalPush(...args);
         },
-        back() {
-            change("changeStarted")
-            back()
+        back: () => {
+            change("changeStarted");
+            back();
         },
-        forward() {
-            change("changeStarted")
-            forward()
+        forward: () => {
+            change("changeStarted");
+            forward();
         },
-        replace(...opts) {
-            change("changeStarted")
-            replace(...opts)
-        },
-        ...funcs
-    }
+        replace: (...args: Parameters<AppRouterInstance['replace']>) => {
+            change("changeStarted");
+            replace(...args);
+        }
+    };
 }
