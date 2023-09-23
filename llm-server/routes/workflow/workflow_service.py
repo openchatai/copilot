@@ -59,7 +59,7 @@ def run_workflow(data: WorkflowData) -> Any:
         record = mongo.workflows.find_one({"_id": first_document_id})
         result = run_openapi_operations(
             RunApiOperationsType(
-                record, swagger_src, text, headers, server_base_url, data.api_payload
+                record, swagger_src, text, headers, server_base_url, data.flow_state
             )
         )
         return result, 200, {"Content-Type": "application/json"}
@@ -92,6 +92,7 @@ def run_openapi_operations(
 
     # resume a paused operation if exists
     if input.flow_state and hasattr(input.flow_state, "flow_index"):
+        # start from the paused state
         i = input.flow_state.flow_index
         j = input.flow_state.step_index
 

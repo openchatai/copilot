@@ -8,10 +8,15 @@ class Headers:
 
 class WorkflowData:
     def __init__(
-        self, text: str, swagger_url: str, headers: Headers, server_base_url: str
+        self,
+        text: str,
+        swagger_url: str,
+        headers: Headers,
+        server_base_url: str,
+        flow_state: ApiFlowState,
     ) -> None:
         self.text = text
         self.swagger_url = swagger_url
         self.headers = headers
         self.server_base_url = server_base_url
-        self.api_payload = ApiFlowState
+        self.flow_state = flow_state
