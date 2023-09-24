@@ -158,7 +158,11 @@ def extract_json_payload(input_string: str) -> Optional[Any]:
 
 
 def generate_openapi_payload(
-    spec_source: str, text: str, _operation_id: str, prev_api_response: str
+    spec_source: str,
+    text: str,
+    _operation_id: str,
+    prev_api_response: str,
+    example: Any,
 ) -> Union[Dict[str, Any], UserConfirmationForm]:
     """Generates an API request payload based on an OpenAPI spec.
     Args:
@@ -202,7 +206,8 @@ def generate_openapi_payload(
         )
 
     if (
-        "requestBody" in api_operation
+        not example
+        and "requestBody" in api_operation
         and "content" in api_operation["requestBody"]
         and "application/json" in api_operation["requestBody"]["content"]
         and "schema" in api_operation["requestBody"]["content"]["application/json"]
@@ -241,7 +246,7 @@ def generate_openapi_payload(
         print("Some key is not present in the requestBody dictionary.")
 
     response = {
-        "body": body,
+        "body": body or example,
         "params": params,
         "path": path,
         "request_type": method,

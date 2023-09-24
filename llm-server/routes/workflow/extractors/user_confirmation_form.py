@@ -7,8 +7,7 @@ from routes.workflow.extractors.extract_json import extract_json_payload
 from custom_types.t_json import JsonData
 from langchain.chat_models import ChatOpenAI
 
-from langchain.schema import AIMessage, HumanMessage, SystemMessage
-from uuid import uuid4
+from langchain.schema import HumanMessage, SystemMessage
 import json
 
 
@@ -42,11 +41,13 @@ class ApiFlowState:
         step_index: int,
         form: UserConfirmationForm,
         msg,
-    ):
+        example: Any,
+    ) -> None:
         self.flow_index = flow_index
         self.step_index = step_index
         self.form = form
         self.msg = msg
+        self.example = example
         # self.uuid = uuid4()
 
     def __str__(self) -> str:
@@ -126,7 +127,7 @@ def generate_additional_data_msg(
 
     messages = [
         SystemMessage(
-            content="""As an AI assistant, your task is to assess user input alongside API logs and the Swagger schema. Your objective is to identify any missing data necessary for generating an API request body. If information is lacking, prompt the user about missing information, like this - I will want some additional information like ...., If you have enough information, respond with 'ALL_GOOD' """
+            content="""As an AI assistant, your role is to analyze user input in conjunction with API logs and the Swagger schema. Your primary goal is to detect any fields that are marked as 'required' in the API request body schema. If there is missing information, attempt to make an informed guess when possible; otherwise, prompt the user to provide the necessary details. For example, you can say, 'I'll need some additional information, such as ....' If the user offers information that is not defined in the schema, please disregard it. Once you have assembled the correct payload, respond with 'ALL_GOOD' in your response."""
         ),
         HumanMessage(
             content=f"""Here is the required information 

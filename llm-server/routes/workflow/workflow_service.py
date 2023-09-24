@@ -10,6 +10,7 @@ from routes.workflow.extractors.user_confirmation_form import (
     ApiFlowState,
 )
 from routes.workflow.typings.run_workflow_input import WorkflowData
+from utils.get_action_and_data import get_action_and_data
 import json
 
 from typing import Any, Dict, Union, Optional
@@ -44,15 +45,20 @@ def run_workflow(data: WorkflowData) -> Any:
     namespace = "workflows"
     server_base_url = data.server_base_url
 
-    if not text:
-        return json.dumps({"error": "text is required"}), 400
+    # getting action out of user input, because workflow accuracy goes for a toss as user adds more information to the input. By extracting action, we make sure that no matter the size of the input we always find the correct workflow
+
+    _ad = get_action_and_data(text)
+    predicate = _ad.predicate
+    _data = _ad.data
 
     vector_store = get_vector_store(StoreOptions(namespace))
     # documents = vector_store.similarity_search(text)
 
-    (document, score) = vector_store.similarity_search_with_relevance_scores(text)[0]
+    (document, score) = vector_store.similarity_search_with_relevance_scores(predicate)[
+        0
+    ]
 
-    if score > 0.9:
+    if score > 0.88:
         first_document_id = (
             ObjectId(document.metadata["workflow_id"]) if document else None
         )
@@ -102,7 +108,11 @@ def run_openapi_operations(
         for step_index, step in enumerate(flow.get("steps")[j:]):
             operation_id = step.get("open_api_operation_id")
             api_payload = generate_openapi_payload(
-                input.swagger_src, input.text, operation_id, prev_api_response
+                input.swagger_src,
+                input.text,
+                operation_id,
+                prev_api_response,
+                input.flow_state.example,
             )
 
             if isinstance(api_payload, UserConfirmationForm):
@@ -111,6 +121,7 @@ def run_openapi_operations(
                     flow_index=flow_index,
                     form=api_payload,
                     msg=None,
+                    example=None,
                 )
 
                 # save_state_to_db(response)
@@ -122,6 +133,7 @@ def run_openapi_operations(
                     flow_index=flow_index,
                     msg=f"{api_payload['msg']}",
                     form=UserConfirmationForm(None, None, None, None),
+                    example=None,
                 )
 
                 return json.loads(response.toJSON())
@@ -139,5 +151,6 @@ def run_openapi_operations(
 
         prev_api_response = ""
         j = 0
+        input.flow_state.example = None
 
     return json.dumps(record_info)

@@ -31,6 +31,7 @@ def handle():
     base_prompt = data.get("base_prompt")
     headers = data.get("headers", {})
     server_base_url = data.get("server_base_url")
+    flow_state = data.get("flow_state", None)
 
     if not base_prompt:
         return json.dumps({"error": "base_prompt is required"}), 400
@@ -42,9 +43,9 @@ def handle():
         return json.dumps({"error": "swagger_url is required"}), 400
 
     try:
-        if True or not hasSingleIntent(swagger_url, text):
+        if not hasSingleIntent(swagger_url, text):
             return run_workflow(
-                WorkflowData(text, swagger_url, headers, server_base_url)
+                WorkflowData(text, swagger_url, headers, server_base_url, flow_state)
             )
     except Exception as e:
         print(f"Using agent: {e}")
