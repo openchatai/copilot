@@ -10,6 +10,7 @@ from utils.make_api_call import make_api_request
 from routes.workflow.typings.run_workflow_input import WorkflowData
 from langchain.tools.json.tool import JsonSpec
 from typing import List
+from routes.workflow.hierarchical_planner import create_and_run_openapi_agent
 import json
 
 from typing import Any, Dict, Optional, cast, Union
@@ -52,7 +53,7 @@ def run_workflow(data: WorkflowData) -> Any:
 
     (document, score) = vector_store.similarity_search_with_relevance_scores(text)[0]
 
-    if score > 0.9:
+    if score > 0.95:
         print(
             f"Record '{document}' is highly similar with a similarity score of {document}"
         )
@@ -67,7 +68,7 @@ def run_workflow(data: WorkflowData) -> Any:
         return result, 200, {"Content-Type": "application/json"}
     else:
         # call openapi spec
-        raise Exception("Workflow not defined for this request, try using an agent")
+        create_and_run_openapi_agent(swagger_src, text, "API_KEY")
 
 
 def run_openapi_operations(

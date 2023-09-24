@@ -47,7 +47,7 @@ def handle():
                 WorkflowData(text, swagger_url, headers, server_base_url)
             )
     except Exception as e:
-        print(f"Using agent: {e}")
+        raise e
 
     if swagger_url.startswith("https://"):
         full_url = swagger_url
