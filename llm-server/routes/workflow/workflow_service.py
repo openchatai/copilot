@@ -40,7 +40,7 @@ def get_valid_url(
 def run_workflow(data: WorkflowData) -> Any:
     text = data.text
     swagger_src = data.swagger_url
-    headers = data.headers
+    headers = data.headers or {}
     # This will come from request payload later on when implementing multi-tenancy
     namespace = "workflows"
     server_base_url = data.server_base_url
@@ -65,10 +65,11 @@ def run_workflow(data: WorkflowData) -> Any:
         result = run_openapi_operations(
             record, swagger_src, text, headers, server_base_url
         )
-        return result, 200, {"Content-Type": "application/json"}
+        return result
     else:
         # call openapi spec
-        create_and_run_openapi_agent(swagger_src, text, "API_KEY")
+        result = create_and_run_openapi_agent(swagger_src, text, headers)
+        return result
 
 
 def run_openapi_operations(

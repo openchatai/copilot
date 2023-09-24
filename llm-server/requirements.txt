@@ -1,6 +1,6 @@
 aiohttp==3.8.5
 aiosignal==1.3.1
-anyio==4.0.0
+anyio==3.7.1
 asgiref==3.7.2
 async-timeout==4.0.2
 attrs==23.1.0
@@ -9,11 +9,13 @@ blinker==1.6.2
 blis==0.7.9
 catalogue==2.0.8
 certifi==2023.7.22
+chardet==5.2.0
 charset-normalizer==3.2.0
 click==8.1.5
 confection==0.1.0
 cymem==2.0.7
 dataclasses-json==0.5.9
+deptry==0.12.0
 dill==0.3.6
 dnspython==2.4.2
 elastic-transport==8.4.0
@@ -39,35 +41,51 @@ huggingface-hub==0.16.4
 hyperframe==6.0.1
 idna==3.4
 importlib-metadata==6.8.0
+isodate==0.6.1
 itsdangerous==2.1.2
 Jinja2==3.1.2
 joblib==1.3.1
+jsonpatch==1.33
+jsonpointer==2.4
 jsonschema==4.19.0
+jsonschema-spec==0.2.4
 jsonschema-specifications==2023.7.1
-langchain==0.0.232
+langchain==0.0.300
 langcodes==3.3.0
-litellm>=0.1.574
-langsmith==0.0.5
+langsmith==0.0.40
+lazy-object-proxy==1.9.0
+litellm==0.1.729
 loguru==0.7.1
 manifest-ml==0.0.1
 MarkupSafe==2.1.3
 marshmallow==3.19.0
 marshmallow-enum==1.5.1
+mccabe @ file:///opt/conda/conda-bld/mccabe_1644221741721/work
+more-itertools==10.1.0
 multidict==6.0.4
 murmurhash==1.0.9
+mypy @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_b7yrbsawof/croot/mypy_1668440220235/work
 mypy-extensions==0.4.3
 nltk==3.8.1
 numexpr==2.8.4
 numpy==1.25.1
 openai==0.27.8
 openapi-schema-pydantic==1.2.4
+openapi-schema-validator==0.6.0
+openapi-spec-validator==0.6.0
 packaging==23.1
+parse==1.19.1
+pathable==0.4.3
+pathspec==0.11.2
 pathy==0.10.2
 pinecone-client==2.2.2
 portalocker==2.7.0
 preshed==3.0.8
 protobuf==4.24.2
+psutil @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_1310b568-21f4-4cb0-b0e3-2f3d31e39728k9coaga5/croots/recipe/psutil_1656431280844/work
+pycodestyle @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_5b2mq44vl0/croot/pycodestyle_1674267228581/work
 pydantic==1.10.11
+pyflakes @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_d9_v8e0_nr/croot/pyflakes_1674165137080/work
 pymongo==4.5.0
 python-dateutil==2.8.2
 python-dotenv==1.0.0
@@ -77,6 +95,7 @@ redis==4.6.0
 referencing==0.30.2
 regex==2023.6.3
 requests==2.31.0
+rfc3339-validator==0.1.4
 rpds-py==0.10.2
 safetensors==0.3.1
 six==1.16.0
@@ -92,6 +111,8 @@ tenacity==8.2.2
 thinc==8.1.10
 tiktoken==0.4.0
 tokenizers==0.13.3
+toml @ file:///tmp/build/80754af9/toml_1616166611790/work
+tomli @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_d0e5ffbf-5cf1-45be-8693-c5dff8108a2awhthtjlq/croots/recipe/tomli_1657175508477/work
 tqdm==4.65.0
 transformers==4.30.2
 typer==0.9.0
@@ -99,6 +120,7 @@ types-PyYAML==6.0.12.11
 types-requests==2.31.0.2
 types-urllib3==1.26.25.14
 typing-inspect==0.9.0
+typing_extensions @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_1fdywrbp_3/croot/typing_extensions_1690297474455/work
 urllib3==1.26.16
 wasabi==1.1.2
 Werkzeug==2.3.6

@@ -43,9 +43,11 @@ def handle():
 
     try:
         if not hasSingleIntent(swagger_url, text):
-            return run_workflow(
+            result = run_workflow(
                 WorkflowData(text, swagger_url, headers, server_base_url)
             )
+
+            return result
     except Exception as e:
         raise e
 
