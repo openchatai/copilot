@@ -11,7 +11,7 @@ export function Header() {
   const { bot_id } = useParams();
   const { online } = useIsOnline();
   const segments = useSelectedLayoutSegments();
-  const isBotLayout = segments.includes("bot");
+  const isBotLayout = segments.includes("(bot)");
   return (
     <header
       id="dashboard-header"
@@ -27,7 +27,7 @@ export function Header() {
               <Logo />
             </Link>
             {bot_id && (
-              <div className="hidden sm:flex items-center gap-1">
+              <div className="flex items-center gap-1">
                 <span className="text-2xl font-light">/</span>
                 <Bots />
               </div>
