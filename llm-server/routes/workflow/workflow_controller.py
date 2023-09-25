@@ -15,6 +15,7 @@ from utils.vector_db.store_options import StoreOptions
 from langchain.docstore.document import Document
 from routes.workflow.workflow_service import run_workflow
 from typing import Any, cast
+from routes.workflow.typings.run_workflow_input import WorkflowData
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -59,6 +60,35 @@ def create_workflow() -> Any:
     )
 
 
+@workflow.route("/", methods=["GET"])
+def get_workflows() -> Any:
+    # Define default page and page_size values
+    page = int(request.args.get("page", 1))
+    page_size = int(request.args.get("page_size", 10))
+
+    # Calculate skip value based on page and page_size
+    skip = (page - 1) * page_size
+
+    # Query MongoDB to get a paginated list of workflows
+    workflows = list(mongo.workflows.find().skip(skip).limit(page_size))
+
+    for workflow in workflows:
+        workflow["_id"] = str(workflow["_id"])
+
+    # Calculate the total number of workflows (for pagination metadata)
+    total_workflows = mongo.workflows.count_documents({})
+
+    # Prepare response data
+    response_data = {
+        "workflows": workflows,
+        "page": page,
+        "page_size": page_size,
+        "total_workflows": total_workflows,
+    }
+
+    return jsonify(response_data), 200
+
+
 @workflow.route("/<workflow_id>", methods=["PUT"])
 @validate_json(workflow_schema)
 @handle_exceptions_and_errors
@@ -88,7 +118,14 @@ def delete_workflow(workflow_id: str) -> Any:
 @handle_exceptions_and_errors
 def run_workflow_controller() -> Any:
     data = request.get_json()
-    result = run_workflow(data)
+    result = run_workflow(
+        WorkflowData(
+            text=data.get("text"),
+            swagger_url=data.get("swagger_url"),
+            headers=data.get("headers", {}),
+            server_base_url=data["server_base_url"],
+        )
+    )
     return result
 
 
