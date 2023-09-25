@@ -18,6 +18,10 @@ from typing import Any, Dict, Optional, cast, Union
 db_instance = Database()
 mongo = db_instance.get_db()
 
+import os
+
+VECTOR_DB_THRESHOLD = float(os.getenv("VECTOR_DB_THRESHOLD", 0.88))
+
 
 def get_valid_url(
     api_payload: Dict[str, Union[str, None]], server_base_url: Optional[str]
@@ -53,7 +57,7 @@ def run_workflow(data: WorkflowData) -> Any:
 
     (document, score) = vector_store.similarity_search_with_relevance_scores(text)[0]
 
-    if score > 0.95:
+    if score > VECTOR_DB_THRESHOLD:
         print(
             f"Record '{document}' is highly similar with a similarity score of {document}"
         )

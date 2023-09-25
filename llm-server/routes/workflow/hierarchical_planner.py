@@ -1,10 +1,10 @@
 from typing import Dict, Any
 
 from langchain.agents.agent_toolkits.openapi.spec import reduce_openapi_spec
+from routes.workflow.load_openapi_spec import load_openapi_spec
 from langchain.requests import RequestsWrapper
 from langchain.llms.openai import OpenAI
 from langchain.agents.agent_toolkits.openapi import planner
-from routes.workflow.load_openapi_spec import load_openapi_spec
 
 
 def create_and_run_openapi_agent(
