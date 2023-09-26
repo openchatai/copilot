@@ -72,8 +72,7 @@ def handle():
     try:
         json_output = try_to_match_and_call_api_endpoint(swagger_spec, text, headers)
     except Exception as e:
-        logging.error(f"An error occurred: {str(e)}")
-        logging.error(f"An error occurred: {str(e)}")
+        logging.error(f"Failed to call or map API endpoint: {str(e)}")
         logging.error("Exception traceback:\n" + traceback.format_exc())
         json_output = None
 
