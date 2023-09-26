@@ -11,7 +11,7 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
 
 
-def extractBodyFromSchema(
+def gen_body_from_schema(
     body_schema: JsonData, text: str, prev_api_response: str, example: str
 ) -> Any:
     _DEFAULT_TEMPLATE = """To enable a substantially intelligent language model to execute a series of APIs sequentially, the following essential details are necessary to gather information needed for the next API call:

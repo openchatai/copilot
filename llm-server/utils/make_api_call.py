@@ -25,11 +25,11 @@ def replace_url_placeholders(url: str, values_dict: Dict[str, Any]) -> str:
 
 
 def make_api_request(
-    request_type: str,
-    url: str,
-    body: Dict[str, Any] = {},
-    params: Dict[str, Any] = {},
-    headers: Dict[str, Any] = {},
+    endpoint: str,
+    method: str,
+    path_params: Dict[str, Any] = {},
+    query_params: Dict[str, Any] = {},
+    body_schema: Dict[str, Any] = {},
 ) -> Response:
     url = replace_url_placeholders(url, params)
     # Create a session and configure it with headers

@@ -99,7 +99,8 @@ def run_openapi_operations(
                 request_type=api_payload["request_type"],
                 url=api_payload["path"],
                 body=api_payload["body"],
-                params=api_payload["params"],
+                params=api_payload["path_params"],
+                query_params=api_payload["query_params"]
                 headers=headers,
             )
             record_info[operation_id] = json.loads(api_response.text)
