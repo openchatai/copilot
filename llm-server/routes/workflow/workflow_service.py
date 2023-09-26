@@ -96,12 +96,13 @@ def run_openapi_operations(
 
             api_payload["path"] = get_valid_url(api_payload, server_base_url)
             api_response = make_api_request(
-                request_type=api_payload["request_type"],
-                url=api_payload["path"],
-                body=api_payload["body"],
-                params=api_payload["path_params"],
-                query_params=api_payload["query_params"]
+                method=api_payload["method"],
+                endpoint=api_payload["endpoint"],
+                body_schema=api_payload["body_schema"],
+                path_params=api_payload["path_params"],
+                query_params=api_payload["query_params"],
                 headers=headers,
+                servers=api_payload["servers"]
             )
             record_info[operation_id] = json.loads(api_response.text)
             prev_api_response = api_response.text

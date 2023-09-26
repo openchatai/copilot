@@ -13,6 +13,7 @@ from typing import Dict, Any, Optional, Union, Tuple
 from routes.workflow.load_openapi_spec import load_openapi_spec
 
 from prance import ResolvingParser
+from prance import convert
 
 load_dotenv()
 
@@ -24,15 +25,16 @@ from typing import Dict, Any, Optional, Union, List
 
 
 # get path param, query param and json body schema for a given operation id
-def get_api_info_by_operation_id(
-    data: Dict[str, Dict[str, dict]], target_operation_id: str
-) -> Dict[str, Union[str, dict, Optional[Dict[str, dict]]]]:
+from typing import Dict, Union, Optional, List
+
+def get_api_info_by_operation_id(data: Dict[str, Dict[str, dict]], target_operation_id: str) -> Dict[str, Union[str, dict, Optional[Dict[str, dict]], List[str]]]:
     api_info = {
         "endpoint": None,
         "method": None,
         "path_params": {},
         "query_params": {},
         "body_schema": None,
+        "servers": []
     }
 
     for path, methods in data["paths"].items():
@@ -74,6 +76,11 @@ def get_api_info_by_operation_id(
                             "application/json"
                         ]["schema"]
 
+                # Extract server URLs
+                servers = data.get("servers", [])
+                server_urls = [server["url"] for server in servers]
+                api_info["servers"] = server_urls
+
                 return api_info
 
 
@@ -112,4 +119,5 @@ def generate_openapi_payload(
         "path_params": path_params,
         "query_params": query_params,
         "body_schema": body_schema,
+        "servers": api_info["servers"]
     }
