@@ -45,35 +45,40 @@ def run_workflow(data: WorkflowData) -> Any:
     text = data.text
     swagger_src = data.swagger_url
     headers = data.headers or {}
-    # This will come from request payload later on when implementing multi-tenancy
+    # This will come from the request payload later on when implementing multi-tenancy
     namespace = "workflows"
     server_base_url = data.server_base_url
 
     if not text:
         return json.dumps({"error": "text is required"}), 400
 
-    vector_store = get_vector_store(StoreOptions(namespace))
-    # documents = vector_store.similarity_search(text)
+    try:
+        vector_store = get_vector_store(StoreOptions(namespace))
+        (document, score) = vector_store.similarity_search_with_relevance_scores(text)[
+            0
+        ]
 
-    (document, score) = vector_store.similarity_search_with_relevance_scores(text)[0]
+        if score > VECTOR_DB_THRESHOLD:
+            print(
+                f"Record '{document}' is highly similar with a similarity score of {score}"
+            )
+            first_document_id = (
+                ObjectId(document.metadata["workflow_id"]) if document else None
+            )
+            record = mongo.workflows.find_one({"_id": first_document_id})
 
-    if score > VECTOR_DB_THRESHOLD:
-        print(
-            f"Record '{document}' is highly similar with a similarity score of {document}"
-        )
-        first_document_id = (
-            ObjectId(document.metadata["workflow_id"]) if document else None
-        )
-        record = mongo.workflows.find_one({"_id": first_document_id})
+            result = run_openapi_operations(
+                record, swagger_src, text, headers, server_base_url
+            )
+            return result
 
-        result = run_openapi_operations(
-            record, swagger_src, text, headers, server_base_url
-        )
-        return result
-    else:
-        # call openapi spec
-        result = create_and_run_openapi_agent(swagger_src, text, headers)
-        return result
+    except Exception as e:
+        # Log the error, but continue with the rest of the code
+        print(f"Error fetching data from namespace '{namespace}': {str(e)}")
+
+    # Call openapi spec even if an error occurred with Qdrant
+    result = create_and_run_openapi_agent(swagger_src, text, headers)
+    return result
 
 
 def run_openapi_operations(

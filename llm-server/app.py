@@ -15,7 +15,7 @@ from typing import Any, Tuple
 from prompts.base import api_base_prompt, non_api_base_prompt
 from routes.workflow.workflow_service import run_workflow
 from routes.workflow.typings.run_workflow_input import WorkflowData
-from utils.detect_multiple_intents import hasMultipleIntents, hasSingleIntent
+from utils.detect_multiple_intents import hasSingleIntent
 
 app = Flask(__name__)
 
