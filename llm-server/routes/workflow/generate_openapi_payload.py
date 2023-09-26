@@ -95,8 +95,13 @@ def extract_json_payload(input_string: str) -> Optional[Any]:
 def generate_openapi_payload(
     swagger_text: str, text: str, _operation_id: str, prev_api_response: str
 ) -> Dict[str, Any]:
+    if isinstance(spec_source, str):
+        if spec_source.startswith(("http://", "https://")):
+            spec_source = "/app/shared"+spec_source
+        
     parser = ResolvingParser(spec_source)
-    (a, b, c) = parser.version_parsed  # (3,0,2), we can then apply transformation on
+    (a,b,c) = parser.version_parsed # (3,0,2), we can then apply transformation on
+    print(a,b,c)
     # add transformation for swagger v2
 
     api_info = get_api_info_by_operation_id(parser.specification, _operation_id)
