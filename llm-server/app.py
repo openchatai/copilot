@@ -1,6 +1,7 @@
-import warnings
-
+import logging
 import requests
+import traceback
+
 from flask import Flask, request
 from langchain.chains.openai_functions import create_structured_output_chain
 from langchain.chat_models import ChatOpenAI
@@ -16,6 +17,8 @@ from prompts.base import api_base_prompt, non_api_base_prompt
 from routes.workflow.workflow_service import run_workflow
 from routes.workflow.typings.run_workflow_input import WorkflowData
 from utils.detect_multiple_intents import hasMultipleIntents, hasSingleIntent
+
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 
@@ -69,7 +72,9 @@ def handle():
     try:
         json_output = try_to_match_and_call_api_endpoint(swagger_spec, text, headers)
     except Exception as e:
-        warnings.warn(str(e))
+        logging.error(f"An error occurred: {str(e)}")
+        logging.error(f"An error occurred: {str(e)}")
+        logging.error("Exception traceback:\n" + traceback.format_exc())
         json_output = None
 
     llm = ChatOpenAI(model="gpt-3.5-turbo-0613", temperature=0)
