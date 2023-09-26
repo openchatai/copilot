@@ -71,7 +71,7 @@ def getSummaries(spec_source: str):
         operation = paths[path]
         for field in operation:
             if "summary" in operation[field]:
-                summaries.append(operation[field]["summary"])
+                summaries.append(operation[field]["operationId"])
 
     return summaries
 
@@ -82,7 +82,7 @@ def hasSingleIntent(spec_source: str, user_requirement: str) -> bool:
     User: Here is a list of API summaries:
     {summaries}
 
-    Considering the user's request outlined below, is it possible to fulfill their requirement with just one of the API calls listed above? Please reply with either "YES" or "NO"
+    Can one of these api's suffice the users request? Please reply with either "YES" or "NO" with explanation
 
     User requirement: 
     {user_requirement}
