@@ -16,14 +16,19 @@ from typing import Any, Tuple
 from prompts.base import api_base_prompt, non_api_base_prompt
 from routes.workflow.workflow_service import run_workflow
 from routes.workflow.typings.run_workflow_input import WorkflowData
-from utils.detect_multiple_intents import hasMultipleIntents, hasSingleIntent
+from utils.detect_multiple_intents import hasSingleIntent, hasMultipleIntents
+import os
+from dotenv import load_dotenv
 
+
+load_dotenv()
+shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
 logging.basicConfig(level=logging.DEBUG)
+
 
 app = Flask(__name__)
 
 app.register_blueprint(workflow, url_prefix="/workflow")
-
 
 ## TODO: Implement caching for the swagger file content (no need to load it everytime)
 @app.route("/handle", methods=["POST", "OPTIONS"])
@@ -44,25 +49,31 @@ def handle():
     if not swagger_url:
         return json.dumps({"error": "swagger_url is required"}), 400
 
+    if swagger_url.startswith("https://"):
+        pass
+    else:
+        swagger_url = shared_folder + swagger_url
+
+    print(f"swagger_url::{swagger_url}")
     try:
-        if not hasSingleIntent(swagger_url, text):
-            return run_workflow(
+        if hasMultipleIntents(text):
+            result = run_workflow(
                 WorkflowData(text, swagger_url, headers, server_base_url)
             )
+
+            return result
     except Exception as e:
-        print(f"Using agent: {e}")
+        raise e
 
     if swagger_url.startswith("https://"):
-        full_url = swagger_url
-        response = requests.get(full_url)
+        response = requests.get(swagger_url)
         if response.status_code == 200:
             swagger_text = response.text
         else:
             return json.dumps({"error": "Failed to fetch Swagger content"}), 500
     else:
-        full_url = "/app/shared_data/" + swagger_url
         try:
-            with open(full_url, "r") as file:
+            with open(swagger_url, "r") as file:
                 swagger_text = file.read()
         except FileNotFoundError:
             return json.dumps({"error": "File not found"}), 404
