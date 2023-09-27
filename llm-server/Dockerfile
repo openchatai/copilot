@@ -15,5 +15,5 @@ COPY . /app/
 
 EXPOSE 8002
 
-# Run app.py when the container launches
-CMD ["python", "app.py"]
+# -u To prevent log accumulation, execute app.py with unbuffered output as soon as the container starts up.
+CMD ["python", "-u" ,"app.py"]

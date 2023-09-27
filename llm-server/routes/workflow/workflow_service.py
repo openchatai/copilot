@@ -78,7 +78,7 @@ def run_workflow(data: WorkflowData) -> Any:
 
     # Call openapi spec even if an error occurred with Qdrant
     result = create_and_run_openapi_agent(swagger_src, text, headers)
-    return result
+    return {"response": result}
 
 
 def run_openapi_operations(
