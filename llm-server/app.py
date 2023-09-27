@@ -11,6 +11,7 @@ from langchain.utilities.openapi import OpenAPISpec
 from utils.base import try_to_match_and_call_api_endpoint
 from models.models import AiResponseFormat
 from routes.workflow.workflow_controller import workflow
+from routes.swagger_controller.swagger_api import swagger_workflow
 import json
 from typing import Any, Tuple
 from prompts.base import api_base_prompt, non_api_base_prompt
@@ -29,6 +30,8 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 
 app.register_blueprint(workflow, url_prefix="/workflow")
+app.register_blueprint(swagger_workflow, url_prefix="/swagger_api")
+
 
 ## TODO: Implement caching for the swagger file content (no need to load it everytime)
 @app.route("/handle", methods=["POST", "OPTIONS"])
