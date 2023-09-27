@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify, Blueprint, request, Response
 from flask_pymongo import PyMongo
 
+import json, yaml
 from bson import ObjectId
 
 from utils.db import Database
 from typing import Any
+import requests
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -37,10 +39,42 @@ def get_swagger_files() -> Response:
 
 
 @swagger_workflow.route("/", methods=["POST"])
-def add_swagger_file() -> Response:
-    file = request.get_json()
-    mongo.db.swagger_files.insert_one(file)
-    return jsonify({"message": "Swagger file added successfully"})
+def add_swagger_file():
+    if request.content_type == "application/json":
+        # JSON file
+        file_content = request.get_json()
+
+    elif "multipart/form-data" in request.content_type:
+        # Uploaded file
+        file = request.files.get("file")
+        if file is None:
+            return jsonify({"error": "File upload is required"}), 400
+
+        if file.filename.endswith(".json"):
+            try:
+                file_content = json.load(file)
+            except json.JSONDecodeError as e:
+                return (
+                    jsonify({"error": "Invalid JSON format in the uploaded file"}),
+                    400,
+                )
+
+        elif file.filename.endswith(".yaml") or file.filename.endswith(".yml"):
+            try:
+                file_content = yaml.safe_load(file)
+            except yaml.YAMLError as e:
+                return (
+                    jsonify({"error": "Invalid YAML format in the uploaded file"}),
+                    400,
+                )
+
+    else:
+        return jsonify({"error": "Unsupported content type"}), 400
+
+    # Insert into MongoDB
+    mongo.db.swagger_files.insert_one(file_content)
+
+    return jsonify({"message": "File added successfully"})
 
 
 @swagger_workflow.route("/<id>", methods=["GET"])
