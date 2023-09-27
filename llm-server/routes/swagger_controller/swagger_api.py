@@ -26,11 +26,11 @@ def get_swagger_files() -> Response:
     # Query for paginated docs
     files = [
         doc.update({"_id": str(doc["_id"])}) or doc
-        for doc in mongo.db.swagger_files.find({}, {}).skip(skip).limit(limit)
+        for doc in mongo.swagger_files.find({}, {}).skip(skip).limit(limit)
     ]
 
     # Get total docs count
-    total = mongo.db.swagger_files.count_documents({})
+    total = mongo.swagger_files.count_documents({})
 
     # Prepare response data
     data = {"total": total, "page": page, "page_size": page_size, "files": files}
@@ -72,14 +72,14 @@ def add_swagger_file():
         return jsonify({"error": "Unsupported content type"}), 400
 
     # Insert into MongoDB
-    mongo.db.swagger_files.insert_one(file_content)
+    mongo.swagger_files.insert_one(file_content)
 
     return jsonify({"message": "File added successfully"})
 
 
 @swagger_workflow.route("/<id>", methods=["GET"])
 def get_swagger_file(id: str) -> Response:
-    file = mongo.db.swagger_files.find_one({"_id": ObjectId(id)})
+    file = mongo.swagger_files.find_one({"_id": ObjectId(id)})
     if not file:
         return jsonify({"message": "Swagger file not found"})
 
@@ -87,10 +87,61 @@ def get_swagger_file(id: str) -> Response:
     return jsonify(file)
 
 
+@swagger_workflow.route("/transform/<_id>", methods=["GET"])
+def get_transformed_swagger_file(_id: str) -> Response:
+    swagger_json = mongo.swagger_files.aggregate(
+        [
+            {"$match": {"_id": ObjectId(_id)}},
+            {"$project": {"paths": 1}},
+            {
+                "$project": {
+                    "methods": {
+                        "$reduce": {
+                            "input": {"$objectToArray": "$paths"},
+                            "initialValue": [],
+                            "in": {
+                                "$concatArrays": [
+                                    "$$value",
+                                    {
+                                        "$map": {
+                                            "input": {"$objectToArray": "$$this.v"},
+                                            "as": "path",
+                                            "in": {
+                                                "$mergeObjects": [
+                                                    "$$path.v",
+                                                    {
+                                                        "method": "$$path.k",
+                                                        "path": "$$this.k",
+                                                    },
+                                                ]
+                                            },
+                                        }
+                                    },
+                                ]
+                            },
+                        }
+                    }
+                }
+            },
+            {
+                "$project": {
+                    "methods.requestBody": 0,
+                    "methods.responses": 0,
+                    "methods.security": 0,
+                }
+            },
+        ]
+    )
+
+    swagger_json = [doc.update({"_id": str(doc["_id"])}) or doc for doc in swagger_json]
+
+    return jsonify(list(swagger_json))
+
+
 @swagger_workflow.route("/<id>", methods=["PUT"])
 def update_swagger_file(id: str) -> Response:
     data = request.get_json()
-    result = mongo.db.swagger_files.update_one({"_id": ObjectId(id)}, {"$set": data})
+    result = mongo.swagger_files.update_one({"_id": ObjectId(id)}, {"$set": data})
     if result.modified_count == 1:
         return jsonify({"message": "Swagger file updated successfully"})
     return jsonify({"message": "Swagger file not found"})
@@ -98,7 +149,7 @@ def update_swagger_file(id: str) -> Response:
 
 @swagger_workflow.route("/<id>", methods=["DELETE"])
 def delete_swagger_file(id: str) -> Response:
-    result = mongo.db.swagger_files.delete_one({"_id": ObjectId(id)})
+    result = mongo.swagger_files.delete_one({"_id": ObjectId(id)})
     if result.deleted_count == 1:
         return jsonify({"message": "Swagger file deleted successfully"})
     return jsonify({"message": "Swagger file not found"})
