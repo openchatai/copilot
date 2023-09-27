@@ -1,6 +1,7 @@
-import warnings
-
+import logging
 import requests
+import traceback
+
 from flask import Flask, request
 from langchain.chains.openai_functions import create_structured_output_chain
 from langchain.chat_models import ChatOpenAI
@@ -19,9 +20,12 @@ from utils.detect_multiple_intents import hasSingleIntent, hasMultipleIntents
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
 
+load_dotenv()
 shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
+logging.basicConfig(level=logging.DEBUG)
+
+
 app = Flask(__name__)
 
 app.register_blueprint(workflow, url_prefix="/workflow")
@@ -79,7 +83,8 @@ def handle():
     try:
         json_output = try_to_match_and_call_api_endpoint(swagger_spec, text, headers)
     except Exception as e:
-        warnings.warn(str(e))
+        logging.error(f"Failed to call or map API endpoint: {str(e)}")
+        logging.error("Exception traceback:\n" + traceback.format_exc())
         json_output = None
 
     llm = ChatOpenAI(model="gpt-3.5-turbo-0613", temperature=0)
