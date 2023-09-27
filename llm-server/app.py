@@ -1,6 +1,7 @@
-import warnings
-
+import logging
 import requests
+import traceback
+
 from flask import Flask, request
 from langchain.chains.openai_functions import create_structured_output_chain
 from langchain.chat_models import ChatOpenAI
@@ -10,16 +11,26 @@ from langchain.utilities.openapi import OpenAPISpec
 from utils.base import try_to_match_and_call_api_endpoint
 from models.models import AiResponseFormat
 from routes.workflow.workflow_controller import workflow
+from routes.swagger_controller.swagger_api import swagger_workflow
 import json
 from typing import Any, Tuple
 from prompts.base import api_base_prompt, non_api_base_prompt
 from routes.workflow.workflow_service import run_workflow
 from routes.workflow.typings.run_workflow_input import WorkflowData
-from utils.detect_multiple_intents import hasMultipleIntents, hasSingleIntent
+from utils.detect_multiple_intents import hasSingleIntent, hasMultipleIntents
+import os
+from dotenv import load_dotenv
+
+
+load_dotenv()
+shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
+logging.basicConfig(level=logging.DEBUG)
+
 
 app = Flask(__name__)
 
 app.register_blueprint(workflow, url_prefix="/workflow")
+app.register_blueprint(swagger_workflow, url_prefix="/swagger_api")
 
 
 ## TODO: Implement caching for the swagger file content (no need to load it everytime)
@@ -41,25 +52,31 @@ def handle():
     if not swagger_url:
         return json.dumps({"error": "swagger_url is required"}), 400
 
+    if swagger_url.startswith("https://"):
+        pass
+    else:
+        swagger_url = shared_folder + swagger_url
+
+    print(f"swagger_url::{swagger_url}")
     try:
-        if not hasSingleIntent(swagger_url, text):
-            return run_workflow(
+        if hasMultipleIntents(text):
+            result = run_workflow(
                 WorkflowData(text, swagger_url, headers, server_base_url)
             )
+
+            return result
     except Exception as e:
-        print(f"Using agent: {e}")
+        raise e
 
     if swagger_url.startswith("https://"):
-        full_url = swagger_url
-        response = requests.get(full_url)
+        response = requests.get(swagger_url)
         if response.status_code == 200:
             swagger_text = response.text
         else:
             return json.dumps({"error": "Failed to fetch Swagger content"}), 500
     else:
-        full_url = "/app/shared_data/" + swagger_url
         try:
-            with open(full_url, "r") as file:
+            with open(swagger_url, "r") as file:
                 swagger_text = file.read()
         except FileNotFoundError:
             return json.dumps({"error": "File not found"}), 404
@@ -69,7 +86,8 @@ def handle():
     try:
         json_output = try_to_match_and_call_api_endpoint(swagger_spec, text, headers)
     except Exception as e:
-        warnings.warn(str(e))
+        logging.error(f"Failed to call or map API endpoint: {str(e)}")
+        logging.error("Exception traceback:\n" + traceback.format_exc())
         json_output = None
 
     llm = ChatOpenAI(model="gpt-3.5-turbo-0613", temperature=0)

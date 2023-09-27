@@ -30,6 +30,8 @@ services:
       - opencopilot_network
     env_file:
       - llm-server/.env
+    ports: 
+      - 8002:8002
     depends_on:
       - mongodb
       - qdrant
