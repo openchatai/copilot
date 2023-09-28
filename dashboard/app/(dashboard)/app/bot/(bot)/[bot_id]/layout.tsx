@@ -29,13 +29,14 @@ export default async function BotLayout({
             <Nav href={`/app/bot/${params.bot_id}/settings`} segment="settings">
               Settings
             </Nav>
+            <Nav href={`/app/bot/${params.bot_id}/flows`}>Flows</Nav>
           </div>
         </div>
       </div>
 
       <div
         data-container="bot-layout"
-        className="px-4 sm:px-6 lg:px-8 py-8 max-w-[96rem] mx-auto flex-1 grow w-full"
+        className="px-4 sm:px-6 lg:px-8 py-8 max-w-[96rem] mx-auto flex-1 grow w-full min-h-fit h-full relative"
       >
         {status === 200 ? (
           <BotDataProvider copilot={copilot.chatbot}>

@@ -11,6 +11,9 @@ dependencies:
   '@formiz/validations':
     specifier: ^1.0.0
     version: 1.0.0(react@18.2.0)
+  '@openchatai/copilot-flows-editor':
+    specifier: ^1.1.2
+    version: 1.1.2(react-dom@18.2.0)(react@18.2.0)
   '@radix-ui/react-accordion':
     specifier: ^1.1.2
     version: 1.1.2(@types/react-dom@18.2.6)(@types/react@18.2.14)(react-dom@18.2.0)(react@18.2.0)
@@ -463,6 +466,16 @@ packages:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.15.0
+
+  /@openchatai/copilot-flows-editor@1.1.2(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-JEoa55+jtG3nJvfLT8tBjNkM18LcN6gHX+k2XqBnl3bZ/ihPHw78WW3N4sBpT3Z/q8gKeKcVPJXRYoyaVh7LfA==}
+    peerDependencies:
+      react: ^18.x
+      react-dom: ^18.x
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
 
   /@radix-ui/number@1.0.1:
     resolution: {integrity: sha512-T5gIdVO2mmPW3NNhjNgEP3cqMXjXL9UbO0BzWcXfvdBs+BohbQxvd/K5hSVKmn9/lbTdsQVKbUcP5WLCwvUbBg==}

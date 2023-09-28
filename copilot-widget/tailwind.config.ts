@@ -2,7 +2,11 @@
 import { Config } from "tailwindcss";
 import { white, transparent, black, rose, current } from "tailwindcss/colors";
 const config: Config = {
-  content: ["./src/**/*.{tsx,ts,html}", "./index.html"],
+  content: [
+    "./src/**/*.{tsx,ts,html}",
+    "./index.html",
+    "./lib/**/*.{tsx,ts,html}",
+  ],
   prefix: "opencopilot-",
   theme: {
     colors: {
@@ -27,5 +31,5 @@ const config: Config = {
     require("@tailwindcss/typography"),
     require("tailwind-scrollbar"),
   ],
-}
+};
 export default config;

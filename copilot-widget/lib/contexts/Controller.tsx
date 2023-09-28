@@ -1,9 +1,9 @@
 import React, { ReactNode, createContext, useContext, useState } from "react";
-import { type Message } from "../lib/types";
 import now from "../utils/timenow";
 import { useAxiosInstance } from "./axiosInstance";
 import { useConfigData } from "./ConfigData";
 import { useSoundEffectes } from "../hooks/useSoundEffects";
+import { Message } from "@lib/types";
 
 interface ChatContextProps {
   messages: Message[];

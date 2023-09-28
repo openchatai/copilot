@@ -6,7 +6,7 @@ import {
   useState,
 } from "react";
 import { useAxiosInstance } from "./axiosInstance";
-import { type InitialDataType } from "../lib/types";
+import { InitialDataType } from "@lib/types";
 
 type InitialDataContextType = {
   data: InitialDataType | undefined;

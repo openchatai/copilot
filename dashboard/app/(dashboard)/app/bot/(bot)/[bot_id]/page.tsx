@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { Input } from "@/ui/components/inputs/BaseInput";
 import CodeBlock from "@/ui/components/CodeBlock";
 import { Heading } from "@/ui/components/Heading";
 import Banner2 from "@/ui/components/Banner";
