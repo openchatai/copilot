@@ -1,11 +1,10 @@
 import React from "react";
-import WidgetState from "../contexts/WidgetState";
-import { AxiosProvider } from "../contexts/axiosInstance";
-import { InitialDataProvider } from "../contexts/InitialDataContext";
-
 import ConfigDataProvider, {
   ConfigDataContextType,
-} from "../contexts/ConfigData";
+} from "./contexts/ConfigData";
+import WidgetState from "./contexts/WidgetState";
+import { AxiosProvider } from "./contexts/axiosInstance";
+import { InitialDataProvider } from "./contexts/InitialDataContext";
 
 function Root({
   children,

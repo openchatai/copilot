@@ -23,7 +23,7 @@ function BotIcon({ error }: { error?: boolean }) {
 function UserIcon() {
   return (
     <div className="opencopilot-rounded-lg opencopilot-shrink-0 opencopilot-bg-accent opencopilot-h-7 opencopilot-w-7 opencopilot-object-cover opencopilot-aspect-square hover:opencopilot-shadow opencopilot-border-primary-light opencopilot-border opencopilot-flex opencopilot-items-center opencopilot-justify-center">
-      <span className="opencopilot-text-xl opencopilot-text-accent2">
+      <span className="opencopilot-text-xl opencopilot-text-primary opencopilot-fill-current">
         <FaRegUserCircle />
       </span>
     </div>

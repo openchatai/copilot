@@ -1,5 +1,5 @@
+import { Options } from "@lib/types";
 import { ReactNode, createContext, useContext } from "react";
-import { Options } from "../lib/types";
 
 export type ConfigDataContextType = Pick<
   Options,
