@@ -4,7 +4,6 @@ import json
 from langchain.tools.json.tool import JsonSpec
 from utils.get_llm import get_llm
 from dotenv import load_dotenv
-from routes.workflow.load_openapi_spec import load_openapi_spec
 from routes.workflow.extractors.extract_body import extractBodyFromSchema
 from routes.workflow.extractors.extract_param import extractParamsFromSchema
 from routes.workflow.extractors.hydrate_params import (
@@ -153,7 +152,7 @@ def extract_json_payload(input_string: str) -> Optional[Any]:
 
 
 def generate_openapi_payload(
-    spec_source: str, text: str, _operation_id: str, prev_api_response: str
+    swagger_text: str, text: str, _operation_id: str, prev_api_response: str
 ) -> Dict[str, Any]:
     """Generates an API request payload based on an OpenAPI spec.
     Args:
@@ -173,7 +172,7 @@ def generate_openapi_payload(
     """
     params: Optional[JsonData] = {}
     body: Optional[Dict[str, Any]] = {}
-    spec_dict: Dict[str, Any] = load_openapi_spec(spec_source)
+    spec_dict: Dict[str, Any] = json.loads(swagger_text)
     # extracted_feature = extract_feature_from_user_query(text)
 
     # Continue with the rest of the code

@@ -1,12 +1,12 @@
 from typing import Dict, Any
 
 from langchain.agents.agent_toolkits.openapi.spec import reduce_openapi_spec
-from routes.workflow.load_openapi_spec import load_openapi_spec
 from langchain.requests import RequestsWrapper
 from langchain.llms.openai import OpenAI
 
 # from langchain.agents.agent_toolkits.openapi import planner # This is a custom planner, because of issue in langchains current implementation of planner, we will track this
 from api_caller import planner
+import json
 
 
 import os
@@ -15,10 +15,10 @@ PLAN_AND_EXECUTE_MODEL = os.getenv("PLAN_AND_EXECUTE_MODEL", "gpt-4")
 
 
 def create_and_run_openapi_agent(
-    spec_path: str, user_query: str, headers: Dict[str, str] = {}
+    swagger_text: str, user_query: str, headers: Dict[str, str] = {}
 ) -> Any:
     # Load OpenAPI spec
-    raw_spec = load_openapi_spec(spec_path)
+    raw_spec = json.loads(swagger_text)
     spec = reduce_openapi_spec(raw_spec)
 
     # Create RequestsWrapper with auth

@@ -2,10 +2,7 @@ from bson import ObjectId
 from utils.db import Database
 from utils.vector_db.get_vector_store import get_vector_store
 from utils.vector_db.store_options import StoreOptions
-from routes.workflow.generate_openapi_payload import (
-    generate_openapi_payload,
-    load_openapi_spec,
-)
+from routes.workflow.generate_openapi_payload import generate_openapi_payload
 from utils.make_api_call import make_api_request
 from routes.workflow.typings.run_workflow_input import WorkflowData
 from langchain.tools.json.tool import JsonSpec
@@ -43,7 +40,7 @@ def get_valid_url(
 
 def run_workflow(data: WorkflowData) -> Any:
     text = data.text
-    swagger_src = data.swagger_url
+    swagger_text = data.swagger_text
     headers = data.headers or {}
     # This will come from the request payload later on when implementing multi-tenancy
     namespace = "workflows"
@@ -68,7 +65,7 @@ def run_workflow(data: WorkflowData) -> Any:
             record = mongo.workflows.find_one({"_id": first_document_id})
 
             result = run_openapi_operations(
-                record, swagger_src, text, headers, server_base_url
+                record, swagger_text, text, headers, server_base_url
             )
             return result
 
@@ -77,13 +74,13 @@ def run_workflow(data: WorkflowData) -> Any:
         print(f"Error fetching data from namespace '{namespace}': {str(e)}")
 
     # Call openapi spec even if an error occurred with Qdrant
-    result = create_and_run_openapi_agent(swagger_src, text, headers)
+    result = create_and_run_openapi_agent(swagger_text, text, headers)
     return {"response": result}
 
 
 def run_openapi_operations(
     record: Any,
-    swagger_src: str,
+    swagger_text: str,
     text: str,
     headers: Any,
     server_base_url: str,
@@ -94,7 +91,7 @@ def run_openapi_operations(
         for step in flow.get("steps"):
             operation_id = step.get("open_api_operation_id")
             api_payload = generate_openapi_payload(
-                swagger_src, text, operation_id, prev_api_response
+                swagger_text, text, operation_id, prev_api_response
             )
 
             api_payload["path"] = get_valid_url(api_payload, server_base_url)
