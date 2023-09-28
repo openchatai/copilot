@@ -28,7 +28,9 @@ def get_vector_store(options: StoreOptions) -> VectorStore:
         )
     elif store_type == StoreType.QDRANT.value:
         client = qdrant_client.QdrantClient(
-            url=os.environ["QDRANT_URL"], prefer_grpc=True
+            url=os.environ["QDRANT_URL"],
+            prefer_grpc=True,
+            api_key=os.getenv("QDRANT_API_KEY", ""),
         )
 
         vector_store = Qdrant(

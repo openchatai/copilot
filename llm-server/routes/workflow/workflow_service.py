@@ -23,15 +23,15 @@ VECTOR_DB_THRESHOLD = float(os.getenv("VECTOR_DB_THRESHOLD", 0.88))
 def get_valid_url(
     api_payload: Dict[str, Union[str, None]], server_base_url: Optional[str]
 ) -> str:
-    if "path" in api_payload:
-        path = api_payload["path"]
+    if "endpoint" in api_payload:
+        endpoint = api_payload["endpoint"]
 
         # Check if path is a valid URL
-        if path and path.startswith(("http://", "https://")):
-            return path
+        if endpoint and endpoint.startswith(("http://", "https://")):
+            return endpoint
         elif server_base_url and server_base_url.startswith(("http://", "https://")):
-            # Append server_base_url to path
-            return f"{server_base_url}{path}"
+            # Append server_base_url to endpoint
+            return f"{server_base_url}{endpoint}"
         else:
             raise ValueError("Invalid server_base_url")
     else:
@@ -102,7 +102,7 @@ def run_openapi_operations(
                 path_params=api_payload["path_params"],
                 query_params=api_payload["query_params"],
                 headers=headers,
-                servers=api_payload["servers"]
+                servers=api_payload["servers"],
             )
             record_info[operation_id] = json.loads(api_response.text)
             prev_api_response = api_response.text

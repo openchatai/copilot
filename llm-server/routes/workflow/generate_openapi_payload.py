@@ -27,14 +27,17 @@ from typing import Dict, Any, Optional, Union, List
 # get path param, query param and json body schema for a given operation id
 from typing import Dict, Union, Optional, List
 
-def get_api_info_by_operation_id(data: Dict[str, Dict[str, dict]], target_operation_id: str) -> Dict[str, Union[str, dict, Optional[Dict[str, dict]], List[str]]]:
+
+def get_api_info_by_operation_id(
+    data: Dict[str, Dict[str, dict]], target_operation_id: str
+) -> Dict[str, Union[str, dict, Optional[Dict[str, dict]], List[str]]]:
     api_info = {
         "endpoint": None,
         "method": None,
         "path_params": {},
         "query_params": {},
         "body_schema": None,
-        "servers": []
+        "servers": [],
     }
 
     for path, methods in data["paths"].items():
@@ -97,26 +100,33 @@ def generate_openapi_payload(
 ) -> Dict[str, Any]:
     if isinstance(spec_source, str):
         if spec_source.startswith(("http://", "https://")):
-            spec_source = "/app/shared"+spec_source
-        
+            spec_source = "/app/shared" + spec_source
+
     parser = ResolvingParser(spec_source)
-    (a,b,c) = parser.version_parsed # (3,0,2), we can then apply transformation on
-    print(a,b,c)
+    (a, b, c) = parser.version_parsed  # (3,0,2), we can then apply transformation on
+    print(a, b, c)
     # add transformation for swagger v2
 
     api_info = get_api_info_by_operation_id(parser.specification, _operation_id)
 
-    path_params = gen_params_from_schema(
-        api_info["path_params"], text, prev_api_response
+    path_params = (
+        {}
+        if not api_info["path_params"]
+        else gen_params_from_schema(api_info["path_params"], text, prev_api_response)
     )
-    query_params = gen_params_from_schema(
-        api_info["query_params"], text, prev_api_response
+    query_params = (
+        {}
+        if not api_info["query_params"]
+        else gen_params_from_schema(api_info["query_params"], text, prev_api_response)
     )
 
-    example = gen_ex_from_schema(api_info["body_schema"])
-    body_schema = gen_body_from_schema(
-        api_info["body_schema"], text, prev_api_response, example
-    )
+    if api_info["body_schema"]:
+        example = gen_ex_from_schema(api_info["body_schema"])
+        body_schema = gen_body_from_schema(
+            api_info["body_schema"], text, prev_api_response, example
+        )
+    else:
+        body_schema = {}
 
     return {
         "endpoint": api_info["endpoint"],
@@ -124,5 +134,5 @@ def generate_openapi_payload(
         "path_params": path_params,
         "query_params": query_params,
         "body_schema": body_schema,
-        "servers": api_info["servers"]
+        "servers": api_info["servers"],
     }
