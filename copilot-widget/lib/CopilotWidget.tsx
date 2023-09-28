@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useWidgetStateContext } from "./contexts/WidgetState";
 import cn from "./utils/cn";
 import ChatScreenWithSfxs from "./screens/ChatScreen";
+import { IS_SERVER } from "./utils/is_server";
 
 export function CopilotWidget({
   triggerSelector,
@@ -10,13 +11,11 @@ export function CopilotWidget({
 }) {
   const [open, toggle] = useWidgetStateContext();
   useEffect(() => {
+    if (IS_SERVER) return;
     const trigger = document.querySelector(triggerSelector);
-    function handleClick() {
-      toggle();
-    }
     if (trigger) {
-      trigger.addEventListener("click", handleClick);
-      return () => trigger.removeEventListener("click", handleClick);
+      trigger.addEventListener("click", toggle);
+      return () => trigger.removeEventListener("click", toggle);
     } else {
       console.warn(
         "the trigger element can't be found,make sure it present in the DOM"
