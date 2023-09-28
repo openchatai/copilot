@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { useWidgetStateContext } from "../contexts/WidgetState";
-import ChatScreenWithSfxs from "../screens/ChatScreen";
-import cn from "../utils/cn";
+import { useWidgetStateContext } from "./contexts/WidgetState";
+import cn from "./utils/cn";
+import ChatScreenWithSfxs from "./screens/ChatScreen";
 
 export function CopilotWidget({
   triggerSelector,
@@ -37,8 +37,10 @@ export function CopilotWidget({
         className={cn(
           "opencopilot-font-inter opencopilot-overflow-hidden opencopilot-h-full sm:opencopilot-rounded-xl opencopilot-bg-white",
           "opencopilot-opacity-0 opencopilot-transition-opacity opencopilot-ease",
-          open && "opencopilot-opacity-100 opencopilot-animate-in opencopilot-fade-in",
-          !open && "opencopilot-hidden opencopilot-animate-out opencopilot-fade-out"
+          open &&
+            "opencopilot-opacity-100 opencopilot-animate-in opencopilot-fade-in",
+          !open &&
+            "opencopilot-hidden opencopilot-animate-out opencopilot-fade-out"
         )}
       >
         <ChatScreenWithSfxs />

@@ -5,22 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "rm -rf ./dist && tsc && vite build",
+    "clean": "rm -rf ./dist",
+    "build:embed": "pnpm clean && tsc && vite build",
+    "build:lib": "tsup",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "release": "release-it",
+    "prepublishOnly": "pnpm build:lib"
   },
-  "dependencies": {
-    "@radix-ui/react-popover": "^1.0.6",
-    "@radix-ui/react-tooltip": "^1.0.6",
-    "axios": "^1.4.0",
+  "dependencies": {},
+  "peerDependencies": {
     "react": "^18.x",
-    "react-dom": "^18.x",
-    "react-icons": "^4.10.1",
-    "react-loader-spinner": "^5.3.4",
-    "react-markdown": "^8.0.7",
-    "react-textarea-autosize": "^8.5.3",
-    "remark-gfm": "^3.0.1",
-    "tailwind-merge": "^1.13.2"
+    "react-dom": "^18.x"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.9",
@@ -41,7 +37,38 @@
     "tailwindcss": "^3.3.3",
     "tailwindcss-animate": "^1.0.6",
     "timeago.js": "^4.0.2",
+    "tsup": "^7.2.0",
     "typescript": "^5.0.2",
-    "vite": "^4.3.9"
+    "vite": "^4.3.9",
+    "vite-tsconfig-paths": "^4.2.1",
+    "@radix-ui/react-popover": "^1.0.6",
+    "@radix-ui/react-tooltip": "^1.0.6",
+    "axios": "^1.4.0",
+    "react": "^18.x",
+    "react-dom": "^18.x",
+    "react-icons": "^4.10.1",
+    "react-loader-spinner": "^5.3.4",
+    "react-markdown": "^8.0.7",
+    "react-textarea-autosize": "^8.5.3",
+    "remark-gfm": "^3.0.1",
+    "tailwind-merge": "^1.13.2"
+  },
+  "files": [
+    "dist"
+  ],
+  "bugs": {
+    "url": "https://github.com/openchatai/OpenCopilot/issues"
+  },
+  "author": {
+    "name": "openchatai",
+    "url": "https://github.com/openchatai"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
   }
 }

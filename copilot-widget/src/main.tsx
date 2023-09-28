@@ -1,7 +1,8 @@
 import ReactDOM from "react-dom/client";
-import css from "./styles/index.css?inline";
-import { CopilotWidget, Root } from "./lib";
-import { Options } from "./lib/types";
+import css from "../styles/index.css?inline";
+import { Options } from "@lib/types";
+import Root from "@lib/Root";
+import { CopilotWidget } from "@lib/CopilotWidget";
 
 declare global {
   interface Window {
