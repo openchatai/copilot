@@ -14,6 +14,9 @@ jobs:
         with:
           node-version: 18
 
+      - name: install pnpm
+        run: npm install -g pnpm
+
       - name: Install dependencies
         run: cd copilot-widget/ && pnpm install
 
