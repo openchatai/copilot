@@ -1,8 +1,5 @@
 import re
 
-from routes.workflow.generate_openapi_payload import (
-    load_openapi_spec,
-)
 from routes.workflow.typings.run_workflow_input import WorkflowData
 from langchain.tools.json.tool import JsonSpec
 from typing import List
@@ -11,6 +8,7 @@ from typing import Any, Dict, Optional, cast, Union
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from utils.get_llm import get_llm
+import json
 
 
 # use spaCy or BERT for more accurate results
@@ -50,13 +48,13 @@ def hasMultipleIntents(user_input: str) -> bool:
 # print(json.dumps(result, indent=2))
 
 
-def getSummaries(spec_source: str):
+def getSummaries(swagger_text: str):
     """Get API endpoint summaries from an OpenAPI spec."""
 
     summaries: List[str] = []
 
     # Load the OpenAPI spec
-    spec_dict: Optional[Dict[str, Any]] = load_openapi_spec(spec_source)
+    spec_dict: Optional[Dict[str, Any]] = json.loads(swagger_text)
     if not spec_dict:
         raise ValueError("Unable to load OpenAPI spec")
 
@@ -76,8 +74,8 @@ def getSummaries(spec_source: str):
     return summaries
 
 
-def hasSingleIntent(spec_source: str, user_requirement: str) -> bool:
-    summaries = getSummaries(spec_source)
+def hasSingleIntent(swagger_text: str, user_requirement: str) -> bool:
+    summaries = getSummaries(swagger_text)
     _DEFAULT_TEMPLATE = """
     User: Here is a list of API summaries:
     {summaries}
