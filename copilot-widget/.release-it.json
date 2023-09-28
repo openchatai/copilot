@@ -1,5 +1,12 @@
 {
     "github": {
-        "release": true
+        "requireBranch": "main",
+        "release": true,
+        "commitMessage": "chore: release ${version}",
+        "hooks": {
+            "before:init": [
+                "pnpm lint"
+            ]
+        }
     }
 }
