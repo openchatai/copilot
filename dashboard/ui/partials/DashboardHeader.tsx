@@ -6,6 +6,8 @@ import { useParams, useSelectedLayoutSegments } from "next/navigation";
 import cn from "../utils/cn";
 import { Link } from "../router-events";
 import { useIsOnline } from "../providers/OnlineStateProvider";
+import { Button } from "../components/Button";
+import { HiOutlineDocumentText } from "react-icons/hi2";
 
 export function Header() {
   const { bot_id } = useParams();
@@ -34,6 +36,18 @@ export function Header() {
             )}
           </div>
           <div className="actions flex items-center gap-3">
+            <Button
+              asChild
+              className="shadow-none border-none space-x-1"
+              variant={{
+                intent: "primary-ghost",
+              }}
+            >
+              <Link href="https://docs.opencopilot.so">
+                <HiOutlineDocumentText className="text-lg" />
+                <span>Docs</span>
+              </Link>
+            </Button>
             <ProfilePopover />
             <div
               data-online={online}

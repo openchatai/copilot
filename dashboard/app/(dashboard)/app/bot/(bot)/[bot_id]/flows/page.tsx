@@ -4,24 +4,21 @@ import {
   CodePreview,
   Controller,
   FlowArena,
+  transformaEndpointToNode,
 } from "@openchatai/copilot-flows-editor";
 import "@openchatai/copilot-flows-editor/dist/style.css";
 import { Button } from "@/ui/components/Button";
 import { useBotData } from "@/ui/providers/BotDataProvider";
-
-const flows = [
+const data = transformaEndpointToNode([
   {
-    id: "1",
-    name: "Add a pet",
-    description:
-      "Add a pet called luna and place order for her 3 days from now",
-    steps: [],
-    createdAt: Date.now(),
+    path: "/",
+    method: "get",
+    description: "This is a step",
+    operationId: "get",
+    summary: "get",
+    tags: ["tag1", "tag2"],
   },
-];
-
-// data-container="bot-layout"
-// load the flows (set the initial state)
+]);
 function Header() {
   const { bot } = useBotData();
   return (
@@ -68,7 +65,15 @@ export default function FlowsPage() {
               ],
             },
           ],
-          flows: flows,
+          flows: [
+            {
+              id: "flow-1",
+              name: "Flow 1",
+              description: "This is a flow 1",
+              createdAt: Date.now(),
+              steps: data,
+            },
+          ],
         }}
       >
         <div className="h-full absolute inset-0 overflow-hidden flex flex-col items-start">

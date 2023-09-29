@@ -16,7 +16,7 @@ export const buttonVariants = tv({
       icon: "!p-1.5 shrink-0 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 shadow-sm",
       danger:
         "text-white bg-rose-500 hover:bg-opacity-80 hover:border-opacity-80",
-      base: "border-none bg-transparent text-slate-600 dark:text-slate-300 !p-0 disabled:!bg-transparent",
+      base: "border-none bg-transparent text-slate-600 dark:text-slate-300 !p-0 disabled:!bg-transparent shadow-none",
       tertiary:
         "hover:border-opacity-80 dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-600 dark:text-slate-300",
       secondary:

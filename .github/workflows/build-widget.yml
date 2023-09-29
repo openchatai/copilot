@@ -14,14 +14,11 @@ jobs:
         with:
           node-version: 18
 
-      - name: install pnpm
-        run: npm install -g pnpm
-
       - name: Install dependencies
-        run: cd copilot-widget/ && pnpm install
+        run: cd copilot-widget/ && npm install
 
       - name: Build copilot-widget
-        run: cd copilot-widget/ && pnpm build:embed
+        run: cd copilot-widget/ && npm run build
 
       - name: Upload embed as artifact.
         uses: actions/upload-artifact@v3
