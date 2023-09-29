@@ -41,7 +41,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
         raise Exception("swagger_url is required")
 
     # Check if swagger file exists in MongoDB
-    swagger_doc = mongo.swagger_files.find_one({"_id": swagger_url})
+    swagger_doc = mongo.swagger_files.find_one({"bot_id": swagger_url})
 
     if swagger_doc:
         swagger_doc["_id"] = str(swagger_doc["_id"])

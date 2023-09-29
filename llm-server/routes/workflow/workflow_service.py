@@ -17,7 +17,7 @@ mongo = db_instance.get_db()
 
 import os
 
-VECTOR_DB_THRESHOLD = float(os.getenv("VECTOR_DB_THRESHOLD", 0.88))
+SCORE_THRESOLD = float(os.getenv("SCORE_THRESOLD", 0.88))
 
 
 def get_valid_url(
@@ -38,7 +38,7 @@ def get_valid_url(
         raise ValueError("Missing path parameter")
 
 
-def run_workflow(data: WorkflowData) -> Any:
+def run_workflow(data: WorkflowData, swagger_json: Any) -> Any:
     text = data.text
     headers = data.headers or {}
     # This will come from the request payload later on when implementing multi-tenancy
@@ -49,40 +49,37 @@ def run_workflow(data: WorkflowData) -> Any:
         return json.dumps({"error": "text is required"}), 400
 
     try:
-        vector_store = get_vector_store(StoreOptions(namespace))
-        (document, score) = vector_store.similarity_search_with_relevance_scores(text)[
-            0
-        ]
+        vector_store = get_vector_store(StoreOptions(namespace=))
+        (document, score) = vector_store.similarity_search_with_relevance_scores(
+            text, score_threshold=SCORE_THRESOLD
+        )[0]
 
-        if score > VECTOR_DB_THRESHOLD:
-            print(
-                f"Record '{document}' is highly similar with a similarity score of {score}"
-            )
-            first_document_id = (
-                ObjectId(document.metadata["workflow_id"]) if document else None
-            )
-            record = mongo.workflows.find_one({"_id": first_document_id})
-            swagger_text = mongo.swagger_files.find_one(
-                {"_id": record.swagger_id}, {"_id": 0}
-            )
+        print(
+            f"Record '{document}' is highly similar with a similarity score of {score}"
+        )
+        first_document_id = (
+            ObjectId(document.metadata["workflow_id"]) if document else None
+        )
+        record = mongo.workflows.find_one({"_id": first_document_id})
 
-            result = run_openapi_operations(
-                record, swagger_text, text, headers, server_base_url
-            )
-            return result
+
+        result = run_openapi_operations(
+            record, swagger_json, text, headers, server_base_url
+        )
+        return result
 
     except Exception as e:
         # Log the error, but continue with the rest of the code
         print(f"Error fetching data from namespace '{namespace}': {str(e)}")
 
     # Call openapi spec even if an error occurred with Qdrant
-    result = create_and_run_openapi_agent(swagger_text, text, headers)
+    result = create_and_run_openapi_agent(swagger_json, text, headers)
     return {"response": result}
 
 
 def run_openapi_operations(
     record: Any,
-    swagger_text: str,
+    swagger_json: str,
     text: str,
     headers: Any,
     server_base_url: str,
@@ -93,7 +90,7 @@ def run_openapi_operations(
         for step in flow.get("steps"):
             operation_id = step.get("open_api_operation_id")
             api_payload = generate_openapi_payload(
-                swagger_text, text, operation_id, prev_api_response
+                swagger_json, text, operation_id, prev_api_response
             )
 
             api_response = make_api_request(headers=headers, **api_payload.__dict__)

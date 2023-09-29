@@ -90,9 +90,9 @@ def extract_json_payload(input_string: str) -> Optional[Any]:
 
 
 def generate_openapi_payload(
-    swagger_text: str, text: str, _operation_id: str, prev_api_response: str
+    swagger_json: str, text: str, _operation_id: str, prev_api_response: str
 ) -> ApiInfo:
-    parser = ResolvingParser(spec_string=swagger_text)
+    parser = ResolvingParser(spec_string=swagger_json)
     (a, b, c) = parser.version_parsed  # (3,0,2), we can then apply transformation on
     print(a, b, c)
     # add transformation for swagger v2
