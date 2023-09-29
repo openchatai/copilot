@@ -87,7 +87,10 @@ class MessageController extends Controller
                 [
                     "type" => "text",
                     "response" => [
-                        "text" => "I'm unable to help you at the moment, please try again later.  **code: b500** " . $exception->getMessage() . " " . $bot->getSwaggerUrl()
+                        "text" => "I'm unable to help you at the moment, please try again later.  **code: b500**  \n" .
+                            "```" .
+                            $exception->getMessage() . " at " . $exception->getFile() .
+                            "```"
                     ]
                 ]
             );
