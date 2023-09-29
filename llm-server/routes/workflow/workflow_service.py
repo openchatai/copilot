@@ -40,7 +40,6 @@ def get_valid_url(
 
 def run_workflow(data: WorkflowData) -> Any:
     text = data.text
-    swagger_text = data.swagger_text
     headers = data.headers or {}
     # This will come from the request payload later on when implementing multi-tenancy
     namespace = "workflows"
@@ -63,6 +62,9 @@ def run_workflow(data: WorkflowData) -> Any:
                 ObjectId(document.metadata["workflow_id"]) if document else None
             )
             record = mongo.workflows.find_one({"_id": first_document_id})
+            swagger_text = mongo.swagger_files.find_one(
+                {"_id": record.swagger_id}, {"_id": 0}
+            )
 
             result = run_openapi_operations(
                 record, swagger_text, text, headers, server_base_url
@@ -94,16 +96,7 @@ def run_openapi_operations(
                 swagger_text, text, operation_id, prev_api_response
             )
 
-            api_payload["path"] = get_valid_url(api_payload, server_base_url)
-            api_response = make_api_request(
-                method=api_payload["method"],
-                endpoint=api_payload["endpoint"],
-                body_schema=api_payload["body_schema"],
-                path_params=api_payload["path_params"],
-                query_params=api_payload["query_params"],
-                headers=headers,
-                servers=api_payload["servers"],
-            )
+            api_response = make_api_request(headers=headers, **api_payload.__dict__)
             record_info[operation_id] = json.loads(api_response.text)
             prev_api_response = api_response.text
         prev_api_response = ""

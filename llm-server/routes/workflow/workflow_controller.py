@@ -39,10 +39,10 @@ def get_workflow(workflow_id: str) -> Any:
         return jsonify({"message": "Workflow not found"}), 404
 
 
-@workflow.route("/", methods=["POST"])
+@workflow.route("/b/<bot_id>", methods=["POST"])
 @validate_json(workflow_schema)
 @handle_exceptions_and_errors
-def create_workflow() -> Any:
+def create_workflow(bot_id: str) -> Any:
     workflow_data = cast(WorkflowDataType, request.json)
     workflows = mongo.workflows
     workflow_id = workflows.insert_one(workflow_data).inserted_id
@@ -52,7 +52,7 @@ def create_workflow() -> Any:
     if namespace == "workflows":
         warning_message = "Warning: The 'namespace' variable is set to the generic value 'workflows'. You should replace it with a specific value for your org / user / account."
         warnings.warn(warning_message, UserWarning)
-    add_workflow_data_to_qdrant(namespace, workflow_id, workflow_data)
+    add_workflow_data_to_qdrant(namespace, workflow_id, workflow_data, bot_id)
 
     return (
         jsonify({"message": "Workflow created", "workflow_id": str(workflow_id)}),
@@ -60,8 +60,8 @@ def create_workflow() -> Any:
     )
 
 
-@workflow.route("/", methods=["GET"])
-def get_workflows() -> Any:
+@workflow.route("/b/<bot_id>", methods=["GET"])
+def get_workflows(bot_id: str) -> Any:
     # Define default page and page_size values
     page = int(request.args.get("page", 1))
     page_size = int(request.args.get("page_size", 10))
@@ -70,13 +70,15 @@ def get_workflows() -> Any:
     skip = (page - 1) * page_size
 
     # Query MongoDB to get a paginated list of workflows
-    workflows = list(mongo.workflows.find().skip(skip).limit(page_size))
+    workflows = list(
+        mongo.workflows.find({"bot_id": bot_id}).skip(skip).limit(page_size)
+    )
 
     for workflow in workflows:
         workflow["_id"] = str(workflow["_id"])
 
     # Calculate the total number of workflows (for pagination metadata)
-    total_workflows = mongo.workflows.count_documents({})
+    total_workflows = mongo.workflows.count_documents({"bot_id": bot_id})
 
     # Prepare response data
     response_data = {
@@ -94,7 +96,9 @@ def get_workflows() -> Any:
 @handle_exceptions_and_errors
 def update_workflow(workflow_id: str) -> Any:
     workflow_data = cast(WorkflowDataType, request.json)
-    mongo.workflows.update_one({"_id": ObjectId(workflow_id)}, {"$set": workflow_data})
+    result = mongo.workflows.update_one(
+        {"_id": ObjectId(workflow_id)}, {"$set": workflow_data}
+    )
     namespace = "workflows"
     vector_store = get_vector_store(StoreOptions(namespace))
     vector_store.delete(ids=[workflow_id])
@@ -103,7 +107,9 @@ def update_workflow(workflow_id: str) -> Any:
         warning_message = "Warning: The 'namespace' variable is set to the generic value 'workflows'. You should replace it with a specific value for your org / user / account."
         warnings.warn(warning_message, UserWarning)
 
-    add_workflow_data_to_qdrant(namespace, workflow_id, workflow_data)
+    add_workflow_data_to_qdrant(
+        namespace, workflow_id, workflow_data, result.raw_result.get("bot_id")
+    )
 
     return jsonify({"message": "Workflow updated"}), 200
 
@@ -121,7 +127,6 @@ def run_workflow_controller() -> Any:
     result = run_workflow(
         WorkflowData(
             text=data.get("text"),
-            swagger_url=data.get("swagger_url"),
             headers=data.get("headers", {}),
             server_base_url=data["server_base_url"],
         )
@@ -130,7 +135,7 @@ def run_workflow_controller() -> Any:
 
 
 def add_workflow_data_to_qdrant(
-    namespace: str, workflow_id: str, workflow_data: Any
+    namespace: str, workflow_id: str, workflow_data: Any, bot_id: str
 ) -> None:
     for flow in workflow_data["flows"]:
         docs = [
@@ -139,6 +144,8 @@ def add_workflow_data_to_qdrant(
                 metadata={
                     "workflow_id": str(workflow_id),
                     "workflow_name": workflow_data.get("name"),
+                    "swagger_id": workflow_data.get("swagger_id"),
+                    "bot_id": bot_id,
                 },
             )
         ]

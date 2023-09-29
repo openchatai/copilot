@@ -15,16 +15,15 @@ app.register_blueprint(_swagger, url_prefix="/swagger_api")
 from routes.root_service import handle_request
 
 
-
 ## TODO: Implement caching for the swagger file content (no need to load it everytime)
 @app.route("/handle", methods=["POST", "OPTIONS"])
 def handle() -> Response:
     data = request.get_json()
     try:
         response = handle_request(data)
-        return jsonify(response), 200
+        return jsonify(response)
     except Exception as e:
-        return jsonify({"response": str(e)}), 500
+        return jsonify({"response": str(e)})
 
 
 @app.errorhandler(500)

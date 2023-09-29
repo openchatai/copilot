@@ -75,9 +75,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
 
     try:
         if hasMultipleIntents(text):
-            return run_workflow(
-                WorkflowData(text, swagger_text, headers, server_base_url)
-            )
+            return run_workflow(WorkflowData(text, headers, server_base_url))
     except Exception as e:
         print(e)
 
