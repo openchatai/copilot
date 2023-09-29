@@ -49,7 +49,7 @@ def run_workflow(data: WorkflowData, swagger_json: Any) -> Any:
         return json.dumps({"error": "text is required"}), 400
 
     try:
-        vector_store = get_vector_store(StoreOptions(namespace=))
+        vector_store = get_vector_store(StoreOptions(namespace=data.swagger_url))
         (document, score) = vector_store.similarity_search_with_relevance_scores(
             text, score_threshold=SCORE_THRESOLD
         )[0]
@@ -61,7 +61,6 @@ def run_workflow(data: WorkflowData, swagger_json: Any) -> Any:
             ObjectId(document.metadata["workflow_id"]) if document else None
         )
         record = mongo.workflows.find_one({"_id": first_document_id})
-
 
         result = run_openapi_operations(
             record, swagger_json, text, headers, server_base_url

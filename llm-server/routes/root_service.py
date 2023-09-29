@@ -41,7 +41,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
         raise Exception("swagger_url is required")
 
     # Check if swagger file exists in MongoDB
-    swagger_doc = mongo.swagger_files.find_one({"bot_id": swagger_url})
+    swagger_doc = mongo.swagger_files.find_one({"meta.swagger_url": swagger_url})
 
     if swagger_doc:
         swagger_doc["_id"] = str(swagger_doc["_id"])
@@ -70,12 +70,14 @@ def handle_request(data: Dict[str, Any]) -> Any:
         swagger_json = json.loads(swagger_text)
         swagger_json["bot_id"] = swagger_url.replace(shared_folder, "")
         mongo.swagger_files.update_one(
-            {"bot_id": swagger_json["bot_id"]}, {"$set": swagger_json}, True
+            {"meta.swagger_url": swagger_url}, {"$set": swagger_json}, True
         )
 
     try:
         if hasMultipleIntents(text):
-            return run_workflow(WorkflowData(text, headers, server_base_url))
+            return run_workflow(
+                WorkflowData(text, headers, server_base_url, swagger_url), swagger_json
+            )
     except Exception as e:
         print(e)
 
