@@ -39,11 +39,12 @@ def get_workflow(workflow_id: str) -> Any:
         return jsonify({"message": "Workflow not found"}), 404
 
 
-@workflow.route("/", methods=["POST"])
+@workflow.route("/b/<bot_id>", methods=["POST"])
 @validate_json(workflow_schema)
 @handle_exceptions_and_errors
-def create_workflow() -> Any:
+def create_workflow(bot_id: str) -> Any:
     workflow_data = cast(WorkflowDataType, request.json)
+    workflow_data["bot_id"] = bot_id
     workflows = mongo.workflows
     workflow_id = workflows.insert_one(workflow_data).inserted_id
 
@@ -60,8 +61,8 @@ def create_workflow() -> Any:
     )
 
 
-@workflow.route("/", methods=["GET"])
-def get_workflows() -> Any:
+@workflow.route("/b/<bot_id>", methods=["GET"])
+def get_workflows(bot_id: str) -> Any:
     # Define default page and page_size values
     page = int(request.args.get("page", 1))
     page_size = int(request.args.get("page_size", 10))
@@ -70,13 +71,15 @@ def get_workflows() -> Any:
     skip = (page - 1) * page_size
 
     # Query MongoDB to get a paginated list of workflows
-    workflows = list(mongo.workflows.find().skip(skip).limit(page_size))
+    workflows = list(
+        mongo.workflows.find({"bot_id": bot_id}).skip(skip).limit(page_size)
+    )
 
     for workflow in workflows:
         workflow["_id"] = str(workflow["_id"])
 
     # Calculate the total number of workflows (for pagination metadata)
-    total_workflows = mongo.workflows.count_documents({})
+    total_workflows = mongo.workflows.count_documents({"bot_id": bot_id})
 
     # Prepare response data
     response_data = {
@@ -121,7 +124,7 @@ def run_workflow_controller() -> Any:
     result = run_workflow(
         WorkflowData(
             text=data.get("text"),
-            swagger_url=data.get("swagger_url"),
+            swagger_text=data.get("swagger_url"),
             headers=data.get("headers", {}),
             server_base_url=data["server_base_url"],
         )
