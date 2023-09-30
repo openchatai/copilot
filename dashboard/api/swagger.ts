@@ -1,9 +1,8 @@
-import axios, { AxiosResponse } from 'axios';
+import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: '/backend/swagger_api',
+  baseURL: "/backend/swagger_api",
 });
-
 
 interface PaginatedSwaggerResponse {
   files: any[]; // Replace 'any' with the actual type of 'files' if known.
@@ -11,7 +10,6 @@ interface PaginatedSwaggerResponse {
   page_size: number;
   total: number;
 }
-
 
 interface SwaggerTransformResponse {
   _id: string;
@@ -37,15 +35,14 @@ interface SwaggerTransformResponse {
   }[];
 }
 
-
 type MultipartPayload = {
   id: string; // Replace with the actual type
   file: File; // Assuming you are dealing with File objects for multipart file upload
 };
 
-export async function getSwaggerData(page: number = 1, pageSize: number = 10): Promise<AxiosResponse<PaginatedSwaggerResponse>> {
+export async function getSwaggerData(page: number = 1, pageSize: number = 10) {
   try {
-    const response = await axiosInstance.get('', {
+    const response = await axiosInstance.get<PaginatedSwaggerResponse>("", {
       params: {
         page,
         page_size: pageSize,
@@ -57,47 +54,49 @@ export async function getSwaggerData(page: number = 1, pageSize: number = 10): P
   }
 }
 
-export async function getDataById(_id: string): Promise<AxiosResponse<any>> {
+export async function getDataById(_id: string) {
   const url = `/${_id}`;
-  return axiosInstance.get(url);
+  return axiosInstance.get<any>(url);
 }
 
-export async function fetchSwaggerTransform(id: string, file: File): Promise<AxiosResponse<SwaggerTransformResponse[]>> {
+export async function fetchSwaggerTransform(id: string, file: File) {
   const formData = new FormData();
-  formData.append('file', file);
+  formData.append("file", file);
 
   try {
-    const response = await axiosInstance.get(`/transform/${id}`, {
-      params: {
-        file: formData,
-      },
-    });
+    const response = await axiosInstance.get<SwaggerTransformResponse[]>(
+      `/transform/${id}`,
+      {
+        params: {
+          file: formData,
+        },
+      }
+    );
     return response;
   } catch (error: any) {
     throw new Error(`Error fetching Swagger transform data: ${error.message}`);
   }
 }
 
-export async function updateData(_id: string, swaggerJson: object): Promise<AxiosResponse<{message: string}>> {
+export async function updateData(_id: string, swaggerJson: object) {
   const url = `/${_id}`;
-  return axiosInstance.put(url, swaggerJson);
+  return axiosInstance.put<{ message: string }>(url, swaggerJson);
 }
 
-export async function deleteData(_id: string): Promise<AxiosResponse<any>> {
+export async function deleteData(_id: string) {
   const url = `/${_id}`;
-  return axiosInstance.delete(url);
+  return axiosInstance.delete<any>(url);
 }
-
 
 /** As of now, we don't have to call this api from the frontend. This will internally be called from the backend */
-export async function uploadSwaggerFile(id: string, file: File): Promise<AxiosResponse<any>> {
+export async function uploadSwaggerFile(id: string, file: File) {
   const formData = new FormData();
-  formData.append('file', file);
+  formData.append("file", file);
 
   try {
-    const response = await axiosInstance.post(`/u/${id}`, formData, {
+    const response = await axiosInstance.post<any>(`/u/${id}`, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
     return response;
