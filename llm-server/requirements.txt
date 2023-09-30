@@ -89,7 +89,7 @@ PyYAML==6.0
 qdrant-client==1.4.0
 redis==4.6.0
 referencing==0.30.2
-regex==2023.6.3
+regex==2023.8.8
 requests==2.31.0
 rfc3339-validator==0.1.4
 rpds-py==0.10.2
