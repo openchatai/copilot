@@ -39,20 +39,15 @@ def get_workflow(workflow_id: str) -> Any:
         return jsonify({"message": "Workflow not found"}), 404
 
 
-@workflow.route("/b/<bot_id>", methods=["POST"])
+@workflow.route("/u/<swagger_url>", methods=["POST"])
 @validate_json(workflow_schema)
 @handle_exceptions_and_errors
-def create_workflow(bot_id: str) -> Any:
+def create_workflow(swagger_url: str) -> Any:
     workflow_data = cast(WorkflowDataType, request.json)
     workflows = mongo.workflows
     workflow_id = workflows.insert_one(workflow_data).inserted_id
 
-    namespace = "workflows"
-    # Check if the namespace is generic
-    if namespace == "workflows":
-        warning_message = "Warning: The 'namespace' variable is set to the generic value 'workflows'. You should replace it with a specific value for your org / user / account."
-        warnings.warn(warning_message, UserWarning)
-    add_workflow_data_to_qdrant(namespace, workflow_id, workflow_data, bot_id)
+    add_workflow_data_to_qdrant(workflow_id, workflow_data, swagger_url)
 
     return (
         jsonify({"message": "Workflow created", "workflow_id": str(workflow_id)}),
@@ -102,13 +97,9 @@ def update_workflow(workflow_id: str) -> Any:
     namespace = "workflows"
     vector_store = get_vector_store(StoreOptions(namespace))
     vector_store.delete(ids=[workflow_id])
-    # Check if the namespace is generic
-    if namespace == "workflows":
-        warning_message = "Warning: The 'namespace' variable is set to the generic value 'workflows'. You should replace it with a specific value for your org / user / account."
-        warnings.warn(warning_message, UserWarning)
 
     add_workflow_data_to_qdrant(
-        namespace, workflow_id, workflow_data, result.raw_result.get("bot_id")
+        workflow_id, workflow_data, result.raw_result.get("bot_id")
     )
 
     return jsonify({"message": "Workflow updated"}), 200
@@ -124,18 +115,23 @@ def delete_workflow(workflow_id: str) -> Any:
 @handle_exceptions_and_errors
 def run_workflow_controller() -> Any:
     data = request.get_json()
+
+    swagger_url = data.get("swagger_url")
+    swagger_json = mongo.swagger_files.find_one({"meta.swagger_url": swagger_url})
     result = run_workflow(
         WorkflowData(
             text=data.get("text"),
             headers=data.get("headers", {}),
             server_base_url=data["server_base_url"],
-        )
+            swagger_url=data.get("swagger_url"),
+        ),
+        swagger_json,
     )
     return result
 
 
 def add_workflow_data_to_qdrant(
-    namespace: str, workflow_id: str, workflow_data: Any, bot_id: str
+    workflow_id: str, workflow_data: Any, swagger_url: str
 ) -> None:
     for flow in workflow_data["flows"]:
         docs = [
@@ -145,9 +141,9 @@ def add_workflow_data_to_qdrant(
                     "workflow_id": str(workflow_id),
                     "workflow_name": workflow_data.get("name"),
                     "swagger_id": workflow_data.get("swagger_id"),
-                    "bot_id": bot_id,
+                    "swagger_url": swagger_url,
                 },
             )
         ]
         embeddings = get_embeddings()
-        init_vector_store(docs, embeddings, StoreOptions(namespace))
+        init_vector_store(docs, embeddings, StoreOptions(swagger_url))

@@ -24,13 +24,13 @@ def get_swagger_files(swagger_url: str) -> Response:
     # Query for paginated docs
     files = [
         doc.update({"_id": str(doc["_id"])}) or doc
-        for doc in mongo.swagger_files.find({"swagger_url": swagger_url}, {})
+        for doc in mongo.swagger_files.find({"meta.swagger_url": swagger_url}, {})
         .skip(skip)
         .limit(limit)
     ]
 
     # Get total docs count
-    total = mongo.swagger_files.count_documents({"swagger_url": swagger_url})
+    total = mongo.swagger_files.count_documents({"meta.swagger_url": swagger_url})
 
     # Prepare response data
     data = {"total": total, "page": page, "page_size": page_size, "files": files}
