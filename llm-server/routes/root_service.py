@@ -66,10 +66,15 @@ def handle_request(data: Dict[str, Any]) -> Any:
     ) or json.loads(fetch_swagger_text(swagger_url))
 
     try:
-        if not hasSingleIntent(swagger_doc, text):
+        k = hasSingleIntent(swagger_doc, text)
+        if k == False:
             return run_workflow(
                 WorkflowData(text, headers, server_base_url, swagger_url), swagger_doc
             )
+        elif(k == True):
+            raise "Try match and call"
+        else:
+            return {"response": k}
     except Exception as e:
         print(e)
 

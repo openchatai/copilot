@@ -72,13 +72,17 @@ def getSummaries(swagger_doc: Any):
 def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> bool:
     summaries = getSummaries(swagger_doc)
     _DEFAULT_TEMPLATE = """
-    User: Here is a list of API summaries:
-    {summaries}
+        You are an AI chatbot equipped with the capability to interact with APIs on behalf of users. However, users may also ask you general questions that do not necessitate API calls.
 
-    Can one of these api's suffice the users request? Please reply with either "YES" or "NO" with explanation
+        **User Input:**
+        ```
+        User: Here is a list of API summaries:
+        {summaries}
 
-    User requirement: 
-    {user_requirement}
+        If the request can be completed with a single API call, please reply with "__ONE__". If it requires multiple API calls, respond with "__MULTIPLE__". If the query is a general question and does not require an API call, provide the answer to the question.
+
+        User Requirement:
+        {user_requirement}
     """
     llm = get_llm()
     PROMPT = PromptTemplate(
@@ -100,7 +104,9 @@ def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> bool:
 
     print(f"Summary call response: {response}")
 
-    if "yes" in response.lower():
+    if "__ONE__" in response.upper():
         return True
-    else:
+    elif "__MULTIPLE__" in response.upper():
         return False
+    else:
+        return response
