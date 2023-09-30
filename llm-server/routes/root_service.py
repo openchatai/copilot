@@ -38,65 +38,42 @@ def fetch_swagger_text(swagger_url: str) -> str:
         response = requests.get(swagger_url)
         if response.status_code == 200:
             return response.text
-        else:
-            raise Exception(FAILED_TO_FETCH_SWAGGER_CONTENT)
-    else:
-        try:
-            with open(swagger_url, "r") as file:
-                return file.read()
-        except FileNotFoundError:
-            raise Exception(FILE_NOT_FOUND)
+        raise Exception(FAILED_TO_FETCH_SWAGGER_CONTENT)
+    try:
+        with open(shared_folder + swagger_url, "r") as file:
+            return file.read()
+    except FileNotFoundError:
+        raise Exception(FILE_NOT_FOUND)
 
 
 def handle_request(data: Dict[str, Any]) -> Any:
-    text = data.get("text")
+    text: str = cast(str, data.get("text"))
     swagger_url = cast(str, data.get("swagger_url", ""))
     base_prompt = data.get("base_prompt", "")
     headers = data.get("headers", {})
     server_base_url = cast(str, data.get("server_base_url", ""))
 
-    # Check if required fields are present
-    if not base_prompt:
-        raise Exception(BASE_PROMPT_REQUIRED)
+    for required_field, error_msg in [
+        ("base_prompt", BASE_PROMPT_REQUIRED),
+        ("text", TEXT_REQUIRED),
+        ("swagger_url", SWAGGER_URL_REQUIRED),
+    ]:
+        if not locals()[required_field]:
+            raise Exception(error_msg)
 
-    if not text:
-        raise Exception(TEXT_REQUIRED)
-
-    if not swagger_url:
-        raise Exception(SWAGGER_URL_REQUIRED)
-
-    # Check if swagger file exists in MongoDB
     swagger_doc = mongo.swagger_files.find_one(
         {"meta.swagger_url": swagger_url}, {"meta": 0, "_id": 0}
-    )
-
-    if swagger_doc:
-        swagger_text = swagger_doc
-    else:
-        if not swagger_url.startswith("https://"):
-            swagger_url = shared_folder + swagger_url
-
-        print(f"swagger_url::{swagger_url}")
-
-        swagger_text = fetch_swagger_text(swagger_url)
-
-        swagger_json = json.loads(swagger_text)
-        swagger_json["bot_id"] = swagger_url.replace(shared_folder, "")
-        mongo.swagger_files.update_one(
-            {"meta.swagger_url": swagger_url}, {"$set": swagger_json}, True
-        )
-
-    swagger_json = swagger_doc or swagger_json
+    ) or json.loads(fetch_swagger_text(swagger_url))
 
     try:
         if hasMultipleIntents(text):
             return run_workflow(
-                WorkflowData(text, headers, server_base_url, swagger_url), swagger_json
+                WorkflowData(text, headers, server_base_url, swagger_url), swagger_doc
             )
     except Exception as e:
         print(e)
 
-    swagger_spec = OpenAPISpec.from_text(swagger_text)
+    swagger_spec = OpenAPISpec.from_text(fetch_swagger_text(swagger_url))
 
     try:
         json_output = try_to_match_and_call_api_endpoint(swagger_spec, text, headers)
@@ -107,11 +84,11 @@ def handle_request(data: Dict[str, Any]) -> Any:
 
     llm = ChatOpenAI(model="gpt-3.5-turbo-0613", temperature=0)
 
-    if json_output is None:
-        prompt_msgs = non_api_base_prompt(base_prompt, text)
-    else:
-        prompt_msgs = api_base_prompt(base_prompt, text, json_output)
-
+    prompt_msgs = (
+        non_api_base_prompt(base_prompt, text)
+        if json_output is None
+        else api_base_prompt(base_prompt, text, json_output)
+    )
     prompt = ChatPromptTemplate(messages=prompt_msgs)
     chain = create_structured_output_chain(AiResponseFormat, llm, prompt, verbose=False)
     return chain.run(question=text).dict()
