@@ -78,14 +78,14 @@ services:
     networks:
       - opencopilot_network
 
-  # adminer:
-  #   image: adminer
-  #   ports:
-  #     - "8080:8080"
-  #   depends_on:
-  #     - mysql
-  #   networks:
-  #     - opencopilot_network
+  adminer:
+    image: adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    networks:
+      - opencopilot_network
 
   qdrant:
     image: qdrant/qdrant

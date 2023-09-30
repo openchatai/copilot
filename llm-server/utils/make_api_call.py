@@ -25,13 +25,16 @@ def replace_url_placeholders(url: str, values_dict: Dict[str, Any]) -> str:
 
 
 def make_api_request(
-    request_type: str,
-    url: str,
-    body: Dict[str, Any] = {},
-    params: Dict[str, Any] = {},
-    headers: Dict[str, Any] = {},
+    method,
+    endpoint,
+    body_schema,
+    path_params,
+    query_params,
+    headers,
+    servers,
 ) -> Response:
-    url = replace_url_placeholders(url, params)
+    endpoint = replace_url_placeholders(endpoint, path_params)
+    url = servers[0] + endpoint
     # Create a session and configure it with headers
     session = requests.Session()
 
@@ -42,14 +45,14 @@ def make_api_request(
         session.headers.update(headers)
     try:
         # Perform the HTTP request based on the request type
-        if request_type.upper() == "GET":
-            response = session.get(url, params=params)
-        elif request_type.upper() == "POST":
-            response = session.post(url, json=body, params=params)
-        elif request_type.upper() == "PUT":
-            response = session.put(url, json=body, params=params)
-        elif request_type.upper() == "DELETE":
-            response = session.delete(url, params=params)
+        if method == "GET":
+            response = session.get(url, params=query_params)
+        elif method == "POST":
+            response = session.post(url, json=body_schema, params=query_params)
+        elif method == "PUT":
+            response = session.put(url, json=body_schema, params=query_params)
+        elif method == "DELETE":
+            response = session.delete(url, params=query_params)
         else:
             raise ValueError("Invalid request type. Use GET, POST, PUT, or DELETE.")
 
@@ -65,8 +68,9 @@ def make_api_request(
             extra={
                 "headers": headers,
                 "url": url,
-                "params": params,
-                "request_type": request_type,
+                "params": path_params,
+                "query_params": query_params,
+                "method": method,
             },
         )
         raise (e)

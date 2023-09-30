@@ -39,6 +39,6 @@ def add_swagger_file(request: Request, id: str) -> Dict[str, str]:
 
     # Insert into MongoDB
     file_content["bot_id"] = id
-    mongo.swagger_files.insert_one(file_content)
+    inserted_id = mongo.swagger_files.insert_one(file_content).inserted_id
 
-    return {"message": "File added successfully"}
+    return {"message": "File added successfully", id: str(inserted_id)}

@@ -245,6 +245,9 @@ def _create_api_controller_agent(
 ) -> AgentExecutor:
     get_llm_chain = LLMChain(llm=llm, prompt=PARSING_GET_PROMPT)
     post_llm_chain = LLMChain(llm=llm, prompt=PARSING_POST_PROMPT)
+    put_llm_chain = LLMChain(llm=llm, prompt=PARSING_PUT_PROMPT)
+    delete_llm_chain = LLMChain(llm=llm, prompt=PARSING_DELETE_PROMPT)
+    path_llm_chain = LLMChain(llm=llm, prompt=PARSING_PATCH_PROMPT)
     tools: List[BaseTool] = [
         RequestsGetToolWithParsing(
             requests_wrapper=requests_wrapper, llm_chain=get_llm_chain
@@ -252,6 +255,15 @@ def _create_api_controller_agent(
         RequestsPostToolWithParsing(
             requests_wrapper=requests_wrapper, llm_chain=post_llm_chain
         ),
+        RequestsPutToolWithParsing(
+            requests_wrapper=requests_wrapper, llm_chain=put_llm_chain
+        ),
+        # RequestsDeleteToolWithParsing(
+        #     requests_wrapper=requests_wrapper, llm_chain=delete_llm_chain
+        # ),
+        # RequestsPatchToolWithParsing(
+        #     requests_wrapper=requests_wrapper, llm_chain=path_llm_chain
+        # ),
     ]
     prompt = PromptTemplate(
         template=API_CONTROLLER_PROMPT,
@@ -293,7 +305,7 @@ def _create_api_controller_tool(
             "{method} {route}".format(method=method, route=route.split("?")[0])
             for method, route in matches
         ]
-        endpoint_docs_by_name = {name: docs for name, _, docs in api_spec.endpoints}
+        # endpoint_docs_by_name = {name: docs for name, _, docs in api_spec.endpoints}
         docs_str = ""
         for endpoint_name in endpoint_names:
             found_match = False
@@ -359,5 +371,8 @@ def create_openapi_agent(
         callback_manager=callback_manager,
         verbose=verbose,
         maxIterations=2,
+        early_stopping_method="generate",  # allow one last pass to generate correct response
+        max_execution_time=20,  # kill after 20 seconds
+        handle_parsing_errors=True,
         **(agent_executor_kwargs or {}),
     )

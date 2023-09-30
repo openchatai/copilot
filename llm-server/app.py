@@ -21,9 +21,9 @@ def handle() -> Response:
     data = request.get_json()
     try:
         response = handle_request(data)
-        return jsonify(response), 200
+        return jsonify(response)
     except Exception as e:
-        return jsonify({"response": str(e)}), 500
+        return jsonify({"response": str(e)})
 
 
 @app.errorhandler(500)

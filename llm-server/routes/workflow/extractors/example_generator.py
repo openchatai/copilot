@@ -95,8 +95,5 @@ def generate_example_json(
     return example_json
 
 
-# This function can be used to generate an example value for llm, incase the response is not correct
-# Also to be used when integrating tools as openai functions, the json output should be used to generate openai function dict
-def generate_example_from_schema(input: Any) -> Any:
-    schema = input["requestBody"]["content"]["application/json"]["schema"]
+def gen_ex_from_schema(schema: Any) -> Any:
     return json.dumps(generate_example_json(schema))
