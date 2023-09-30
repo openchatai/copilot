@@ -17,7 +17,7 @@ from routes.root_service import handle_request
 
 ## TODO: Implement caching for the swagger file content (no need to load it everytime)
 @app.route("/handle", methods=["POST", "OPTIONS"])
-def handle() -> Response:
+def handle() -> tuple[Response, int]:
     data = request.get_json()
     try:
         response = handle_request(data)
