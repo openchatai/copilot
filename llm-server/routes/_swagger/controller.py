@@ -36,7 +36,7 @@ def get_swagger_files(id: str) -> Response:
     return jsonify(data)
 
 
-@_swagger.route("/b/<id>", methods=["POST"])
+@_swagger.route("/u/<id>", methods=["POST"])
 def add_swagger_file(id) -> Response:
     result = swagger_service.add_swagger_file(request, id)
     return jsonify(result)
