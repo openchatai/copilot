@@ -55,8 +55,8 @@ def create_workflow(swagger_url: str) -> Any:
     )
 
 
-@workflow.route("/b/<bot_id>", methods=["GET"])
-def get_workflows(bot_id: str) -> Any:
+@workflow.route("/u/<swagger_url>", methods=["GET"])
+def get_workflows(swagger_url: str) -> Any:
     # Define default page and page_size values
     page = int(request.args.get("page", 1))
     page_size = int(request.args.get("page_size", 10))
@@ -66,14 +66,14 @@ def get_workflows(bot_id: str) -> Any:
 
     # Query MongoDB to get a paginated list of workflows
     workflows = list(
-        mongo.workflows.find({"bot_id": bot_id}).skip(skip).limit(page_size)
+        mongo.workflows.find({"meta.swagger_url": swagger_url}).skip(skip).limit(page_size)
     )
 
     for workflow in workflows:
         workflow["_id"] = str(workflow["_id"])
 
     # Calculate the total number of workflows (for pagination metadata)
-    total_workflows = mongo.workflows.count_documents({"bot_id": bot_id})
+    total_workflows = mongo.workflows.count_documents({"meta.swagger_url": swagger_url})
 
     # Prepare response data
     response_data = {
@@ -102,7 +102,7 @@ def update_workflow(workflow_id: str) -> Any:
         workflow_id, workflow_data, result.raw_result.get("bot_id")
     )
 
-    return jsonify({"message": "Workflow updated"}), 200
+    return jsonify(workflow_data), 200
 
 
 @workflow.route("/<workflow_id>", methods=["DELETE"])
