@@ -9,6 +9,7 @@ from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from utils.get_llm import get_llm
 import json
+from prance import ResolvingParser
 
 
 # use spaCy or BERT for more accurate results
@@ -40,37 +41,63 @@ def hasMultipleIntents(user_input: str) -> bool:
     print(f"Found {question_matches} in the following input: {user_input}")
     return bool(question_matches)
 
+    # user_input = (
+    #     "I want to fetch data from API A and also, can you answer another question?"
+    # )
+    # result = hasMultipleIntents(user_input)
+    # print(json.dumps(result, indent=2))
 
-# user_input = (
-#     "I want to fetch data from API A and also, can you answer another question?"
-# )
-# result = hasMultipleIntents(user_input)
-# print(json.dumps(result, indent=2))
 
+def get_summaries(swagger_doc):
+    swagger_doc = ResolvingParser(spec_string=swagger_doc)
+    servers = ", ".join(
+        [s["url"] for s in swagger_doc.specification.get("servers", [])]
+    )
 
-def getSummaries(swagger_doc: Any):
-    """Get API endpoint summaries from an OpenAPI spec."""
+    summaries_str = "servers:" + servers + "\n"
 
-    summaries: List[str] = []
-
-    # Get the paths and iterate over them
-    paths: Optional[Dict[str, Any]] = swagger_doc.get("paths")
-    if not paths:
-        raise ValueError("OpenAPI spec missing 'paths'")
+    paths = swagger_doc.specification.get("paths")
 
     for path in paths:
-        operation = paths[path]
-        for field in operation:
-            if "summary" in operation[field]:
-                summaries.append(
-                    f"""{operation[field]["operationId"]} - {operation[field]["description"]}"""
-                )
+        operations = paths[path]
 
-    return summaries
+        for method in operations:
+            operation = operations[method]
+
+            try:
+                summary = f"- {operation['operationId']} - {operation['summary']}\n"
+
+                if "requestBody" in operation:
+                    content_types = operation["requestBody"]["content"]
+
+                    if "application/json" in content_types:
+                        schema = content_types["application/json"]["schema"]
+                        if "properties" in schema:
+                            params = schema["properties"].keys()
+                        elif "items" in schema:
+                            params = schema["items"]["properties"].keys()
+
+                    elif "application/octet-stream" in content_types:
+                        params = ["binary data"]
+
+                    summary += f"  - Body Parameters: {', '.join(params)}\n"
+
+                summary += f"  - Method: {method}\n"
+
+                if "parameters" in operation:
+                    params = [p["name"] for p in operation["parameters"]]
+                    summary += f"  - Parameters: {', '.join(params)}\n"
+
+                summaries_str += summary + "\n"
+
+            except:
+                pass
+
+    return summaries_str
 
 
 def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> bool:
-    summaries = getSummaries(swagger_doc)
+    summaries = get_summaries(swagger_doc)
     _DEFAULT_TEMPLATE = """
         You are an AI chatbot equipped with the capability to interact with APIs on behalf of users. However, users may also ask you general questions that do not necessitate API calls.
 
