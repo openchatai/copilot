@@ -82,7 +82,9 @@ def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> bool:
         If the request can be completed with a single API call, please reply with "__ONE__". If it requires multiple API calls, respond with "__MULTIPLE__". If the query is a general question and does not require an API call, provide the answer to the question.
 
         User Requirement:
-        {user_requirement}
+        {user_requirement} \n
+        
+        **Chatbot Response:**
     """
     llm = get_llm()
     PROMPT = PromptTemplate(
