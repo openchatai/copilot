@@ -10,10 +10,6 @@ interface PaginatedWorkflows {
   total_workflows: number;
 }
 
-interface Bot {
-  id: string;
-  // ...other bot fields
-}
 
 export const getWorkflowById = (id: string) => {
   return axios.get<Workflow>(`/backend/flows/${id}`);

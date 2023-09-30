@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "/backend/swagger_api",
+  baseURL: "/backend/flows",
 });
 
 interface PaginatedSwaggerResponse {
