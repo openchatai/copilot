@@ -65,7 +65,7 @@ def run_workflow(data: WorkflowData, swagger_json: Any) -> Any:
         result = run_openapi_operations(
             record, swagger_json, text, headers, server_base_url
         )
-        return result
+        return {"response": result}
 
     except Exception as e:
         # Log the error, but continue with the rest of the code

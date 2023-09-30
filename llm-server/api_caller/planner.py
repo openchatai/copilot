@@ -359,5 +359,8 @@ def create_openapi_agent(
         callback_manager=callback_manager,
         verbose=verbose,
         maxIterations=2,
+        early_stopping_method="generate",  # allow additional pass
+        max_execution_time=10,  # kill after 40 seconds
+        handle_parsing_errors=True,
         **(agent_executor_kwargs or {}),
     )

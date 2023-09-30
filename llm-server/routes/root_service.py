@@ -66,7 +66,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
     ) or json.loads(fetch_swagger_text(swagger_url))
 
     try:
-        if hasMultipleIntents(text):
+        if not hasSingleIntent(swagger_doc, text):
             return run_workflow(
                 WorkflowData(text, headers, server_base_url, swagger_url), swagger_doc
             )

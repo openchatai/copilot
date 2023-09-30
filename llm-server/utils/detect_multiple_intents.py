@@ -48,20 +48,13 @@ def hasMultipleIntents(user_input: str) -> bool:
 # print(json.dumps(result, indent=2))
 
 
-def getSummaries(swagger_text: str):
+def getSummaries(swagger_doc: Any):
     """Get API endpoint summaries from an OpenAPI spec."""
 
     summaries: List[str] = []
 
-    # Load the OpenAPI spec
-    spec_dict: Optional[Dict[str, Any]] = json.loads(swagger_text)
-    if not spec_dict:
-        raise ValueError("Unable to load OpenAPI spec")
-
-    json_spec: JsonSpec = JsonSpec(dict_=spec_dict, max_value_length=4000)
-
     # Get the paths and iterate over them
-    paths: Optional[Dict[str, Any]] = json_spec.dict_.get("paths")
+    paths: Optional[Dict[str, Any]] = swagger_doc.get("paths")
     if not paths:
         raise ValueError("OpenAPI spec missing 'paths'")
 
@@ -69,13 +62,15 @@ def getSummaries(swagger_text: str):
         operation = paths[path]
         for field in operation:
             if "summary" in operation[field]:
-                summaries.append(operation[field]["operationId"])
+                summaries.append(
+                    f"""{operation[field]["operationId"]} - {operation[field]["description"]}"""
+                )
 
     return summaries
 
 
-def hasSingleIntent(swagger_text: str, user_requirement: str) -> bool:
-    summaries = getSummaries(swagger_text)
+def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> bool:
+    summaries = getSummaries(swagger_doc)
     _DEFAULT_TEMPLATE = """
     User: Here is a list of API summaries:
     {summaries}
