@@ -17,41 +17,20 @@ mongo = db_instance.get_db()
 
 import os
 
-SCORE_THRESOLD = float(os.getenv("SCORE_THRESOLD", 0.88))
+SCORE_THRESHOLD = float(os.getenv("SCORE_THRESHOLD", 0.88))
 
 
-def get_valid_url(
-    api_payload: Dict[str, Union[str, None]], server_base_url: Optional[str]
-) -> str:
-    if "endpoint" in api_payload:
-        endpoint = api_payload["endpoint"]
-
-        # Check if path is a valid URL
-        if endpoint and endpoint.startswith(("http://", "https://")):
-            return endpoint
-        elif server_base_url and server_base_url.startswith(("http://", "https://")):
-            # Append server_base_url to endpoint
-            return f"{server_base_url}{endpoint}"
-        else:
-            raise ValueError("Invalid server_base_url")
-    else:
-        raise ValueError("Missing path parameter")
-
-
-def run_workflow(data: WorkflowData, swagger_json: Any) -> Any:
+def check_workflow_in_vector_store(data: WorkflowData):
     text = data.text
-    headers = data.headers or {}
-    # This will come from the request payload later on when implementing multi-tenancy
     namespace = "workflows"
-    server_base_url = data.server_base_url
 
     if not text:
-        return json.dumps({"error": "text is required"}), 400
+        return None, 400
 
     try:
-        vector_store = get_vector_store(StoreOptions(namespace=data.swagger_url))
+        vector_store = get_vector_store(StoreOptions(namespace=namespace))
         (document, score) = vector_store.similarity_search_with_relevance_scores(
-            text, score_threshold=SCORE_THRESOLD
+            text, score_threshold=SCORE_THRESHOLD
         )[0]
 
         print(
@@ -61,18 +40,28 @@ def run_workflow(data: WorkflowData, swagger_json: Any) -> Any:
             ObjectId(document.metadata["workflow_id"]) if document else None
         )
         record = mongo.workflows.find_one({"_id": first_document_id})
-
-        result = run_openapi_operations(
-            record, swagger_json, text, headers, server_base_url
-        )
-        return {"response": result}
-
+        return record
     except Exception as e:
-        # Log the error, but continue with the rest of the code
         print(f"Error fetching data from namespace '{namespace}': {str(e)}")
+        return None
 
-    # Call openapi spec even if an error occurred with Qdrant
-    result = create_and_run_openapi_agent(swagger_json, text, headers)
+
+def run_openapi(record, swagger_json, data: WorkflowData):
+    if record:
+        return run_openapi_operations(
+            record, swagger_json, data.text, data.headers, data.server_base_url
+        )
+    else:
+        return create_and_run_openapi_agent(swagger_json, data.text, data.headers)
+
+
+def run_workflow(data: WorkflowData, swagger_json: Any) -> Any:
+    record = check_workflow_in_vector_store(data)
+    run_workflow_final(record, swagger_json, data)
+
+
+def run_workflow_final(record: Any, swagger_json: Any, data: WorkflowData):
+    result = run_openapi(record, swagger_json, data)
     return {"response": result}
 
 
