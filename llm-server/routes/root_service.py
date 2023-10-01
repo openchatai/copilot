@@ -18,7 +18,7 @@ import os
 from dotenv import load_dotenv
 from typing import Dict, Any, cast, List
 from utils.db import Database
-import json
+import json, yaml
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -67,7 +67,18 @@ def handle_request(data: Dict[str, Any]) -> Any:
 
     swagger_doc = mongo.swagger_files.find_one(
         {"meta.swagger_url": swagger_url}, {"meta": 0, "_id": 0}
-    ) or json.loads(fetch_swagger_text(swagger_url))
+    )
+
+    if not swagger_doc:
+        # If the document is not found in MongoDB, fetch it from the URL
+        swagger_text = fetch_swagger_text(swagger_url)
+
+        # Check if the fetched content is in YAML format
+        try:
+            swagger_doc = yaml.safe_load(swagger_text)
+        except yaml.YAMLError:
+            # If it's not valid YAML, assume it's JSON
+            swagger_doc = json.loads(swagger_text)
 
     try:
         plan = get_api_plan(swagger_doc, text)
@@ -115,11 +126,26 @@ def handle_request(data: Dict[str, Any]) -> Any:
     return chain.run(question=text).dict()
 
 
+def get_operation_by_id(swagger_spec, op_id_key: str):
+    operation_lookup = {}
+
+    for path in swagger_spec["paths"]:
+        for method in swagger_spec["paths"][path]:
+            operation = swagger_spec["paths"][path][method]
+            operation_id = operation["operationId"]
+            operation_lookup[operation_id] = {
+                "name": operation.get("name"),
+                "description": operation.get("description"),
+            }
+
+    return operation_lookup[op_id_key]
+
+
 def create_workflow_from_operation_ids(op_ids: List[str], SWAGGER_SPEC: Any) -> Any:
     flows = []
 
     for op_id in op_ids:
-        operation = SWAGGER_SPEC[op_id]
+        operation = get_operation_by_id(SWAGGER_SPEC, op_id)
         step = {
             "stepId": str(op_ids.index(op_id)),
             "operation": "call",

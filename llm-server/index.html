@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My bot here</title>
+    <script src="http://localhost:8888/backend/pilot.js"></script>
+    <script>
+        window.onload = () => {
+            initAiCoPilot({
+                initialMessage: "Hello, how can I help you?", // Fixed typo in "can" instead of "I".
+                token: "6se3WoOioHnIWfAyWQUY",
+                triggerSelector: "#triggerSelector",
+                apiUrl: "http://localhost:8888/backend/api", // Use HTTPS for consistency.
+                headers: {
+                    // Properly formatted Authorization header for OAuth.
+                    Authorization: 'Bearer YOUR_ACCESS_TOKEN', // Replace with your OAuth token.
+                },
+            });
+        };
+    </script>
+</head>
+<body>
+    <div style="height: 200px; width: 200px;" id="triggerSelector"></div>
+</body>
+</html>

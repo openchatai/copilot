@@ -11,9 +11,9 @@ from routes.workflow.extractors.extract_json import extract_json_payload
 
 
 class APIResponse:
-    def __init__(self) -> None:
-        self.ids: List[str] = []
-        self.bot_message: str = ""
+    def __init__(self, ids: List[str], bot_message: str) -> None:
+        self.ids = ids
+        self.bot_message = bot_message
 
 
 def get_summaries(_swagger_doc: str) -> str:
@@ -90,17 +90,14 @@ Only return the JSON structure, no additional text.
         # memory=memory,
         verbose=True,
     )
-    response = cast(
-        APIResponse,
-        extract_json_payload(
-            chain.run(
-                {
-                    "summaries": "\n".join(summaries),
-                    "user_requirement": user_requirement,
-                }
-            )
-        ),
+    response = extract_json_payload(
+        chain.run(
+            {
+                "summaries": summaries,
+                "user_requirement": user_requirement,
+            }
+        )
     )
 
     print(f"Summary call response: {response}")
-    return response
+    return APIResponse(ids=response["ids"], bot_message=response["bot_message"])
