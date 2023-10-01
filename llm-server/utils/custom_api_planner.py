@@ -70,7 +70,7 @@ Respond with the following JSON structure:
     "operation",
     "ids"
   ],
-  "bot_message": "this will contain the response if user asked a generic question that does not require an api call." 
+  "bot_message": "Bot reasoning here" 
 }}
 ```
 

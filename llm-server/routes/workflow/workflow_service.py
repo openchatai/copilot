@@ -9,6 +9,10 @@ from langchain.tools.json.tool import JsonSpec
 from typing import List
 from routes.workflow.hierarchical_planner import create_and_run_openapi_agent
 import json
+import logging
+import traceback
+
+logger = logging.getLogger(__name__)
 
 from typing import Any, Dict, Optional, cast, Union
 
@@ -65,24 +69,34 @@ def run_workflow_final(record: Any, swagger_json: Any, data: WorkflowData):
     return {"response": result}
 
 
-def run_openapi_operations(
-    record: Any,
-    swagger_json: str,
-    text: str,
-    headers: Any,
-    server_base_url: str,
-) -> str:
+def run_openapi_operations(record, swagger_json, text, headers, server_base_url):
     record_info = {"Workflow Name": record.get("name")}
+
     for flow in record.get("flows", []):
         prev_api_response = ""
-        for step in flow.get("steps"):
-            operation_id = step.get("open_api_operation_id")
-            api_payload = generate_openapi_payload(
-                swagger_json, text, operation_id, prev_api_response
-            )
 
-            api_response = make_api_request(headers=headers, **api_payload.__dict__)
-            record_info[operation_id] = json.loads(api_response.text)
-            prev_api_response = api_response.text
+        for step in flow.get("steps"):
+            try:
+                operation_id = step.get("open_api_operation_id")
+                api_payload = generate_openapi_payload(
+                    swagger_json, text, operation_id, prev_api_response
+                )
+
+                api_response = make_api_request(headers=headers, **api_payload.__dict__)
+                record_info[operation_id] = json.loads(api_response.text)
+                prev_api_response = api_response.text
+
+            except Exception as e:
+                logger.error("Error making API call", exc_info=True)
+
+                error_info = {
+                    "operation_id": operation_id,
+                    "error": str(e),
+                    "traceback": traceback.format_exc(),
+                }
+
+                record_info[operation_id] = error_info
+
         prev_api_response = ""
+
     return json.dumps(record_info)

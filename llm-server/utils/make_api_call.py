@@ -64,7 +64,7 @@ def make_api_request(
     except requests.exceptions.RequestException as e:
         logger.error(
             "API request failed",
-            exc_info=e,
+            exc_info=e.response.content,
             extra={
                 "headers": headers,
                 "url": url,
