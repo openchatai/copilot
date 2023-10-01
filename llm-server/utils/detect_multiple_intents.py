@@ -9,6 +9,7 @@ from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from utils.get_llm import get_llm
 import json
+from routes.workflow.extractors.extract_json import extract_json_payload
 
 
 # use spaCy or BERT for more accurate results
@@ -71,28 +72,36 @@ def getSummaries(swagger_doc: Any):
 
 def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> bool:
     summaries = getSummaries(swagger_doc)
-    _DEFAULT_TEMPLATE = """
-        You are an AI chatbot equipped with the capability to interact with APIs on behalf of users. However, users may also ask you general questions that do not necessitate API calls.
+    _DEFAULT_TEMPLATE = """You are an AI chatbot that determines the sequence of API calls needed to perform an action. You only provide the user with the list of API calls. You have been given a summary of the APIs that a third party system allows access to. However, users may also ask general questions that do not require API calls. 
 
-        **User Input:**
-        ```
-        User: Here is a list of API summaries:
-        {summaries}
+When given:
 
-        If the request can be completed with a single API call, please reply with "__ONE__". If it requires multiple API calls, respond with "__MULTIPLE__". If the query is a general question and does not require an API call, provide the answer to the question.
+- A list of API summaries `{summaries}`
+- The user's desired action `{user_requirement}`
 
-        User Requirement:
-        {user_requirement} \n
-        
-        **Chatbot Response:**
-    """
+Respond with the following JSON structure:
+
+```json
+{{
+  "ids": [
+    "list",
+    "of",
+    "operation",
+    "ids"
+  ],
+  "bot_message": "Bot reasoning here" 
+}}
+```
+
+Only return the JSON structure, no additional text.
+"""
     llm = get_llm()
     PROMPT = PromptTemplate(
         input_variables=["summaries", "user_requirement"],
         template=_DEFAULT_TEMPLATE,
     )
 
-    PROMPT.format(user_requirement=user_requirement, summaries="\n".join(summaries))
+    PROMPT.format(user_requirement=user_requirement, summaries=summaries)
 
     chain = LLMChain(
         llm=llm,
@@ -100,15 +109,18 @@ def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> bool:
         # memory=memory,
         verbose=True,
     )
-    response = chain.run(
-        {"summaries": "\n".join(summaries), "user_requirement": user_requirement}
+    response = extract_json_payload(
+        chain.run(
+            {
+                "summaries": summaries,
+                "user_requirement": user_requirement,
+            }
+        )
     )
 
-    print(f"Summary call response: {response}")
-
-    if "__ONE__" in response.upper():
+    if len(response["ids"]) == 1:
         return True
-    elif "__MULTIPLE__" in response.upper():
+    elif len(response["ids"]) > 1:
         return False
     else:
-        return response
+        return response["bot_message"]
