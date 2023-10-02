@@ -1,20 +1,22 @@
-import requests, traceback, logging
+import json
+import os
+from typing import Dict, Any, cast
+
+import logging
+import requests
+import traceback
+from dotenv import load_dotenv
 from langchain.chains.openai_functions import create_structured_output_chain
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
-
 from langchain.utilities.openapi import OpenAPISpec
-from utils.base import try_to_match_and_call_api_endpoint
 from models.models import AiResponseFormat
 from prompts.base import api_base_prompt, non_api_base_prompt
-from routes.workflow.workflow_service import run_workflow
 from routes.workflow.typings.run_workflow_input import WorkflowData
-from utils.detect_multiple_intents import hasSingleIntent, hasMultipleIntents
-import os
-from dotenv import load_dotenv
-from typing import Dict, Any, cast
+from routes.workflow.workflow_service import run_workflow
+from utils.base import try_to_match_and_call_api_endpoint
 from utils.db import Database
-import json
+from utils.detect_multiple_intents import hasSingleIntent
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -91,7 +93,8 @@ def handle_request(data: Dict[str, Any]) -> Any:
         json_output = try_to_match_and_call_api_endpoint(swagger_spec, text, headers)
 
         formatted_response = json.dumps(json_output, indent=4)  # Indent the JSON with 4 spaces
-        logging.info("[OpenCopilot] We were able to match and call the API endpoint, the response was: {}".format(json_output))
+        logging.info(
+            "[OpenCopilot] We were able to match and call the API endpoint, the response was: {}".format(json_output))
     except Exception as e:
         logging.info("[OpenCopilot] Failed to call the single API endpoint - so we will fallback to normal text "
                      "response")

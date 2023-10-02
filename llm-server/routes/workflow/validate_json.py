@@ -1,6 +1,7 @@
+from typing import Callable, Any, Dict
+
 from flask import request, jsonify
 from jsonschema import validate, ValidationError
-from typing import Callable, Any, Dict
 
 
 def validate_json(schema: Dict[str, Any]) -> Callable[..., Any]:

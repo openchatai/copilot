@@ -1,17 +1,12 @@
+import json
+import logging
 import re
-
-from langchain.chains.openai_functions import create_structured_output_chain
-from routes.workflow.typings.run_workflow_input import WorkflowData
-from langchain.tools.json.tool import JsonSpec
+from typing import Any, Dict, Optional
 from typing import List
 
-from typing import Any, Dict, Optional, cast, Union
 from langchain.chains import LLMChain
-from langchain.prompts import PromptTemplate, ChatPromptTemplate
+from langchain.prompts import PromptTemplate
 from utils.get_llm import get_llm
-import json
-from routes.workflow.extractors.extract_json import extract_json_payload
-import logging
 
 
 # use spaCy or BERT for more accurate results
