@@ -5,6 +5,7 @@ import {
   Controller,
   FlowArena,
   transformaEndpointToNode,
+  useController,
 } from "@openchatai/copilot-flows-editor";
 import "@openchatai/copilot-flows-editor/dist/style.css";
 import { Button } from "@/ui/components/Button";
@@ -21,12 +22,22 @@ const data = transformaEndpointToNode([
 ]);
 function Header() {
   const { bot } = useBotData();
+  const {
+    state: { flows, activeFlowId },
+  } = useController();
+  const activeFlow = flows?.filter((flow) => flow.id === activeFlowId)?.[0];
   return (
     <div className="px-4 py-2 bg-white flex items-center justify-between w-full">
       <div className="flex items-center">
         <h1 className="text-lg font-bold">{bot?.name}</h1>
-        <span className="mx-0.5 text-xl">/</span>
-        <h2 className="text-sm text-gray-500 font-semibold"></h2>
+        {activeFlow && (
+          <>
+            <span className="mx-0.5 text-xl">/</span>
+            <h2 className="text-sm text-gray-500 font-semibold">
+              {activeFlow.name}
+            </h2>
+          </>
+        )}
       </div>
       <Button variant={{ intent: "primary", size: "sm" }}>Save</Button>
     </div>

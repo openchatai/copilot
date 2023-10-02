@@ -29,6 +29,7 @@ export default async function BotLayout({
             <Nav href={`/app/bot/${params.bot_id}/settings`} segment="settings">
               Settings
             </Nav>
+            <Nav href={`/app/bot/${params.bot_id}/swagger`}>Swagger</Nav>
             <Nav href={`/app/bot/${params.bot_id}/workflows`}>Workflows</Nav>
           </div>
         </div>
