@@ -61,7 +61,7 @@ def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> BotMessage:
     )
     messages = [
         SystemMessage(
-            content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. It is essential that you consistently provide a valid JSON payload in your responses. If the user's query is informational and does not involve initiating any actions or require API calls, please respond appropriately in the `bot_message` section of the response while leaving the `ids` field empty ([])."
+            content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. It is essential that you consistently provide a valid JSON payload (use double quotes) in your responses. If the user's query is informational and does not involve initiating any actions or require API calls, please respond appropriately in the `bot_message` section of the response while leaving the `ids` field empty ([])."
         ),
         HumanMessage(
             content="Here's a list of api summaries {}".format(summaries),
@@ -81,7 +81,15 @@ def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> BotMessage:
     ]
 
     result = chat(messages)
-    logging.debug("Chat endpoint response: %s", result.content)
+    logging.info(
+        "[OpenCopilot] Extracted the needed steps to get the job done: {}".format(
+            result.content
+        )
+    )
     d: Any = extract_json_payload(result.content)
-    logging.info("parsed json: %s", d)
+    logging.info(
+        "[OpenCopilot] Parsed the json payload: {}, context: {}".format(
+            d, "hasSingleIntent"
+        )
+    )
     return BotMessage.from_dict(d)

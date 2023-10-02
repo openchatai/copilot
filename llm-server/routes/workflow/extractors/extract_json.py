@@ -10,8 +10,6 @@ def extract_json_payload(
 ) -> Optional[
     Union[Dict[str, List[Union[str, Dict[str, Union[str, int]]]]], List[str]]
 ]:
-    # Replace single quotes with double quotes while escaping double quotes and single quotes within strings
-    input_string = re.sub(r"'(.*?[^\\])'", r'"\1"', input_string)
 
     match = re.findall(r"{[^{}]*}|\[[^\[\]]*\]", input_string)
 

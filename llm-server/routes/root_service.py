@@ -13,6 +13,7 @@ from langchain.utilities.openapi import OpenAPISpec
 from models.models import AiResponseFormat
 from prompts.base import api_base_prompt, non_api_base_prompt
 from routes.workflow.typings.run_workflow_input import WorkflowData
+from routes.workflow.workflow_service import run_workflow
 from utils.detect_multiple_intents import hasSingleIntent
 import os
 from dotenv import load_dotenv
@@ -22,6 +23,7 @@ from utils.detect_multiple_intents import hasSingleIntent
 import json
 import yaml
 from yaml.parser import ParserError
+from api_caller.base import try_to_match_and_call_api_endpoint
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -102,15 +104,27 @@ def handle_request(data: Dict[str, Any]) -> Any:
     ) or json.loads(fetch_swagger_text(swagger_url))
 
     try:
+        logging.info(
+            "[OpenCopilot] Trying to figure out if the user request require 1) APIs calls 2) If yes how many "
+            "of them"
+        )
         bot_response = hasSingleIntent(swagger_doc, text)
         if len(bot_response.ids) > 1:
+            logging.warning(
+                "[OpenCopilot] Apparently, the user request require calling more than single API endpoint "
+                "to get the job done"
+            )
             return run_workflow(
                 WorkflowData(text, headers, server_base_url, swagger_url), swagger_doc
             )
         elif len(bot_response.ids) == 0:
+            logging.info("[OpenCopilot] The user request doesnot require an api call")
             return {"response": bot_response.bot_message}
 
         else:
+            logging.info(
+                "[OpenCopilot] The user request can be handled in single API call"
+            )
             raise "Falling back to planner"
         # else:
         #     return {"": k}
@@ -136,7 +150,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
         )  # Indent the JSON with 4 spaces
         logging.info(
             "[OpenCopilot] We were able to match and call the API endpoint, the response was: {}".format(
-                json_output
+                formatted_response
             )
         )
     except Exception as e:
