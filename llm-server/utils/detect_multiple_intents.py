@@ -10,6 +10,9 @@ from langchain.chat_models import ChatOpenAI
 from routes.workflow.extractors.extract_json import extract_json_payload
 import os
 from dotenv import load_dotenv
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 load_dotenv()
 
@@ -52,15 +55,18 @@ def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> BotMessage:
     summaries = getSummaries(swagger_doc)
 
     chat = ChatOpenAI(
-        openai_api_key=os.getenv("OPENAI_API_KEY"), model="gpt-3.5-turbo-16k"
+        openai_api_key=os.getenv("OPENAI_API_KEY"),
+        model="gpt-3.5-turbo-16k",
+        temperature=0,
     )
     messages = [
         SystemMessage(
-            content="You are an ai copilot that helps find the right sequence of api calls to perform a user action. You always respond with a valid json payload. If the user is not related to the given summary, just respond with a suitable answer"
+            content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. It is essential that you consistently provide a valid JSON payload in your responses. If the user's query is informational and does not involve initiating any actions or require API calls, please respond appropriately in the `bot_message` section of the response while leaving the `ids` field empty ([])."
         ),
         HumanMessage(
             content="Here's a list of api summaries {}".format(summaries),
         ),
+        HumanMessage(content="{}".format(user_requirement)),
         HumanMessage(
             content="""Reply in the following json format ```{
                 "ids": [
@@ -69,12 +75,13 @@ def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> BotMessage:
                     "operation",
                     "ids"
                 ],
-                "bot_message": "Bot reasoning here" 
+                "bot_message": "Bot response here" 
             }```"""
         ),
-        HumanMessage(content="{}".format(user_requirement)),
     ]
 
     result = chat(messages)
+    logging.debug("Chat endpoint response: %s", result.content)
     d: Any = extract_json_payload(result.content)
+    logging.info("parsed json: %s", d)
     return BotMessage.from_dict(d)
