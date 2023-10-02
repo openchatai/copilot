@@ -1,15 +1,12 @@
+import json
+import logging
 import re
-
-from routes.workflow.typings.run_workflow_input import WorkflowData
-from langchain.tools.json.tool import JsonSpec
+from typing import Any, Dict, Optional
 from typing import List
 
-from typing import Any, Dict, Optional, cast, Union
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from utils.get_llm import get_llm
-import json
-from routes.workflow.extractors.extract_json import extract_json_payload
 
 
 # use spaCy or BERT for more accurate results
@@ -71,6 +68,7 @@ def getSummaries(swagger_doc: Any):
 
 
 def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> bool:
+    # todo use create_structured_output_chain with validation
     summaries = getSummaries(swagger_doc)
     _DEFAULT_TEMPLATE = """You are an AI chatbot that determines the sequence of API calls needed to perform an action. You only provide the user with the list of API calls. You have been given a summary of the APIs that a third party system allows access to. However, users may also ask general questions that do not require API calls. 
 
@@ -81,7 +79,6 @@ When given:
 
 Respond with the following JSON structure:
 
-```json
 {{
   "ids": [
     "list",
@@ -91,9 +88,11 @@ Respond with the following JSON structure:
   ],
   "bot_message": "Bot reasoning here" 
 }}
-```
 
-Only return the JSON structure, no additional text.
+
+IT'S EXTREMELY IMPORTANT TO ONLY RETURN THE OPERATION IDS REQUIRE TO GET THE JOB DONE, NEVER ADD THINGS THAT IS NOT REQUIRED.
+
+Only return the JSON structure, no additional text or formatting, just JSON.
 """
     llm = get_llm()
     PROMPT = PromptTemplate(
@@ -109,18 +108,22 @@ Only return the JSON structure, no additional text.
         # memory=memory,
         verbose=True,
     )
-    response = extract_json_payload(
-        chain.run(
-            {
-                "summaries": summaries,
-                "user_requirement": user_requirement,
-            }
-        )
-    )
+    response = json.loads(chain.run(
+        {
+            "summaries": summaries,
+            "user_requirement": user_requirement,
+        }
+    ))
+
+    formatted_response = json.dumps(response, indent=4)  # Indent the JSON with 4 spaces
+
+    logging.info("[OpenCopilot] Extracted the needed steps to get the job done: {}".format(formatted_response))
 
     if len(response["ids"]) == 1:
+        logging.info("[OpenCopilot] The user request can be done in a single API")
         return True
     elif len(response["ids"]) > 1:
+        logging.info("[OpenCopilot] The user request require multiple API calls to be done")
         return False
     else:
         return response["bot_message"]

@@ -1,6 +1,7 @@
-from langchain.schema import HumanMessage, SystemMessage
-from langchain.schema import BaseMessage
 from typing import List
+
+from langchain.schema import BaseMessage
+from langchain.schema import HumanMessage, SystemMessage
 
 
 def non_api_base_prompt(initial_prompt: str, text: str) -> List[BaseMessage]:
@@ -12,14 +13,14 @@ def non_api_base_prompt(initial_prompt: str, text: str) -> List[BaseMessage]:
 
 
 def api_base_prompt(
-    initial_prompt: str, text: str, api_json_output: str
+        initial_prompt: str, text: str, api_json_output: str
 ) -> List[BaseMessage]:
     return [
         SystemMessage(
             content=initial_prompt
-            + "Sometimes you call API endpoints to get data or execute actions. \n"
-            "however you should not let the user know that you are calling an API endpoint. \n"
-            "do not ask follow up questions and try to get the job done in one go"
+                    + "Sometimes you call API endpoints to get data or execute actions. \n"
+                      "however you should not let the user know that you are calling an API endpoint. \n"
+                      "do not ask follow up questions and try to get the job done in one go"
         ),
         SystemMessage(content="Calling the API endpoint..."),
         SystemMessage(content="API called successfully..."),

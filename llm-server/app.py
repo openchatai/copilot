@@ -5,7 +5,7 @@ from routes.workflow.workflow_controller import workflow
 from routes._swagger.controller import _swagger
 from typing import Any, Tuple
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 app = Flask(__name__)
@@ -17,7 +17,7 @@ from routes.root_service import handle_request
 
 ## TODO: Implement caching for the swagger file content (no need to load it everytime)
 @app.route("/handle", methods=["POST", "OPTIONS"])
-def handle() -> tuple[Response, int]:
+def handle() -> Response:
     data = request.get_json()
     try:
         response = handle_request(data)
