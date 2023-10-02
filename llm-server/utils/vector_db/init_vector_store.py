@@ -56,6 +56,7 @@ def init_vector_store(
             embeddings,
             collection_name=options.namespace,
             url=os.environ["QDRANT_URL"],
+            api_key=os.getenv("QDRANT_API_KEY", ""),
         )
 
     else:

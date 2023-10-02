@@ -1,8 +1,0 @@
-.form-input:focus,
-.form-textarea:focus,
-.form-multiselect:focus,
-.form-select:focus,
-.form-checkbox:focus,
-.form-radio:focus {
-    @apply ring-0;
-}

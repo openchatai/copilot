@@ -15,11 +15,11 @@ PLAN_AND_EXECUTE_MODEL = os.getenv("PLAN_AND_EXECUTE_MODEL", "gpt-4")
 
 
 def create_and_run_openapi_agent(
-    swagger_text: str, user_query: str, headers: Dict[str, str] = {}
+    swagger_json: Any, user_query: str, headers: Dict[str, str] = {}
 ) -> Any:
     # Load OpenAPI spec
-    raw_spec = json.loads(swagger_text)
-    spec = reduce_openapi_spec(raw_spec)
+    # raw_spec = json.loads(swagger_json)
+    spec = reduce_openapi_spec(swagger_json)
 
     # Create RequestsWrapper with auth
     requests_wrapper: RequestsWrapper = RequestsWrapper(headers=headers)
@@ -28,7 +28,7 @@ def create_and_run_openapi_agent(
         f"Using {PLAN_AND_EXECUTE_MODEL} for plan and execute agent, you can change it by setting PLAN_AND_EXECUTE_MODEL variable"
     )
     # Create OpenAPI agent
-    llm: OpenAI = OpenAI(model_name=PLAN_AND_EXECUTE_MODEL, temperature=0.0)
+    llm: OpenAI = OpenAI(temperature=0.0)
     agent = planner.create_openapi_agent(spec, requests_wrapper, llm)
 
     # Run agent on user query

@@ -11,15 +11,15 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
 
 
-def extractBodyFromSchema(
-    body_schema: JsonData, text: str, prev_api_response: str, example: str
+def gen_body_from_schema(
+    body_schema: str, text: str, prev_api_response: str, example: str
 ) -> Any:
     _DEFAULT_TEMPLATE = """To enable a substantially intelligent language model to execute a series of APIs sequentially, the following essential details are necessary to gather information needed for the next API call:
     1. Initial input when starting the flow: `{text}`
     2. Previous API responses: `{prev_api_response}`
     3. A JSON response schema that defines the expected format: `{body_schema}`
 
-    Here is a dummy example for expected output: ```{example}```
+    Try to adhere to this sample api payload as much as possible: ```{example}```
     The JSON payload, enclosed within triple backticks on both sides, strictly conforming to the specified "type/format" as outlined in the schema is as follows:  
     """
 

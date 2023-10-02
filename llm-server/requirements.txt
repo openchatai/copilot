@@ -78,6 +78,7 @@ pathspec==0.11.2
 pathy==0.10.2
 pinecone-client==2.2.2
 portalocker==2.7.0
+prance==23.6.21.0
 preshed==3.0.8
 protobuf==4.24.2
 pydantic==1.10.11
@@ -92,6 +93,8 @@ regex==2023.6.3
 requests==2.31.0
 rfc3339-validator==0.1.4
 rpds-py==0.10.2
+ruamel.yaml==0.17.32
+ruamel.yaml.clib==0.2.7
 safetensors==0.3.1
 six==1.16.0
 smart-open==6.3.0
@@ -101,7 +104,7 @@ spacy-legacy==3.0.12
 spacy-loggers==1.0.4
 SQLAlchemy==1.4.49
 sqlitedict==2.1.0
-srsly==2.4.6
+srsly==2.4.8
 tenacity==8.2.2
 thinc==8.1.10
 tiktoken==0.4.0

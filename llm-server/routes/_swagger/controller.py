@@ -11,8 +11,13 @@ mongo = db_instance.get_db()
 _swagger = Blueprint("_swagger", __name__)
 
 
+<<<<<<< HEAD
 @_swagger.route("", methods=["GET"])
 def get_swagger_files() -> Response:
+=======
+@_swagger.route("/u/<swagger_url>", methods=["GET"])
+def get_swagger_files(swagger_url: str) -> Response:
+>>>>>>> 0c90402ed4742d83e9ee7c0e12494b805ffa3c65
     # Get page and page_size query params
     page = int(request.args.get("page", 1))
     page_size = int(request.args.get("page_size", 10))
@@ -24,11 +29,17 @@ def get_swagger_files() -> Response:
     # Query for paginated docs
     files = [
         doc.update({"_id": str(doc["_id"])}) or doc
+<<<<<<< HEAD
         for doc in mongo.swagger_files.find({}, {}).skip(skip).limit(limit)
+=======
+        for doc in mongo.swagger_files.find({"meta.swagger_url": swagger_url}, {})
+        .skip(skip)
+        .limit(limit)
+>>>>>>> 0c90402ed4742d83e9ee7c0e12494b805ffa3c65
     ]
 
     # Get total docs count
-    total = mongo.swagger_files.count_documents({})
+    total = mongo.swagger_files.count_documents({"meta.swagger_url": swagger_url})
 
     # Prepare response data
     data = {"total": total, "page": page, "page_size": page_size, "files": files}

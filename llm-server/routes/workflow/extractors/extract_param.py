@@ -10,8 +10,8 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
 
 
-def extractParamsFromSchema(
-    param_schema: JsonData, text: str, prev_resp: str
+def gen_params_from_schema(
+    param_schema: str, text: str, prev_resp: str
 ) -> Optional[JsonData]:
     """Extracts API parameters from a schema based on user text and previous response.
 

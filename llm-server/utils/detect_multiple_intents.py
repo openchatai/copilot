@@ -9,6 +9,7 @@ from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from utils.get_llm import get_llm
 import json
+from routes.workflow.extractors.extract_json import extract_json_payload
 
 
 # use spaCy or BERT for more accurate results
@@ -48,20 +49,13 @@ def hasMultipleIntents(user_input: str) -> bool:
 # print(json.dumps(result, indent=2))
 
 
-def getSummaries(swagger_text: str):
+def getSummaries(swagger_doc: Any):
     """Get API endpoint summaries from an OpenAPI spec."""
 
     summaries: List[str] = []
 
-    # Load the OpenAPI spec
-    spec_dict: Optional[Dict[str, Any]] = json.loads(swagger_text)
-    if not spec_dict:
-        raise ValueError("Unable to load OpenAPI spec")
-
-    json_spec: JsonSpec = JsonSpec(dict_=spec_dict, max_value_length=4000)
-
     # Get the paths and iterate over them
-    paths: Optional[Dict[str, Any]] = json_spec.dict_.get("paths")
+    paths: Optional[Dict[str, Any]] = swagger_doc.get("paths")
     if not paths:
         raise ValueError("OpenAPI spec missing 'paths'")
 
@@ -69,29 +63,45 @@ def getSummaries(swagger_text: str):
         operation = paths[path]
         for field in operation:
             if "summary" in operation[field]:
-                summaries.append(operation[field]["operationId"])
+                summaries.append(
+                    f"""{operation[field]["operationId"]} - {operation[field]["description"]}"""
+                )
 
     return summaries
 
 
-def hasSingleIntent(swagger_text: str, user_requirement: str) -> bool:
-    summaries = getSummaries(swagger_text)
-    _DEFAULT_TEMPLATE = """
-    User: Here is a list of API summaries:
-    {summaries}
+def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> bool:
+    summaries = getSummaries(swagger_doc)
+    _DEFAULT_TEMPLATE = """You are an AI chatbot that determines the sequence of API calls needed to perform an action. You only provide the user with the list of API calls. You have been given a summary of the APIs that a third party system allows access to. However, users may also ask general questions that do not require API calls. 
 
-    Can one of these api's suffice the users request? Please reply with either "YES" or "NO" with explanation
+When given:
 
-    User requirement: 
-    {user_requirement}
-    """
+- A list of API summaries `{summaries}`
+- The user's desired action `{user_requirement}`
+
+Respond with the following JSON structure:
+
+```json
+{{
+  "ids": [
+    "list",
+    "of",
+    "operation",
+    "ids"
+  ],
+  "bot_message": "Bot reasoning here" 
+}}
+```
+
+Only return the JSON structure, no additional text.
+"""
     llm = get_llm()
     PROMPT = PromptTemplate(
         input_variables=["summaries", "user_requirement"],
         template=_DEFAULT_TEMPLATE,
     )
 
-    PROMPT.format(user_requirement=user_requirement, summaries="\n".join(summaries))
+    PROMPT.format(user_requirement=user_requirement, summaries=summaries)
 
     chain = LLMChain(
         llm=llm,
@@ -99,13 +109,18 @@ def hasSingleIntent(swagger_text: str, user_requirement: str) -> bool:
         # memory=memory,
         verbose=True,
     )
-    response = chain.run(
-        {"summaries": "\n".join(summaries), "user_requirement": user_requirement}
+    response = extract_json_payload(
+        chain.run(
+            {
+                "summaries": summaries,
+                "user_requirement": user_requirement,
+            }
+        )
     )
 
-    print(f"Summary call response: {response}")
-
-    if "yes" in response.lower():
+    if len(response["ids"]) == 1:
         return True
-    else:
+    elif len(response["ids"]) > 1:
         return False
+    else:
+        return response["bot_message"]

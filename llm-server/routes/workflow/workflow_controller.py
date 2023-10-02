@@ -39,21 +39,23 @@ def get_workflow(workflow_id: str) -> Any:
         return jsonify({"message": "Workflow not found"}), 404
 
 
+<<<<<<< HEAD
 @workflow.route("/b/<bot_id>", methods=["POST"])
 @validate_json(workflow_schema)
 @handle_exceptions_and_errors
 def create_workflow(bot_id: str) -> Any:
+=======
+@workflow.route("/u/<swagger_url>", methods=["POST"])
+@validate_json(workflow_schema)
+@handle_exceptions_and_errors
+def create_workflow(swagger_url: str) -> Any:
+>>>>>>> 0c90402ed4742d83e9ee7c0e12494b805ffa3c65
     workflow_data = cast(WorkflowDataType, request.json)
     workflow_data["bot_id"] = bot_id
     workflows = mongo.workflows
     workflow_id = workflows.insert_one(workflow_data).inserted_id
 
-    namespace = "workflows"
-    # Check if the namespace is generic
-    if namespace == "workflows":
-        warning_message = "Warning: The 'namespace' variable is set to the generic value 'workflows'. You should replace it with a specific value for your org / user / account."
-        warnings.warn(warning_message, UserWarning)
-    add_workflow_data_to_qdrant(namespace, workflow_id, workflow_data)
+    add_workflow_data_to_qdrant(workflow_id, workflow_data, swagger_url)
 
     return (
         jsonify({"message": "Workflow created", "workflow_id": str(workflow_id)}),
@@ -61,8 +63,13 @@ def create_workflow(bot_id: str) -> Any:
     )
 
 
+<<<<<<< HEAD
 @workflow.route("/u/<swagger_url>", methods=["GET"])
 def get_workflows(swagger_url: str) -> Any:
+=======
+@workflow.route("/b/<bot_id>", methods=["GET"])
+def get_workflows(bot_id: str) -> Any:
+>>>>>>> 0c90402ed4742d83e9ee7c0e12494b805ffa3c65
     # Define default page and page_size values
     page = int(request.args.get("page", 1))
     page_size = int(request.args.get("page_size", 10))
@@ -72,14 +79,22 @@ def get_workflows(swagger_url: str) -> Any:
 
     # Query MongoDB to get a paginated list of workflows
     workflows = list(
+<<<<<<< HEAD
         mongo.workflows.find({"meta.swagger_url": swagger_url}).skip(skip).limit(page_size)
+=======
+        mongo.workflows.find({"bot_id": bot_id}).skip(skip).limit(page_size)
+>>>>>>> 0c90402ed4742d83e9ee7c0e12494b805ffa3c65
     )
 
     for workflow in workflows:
         workflow["_id"] = str(workflow["_id"])
 
     # Calculate the total number of workflows (for pagination metadata)
+<<<<<<< HEAD
     total_workflows = mongo.workflows.count_documents({"meta.swagger_url": swagger_url})
+=======
+    total_workflows = mongo.workflows.count_documents({"bot_id": bot_id})
+>>>>>>> 0c90402ed4742d83e9ee7c0e12494b805ffa3c65
 
     # Prepare response data
     response_data = {
@@ -97,16 +112,16 @@ def get_workflows(swagger_url: str) -> Any:
 @handle_exceptions_and_errors
 def update_workflow(workflow_id: str) -> Any:
     workflow_data = cast(WorkflowDataType, request.json)
-    mongo.workflows.update_one({"_id": ObjectId(workflow_id)}, {"$set": workflow_data})
+    result = mongo.workflows.update_one(
+        {"_id": ObjectId(workflow_id)}, {"$set": workflow_data}
+    )
     namespace = "workflows"
     vector_store = get_vector_store(StoreOptions(namespace))
     vector_store.delete(ids=[workflow_id])
-    # Check if the namespace is generic
-    if namespace == "workflows":
-        warning_message = "Warning: The 'namespace' variable is set to the generic value 'workflows'. You should replace it with a specific value for your org / user / account."
-        warnings.warn(warning_message, UserWarning)
 
-    add_workflow_data_to_qdrant(namespace, workflow_id, workflow_data)
+    add_workflow_data_to_qdrant(
+        workflow_id, workflow_data, result.raw_result.get("bot_id")
+    )
 
     return jsonify(workflow_data), 200
 
@@ -121,19 +136,27 @@ def delete_workflow(workflow_id: str) -> Any:
 @handle_exceptions_and_errors
 def run_workflow_controller() -> Any:
     data = request.get_json()
+
+    swagger_url = data.get("swagger_url")
+    swagger_json = mongo.swagger_files.find_one({"meta.swagger_url": swagger_url})
     result = run_workflow(
         WorkflowData(
             text=data.get("text"),
+<<<<<<< HEAD
             swagger_text=data.get("swagger_url"),
+=======
+>>>>>>> 0c90402ed4742d83e9ee7c0e12494b805ffa3c65
             headers=data.get("headers", {}),
             server_base_url=data["server_base_url"],
-        )
+            swagger_url=data.get("swagger_url"),
+        ),
+        swagger_json,
     )
     return result
 
 
 def add_workflow_data_to_qdrant(
-    namespace: str, workflow_id: str, workflow_data: Any
+    workflow_id: str, workflow_data: Any, swagger_url: str
 ) -> None:
     for flow in workflow_data["flows"]:
         docs = [
@@ -142,8 +165,10 @@ def add_workflow_data_to_qdrant(
                 metadata={
                     "workflow_id": str(workflow_id),
                     "workflow_name": workflow_data.get("name"),
+                    "swagger_id": workflow_data.get("swagger_id"),
+                    "swagger_url": swagger_url,
                 },
             )
         ]
         embeddings = get_embeddings()
-        init_vector_store(docs, embeddings, StoreOptions(namespace))
+        init_vector_store(docs, embeddings, StoreOptions(swagger_url))
