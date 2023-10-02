@@ -86,6 +86,37 @@ def get_workflows(bot_id: str) -> Any:
     return jsonify(response_data), 200
 
 
+@workflow.route("/s/<swagger_id>", methods=["GET"])
+def get_workflows_by_swagger_id(swagger_id: str) -> Any:
+    # Define default page and page_size values
+    page = int(request.args.get("page", 1))
+    page_size = int(request.args.get("page_size", 10))
+
+    # Calculate skip value based on page and page_size
+    skip = (page - 1) * page_size
+
+    # Query MongoDB to get a paginated list of workflows
+    workflows = list(
+        mongo.workflows.find({"swagger_id": swagger_id}).skip(skip).limit(page_size)
+    )
+
+    for workflow in workflows:
+        workflow["_id"] = str(workflow["_id"])
+
+    # Calculate the total number of workflows (for pagination metadata)
+    total_workflows = mongo.workflows.count_documents({"swagger_id": swagger_id})
+
+    # Prepare response data
+    response_data = {
+        "workflows": workflows,
+        "page": page,
+        "page_size": page_size,
+        "total_workflows": total_workflows,
+    }
+
+    return jsonify(response_data), 200
+
+
 @workflow.route("/<workflow_id>", methods=["PUT"])
 @validate_json(workflow_schema)
 @handle_exceptions_and_errors
