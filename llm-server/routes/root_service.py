@@ -17,6 +17,9 @@ from routes.workflow.workflow_service import run_workflow
 from utils.base import try_to_match_and_call_api_endpoint
 from utils.db import Database
 from utils.detect_multiple_intents import hasSingleIntent
+import json
+import yaml
+from yaml.parser import ParserError
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -37,13 +40,42 @@ def fetch_swagger_text(swagger_url: str) -> str:
     if swagger_url.startswith("https://"):
         response = requests.get(swagger_url)
         if response.status_code == 200:
-            return response.text
-        raise Exception(FAILED_TO_FETCH_SWAGGER_CONTENT)
+            try:
+                # Try parsing the content as JSON
+                json_content = json.loads(response.text)
+                return json.dumps(json_content, indent=2)
+            except json.JSONDecodeError:
+                try:
+                    # Try parsing the content as YAML
+                    yaml_content = yaml.safe_load(response.text)
+                    if isinstance(yaml_content, dict):
+                        return json.dumps(yaml_content, indent=2)
+                    else:
+                        raise Exception("Invalid YAML content")
+                except ParserError:
+                    raise Exception("Failed to parse content as JSON or YAML")
+
+        raise Exception("Failed to fetch Swagger content")
+
     try:
         with open(shared_folder + swagger_url, "r") as file:
-            return file.read()
+            content = file.read()
+            try:
+                # Try parsing the content as JSON
+                json_content = json.loads(content)
+                return json.dumps(json_content, indent=2)
+            except json.JSONDecodeError:
+                try:
+                    # Try parsing the content as YAML
+                    yaml_content = yaml.safe_load(content)
+                    if isinstance(yaml_content, dict):
+                        return json.dumps(yaml_content, indent=2)
+                    else:
+                        raise Exception("Invalid YAML content")
+                except ParserError:
+                    raise Exception("Failed to parse content as JSON or YAML")
     except FileNotFoundError:
-        raise Exception(FILE_NOT_FOUND)
+        raise Exception("File not found")
 
 
 def handle_request(data: Dict[str, Any]) -> Any:
@@ -68,36 +100,57 @@ def handle_request(data: Dict[str, Any]) -> Any:
     ) or json.loads(fetch_swagger_text(swagger_url))
 
     try:
-        logging.info("[OpenCopilot] Trying to figure out if the user request require 1) APIs calls 2) If yes how many "
-                     "of them")
+        logging.info(
+            "[OpenCopilot] Trying to figure out if the user request require 1) APIs calls 2) If yes how many "
+            "of them"
+        )
         k = hasSingleIntent(swagger_doc, text)
         if k is False:
-            logging.warning("[OpenCopilot] Apparently, the user request require calling more than single API endpoint "
-                            "to get the job done")
+            logging.warning(
+                "[OpenCopilot] Apparently, the user request require calling more than single API endpoint "
+                "to get the job done"
+            )
             return run_workflow(
                 WorkflowData(text, headers, server_base_url, swagger_url), swagger_doc
             )
         elif k is True:
             logging.info(
-                "[OpenCopilot] The user request can be handled in single API call")
+                "[OpenCopilot] The user request can be handled in single API call"
+            )
+        else:
+            raise "Try match and call"
+        # else:
+        #     return {"response": k}
     except Exception as e:
-        logging.info("[OpenCopilot] Something went wrong when try to get how many calls is required")
+        logging.info(
+            "[OpenCopilot] Something went wrong when try to get how many calls is required"
+        )
 
     logging.info(
-        "[OpenCopilot] The user request will be handled by single API call or otherwise a normal text response")
+        "[OpenCopilot] The user request will be handled by single API call or otherwise a normal text response"
+    )
 
     swagger_spec = OpenAPISpec.from_text(fetch_swagger_text(swagger_url))
 
     try:
-        logging.info("[OpenCopilot] Trying to match the request to a single API endpoint")
+        logging.info(
+            "[OpenCopilot] Trying to match the request to a single API endpoint"
+        )
         json_output = try_to_match_and_call_api_endpoint(swagger_spec, text, headers)
 
-        formatted_response = json.dumps(json_output, indent=4)  # Indent the JSON with 4 spaces
+        formatted_response = json.dumps(
+            json_output, indent=4
+        )  # Indent the JSON with 4 spaces
         logging.info(
-            "[OpenCopilot] We were able to match and call the API endpoint, the response was: {}".format(json_output))
+            "[OpenCopilot] We were able to match and call the API endpoint, the response was: {}".format(
+                json_output
+            )
+        )
     except Exception as e:
-        logging.info("[OpenCopilot] Failed to call the single API endpoint - so we will fallback to normal text "
-                     "response")
+        logging.info(
+            "[OpenCopilot] Failed to call the single API endpoint - so we will fallback to normal text "
+            "response"
+        )
         logging.error(f"{FAILED_TO_CALL_API_ENDPOINT}: {str(e)}")
         logging.error("Exception traceback:\n" + traceback.format_exc())
         json_output = None
