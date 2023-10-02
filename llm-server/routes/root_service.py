@@ -83,7 +83,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
     try:
         plan = get_api_plan(swagger_doc, text)
 
-        if len(plan.ids) > 1:
+        if len(plan.ids) >= 1:
             workflow_data = WorkflowData(text, headers, server_base_url, swagger_url)
             # generate a workflow, if it fails remove it immediately. Furthur api calls can use the workflow if it was defined and it worked
             workflow = check_workflow_in_vector_store(workflow_data)
