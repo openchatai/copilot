@@ -13,8 +13,10 @@ from langchain.utilities.openapi import OpenAPISpec
 from models.models import AiResponseFormat
 from prompts.base import api_base_prompt, non_api_base_prompt
 from routes.workflow.typings.run_workflow_input import WorkflowData
-from routes.workflow.workflow_service import run_workflow
-from utils.base import try_to_match_and_call_api_endpoint
+from utils.detect_multiple_intents import hasSingleIntent
+import os
+from dotenv import load_dotenv
+from typing import Dict, Any, cast
 from utils.db import Database
 from utils.detect_multiple_intents import hasSingleIntent
 import json
@@ -100,27 +102,18 @@ def handle_request(data: Dict[str, Any]) -> Any:
     ) or json.loads(fetch_swagger_text(swagger_url))
 
     try:
-        logging.info(
-            "[OpenCopilot] Trying to figure out if the user request require 1) APIs calls 2) If yes how many "
-            "of them"
-        )
-        k = hasSingleIntent(swagger_doc, text)
-        if k is False:
-            logging.warning(
-                "[OpenCopilot] Apparently, the user request require calling more than single API endpoint "
-                "to get the job done"
-            )
+        bot_response = hasSingleIntent(swagger_doc, text)
+        if len(bot_response.ids) > 1:
             return run_workflow(
                 WorkflowData(text, headers, server_base_url, swagger_url), swagger_doc
             )
-        elif k is True:
-            logging.info(
-                "[OpenCopilot] The user request can be handled in single API call"
-            )
+        elif len(bot_response.ids) == 0:
+            return {"response": bot_response.bot_message}
+
         else:
-            raise "Try match and call"
+            raise "Falling back to planner"
         # else:
-        #     return {"response": k}
+        #     return {"": k}
     except Exception as e:
         logging.info(
             "[OpenCopilot] Something went wrong when try to get how many calls is required"
