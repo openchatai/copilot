@@ -19,10 +19,8 @@ import json
 db_instance = Database()
 mongo = db_instance.get_db()
 
-
 load_dotenv()
 shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
-
 
 # Define constants for error messages
 BASE_PROMPT_REQUIRED = "base_prompt is required"
@@ -53,6 +51,8 @@ def handle_request(data: Dict[str, Any]) -> Any:
     headers = data.get("headers", {})
     server_base_url = cast(str, data.get("server_base_url", ""))
 
+    logging.info("[OpenCopilot] Got the following user request: {}".format(text))
+
     for required_field, error_msg in [
         ("base_prompt", BASE_PROMPT_REQUIRED),
         ("text", TEXT_REQUIRED),
@@ -66,23 +66,35 @@ def handle_request(data: Dict[str, Any]) -> Any:
     ) or json.loads(fetch_swagger_text(swagger_url))
 
     try:
+        logging.info("[OpenCopilot] Trying to figure out if the user request require 1) APIs calls 2) If yes how many "
+                     "of them")
         k = hasSingleIntent(swagger_doc, text)
-        if k == False:
+        if k is False:
+            logging.warning("[OpenCopilot] Apparently, the user request require calling more than single API endpoint "
+                            "to get the job done")
             return run_workflow(
                 WorkflowData(text, headers, server_base_url, swagger_url), swagger_doc
             )
-        elif(k == True):
-            raise "Try match and call"
-        else:
-            return {"response": k}
+        elif k is True:
+            logging.info(
+                "[OpenCopilot] The user request can be handled in single API call")
     except Exception as e:
-        print(e)
+        logging.info("[OpenCopilot] Something went wrong when try to get how many calls is required")
+
+    logging.info(
+        "[OpenCopilot] The user request will be handled by single API call or otherwise a normal text response")
 
     swagger_spec = OpenAPISpec.from_text(fetch_swagger_text(swagger_url))
 
     try:
+        logging.info("[OpenCopilot] Trying to match the request to a single API endpoint")
         json_output = try_to_match_and_call_api_endpoint(swagger_spec, text, headers)
+
+        formatted_response = json.dumps(json_output, indent=4)  # Indent the JSON with 4 spaces
+        logging.info("[OpenCopilot] We were able to match and call the API endpoint, the response was: {}".format(json_output))
     except Exception as e:
+        logging.info("[OpenCopilot] Failed to call the single API endpoint - so we will fallback to normal text "
+                     "response")
         logging.error(f"{FAILED_TO_CALL_API_ENDPOINT}: {str(e)}")
         logging.error("Exception traceback:\n" + traceback.format_exc())
         json_output = None
