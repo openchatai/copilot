@@ -1,49 +1,33 @@
 import json
 import logging
 import re
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union, cast
 from typing import List
 
-from langchain.chains import LLMChain
-from langchain.prompts import PromptTemplate
-from utils.get_llm import get_llm
+
+from langchain.schema import AIMessage, HumanMessage, SystemMessage
+from langchain.chat_models import ChatOpenAI
+from routes.workflow.extractors.extract_json import extract_json_payload
+import os
+from dotenv import load_dotenv
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+
+load_dotenv()
 
 
-# use spaCy or BERT for more accurate results
-def hasMultipleIntents(user_input: str) -> bool:
-    # Keywords for multiple questions
-    question_keywords = [
-        "and",
-        "also",
-        "in addition",
-        "moreover",
-        "furthermore",
-        "besides",
-        "additionally",
-        "another question",
-        "second question",
-        "next, ask",
-        "thirdly",
-        "finally",
-        "lastly",
-    ]
+class BotMessage:
+    def __init__(self, ids: List[str], bot_message: str):
+        self.ids = ids
+        self.bot_message = bot_message
 
-    # Check for question keywords
-    question_pattern = "|".join(re.escape(keyword) for keyword in question_keywords)
-    question_matches = [
-        match.group()
-        for match in re.finditer(question_pattern, user_input, re.IGNORECASE)
-    ]
+    def to_dict(self) -> Dict[str, Union[str, List[str]]]:
+        return {"ids": self.ids, "bot_message": self.bot_message}
 
-    print(f"Found {question_matches} in the following input: {user_input}")
-    return bool(question_matches)
-
-
-# user_input = (
-#     "I want to fetch data from API A and also, can you answer another question?"
-# )
-# result = hasMultipleIntents(user_input)
-# print(json.dumps(result, indent=2))
+    @classmethod
+    def from_dict(cls, data: Dict[str, Union[str, List[str]]]) -> "BotMessage":
+        return cls(cast(List[str], data["ids"]), cast(str, data["bot_message"]))
 
 
 def getSummaries(swagger_doc: Any):
@@ -67,63 +51,45 @@ def getSummaries(swagger_doc: Any):
     return summaries
 
 
-def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> bool:
-    # todo use create_structured_output_chain with validation
+def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> BotMessage:
     summaries = getSummaries(swagger_doc)
-    _DEFAULT_TEMPLATE = """You are an AI chatbot that determines the sequence of API calls needed to perform an action. You only provide the user with the list of API calls. You have been given a summary of the APIs that a third party system allows access to. However, users may also ask general questions that do not require API calls. 
 
-When given:
-
-- A list of API summaries `{summaries}`
-- The user's desired action `{user_requirement}`
-
-Respond with the following JSON structure:
-
-{{
-  "ids": [
-    "list",
-    "of",
-    "operation",
-    "ids"
-  ],
-  "bot_message": "Bot reasoning here" 
-}}
-
-
-IT'S EXTREMELY IMPORTANT TO ONLY RETURN THE OPERATION IDS REQUIRE TO GET THE JOB DONE, NEVER ADD THINGS THAT IS NOT REQUIRED.
-
-Only return the JSON structure, no additional text or formatting, just JSON.
-"""
-    llm = get_llm()
-    PROMPT = PromptTemplate(
-        input_variables=["summaries", "user_requirement"],
-        template=_DEFAULT_TEMPLATE,
+    chat = ChatOpenAI(
+        openai_api_key=os.getenv("OPENAI_API_KEY"),
+        model="gpt-3.5-turbo-16k",
+        temperature=0,
     )
+    messages = [
+        SystemMessage(
+            content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. It is essential that you consistently provide a valid JSON payload (use double quotes) in your responses. If the user's input is a `question` and does not involve initiating any actions or require API calls, please respond appropriately in the `bot_message` section of the response while leaving the `ids` field empty ([]). If the user is asking you to perform a `CRUD` operation, provide the list of operation ids of api calls needed in the `ids` field of the json"
+        ),
+        HumanMessage(
+            content="Here's a list of api summaries {}".format(summaries),
+        ),
+        HumanMessage(content="{}".format(user_requirement)),
+        HumanMessage(
+            content="""Reply in the following json format ```{
+                "ids": [
+                    "list",
+                    "of",
+                    "operation",
+                    "ids"
+                ],
+                "bot_message": "Bot response here" 
+            }```"""
+        ),
+    ]
 
-    PROMPT.format(user_requirement=user_requirement, summaries=summaries)
-
-    chain = LLMChain(
-        llm=llm,
-        prompt=PROMPT,
-        # memory=memory,
-        verbose=True,
+    result = chat(messages)
+    logging.info(
+        "[OpenCopilot] Extracted the needed steps to get the job done: {}".format(
+            result.content
+        )
     )
-    response = json.loads(chain.run(
-        {
-            "summaries": summaries,
-            "user_requirement": user_requirement,
-        }
-    ))
-
-    formatted_response = json.dumps(response, indent=4)  # Indent the JSON with 4 spaces
-
-    logging.info("[OpenCopilot] Extracted the needed steps to get the job done: {}".format(formatted_response))
-
-    if len(response["ids"]) == 1:
-        logging.info("[OpenCopilot] The user request can be done in a single API")
-        return True
-    elif len(response["ids"]) > 1:
-        logging.info("[OpenCopilot] The user request require multiple API calls to be done")
-        return False
-    else:
-        return response["bot_message"]
+    d: Any = extract_json_payload(result.content)
+    logging.info(
+        "[OpenCopilot] Parsed the json payload: {}, context: {}".format(
+            d, "hasSingleIntent"
+        )
+    )
+    return BotMessage.from_dict(d)
