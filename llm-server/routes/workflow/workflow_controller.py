@@ -1,27 +1,25 @@
 import json
 import os
+from typing import Any, cast
 
-from flask import Blueprint, request, jsonify
-from routes.workflow.validate_json import validate_json
 from bson import ObjectId, json_util
 from copilot_exceptions.handle_exceptions_and_errors import handle_exceptions_and_errors
-from utils.get_embeddings import get_embeddings
-from opencopilot_types.workflow_type import WorkflowDataType
-import warnings
-from utils.db import Database
-from utils.vector_db.init_vector_store import init_vector_store
-from utils.vector_db.get_vector_store import get_vector_store
-from utils.vector_db.store_options import StoreOptions
+from flask import Blueprint, request, jsonify
 from langchain.docstore.document import Document
-from routes.workflow.workflow_service import run_workflow
-from typing import Any, cast
+from opencopilot_types.workflow_type import WorkflowDataType
 from routes.workflow.typings.run_workflow_input import WorkflowData
+from routes.workflow.validate_json import validate_json
+from routes.workflow.workflow_service import run_workflow
+from utils.db import Database
+from utils.get_embeddings import get_embeddings
+from utils.vector_db.get_vector_store import get_vector_store
+from utils.vector_db.init_vector_store import init_vector_store
+from utils.vector_db.store_options import StoreOptions
 
 db_instance = Database()
 mongo = db_instance.get_db()
 
 workflow = Blueprint("workflow", __name__)
-
 
 json_file_path = os.path.join(os.getcwd(), "routes", "workflow", "workflow_schema.json")
 with open(json_file_path, "r") as workflow_schema_file:
@@ -39,18 +37,28 @@ def get_workflow(workflow_id: str) -> Any:
         return jsonify({"message": "Workflow not found"}), 404
 
 
-<<<<<<< HEAD
-@workflow.route("/b/<bot_id>", methods=["POST"])
-@validate_json(workflow_schema)
-@handle_exceptions_and_errors
-def create_workflow(bot_id: str) -> Any:
-=======
 @workflow.route("/u/<swagger_url>", methods=["POST"])
 @validate_json(workflow_schema)
 @handle_exceptions_and_errors
 def create_workflow(swagger_url: str) -> Any:
->>>>>>> 0c90402ed4742d83e9ee7c0e12494b805ffa3c65
     workflow_data = cast(WorkflowDataType, request.json)
+    workflows = mongo.workflows
+    workflow_id = workflows.insert_one(workflow_data).inserted_id
+
+    add_workflow_data_to_qdrant(workflow_id, workflow_data, swagger_url)
+
+    return (
+        jsonify({"message": "Workflow created", "workflow_id": str(workflow_id)}),
+        201,
+    )
+
+
+@workflow.route("/b/<bot_id>", methods=["POST"])
+@validate_json(workflow_schema)
+@handle_exceptions_and_errors
+def create_workflow_by_bot_id(bot_id: str) -> Any:
+    workflow_data = cast(WorkflowDataType, request.json)
+    swagger_url = ""
     workflow_data["bot_id"] = bot_id
     workflows = mongo.workflows
     workflow_id = workflows.insert_one(workflow_data).inserted_id
@@ -63,13 +71,8 @@ def create_workflow(swagger_url: str) -> Any:
     )
 
 
-<<<<<<< HEAD
-@workflow.route("/u/<swagger_url>", methods=["GET"])
-def get_workflows(swagger_url: str) -> Any:
-=======
 @workflow.route("/b/<bot_id>", methods=["GET"])
-def get_workflows(bot_id: str) -> Any:
->>>>>>> 0c90402ed4742d83e9ee7c0e12494b805ffa3c65
+def get_workflows_by_bot_id(bot_id: str) -> Any:
     # Define default page and page_size values
     page = int(request.args.get("page", 1))
     page_size = int(request.args.get("page_size", 10))
@@ -79,22 +82,45 @@ def get_workflows(bot_id: str) -> Any:
 
     # Query MongoDB to get a paginated list of workflows
     workflows = list(
-<<<<<<< HEAD
-        mongo.workflows.find({"meta.swagger_url": swagger_url}).skip(skip).limit(page_size)
-=======
         mongo.workflows.find({"bot_id": bot_id}).skip(skip).limit(page_size)
->>>>>>> 0c90402ed4742d83e9ee7c0e12494b805ffa3c65
     )
 
     for workflow in workflows:
         workflow["_id"] = str(workflow["_id"])
 
     # Calculate the total number of workflows (for pagination metadata)
-<<<<<<< HEAD
-    total_workflows = mongo.workflows.count_documents({"meta.swagger_url": swagger_url})
-=======
     total_workflows = mongo.workflows.count_documents({"bot_id": bot_id})
->>>>>>> 0c90402ed4742d83e9ee7c0e12494b805ffa3c65
+
+    # Prepare response data
+    response_data = {
+        "workflows": workflows,
+        "page": page,
+        "page_size": page_size,
+        "total_workflows": total_workflows,
+    }
+
+    return jsonify(response_data), 200
+
+
+@workflow.route("/s/<swagger_id>", methods=["GET"])
+def get_workflows_by_swagger_id(swagger_id: str) -> Any:
+    # Define default page and page_size values
+    page = int(request.args.get("page", 1))
+    page_size = int(request.args.get("page_size", 10))
+
+    # Calculate skip value based on page and page_size
+    skip = (page - 1) * page_size
+
+    # Query MongoDB to get a paginated list of workflows
+    workflows = list(
+        mongo.workflows.find({"swagger_id": swagger_id}).skip(skip).limit(page_size)
+    )
+
+    for workflow in workflows:
+        workflow["_id"] = str(workflow["_id"])
+
+    # Calculate the total number of workflows (for pagination metadata)
+    total_workflows = mongo.workflows.count_documents({"swagger_id": swagger_id})
 
     # Prepare response data
     response_data = {
@@ -123,7 +149,7 @@ def update_workflow(workflow_id: str) -> Any:
         workflow_id, workflow_data, result.raw_result.get("bot_id")
     )
 
-    return jsonify(workflow_data), 200
+    return jsonify({"message": "Workflow updated"}), 200
 
 
 @workflow.route("/<workflow_id>", methods=["DELETE"])
@@ -142,10 +168,6 @@ def run_workflow_controller() -> Any:
     result = run_workflow(
         WorkflowData(
             text=data.get("text"),
-<<<<<<< HEAD
-            swagger_text=data.get("swagger_url"),
-=======
->>>>>>> 0c90402ed4742d83e9ee7c0e12494b805ffa3c65
             headers=data.get("headers", {}),
             server_base_url=data["server_base_url"],
             swagger_url=data.get("swagger_url"),

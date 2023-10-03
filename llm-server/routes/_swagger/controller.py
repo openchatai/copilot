@@ -11,13 +11,8 @@ mongo = db_instance.get_db()
 _swagger = Blueprint("_swagger", __name__)
 
 
-<<<<<<< HEAD
-@_swagger.route("", methods=["GET"])
-def get_swagger_files() -> Response:
-=======
 @_swagger.route("/u/<swagger_url>", methods=["GET"])
 def get_swagger_files(swagger_url: str) -> Response:
->>>>>>> 0c90402ed4742d83e9ee7c0e12494b805ffa3c65
     # Get page and page_size query params
     page = int(request.args.get("page", 1))
     page_size = int(request.args.get("page_size", 10))
@@ -29,13 +24,9 @@ def get_swagger_files(swagger_url: str) -> Response:
     # Query for paginated docs
     files = [
         doc.update({"_id": str(doc["_id"])}) or doc
-<<<<<<< HEAD
-        for doc in mongo.swagger_files.find({}, {}).skip(skip).limit(limit)
-=======
         for doc in mongo.swagger_files.find({"meta.swagger_url": swagger_url}, {})
         .skip(skip)
         .limit(limit)
->>>>>>> 0c90402ed4742d83e9ee7c0e12494b805ffa3c65
     ]
 
     # Get total docs count
@@ -47,7 +38,7 @@ def get_swagger_files(swagger_url: str) -> Response:
     return jsonify(data)
 
 
-@_swagger.route("/u/<id>", methods=["POST"])
+@_swagger.route("/b/<id>", methods=["POST"])
 def add_swagger_file(id) -> Response:
     result = swagger_service.add_swagger_file(request, id)
     return jsonify(result)
@@ -120,10 +111,6 @@ def update_swagger_file(_id: str) -> Response:
     result = mongo.swagger_files.update_one({"_id": ObjectId(_id)}, {"$set": data})
     if result.modified_count == 1:
         return jsonify({"message": "Swagger file updated successfully"})
-
-    elif result.matched_count == 1:
-        return jsonify({"message": "File found but nothing to modify"})
-
     return jsonify({"message": "Swagger file not found"})
 
 
