@@ -14,6 +14,7 @@ db_instance = Database()
 mongo = db_instance.get_db()
 
 import os
+import logging
 
 SCORE_THRESOLD = float(os.getenv("SCORE_THRESOLD", 0.88))
 
@@ -37,6 +38,9 @@ def get_valid_url(
 
 
 def run_workflow(data: WorkflowData, swagger_json: Any) -> Any:
+    logging.info(
+        "[OpenCopilot] Trying to map the user request with a flow (since the request need multiple API calls)"
+    )
     text = data.text
     headers = data.headers or {}
     # This will come from the request payload later on when implementing multi-tenancy
@@ -52,8 +56,9 @@ def run_workflow(data: WorkflowData, swagger_json: Any) -> Any:
             text, score_threshold=SCORE_THRESOLD
         )[0]
 
-        print(
-            f"Record '{document}' is highly similar with a similarity score of {score}"
+        logging.info(
+            f"[OpenCopilot] Record '{document}' is highly similar with a similarity score of {score} which means "
+            f"we can run this flow"
         )
         first_document_id = (
             ObjectId(document.metadata["workflow_id"]) if document else None
@@ -67,10 +72,15 @@ def run_workflow(data: WorkflowData, swagger_json: Any) -> Any:
 
     except Exception as e:
         # Log the error, but continue with the rest of the code
-        print(f"Error fetching data from namespace '{namespace}': {str(e)}")
+        logging.info(f"[OpenCopilot] Error fetching data from namespace '{namespace}': {str(e)}")
+
+    logging.info(f"[OpenCopilot] Could not map the user request to a flow, last attempt is to run the hierarchical "
+                 f"planning AI")
 
     # Call openapi spec even if an error occurred with Qdrant
     result = create_and_run_openapi_agent(swagger_json, text, headers)
+
+    logging.info("[OpenCopilot] Planner out come {}".format(json.dumps({"response": result})))
     return {"response": result}
 
 
