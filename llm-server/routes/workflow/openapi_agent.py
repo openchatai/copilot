@@ -1,14 +1,15 @@
+import os
+from typing import Dict, Any
+
 from langchain.agents import create_openapi_agent
 from langchain.agents.agent_toolkits import OpenAPIToolkit
 from langchain.requests import RequestsWrapper
 from langchain.tools.json.tool import JsonSpec
 from utils.get_llm import get_llm
-import os
-from typing import Dict, Any
 
 
 def run_openapi_agent_from_json(
-    spec_json: Dict[str, Any], prompt: str, prev_api_response: str
+        spec_json: Dict[str, Any], prompt: str, prev_api_response: str
 ) -> str:
     json_spec = JsonSpec(dict_=spec_json, max_value_length=4000)
 

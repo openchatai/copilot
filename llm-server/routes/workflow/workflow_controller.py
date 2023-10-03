@@ -178,7 +178,7 @@ def run_workflow_controller() -> Any:
 
 
 def add_workflow_data_to_qdrant(
-    workflow_id: str, workflow_data: Any, swagger_url: str
+        workflow_id: str, workflow_data: Any, swagger_url: str
 ) -> None:
     for flow in workflow_data["flows"]:
         docs = [
