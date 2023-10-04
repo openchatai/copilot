@@ -80,7 +80,10 @@ def run_workflow(data: WorkflowData, swagger_json: Any, needed_calls: Any) -> An
     # Since we could not map the user request to a flow, we will try to generate one on the fly
     generated_flow = generate_workflow_on_the_fly_based_on_the_user_request(needed_calls, swagger_json)
 
-    # Call openapi spec even if an error occurred with Qdrant
+    # Now let's try to call the flow
+    # todo
+
+    # Otherwise, let's call the agents.
     result = create_and_run_openapi_agent(swagger_json, text, headers)
 
     logging.info("[OpenCopilot] Planner out come {}".format(json.dumps({"response": result})))
