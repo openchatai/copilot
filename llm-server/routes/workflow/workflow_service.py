@@ -37,7 +37,7 @@ def get_valid_url(
         raise ValueError("Missing path parameter")
 
 
-def run_workflow(data: WorkflowData, swagger_json: Any) -> Any:
+def run_workflow(data: WorkflowData, swagger_json: Any, needed_calls: Any) -> Any:
     logging.info(
         "[OpenCopilot] Trying to map the user request with a flow (since the request need multiple API calls)"
     )
@@ -77,12 +77,19 @@ def run_workflow(data: WorkflowData, swagger_json: Any) -> Any:
     logging.info(f"[OpenCopilot] Could not map the user request to a flow, last attempt is to run the hierarchical "
                  f"planning AI")
 
+    # Since we could not map the user request to a flow, we will try to generate one on the fly
+    generated_flow = generate_workflow_on_the_fly_based_on_the_user_request(needed_calls, swagger_json)
+
     # Call openapi spec even if an error occurred with Qdrant
     result = create_and_run_openapi_agent(swagger_json, text, headers)
 
     logging.info("[OpenCopilot] Planner out come {}".format(json.dumps({"response": result})))
     return {"response": result}
 
+
+def generate_workflow_on_the_fly_based_on_the_user_request(needed_calls, swagger_doc):
+
+    pass
 
 def run_openapi_operations(
         record: Any,

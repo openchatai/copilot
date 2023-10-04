@@ -103,6 +103,8 @@ def handle_request(data: Dict[str, Any]) -> Any:
         {"meta.swagger_url": swagger_url}, {"meta": 0, "_id": 0}
     ) or json.loads(fetch_swagger_text(swagger_url))
 
+    logging.info(json.dumps(swagger_doc))
+
     try:
         logging.info(
             "[OpenCopilot] Trying to figure out if the user request require 1) APIs calls 2) If yes how many "
@@ -115,7 +117,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
                 "to get the job done"
             )
             return run_workflow(
-                WorkflowData(text, headers, server_base_url, swagger_url), swagger_doc
+                WorkflowData(text, headers, server_base_url, swagger_url), swagger_doc, bot_response
             )
         elif len(bot_response.ids) == 0:
             logging.info("[OpenCopilot] The user request doesnot require an api call")
