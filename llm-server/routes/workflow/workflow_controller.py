@@ -53,7 +53,7 @@ def create_workflow(swagger_url: str) -> Any:
     )
 
 
-@workflow.route("/b/<bot_id>", methods=["POST"])
+@workflow.route("/b/<bot_id>", methods=["GET", "POST"])
 @validate_json(workflow_schema)
 @handle_exceptions_and_errors
 def create_workflow_by_bot_id(bot_id: str) -> Any:
