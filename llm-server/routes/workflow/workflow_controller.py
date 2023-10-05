@@ -71,7 +71,7 @@ def create_workflow_by_bot_id(bot_id: str) -> Any:
     )
 
 
-@workflow.route("/b/<bot_id>", methods=["GET"])
+@workflow.route("/get/b/<bot_id>", methods=["GET"])
 def get_workflows_by_bot_id(bot_id: str) -> Any:
     # Define default page and page_size values
     page = int(request.args.get("page", 1))
