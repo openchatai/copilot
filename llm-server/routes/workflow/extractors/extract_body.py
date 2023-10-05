@@ -29,6 +29,9 @@ def gen_body_from_schema(
         HumanMessage(content="Dummy json payload: {}".format(example)),
         HumanMessage(content="User input: {}".format(text)),
         HumanMessage(content="prev api responses: {}".format(prev_api_response)),
+        HumanMessage(
+            content="Given the provided information, generate the appropriate JSON payload to use as body for the API request"
+        ),
     ]
     result = chat(messages)
 

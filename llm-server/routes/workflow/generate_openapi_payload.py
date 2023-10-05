@@ -110,6 +110,8 @@ def generate_openapi_payload(
         api_info.body_schema = gen_body_from_schema(
             json.dumps(api_info.body_schema), text, prev_api_response, example
         )
+        # when you come back, clear the trello board and
+        # extract api info and set it up for next call
     else:
         api_info.body_schema = {}
 

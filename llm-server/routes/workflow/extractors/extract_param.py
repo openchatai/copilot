@@ -27,6 +27,9 @@ def gen_params_from_schema(
         HumanMessage(content="Json Schema: {}".format(param_schema)),
         HumanMessage(content="User input: {}".format(text)),
         HumanMessage(content="prev api responses: {}".format(prev_resp)),
+        HumanMessage(
+            content="Given the provided information, generate the appropriate JSON payload to use as parameters for the API request"
+        ),
     ]
     result = chat(messages)
 
