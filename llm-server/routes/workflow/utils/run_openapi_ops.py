@@ -5,12 +5,13 @@ import traceback
 import logging
 from typing import Any
 
+
 def run_openapi_operations(
-        record: Any,
-        swagger_json: str,
-        text: str,
-        headers: Any,
-        server_base_url: str,
+    record: Any,
+    swagger_json: str,
+    text: str,
+    headers: Any,
+    server_base_url: str,
 ) -> str:
     record_info = {"Workflow Name": record.get("name")}
     for flow in record.get("flows", []):
