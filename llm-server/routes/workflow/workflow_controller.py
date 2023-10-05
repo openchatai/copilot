@@ -10,7 +10,7 @@ from langchain.docstore.document import Document
 from opencopilot_types.workflow_type import WorkflowDataType
 from routes.workflow.typings.run_workflow_input import WorkflowData
 from routes.workflow.validate_json import validate_json
-from routes.workflow.workflow_service import run_workflow
+from routes.workflow.utils import run_workflow
 from utils.db import Database
 from utils.get_embeddings import get_embeddings
 from utils.vector_db.get_vector_store import get_vector_store
@@ -158,4 +158,3 @@ def run_workflow_controller() -> Any:
         swagger_json,
     )
     return result
-
