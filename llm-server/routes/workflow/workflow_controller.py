@@ -4,6 +4,7 @@ from typing import Any, cast
 
 from bson import ObjectId, json_util
 from copilot_exceptions.handle_exceptions_and_errors import handle_exceptions_and_errors
+from utils.vector_db.add_workflow import add_workflow_data_to_qdrant
 from flask import Blueprint, request, jsonify
 from langchain.docstore.document import Document
 from opencopilot_types.workflow_type import WorkflowDataType
@@ -158,21 +159,3 @@ def run_workflow_controller() -> Any:
     )
     return result
 
-
-def add_workflow_data_to_qdrant(
-        workflow_id: str, workflow_data: Any, swagger_url: str
-) -> None:
-    for flow in workflow_data["flows"]:
-        docs = [
-            Document(
-                page_content=flow["description"],
-                metadata={
-                    "workflow_id": str(workflow_id),
-                    "workflow_name": workflow_data.get("name"),
-                    "swagger_id": workflow_data.get("swagger_id"),
-                    "swagger_url": swagger_url,
-                },
-            )
-        ]
-        embeddings = get_embeddings()
-        init_vector_store(docs, embeddings, StoreOptions(swagger_url))

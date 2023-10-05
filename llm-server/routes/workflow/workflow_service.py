@@ -9,6 +9,7 @@ from utils.db import Database
 from utils.make_api_call import make_api_request
 from utils.vector_db.get_vector_store import get_vector_store
 from utils.vector_db.store_options import StoreOptions
+import traceback
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -16,7 +17,7 @@ mongo = db_instance.get_db()
 import os
 import logging
 
-SCORE_THRESOLD = float(os.getenv("SCORE_THRESOLD", 0.88))
+SCORE_THRESHOLD = float(os.getenv("SCORE_THRESOLD", 0.88))
 
 
 def get_valid_url(
@@ -53,7 +54,7 @@ def run_workflow(data: WorkflowData, swagger_json: Any) -> Any:
     try:
         vector_store = get_vector_store(StoreOptions(namespace=data.swagger_url))
         (document, score) = vector_store.similarity_search_with_relevance_scores(
-            text, score_threshold=SCORE_THRESOLD
+            text, score_threshold=SCORE_THRESHOLD
         )[0]
 
         logging.info(
@@ -94,14 +95,28 @@ def run_openapi_operations(
     record_info = {"Workflow Name": record.get("name")}
     for flow in record.get("flows", []):
         prev_api_response = ""
-        for step in flow.get("steps"):
-            operation_id = step.get("open_api_operation_id")
-            api_payload = generate_openapi_payload(
-                swagger_json, text, operation_id, prev_api_response
-            )
 
-            api_response = make_api_request(headers=headers, **api_payload.__dict__)
-            record_info[operation_id] = json.loads(api_response.text)
-            prev_api_response = api_response.text
+        for step in flow.get("steps"):
+            try:
+                operation_id = step.get("open_api_operation_id")
+                api_payload = generate_openapi_payload(
+                    swagger_json, text, operation_id, prev_api_response
+                )
+
+                api_response = make_api_request(headers=headers, **api_payload.__dict__)
+                record_info[operation_id] = json.loads(api_response.text)
+                prev_api_response = api_response.text
+
+            except Exception as e:
+                logging.error("Error making API call", exc_info=True)
+
+                error_info = {
+                    "operation_id": operation_id,
+                    "error": str(e),
+                    "traceback": traceback.format_exc(),
+                }
+
+                record_info[operation_id] = error_info
+
         prev_api_response = ""
     return json.dumps(record_info)

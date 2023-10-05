@@ -125,9 +125,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
             logging.info(
                 "[OpenCopilot] The user request can be handled in single API call"
             )
-            raise "Falling back to planner"
-        # else:
-        #     return {"": k}
+
     except Exception as e:
         logging.info(
             "[OpenCopilot] Something went wrong when try to get how many calls is required"

@@ -44,23 +44,14 @@ def get_api_info_by_operation_id(data: Any, target_operation_id: str) -> ApiInfo
                 api_info.endpoint = path
                 api_info.method = method.upper()
 
-                # Extract path parameters and their schemas
-                path_params = {}
-                for parameter in details.get("parameters", []):
-                    if parameter["in"] == "path":
-                        param_name = parameter["name"]
-                        param_schema = parameter.get("schema", {})
-                        path_params[param_name] = param_schema
-                api_info.path_params = path_params
+                all_params = details.get("parameters", [])
+                api_info.path_params = {
+                    "properties": [obj for obj in all_params if obj["in"] == "path"]
+                }
 
-                # Extract query parameters and their schemas
-                query_params = {}
-                for parameter in details.get("parameters", []):
-                    if parameter["in"] == "query":
-                        param_name = parameter["name"]
-                        param_schema = parameter.get("schema", {})
-                        query_params[param_name] = param_schema
-                api_info.query_params = query_params
+                api_info.query_params = {
+                    "properties": [obj for obj in all_params if obj["in"] == "query"]
+                }
 
                 # Extract request body schema
                 if "requestBody" in details:
@@ -101,14 +92,14 @@ def generate_openapi_payload(
 
     api_info.path_params = (
         {}
-        if not api_info.path_params
+        if not api_info.path_params["properties"]
         else gen_params_from_schema(
             json.dumps(api_info.path_params), text, prev_api_response
         )
     )
     api_info.query_params = (
         {}
-        if not api_info.query_params
+        if not api_info.query_params["properties"]
         else gen_params_from_schema(
             json.dumps(api_info.query_params), text, prev_api_response
         )

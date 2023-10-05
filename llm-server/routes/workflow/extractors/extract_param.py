@@ -13,28 +13,14 @@ llm = get_llm()
 def gen_params_from_schema(
     param_schema: str, text: str, prev_resp: str
 ) -> Optional[JsonData]:
-    """Extracts API parameters from a schema based on user text and previous response.
-
-    Args:
-        param_schema (JsonData): A snippet of the OpenAPI parameter schema relevant to this operation.
-        text (str): The original user text query.
-        prev_resp (str): The previous API response.
-
-    Returns:
-        Optional[JsonData]: The extracted JSON parameters, if successful.
-
-    This function constructs a prompt with the given inputs and passes it to
-    an LLM to generate a JSON string containing the parameters. It then parses
-    this to extract a JSON payload matching the schema structure.
-    """
-
-    _DEFAULT_TEMPLATE = """In order to facilitate the sequential execution of a highly intelligent language model with a series of APIs, we furnish the vital information required for executing the next API call.
-
-    The initial input at the onset of the process: {text}
-    The responses obtained from previous API calls: {prev_resp}
-    A schema for request parameters that defines the expected format: {param_schema}
-
-    The JSON payload, which is used to represent the query parameters and is constructed using the initial input and previous API responses, must be enclosed within triple backticks on both sides. It must strictly adhere to the specified "type/format" guidelines laid out in the schema, and the structure is as follows:"""
+    
+    _DEFAULT_TEMPLATE = """We have the following information required for executing the next API call.\n
+    The initial input at the onset of the process: `{text}`\n
+    The responses obtained from previous API calls: ```{prev_resp}```
+    Swagger Schema defining parameters: ```{param_schema}```
+    Output musts be a json object representing the query params and nothing else. Also query params should only have keys defined in the swagger schema ignore anything else, moreover if user instruction doesnot have information about a query parameter ignore that as well. 
+    
+    Query params: """
 
     PROMPT = PromptTemplate(
         input_variables=["prev_resp", "text", "param_schema"],
