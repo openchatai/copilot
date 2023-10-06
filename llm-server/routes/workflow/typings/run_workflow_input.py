@@ -1,6 +1,7 @@
 from typing import Dict, Optional
 
 
+# This is the api payload and doesnot represent workflow schema, use WorkflowDataType from opencopilot types for that
 class WorkflowData:
     def __init__(
         self,

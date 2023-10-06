@@ -3,7 +3,6 @@ import os
 from typing import Dict, Any, cast
 
 import logging
-import requests
 import traceback
 from dotenv import load_dotenv
 from langchain.chains.openai_functions import create_structured_output_chain
@@ -13,16 +12,19 @@ from langchain.utilities.openapi import OpenAPISpec
 from models.models import AiResponseFormat
 from prompts.base import api_base_prompt, non_api_base_prompt
 from routes.workflow.typings.run_workflow_input import WorkflowData
-from routes.workflow.workflow_service import run_workflow
-from utils.detect_multiple_intents import hasSingleIntent
+from routes.workflow.utils import (
+    run_workflow,
+    check_workflow_in_store,
+    fetch_swagger_text,
+    hasSingleIntent,
+    create_workflow_from_operation_ids,
+)
+from bson import ObjectId
 import os
 from dotenv import load_dotenv
 from typing import Dict, Any, cast
 from utils.db import Database
-from utils.detect_multiple_intents import hasSingleIntent
 import json
-import yaml
-from yaml.parser import ParserError
 from api_caller.base import try_to_match_and_call_api_endpoint
 
 db_instance = Database()
@@ -38,48 +40,6 @@ SWAGGER_URL_REQUIRED = "swagger_url is required"
 FAILED_TO_FETCH_SWAGGER_CONTENT = "Failed to fetch Swagger content"
 FILE_NOT_FOUND = "File not found"
 FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
-
-
-def fetch_swagger_text(swagger_url: str) -> str:
-    if swagger_url.startswith("https://"):
-        response = requests.get(swagger_url)
-        if response.status_code == 200:
-            try:
-                # Try parsing the content as JSON
-                json_content = json.loads(response.text)
-                return json.dumps(json_content, indent=2)
-            except json.JSONDecodeError:
-                try:
-                    # Try parsing the content as YAML
-                    yaml_content = yaml.safe_load(response.text)
-                    if isinstance(yaml_content, dict):
-                        return json.dumps(yaml_content, indent=2)
-                    else:
-                        raise Exception("Invalid YAML content")
-                except ParserError:
-                    raise Exception("Failed to parse content as JSON or YAML")
-
-        raise Exception("Failed to fetch Swagger content")
-
-    try:
-        with open(shared_folder + swagger_url, "r") as file:
-            content = file.read()
-            try:
-                # Try parsing the content as JSON
-                json_content = json.loads(content)
-                return json.dumps(json_content, indent=2)
-            except json.JSONDecodeError:
-                try:
-                    # Try parsing the content as YAML
-                    yaml_content = yaml.safe_load(content)
-                    if isinstance(yaml_content, dict):
-                        return json.dumps(yaml_content, indent=2)
-                    else:
-                        raise Exception("Invalid YAML content")
-                except ParserError:
-                    raise Exception("Failed to parse content as JSON or YAML")
-    except FileNotFoundError:
-        raise Exception("File not found")
 
 
 def handle_request(data: Dict[str, Any]) -> Any:
@@ -99,7 +59,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
         if not locals()[required_field]:
             raise Exception(error_msg)
 
-    swagger_doc = mongo.swagger_files.find_one(
+    swagger_doc: Dict[str, Any] = mongo.swagger_files.find_one(
         {"meta.swagger_url": swagger_url}, {"meta": 0, "_id": 0}
     ) or json.loads(fetch_swagger_text(swagger_url))
 
@@ -114,9 +74,26 @@ def handle_request(data: Dict[str, Any]) -> Any:
                 "[OpenCopilot] Apparently, the user request require calling more than single API endpoint "
                 "to get the job done"
             )
+
+            # check workflow in mongodb, if present use that, else ask planner to create a workflow based on summaries
+            # then call run_workflow on that
+            (document, score) = check_workflow_in_store(text, swagger_url)
+
+            _workflow = None
+            if document:
+                _workflow = mongo.workflows.find_one(
+                    {"_id": ObjectId(document.metadata["workflow_id"])}
+                )
+            else:
+                _workflow = create_workflow_from_operation_ids(
+                    bot_response.ids, SWAGGER_SPEC=swagger_doc
+                )
             return run_workflow(
-                WorkflowData(text, headers, server_base_url, swagger_url), swagger_doc
+                _workflow,
+                swagger_doc,
+                WorkflowData(text, headers, server_base_url, swagger_url),
             )
+
         elif len(bot_response.ids) == 0:
             logging.info("[OpenCopilot] The user request doesnot require an api call")
             return {"response": bot_response.bot_message}
@@ -125,9 +102,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
             logging.info(
                 "[OpenCopilot] The user request can be handled in single API call"
             )
-            raise "Falling back to planner"
-        # else:
-        #     return {"": k}
+
     except Exception as e:
         logging.info(
             "[OpenCopilot] Something went wrong when try to get how many calls is required"
@@ -145,9 +120,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
         )
         json_output = try_to_match_and_call_api_endpoint(swagger_spec, text, headers)
 
-        formatted_response = json.dumps(
-            json_output, indent=4
-        )  # Indent the JSON with 4 spaces
+        formatted_response = json.dumps(json_output, indent=4)
         logging.info(
             "[OpenCopilot] We were able to match and call the API endpoint, the response was: {}".format(
                 formatted_response

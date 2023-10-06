@@ -11,7 +11,7 @@ from routes.workflow.extractors.extract_json import extract_json_payload
 import os
 from dotenv import load_dotenv
 import logging
-
+from prance import ResolvingParser
 logging.basicConfig(level=logging.DEBUG)
 
 load_dotenv()
@@ -30,29 +30,42 @@ class BotMessage:
         return cls(cast(List[str], data["ids"]), cast(str, data["bot_message"]))
 
 
-def getSummaries(swagger_doc: Any):
-    """Get API endpoint summaries from an OpenAPI spec."""
-
-    summaries: List[str] = []
-
-    # Get the paths and iterate over them
-    paths: Optional[Dict[str, Any]] = swagger_doc.get("paths")
-    if not paths:
-        raise ValueError("OpenAPI spec missing 'paths'")
-
+def get_summaries(_swagger_doc: str) -> str:
+    swagger_doc = ResolvingParser(spec_string=_swagger_doc)
+    servers = ", ".join(
+        [s["url"] for s in swagger_doc.specification.get("servers", [])]
+    )
+    summaries_str = "servers:" + servers + "\n"
+    paths = swagger_doc.specification.get("paths")
     for path in paths:
-        operation = paths[path]
-        for field in operation:
-            if "summary" in operation[field]:
-                summaries.append(
-                    f"""{operation[field]["operationId"]} - {operation[field]["description"]}"""
-                )
-
-    return summaries
+        operations = paths[path]
+        for method in operations:
+            operation = operations[method]
+            try:
+                summary = f"- {operation['operationId']} - {operation['summary']}\n"
+                if "requestBody" in operation:
+                    content_types = operation["requestBody"]["content"]
+                    if "application/json" in content_types:
+                        schema = content_types["application/json"]["schema"]
+                        if "properties" in schema:
+                            params = schema["properties"].keys()
+                        elif "items" in schema:
+                            params = schema["items"]["properties"].keys()
+                    elif "application/octet-stream" in content_types:
+                        params = ["binary data"]
+                    summary += f"  - Body Parameters: {', '.join(params)}\n"
+                summary += f"  - Method: {method}\n"
+                if "parameters" in operation:
+                    params = [p["name"] for p in operation["parameters"]]
+                    summary += f"  - Parameters: {', '.join(params)}\n"
+                summaries_str += summary + "\n"
+            except:
+                pass
+    return summaries_str
 
 
 def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> BotMessage:
-    summaries = getSummaries(swagger_doc)
+    summaries = get_summaries(swagger_doc)
 
     chat = ChatOpenAI(
         openai_api_key=os.getenv("OPENAI_API_KEY"),
