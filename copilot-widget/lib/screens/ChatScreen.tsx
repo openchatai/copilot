@@ -28,7 +28,7 @@ function ChatScreen() {
   }, [messages, setPos]);
 
   return (
-    <div className="opencopilot-w-full opencopilot-flex opencopilot-h-full opencopilot-flex-col opencopilot-items-start">
+    <div className="opencopilot-w-full opencopilot-flex opencopilot-h-full opencopilot-flex-col opencopilot-items-start opencopilot-relative">
       <ChatHeader />
       <main
         ref={scrollElementRef}
