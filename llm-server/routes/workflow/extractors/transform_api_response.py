@@ -1,7 +1,5 @@
 import os, logging
 from langchain.chat_models import ChatOpenAI
-from custom_types.t_json import JsonData
-from typing import Optional
 from dotenv import load_dotenv
 from langchain.schema import HumanMessage, SystemMessage
 from typing import Any
@@ -12,9 +10,7 @@ load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
 
-def transform_api_response_from_schema(
-    server_url: str, api_response: str
-) -> Optional[JsonData]:
+def transform_api_response_from_schema(server_url: str, api_response: str) -> str:
     chat = ChatOpenAI(
         openai_api_key=os.getenv("OPENAI_API_KEY"),
         model="gpt-3.5-turbo-16k",
@@ -23,26 +19,19 @@ def transform_api_response_from_schema(
 
     messages = [
         SystemMessage(
-            content="You are an intelligent AI assistant that can identify important fields from a REST API response."
+            content="You are a bot capable of comprehending API responses."
         ),
         HumanMessage(
-            content="Here is the response from a REST API call: {} for endpoint: {}".format(
+            content="Here is the response from current REST API: {} for endpoint: {}".format(
                 api_response, server_url
             )
         ),
         HumanMessage(
-            content="Please examine the given API response and return only the fields that are important when making API calls. Ignore any unimportant fields. Structure your response as a JSON object with self-descriptive keys mapped to the corresponding values from the API response."
+            content="Analyze the provided API responses and extract only the essential fields required for subsequent API interactions. Disregard any non-essential attributes such as CSS or color-related data. If there are generic fields like 'id,' provide them with more descriptive names in your response. Format your response as a JSON object with clear and meaningful keys that map to their respective values from the API response."
         ),
     ]
 
     result = chat(messages)
-    logging.info("[OpenCopilot] LLM Body Response: {}".format(result.content))
+    logging.info("[OpenCopilot] Transformed Response: {}".format(result.content))
 
-    d = extract_json_payload(result.content)
-    logging.info(
-        "[OpenCopilot] Parsed the json payload: {}, context: {}".format(
-            d, "gen_body_from_schema"
-        )
-    )
-
-    return d
+    return result.content

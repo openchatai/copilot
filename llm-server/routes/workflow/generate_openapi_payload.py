@@ -1,9 +1,6 @@
 import re
 import os
 import json
-from routes.workflow.extractors.transform_api_response import (
-    transform_api_response_from_schema,
-)
 from utils.get_llm import get_llm
 from dotenv import load_dotenv
 from .extractors.example_generator import gen_ex_from_schema
@@ -113,13 +110,7 @@ def generate_openapi_payload(
         api_info.body_schema = gen_body_from_schema(
             json.dumps(api_info.body_schema), text, prev_api_response, example
         )
-        # when you come back, clear the trello board and
-        # extract api info and set it up for next call
-        transformed_response = transform_api_response_from_schema(
-            api_info.endpoint or "", api_info.body_schema
-        )
 
-        prev_api_response = prev_api_response + json.loads(transformed_response)
     else:
         api_info.body_schema = {}
 

@@ -4,6 +4,9 @@ from utils.make_api_call import make_api_request
 import traceback
 import logging
 from typing import Any
+from routes.workflow.extractors.transform_api_response import (
+    transform_api_response_from_schema,
+)
 
 
 def run_openapi_operations(
@@ -13,10 +16,9 @@ def run_openapi_operations(
     headers: Any,
     server_base_url: str,
 ) -> str:
+    prev_api_response = ""
     record_info = {"Workflow Name": record.get("name")}
     for flow in record.get("flows", []):
-        prev_api_response = ""
-
         for step in flow.get("steps"):
             try:
                 operation_id = step.get("open_api_operation_id")
@@ -25,8 +27,13 @@ def run_openapi_operations(
                 )
 
                 api_response = make_api_request(headers=headers, **api_payload.__dict__)
+
+                transformed_response = transform_api_response_from_schema(
+                    api_payload.endpoint or "", api_response.text
+                )
+
+                prev_api_response = prev_api_response + transformed_response
                 record_info[operation_id] = json.loads(api_response.text)
-                prev_api_response = api_response.text
 
             except Exception as e:
                 logging.error("Error making API call", exc_info=True)
@@ -36,8 +43,8 @@ def run_openapi_operations(
                     "error": str(e),
                     "traceback": traceback.format_exc(),
                 }
-
                 record_info[operation_id] = error_info
 
-        prev_api_response = ""
+                # At this point we will retry the operation with hierarchical planner
+                raise e
     return json.dumps(record_info)

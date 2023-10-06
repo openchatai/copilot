@@ -28,7 +28,7 @@ def gen_params_from_schema(
         HumanMessage(content="User input: {}".format(text)),
         HumanMessage(content="prev api responses: {}".format(prev_resp)),
         HumanMessage(
-            content="Given the provided information, generate the appropriate JSON payload to use as parameters for the API request"
+            content="Based on the information provided,  construct a valid parameter object to be used with python requests library. In cases where user input doesnot contain information for a query, DO NOT add that specific query parameter to the output. "
         ),
     ]
     result = chat(messages)

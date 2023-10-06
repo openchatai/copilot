@@ -11,7 +11,7 @@ PLAN_AND_EXECUTE_MODEL = os.getenv("PLAN_AND_EXECUTE_MODEL", "gpt-4")
 
 
 def create_and_run_openapi_agent(
-        swagger_json: Any, user_query: str, headers: Dict[str, str] = {}
+    swagger_json: Any, user_query: str, headers: Dict[str, str] = {}
 ) -> Any:
     # Load OpenAPI spec
     # raw_spec = json.loads(swagger_json)
