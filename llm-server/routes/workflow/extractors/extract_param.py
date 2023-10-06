@@ -22,13 +22,13 @@ def gen_params_from_schema(
 
     messages = [
         SystemMessage(
-            content="You are an intelligent machine learning model that can produce REST API's params / query params in json format, given the json schema, user input, data from previous api calls."
+            content="You are an intelligent machine learning model that can produce REST API's params / query params in json format, given the json schema, user input, data from previous api calls. Respond with json nothing else."
         ),
-        HumanMessage(content="Json Schema: {}".format(param_schema)),
-        HumanMessage(content="User input: {}".format(text)),
-        HumanMessage(content="prev api responses: {}".format(prev_resp)),
+        HumanMessage(content="Json Schema: {}.".format(param_schema)),
+        HumanMessage(content="prev api responses: {}.".format(prev_resp)),
+        HumanMessage(content="User's requirement: {}.".format(text)),
         HumanMessage(
-            content="Based on the information provided,  construct a valid parameter object to be used with python requests library. In cases where user input doesnot contain information for a query, DO NOT add that specific query parameter to the output. "
+            content="Based on the information provided,  construct a valid parameter object to be used with python requests library. In cases where user input doesnot contain information for a query, DO NOT add that specific query parameter to the output. If a user doesn't provide a required parameter, generate a relevant one based on their input."
         ),
     ]
     result = chat(messages)
