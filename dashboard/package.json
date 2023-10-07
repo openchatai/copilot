@@ -8,7 +8,8 @@
     "dev:fresh": "rm -rf .next/ && next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "clean": "rm -rf ./.next"
   },
   "dependencies": {
     "@formiz/core": "^1.8.1",

@@ -10,6 +10,8 @@ import {
 import "@openchatai/copilot-flows-editor/dist/style.css";
 import { Button } from "@/ui/components/Button";
 import { useBotData } from "@/ui/providers/BotDataProvider";
+import useSWR from "swr";
+import { getWorkflowById } from "api/flows";
 const data = transformaEndpointToNode([
   {
     path: "/",
@@ -44,7 +46,19 @@ function Header() {
   );
 }
 
-export default function FlowsPage() {
+export default function FlowsPage({
+  params,
+}: {
+  params: {
+    bot_id: string;
+    workflow_id: string;
+  };
+}) {
+  const { data: $data } = useSWR(
+    params.bot_id + "/" + params.workflow_id,
+    async () => await getWorkflowById(params.workflow_id)
+  );
+  console.log("data", $data?.data);
   return (
     <>
       <style jsx global>{`

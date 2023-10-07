@@ -11,18 +11,23 @@ import { Input } from "@/ui/components/inputs/BaseInput";
 import { CardWrapper } from "@/ui/components/wrappers/CardWrapper";
 import EmptyState from "@/ui/partials/EmptyState";
 import { Link } from "@/ui/router-events";
+import { getWorkflowsByBotId } from "api/flows";
 import React from "react";
 import { BiPencil, BiSearch, BiTrash } from "react-icons/bi";
 import { BsChevronLeft, BsChevronRight, BsExclamation } from "react-icons/bs";
 import { LuWorkflow } from "react-icons/lu";
 
-export default function Workflows({
+export default async function Workflows({
   params: { bot_id },
+  searchParams,
 }: {
   params: {
     bot_id: string;
   };
+  searchParams: { [key: string]: string | string[] | undefined };
 }) {
+  const { page } = searchParams;
+  const workflows = await getWorkflowsByBotId(bot_id);
   return (
     <div className="flex items-start flex-col max-w-screen-xl mx-auto w-full h-full overflow-hidden">
       <div className="w-full">
@@ -61,7 +66,7 @@ export default function Workflows({
           description="Create a workflow to get started."
         />
         <div className="w-full space-y-2 overflow-auto">
-          {Array.from({ length: 10 }).map((_, i) => (
+          {workflows.data.workflows.map((_, i) => (
             <CardWrapper
               key={i}
               className="shadow-sm border select-none hover:border-indigo-500 group"
@@ -69,7 +74,7 @@ export default function Workflows({
               <div className="w-full flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <LuWorkflow className="text-2xl group-hover:text-indigo-500" />
-                  <h2 className="line-clamp-1">Add a pet</h2>
+                  <h2 className="line-clamp-1">{_.info.title}</h2>
                 </div>
                 <div className="actions flex items-center gap-2 ms-auto">
                   <Button
@@ -77,7 +82,7 @@ export default function Workflows({
                     className="shadow-none"
                     asChild
                   >
-                    <Link href={`/app/bot/${bot_id}/workflow/32498y394`}>
+                    <Link href={`/app/bot/${bot_id}/workflow/` + _._id}>
                       <BiPencil />
                     </Link>
                   </Button>
