@@ -80,12 +80,8 @@ def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> BotMessage:
     )
     messages = [
         SystemMessage(
-            content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. You only respond in json. If the user's input is a `question` and does not involve initiating any actions or require API calls, please respond appropriately in the `bot_message` section of the response while leaving the `ids` field empty ([]). If the user is asking you to perform a `CRUD` operation, provide the list of operation ids of api calls needed in the `ids` field of the json. `bot_message` should consist of a straightforward sentence, free from any special characters."
-        ),
-        customizer
-        and SystemMessage(
-            content="Here is a list of constraints which must be followed when generating the list of operation ids: {}".format(
-                customizer["constraints"]
+            content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. You only respond in json. If the user's input is a `question` and does not involve initiating any actions or require API calls, please respond appropriately in the `bot_message` section of the response while leaving the `ids` field empty ([]). If the user is asking you to perform a `CRUD` operation, provide the list of operation ids of api calls needed in the `ids` field of the json. `bot_message` should consist of a straightforward sentence, free from any special characters. You MUST also follow the following rules if defined: `{}`.".format(
+                customizer["constraints"] or ""
             )
         ),
         HumanMessage(
