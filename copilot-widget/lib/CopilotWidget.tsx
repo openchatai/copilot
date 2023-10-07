@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useWidgetStateContext } from "./contexts/WidgetState";
 import cn from "./utils/cn";
 import ChatScreenWithSfxs from "./screens/ChatScreen";
@@ -10,20 +10,22 @@ export function CopilotWidget({
   triggerSelector: string;
 }) {
   const [open, toggle] = useWidgetStateContext();
+
   useEffect(() => {
     if (IS_SERVER) return;
     const trigger = document.querySelector(triggerSelector);
+
     if (trigger) {
       trigger.addEventListener("click", toggle);
+
+      // Return cleanup function to remove event listener
       return () => trigger.removeEventListener("click", toggle);
     } else {
       console.warn(
-        "the trigger element can't be found,make sure it present in the DOM"
+        "The trigger element can't be found, make sure it is present in the DOM"
       );
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [triggerSelector]);
+  }, [triggerSelector, toggle]);
   return (
     <div
       className={cn(
