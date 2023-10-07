@@ -38,7 +38,15 @@ def get_swagger_files(swagger_url: str) -> Response:
     return jsonify(data)
 
 
-@_swagger.route("/b/<id>", methods=["POST"])
+@_swagger.route("/get/b/<bot_id>", methods=["GET"])
+def get_swagger_files_by_bot_id(bot_id: str) -> Response:
+    swagger_file = mongo.swagger_files.find_one({"meta.bot_id": bot_id})
+    swagger_file["_id"] = str(swagger_file["_id"])
+
+    return jsonify(swagger_file)
+
+
+@_swagger.route("/b/<id>", methods=["GET", "POST"])
 def add_swagger_file(id) -> Response:
     result = swagger_service.add_swagger_file(request, id)
     return jsonify(result)
