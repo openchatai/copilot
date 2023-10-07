@@ -7,6 +7,7 @@ from typing import Any
 from routes.workflow.extractors.transform_api_response import (
     transform_api_response_from_schema,
 )
+from routes.workflow.extractors.convert_json_to_text import convert_json_to_text
 
 
 def run_openapi_operations(
@@ -47,4 +48,4 @@ def run_openapi_operations(
 
                 # At this point we will retry the operation with hierarchical planner
                 raise e
-    return json.dumps(record_info)
+    return convert_json_to_text(text, prev_api_response)
