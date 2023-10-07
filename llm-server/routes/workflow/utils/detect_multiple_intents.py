@@ -2,6 +2,7 @@ import json
 import logging
 import re
 from typing import Any, Dict, Union, cast
+from typing import Any, Dict, Optional, Union, cast
 from typing import List
 
 
@@ -12,7 +13,7 @@ import os
 from dotenv import load_dotenv
 import logging
 from prance import ResolvingParser
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 load_dotenv()
 
