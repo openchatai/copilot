@@ -33,6 +33,8 @@ def gen_params_from_schema(
     ]
     result = chat(messages)
 
+    # @Todo: if the query params are not as per swagger short cicruit and reject it here, so that llm call doesnot fail later on.
+
     logging.info("[OpenCopilot] LLM Body Response: {}".format(result.content))
 
     d: Optional[JsonData] = extract_json_payload(result.content)

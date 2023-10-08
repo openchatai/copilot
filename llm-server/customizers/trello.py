@@ -13,7 +13,7 @@ def trello_migration() -> None:
         {
             "$set": {
                 "text": "You cannot create a card without a list",
-                "constraints": "1. createList must always follow createBoard operation, if list was not defined user made a mistake and you should add one on your own.",
+                "constraints": "createList must always follow createBoard operation because cards can only be added to lists.",
             }
         },
         upsert=True,

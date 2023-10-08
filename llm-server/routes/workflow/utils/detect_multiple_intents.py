@@ -78,16 +78,20 @@ def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> BotMessage:
         model="gpt-3.5-turbo-16k",
         temperature=0,
     )
+
+    system_message = "You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. You only respond in JSON."
+
+    if "constraints" in customizer and customizer["constraints"]:
+        system_message += " You should also adhere to the provided rules if they are defined. The user's prompts may sometimes be unclear or ambiguous. Following these steps will assist you in generating accurate API sequences: {}.".format(
+            customizer["constraints"]
+        )
+
     messages = [
-        SystemMessage(
-            content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. You only respond in json. If the user's input is a `question` and does not involve initiating any actions or require API calls, please respond appropriately in the `bot_message` section of the response while leaving the `ids` field empty ([]). If the user is asking you to perform a `CRUD` operation, provide the list of operation ids of api calls needed in the `ids` field of the json. `bot_message` should consist of a straightforward sentence, free from any special characters. You MUST also follow the following rules if defined: `{}`.".format(
-                customizer["constraints"] or ""
-            )
-        ),
+        SystemMessage(content=system_message),
         HumanMessage(
-            content="Here's a list of api summaries {}".format(summaries),
+            content="Here's a list of api summaries {}.".format(summaries),
         ),
-        HumanMessage(content="{}".format(user_requirement)),
+        HumanMessage(content="{}.".format(user_requirement)),
         HumanMessage(
             content="""Reply in the following json format ```{
                 "ids": [
