@@ -1,0 +1,22 @@
+{
+    "appId": "trello",
+    "appName": "Trello",
+    "description": "App description (Helps in alignining the bot)",
+    "headers": [],
+    "entities": {
+        "boards": {
+            "endpoint": "https://api.trello.com/me/boards",
+            "dataSource": "Get boards",
+            "parseFn": "parse_boards",
+            "transformFn": "transform_boards",
+            "data": []
+        }
+    },
+    "relationships": [
+        {
+            "from": "board",
+            "to": "lists",
+            "type": "has"
+        }
+    ]
+}
