@@ -1,14 +1,15 @@
 import json
-import pickle
-from pymongo import MongoClient
+import pickle, requests
 
-client = MongoClient()
-db = client.test_db
-integrations = db.integrations
+from utils.db import Database
+from bson import ObjectId, json_util
+
+db_instance = Database()
+mongo = db_instance.get_db()
 
 
-def process_state(state_id):
-    state = integrations.find_one({"_id": state_id})
+def process_state(state_id: str) -> None:
+    state = mongo.integrations.find_one({"_id": ObjectId(state_id)})
 
     for entity_name, entity in state["entities"].items():
         parse_fn = pickle.loads(entity["parseFn"])
@@ -22,6 +23,6 @@ def process_state(state_id):
 
         state["entities"][entity_name]["data"] = transformed_data
 
-    integrations.update_one({"_id": state_id}, {"$set": state})
-
-    return state
+    mongo.integrations.update_one(
+        {"_id": ObjectId(state_id)}, {"$set": transformed_data}, True
+    )
