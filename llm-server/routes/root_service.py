@@ -69,7 +69,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
             "of them"
         )
         bot_response = hasSingleIntent(swagger_doc, text)
-        if len(bot_response.ids) > 1:
+        if len(bot_response.ids) >= 1:
             logging.info(
                 "[OpenCopilot] Apparently, the user request require calling more than single API endpoint "
                 "to get the job done"
