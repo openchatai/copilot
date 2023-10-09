@@ -32,6 +32,6 @@ def run_workflow(
 
     output = {"response": result if not error else "", "error": error}
 
-    logging.info("[OpenCopilot] Workflow output %s", json.dumps(output))
+    logging.info("[OpenCopilot] Workflow output %s", json.dumps(output, separators=(',', ':')))
 
     return output

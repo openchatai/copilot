@@ -33,17 +33,17 @@ def make_api_request(
     headers,
     servers,
 ) -> Response:
-    endpoint = replace_url_placeholders(endpoint, path_params)
-    url = servers[0] + endpoint
-    # Create a session and configure it with headers
-    session = requests.Session()
-
-    # Add the "Content-Type" header with the value "application/json" to the headers
-    headers["Content-Type"] = "application/json"
-
-    if headers:
-        session.headers.update(headers)
     try:
+        endpoint = replace_url_placeholders(endpoint, path_params)
+        url = servers[0] + endpoint
+        # Create a session and configure it with headers
+        session = requests.Session()
+
+        # Add the "Content-Type" header with the value "application/json" to the headers
+        headers["Content-Type"] = "application/json"
+
+        if headers:
+            session.headers.update(headers)
         # Perform the HTTP request based on the request type
         if method == "GET":
             response = session.get(url, params=query_params)

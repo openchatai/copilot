@@ -94,21 +94,21 @@ def generate_openapi_payload(
         {}
         if not api_info.path_params["properties"]
         else gen_params_from_schema(
-            json.dumps(api_info.path_params), text, prev_api_response
+            json.dumps(api_info.path_params, separators=(',', ':')), text, prev_api_response
         )
     )
     api_info.query_params = (
         {}
         if not api_info.query_params["properties"]
         else gen_params_from_schema(
-            json.dumps(api_info.query_params), text, prev_api_response
+            json.dumps(api_info.query_params, separators=(',', ':')), text, prev_api_response
         )
     )
 
     if api_info.body_schema:
         example = gen_ex_from_schema(api_info.body_schema)
         api_info.body_schema = gen_body_from_schema(
-            json.dumps(api_info.body_schema), text, prev_api_response, example
+            json.dumps(api_info.body_schema, separators=(',', ':')), text, prev_api_response, example
         )
 
     else:

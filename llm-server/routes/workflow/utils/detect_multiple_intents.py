@@ -76,7 +76,7 @@ def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> BotMessage:
     )
     messages = [
         SystemMessage(
-            content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. If the user is asking you to perform a `CRUD` operation, provide the list of operation ids of api calls needed in the `ids` field of the json. `bot_message` should consist of a straightforward sentence, free from any special characters. Your response MUST be a valid json"
+            content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. If the user is asking you to perform a `CRUD` operation, provide the list of operation ids of api calls needed in the `ids` field of the json. `bot_message` should consist of a straightforward sentence, free from any special characters. Your response MUST be a valid minified json"
         ),
         HumanMessage(
             content="Here's a list of api summaries {}.".format(summaries),
