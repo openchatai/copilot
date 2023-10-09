@@ -1,0 +1,1104 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "AOE Public Data API",
+        "description": "\nThis is an api that allows you to get the current information the AOE has about Local Education Agencies(LEA)'s like Supervisory unions, schools and their contact information.\n\nAll data contained is public information that can be released.\n\n## Notes\n- This information is subject to change, the information is only as accurate as what we are told.\n- Most functions have the ability to export as a csv instead of json\n- the main organizations endpoint contains all organizations we have on file, you can then filter by `OrgType` attribute/column to get the specific organization grouping you are looking for.\n",
+        "contact": {
+            "name": "Agency of Education Data Division",
+            "email": "AOE.SLDSSupportGroup@vermont.gov"
+        },
+        "version": "0.1.0"
+    },
+    "servers": [
+        {
+          "url": "https://datacollection.education.vermont.gov"
+        }
+    ],
+    "paths": {
+        "/api/lists/businessManagers": {
+            "get": {
+                "tags": [
+                    "contacts"
+                ],
+                "summary": "Get Current Business Managers",
+                "operationId": "get_current_business_managers_api_lists_businessManagers_get",
+                "parameters": [
+                    {
+                        "name": "csv",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "description": "If set to true, results will be returned as a csv file",
+                            "default": false,
+                            "title": "Csv"
+                        },
+                        "description": "If set to true, results will be returned as a csv file"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Contact"
+                                    },
+                                    "title": "Response Get Current Business Managers Api Lists Businessmanagers Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/lists/dataManagers": {
+            "get": {
+                "tags": [
+                    "contacts"
+                ],
+                "summary": "Get Current Data Mangers",
+                "operationId": "get_current_data_mangers_api_lists_dataManagers_get",
+                "parameters": [
+                    {
+                        "name": "csv",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "description": "If set to true, results will be returned as a csv file",
+                            "default": false,
+                            "title": "Csv"
+                        },
+                        "description": "If set to true, results will be returned as a csv file"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Contact"
+                                    },
+                                    "title": "Response Get Current Data Mangers Api Lists Datamanagers Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/lists/principals": {
+            "get": {
+                "tags": [
+                    "contacts"
+                ],
+                "summary": "Get Current Principals",
+                "operationId": "get_current_principals_api_lists_principals_get",
+                "parameters": [
+                    {
+                        "name": "csv",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "description": "If set to true, results will be returned as a csv file",
+                            "default": false,
+                            "title": "Csv"
+                        },
+                        "description": "If set to true, results will be returned as a csv file"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Contact"
+                                    },
+                                    "title": "Response Get Current Principals Api Lists Principals Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/lists/testAdministrators": {
+            "get": {
+                "tags": [
+                    "contacts"
+                ],
+                "summary": "Get Current Test Administrators",
+                "operationId": "get_current_test_administrators_api_lists_testAdministrators_get",
+                "parameters": [
+                    {
+                        "name": "csv",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "description": "If set to true, results will be returned as a csv file",
+                            "default": false,
+                            "title": "Csv"
+                        },
+                        "description": "If set to true, results will be returned as a csv file"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Contact"
+                                    },
+                                    "title": "Response Get Current Test Administrators Api Lists Testadministrators Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/lists/testAlternateAdministrators": {
+            "get": {
+                "tags": [
+                    "contacts"
+                ],
+                "summary": "Get Current Test Alternate Administrators",
+                "operationId": "get_current_test_Alternate_Administrators_api_lists_testAlternateAdministrators_get",
+                "parameters": [
+                    {
+                        "name": "csv",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "description": "If set to true, results will be returned as a csv file",
+                            "default": false,
+                            "title": "Csv"
+                        },
+                        "description": "If set to true, results will be returned as a csv file"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Contact"
+                                    },
+                                    "title": "Response Get Current Test Alternate Administrators Api Lists Testalternateadministrators Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/lists/superintendents": {
+            "get": {
+                "tags": [
+                    "contacts"
+                ],
+                "summary": "Get Current Superintendents",
+                "operationId": "get_current_superintendents_api_lists_superintendents_get",
+                "parameters": [
+                    {
+                        "name": "csv",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "description": "If set to true, results will be returned as a csv file",
+                            "default": false,
+                            "title": "Csv"
+                        },
+                        "description": "If set to true, results will be returned as a csv file"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Contact"
+                                    },
+                                    "title": "Response Get Current Superintendents Api Lists Superintendents Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/lists/organizations": {
+            "get": {
+                "tags": [
+                    "organizations"
+                ],
+                "summary": "Get Current Orgs",
+                "operationId": "get_current_orgs_api_lists_organizations_get",
+                "parameters": [
+                    {
+                        "name": "csv",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "description": "If set to true, results will be returned as a csv file",
+                            "default": false,
+                            "title": "Csv"
+                        },
+                        "description": "If set to true, results will be returned as a csv file"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/OrganizationWithType"
+                                    },
+                                    "title": "Response Get Current Orgs Api Lists Organizations Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/lists/closed_organizations": {
+            "get": {
+                "tags": [
+                    "organizations"
+                ],
+                "summary": "Get Current Closed Orgs",
+                "operationId": "get_current_closed_orgs_api_lists_closed_organizations_get",
+                "parameters": [
+                    {
+                        "name": "csv",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "description": "If set to true, results will be returned as a csv file",
+                            "default": false,
+                            "title": "Csv"
+                        },
+                        "description": "If set to true, results will be returned as a csv file"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/OrganizationWithType"
+                                    },
+                                    "title": "Response Get Current Closed Orgs Api Lists Closed Organizations Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/lists/supervisoryUnions": {
+            "get": {
+                "tags": [
+                    "organizations"
+                ],
+                "summary": "Get Current Supervisory Unions",
+                "operationId": "get_current_supervisory_Unions_api_lists_supervisoryUnions_get",
+                "parameters": [
+                    {
+                        "name": "csv",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "description": "If set to true, results will be returned as a csv file",
+                            "default": false,
+                            "title": "Csv"
+                        },
+                        "description": "If set to true, results will be returned as a csv file"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Organization"
+                                    },
+                                    "title": "Response Get Current Supervisory Unions Api Lists Supervisoryunions Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/lists/towns": {
+            "get": {
+                "tags": [
+                    "organizations"
+                ],
+                "summary": "Get Current Towns",
+                "operationId": "get_current_towns_api_lists_towns_get",
+                "parameters": [
+                    {
+                        "name": "csv",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "description": "If set to true, results will be returned as a csv file",
+                            "default": false,
+                            "title": "Csv"
+                        },
+                        "description": "If set to true, results will be returned as a csv file"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Town"
+                                    },
+                                    "title": "Response Get Current Towns Api Lists Towns Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/lists/leaContacts": {
+            "get": {
+                "tags": [
+                    "contacts"
+                ],
+                "summary": "Get Current Lea Contacts",
+                "operationId": "get_current_lea_contacts_api_lists_leaContacts_get",
+                "parameters": [
+                    {
+                        "name": "OrgID",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Orgid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/forms/student_match_file_upload": {
+            "post": {
+                "tags": [
+                    "matching"
+                ],
+                "summary": "Securely Upload Student Match File To Aoe For Processing",
+                "operationId": "securely_upload_student_match_file_to_aoe_for_processing_api_forms_student_match_file_upload_post",
+                "parameters": [
+                    {
+                        "name": "X-Forwarded-For",
+                        "in": "header",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-Forwarded-For"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Body_securely_upload_student_match_file_to_aoe_for_processing_api_forms_student_match_file_upload_post"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StudentMatchResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Body_securely_upload_student_match_file_to_aoe_for_processing_api_forms_student_match_file_upload_post": {
+                "properties": {
+                    "file": {
+                        "type": "string",
+                        "format": "binary",
+                        "title": "File"
+                    },
+                    "contact_first_name": {
+                        "type": "string",
+                        "title": "Contact First Name"
+                    },
+                    "contact_last_name": {
+                        "type": "string",
+                        "title": "Contact Last Name"
+                    },
+                    "contact_email": {
+                        "type": "string",
+                        "format": "email",
+                        "title": "Contact Email"
+                    },
+                    "contact_phone": {
+                        "type": "string",
+                        "title": "Contact Phone"
+                    },
+                    "message": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Any extra information that might be helpful"
+                    },
+                    "show_full_matches": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "boolean"
+                            }
+                        ],
+                        "title": "Show Full Matches",
+                        "default": false
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "file",
+                    "contact_first_name",
+                    "contact_last_name",
+                    "contact_email",
+                    "contact_phone"
+                ],
+                "title": "Body_securely_upload_student_match_file_to_aoe_for_processing_api_forms_student_match_file_upload_post"
+            },
+            "Contact": {
+                "properties": {
+                    "ServerId": {
+                        "type": "integer",
+                        "title": "The unique server assigned ID for this contact instance"
+                    },
+                    "OrgName": {
+                        "type": "string",
+                        "title": "The name of the organization this contact relates to"
+                    },
+                    "OrgID": {
+                        "type": "string",
+                        "title": "The VT assigned ID of the organization this contact relates to"
+                    },
+                    "FirstName": {
+                        "type": "string",
+                        "title": "The first name of this contact"
+                    },
+                    "LastName": {
+                        "type": "string",
+                        "title": "The last name of this contact"
+                    },
+                    "Email": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "The email of the contact if available"
+                    },
+                    "Phone": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "The phone number of the contact if available"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "ServerId",
+                    "OrgName",
+                    "OrgID",
+                    "FirstName",
+                    "LastName"
+                ],
+                "title": "Contact"
+            },
+            "HTTPValidationError": {
+                "properties": {
+                    "detail": {
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        },
+                        "type": "array",
+                        "title": "Detail"
+                    }
+                },
+                "type": "object",
+                "title": "HTTPValidationError"
+            },
+            "Organization": {
+                "properties": {
+                    "ServerId": {
+                        "type": "integer",
+                        "title": "The unique server assigned ID for this contact instance"
+                    },
+                    "Name": {
+                        "type": "string",
+                        "title": "The name of the organization this contact relates to"
+                    },
+                    "OrgID": {
+                        "type": "string",
+                        "title": "The VT assigned ID of the organization this contact relates to"
+                    },
+                    "OperatedBy": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "The VT assigned ID of the organization that governs this organization, usually connects schools to SU"
+                    },
+                    "Grades": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "A list of grades the school serves or reports on"
+                    },
+                    "Latitude": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Coordinates to locate the physical location of the organization"
+                    },
+                    "Longitude": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Coordinates to locate the physical location of the organization"
+                    },
+                    "MailingAddress": {
+                        "type": "string",
+                        "title": "Mailling address of organization if available"
+                    },
+                    "MailingCity": {
+                        "type": "string",
+                        "title": "Mailling address of organization if available"
+                    },
+                    "MailingZip": {
+                        "type": "string",
+                        "title": "Mailling address of organization if available"
+                    },
+                    "MailingState": {
+                        "type": "string",
+                        "title": "Mailling address of organization if available"
+                    },
+                    "Website": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "The website of the organization if available"
+                    },
+                    "Phone": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "The phone number of the contact if available"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "ServerId",
+                    "Name",
+                    "OrgID"
+                ],
+                "title": "Organization"
+            },
+            "OrganizationWithType": {
+                "properties": {
+                    "ServerId": {
+                        "type": "integer",
+                        "title": "The unique server assigned ID for this contact instance"
+                    },
+                    "Name": {
+                        "type": "string",
+                        "title": "The name of the organization this contact relates to"
+                    },
+                    "OrgID": {
+                        "type": "string",
+                        "title": "The VT assigned ID of the organization this contact relates to"
+                    },
+                    "OperatedBy": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "The VT assigned ID of the organization that governs this organization, usually connects schools to SU"
+                    },
+                    "Grades": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "A list of grades the school serves or reports on"
+                    },
+                    "Latitude": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Coordinates to locate the physical location of the organization"
+                    },
+                    "Longitude": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Coordinates to locate the physical location of the organization"
+                    },
+                    "MailingAddress": {
+                        "type": "string",
+                        "title": "Mailling address of organization if available"
+                    },
+                    "MailingCity": {
+                        "type": "string",
+                        "title": "Mailling address of organization if available"
+                    },
+                    "MailingZip": {
+                        "type": "string",
+                        "title": "Mailling address of organization if available"
+                    },
+                    "MailingState": {
+                        "type": "string",
+                        "title": "Mailling address of organization if available"
+                    },
+                    "Website": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "The website of the organization if available"
+                    },
+                    "Phone": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "The phone number of the contact if available"
+                    },
+                    "OrgType": {
+                        "type": "string",
+                        "title": "The Type of organization this is, use this to filter on to get subsets of organizations"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "ServerId",
+                    "Name",
+                    "OrgID",
+                    "OrgType"
+                ],
+                "title": "OrganizationWithType"
+            },
+            "SecureStudentMatch": {
+                "properties": {
+                    "contact_first_name": {
+                        "type": "string",
+                        "title": "Contact First Name"
+                    },
+                    "contact_last_name": {
+                        "type": "string",
+                        "title": "Contact Last Name"
+                    },
+                    "contact_email": {
+                        "type": "string",
+                        "format": "email",
+                        "title": "Contact Email"
+                    },
+                    "contact_phone": {
+                        "type": "string",
+                        "title": "Contact Phone"
+                    },
+                    "message": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Any extra information that might be helpful"
+                    },
+                    "show_full_matches": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "boolean"
+                            }
+                        ],
+                        "title": "Show Full Matches",
+                        "default": false
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "contact_first_name",
+                    "contact_last_name",
+                    "contact_email",
+                    "contact_phone"
+                ],
+                "title": "SecureStudentMatch"
+            },
+            "StudentMatchResponse": {
+                "properties": {
+                    "form": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/SecureStudentMatch"
+                            }
+                        ],
+                        "title": "Contact information you uploaded returned back for confirmation"
+                    },
+                    "title": {
+                        "type": "string",
+                        "title": "The title of the message describing the results of the operation"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "title": "The body  of the message describing the results of the operation, as an id to use as reference for the future."
+                    },
+                    "id": {
+                        "type": "integer",
+                        "title": "Integer ID used to reference this submission if needed."
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "form",
+                    "title",
+                    "msg",
+                    "id"
+                ],
+                "title": "StudentMatchResponse"
+            },
+            "Town": {
+                "properties": {
+                    "ServerId": {
+                        "type": "integer",
+                        "title": "The unique server assigned ID for this contact instance"
+                    },
+                    "Name": {
+                        "type": "string",
+                        "title": "The name of the organization this contact relates to"
+                    },
+                    "OrgId": {
+                        "type": "string",
+                        "title": "The VT assigned ID of the organization this contact relates to"
+                    },
+                    "OrgType": {
+                        "type": "string",
+                        "title": "The Type of organization this is, use this to filter on to get subsets of organizations"
+                    },
+                    "ParentOrg": {
+                        "type": "string",
+                        "title": "The VT assigned ID of the organization that governs this organization, usually connects schools to Union School District"
+                    },
+                    "OperatedBy": {
+                        "type": "string",
+                        "title": "The VT assigned ID of the organization that governs this organization, usually connects schools to SU"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "ServerId",
+                    "Name",
+                    "OrgType"
+                ],
+                "title": "Town"
+            },
+            "ValidationError": {
+                "properties": {
+                    "loc": {
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        },
+                        "type": "array",
+                        "title": "Location"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Error Type"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "title": "ValidationError"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "contacts",
+            "description": "Operations with contacts/people."
+        },
+        {
+            "name": "organizations",
+            "description": "Operations with Organizations like schools and local education agencies(LEA)."
+        },
+        {
+            "name": "matching",
+            "description": "Operations with matching people to their permanant numbers."
+        }
+    ]
+}

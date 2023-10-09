@@ -13,6 +13,7 @@ import os
 from dotenv import load_dotenv
 import logging
 from prance import ResolvingParser
+
 logging.basicConfig(level=logging.INFO)
 
 load_dotenv()
@@ -75,10 +76,10 @@ def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> BotMessage:
     )
     messages = [
         SystemMessage(
-            content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. It is essential that you consistently provide a valid JSON payload (use double quotes) in your responses. If the user's input is a `question` and does not involve initiating any actions or require API calls, please respond appropriately in the `bot_message` section of the response while leaving the `ids` field empty ([]). If the user is asking you to perform a `CRUD` operation, provide the list of operation ids of api calls needed in the `ids` field of the json. `bot_message` should consist of a straightforward sentence, free from any special characters."
+            content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. If the user is asking you to perform a `CRUD` operation, provide the list of operation ids of api calls needed in the `ids` field of the json. `bot_message` should consist of a straightforward sentence, free from any special characters. Your response MUST be a valid json"
         ),
         HumanMessage(
-            content="Here's a list of api summaries {}".format(summaries),
+            content="Here's a list of api summaries {}.".format(summaries),
         ),
         HumanMessage(content="{}".format(user_requirement)),
         HumanMessage(
@@ -91,6 +92,9 @@ def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> BotMessage:
                 ],
                 "bot_message": "Bot response here" 
             }```"""
+        ),
+        HumanMessage(
+            content="If the user's question can be answered directly without making API calls, please respond appropriately in the `bot_message` section of the response and leaving the `ids` field empty ([])."
         ),
     ]
 
