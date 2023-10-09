@@ -16,13 +16,13 @@ def fetch_swagger_text(swagger_url: str) -> str:
             try:
                 # Try parsing the content as JSON
                 json_content = json.loads(response.text)
-                return json.dumps(json_content, indent=2)
+                return json.dumps(json_content, separators=(',', ':'))
             except json.JSONDecodeError:
                 try:
                     # Try parsing the content as YAML
                     yaml_content = yaml.safe_load(response.text)
                     if isinstance(yaml_content, dict):
-                        return json.dumps(yaml_content, indent=2)
+                        return json.dumps(yaml_content, separators=(',', ':'))
                     else:
                         raise Exception("Invalid YAML content")
                 except ParserError:
@@ -36,13 +36,13 @@ def fetch_swagger_text(swagger_url: str) -> str:
             try:
                 # Try parsing the content as JSON
                 json_content = json.loads(content)
-                return json.dumps(json_content, indent=2)
+                return json.dumps(json_content, separators=(',', ':'))
             except json.JSONDecodeError:
                 try:
                     # Try parsing the content as YAML
                     yaml_content = yaml.safe_load(content)
                     if isinstance(yaml_content, dict):
-                        return json.dumps(yaml_content, indent=2)
+                        return json.dumps(yaml_content, separators=(',', ':'))
                     else:
                         raise Exception("Invalid YAML content")
                 except ParserError:
