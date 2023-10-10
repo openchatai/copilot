@@ -26,6 +26,7 @@ from typing import Dict, Any, cast
 from utils.db import Database
 import json
 from api_caller.base import try_to_match_and_call_api_endpoint
+from models.repository.chat_history_repo import create_chat_history
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -45,12 +46,13 @@ FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
 def handle_request(data: Dict[str, Any]) -> Any:
     text: str = cast(str, data.get("text"))
     swagger_url = cast(str, data.get("swagger_url", ""))
+    session_id = cast(str, data.get("session_id", ""))
     base_prompt = data.get("base_prompt", "")
     headers = data.get("headers", {})
     server_base_url = cast(str, data.get("server_base_url", ""))
 
     logging.info("[OpenCopilot] Got the following user request: {}".format(text))
-    
+    create_chat_history(swagger_url, session_id, True, text)
     for required_field, error_msg in [
         ("base_prompt", BASE_PROMPT_REQUIRED),
         ("text", TEXT_REQUIRED),
@@ -88,14 +90,19 @@ def handle_request(data: Dict[str, Any]) -> Any:
                 _workflow = create_workflow_from_operation_ids(
                     bot_response.ids, SWAGGER_SPEC=swagger_doc
                 )
-            return run_workflow(
+            output = run_workflow(
                 _workflow,
                 swagger_doc,
                 WorkflowData(text, headers, server_base_url, swagger_url),
             )
 
+            create_chat_history(
+                swagger_url, session_id, True, output["response"] or output["error"]
+            )
+
         elif len(bot_response.ids) == 0:
             logging.info("[OpenCopilot] The user request doesnot require an api call")
+            create_chat_history(swagger_url, session_id, True, bot_response.bot_message)
             return {"response": bot_response.bot_message}
 
         else:

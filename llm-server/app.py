@@ -5,7 +5,6 @@ from routes.workflow.workflow_controller import workflow
 from routes._swagger.controller import _swagger
 from typing import Any, Tuple
 from utils.config import Config
-from flask_sqlalchemy import SQLAlchemy
 
 logging.basicConfig(level=logging.INFO)
 
@@ -17,7 +16,6 @@ app.register_blueprint(_swagger, url_prefix="/swagger_api")
 
 
 app.config.from_object(Config)
-db = SQLAlchemy(app)
 from routes.root_service import handle_request
 
 

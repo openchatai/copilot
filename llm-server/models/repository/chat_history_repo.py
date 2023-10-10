@@ -1,6 +1,6 @@
 from datetime import datetime
-from typing import Optional, cast
-from app import db
+from typing import Optional, cast, List
+from utils.__sql import sql_db
 from models.chat_history import ChatHistory
 
 
@@ -30,26 +30,51 @@ def create_chat_history(
         created_at=datetime.now(),
         updated_at=datetime.now(),
     )
-    db.session.add(chat_history)
-    db.session.commit()
+    sql_db.session.add(chat_history)
+    sql_db.session.commit()
     return chat_history
 
 
-def read_chat_history(chat_history_id: Optional[str] = None) -> List[ChatHistory]:
-    """Retrieves chat history records.
+from datetime import datetime
+from typing import Optional
+
+
+def get_all_chat_history_by_session_id(
+    session_id: str, limit: int = 10, offset: int = 0
+) -> List[ChatHistory]:
+    """Retrieves all chat history records for a given session ID.
 
     Args:
-      chat_history_id: The ID of the chat history record to retrieve. If None,
-        all chat history records will be retrieved.
+      session_id: The ID of the session to retrieve chat history for.
+      limit: The maximum number of chat history records to retrieve.
+      offset: The offset at which to start retrieving chat history records.
 
     Returns:
       A list of ChatHistory objects.
     """
 
-    if chat_history_id:
-        return ChatHistory.query.get(chat_history_id)
-    else:
-        return ChatHistory.query.all()
+    chats = (
+        ChatHistory.query.filter_by(session_id=session_id)
+        .limit(limit)
+        .offset(offset)
+        .all()
+    )
+    return cast(List[ChatHistory], chats)
+
+
+def get_all_chat_history(limit: int = 10, offset: int = 0) -> List[ChatHistory]:
+    """Retrieves all chat history records.
+
+    Args:
+      limit: The maximum number of chat history records to retrieve.
+      offset: The offset at which to start retrieving chat history records.
+
+    Returns:
+      A list of ChatHistory objects.
+    """
+
+    chats = ChatHistory.query.limit(limit).offset(offset).all()
+    return cast(List[ChatHistory], chats)
 
 
 def update_chat_history(
@@ -78,7 +103,7 @@ def update_chat_history(
     chat_history.from_user = from_user or chat_history.from_user
     chat_history.message = message or chat_history.message
     chat_history.updated_at = datetime.now()
-    db.session.commit()
+    sql_db.session.commit()
     return cast(ChatHistory, chat_history)
 
 
@@ -90,5 +115,5 @@ def delete_chat_history(chat_history_id: str) -> None:
     """
 
     chat_history = ChatHistory.query.get(chat_history_id)
-    db.session.delete(chat_history)
-    db.session.commit()
+    sql_db.session.delete(chat_history)
+    sql_db.session.commit()
