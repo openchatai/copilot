@@ -115,6 +115,9 @@ def generate_consolidated_requirement(user_input: str, session_id: str) -> str:
                 conversation_str, user_input
             ),
         ),
+        HumanMessage(
+            content="The consolidated query must contain any api data like id, tags, name etc"
+        ),
     ]
 
     return chat(messages).content
