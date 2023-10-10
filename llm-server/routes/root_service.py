@@ -50,7 +50,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
     server_base_url = cast(str, data.get("server_base_url", ""))
 
     logging.info("[OpenCopilot] Got the following user request: {}".format(text))
-
+    
     for required_field, error_msg in [
         ("base_prompt", BASE_PROMPT_REQUIRED),
         ("text", TEXT_REQUIRED),
