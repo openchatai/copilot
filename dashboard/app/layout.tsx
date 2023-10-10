@@ -1,48 +1,16 @@
-import Toaster from "@/ui/components/headless/toast/Toaster";
-import "styles/globals.css";
-import { Inter } from "next/font/google";
-import cn from "@/ui/utils/cn";
-import ThemeProvider from "@/ui/providers/ThemeProvider";
-import { SWRConfigProvider } from "@/ui/providers/SWRConfigProvider";
-import { RouterEventsProvider } from "@/ui/router-events";
-import { TopLoader } from "@/ui/partials/TopLoader";
-import { OnlineProvider } from "@/ui/providers/OnlineStateProvider";
+import { cn } from "@/lib/utils";
+import "./globals.css";
 import type { Metadata } from "next";
+import { Open_Sans } from "next/font/google";
+import { ComputerIcon } from "lucide-react";
 
-const inter = Inter({
+const opensans = Open_Sans({
   subsets: ["latin"],
-  fallback: ["system-ui", "Roboto", "sans-serif"],
-  display: "swap",
-  variable: "--font-inter",
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
-  title: "OpenCopilot - Build your own ChatGPT",
-  description:
-    "OpenCopilot - Build your own ChatGPT for yor website, PDF files, Notion and many more integrations for free, no coding required!",
-  viewport:
-    "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0",
-  keywords: [
-    "OpenCopilot",
-    "OpenCopilot-ai",
-    "Chat-GPT",
-    "Chat Widgets",
-    "customer support",
-    "AI-bots",
-    "ai-chatbots",
-  ],
-  robots: "index, follow",
-  authors: [
-    {
-      name: "OpenChatai",
-      url: "https://openchat.so",
-    },
-    {
-      name: "openchatai",
-      url: "https://github.com/openchatai",
-    },
-  ],
-  category: "Chatbots",
+  title: "Proof of concept for a design system",
 };
 
 export default function RootLayout({
@@ -51,25 +19,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <OnlineProvider>
-      <RouterEventsProvider>
-        <SWRConfigProvider>
-          <html lang="en" suppressHydrationWarning>
-            <body
-              className={cn(
-                inter.variable,
-                "font-inter antialiased bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 min-h-screen min-w-full"
-              )}
-            >
-              <ThemeProvider>
-                <TopLoader color="#6366f1" />
-                {children}
-              </ThemeProvider>
-              <Toaster />
-            </body>
-          </html>
-        </SWRConfigProvider>
-      </RouterEventsProvider>
-    </OnlineProvider>
+    <html lang="en">
+      <body
+        className={cn(
+          opensans.className,
+          "min-h-screen relative h-screen text-accent-foreground overflow-hidden w-screen bg-background [&>*]:h-full"
+        )}
+      >
+        {children}
+        {/* browser too small message */}
+        <div className="absolute flex items-center justify-center lg:hidden inset-0 z-[500] backdrop-blur bg-primary-foreground/70">
+          <div className="flex flex-col text-lg items-center justify-center">
+            <span>
+              <ComputerIcon className="h-20 w-20 text-primary" />
+            </span>
+            <h2 className="font-semibold">Your browser is too small</h2>
+            <p className="text-base font-medium">
+              Resize your browser to at least 900px wide to continue.
+            </p>
+          </div>
+        </div>
+      </body>
+    </html>
   );
 }
