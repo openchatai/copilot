@@ -18,7 +18,7 @@ function createAxiosInstance(apiUrl?: string, sessionId?: string) {
   instance.interceptors.request.use((config) => {
     config.data = {
       ...config.data,
-      sessionId,
+      session_id: sessionId,
     };
     return config;
   });
