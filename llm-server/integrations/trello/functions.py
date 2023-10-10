@@ -1,9 +1,10 @@
 from typing import Any
 
 
-def parse_boards(data: Any) -> Any:
-    pass
+def parseFn(data: Any) -> Any:
+    return data["boards"]
 
 
-def transform_boards(data: Any) -> Any:
-    pass
+# we can use fuzzy search to look for a value, but this is an optimization task that we can do later
+def transformFn(data: Any) -> Any:
+    return data

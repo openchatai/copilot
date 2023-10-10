@@ -13,6 +13,7 @@ import os
 from dotenv import load_dotenv
 import logging
 from prance import ResolvingParser
+from utils.process_app_state import process_state
 
 logging.basicConfig(level=logging.INFO)
 
@@ -66,7 +67,11 @@ def get_summaries(_swagger_doc: str) -> str:
     return summaries_str
 
 
-def hasSingleIntent(swagger_doc: Any, user_requirement: str) -> BotMessage:
+def hasSingleIntent(
+    swagger_doc: Any, user_requirement: str, headers: Any
+) -> BotMessage:
+    # This app state can be passed to one of the following stages
+    app_state = process_state("6524d467fba1c6f306fc3160", headers=headers)
     summaries = get_summaries(swagger_doc)
 
     chat = ChatOpenAI(

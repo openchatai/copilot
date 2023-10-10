@@ -1,21 +1,22 @@
 import json
-import pickle, requests
+import dill, requests
 
 from utils.db import Database
 from bson import ObjectId
+from typing import Any, Dict
 
 db_instance = Database()
 mongo = db_instance.get_db()
 
 
-def process_state(state_id: str) -> None:
+def process_state(state_id: str, headers: Dict[str, Any]) -> Any:
     state = mongo.integrations.find_one({"_id": ObjectId(state_id)})
 
     for entity_name, entity in state["entities"].items():
-        parse_fn = pickle.loads(entity["parseFn"])
-        transform_fn = pickle.loads(entity["transformFn"])
+        parse_fn = dill.loads(entity["parseFn"])
+        transform_fn = dill.loads(entity["transformFn"])
 
-        response = requests.get(entity["endpoint"])
+        response = requests.get(entity["endpoint"], headers=headers)
         data = response.json()
 
         parsed_data = parse_fn(data)
@@ -23,6 +24,9 @@ def process_state(state_id: str) -> None:
 
         state["entities"][entity_name]["data"] = transformed_data
 
-    mongo.integrations.update_one(
-        {"_id": ObjectId(state_id)}, {"$set": transformed_data}, True
+    res = mongo.integrations.update_one(
+        {"_id": ObjectId(state_id)}, {"$set": state}, True
     )
+
+    # @todo this can be made lose by passing state["entities"], for testing we will keep it strict
+    return state["entities"][entity_name]["data"]

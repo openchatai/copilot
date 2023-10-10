@@ -11,7 +11,7 @@ db_instance = Database()
 mongo = db_instance.get_db()
 
 
-def process_app_folder(folder_name: str) -> None:
+def process_app_folder(folder_name: str, uid: str) -> None:
     current_file_path = os.path.dirname(os.path.abspath(__file__))
 
     state_file = os.path.join(current_file_path, folder_name, "state.json")
@@ -26,10 +26,11 @@ def process_app_folder(folder_name: str) -> None:
 
     for entity in state["entities"].values():
         if "transformFn" in entity:
-            entity["transformFn"] = dill.dumps(functions[entity["transformFn"]])
+            entity["transformFn"] = dill.dumps(functions["transformFn"])
         if "parseFn" in entity:
-            entity["parseFn"] = dill.dumps(functions[entity["parseFn"]])
+            entity["parseFn"] = dill.dumps(functions["parseFn"])
 
+    state["uid"] = uid
     mongo.integrations.insert_one(state)
 
 
@@ -37,4 +38,7 @@ if __name__ == "__main__":
     print("Enter folder path to scan:")
     path = input()
 
-    process_app_folder(path)
+    print("Enter user's unique identifier")
+    uid = input()
+
+    process_app_folder(path, uid)

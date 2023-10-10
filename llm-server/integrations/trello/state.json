@@ -5,7 +5,7 @@
     "headers": [],
     "entities": {
         "boards": {
-            "endpoint": "https://api.trello.com/me/boards",
+            "endpoint": "https://api.trello.com/1/members/me?boards=open",
             "dataSource": "Get boards",
             "parseFn": "parse_boards",
             "transformFn": "transform_boards",
