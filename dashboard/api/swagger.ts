@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "/backend/flows",
+  baseURL: "http://localhost:8888/backend/swagger_api",
 });
 
 interface PaginatedSwaggerResponse {
@@ -34,10 +34,48 @@ interface SwaggerTransformResponse {
     tags: string[];
   }[];
 }
+type SwaggerType = {
+  _id: string;
+  meta: {
+    bot_id: string;
+  };
+  bot_id: string;
+  info: {
+    title: string;
+    description: string;
+    version: string;
+  };
+  paths:{
+    
+  }
+};
+type Schema = {
+  default?: string;
+  enum?: string[];
+  items?: {
+    type: string;
+  };
+  format?: string;
+  type: string;
+};
 
-type MultipartPayload = {
-  id: string; // Replace with the actual type
-  file: File; // Assuming you are dealing with File objects for multipart file upload
+type Parameter = {
+  description: string;
+  explode?: boolean;
+  in: string;
+  name: string;
+  required?: boolean;
+  schema: Schema;
+};
+
+type Method = {
+  description: string;
+  method: string;
+  operationId: string;
+  parameters?: Parameter[];
+  path: string;
+  summary: string;
+  tags: string[];
 };
 
 export async function getSwaggerData(page: number = 1, pageSize: number = 10) {
@@ -88,6 +126,22 @@ export async function deleteData(_id: string) {
   return axiosInstance.delete<any>(url);
 }
 
+// http://localhost:8888/backend/swagger_api/transform/:swagger_id
+export const getTrasnformedSwagger = (id: string) => {
+  return axiosInstance.get<
+    [
+      {
+        _id: string;
+        methods: Method[];
+      }
+    ]
+  >(`/transform/${id}`);
+};
+
+// http://localhost:8888/backend/swagger_api/get/b/:bot_id
+export const getSwaggerByBotId = (bot_id: string) => {
+  return axiosInstance.get<SwaggerType>(`/get/b/${bot_id}`);
+};
 /** As of now, we don't have to call this api from the frontend. This will internally be called from the backend */
 export async function uploadSwaggerFile(id: string, file: File) {
   const formData = new FormData();

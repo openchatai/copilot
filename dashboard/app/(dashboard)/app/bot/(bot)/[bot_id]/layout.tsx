@@ -24,12 +24,10 @@ export default async function BotLayout({
         <div className="px-4 sm:px-6 w-full bg-white dark:bg-[#182235] border-b border-b-slate-200 dark:border-b-slate-700 ">
           {/* py-2 controls the offset => -bottom-2 in Nav */}
           <div className="flex items-center gap-2 py-2 w-full max-w-full overflow-x-scroll relative no-scrollbar whitespace-nowrap flex-nowrap">
-            {/* <Nav href={`/app/bot/${params.bot_id}`}>Overview</Nav> */}
             <Nav href={`/app/bot/${params.bot_id}`}>Try & Share</Nav>
             <Nav href={`/app/bot/${params.bot_id}/settings`} segment="settings">
               Settings
             </Nav>
-            <Nav href={`/app/bot/${params.bot_id}/swagger`}>Swagger</Nav>
             <Nav href={`/app/bot/${params.bot_id}/workflows`}>Workflows</Nav>
           </div>
         </div>
