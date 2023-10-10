@@ -10,6 +10,7 @@ db_instance = Database()
 mongo = db_instance.get_db()
 _swagger = Blueprint("_swagger", __name__)
 
+
 @_swagger.route("/u/<swagger_url>", methods=["GET"])
 def get_swagger_files(swagger_url: str) -> Response:
     # Validate and parse page and page_size query params
@@ -77,57 +78,44 @@ def get_swagger_file(_id: str) -> Response:
 
 @_swagger.route("/transform/<_id>", methods=["GET"])
 def get_transformed_swagger_file(_id: str) -> Response:
-    # Validate _id
-    if not ObjectId.is_valid(_id):
-        return jsonify({"message": "Invalid _id format"}), 400
+    methods_array = [
+        "get",
+        "post",
+        "put",
+        "delete",
+        "options",
+        "head",
+        "patch",
+        "trace",
+    ]
 
-    swagger_json = mongo.swagger_files.aggregate(
-        [
-            {"$match": {"_id": ObjectId(_id)}},
-            {"$project": {"paths": 1}},
-            {
-                "$project": {
-                    "methods": {
-                        "$reduce": {
-                            "input": {"$objectToArray": "$paths"},
-                            "initialValue": [],
-                            "in": {
-                                "$concatArrays": [
-                                    "$$value",
-                                    {
-                                        "$map": {
-                                            "input": {"$objectToArray": "$$this.v"},
-                                            "as": "path",
-                                            "in": {
-                                                "$mergeObjects": [
-                                                    "$$path.v",
-                                                    {
-                                                        "method": "$$path.k",
-                                                        "path": "$$this.k",
-                                                    },
-                                                ]
-                                            },
-                                        }
-                                    },
-                                ]
-                            },
-                        }
+    pipeline = [
+        {"$project": {"paths": {"$objectToArray": "$paths"}}},
+        {"$unwind": "$paths"},
+        {
+            "$project": {
+                "path": "$paths.k",
+                "methods": {
+                    "$filter": {
+                        "input": {"$objectToArray": "$paths.v"},
+                        "as": "method",
+                        "cond": {"$in": ["$$method.k", methods_array]},
                     }
-                }
-            },
-            {
-                "$project": {
-                    "methods.requestBody": 0,
-                    "methods.responses": 0,
-                    "methods.security": 0,
-                }
-            },
-        ]
-    )
+                },
+            }
+        },
+        {
+            "$group": {
+                "_id": 1,
+                "endpoints": {"$push": {"path": "$path", "methods": "$methods"}},
+            }
+        },
+    ]
 
-    swagger_json = [doc.update({"_id": str(doc["_id"])}) or doc for doc in swagger_json]
+    doc = mongo.swagger_files.aggregate(pipeline)
+    swagger_json = [doc.update({"_id": str(doc["_id"])}) or doc for doc in doc][0]
 
-    return jsonify(list(swagger_json))
+    return swagger_json["endpoints"]
 
 
 @_swagger.route("/<_id>", methods=["PUT"])
