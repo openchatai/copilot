@@ -2,7 +2,7 @@ import json
 import pickle, requests
 
 from utils.db import Database
-from bson import ObjectId, json_util
+from bson import ObjectId
 
 db_instance = Database()
 mongo = db_instance.get_db()

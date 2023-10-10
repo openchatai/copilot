@@ -1,26 +1,40 @@
-import json, requests, pickle
-from pymongo import MongoClient
+import json
+import os
+from typing import Any
+from dotenv import load_dotenv
+from database import Database
+import dill
 
-from utils.db import Database
-from bson import ObjectId, json_util
 
+load_dotenv("../.env")
 db_instance = Database()
 mongo = db_instance.get_db()
 
 
-def process_state(state_id: str) -> None:
-    state = mongo.integrations.find_one({"_id": state_id})
+def process_app_folder(folder_name: str) -> None:
+    current_file_path = os.path.dirname(os.path.abspath(__file__))
 
-    for entity_name, entity in state["entities"].items():
-        parse_fn = pickle.loads(entity["parseFn"])
-        transform_fn = pickle.loads(entity["transformFn"])
+    state_file = os.path.join(current_file_path, folder_name, "state.json")
+    functions_file = os.path.join(current_file_path, folder_name, "functions.py")
+    with open(state_file) as f:
+        state = json.load(f)
 
-        response = requests.get(entity["endpoint"])
-        data = response.json()
+    functions: Any = {}
+    with open(functions_file) as f:
+        code = f.read()
+        exec(code, functions)
 
-        parsed_data = parse_fn(data)
-        transformed_data = transform_fn(parsed_data)
+    for entity in state["entities"].values():
+        if "transformFn" in entity:
+            entity["transformFn"] = dill.dumps(functions[entity["transformFn"]])
+        if "parseFn" in entity:
+            entity["parseFn"] = dill.dumps(functions[entity["parseFn"]])
 
-        state["entities"][entity_name]["data"] = transformed_data
+    mongo.integrations.insert_one(state)
 
-    mongo.integrations.update_one({"_id": state_id}, {"$set": state}, True)
+
+if __name__ == "__main__":
+    print("Enter folder path to scan:")
+    path = input()
+
+    process_app_folder(path)
