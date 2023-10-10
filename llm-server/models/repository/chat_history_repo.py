@@ -40,9 +40,9 @@ from typing import Optional
 
 
 def get_all_chat_history_by_session_id(
-    session_id: str, limit: int = 10, offset: int = 0
+    session_id: str, limit: int = 20, offset: int = 0
 ) -> List[ChatHistory]:
-    """Retrieves all chat history records for a given session ID.
+    """Retrieves all chat history records for a given session ID, sorted by created_at in descending order (most recent first).
 
     Args:
       session_id: The ID of the session to retrieve chat history for.
@@ -50,15 +50,20 @@ def get_all_chat_history_by_session_id(
       offset: The offset at which to start retrieving chat history records.
 
     Returns:
-      A list of ChatHistory objects.
+      A list of ChatHistory objects, sorted by created_at in descending order.
     """
 
     chats = (
         ChatHistory.query.filter_by(session_id=session_id)
         .limit(limit)
         .offset(offset)
+        .order_by(ChatHistory.created_at.desc())
         .all()
     )
+
+    # Sort the chat history records by created_at in descending order.
+    chats.sort(key=lambda chat: chat.created_at, reverse=True)
+
     return cast(List[ChatHistory], chats)
 
 
