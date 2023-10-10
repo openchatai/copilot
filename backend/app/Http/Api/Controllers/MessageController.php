@@ -35,7 +35,6 @@ class MessageController extends Controller
                 "logo" => "logo",
                 "faq" => $faq ?? [],
                 "inital_questions" => $initialQuestions ?? [],
-
             ]
         );
     }
@@ -44,12 +43,15 @@ class MessageController extends Controller
     {
         $this->validate($request, [
             'content' => 'required|string|max:255',
+            'session_id' => 'sometimes|string',
             'headers' => 'sometimes|array',
         ]);
 
         $botToken = $request->header('X-Bot-Token');
         /** @var Chatbot $bot */
         $bot = Chatbot::where('token', $botToken)->first();
+
+        $sessionId = $request->input('session_id', md5(rand())); // @todo get it from the dashboard
 
         if (!$bot) {
             return response()->json(
@@ -67,7 +69,7 @@ class MessageController extends Controller
         try {
             $client = new Client();
             $response = $client->post('http://llm-server:8002/handle', [
-                'json' => ['text' => $message, 'swagger_url' => $bot->getSwaggerUrl(), 'headers' => $request->input('headers'), 'base_prompt' => $bot->getPromptMessage()],
+                'json' => ['session_id' =>$sessionId, 'text' => $message, 'swagger_url' => $bot->getSwaggerUrl(), 'headers' => $request->input('headers'), 'base_prompt' => $bot->getPromptMessage()],
             ]);
 
             // Retrieve the response from the Flask endpoint
