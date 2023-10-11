@@ -1,10 +1,11 @@
 import Aside from "./parts/Aside";
 
-export default function MainLayout({
+export default async function MainLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+
   return (
     <div className="w-full h-full flex">
       <Aside />

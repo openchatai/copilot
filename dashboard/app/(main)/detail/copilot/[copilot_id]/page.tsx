@@ -19,7 +19,6 @@ import {
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableRow,
@@ -33,7 +32,8 @@ type Props = {
   };
 };
 
-export default function CopilotDetailPage({}: Props) {
+export default async function CopilotDetailPage({}: Props) {
+
   return (
     <div className="w-full h-full flex flex-col">
       <HeaderShell>
@@ -100,7 +100,7 @@ export default function CopilotDetailPage({}: Props) {
           </div>
         </div>
         <div className="mt-10">
-          <div className="bg-primary/10 rounded-t-lg py-5 px-4">
+          <div className="bg-secondary rounded-t-lg py-5 px-4">
             <h2 className="text-lg font-bold inline text-accent-foreground">
               Latest Conversations
             </h2>
