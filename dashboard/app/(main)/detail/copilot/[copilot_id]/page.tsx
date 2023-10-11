@@ -32,8 +32,8 @@ type Props = {
   };
 };
 
-export default async function CopilotDetailPage({}: Props) {
-
+export default async function CopilotDetailPage({ params }: Props) {
+  const copilotBase = "/copilot/" + params.copilot_id;
   return (
     <div className="w-full h-full flex flex-col">
       <HeaderShell>
@@ -53,7 +53,9 @@ export default async function CopilotDetailPage({}: Props) {
           <div className="rounded-lg relative h-56 border bg-secondary shadow-sm flex items-center justify-center p-5 group">
             <div className="inset-0 absolute backdrop-blur-sm bg-accent-alt/50 group-focus-visible:opacity-100 group-focus-within:opacity-100 transition-opacity">
               <div className="h-full w-full gap-2 flex items-center justify-center">
-                <Button size="lg">Edit</Button>
+                <Button size="lg" asChild>
+                  <Link href={copilotBase + "/settings"}>Edit</Link>
+                </Button>
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -62,10 +64,9 @@ export default async function CopilotDetailPage({}: Props) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    <DropdownMenuItem>Profile</DropdownMenuItem>
-                    <DropdownMenuItem>Billing</DropdownMenuItem>
-                    <DropdownMenuItem>Team</DropdownMenuItem>
-                    <DropdownMenuItem>Subscription</DropdownMenuItem>
+                    <DropdownMenuItem>Flows</DropdownMenuItem>
+                    <DropdownMenuItem>Rename</DropdownMenuItem>
+                    <DropdownMenuItem>Delete</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -91,7 +92,7 @@ export default async function CopilotDetailPage({}: Props) {
           </div>
           <div className="mt-1.5 ps-1">
             <Link
-              href="/detail/copilot/12346879798"
+              href={copilotBase}
               className="text-base font-semibold whitespace-nowrap line-clamp-1 text-ellipsis"
             >
               Copilot 1

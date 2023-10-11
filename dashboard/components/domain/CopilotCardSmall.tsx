@@ -20,7 +20,9 @@ export function CopilotCardSmall() {
       <div className="rounded-lg relative h-56 border bg-secondary shadow-sm flex items-center justify-center p-5 group">
         <div className="inset-0 absolute backdrop-blur-sm bg-accent-alt/50 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 group-focus-within:opacity-100 transition-opacity">
           <div className="h-full w-full gap-2 flex items-center justify-center">
-            <Button size="lg">Edit</Button>
+            <Button size="lg" asChild>
+              <Link href={"/copilot/12346879798/settings"}>Edit</Link>
+            </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -29,10 +31,10 @@ export function CopilotCardSmall() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Billing</DropdownMenuItem>
-                <DropdownMenuItem>Team</DropdownMenuItem>
-                <DropdownMenuItem>Subscription</DropdownMenuItem>
+                <DropdownMenuItem>Rename</DropdownMenuItem>
+                <DropdownMenuItem>Detail</DropdownMenuItem>
+                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem>Duplicate</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

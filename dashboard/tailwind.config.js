@@ -8,6 +8,9 @@ module.exports = {
     "./src/**/*.{ts,tsx}",
   ],
   theme: {
+    debugScreens: {
+      position: ["bottom", "right"],
+    },
     container: {
       center: true,
       padding: "2rem",
@@ -76,6 +79,7 @@ module.exports = {
       },
       width: {
         aside: "var(--aside-width)",
+        header: "var(--header-height)",
       },
     },
   },
