@@ -1,6 +1,6 @@
 import { HeaderShell } from "@/app/(main)/parts/Header";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import {
@@ -16,6 +16,16 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableHeader,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
 
 type Props = {
   params: {
@@ -88,6 +98,43 @@ export default function CopilotDetailPage({}: Props) {
             </Link>
             <p className="text-sm text-gray-400">Created 2 days ago</p>
           </div>
+        </div>
+        <div className="mt-10">
+          <div className="bg-primary/10 rounded-t-lg py-5 px-4">
+            <h2 className="text-lg font-bold inline text-accent-foreground">
+              Latest Conversations
+            </h2>
+            <div className="flex items-center justify-between gap-5 mt-2">
+              <Input
+                placeholder="Search conversations..."
+                className="focus-visible:ring-transparent focus-visible:ring-offset-transparent"
+              />
+              <Button>Chat</Button>
+            </div>
+          </div>
+          <Table
+            className="text-base"
+            wrapperClassName="rounded-t-none border-t-transparent"
+          >
+            <TableHeader>
+              <TableRow>
+                <TableHead>conversation id</TableHead>
+                <TableHead>messages no.</TableHead>
+                <TableHead className="text-right"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>123465498</TableCell>
+                <TableCell>30</TableCell>
+                <TableCell className="text-right">
+                  <Button size="icon" variant="ghost">
+                    <MoreHorizontal className="h-5 w-5 text-accent-foreground" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
         </div>
       </div>
     </div>
