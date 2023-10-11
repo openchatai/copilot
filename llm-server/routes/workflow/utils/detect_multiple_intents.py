@@ -124,8 +124,8 @@ def generate_consolidated_requirement(
             content="Give me the consolidated output as per instructions given"
         ),
     ]
-
-    return chat(messages).content
+    content = chat(messages).content
+    return content
 
 
 def hasSingleIntent(

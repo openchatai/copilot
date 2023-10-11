@@ -43,6 +43,7 @@ git clone git@github.com:openchatai/OpenCopilot.git
 
 ```
 OPENAI_API_KEY=YOUR_TOKEN_HERE
+MYSQL_URI=mysql+pymysql://dbuser:dbpass@mysql:3306/opencopilot
 ```
 
 - gpt-4: Ideal for more complex tasks, but may have slower processing times.
