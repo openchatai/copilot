@@ -24,6 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { HeaderShell } from "./parts/Header";
 
 function CopilotCard() {
   return (
@@ -66,51 +67,69 @@ function CopilotCard() {
 // list copilots
 export default function Home() {
   return (
-    <div className="flex-1 p-8 pt-4 overflow-auto">
-      <div className="w-full flex items-center gap-5 justify-between">
-        <div className="flex items-center gap-1 flex-1">
-          <Label htmlFor="search-copilots">
-            <Search className="h-5 w-5 opacity-50" />
-            {/* <X className="h-5 w-5 opacity-50" /> */}
-          </Label>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Input
-                  id="search-copilots"
-                  className="border-none focus-visible:!ring-transparent font-medium"
-                  placeholder="Search Copilots..."
-                />
-              </TooltipTrigger>
-              <TooltipContent>Press <i className="text-white px-1">/</i> to search</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+    <div className="w-full h-full overflow-hidden flex flex-col">
+      <HeaderShell>
+        <div className="flex-1 flex items-center justify-between px-8">
+          <div>
+            <h1 className="text-lg font-bold text-accent-foreground">
+              All Copilots
+            </h1>
+          </div>
+          <div className="space-x-2">
+            <Button variant="secondary">Invite</Button>
+            <Button>Create Copilot</Button>
+          </div>
         </div>
+      </HeaderShell>
 
-        <Select defaultValue="last-viewed">
-          <SelectTrigger className="text-sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem className="py-2" value="last-viewed">
-              Last Viewed
-            </SelectItem>
-            <SelectItem className="py-2" value="date-created">
-              Date Created
-            </SelectItem>
-            <SelectItem className="py-2" value="alphapetically">
-              Alphapetically
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="grid xl:grid-cols-4 grid-cols-2 gap-8 py-4">
-        <CopilotCard />
-        <CopilotCard />
-        <CopilotCard />
-        <CopilotCard />
-        <CopilotCard />
-        <CopilotCard />
+      <div className="flex-1 p-8 pt-4 overflow-auto">
+        <div className="w-full flex items-center gap-5 justify-between">
+          <div className="flex items-center gap-1 flex-1">
+            <Label htmlFor="search-copilots">
+              <Search className="h-5 w-5 opacity-50" />
+              {/* <X className="h-5 w-5 opacity-50" /> */}
+            </Label>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Input
+                    id="search-copilots"
+                    className="border-none focus-visible:!ring-transparent font-medium"
+                    placeholder="Search Copilots..."
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  Press <i className="text-white px-1">/</i> to search
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+
+          <Select defaultValue="last-viewed">
+            <SelectTrigger className="text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem className="py-2" value="last-viewed">
+                Last Viewed
+              </SelectItem>
+              <SelectItem className="py-2" value="date-created">
+                Date Created
+              </SelectItem>
+              <SelectItem className="py-2" value="alphapetically">
+                Alphapetically
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="grid xl:grid-cols-4 grid-cols-2 gap-8 py-4">
+          <CopilotCard />
+          <CopilotCard />
+          <CopilotCard />
+          <CopilotCard />
+          <CopilotCard />
+          <CopilotCard />
+        </div>
       </div>
     </div>
   );
