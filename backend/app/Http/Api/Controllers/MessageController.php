@@ -51,7 +51,7 @@ class MessageController extends Controller
         /** @var Chatbot $bot */
         $bot = Chatbot::where('token', $botToken)->first();
 
-        $sessionId = $request->input('session_id', md5(rand())); // @todo get it from the dashboard
+        $sessionId = $request->header('X-Session-Id', '');
 
         if (!$bot) {
             return response()->json(
@@ -69,7 +69,7 @@ class MessageController extends Controller
         try {
             $client = new Client();
             $response = $client->post('http://llm-server:8002/handle', [
-                'json' => ['session_id' =>$sessionId, 'text' => $message, 'swagger_url' => $bot->getSwaggerUrl(), 'headers' => $request->input('headers'), 'base_prompt' => $bot->getPromptMessage()],
+                'json' => ['session_id' => $sessionId, 'text' => $message, 'swagger_url' => $bot->getSwaggerUrl(), 'headers' => $request->input('headers'), 'base_prompt' => $bot->getPromptMessage()],
             ]);
 
             // Retrieve the response from the Flask endpoint
