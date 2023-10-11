@@ -27,8 +27,6 @@ def create_chat_history(
         session_id=session_id,
         from_user=from_user,
         message=message,
-        created_at=datetime.now(),
-        updated_at=datetime.now(),
     )
     sql_db.session.add(chat_history)
     sql_db.session.commit()
@@ -55,14 +53,14 @@ def get_all_chat_history_by_session_id(
 
     chats = (
         ChatHistory.query.filter_by(session_id=session_id)
+        .order_by(ChatHistory.created_at.desc())
         .limit(limit)
         .offset(offset)
-        .order_by(ChatHistory.created_at.desc())
         .all()
     )
 
     # Sort the chat history records by created_at in descending order.
-    chats.sort(key=lambda chat: chat.created_at, reverse=True)
+    chats.sort(key=lambda chat: chat.created_at)
 
     return cast(List[ChatHistory], chats)
 

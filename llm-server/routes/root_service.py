@@ -52,7 +52,6 @@ def handle_request(data: Dict[str, Any]) -> Any:
     server_base_url = cast(str, data.get("server_base_url", ""))
 
     logging.info("[OpenCopilot] Got the following user request: {}".format(text))
-    create_chat_history(swagger_url, session_id, True, text)
     for required_field, error_msg in [
         ("base_prompt", BASE_PROMPT_REQUIRED),
         ("text", TEXT_REQUIRED),
@@ -70,7 +69,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
             "[OpenCopilot] Trying to figure out if the user request require 1) APIs calls 2) If yes how many "
             "of them"
         )
-        bot_response = hasSingleIntent(swagger_doc, text)
+        bot_response = hasSingleIntent(swagger_doc, text, session_id)
         if len(bot_response.ids) >= 1:
             logging.info(
                 "[OpenCopilot] Apparently, the user request require calling more than single API endpoint "
@@ -96,13 +95,22 @@ def handle_request(data: Dict[str, Any]) -> Any:
                 WorkflowData(text, headers, server_base_url, swagger_url),
             )
 
+            create_chat_history(swagger_url, session_id, True, text)
+            # bot response
             create_chat_history(
-                swagger_url, session_id, True, output["response"] or output["error"]
+                swagger_url, session_id, False, output["response"] or output["error"]
             )
+
+            return output
 
         elif len(bot_response.ids) == 0:
             logging.info("[OpenCopilot] The user request doesnot require an api call")
-            create_chat_history(swagger_url, session_id, True, bot_response.bot_message)
+
+            create_chat_history(swagger_url, session_id, True, text)
+            # bot response
+            create_chat_history(
+                swagger_url, session_id, False, bot_response.bot_message
+            )
             return {"response": bot_response.bot_message}
 
         else:

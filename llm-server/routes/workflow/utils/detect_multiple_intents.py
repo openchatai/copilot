@@ -15,6 +15,7 @@ import logging
 from prance import ResolvingParser
 from models.repository.chat_history_repo import get_all_chat_history_by_session_id
 from models.chat_history import ChatHistory
+from models.repository.chat_history_repo import create_chat_history
 
 logging.basicConfig(level=logging.INFO)
 
@@ -87,7 +88,9 @@ def get_summaries(_swagger_doc: str) -> str:
     return summaries_str
 
 
-def generate_consolidated_requirement(user_input: str, session_id: str) -> str:
+def generate_consolidated_requirement(
+    user_input: str, session_id: str
+) -> Optional[str]:
     """Generates a consolidated query from chat history and an AI chat.
 
     Args:
@@ -103,20 +106,22 @@ def generate_consolidated_requirement(user_input: str, session_id: str) -> str:
         temperature=0,
     )
 
-    conversation_str = join_conversations(
-        get_all_chat_history_by_session_id(session_id)
-    )
+    history = get_all_chat_history_by_session_id(session_id)
+    if len(history) == 0:
+        return None
+
+    conversation_str = join_conversations(history)
     messages = [
         SystemMessage(
-            content="You are a LLM good at consolidating large amount of text. Summarize the previous conversation and the new user input into a concise (three sentences or less) query that can be used to continue the conversation."
+            content="As an Assistant, you excel at consolidating a large amount of text. You will receive user input and some of the past conversations you've had with the user. Your task is to carefully examine the current input and append any past messages that the user is referring to. If the current user input is independent of past conversations, please return the user input unchanged."
         ),
         HumanMessage(
-            content="Conversation: {}, \n\n User input: {}.".format(
+            content="Conversation History: {}, \n\n Current User input: {}.".format(
                 conversation_str, user_input
             ),
         ),
         HumanMessage(
-            content="The consolidated query must contain any api data like id, tags, name etc"
+            content="Give me the consolidated output as per instructions given"
         ),
     ]
 
@@ -134,8 +139,9 @@ def hasSingleIntent(
         temperature=0,
     )
 
-    consolidated_user_requirement = generate_consolidated_requirement(
-        user_requirement, session_id
+    consolidated_user_requirement = (
+        generate_consolidated_requirement(user_requirement, session_id)
+        or user_requirement
     )
     messages = [
         SystemMessage(
@@ -144,7 +150,10 @@ def hasSingleIntent(
         HumanMessage(
             content="Here's a list of api summaries {}.".format(summaries),
         ),
-        HumanMessage(content="{}".format(consolidated_user_requirement)),
+        consolidated_user_requirement
+        and HumanMessage(
+            content="user requirement: {}".format(consolidated_user_requirement)
+        ),
         HumanMessage(
             content="""Reply in the following json format ```{
                 "ids": [
@@ -173,4 +182,6 @@ def hasSingleIntent(
             d, "hasSingleIntent"
         )
     )
-    return BotMessage.from_dict(d)
+
+    bot_message = BotMessage.from_dict(d)
+    return bot_message
