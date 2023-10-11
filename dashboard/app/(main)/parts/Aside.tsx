@@ -1,27 +1,20 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-    Bot,
-    GraduationCap,
-    ScrollText,
-    Settings,
-    GithubIcon,
-  } from "lucide-react";
+  Bot,
+  GraduationCap,
+  ScrollText,
+  Settings,
+  GithubIcon,
+  PlaySquare,
+  ExternalLink,
+} from "lucide-react";
 export default function Aside({}: {}) {
   return (
     <aside className="h-full flex flex-col w-aside justify-between border-r border-border bg-primary-foreground overflow-hidden">
       <div className="w-full h-full py-4 px-0 flex-1 overflow-auto space-y-4">
         <ul className="space-y-1 px-2">
           <li>
-            <button className="justify-between items-center gap-1 px-4 py-2 w-full rounded text-accent-foreground flex font-semibold hover:bg-card-foreground">
-              <div className="flex items-center flex-1 gap-2">
-                <Bot className="h-5 w-5" />
-                <span>Copilots</span>
-              </div>
-              <span className="text-sm font-normal">2</span>
-            </button>
-          </li>
-          <li>
-            <button className="justify-between items-center gap-1 px-4 py-2 w-full rounded text-accent-foreground flex font-semibold hover:bg-card-foreground">
+            <button className="justify-between text-sm items-center gap-1 px-4 py-2 w-full rounded text-accent-foreground flex font-medium hover:bg-card-foreground">
               <div className="flex items-center flex-1 gap-2">
                 <Bot className="h-5 w-5" />
                 <span>Copilots</span>
@@ -33,35 +26,44 @@ export default function Aside({}: {}) {
 
         <ul className="space-y-1 px-2">
           <li>
-            <button className="justify-between items-center gap-1 px-4 py-2 w-full rounded text-accent-foreground flex font-semibold hover:bg-card-foreground">
+            <button className="justify-between group items-center gap-1 px-4 py-2 w-full rounded text-accent-foreground flex font-semibold hover:bg-card-foreground">
               <div className="flex items-center flex-1 gap-2">
-                <GraduationCap className="h-5 w-5" />
+                <PlaySquare className="h-5 w-5" />
                 <span>Learn</span>
               </div>
+              <span className="text-sm font-normal opacity-0 group-hover:opacity-100">
+                <ExternalLink className="h-4 w-4" />
+              </span>
             </button>
           </li>
           <li>
-            <button className="justify-between items-center gap-1 px-4 py-2 w-full rounded text-accent-foreground flex font-semibold hover:bg-card-foreground">
+            <button className="justify-between group items-center gap-1 px-4 py-2 w-full rounded text-accent-foreground flex font-semibold hover:bg-card-foreground">
               <div className="flex items-center flex-1 gap-2">
                 <ScrollText className="h-5 w-5" />
                 <span>Changelog</span>
               </div>
+              <span className="text-sm font-normal opacity-0 group-hover:opacity-100">
+                <ExternalLink className="h-4 w-4" />
+              </span>
             </button>
           </li>
 
           <li>
-            <button className="justify-between items-center gap-1 px-4 py-2 w-full rounded text-accent-foreground flex font-semibold hover:bg-card-foreground">
+            <button className="justify-between group items-center gap-1 px-4 py-2 w-full rounded text-accent-foreground flex font-semibold hover:bg-card-foreground">
               <div className="flex items-center flex-1 gap-2">
                 <GithubIcon className="h-5 w-5" />
                 <span>Github</span>
               </div>
+              <span className="text-sm font-normal opacity-0 group-hover:opacity-100">
+                <ExternalLink className="h-4 w-4" />
+              </span>
             </button>
           </li>
         </ul>
 
         <ul className="space-y-1 px-2">
           <li>
-            <button className="justify-between items-center gap-1 px-4 py-2 w-full rounded text-accent-foreground flex font-semibold hover:bg-card-foreground">
+            <button className="justify-between group items-center gap-1 px-4 py-2 w-full rounded text-accent-foreground flex font-semibold hover:bg-card-foreground">
               <div className="flex items-center flex-1 gap-2">
                 <Settings className="h-5 w-5" />
                 <span>Settings</span>

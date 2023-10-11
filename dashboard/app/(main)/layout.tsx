@@ -21,7 +21,7 @@ export default function MainLayout({
             </h1>
           </div>
           <div className="space-x-2">
-            <Button variant="outline">Invite</Button>
+            <Button variant="secondary">Invite</Button>
             <Button>Create Copilot</Button>
           </div>
         </div>

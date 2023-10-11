@@ -1,12 +1,11 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import * as React from "react";
-
+import { SelectTrigger } from "@radix-ui/react-select";
 import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { Search, BotIcon } from "lucide-react";
@@ -19,9 +18,16 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 function CopilotCard() {
   return (
-    <div className="aspect-square">
+    <div className="xl:aspect-square">
       <div className="rounded-lg relative h-56 border bg-secondary shadow-sm flex items-center justify-center p-5 group">
         <div className="inset-0 absolute backdrop-blur-sm bg-accent-alt/50 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 group-focus-within:opacity-100 transition-opacity">
           <div className="h-full w-full gap-2 flex items-center justify-center">
@@ -43,11 +49,11 @@ function CopilotCard() {
         </div>
         <div>
           <div className="h-20 grid place-content-center aspect-square rounded-lg bg-slate-950 text-gray-100">
-            <BotIcon className="h-10 w-10" />
+            <BotIcon className="h-12 w-12" />
           </div>
         </div>
       </div>
-      <div className="mt-1 ps-1">
+      <div className="mt-1.5 ps-1">
         <h2 className="text-sm font-semibold whitespace-nowrap line-clamp-1 text-ellipsis">
           Copilot 1
         </h2>
@@ -67,14 +73,21 @@ export default function Home() {
             <Search className="h-5 w-5 opacity-50" />
             {/* <X className="h-5 w-5 opacity-50" /> */}
           </Label>
-          <Input
-            id="search-copilots"
-            className="border-none focus-visible:!ring-transparent font-medium"
-            placeholder="Search Copilots..."
-          />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Input
+                  id="search-copilots"
+                  className="border-none focus-visible:!ring-transparent font-medium"
+                  placeholder="Search Copilots..."
+                />
+              </TooltipTrigger>
+              <TooltipContent>Press <i className="text-white px-1">/</i> to search</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
 
-        <Select value="last-viewed">
+        <Select defaultValue="last-viewed">
           <SelectTrigger className="text-sm">
             <SelectValue />
           </SelectTrigger>
@@ -91,7 +104,7 @@ export default function Home() {
           </SelectContent>
         </Select>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 py-4">
+      <div className="grid xl:grid-cols-4 grid-cols-2 gap-8 py-4">
         <CopilotCard />
         <CopilotCard />
         <CopilotCard />

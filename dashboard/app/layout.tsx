@@ -2,7 +2,8 @@ import { cn } from "@/lib/utils";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
-import { ComputerIcon } from "lucide-react";
+import { Tv2 } from "lucide-react";
+import { IS_DEV } from "@/lib/consts";
 
 const opensans = Open_Sans({
   subsets: ["latin"],
@@ -23,7 +24,8 @@ export default function RootLayout({
       <body
         className={cn(
           opensans.className,
-          "min-h-screen relative h-screen text-accent-foreground overflow-hidden w-screen bg-background [&>*]:h-full"
+          "min-h-screen relative h-screen text-accent-foreground overflow-hidden w-screen bg-background [&>*]:h-full",
+          IS_DEV && "debug-screens"
         )}
       >
         {children}
@@ -31,7 +33,7 @@ export default function RootLayout({
         <div className="absolute flex items-center justify-center lg:hidden inset-0 z-[500] backdrop-blur bg-primary-foreground/70">
           <div className="flex flex-col text-lg items-center justify-center">
             <span>
-              <ComputerIcon className="h-20 w-20 text-primary" />
+              <Tv2 className="h-20 w-20 text-primary" />
             </span>
             <h2 className="font-semibold">Your browser is too small</h2>
             <p className="text-base font-medium">

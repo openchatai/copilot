@@ -18,14 +18,15 @@
     /*  */
     --primary-foreground: 0 0% 98%;
     /*  */
-    --accent-alt:200 27% 96%;
-    --secondary: 0 0% 96.1%;
+    --accent-alt: 200 27% 96%;
+    --secondary: 189 28% 95%;
     --secondary-foreground: 0 0% 9%;
 
     --muted: 0 0% 96.1%;
     --muted-foreground: 0 0% 45.1%;
 
     --accent: 195 31% 95%;
+    /*  */
     --accent-foreground: 223 56% 17%;
 
     --destructive: 0 84.2% 60.2%;
@@ -77,5 +78,11 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  .primary-shadow {
+    box-shadow: rgba(19, 33, 68, 0.08) 0px -1px 0px 1px inset,
+      rgba(19, 33, 68, 0.16) 0px 1px 3px 0px,
+      rgba(19, 33, 68, 0.08) 0px 0px 1px 0px,
+      rgba(19, 33, 68, 0.1) 0px 1px 1px 0px;
   }
 }
