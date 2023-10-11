@@ -11,7 +11,7 @@ const opensans = Open_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Proof of concept for a design system",
+  title: "Opencopilot",
 };
 
 export default function RootLayout({
