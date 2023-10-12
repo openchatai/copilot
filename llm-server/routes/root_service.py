@@ -26,6 +26,7 @@ from typing import Dict, Any, cast
 from utils.db import Database
 import json
 from api_caller.base import try_to_match_and_call_api_endpoint
+from models.repository.chat_history_repo import create_chat_history
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -45,12 +46,12 @@ FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
 def handle_request(data: Dict[str, Any]) -> Any:
     text: str = cast(str, data.get("text"))
     swagger_url = cast(str, data.get("swagger_url", ""))
+    session_id = cast(str, data.get("session_id", ""))
     base_prompt = data.get("base_prompt", "")
     headers = data.get("headers", {})
     server_base_url = cast(str, data.get("server_base_url", ""))
 
     logging.info("[OpenCopilot] Got the following user request: {}".format(text))
-
     for required_field, error_msg in [
         ("base_prompt", BASE_PROMPT_REQUIRED),
         ("text", TEXT_REQUIRED),
@@ -68,7 +69,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
             "[OpenCopilot] Trying to figure out if the user request require 1) APIs calls 2) If yes how many "
             "of them"
         )
-        bot_response = hasSingleIntent(swagger_doc, text, headers)
+        bot_response = hasSingleIntent(swagger_doc, text, session_id)
         if len(bot_response.ids) >= 1:
             logging.info(
                 "[OpenCopilot] Apparently, the user request require calling more than single API endpoint "
@@ -88,14 +89,28 @@ def handle_request(data: Dict[str, Any]) -> Any:
                 _workflow = create_workflow_from_operation_ids(
                     bot_response.ids, SWAGGER_SPEC=swagger_doc
                 )
-            return run_workflow(
+            output = run_workflow(
                 _workflow,
                 swagger_doc,
                 WorkflowData(text, headers, server_base_url, swagger_url),
             )
 
+            create_chat_history(swagger_url, session_id, True, text)
+            # bot response
+            create_chat_history(
+                swagger_url, session_id, False, output["response"] or output["error"]
+            )
+
+            return output
+
         elif len(bot_response.ids) == 0:
             logging.info("[OpenCopilot] The user request doesnot require an api call")
+
+            create_chat_history(swagger_url, session_id, True, text)
+            # bot response
+            create_chat_history(
+                swagger_url, session_id, False, bot_response.bot_message
+            )
             return {"response": bot_response.bot_message}
 
         else:

@@ -14,6 +14,9 @@ from dotenv import load_dotenv
 import logging
 from prance import ResolvingParser
 from utils.process_app_state import process_state
+from models.repository.chat_history_repo import get_all_chat_history_by_session_id
+from models.chat_history import ChatHistory
+from models.repository.chat_history_repo import create_chat_history
 
 logging.basicConfig(level=logging.INFO)
 
@@ -31,6 +34,25 @@ class BotMessage:
     @classmethod
     def from_dict(cls, data: Dict[str, Union[str, List[str]]]) -> "BotMessage":
         return cls(cast(List[str], data["ids"]), cast(str, data["bot_message"]))
+
+
+def join_conversations(chat_histories: List[ChatHistory]) -> str:
+    """Joins a list of ChatHistory objects into a single conversation string.
+
+    Args:
+      chat_histories: A list of ChatHistory objects.
+
+    Returns:
+      A string containing the joined conversation.
+    """
+
+    conversation = ""
+    for chat_history in chat_histories:
+        if chat_history.from_user:
+            conversation += f"User: {chat_history.message}\n"
+        else:
+            conversation += f"Assistant: {chat_history.message}\n"
+    return conversation
 
 
 def get_summaries(_swagger_doc: str) -> str:
@@ -67,17 +89,60 @@ def get_summaries(_swagger_doc: str) -> str:
     return summaries_str
 
 
+def generate_consolidated_requirement(
+    user_input: str, session_id: str
+) -> Optional[str]:
+    """Generates a consolidated query from chat history and an AI chat.
+
+    Args:
+      chat_history: A list of Message objects representing the chat history.
+      ai_chat: A ChatOpenAI object representing the AI chat.
+
+    Returns:
+      A consolidated query string.
+    """
+    chat = ChatOpenAI(
+        openai_api_key=os.getenv("OPENAI_API_KEY"),
+        model="gpt-3.5-turbo",
+        temperature=0,
+    )
+
+    history = get_all_chat_history_by_session_id(session_id)
+    if len(history) == 0:
+        return None
+
+    conversation_str = join_conversations(history)
+    messages = [
+        SystemMessage(
+            content="As an Assistant, you excel at consolidating a large amount of text. You will receive user input and some of the past conversations you've had with the user. Your task is to carefully examine the current input and append any past messages that the user is referring to. If the current user input is independent of past conversations, please return the user input unchanged."
+        ),
+        HumanMessage(
+            content="Conversation History: {}, \n\n Current User input: {}.".format(
+                conversation_str, user_input
+            ),
+        ),
+        HumanMessage(
+            content="Give me the consolidated output as per instructions given"
+        ),
+    ]
+    content = chat(messages).content
+    return content
+
+
 def hasSingleIntent(
-    swagger_doc: Any, user_requirement: str, headers: Any
+    swagger_doc: Any, user_requirement: str, session_id: str
 ) -> BotMessage:
-    # This app state can be passed to one of the following stages
-    app_state = process_state("6524d467fba1c6f306fc3160", headers=headers)
     summaries = get_summaries(swagger_doc)
 
     chat = ChatOpenAI(
         openai_api_key=os.getenv("OPENAI_API_KEY"),
         model="gpt-3.5-turbo-16k",
         temperature=0,
+    )
+
+    consolidated_user_requirement = (
+        generate_consolidated_requirement(user_requirement, session_id)
+        or user_requirement
     )
     messages = [
         SystemMessage(
@@ -86,7 +151,10 @@ def hasSingleIntent(
         HumanMessage(
             content="Here's a list of api summaries {}.".format(summaries),
         ),
-        HumanMessage(content="{}".format(user_requirement)),
+        consolidated_user_requirement
+        and HumanMessage(
+            content="user requirement: {}".format(consolidated_user_requirement)
+        ),
         HumanMessage(
             content="""Reply in the following json format ```{
                 "ids": [
@@ -115,4 +183,6 @@ def hasSingleIntent(
             d, "hasSingleIntent"
         )
     )
-    return BotMessage.from_dict(d)
+
+    bot_message = BotMessage.from_dict(d)
+    return bot_message
