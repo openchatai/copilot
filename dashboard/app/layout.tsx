@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import { Tv2 } from "lucide-react";
 import { IS_DEV } from "@/lib/consts";
+import { SearchModal } from "./(main)/_parts/SearchModal";
 
 const opensans = Open_Sans({
   subsets: ["latin"],
@@ -24,14 +25,14 @@ export default function RootLayout({
       <body
         className={cn(
           opensans.className,
-          "min-h-screen relative h-screen text-accent-foreground overflow-hidden w-screen bg-background [&>*]:h-full",
-          IS_DEV && "debug-screens"
+          "h-screen min-h-screen w-screen overflow-hidden bg-background text-accent-foreground scroll-smooth antialiased",
+          IS_DEV && "debug-screens",
         )}
       >
         {children}
         {/* browser too small message */}
-        <div className="absolute flex items-center justify-center lg:hidden inset-0 z-[500] backdrop-blur bg-primary-foreground/70">
-          <div className="flex flex-col text-lg items-center justify-center">
+        <div className="fixed inset-0 z-[500] flex items-center justify-center bg-primary-foreground/70 backdrop-blur lg:hidden">
+          <div className="flex flex-col items-center justify-center text-lg">
             <span>
               <Tv2 className="h-20 w-20 text-primary" />
             </span>
@@ -41,6 +42,9 @@ export default function RootLayout({
             </p>
           </div>
         </div>
+
+        {/* search modal */}
+        <SearchModal />
       </body>
     </html>
   );

@@ -27,7 +27,7 @@
 
     --accent: 195 31% 95%;
     /*  */
-    --accent-foreground: 222.86 56.32% 17.06%;
+    --accent-foreground: 222 56% 17%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
@@ -80,9 +80,16 @@
     @apply bg-background text-foreground;
   }
   .primary-shadow {
-    box-shadow: rgba(19, 33, 68, 0.08) 0px -1px 0px 1px inset,
+    box-shadow:
+      rgba(19, 33, 68, 0.08) 0px -1px 0px 1px inset,
       rgba(19, 33, 68, 0.16) 0px 1px 3px 0px,
       rgba(19, 33, 68, 0.08) 0px 0px 1px 0px,
       rgba(19, 33, 68, 0.1) 0px 1px 1px 0px;
+  }
+
+  .flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }

@@ -26,7 +26,7 @@ export function CopilotCardSmall() {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="lg" variant="secondary">
+                <Button size="lg" variant="outline">
                   ...
                 </Button>
               </DropdownMenuTrigger>

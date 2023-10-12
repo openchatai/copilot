@@ -1,4 +1,4 @@
-import { HeaderShell } from "@/app/(main)/parts/Header";
+import { HeaderShell } from "@/app/(main)/_parts/Header";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
