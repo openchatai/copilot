@@ -1,7 +1,7 @@
 "use client";
 import { createSafeContext } from "@/lib/createSafeContext";
 import { cn } from "@/lib/utils";
-import { forwardRef, useCallback, useState } from "react";
+import React, { forwardRef, useCallback, useState } from "react";
 
 const [SafeProvider, useClosableDiv] = createSafeContext<{
   closed: boolean;

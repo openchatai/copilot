@@ -1,4 +1,3 @@
-import { HeaderShell } from "@/app/(main)/_parts/Header";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
@@ -25,6 +24,7 @@ import {
   TableHeader,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { HeaderShell } from "@/components/domain/HeaderShell";
 
 type Props = {
   params: {

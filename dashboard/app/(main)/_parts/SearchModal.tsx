@@ -2,14 +2,11 @@
 
 import * as React from "react";
 import {
-    Bot,
-  Calculator,
-  Calendar,
+  Bot,
   CreditCard,
   FileStack,
   HelpCircle,
   Settings,
-  Smile,
   User,
 } from "lucide-react";
 

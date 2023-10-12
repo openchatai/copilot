@@ -41,7 +41,7 @@ export default function CopilotLayout({ children, params }: Props) {
           <LogoMenu />
         </div>
         <div className="mx-auto flex-1 overflow-hidden overflow-y-auto pt-5">
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center">
             <CopilotLayoutNavLink
               href={copilotBase}
               IconComponent={Home}
@@ -49,7 +49,7 @@ export default function CopilotLayout({ children, params }: Props) {
             />
           </div>
           <Separator className="my-2" />
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-4">
             <CopilotLayoutNavLink
               href={copilotBase + "/settings"}
               segment="settings"

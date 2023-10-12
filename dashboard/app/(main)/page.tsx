@@ -18,13 +18,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { HeaderShell } from "./_parts/Header";
 import {
   ClosableDiv,
   ClosableDivProvider,
   CloseBtn,
 } from "@/components/headless/ClosableDiv";
 import { CopilotCardSmall } from "@/components/domain/CopilotCardSmall";
+import { HeaderShell } from "@/components/domain/HeaderShell";
 
 // list copilots
 export default function Home() {

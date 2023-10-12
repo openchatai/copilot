@@ -1,7 +1,6 @@
 import React from "react";
 
-type Props = {};
 
-export default async function CopilotPage({}: Props) {
+export default async function CopilotPage() {
   return <div>CopilotPage</div>;
 }
