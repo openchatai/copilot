@@ -11,7 +11,7 @@ catalogue==2.0.8
 certifi==2023.7.22
 chardet==5.2.0
 charset-normalizer==3.2.0
-click==8.1.5
+click==8.1.7
 confection==0.1.0
 cymem==2.0.7
 dataclasses-json==0.5.9
