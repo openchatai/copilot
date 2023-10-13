@@ -13,7 +13,6 @@ import os
 from dotenv import load_dotenv
 import logging
 from prance import ResolvingParser
-from utils.process_app_state import process_state
 from models.repository.chat_history_repo import get_all_chat_history_by_session_id
 from models.chat_history import ChatHistory
 from models.repository.chat_history_repo import create_chat_history

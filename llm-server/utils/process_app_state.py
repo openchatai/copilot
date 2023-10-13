@@ -9,27 +9,13 @@ db_instance = Database()
 mongo = db_instance.get_db()
 
 
-def process_state(state_id: Optional[str], headers: Dict[str, Any]) -> Optional[str]:
-    if state_id == None:
+def process_state(app: str, headers: Dict[str, Any]) -> Optional[str]:
+    # new app or user didn't define app because they are using an older version of the frontend
+    if app == None:
         return None
 
-    state = mongo.integrations.find_one({"_id": ObjectId(state_id)})
+    _state = mongo.integrations.find_one({"app": app})
+    state = dill.loads(_state["process_state"])(headers)
 
-    for entity_name, entity in state["entities"].items():
-        parse_fn = dill.loads(entity["parseFn"])
-        transform_fn = dill.loads(entity["transformFn"])
-
-        response = requests.get(entity["endpoint"], headers=headers)
-        data = response.json()
-
-        parsed_data = parse_fn(data)
-        transformed_data = transform_fn(parsed_data)
-
-        state["entities"][entity_name]["data"] = transformed_data
-
-    res = mongo.integrations.update_one(
-        {"_id": ObjectId(state_id)}, {"$set": state}, True
-    )
-
-    # @todo this can be made lose by passing state["entities"], for testing we will keep it strict
-    return json.dumps(state["entities"][entity_name]["data"], separators=(",", ":"))
+    # should return {"entities": [Array], description: "App description for alignment"}
+    return json.dumps(state, separators=(",", ":"))
