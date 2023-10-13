@@ -4,6 +4,7 @@ from routes.workflow.utils.run_openapi_ops import run_openapi_operations
 from opencopilot_types.workflow_type import WorkflowDataType
 from routes.workflow.hierarchical_planner import create_and_run_openapi_agent
 import logging, json
+from utils.process_app_state import process_state
 
 
 def run_workflow(
@@ -16,8 +17,15 @@ def run_workflow(
     error = None
 
     try:
+        # process state here, pass along the data to next call
+        current_state = process_state(data.state_id, headers)
         result = run_openapi_operations(
-            workflow_doc, swagger_json, data.text, headers, server_base_url
+            workflow_doc,
+            swagger_json,
+            data.text,
+            headers,
+            server_base_url,
+            current_state,
         )
     except Exception as e:
         logging.error("[OpenCopilot] Custom planner failed: %s", e)

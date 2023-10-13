@@ -51,6 +51,9 @@ def handle_request(data: Dict[str, Any]) -> Any:
     headers = data.get("headers", {})
     server_base_url = cast(str, data.get("server_base_url", ""))
 
+    # this will be used to load application state, basically bunch of get calls to understand what already exists in the system
+    state_id: cast(str, data.get("state_id"))
+
     logging.info("[OpenCopilot] Got the following user request: {}".format(text))
     for required_field, error_msg in [
         ("base_prompt", BASE_PROMPT_REQUIRED),
@@ -92,7 +95,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
             output = run_workflow(
                 _workflow,
                 swagger_doc,
-                WorkflowData(text, headers, server_base_url, swagger_url),
+                WorkflowData(text, headers, server_base_url, swagger_url, state_id),
             )
 
             create_chat_history(swagger_url, session_id, True, text)

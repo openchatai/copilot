@@ -3,13 +3,16 @@ import dill, requests
 
 from utils.db import Database
 from bson import ObjectId
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 db_instance = Database()
 mongo = db_instance.get_db()
 
 
-def process_state(state_id: str, headers: Dict[str, Any]) -> Any:
+def process_state(state_id: Optional[str], headers: Dict[str, Any]) -> Optional[str]:
+    if state_id == None:
+        return None
+
     state = mongo.integrations.find_one({"_id": ObjectId(state_id)})
 
     for entity_name, entity in state["entities"].items():
@@ -29,4 +32,4 @@ def process_state(state_id: str, headers: Dict[str, Any]) -> Any:
     )
 
     # @todo this can be made lose by passing state["entities"], for testing we will keep it strict
-    return state["entities"][entity_name]["data"]
+    return json.dumps(state["entities"][entity_name]["data"], separators=(",", ":"))
