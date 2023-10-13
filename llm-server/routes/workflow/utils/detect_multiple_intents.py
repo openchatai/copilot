@@ -129,7 +129,10 @@ def generate_consolidated_requirement(
 
 
 def hasSingleIntent(
-    swagger_doc: Any, user_requirement: str, session_id: str
+    swagger_doc: Any,
+    user_requirement: str,
+    session_id: str,
+    current_state: Optional[str],
 ) -> BotMessage:
     summaries = get_summaries(swagger_doc)
 
@@ -146,6 +149,12 @@ def hasSingleIntent(
     messages = [
         SystemMessage(
             content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. If the user is asking you to perform a `CRUD` operation, provide the list of operation ids of api calls needed in the `ids` field of the json. `bot_message` should consist of a straightforward sentence, free from any special characters. Your response MUST be a valid minified json"
+        ),
+        current_state
+        and HumanMessage(
+            content="Here is the current state of the application: {}".format(
+                current_state
+            )
         ),
         HumanMessage(
             content="Here's a list of api summaries {}.".format(summaries),
@@ -170,7 +179,7 @@ def hasSingleIntent(
         ),
     ]
 
-    result = chat(messages)
+    result = chat([x for x in messages if x is not None])
     logging.info(
         "[OpenCopilot] Extracted the needed steps to get the job done: {}".format(
             result.content

@@ -8,7 +8,10 @@ from utils.process_app_state import process_state
 
 
 def run_workflow(
-    workflow_doc: WorkflowDataType, swagger_json: Any, data: WorkflowData
+    workflow_doc: WorkflowDataType,
+    swagger_json: Any,
+    data: WorkflowData,
+    current_state: Any,
 ) -> Dict[str, Any]:
     headers = data.headers or {}
     server_base_url = data.server_base_url
@@ -17,8 +20,6 @@ def run_workflow(
     error = None
 
     try:
-        # process state here, pass along the data to next call
-        current_state = process_state(data.state_id, headers)
         result = run_openapi_operations(
             workflow_doc,
             swagger_json,

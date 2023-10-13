@@ -1,19 +1,13 @@
-from typing import Any, Dict, Optional
-import requests
-import dill
-from database import Database
-from dotenv import load_dotenv
-
-load_dotenv("../.env")
-db_instance = Database()
-mongo = db_instance.get_db()
+from typing import Any, Dict
 
 
 def process_state(headers: Dict[str, Any]) -> Dict[str, Any]:
+    import requests
+
     state: Dict[str, Any] = {
         "appId": "trello",
         "appName": "Trello",
-        "description": "App description (Helps in alignining the bot)",
+        "description": "Given below is an array of objects with boards and list entities. You will find the listId and boardId.",
         "entities": {
             "boards": {
                 "endpoint": "https://api.trello.com/1/members/me?boards=open",
@@ -35,6 +29,11 @@ def process_state(headers: Dict[str, Any]) -> Dict[str, Any]:
     response = requests.get(boards_endpoint, headers=headers)
     boards_data = response.json()
 
+    boards_mapped = []
+    for b in boards_data["boards"]:
+        boards_mapped.append({"boardId": b["id"], "name": b["name"]})
+
+    state["entities"]["boards"]["data"] = boards_mapped
     # Iterate over each board and get lists
     for board in boards_data["boards"]:
         board_id = board["id"]
@@ -55,10 +54,4 @@ def process_state(headers: Dict[str, Any]) -> Dict[str, Any]:
         # Append the transformed data to the "data" array in the "lists" entity
         state["entities"]["lists"]["data"].extend(transformed_data)
 
-    return state
-
-
-if __name__ == "__main__":
-    mongo.integrations.insert_one(
-        {"function": dill.dumps(process_state), "app": "trello"}
-    )
+    return state["entities"]

@@ -85,7 +85,7 @@ def generate_openapi_payload(
     text: str,
     _operation_id: str,
     prev_api_response: str,
-    current_state: str,
+    current_state: Optional[str],
 ) -> ApiInfo:
     parser = ResolvingParser(spec_string=swagger_json)
     (a, b, c) = parser.version_parsed  # (3,0,2), we can then apply transformation on
