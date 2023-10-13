@@ -29,6 +29,7 @@ OpenCopilot allows you to have your own product's AI copilot. It integrates with
 
 
 https://github.com/openchatai/OpenCopilot/assets/32633162/0d9cfe4d-87f3-437e-b038-cf53c122d1d2
+
 (In this example, the user was able to add a new fish to the store just by text commands)
 
 
