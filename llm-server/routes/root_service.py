@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Dict, Any, cast
+from typing import Dict, Any, cast, Optional
 
 import logging
 import traceback
@@ -51,7 +51,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
     base_prompt = data.get("base_prompt", "")
     headers = data.get("headers", {})
     server_base_url = cast(str, data.get("server_base_url", ""))
-    app = data.get("app")
+    app = cast(Optional[str], data.get("app"))
 
     logging.info("[OpenCopilot] Got the following user request: {}".format(text))
     for required_field, error_msg in [
@@ -96,7 +96,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
                 _workflow,
                 swagger_doc,
                 WorkflowData(text, headers, server_base_url, swagger_url, app),
-                current_state,
+                app,
             )
 
             create_chat_history(swagger_url, session_id, True, text)
