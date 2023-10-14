@@ -109,8 +109,8 @@ export default function CopilotLayout({ children, params }: Props) {
           </DropdownMenu>
         </div>
       </aside>
-      <main className="flex flex-1 flex-col">
-        <div className="flex-1 h-full max-w-full overflow-hidden bg-primary-foreground">{children}</div>
+      <main className="flex flex-1 flex-col overflow-hidden">
+        <div className="flex-1 h-full max-w-full bg-primary-foreground">{children}</div>
       </main>
     </div>
   );

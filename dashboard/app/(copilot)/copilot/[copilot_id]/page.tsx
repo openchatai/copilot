@@ -59,14 +59,14 @@ function InstallationSection() {
 
 export default async function CopilotPage() {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col overflow-hidden w-full h-full">
       <HeaderShell className="bg-white">
         <h1 className="text-lg font-bold text-accent-foreground">
           Copilot's Name
         </h1>
       </HeaderShell>
-      <div className="flex-1">
-        <div className="container max-w-screen-md overflow-hidden p-8">
+      <div className="flex-1 overflow-auto">
+        <div className="container max-w-screen-md p-8">
           <Alert variant='info' className="mb-5">
             <ShieldAlert className="h-6 w-6" />
             <AlertTitle>Attention</AlertTitle>
