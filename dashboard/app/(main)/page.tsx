@@ -34,7 +34,7 @@ export default function Home() {
         <div className="flex flex-1 items-center justify-between">
           <div>
             <h1 className="text-lg font-bold text-accent-foreground">
-              All Copilots
+              All Copilots ✨
             </h1>
           </div>
           <div className="space-x-2">

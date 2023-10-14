@@ -39,37 +39,6 @@ export default function GeneralSettingsPage() {
             </div>
           </section>
 
-          {/* <section>
-            <h2 className="text-base font-bold text-accent-foreground">
-              Custom Context
-            </h2>
-            <p className="mb-1 text-sm font-normal">
-              You can change your copilot initial context / prompt from here.
-              also you can change the copilot response language.
-            </p>
-            <div className="mt-4 block rounded-lg border border-border bg-white shadow shadow-accent">
-              <div className="space-y-1 px-8 py-5">
-                <div className="w-full flex items-center justify-between gap-5">
-                  <Label className="mb-2 text-base font-semibold text-accent-foreground/50">
-                    Context
-                  </Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="default">Default</SelectItem>
-                      <SelectItem value="general">General Copilot</SelectItem>
-                      <SelectItem value="saas">SaaS Accounting</SelectItem>
-                      <SelectItem value="marketing">Marketeing</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Textarea />
-              </div>
-            </div>
-          </section> */}
-
           <section>
             <h2 className="mb-4 text-base font-bold text-destructive">
               Danger Zone

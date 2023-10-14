@@ -36,7 +36,7 @@ export default function CopilotLayout({ children, params }: Props) {
   const copilotBase = `/copilot/${params.copilot_id}`;
   return (
     <div className="flex h-full overflow-hidden">
-      <aside className="flex h-full w-header shrink-0 flex-col items-stretch justify-between border-r border-border bg-primary-foreground">
+      <aside className="flex h-full w-header shrink-0 flex-col items-stretch justify-between border-r border-border bg-white">
         <div className="flex h-header items-center justify-center border-b border-border p-1">
           <LogoMenu />
         </div>
@@ -110,7 +110,7 @@ export default function CopilotLayout({ children, params }: Props) {
         </div>
       </aside>
       <main className="flex flex-1 flex-col">
-        <div className="flex-1 h-full w-full overflow-hidden">{children}</div>
+        <div className="flex-1 h-full max-w-full overflow-hidden bg-primary-foreground">{children}</div>
       </main>
     </div>
   );

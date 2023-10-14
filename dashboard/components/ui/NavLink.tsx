@@ -3,15 +3,31 @@ import React from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { usePathname, useSelectedLayoutSegments } from "next/navigation";
-interface Props extends React.ComponentPropsWithoutRef<typeof Link> {
+
+type RenderProps = {
+  isActive: boolean;
+};
+
+interface Props
+  extends Omit<React.ComponentPropsWithoutRef<typeof Link>, "children"> {
   activeClassName?: string;
   inactiveClassName?: string;
   segment?: string;
+  children?:
+    | React.ReactNode
+    | (({ isActive }: RenderProps) => React.JSX.Element);
 }
 
 export const NavLink = React.forwardRef<React.ElementRef<typeof Link>, Props>(
   (
-    { className, activeClassName, segment, inactiveClassName, ...props },
+    {
+      className,
+      activeClassName,
+      segment,
+      inactiveClassName,
+      children,
+      ...props
+    },
     _ref,
   ) => {
     const pathname = usePathname();
@@ -22,6 +38,14 @@ export const NavLink = React.forwardRef<React.ElementRef<typeof Link>, Props>(
     return (
       <Link
         {...props}
+        // eslint-disable-next-line react/no-children-prop
+        children={
+          <>
+            {typeof children === "function"
+              ? children({ isActive })
+              : children ?? props.href}
+          </>
+        }
         ref={_ref}
         className={cn(
           className,

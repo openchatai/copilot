@@ -8,32 +8,37 @@ import {
   ExternalLink,
 } from "lucide-react";
 import SelectWorkspace from "./SelectWorkspace";
-
+import { NavLink } from "@/components/ui/NavLink";
 
 export default function Aside() {
   return (
-    <aside className="h-full flex flex-col w-aside justify-between border-r border-border bg-primary-foreground overflow-hidden">
-      <div className="w-full border-r border-b border-border bg-primary-foreground h-header">
+    <aside className="flex h-full w-aside flex-col justify-between overflow-hidden border-r border-border bg-primary-foreground">
+      <div className="h-header w-full border-b border-r border-border bg-primary-foreground">
         <SelectWorkspace />
       </div>
-      <div className="w-full h-full py-4 px-0 flex-1 overflow-auto space-y-4">
+      <div className="h-full w-full flex-1 space-y-4 overflow-auto px-0 py-4">
         <ul className="space-y-1 px-2">
           <li>
-            <button className="justify-between text-sm font-normal items-center gap-1 px-4 py-2 w-full rounded text-accent-foreground flex hover:bg-card-foreground">
-              <div className="flex items-center flex-1 gap-2">
-                <Bot className="h-5 w-5" />
+            <NavLink
+              href={"/"}
+              className="flex items-center rounded-md border px-3 py-2 text-base text-accent-foreground transition duration-150 ease-in-out"
+              activeClassName="border-gray-300 bg-accent font-semibold"
+              inactiveClassName="border-transparent hover:border-gray-300 font-normal opacity-80 hover:bg-accent flex w-full items-center justify-between gap-1 rounded px-4 py-2 text-sm font-normal text-accent-foreground hover:bg-card-foreground"
+            >
+              <div className="flex flex-1 items-center gap-2">
+                <Bot className="h-4 w-4" />
                 <span>Copilots</span>
               </div>
               <span className="text-sm">2</span>
-            </button>
+            </NavLink>
           </li>
         </ul>
 
         <ul className="space-y-1 px-2">
           <li>
-            <button className="justify-between group items-center gap-1 px-4 py-2 w-full rounded text-accent-foreground flex font-normal hover:bg-card-foreground">
-              <div className="flex items-center flex-1 gap-2">
-                <PlaySquare className="h-5 w-5" />
+            <button className="group flex w-full items-center justify-between gap-1 rounded px-4 py-2 text-base font-light text-accent-foreground transition duration-150 ease-in-out hover:bg-card-foreground">
+              <div className="flex flex-1 items-center gap-2">
+                <PlaySquare className="h-4 w-4" />
                 <span>Learn</span>
               </div>
               <span className="text-sm opacity-0 group-hover:opacity-100">
@@ -42,8 +47,8 @@ export default function Aside() {
             </button>
           </li>
           <li>
-            <button className="justify-between group items-center gap-1 px-4 py-2 w-full rounded text-accent-foreground flex font-normal hover:bg-card-foreground">
-              <div className="flex items-center flex-1 gap-2">
+            <button className="group flex w-full items-center justify-between gap-1 rounded px-4 py-2 text-base font-light text-accent-foreground transition duration-150 ease-in-out hover:bg-card-foreground">
+              <div className="flex flex-1 items-center gap-2">
                 <ScrollText className="h-5 w-5" />
                 <span>Changelog</span>
               </div>
@@ -54,8 +59,8 @@ export default function Aside() {
           </li>
 
           <li>
-            <button className="justify-between group items-center gap-1 px-4 py-2 w-full rounded text-accent-foreground flex font-normal hover:bg-card-foreground">
-              <div className="flex items-center flex-1 gap-2">
+            <button className="group flex w-full items-center justify-between gap-1 rounded px-4 py-2 text-base font-normal text-accent-foreground transition duration-150 ease-in-out hover:bg-card-foreground">
+              <div className="flex flex-1 items-center gap-2">
                 <GithubIcon className="h-5 w-5" />
                 <span>Github</span>
               </div>
@@ -68,16 +73,19 @@ export default function Aside() {
 
         <ul className="space-y-1 px-2">
           <li>
-            <button className="justify-between group items-center gap-1 px-4 py-2 w-full rounded text-accent-foreground flex font-normal hover:bg-card-foreground">
-              <div className="flex items-center flex-1 gap-2">
-                <Settings className="h-5 w-5" />
+            <NavLink
+              className="group flex w-full items-center justify-between gap-1 rounded px-4 py-2 text-base font-normal text-accent-foreground hover:bg-card-foreground"
+              href="/settings"
+            >
+              <div className="flex flex-1 items-center gap-2">
+                <Settings className="h-4 w-4" />
                 <span>Settings</span>
               </div>
-            </button>
+            </NavLink>
           </li>
         </ul>
       </div>
-      <div className="border-t border-border py-4 px-5 hover:bg-card-foreground">
+      <div className="border-t border-border px-5 py-4 hover:bg-card-foreground">
         <div className="flex items-center gap-2">
           <Avatar>
             <AvatarFallback>AH</AvatarFallback>

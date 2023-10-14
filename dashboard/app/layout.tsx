@@ -10,6 +10,7 @@ import { JotaiProvider } from "./_store/JotaiProvider";
 const opensans = Open_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
+  fallback: ["system-ui", "Roboto", "sans-serif"],
 });
 
 export const metadata: Metadata = {
@@ -33,7 +34,7 @@ export default function RootLayout({
         >
           {children}
           {/* browser too small message */}
-          <div className="fixed inset-0 z-[500] flex items-center justify-center bg-primary-foreground/70 backdrop-blur lg:hidden">
+          <div className="fixed inset-0 z-[500] flex items-center justify-center bg-primary-foreground/70 backdrop-blur lg:hidden p-5">
             <div className="flex flex-col items-center justify-center text-lg">
               <span>
                 <Tv2 className="h-20 w-20 text-primary" />

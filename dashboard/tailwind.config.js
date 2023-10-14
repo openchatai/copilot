@@ -70,8 +70,8 @@ module.exports = {
         },
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
+        "accordion-down": "accordion-down 100ms ease",
+        "accordion-up": "accordion-up 100ms ease",
       },
       height: {
         header: "var(--header-height)",
