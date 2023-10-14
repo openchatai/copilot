@@ -81,7 +81,11 @@ def extract_json_payload(input_string: str) -> Optional[Any]:
 
 
 def generate_openapi_payload(
-    swagger_json: str, text: str, _operation_id: str, prev_api_response: str
+    swagger_json: str,
+    text: str,
+    _operation_id: str,
+    prev_api_response: str,
+    current_state: Optional[str],
 ) -> ApiInfo:
     parser = ResolvingParser(spec_string=swagger_json)
     (a, b, c) = parser.version_parsed  # (3,0,2), we can then apply transformation on
@@ -94,21 +98,31 @@ def generate_openapi_payload(
         {}
         if not api_info.path_params["properties"]
         else gen_params_from_schema(
-            json.dumps(api_info.path_params, separators=(',', ':')), text, prev_api_response
+            json.dumps(api_info.path_params, separators=(",", ":")),
+            text,
+            prev_api_response,
+            current_state,
         )
     )
     api_info.query_params = (
         {}
         if not api_info.query_params["properties"]
         else gen_params_from_schema(
-            json.dumps(api_info.query_params, separators=(',', ':')), text, prev_api_response
+            json.dumps(api_info.query_params, separators=(",", ":")),
+            text,
+            prev_api_response,
+            current_state,
         )
     )
 
     if api_info.body_schema:
         example = gen_ex_from_schema(api_info.body_schema)
         api_info.body_schema = gen_body_from_schema(
-            json.dumps(api_info.body_schema, separators=(',', ':')), text, prev_api_response, example
+            json.dumps(api_info.body_schema, separators=(",", ":")),
+            text,
+            prev_api_response,
+            example,
+            current_state,
         )
 
     else:

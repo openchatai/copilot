@@ -3,11 +3,12 @@ from routes.workflow.generate_openapi_payload import generate_openapi_payload
 from utils.make_api_call import make_api_request
 import traceback
 import logging
-from typing import Any
+from typing import Any, Optional
 from routes.workflow.extractors.transform_api_response import (
     transform_api_response_from_schema,
 )
 from routes.workflow.extractors.convert_json_to_text import convert_json_to_text
+from utils.process_app_state import process_state
 
 
 def run_openapi_operations(
@@ -16,15 +17,18 @@ def run_openapi_operations(
     text: str,
     headers: Any,
     server_base_url: str,
+    app: Optional[str],
 ) -> str:
     prev_api_response = ""
     record_info = {"Workflow Name": record.get("name")}
     for flow in record.get("flows", []):
         for step in flow.get("steps"):
             try:
+                # refresh state after every api call, we can look into optimizing this later as well
+                current_state = process_state(app, headers)
                 operation_id = step.get("open_api_operation_id")
                 api_payload = generate_openapi_payload(
-                    swagger_json, text, operation_id, prev_api_response
+                    swagger_json, text, operation_id, prev_api_response, current_state
                 )
 
                 api_response = make_api_request(headers=headers, **api_payload.__dict__)

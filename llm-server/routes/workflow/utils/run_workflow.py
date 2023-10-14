@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from routes.workflow.typings.run_workflow_input import WorkflowData
 from routes.workflow.utils.run_openapi_ops import run_openapi_operations
 from opencopilot_types.workflow_type import WorkflowDataType
@@ -7,7 +7,10 @@ import logging, json
 
 
 def run_workflow(
-    workflow_doc: WorkflowDataType, swagger_json: Any, data: WorkflowData
+    workflow_doc: WorkflowDataType,
+    swagger_json: Any,
+    data: WorkflowData,
+    app: Optional[str],
 ) -> Dict[str, Any]:
     headers = data.headers or {}
     server_base_url = data.server_base_url
@@ -17,7 +20,12 @@ def run_workflow(
 
     try:
         result = run_openapi_operations(
-            workflow_doc, swagger_json, data.text, headers, server_base_url
+            workflow_doc,
+            swagger_json,
+            data.text,
+            headers,
+            server_base_url,
+            app,
         )
     except Exception as e:
         logging.error("[OpenCopilot] Custom planner failed: %s", e)

@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Dict, Any, cast
+from typing import Dict, Any, cast, Optional
 
 import logging
 import traceback
@@ -27,6 +27,7 @@ from utils.db import Database
 import json
 from api_caller.base import try_to_match_and_call_api_endpoint
 from models.repository.chat_history_repo import create_chat_history
+from utils.process_app_state import process_state
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -50,6 +51,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
     base_prompt = data.get("base_prompt", "")
     headers = data.get("headers", {})
     server_base_url = cast(str, data.get("server_base_url", ""))
+    app = cast(Optional[str], data.get("app"))
 
     logging.info("[OpenCopilot] Got the following user request: {}".format(text))
     for required_field, error_msg in [
@@ -69,10 +71,11 @@ def handle_request(data: Dict[str, Any]) -> Any:
             "[OpenCopilot] Trying to figure out if the user request require 1) APIs calls 2) If yes how many "
             "of them"
         )
-        bot_response = hasSingleIntent(swagger_doc, text, session_id)
+        current_state = process_state(app, headers)
+        bot_response = hasSingleIntent(swagger_doc, text, session_id, current_state)
         if len(bot_response.ids) >= 1:
             logging.info(
-                "[OpenCopilot] Apparently, the user request require calling more than single API endpoint "
+                "[OpenCopilot] Apparently, the user request require calling one or more API endpoint "
                 "to get the job done"
             )
 
@@ -92,7 +95,8 @@ def handle_request(data: Dict[str, Any]) -> Any:
             output = run_workflow(
                 _workflow,
                 swagger_doc,
-                WorkflowData(text, headers, server_base_url, swagger_url),
+                WorkflowData(text, headers, server_base_url, swagger_url, app),
+                app,
             )
 
             create_chat_history(swagger_url, session_id, True, text)
