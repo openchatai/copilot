@@ -15,6 +15,7 @@ interface Props
   segment?: string;
   children?:
     | React.ReactNode
+    // eslint-disable-next-line no-unused-vars
     | (({ isActive }: RenderProps) => React.JSX.Element);
 }
 

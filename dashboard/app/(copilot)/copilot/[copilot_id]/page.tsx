@@ -7,14 +7,16 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ShieldAlert, Wand2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ShieldAlert, Wand2, Inspect } from "lucide-react";
+import Link from "next/link";
 import React from "react";
 
 function InstallationSection() {
   return (
     <section className="rounded-lg border bg-white shadow-sm">
       <AccordionItem value="installation">
-        <AccordionTrigger className="">
+        <AccordionTrigger>
           <div className="flex flex-row items-center gap-3">
             <span className="flex-center h-9 w-9 rounded-lg bg-secondary text-secondary-foreground">
               <Wand2 className="h-4 w-4" />
@@ -28,10 +30,10 @@ function InstallationSection() {
           </div>
         </AccordionTrigger>
         <AccordionContent className="px-8 py-6">
-          <p className="mb-2">
-            Paste this code snippet before the closing {`</body>`} tag on all
-            pages you want the widget to appear. Remember to version to run your
-            Assistant.
+          <p className="mb-2 font-medium">
+            Paste this code snippet before the closing{" "}
+            <strong>{`</body>`}</strong> tag on all pages you want the widget to
+            appear. Remember to version to run your Assistant.
           </p>
           <CodeBlock
             code={`<script>
@@ -57,9 +59,37 @@ function InstallationSection() {
   );
 }
 
+function TryItSection() {
+  return (
+    <section className="rounded-lg border bg-white shadow-sm">
+      <AccordionItem value="try-share">
+        <AccordionTrigger>
+          <div className="flex flex-row items-center gap-3">
+            <span className="flex-center h-9 w-9 rounded-lg bg-secondary text-secondary-foreground">
+              <Inspect className="h-4 w-4" />
+            </span>
+            <div className="text-start">
+              <h1 className="text-base font-semibold">Try and Share</h1>
+              <p className="text-sm font-normal">
+                You can alsoe try the widget and share it with your friends
+              </p>
+            </div>
+          </div>
+        </AccordionTrigger>
+        <AccordionContent className="px-8 py-6">
+          <p className="mb-2">1- Here is an example Dashboard to test it out</p>
+          <Button asChild variant="link">
+            <Link href="/copilot/1">Open Dashboard</Link>
+          </Button>
+        </AccordionContent>
+      </AccordionItem>
+    </section>
+  );
+}
+
 export default async function CopilotPage() {
   return (
-    <div className="flex flex-col overflow-hidden w-full h-full">
+    <div className="flex h-full w-full flex-col overflow-hidden">
       <HeaderShell className="bg-white">
         <h1 className="text-lg font-bold text-accent-foreground">
           Copilot's Name
@@ -67,15 +97,17 @@ export default async function CopilotPage() {
       </HeaderShell>
       <div className="flex-1 overflow-auto">
         <div className="container max-w-screen-md p-8">
-          <Alert variant='info' className="mb-5">
+          <Alert variant="info" className="mb-5">
             <ShieldAlert className="h-6 w-6" />
             <AlertTitle>Attention</AlertTitle>
             <AlertDescription>
-            If your APIs requires authorization then you might need to provide the needed headers to enable OpenCopilot from accessing it
+              If your APIs requires authorization then you might need to provide
+              the needed headers to enable OpenCopilot from accessing it
             </AlertDescription>
           </Alert>
-          <Accordion type="multiple" className="max-w-full">
+          <Accordion type="single" className="max-w-full space-y-5">
             <InstallationSection />
+            <TryItSection />
           </Accordion>
         </div>
       </div>
