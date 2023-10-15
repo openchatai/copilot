@@ -125,8 +125,8 @@ And our goal is to empower every SaaS product with the ability to have their own
 - [x] Provide Swagger definitions for your APIs.
 - [x] Swagger definition validator + recommender.
 - [x] UI endpoints editor.
-- [ ] Chat memory.
-- [ ] Vector DB support for large Swagger files.
+- [x] Chat memory.
+- [x] Vector DB support for large Swagger files.
 - [ ] Plugins system to support different types of authentications.
 - [ ] Offline LLMs.
 - [ ] Ability to ingest text data, PDF files, websites, and extra data sources.
