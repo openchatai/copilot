@@ -65,7 +65,7 @@ make install
 
 This will install the necessary dependencies and set up the environment for the OpenCopilot project.
 
-Once the installation is complete, you can access the OpenCopilot console at: http://localhost:8888
+Once the installation is complete, you can access the OpenCopilot console at http://localhost:8888
 
 ---
 
@@ -92,10 +92,10 @@ https://github.com/openchatai/OpenCopilot/assets/32633162/3bf5c24d-572c-4a42-9e4
 [Watch this video from Shopify:](http://www.youtube.com/watch?v=HVvbY7A7lIQ)
 
 [![IMAGE ALT TEXT](https://github.com/openchatai/OpenCopilot/assets/32633162/edebbaa6-eba5-4f72-b88d-cf0d690fffa8)](http://www.youtube.com/watch?v=HVvbY7A7lIQ "Video Title")
-(OpenCopilot is not affliated with Shopify, and they do not use OpenCopilot, it's just a demo on what copilots are capable of)
+(OpenCopilot is not affiliated with Shopify, and they do not use OpenCopilot, it's just a demo on what copilots are capable of)
 
 
-## AI Copilot: growing trend
+## AI Copilot: a growing trend
 
 - [Shopify is developing "Shopify Sidekick."](https://www.youtube.com/watch?v=HVvbY7A7lIQ&ab_channel=Shopify)
 - [Microsoft is working on "Windows Copilot."](https://www.youtube.com/watch?v=FCfwc-NNo30&ab_channel=MicrosoftDeveloper)
@@ -103,7 +103,7 @@ https://github.com/openchatai/OpenCopilot/assets/32633162/3bf5c24d-572c-4a42-9e4
 - [Microsoft is also developing "Bing Copilot."](https://www.microsoft.com/en-us/bing?form=MA13FV)
 
 
-And our goal is to empower every SaaS product with the ability to have their own AI copilots tailored for their unique products.
+Our goal is to empower every SaaS product with the ability to have their own AI copilots tailored for their unique products.
 
 ## 🏁 What OpenCopilot can and can't do now?
 
@@ -136,7 +136,7 @@ We love hearing from you! Got any cool ideas or requests? We're all ears! So, if
 
 ### Important links
 - [OpenCopilot Flows Editor](https://editor.opencopilot.so)
-- The backend server (API) is reacheable via http://localhost:8888/backend
+- The backend server (API) is reachable via http://localhost:8888/backend
 - The dashboard server is reachable via http://localhost:8888/ or http://localhost:8888/dashboard
  
 
