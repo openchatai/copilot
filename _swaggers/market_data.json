@@ -1,0 +1,1316 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Market Data API",
+    "version": "1.0.0",
+    "termsOfService": "https://www.marketdata.app/terms/",
+    "contact": {
+      "email": "support@marketdata.app"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.marketdata.app"
+    }
+  ],
+  "paths": {
+    "/v1/indices/candles/{resolution}/{symbol}/": {
+      "get": {
+        "operationId": "v1_indices_candles_retrieve",
+        "description": "Get historical price candles for an index.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "csv",
+                "json"
+              ]
+            },
+            "description": "The format parameter is used to specify the format for your data. We support JSON and CSV formats. The default format is JSON."
+          },
+          {
+            "in": "path",
+            "name": "resolution",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The duration of each candle.\n                                                                                        Minutely Resolutions: (1, 3, 5, 15, 30, 45, ...)\n                                                                                        Hourly Resolutions: (H, 1H, 2H, ...)\n                                                                                        Daily Resolutions: (D, 1D, 2D, ...)\n                                                                                        Weekly Resolutions: (W, 1W, 2W, ...)\n                                                                                        Monthly Resolutions: (M, 1M, 2M, ...)\n                                                                                        Yearly Resolutions:(Y, 1Y, 2Y, ...)')",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "symbol",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The index's ticker symbol. If no exchange is specified. You may embed the exchange in the ticker symbol using the Yahoo Finance or TradingView formats.",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "date",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Use to lookup historical candles from a specific trading day. Accepted date inputs: ISO 8601, unix, spreadsheet."
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "The leftmost candle on a chart (inclusive). If you use countback, to is not required. Accepted timestamp inputs: ISO 8601, unix, spreadsheet."
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "The rightmost candle on a chart (not inclusive). Accepted timestamp inputs: ISO 8601, unix, spreadsheet."
+          },
+          {
+            "in": "query",
+            "name": "countback",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Countback will fetch a number of candles before (to the left of) to If you use from, countback is not required."
+          },
+          {
+            "in": "query",
+            "name": "dateformat",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "spreadsheet",
+                "timestamp",
+                "unix"
+              ]
+            },
+            "description": "The dateformat parameter allows you specify the format you wish to receive date and time information in."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The limit parameter allows you to limit the number of results for a particular API call or override an endpoint’s default limits to get more data."
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The offset parameter is used together with limit to allow you to implement pagination in your application. Offset will allow you to return values starting at a certain value."
+          },
+          {
+            "in": "query",
+            "name": "headers",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "The headers parameter is used to turn off headers when using CSV output."
+          },
+          {
+            "in": "query",
+            "name": "columns",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The columns parameter is used to limit the results and only request the columns you need. The most common use of this feature is to embed a single numeric result from one of the end points in a spreadsheet cell."
+          },
+          {
+            "in": "query",
+            "name": "human",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Use human-readable attribute names in the JSON or CSV output instead of the standard camelCase attribute names."
+          }
+        ],
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {}
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/v1/indices/quotes/{symbol}/": {
+      "get": {
+        "operationId": "v1_indices_quotes_retrieve",
+        "description": "Get last quote for an index.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "csv",
+                "json"
+              ]
+            },
+            "description": "The format parameter is used to specify the format for your data. We support JSON and CSV formats. The default format is JSON."
+          },
+          {
+            "in": "path",
+            "name": "symbol",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The index's ticker symbol. If no exchange is specified. You may embed the exchange in the ticker symbol using the Yahoo Finance or TradingView formats.",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "dateformat",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "spreadsheet",
+                "timestamp",
+                "unix"
+              ]
+            },
+            "description": "The dateformat parameter allows you specify the format you wish to receive date and time information in."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The limit parameter allows you to limit the number of results for a particular API call or override an endpoint's default limits to get more data."
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The offset parameter is used together with limit to allow you to implement pagination in your application. Offset will allow you to return values starting at a certain value."
+          },
+          {
+            "in": "query",
+            "name": "headers",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "The headers parameter is used to turn off headers when using CSV output."
+          },
+          {
+            "in": "query",
+            "name": "columns",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The columns parameter is used to limit the results and only request the columns you need. The most common use of this feature is to embed a single numeric result from one of the end points in a spreadsheet cell."
+          },
+          {
+            "in": "query",
+            "name": "human",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Use human-readable attribute names in the JSON or CSV output instead of the standard camelCase attribute names."
+          }
+        ],
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {}
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/v1/markets/status/": {
+      "get": {
+        "operationId": "v1_markets_status_retrieve",
+        "description": "Get market status (\"open\" or \"closed\") for a date or range of dates.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "csv",
+                "json"
+              ]
+            },
+            "description": "The format parameter is used to specify the format for your data. We support JSON and CSV formats. The default format is JSON."
+          },
+          {
+            "in": "query",
+            "name": "date",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Use to lookup status from a specific trading day. Accepted date inputs: ISO 8601, unix, spreadsheet."
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Limit the status to dates after from (inclusive). Should be combined with to to create a range. Accepted date inputs: ISO 8601, unix, spreadsheet."
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Limit the status to dates before to (inclusive). Should be combined with from to create a range. Accepted date inputs: ISO 8601, unix, spreadsheet."
+          },
+          {
+            "in": "query",
+            "name": "countback",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Countback will fetch a number of dates before (to the left of) to. If you use from, countback is not required."
+          },
+          {
+            "in": "query",
+            "name": "country",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Use to specify the country of the exchange. Use the two digit ISO 3166 country code. If no country is specified, US exchanges will be assumed."
+          },
+          {
+            "in": "query",
+            "name": "dateformat",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "spreadsheet",
+                "timestamp",
+                "unix"
+              ]
+            },
+            "description": "The dateformat parameter allows you specify the format you wish to receive date and time information in."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The limit parameter allows you to limit the number of results for a particular API call or override an endpoint’s default limits to get more data."
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The offset parameter is used together with limit to allow you to implement pagination in your application. Offset will allow you to return values starting at a certain value."
+          },
+          {
+            "in": "query",
+            "name": "headers",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "The headers parameter is used to turn off headers when using CSV output."
+          },
+          {
+            "in": "query",
+            "name": "columns",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The columns parameter is used to limit the results and only request the columns you need. The most common use of this feature is to embed a single numeric result from one of the end points in a spreadsheet cell."
+          },
+          {
+            "in": "query",
+            "name": "human",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Use human-readable attribute names in the JSON or CSV output instead of the standard camelCase attribute names."
+          }
+        ],
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {}
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/v1/options/chain/{underlying}/": {
+      "get": {
+        "operationId": "v1_options_chain_retrieve",
+        "description": "Get a current or historical end of day options chain for an underlying ticker symbol.\nOptional parameters allow for extensive filtering of the chain.\nUse the optionSymbol returned from this endpoint to get quotes, greeks, or other information using the other endpoints.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "csv",
+                "json"
+              ]
+            },
+            "description": "The format parameter is used to specify the format for your data. We support JSON and CSV formats. The default format is JSON."
+          },
+          {
+            "in": "path",
+            "name": "underlying",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The underlying ticker symbol for the options chain you wish to lookup. A company or securities identifier can also be used instead of a ticker symbol.\n                                                                                        Ticker Formats: (TICKER, TICKER.EX, EXCHANGE:TICKER)\n                                                                                        Company Identifiers: (CIK, LEI)\n                                                                                       Securities Identifiers: (CUSIP, SEDOL, ISIN, FIGI)",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "date",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Use to lookup a historical end of day options chain from a specific trading day. If no date is specified the chain will be the most current chain available during market hours. When the market is closed the chain will be from the last trading day. Accepted date inputs: ISO 8601, unix, spreadsheet."
+          },
+          {
+            "in": "query",
+            "name": "expiration",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Limit the option chain to a specific expiration date. Accepted date inputs: ISO 8601, unix, spreadsheet. If omitted all expirations will be returned."
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Limit the option chain to expiration dates after from (inclusive). Should be combined with to to create a range. Accepted date inputs: ISO 8601, unix, spreadsheet. If omitted all expirations will be returned."
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Limit the option chain to expiration dates before to (not inclusive). Should be combined with from to create a range. Accepted date inputs: ISO 8601, unix, spreadsheet. If omitted all expirations will be returned."
+          },
+          {
+            "in": "query",
+            "name": "month",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Limit the option chain to options that expire in a specific month (1-12)."
+          },
+          {
+            "in": "query",
+            "name": "year",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Limit the option chain to options that expire in a specific year."
+          },
+          {
+            "in": "query",
+            "name": "weekly",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Limit the option chain to weekly expirations by setting weekly to true and omitting the monthly and quarterly parameters. If set to false, no weekly expirations will be returned."
+          },
+          {
+            "in": "query",
+            "name": "monthly",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Limit the option chain to standard monthly expirations by setting monthly to true and omitting the weekly and quarterly parameters. If set to false, no monthly expirations will be returned."
+          },
+          {
+            "in": "query",
+            "name": "quarterly",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Limit the option chain to quarterly expirations by setting quarterly to true and omitting the weekly and monthly parameters. If set to false, no quarterly expirations will be returned."
+          },
+          {
+            "in": "query",
+            "name": "dte",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Days to expiry. Limit the option chain to a single expiration date closest to the dte provided. Should not be used together with from and to. Take care before combining with weekly, monthly, quarterly, since that will limit the expirations dte can return. If you are using the date parameter, dte is relative to the date provided."
+          },
+          {
+            "in": "query",
+            "name": "side",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "call",
+                "put"
+              ]
+            },
+            "description": "Limit the option chain to either call or put. If omitted, both sides will be returned."
+          },
+          {
+            "in": "query",
+            "name": "range",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "itm",
+                "otm"
+              ]
+            },
+            "description": "Limit the option chain to strikes that are in the money, out of the money, or include all. If omitted all options will be returned. Valid inputs: itm, otm, all."
+          },
+          {
+            "in": "query",
+            "name": "strike",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            },
+            "description": "Limit the option chain to options with the specific strike specified."
+          },
+          {
+            "in": "query",
+            "name": "minOpenInterest",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            },
+            "description": "Limit the option chain to options with an open interest greater than or equal to the number provided. Can be combined with minVolume and minLiquidity to further filter."
+          },
+          {
+            "in": "query",
+            "name": "minVolume",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Limit the option chain to options with an volume transacted greater than or equal to the number provided."
+          },
+          {
+            "in": "query",
+            "name": "maxBidAskSpread",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            },
+            "description": "Limit the option chain to options with a bid-ask spread less than or equal to the number provided."
+          },
+          {
+            "in": "query",
+            "name": "maxBidAskSpreadPct",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            },
+            "description": "Limit the option chain to options with a bid-ask spread less than or equal to the percent provided (relative to the underlying). For example, a value of 0.5% would exclude all options trading with a bid-ask spread greater than $1.00 in an underlying that trades at $200."
+          },
+          {
+            "in": "query",
+            "name": "dateformat",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "spreadsheet",
+                "timestamp",
+                "unix"
+              ]
+            },
+            "description": "The dateformat parameter allows you specify the format you wish to receive date and time information in."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The limit parameter allows you to limit the number of results for a particular API call or override an endpoint’s default limits to get more data."
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The offset parameter is used together with limit to allow you to implement pagination in your application. Offset will allow you to return values starting at a certain value."
+          },
+          {
+            "in": "query",
+            "name": "headers",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "The headers parameter is used to turn off headers when using CSV output."
+          },
+          {
+            "in": "query",
+            "name": "columns",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The columns parameter is used to limit the results and only request the columns you need. The most common use of this feature is to embed a single numeric result from one of the end points in a spreadsheet cell."
+          },
+          {
+            "in": "query",
+            "name": "symbol_lookup",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "quote",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Include quotes"
+          },
+          {
+            "in": "query",
+            "name": "human",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Use human-readable attribute names in the JSON or CSV output instead of the standard camelCase attribute names."
+          }
+        ],
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {}
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/v1/options/expirations/{underlying}/": {
+      "get": {
+        "operationId": "v1_options_expirations_retrieve",
+        "description": "Get a list of current or historical option expiration dates for an underlying symbol.\nIf no optional parameters are used, the endpoint returns the expirations for strike in the chain.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "csv",
+                "json"
+              ]
+            },
+            "description": "The format parameter is used to specify the format for your data. We support JSON and CSV formats. The default format is JSON."
+          },
+          {
+            "in": "path",
+            "name": "underlying",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The underlying ticker symbol for the options chain you wish to lookup. A company or securities identifier can also be used instead of a ticker symbol.\n                                                                                        Ticker Formats: (TICKER, TICKER.EX, EXCHANGE:TICKER)\n                                                                                        Company Identifiers: (CIK, LEI)\n                                                                                       Securities Identifiers: (CUSIP, SEDOL, ISIN, FIGI)",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "strike",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            },
+            "description": "Limit the lookup of expiration dates to the strike provide. This will cause the endpoint to only return expiration dates that include this strike."
+          },
+          {
+            "in": "query",
+            "name": "date",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Use to lookup a historical list of expiration dates from a specific previous trading day. If date is omitted the expiration dates will be from the current trading day during market hours or from the last trading day when the market is closed. Accepted date inputs: ISO 8601, unix, spreadsheet."
+          },
+          {
+            "in": "query",
+            "name": "dateformat",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "spreadsheet",
+                "timestamp",
+                "unix"
+              ]
+            },
+            "description": "The dateformat parameter allows you specify the format you wish to receive date and time information in."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The limit parameter allows you to limit the number of results for a particular API call or override an endpoint’s default limits to get more data."
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The offset parameter is used together with limit to allow you to implement pagination in your application. Offset will allow you to return values starting at a certain value."
+          },
+          {
+            "in": "query",
+            "name": "headers",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "The headers parameter is used to turn off headers when using CSV output."
+          },
+          {
+            "in": "query",
+            "name": "columns",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The columns parameter is used to limit the results and only request the columns you need. The most common use of this feature is to embed a single numeric result from one of the end points in a spreadsheet cell."
+          },
+          {
+            "in": "query",
+            "name": "symbol_lookup",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "human",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Use human-readable attribute names in the JSON or CSV output instead of the standard camelCase attribute names."
+          }
+        ],
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {}
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/v1/options/lookup/{userInput}/": {
+      "get": {
+        "operationId": "v1_options_lookup_retrieve",
+        "description": "Generate a properly formatted OCC option symbol based on the user's human-readable description of an option.\nThis endpoint converts text such as \"AAPL 7/26/23 $200 Call\" to OCC option symbol format: AAPL230726C00200000.\nThe user input must be URL-encoded.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "csv",
+                "json"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "userInput",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The human-readable string input that contains (1) stock symbol (2) strike (3) expiration date (4) option side (i.e. put or call). This endpoint will translate the user's input into a valid OCC option symbol.",
+            "required": true
+          }
+        ],
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {}
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/v1/options/quotes/{optionSymbol}/": {
+      "get": {
+        "operationId": "v1_options_quotes_retrieve",
+        "description": "Get a current or historical end of day quote for a single or multiple options contracts.\nSeparate multiple options symbols with a comma.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "csv",
+                "json"
+              ]
+            },
+            "description": "The format parameter is used to specify the format for your data. We support JSON and CSV formats. The default format is JSON."
+          },
+          {
+            "in": "path",
+            "name": "optionSymbol",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The option symbol (as defined by the OCC) for the option you wish to lookup. Use the current OCC option symbol format, even for historic options that quoted before the format change in 2010.",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "date",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Use to lookup a historical end of day quote from a specific trading day. If no date is specified the quote will be the most current price available during market hours. When the market is closed the quote will be from the last trading day. Accepted date inputs: ISO 8601, unix, spreadsheet."
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Use to lookup a series of end of day quotes. From is the oldest (leftmost) date to return (inclusive). If from/to is not specified the quote will be the most current price available during market hours. When the market is closed the quote will be from the last trading day. Accepted date inputs: ISO 8601, unix, spreadsheet."
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Use to lookup a series of end of day quotes. To is the newest (rightmost) date to return (exclusive). If from/to is not specified the quote will be the most current price available during market hours. When the market is closed the quote will be from the last trading day. Accepted date inputs: ISO 8601, unix, spreadsheet."
+          },
+          {
+            "in": "query",
+            "name": "countback",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Countback will fetch a number of quotes before (to the left of) to If you use from, countback is not required."
+          },
+          {
+            "in": "query",
+            "name": "dateformat",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "spreadsheet",
+                "timestamp",
+                "unix"
+              ]
+            },
+            "description": "The dateformat parameter allows you specify the format you wish to receive date and time information in."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The limit parameter allows you to limit the number of results for a particular API call or override an endpoint’s default limits to get more data."
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The offset parameter is used together with limit to allow you to implement pagination in your application. Offset will allow you to return values starting at a certain value."
+          },
+          {
+            "in": "query",
+            "name": "headers",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "The headers parameter is used to turn off headers when using CSV output."
+          },
+          {
+            "in": "query",
+            "name": "columns",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The columns parameter is used to limit the results and only request the columns you need. The most common use of this feature is to embed a single numeric result from one of the end points in a spreadsheet cell."
+          },
+          {
+            "in": "query",
+            "name": "human",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Use human-readable attribute names in the JSON or CSV output instead of the standard camelCase attribute names."
+          }
+        ],
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {}
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/v1/options/strikes/{underlying}/": {
+      "get": {
+        "operationId": "v1_options_strikes_retrieve",
+        "description": "Get a list of current or historical options strikes for an underlying symbol.\nIf no optional parameters are used, the endpoint returns the strikes for every expiration in the chain.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "csv",
+                "json"
+              ]
+            },
+            "description": "The format parameter is used to specify the format for your data. We support JSON and CSV formats. The default format is JSON."
+          },
+          {
+            "in": "path",
+            "name": "underlying",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The underlying ticker symbol for the options chain you wish to lookup. A company or securities identifier can also be used instead of a ticker symbol.\n                                                                                        Ticker Formats: (TICKER, TICKER.EX, EXCHANGE:TICKER)\n                                                                                        Company Identifiers: (CIK, LEI)\n                                                                                       Securities Identifiers: (CUSIP, SEDOL, ISIN, FIGI)",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "date",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Use to lookup a historical list of strikes from a specific previous trading day. If date is omitted the strikes will be from the current trading day during market hours or from the last trading day when the market is closed. Accepted date inputs: ISO 8601, unix, spreadsheet."
+          },
+          {
+            "in": "query",
+            "name": "expiration",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "imit the lookup of strikes to options that expire on a specific expiration date. Accepted date inputs: ISO 8601, unix, spreadsheet."
+          },
+          {
+            "in": "query",
+            "name": "dateformat",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "spreadsheet",
+                "timestamp",
+                "unix"
+              ]
+            },
+            "description": "The dateformat parameter allows you specify the format you wish to receive date and time information in."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The limit parameter allows you to limit the number of results for a particular API call or override an endpoint’s default limits to get more data."
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The offset parameter is used together with limit to allow you to implement pagination in your application. Offset will allow you to return values starting at a certain value."
+          },
+          {
+            "in": "query",
+            "name": "headers",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "The headers parameter is used to turn off headers when using CSV output."
+          },
+          {
+            "in": "query",
+            "name": "columns",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The columns parameter is used to limit the results and only request the columns you need. The most common use of this feature is to embed a single numeric result from one of the end points in a spreadsheet cell."
+          },
+          {
+            "in": "query",
+            "name": "symbol_lookup",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "human",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Use human-readable attribute names in the JSON or CSV output instead of the standard camelCase attribute names."
+          }
+        ],
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {}
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/v1/stocks/candles/{resolution}/{symbol}/": {
+      "get": {
+        "operationId": "v1_stocks_candles_retrieve",
+        "description": "Get historical price candles for a stock.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "csv",
+                "json"
+              ]
+            },
+            "description": "The format parameter is used to specify the format for your data. We support JSON and CSV formats. The default format is JSON."
+          },
+          {
+            "in": "path",
+            "name": "resolution",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The duration of each candle.\n                                                                                        Minutely Resolutions: (1, 3, 5, 15, 30, 45, ...)\n                                                                                        Hourly Resolutions: (H, 1H, 2H, ...)\n                                                                                        Daily Resolutions: (D, 1D, 2D, ...)\n                                                                                        Weekly Resolutions: (W, 1W, 2W, ...)\n                                                                                        Monthly Resolutions: (M, 1M, 2M, ...)\n                                                                                        Yearly Resolutions:(Y, 1Y, 2Y, ...)')",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "symbol",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The company's ticker symbol. If no exchange is specified, by default a US exchange will be assumed. You may embed the exchange in the ticker symbol using the Yahoo Finance or TradingView formats. A company or securities identifier can also be used instead of a ticker symbol.\n                                                                                    Ticker Formats: (TICKER, TICKER.EX, EXCHANGE:TICKER)\n                                                                                    Company Identifiers: (CIK, LEI)\n                                                                                    Securities Identifiers: (CUSIP, SEDOL, ISIN, FIGI)",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "date",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Use to lookup historical candles from a specific trading day. Accepted date inputs: ISO 8601, unix, spreadsheet."
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "The leftmost candle on a chart (inclusive). If you use countback, to is not required. Accepted timestamp inputs: ISO 8601, unix, spreadsheet."
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "The rightmost candle on a chart (not inclusive). Accepted timestamp inputs: ISO 8601, unix, spreadsheet."
+          },
+          {
+            "in": "query",
+            "name": "countback",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Countback will fetch a number of candles before (to the left of) to If you use from, countback is not required."
+          },
+          {
+            "in": "query",
+            "name": "exchange",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Use to specify the exchange of the ticker. This is useful when you need to specify stock that quotes on several exchanges with the same symbol. You may specify the exchange using the EXCHANGE ACRONYM, MIC CODE, or two digit YAHOO FINANCE EXCHANGE CODE. If no exchange is specified symbols will be matched to US exchanges first."
+          },
+          {
+            "in": "query",
+            "name": "extended",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Include extended hours trading sessions when returning intraday candles. Daily resolutions never return extended hours candles. The default is false"
+          },
+          {
+            "in": "query",
+            "name": "country",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Use to specify the country of the exchange (not the country of the company) in conjunction with the symbol argument. This argument is useful when you know the ticker symbol and the country of the exchange, but not the exchange code. Use the two digit ISO 3166 country code. If no country is specified, US exchanges will be assumed."
+          },
+          {
+            "in": "query",
+            "name": "adjustsplits",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Adjust historical data for for historical splits and reverse splits. Market Data uses the CRSP methodology for adjustment.\n                                                                                    Daily candles default: true.\n                                                                                    Intraday candles default: false."
+          },
+          {
+            "in": "query",
+            "name": "adjustdividends",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Adjust candles for dividends. Market Data uses the CRSP methodology for adjustment.\n                                                                                    Daily candles default: true.\n                                                                                    Intraday candles default: false."
+          },
+          {
+            "in": "query",
+            "name": "dateformat",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "spreadsheet",
+                "timestamp",
+                "unix"
+              ]
+            },
+            "description": "The dateformat parameter allows you specify the format you wish to receive date and time information in."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The limit parameter allows you to limit the number of results for a particular API call or override an endpoint’s default limits to get more data."
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The offset parameter is used together with limit to allow you to implement pagination in your application. Offset will allow you to return values starting at a certain value."
+          },
+          {
+            "in": "query",
+            "name": "headers",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "The headers parameter is used to turn off headers when using CSV output."
+          },
+          {
+            "in": "query",
+            "name": "columns",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The columns parameter is used to limit the results and only request the columns you need. The most common use of this feature is to embed a single numeric result from one of the end points in a spreadsheet cell."
+          },
+          {
+            "in": "query",
+            "name": "human",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Use human-readable attribute names in the JSON or CSV output instead of the standard camelCase attribute names."
+          }
+        ],
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {}
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    },
+    "/v1/stocks/quotes/{symbol}/": {
+      "get": {
+        "operationId": "v1_stocks_quotes_retrieve",
+        "description": "Get last quote for a stock.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "csv",
+                "json"
+              ]
+            },
+            "description": "The format parameter is used to specify the format for your data. We support JSON and CSV formats. The default format is JSON."
+          },
+          {
+            "in": "path",
+            "name": "symbol",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The company's ticker symbol. If no exchange is specified, by default a US exchange will be assumed. You may embed the exchange in the ticker symbol using the Yahoo Finance or TradingView formats. A company or securities identifier can also be used instead of a ticker symbol.\n                                                                                    Ticker Formats: (TICKER, TICKER.EX, EXCHANGE:TICKER)\n                                                                                    Company Identifiers: (CIK, LEI)\n                                                                                    Securities Identifiers: (CUSIP, SEDOL, ISIN, FIGI)",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "dateformat",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "spreadsheet",
+                "timestamp",
+                "unix"
+              ]
+            },
+            "description": "The dateformat parameter allows you specify the format you wish to receive date and time information in."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The limit parameter allows you to limit the number of results for a particular API call or override an endpoint's default limits to get more data."
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The offset parameter is used together with limit to allow you to implement pagination in your application. Offset will allow you to return values starting at a certain value."
+          },
+          {
+            "in": "query",
+            "name": "headers",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "The headers parameter is used to turn off headers when using CSV output."
+          },
+          {
+            "in": "query",
+            "name": "columns",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The columns parameter is used to limit the results and only request the columns you need. The most common use of this feature is to embed a single numeric result from one of the end points in a spreadsheet cell."
+          },
+          {
+            "in": "query",
+            "name": "symbol_lookup",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "human",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Use human-readable attribute names in the JSON or CSV output instead of the standard camelCase attribute names."
+          }
+        ],
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {}
+        ],
+        "responses": {
+          "200": {
+            "description": "No response body"
+          }
+        }
+      }
+    }
+  }
+}
