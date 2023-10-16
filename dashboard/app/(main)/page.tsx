@@ -1,23 +1,8 @@
-"use client";
 import { Button } from "@/components/ui/button";
 import * as React from "react";
-import { SelectTrigger } from "@radix-ui/react-select";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/components/ui/select";
-import { Search, XIcon } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { XIcon } from "lucide-react";
+
 import {
   ClosableDiv,
   ClosableDivProvider,
@@ -25,9 +10,16 @@ import {
 } from "@/components/headless/ClosableDiv";
 import { CopilotCardSmall } from "@/components/domain/CopilotCardSmall";
 import { HeaderShell } from "@/components/domain/HeaderShell";
+import { Search } from "./_parts/Search";
+import Link from "next/link";
 
-// list copilots
-export default function Home() {
+type Props = {
+  searchParams: {
+    q: string;
+  };
+};
+
+export default async function HomePage({ searchParams }: Props) {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
       <HeaderShell>
@@ -39,7 +31,9 @@ export default function Home() {
           </div>
           <div className="space-x-2">
             <Button variant="secondary">Invite</Button>
-            <Button>Create Copilot</Button>
+            <Button asChild>
+              <Link href="create/copilot">Create Copilot</Link>
+            </Button>
           </div>
         </div>
       </HeaderShell>
@@ -64,46 +58,7 @@ export default function Home() {
             </CloseBtn>
           </ClosableDiv>
         </ClosableDivProvider>
-
-        <div className="py-5 flex items-center justify-between gap-5">
-          <div className="flex flex-1 items-center gap-1">
-            <Label htmlFor="search-copilots">
-              <Search className="h-5 w-5 opacity-50" />
-              {/* <X className="h-5 w-5 opacity-50" /> */}
-            </Label>
-            <TooltipProvider disableHoverableContent>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Input
-                    id="search-copilots"
-                    className="border-none font-medium focus-visible:!ring-transparent"
-                    placeholder="Search Copilots..."
-                  />
-                </TooltipTrigger>
-                <TooltipContent>
-                  Press <span className="px-1 text-white">/</span> to search
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-
-          <Select defaultValue="last-viewed">
-            <SelectTrigger className="text-sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem className="py-2" value="last-viewed">
-                Last Viewed
-              </SelectItem>
-              <SelectItem className="py-2" value="date-created">
-                Date Created
-              </SelectItem>
-              <SelectItem className="py-2" value="alphapetically">
-                Alphapetically
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <Search />
         <div className="grid grid-cols-2 gap-8 py-4 xl:grid-cols-4">
           <CopilotCardSmall />
           <CopilotCardSmall />
