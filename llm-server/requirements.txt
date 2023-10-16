@@ -119,7 +119,7 @@ types-PyYAML==6.0.12.11
 types-requests==2.31.0.2
 types-urllib3==1.26.25.14
 typing-inspect==0.9.0
-urllib3==1.26.16
+urllib3==1.26.17
 wasabi==1.1.2
 Werkzeug==2.3.6
 wikipedia==1.4.0
