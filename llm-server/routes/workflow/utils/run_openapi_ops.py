@@ -33,6 +33,13 @@ def run_openapi_operations(
 
                 api_response = make_api_request(headers=headers, **api_payload.__dict__)
 
+                # intended change here:
+                # transformer_function = transformer_functions.get((app, method, api_endpoint))
+                # if transformer_function:
+                #     return transformer_function(api_payload, api_response)
+                # else:
+                #     return transform_api_response_from_schema(api_payload.endpoint or "",
+                #                                             api_response.text)
                 transformed_response = transform_api_response_from_schema(
                     api_payload.endpoint or "", api_response.text
                 )

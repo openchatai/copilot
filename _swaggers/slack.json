@@ -14157,7 +14157,7 @@
                                     "description": "This method either only returns a brief _OK_ response or a verbose schema is not available for this method."
                                 },
                                 "example": {
-                                    "access_token": "",
+                                    "access_token": "xoxb--19874698323-pdFZKVeTuE8sk7oOcBrzbqgy",
                                     "app_id": "A0KRD7HC3",
                                     "authed_user": {
                                         "access_token": "xoxp-1234",
