@@ -1,3 +1,4 @@
+@import url("@openchatai/copilot-flows-editor/dist/style.css");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

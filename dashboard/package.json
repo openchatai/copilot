@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.1",
+    "@openchatai/copilot-flows-editor": "^1.4.0",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-avatar": "^1.0.4",
@@ -59,7 +60,6 @@
     "prettier": "^3.0.3",
     "prettier-plugin-tailwindcss": "^0.5.5",
     "tailwindcss": "^3",
-    "@types/react-dropzone": "^5.1.0",
     "tailwindcss-debug-screens": "^2.2.1",
     "typescript": "^5"
   }

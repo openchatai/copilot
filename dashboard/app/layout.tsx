@@ -34,7 +34,7 @@ export default function RootLayout({
         >
           {children}
           {/* browser too small message */}
-          <div className="fixed inset-0 z-[500] flex items-center justify-center bg-primary-foreground/70 backdrop-blur md:hidden p-5">
+          <div className="fixed inset-0 z-[500] flex items-center justify-center bg-primary-foreground/70 backdrop-blur md:!hidden p-5">
             <div className="flex flex-col items-center justify-center text-lg">
               <span>
                 <Tv2 className="h-20 w-20 text-primary" />
