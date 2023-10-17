@@ -9,11 +9,12 @@ from routes.workflow.extractors.transform_api_response import (
 )
 from routes.workflow.extractors.convert_json_to_text import convert_json_to_text
 from utils.process_app_state import process_state
+from prance import ResolvingParser
 
 
 def run_openapi_operations(
     record: Any,
-    swagger_json: str,
+    swagger_json: ResolvingParser,
     text: str,
     headers: Any,
     server_base_url: str,
