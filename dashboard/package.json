@@ -43,6 +43,7 @@
     "react-hook-form": "^7.47.0",
     "react-syntax-highlighter": "^15.5.0",
     "react-use-wizard": "^2.2.3",
+    "swr": "^2.2.4",
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.22.3"
