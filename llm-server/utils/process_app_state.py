@@ -18,10 +18,13 @@ def extract_data_property(obj: Any) -> Any:
 
 
 def process_state(app: Optional[str], headers: Dict[str, Any]) -> Optional[str]:
-    # new app or user didn't define app because they are using an older version of the frontend
-    if app == None:
+    if app is None:
         return None
 
-    processor = importlib.import_module(f"integrations.{app}")
+    try:
+        processor = importlib.import_module(f"integrations.{app}")
+    except ModuleNotFoundError:
+        return None
+
     state = extract_data_property(processor.process_state(headers))
     return json.dumps(state, separators=(",", ":"))
