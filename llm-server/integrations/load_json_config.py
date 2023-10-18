@@ -4,7 +4,8 @@ import os
 import re
 
 
-def load_config(app_name: str, operationId: str, method: str) -> Any:
+# loads hint for llm to transform the api response
+def load_json_config(app_name: str, operationId: str) -> Any:
     """Load the configuration for the given app name, operation ID and method.
 
     Args:
@@ -18,9 +19,9 @@ def load_config(app_name: str, operationId: str, method: str) -> Any:
 
     current_dir = os.path.dirname(__file__)
     config_file = os.path.join(
-        current_dir, f"transformers/{app_name}/operations/{operationId}.py"
+        current_dir, f"transformers/{app_name}/operations/{operationId}.json"
     )
-
+    # safety check, not important
     with open(config_file, "r") as f:
         data = f.read()
         data = re.sub(r"\s+", "", data)  # Remove whitespace
@@ -29,8 +30,8 @@ def load_config(app_name: str, operationId: str, method: str) -> Any:
         data = re.sub(r",(?=\s*?})", "", data)  # Remove trailing commas
         f_data = json.loads(data)
 
-    return f_data[method]
+    return f_data
 
 
-config = load_config("slack", "users_list", "get")
+config = load_json_config("slack", "users_list")
 print(config)

@@ -1,13 +1,14 @@
 {
-    "channel": {
-        "id": "C012AB3CD",
-        "previous_names": [
-            "specifics",
-            "abstractions",
-            "etc"
-        ],
-        "purpose": {
-            "value": "This part of the workspace is for fun. Make fun here."
+    "channels": [
+        {
+            "id": "C012AB3CD",
+            "name": "general",
+            "purpose": {
+                "value": "This channel is for team-wide communication and announcements. All team members are in this channel."
+            }
         }
+    ],
+    "response_metadata": {
+        "next_cursor": "dGVhbTpDMDYxRkE1UEI="
     }
 }

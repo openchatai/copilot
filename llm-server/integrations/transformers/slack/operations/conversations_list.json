@@ -1,19 +1,14 @@
 {
-    "get": {
-        "channels": [
-            {
-                "id": "C012AB3CD",
-                "name": "general",
-                "purpose": {
-                    "value": "This channel is for team-wide communication and announcements. All team members are in this channel."
-                }
+    "channels": [
+        {
+            "id": "C012AB3CD",
+            "name": "general",
+            "purpose": {
+                "value": "This channel is for team-wide communication and announcements. All team members are in this channel."
             }
-        ],
-        "response_metadata": {
-            "next_cursor": "dGVhbTpDMDYxRkE1UEI="
         }
-    },
-    "put": {},
-    "post": {},
-    "delete": {}
+    ],
+    "response_metadata": {
+        "next_cursor": "dGVhbTpDMDYxRkE1UEI="
+    }
 }
