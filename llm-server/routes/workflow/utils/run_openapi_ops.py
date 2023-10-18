@@ -10,7 +10,8 @@ from routes.workflow.extractors.transform_api_response import (
 from routes.workflow.extractors.convert_json_to_text import convert_json_to_text
 from utils.process_app_state import process_state
 from prance import ResolvingParser
-import importlib
+from integrations.load_json_config import load_json_config
+from integrations.transformers.transformer import transform_response
 
 
 def run_openapi_operations(
@@ -35,18 +36,20 @@ def run_openapi_operations(
 
                 api_response = make_api_request(headers=headers, **api_payload.__dict__)
 
-                # intended change here:
-                # transformer_function = transformer_functions.get((app, method, api_endpoint))
-                # if transformer_function:
-                #     return transformer_function(api_payload, api_response)
-                # else:
-                #     return transform_api_response_from_schema(api_payload.endpoint or "",
-                #                                             api_response.text)
-
-                mod = importlib.import_module("")
-                transformed_response = transform_api_response_from_schema(
-                    api_payload.endpoint or "", api_response.text
-                )
+                # if a custom transformer function is defined for this operationId use that, otherwise forward it to the llm
+                # so we don't necessarily have to defined mappers for all api endpoints
+                partial_json = load_json_config(app, operation_id)
+                if not partial_json:
+                    transformed_response = transform_api_response_from_schema(
+                        api_payload.endpoint or "", api_response.text
+                    )
+                else:
+                    api_json = json.loads(api_response.text)
+                    transformed_response = json.dumps(
+                        transform_response(
+                            full_json=api_json, partial_json=partial_json
+                        )
+                    )
 
                 prev_api_response = prev_api_response + transformed_response
                 record_info[operation_id] = json.loads(api_response.text)

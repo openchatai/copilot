@@ -36,15 +36,10 @@ For example:
 
 ```json
 {
-  "get": {
-    "users": "$.members[*].id"
-  }
+  "users": "$.members[*].id"
 }
 ```
-
 This maps the `users` property to extract IDs from the `members` list in the response.
-
-The keys represent the HTTP method (get, post, etc). The values contain the property mappings.
 
 ## Usage
 
@@ -53,9 +48,35 @@ The transformers can be loaded dynamically based on the `app_name`, `operationId
 For example:
 
 ```python
-config = load_config("slack", "users_list", "get")
+config = load_config("slack", "users_list")
 ```
 
-This would load the `get` config from `transformers/slack/operations/users_list.py`.
+This would load the config from `transformers/slack/operations/users_list.py`.
 
 The config can then be used to parse the API response.
+
+
+## Full Example
+[run_openapi_ops.py](routes/workflow/utils/run_openapi_ops.py)
+```py
+from integrations.transformers.transformer import transform_response
+from routes.workflow.extractors.transform_api_response 
+
+api_response = make_api_request(headers=headers, **api_payload.__dict__)
+
+# if a custom transformer function is defined for this operationId use that, otherwise forward it to the llm
+# so we don't necessarily have to defined mappers for all api endpoints
+partial_json = load_json_config(app, operation_id)
+if not partial_json:
+    transformed_response = transform_api_response_from_schema(
+        api_payload.endpoint or "", api_response.text
+    )
+else:
+    api_json = json.loads(api_response.text)
+    transformed_response = json.dumps(
+        transform_response(
+            full_json=api_json, partial_json=partial_json
+        )
+    )
+
+```
