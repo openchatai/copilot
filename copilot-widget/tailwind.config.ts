@@ -13,7 +13,7 @@ const config: Config = {
       primary: "var(--opencopilot-primary-clr)",
       "primary-light": "var(--opencopilot-primary-light-clr)",
       accent: "var(--opencopilot-accent-clr)",
-      accent2: "var(--opencopilot-accnet-2-clr)",
+      accent2: "var(--opencopilot-accent-2-clr)",
       white,
       transparent,
       black,

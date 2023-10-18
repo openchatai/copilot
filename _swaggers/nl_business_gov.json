@@ -1,0 +1,622 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Business.gov.nl Open Data API",
+    "contact": {
+      "name": "Business.gov.nl",
+      "email": "editor@business.gov.nl"
+    },
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "https://opendata.business.gov.nl"
+    }
+  ],
+  "paths": {
+    "/api/v1/articles/{id}": {
+      "get": {
+        "tags": [
+          "Article"
+        ],
+        "summary": "Get an article by ID",
+        "description": "Retrieve information about an article by its unique ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "getArticleById",
+        "responses": {
+          "200": {
+            "description": "Article information retrieved successfully"
+          }
+        }
+      }
+    },
+    "/api/v1/articles": {
+      "get": {
+        "tags": [
+          "Articles"
+        ],
+        "summary": "Get a list of articles",
+        "description": "Retrieve a list of articles with optional pagination.",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "operationId": "getArticleList",
+        "responses": {
+          "200": {
+            "description": "Article information retrieved successfully"
+          }
+        }
+      }
+    },
+    "/api/v1/webinars/{id}": {
+      "get": {
+        "tags": [
+          "Webinar"
+        ],
+        "summary": "Get a webinar by ID",
+        "description": "Retrieve information about a webinar by its unique ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "getWebinarById",
+        "responses": {
+          "200": {
+            "description": "Article information retrieved successfully"
+          }
+        }
+      }
+    },
+    "/api/v1/webinars": {
+      "get": {
+        "tags": [
+          "Webinars"
+        ],
+        "summary": "Get a list of webinars",
+        "description": "Retrieve a list of webinars with optional pagination.",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "operationId": "getWebinarList",
+        "responses": {
+          "200": {
+            "description": "Article information retrieved successfully"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AmendmentLink": {
+        "required": [
+          "id",
+          "self",
+          "title",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "statusMessage": {
+            "type": "string",
+            "nullable": true
+          },
+          "self": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ArticleContract": {
+        "required": [
+          "authors",
+          "body",
+          "dateModified",
+          "id",
+          "self",
+          "title",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "intro": {
+            "type": "string",
+            "nullable": true
+          },
+          "body": {
+            "type": "string"
+          },
+          "statusMessage": {
+            "type": "string",
+            "nullable": true
+          },
+          "amendments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AmendmentLink"
+            },
+            "description": "Related amendments.",
+            "nullable": true
+          },
+          "articles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ArticleLink"
+            },
+            "description": "Related articles.",
+            "nullable": true
+          },
+          "externalLinks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PageLink"
+            },
+            "description": "Related external links.",
+            "nullable": true
+          },
+          "authors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Author"
+            }
+          },
+          "contact": {
+            "$ref": "#/components/schemas/Contact"
+          },
+          "dateModified": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "self": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ArticleLink": {
+        "required": [
+          "dateModified",
+          "id",
+          "self",
+          "title",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "dateModified": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "self": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ArticlesContract": {
+        "required": [
+          "articles",
+          "pagination"
+        ],
+        "type": "object",
+        "properties": {
+          "articles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ArticleLink"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Author": {
+        "required": [
+          "logo",
+          "name",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "logo": {
+            "type": "string"
+          },
+          "payoff": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Contact": {
+        "required": [
+          "organisation"
+        ],
+        "type": "object",
+        "properties": {
+          "organisation": {
+            "type": "string"
+          },
+          "phones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Phone"
+            },
+            "nullable": true
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalLink"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExternalLink": {
+        "required": [
+          "title",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PageLink": {
+        "required": [
+          "title",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "dateModified": {
+            "type": "string",
+            "nullable": true
+          },
+          "url": {
+            "type": "string"
+          },
+          "self": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Pagination": {
+        "required": [
+          "limit",
+          "offset",
+          "returned",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "description": "Offset.",
+            "format": "int32"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Limit.",
+            "format": "int32"
+          },
+          "returned": {
+            "type": "integer",
+            "description": "Number of returned result.",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of result.",
+            "format": "int32"
+          },
+          "prev": {
+            "type": "string",
+            "description": "Previous result page.",
+            "nullable": true
+          },
+          "next": {
+            "type": "string",
+            "description": "Next result page.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Phone": {
+        "required": [
+          "phoneNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "WebinarContract": {
+        "required": [
+          "authors",
+          "body",
+          "dateModified",
+          "id",
+          "participants",
+          "self",
+          "title",
+          "url",
+          "video"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "body": {
+            "type": "string"
+          },
+          "video": {
+            "$ref": "#/components/schemas/WebinarVideo"
+          },
+          "participants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WebinarParticipant"
+            }
+          },
+          "webinars": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WebinarLink"
+            },
+            "nullable": true
+          },
+          "seeAlso": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PageLink"
+            },
+            "nullable": true
+          },
+          "authors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Author"
+            }
+          },
+          "contact": {
+            "$ref": "#/components/schemas/Contact"
+          },
+          "dateModified": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "self": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "WebinarLink": {
+        "required": [
+          "dateModified",
+          "id",
+          "self",
+          "title",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "video": {
+            "$ref": "#/components/schemas/WebinarVideo"
+          },
+          "dateModified": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "self": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "WebinarParticipant": {
+        "required": [
+          "description",
+          "image",
+          "name",
+          "socials"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "socials": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalLink"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "WebinarVideo": {
+        "required": [
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string",
+            "nullable": true
+          },
+          "duration": {
+            "type": "string",
+            "nullable": true
+          },
+          "downloads": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalLink"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "WebinarsContract": {
+        "required": [
+          "pagination",
+          "webinars"
+        ],
+        "type": "object",
+        "properties": {
+          "webinars": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WebinarLink"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

@@ -4,6 +4,8 @@ from flask import Flask, request, jsonify, Response
 from routes.workflow.workflow_controller import workflow
 from routes._swagger.controller import _swagger
 from typing import Any, Tuple
+from utils.config import Config
+from utils.__sql import sql_db
 
 logging.basicConfig(level=logging.INFO)
 
@@ -12,6 +14,9 @@ app = Flask(__name__)
 
 app.register_blueprint(workflow, url_prefix="/workflow")
 app.register_blueprint(_swagger, url_prefix="/swagger_api")
+
+
+app.config.from_object(Config)
 from routes.root_service import handle_request
 
 
@@ -32,6 +37,11 @@ def internal_server_error(error: Any) -> Tuple[str, int]:
     print(error)
     return "Internal Server Error", 500
 
+
+sql_db.init_app(app)
+
+with app.app_context():
+    sql_db.create_all()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8002, debug=True)

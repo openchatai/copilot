@@ -1,0 +1,203 @@
+import json
+import logging
+import re
+from typing import Any, Dict, Union, cast
+from typing import Any, Dict, Optional, Union, cast
+from typing import List
+
+
+from langchain.schema import AIMessage, HumanMessage, SystemMessage
+from langchain.chat_models import ChatOpenAI
+from routes.workflow.extractors.extract_json import extract_json_payload
+import os
+from dotenv import load_dotenv
+import logging
+from prance import ResolvingParser
+from models.repository.chat_history_repo import get_all_chat_history_by_session_id
+from models.chat_history import ChatHistory
+
+logging.basicConfig(level=logging.INFO)
+
+load_dotenv()
+
+
+class BotMessage:
+    def __init__(self, ids: List[str], bot_message: str):
+        self.ids = ids
+        self.bot_message = bot_message
+
+    def to_dict(self) -> Dict[str, Union[str, List[str]]]:
+        return {"ids": self.ids, "bot_message": self.bot_message}
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Union[str, List[str]]]) -> "BotMessage":
+        return cls(cast(List[str], data["ids"]), cast(str, data["bot_message"]))
+
+
+def join_conversations(chat_histories: List[ChatHistory]) -> str:
+    """Joins a list of ChatHistory objects into a single conversation string.
+
+    Args:
+      chat_histories: A list of ChatHistory objects.
+
+    Returns:
+      A string containing the joined conversation.
+    """
+
+    conversation = ""
+    for chat_history in chat_histories:
+        if chat_history.from_user:
+            conversation += f"User: {chat_history.message}\n"
+        else:
+            conversation += f"Assistant: {chat_history.message}\n"
+    return conversation
+
+
+def get_summaries(_swagger_doc: str) -> str:
+    swagger_doc = ResolvingParser(spec_string=_swagger_doc)
+    servers = ", ".join(
+        [s["url"] for s in swagger_doc.specification.get("servers", [])]
+    )
+    summaries_str = "servers:" + servers + "\n"
+    paths = swagger_doc.specification.get("paths")
+    for path in paths:
+        operations = paths[path]
+        for method in operations:
+            operation = operations[method]
+            try:
+                summary = f"- {operation['operationId']} - {operation['summary']}\n"
+                if "requestBody" in operation:
+                    content_types = operation["requestBody"]["content"]
+                    if "application/json" in content_types:
+                        schema = content_types["application/json"]["schema"]
+                        if "properties" in schema:
+                            params = schema["properties"].keys()
+                        elif "items" in schema:
+                            params = schema["items"]["properties"].keys()
+                    elif "application/octet-stream" in content_types:
+                        params = ["binary data"]
+                    summary += f"  - Body Parameters: {', '.join(params)}\n"
+                summary += f"  - Method: {method}\n"
+                if "parameters" in operation:
+                    params = [p["name"] for p in operation["parameters"]]
+                    summary += f"  - Parameters: {', '.join(params)}\n"
+                summaries_str += summary + "\n"
+            except:
+                pass
+    return summaries_str
+
+
+def generate_consolidated_requirement(
+    user_input: str, session_id: str
+) -> Optional[str]:
+    """Generates a consolidated query from chat history and an AI chat.
+
+    Args:
+      chat_history: A list of Message objects representing the chat history.
+      ai_chat: A ChatOpenAI object representing the AI chat.
+
+    Returns:
+      A consolidated query string.
+    """
+    chat = ChatOpenAI(
+        openai_api_key=os.getenv("OPENAI_API_KEY"),
+        model="gpt-3.5-turbo",
+        temperature=0,
+    )
+
+    history = get_all_chat_history_by_session_id(session_id)
+    if len(history) == 0:
+        return None
+
+    conversation_str = join_conversations(history)
+    messages = [
+        SystemMessage(
+            content="You are an AI model designed to perform text substitution. You will receive user input. If the user's input contains references such as `the` or `this` etc... you should replace these words with the specific objects or concepts they refer to within the ongoing conversation, if applicable. However, if the user's input already contains all the necessary information, you should return the original user text."
+        ),
+        HumanMessage(
+            content="Conversation History: ({}), \n\n Current User input: ({}).".format(
+                conversation_str, user_input
+            ),
+        ),
+        HumanMessage(
+            content="Give me the user input after substituting the references."
+        ),
+    ]
+    content = chat(messages).content
+    return content
+
+
+def hasSingleIntent(
+    swagger_doc: Any,
+    user_requirement: str,
+    session_id: str,
+    current_state: Optional[str],
+) -> BotMessage:
+    summaries = get_summaries(swagger_doc)
+
+    chat = ChatOpenAI(
+        openai_api_key=os.getenv("OPENAI_API_KEY"),
+        model="gpt-3.5-turbo-16k",
+        temperature=0,
+    )
+
+    consolidated_user_requirement = (
+        generate_consolidated_requirement(user_requirement, session_id)
+        or user_requirement
+    )
+
+    history = get_all_chat_history_by_session_id(session_id, 4)
+
+    conversation_str = join_conversations(history)
+    messages = [
+        SystemMessage(
+            content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. To accomplish the task, you will be provided with information about the existing state of the application. A user input and list of api summaries. If the user is asking you to perform a `CRUD` operation, provide the list of operation ids of api calls needed in the `ids` field of the json. `bot_message` should consist of a straightforward sentence, free from any special characters. Note that the application uses current state as a cache, so if information is found in cache do not add that api call in `ids` list. Your response MUST be a valid minified json"
+        ),
+        current_state
+        and HumanMessage(
+            content="Here is the current state of the application: {}".format(
+                current_state
+            )
+        ),
+        HumanMessage(
+            content="User this conversation history for lookups if necessary: ({})".format(
+                conversation_str
+            )
+        ),
+        HumanMessage(
+            content="Here's a list of api summaries {}.".format(summaries),
+        ),
+        HumanMessage(
+            content="user requirement: {}".format(consolidated_user_requirement)
+        ),
+        HumanMessage(
+            content="""Reply in the following json format ```{
+                "ids": [
+                    "list",
+                    "of",
+                    "operation",
+                    "ids"
+                ],
+                "bot_message": "Bot response here" 
+            }```"""
+        ),
+        HumanMessage(
+            content="If the user's question can be answered directly without making API calls, please respond appropriately in the `bot_message` section of the response and leaving the `ids` field empty ([])."
+        ),
+    ]
+
+    result = chat([x for x in messages if x is not None])
+    logging.info(
+        "[OpenCopilot] Extracted the needed steps to get the job done: {}".format(
+            result.content
+        )
+    )
+    d: Any = extract_json_payload(result.content)
+    logging.info(
+        "[OpenCopilot] Parsed the json payload: {}, context: {}".format(
+            d, "hasSingleIntent"
+        )
+    )
+
+    bot_message = BotMessage.from_dict(d)
+    return bot_message

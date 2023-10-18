@@ -1,0 +1,502 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Trello API",
+    "description": "This Swagger specification documents the Trello API, which provides a set of endpoints for interacting with Trello boards, cards, and other resources.\n"
+  },
+  "servers": [
+    {
+      "url": "https://api.trello.com/1"
+    }
+  ],
+  "paths": {
+    "/boards": {
+      "post": {
+        "summary": "Create a new Trello board",
+        "operationId": "createBoard",
+        "description": "Create a new Trello board",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "The name of the Trello board.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {}
+            }
+          },
+          "default": {
+            "description": "Error response",
+            "content": {
+              "application/json": {}
+            }
+          }
+        }
+      }
+    },
+    "/boards/{id}": {
+      "delete": {
+        "summary": "Delete a Trello board by ID",
+        "operationId": "deleteBoard",
+        "description": "Delete a Trello board by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the Trello board to delete.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {}
+            }
+          },
+          "default": {
+            "description": "Error response",
+            "content": {
+              "application/json": {}
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get Board by ID",
+        "operationId": "getBoardById",
+        "description": "Retrieve a Trello board by its ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the Trello board.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Board retrieved successfully",
+            "content": {
+              "application/json": {}
+            }
+          },
+          "default": {
+            "description": "Error response",
+            "content": {
+              "application/json": {}
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a Trello board by ID",
+        "description": "This endpoint allows you to update a Trello board by its ID.",
+        "operationId": "updateBoard",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the Trello board to update.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "The new name for the board (1 to 16384 characters long).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "desc",
+            "in": "query",
+            "description": "A new description for the board (0 to 16384 characters long).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "closed",
+            "in": "query",
+            "description": "Whether the board is closed.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "subscribed",
+            "in": "query",
+            "description": "Whether the acting user is subscribed to the board.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "idOrganization",
+            "in": "query",
+            "description": "The ID of the Workspace the board should be moved to.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "prefs/permissionLevel",
+            "in": "query",
+            "description": "The permission level for the board (one of org, private, public).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "prefs/selfJoin",
+            "in": "query",
+            "description": "Whether Workspace members can join the board themselves.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "prefs/cardCovers",
+            "in": "query",
+            "description": "Whether card covers should be displayed on this board.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "prefs/hideVotes",
+            "in": "query",
+            "description": "Determines whether the Voting Power-Up should hide who voted on cards or not.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "prefs/invitations",
+            "in": "query",
+            "description": "Who can invite people to this board (one of admins, members).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {}
+            }
+          },
+          "default": {
+            "description": "Error response",
+            "content": {
+              "application/json": {}
+            }
+          }
+        }
+      }
+    },
+    "/boards/{boardId}/actions": {
+      "get": {
+        "summary": "Get actions of a Trello board",
+        "operationId": "getBoardActions",
+        "description": "This endpoint allows you to retrieve actions for a Trello board by its ID.",
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "description": "The ID of the Trello board for which you want to retrieve actions.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {}
+            }
+          },
+          "default": {
+            "description": "Error response",
+            "content": {
+              "application/json": {}
+            }
+          }
+        }
+      }
+    },
+    "/boards/{id}/cards": {
+      "get": {
+        "summary": "Get cards on a Trello board",
+        "operationId": "getBoardCards",
+        "description": "This endpoint allows you to retrieve cards on a Trello board by its ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the Trello board for which you want to retrieve cards.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {}
+            }
+          },
+          "default": {
+            "description": "Error response",
+            "content": {
+              "application/json": {}
+            }
+          }
+        }
+      }
+    },
+    "/boards/{id}/cards/{filter}": {
+      "get": {
+        "summary": "Get filtered cards on a Trello board",
+        "operationId": "getFilteredBoardCards",
+        "description": "This endpoint allows you to retrieve filtered cards on a Trello board by its ID and a filter value.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the Trello board for which you want to retrieve filtered cards.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "path",
+            "description": "The filter to apply when retrieving cards (all, closed, none, open, visible).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {}
+            }
+          },
+          "default": {
+            "description": "Error response",
+            "content": {
+              "application/json": {}
+            }
+          }
+        }
+      }
+    },
+    "/cards/{id}": {
+      "delete": {
+        "summary": "Delete a Trello card by ID",
+        "operationId": "deleteCard",
+        "description": "This endpoint allows you to delete a Trello card by its ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the Trello card to delete.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {}
+            }
+          },
+          "default": {
+            "description": "Error response",
+            "content": {
+              "application/json": {}
+            }
+          }
+        }
+      }
+    },
+    "/boards/{id}/lists": {
+      "post": {
+        "summary": "Create a list on a Trello board",
+        "operationId": "createList",
+        "description": "This endpoint allows you to create a list on a Trello board by its ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the Trello board where you want to create the list.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "The name of the list you want to create.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {}
+            }
+          },
+          "default": {
+            "description": "Error response",
+            "content": {
+              "application/json": {}
+            }
+          }
+        }
+      }
+    },
+    "/cards": {
+      "post": {
+        "summary": "Create a new card on a Trello board",
+        "operationId": "createCard",
+        "description": "This endpoint allows you to create a new card on a Trello board.",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "The name for the card.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "desc",
+            "in": "query",
+            "description": "The description for the card.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pos",
+            "in": "query",
+            "description": "The position of the new card (top, bottom, or a positive float).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "due",
+            "in": "query",
+            "description": "A due date for the card (Format date).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "The start date of a card or null (Format date).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dueComplete",
+            "in": "query",
+            "description": "Whether the due date is complete (boolean).",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "idList",
+            "in": "query",
+            "description": "The ID of the list where the card should be created (REQUIRED).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "idMembers",
+            "in": "query",
+            "description": "Comma-separated list of member IDs to add to the card.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "idLabels",
+            "in": "query",
+            "description": "Comma-separated list of label IDs to add to the card.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "urlSource",
+            "in": "query",
+            "description": "A URL starting with http:// or https://.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {}
+            }
+          },
+          "default": {
+            "description": "Error response",
+            "content": {
+              "application/json": {}
+            }
+          }
+        }
+      }
+    }
+  }
+}
