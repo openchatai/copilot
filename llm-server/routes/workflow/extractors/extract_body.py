@@ -1,60 +1,53 @@
 import os
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
+from langchain.schema import AIMessage, HumanMessage, SystemMessage
+from langchain.chat_models import ChatOpenAI
 from utils.get_llm import get_llm
 
-from typing import Any
+from typing import Any, Optional
 from routes.workflow.extractors.extract_json import extract_json_payload
 from custom_types.t_json import JsonData
+import logging
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
 
 
 def gen_body_from_schema(
-    body_schema: str, text: str, prev_api_response: str, example: str
+    body_schema: str,
+    text: str,
+    prev_api_response: str,
+    example: str,
+    current_state: Optional[str],
 ) -> Any:
-    _DEFAULT_TEMPLATE = """To enable a substantially intelligent language model to execute a series of APIs sequentially, the following essential details are necessary to gather information needed for the next API call:
-    1. Initial input when starting the flow: `{text}`
-    2. Previous API responses: `{prev_api_response}`
-    3. A JSON response schema that defines the expected format: `{body_schema}`
-
-    Try to adhere to this sample api payload as much as possible: ```{example}```
-    The JSON payload, enclosed within triple backticks on both sides, strictly conforming to the specified "type/format" as outlined in the schema is as follows:  
-    """
-
-    PROMPT = PromptTemplate(
-        input_variables=[
-            "text",
-            "body_schema",
-            "prev_api_response",
-            "example",
-        ],
-        template=_DEFAULT_TEMPLATE,
+    chat = ChatOpenAI(
+        openai_api_key=os.getenv("OPENAI_API_KEY"),
+        model="gpt-3.5-turbo-16k",
+        temperature=0,
     )
 
-    PROMPT.format(
-        prev_api_response=prev_api_response,
-        body_schema=body_schema,
-        text=text,
-        example=example,
+    messages = [
+        SystemMessage(
+            content="You are an intelligent machine learning model that can produce REST API's body in json format, given the json schema, dummy json payload, user input, data from previous api calls, and current state information stored in the current_state variable."
+        ),
+        HumanMessage(content="Json Schema: {}".format(body_schema)),
+        HumanMessage(content="Dummy json payload: {}".format(example)),
+        HumanMessage(content="User input: {}".format(text)),
+        HumanMessage(content="prev api responses: {}".format(prev_api_response)),
+        HumanMessage(content="Current state: {}".format(current_state)),
+        HumanMessage(
+            content="Given the provided information, generate the appropriate minified JSON payload to use as body for the API request."
+        ),
+    ]
+
+    result = chat(messages)
+
+    logging.info("[OpenCopilot] LLM Body Response: {}".format(result.content))
+
+    d: Any = extract_json_payload(result.content)
+    logging.info(
+        "[OpenCopilot] Parsed the json payload: {}, context: {}".format(
+            d, "gen_body_from_schema"
+        )
     )
 
-    chain = LLMChain(
-        llm=llm,
-        prompt=PROMPT,
-        # memory=memory,
-        verbose=True,
-    )
-    json_string = chain.run(
-        {
-            "text": text,
-            "body_schema": body_schema,
-            "prev_api_response": prev_api_response,
-            "example": example,
-        }
-    )
-
-    response = extract_json_payload(json_string)
-
-    return response
+    return d

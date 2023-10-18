@@ -1,0 +1,11 @@
+{
+    "boards": [
+        {
+            "id": "651f68ddee81d0850c94f12e",
+            "name": "YCombinator",
+            "closed": false,
+            "idOrganization": "6519f17138a53167b7c275d4",
+            "pinned": false
+        }
+    ]
+}

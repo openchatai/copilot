@@ -1,0 +1,1 @@
+https://airquality.des.qld.gov.au/docs/#/default/getAllStationsAllParameters

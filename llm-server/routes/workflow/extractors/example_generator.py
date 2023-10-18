@@ -96,4 +96,4 @@ def generate_example_json(
 
 
 def gen_ex_from_schema(schema: Any) -> Any:
-    return json.dumps(generate_example_json(schema))
+    return json.dumps(generate_example_json(schema), separators=(',', ':'))

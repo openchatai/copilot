@@ -44,23 +44,14 @@ def get_api_info_by_operation_id(data: Any, target_operation_id: str) -> ApiInfo
                 api_info.endpoint = path
                 api_info.method = method.upper()
 
-                # Extract path parameters and their schemas
-                path_params = {}
-                for parameter in details.get("parameters", []):
-                    if parameter["in"] == "path":
-                        param_name = parameter["name"]
-                        param_schema = parameter.get("schema", {})
-                        path_params[param_name] = param_schema
-                api_info.path_params = path_params
+                all_params = details.get("parameters", [])
+                api_info.path_params = {
+                    "properties": [obj for obj in all_params if obj["in"] == "path"]
+                }
 
-                # Extract query parameters and their schemas
-                query_params = {}
-                for parameter in details.get("parameters", []):
-                    if parameter["in"] == "query":
-                        param_name = parameter["name"]
-                        param_schema = parameter.get("schema", {})
-                        query_params[param_name] = param_schema
-                api_info.query_params = query_params
+                api_info.query_params = {
+                    "properties": [obj for obj in all_params if obj["in"] == "query"]
+                }
 
                 # Extract request body schema
                 if "requestBody" in details:
@@ -90,7 +81,11 @@ def extract_json_payload(input_string: str) -> Optional[Any]:
 
 
 def generate_openapi_payload(
-    swagger_json: str, text: str, _operation_id: str, prev_api_response: str
+    swagger_json: str,
+    text: str,
+    _operation_id: str,
+    prev_api_response: str,
+    current_state: Optional[str],
 ) -> ApiInfo:
     parser = ResolvingParser(spec_string=swagger_json)
     (a, b, c) = parser.version_parsed  # (3,0,2), we can then apply transformation on
@@ -101,24 +96,35 @@ def generate_openapi_payload(
 
     api_info.path_params = (
         {}
-        if not api_info.path_params
+        if not api_info.path_params["properties"]
         else gen_params_from_schema(
-            json.dumps(api_info.path_params), text, prev_api_response
+            json.dumps(api_info.path_params, separators=(",", ":")),
+            text,
+            prev_api_response,
+            current_state,
         )
     )
     api_info.query_params = (
         {}
-        if not api_info.query_params
+        if not api_info.query_params["properties"]
         else gen_params_from_schema(
-            json.dumps(api_info.query_params), text, prev_api_response
+            json.dumps(api_info.query_params, separators=(",", ":")),
+            text,
+            prev_api_response,
+            current_state,
         )
     )
 
     if api_info.body_schema:
         example = gen_ex_from_schema(api_info.body_schema)
         api_info.body_schema = gen_body_from_schema(
-            json.dumps(api_info.body_schema), text, prev_api_response, example
+            json.dumps(api_info.body_schema, separators=(",", ":")),
+            text,
+            prev_api_response,
+            example,
+            current_state,
         )
+
     else:
         api_info.body_schema = {}
 

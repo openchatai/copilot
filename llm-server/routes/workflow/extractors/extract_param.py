@@ -1,61 +1,42 @@
 import os
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
+from langchain.chat_models import ChatOpenAI
 from routes.workflow.extractors.extract_json import extract_json_payload
 from utils.get_llm import get_llm
 from custom_types.t_json import JsonData
-from typing import Optional
+from typing import Optional, Any
+import logging
+from langchain.schema import HumanMessage, SystemMessage
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
 
 
 def gen_params_from_schema(
-    param_schema: str, text: str, prev_resp: str
+    param_schema: str, text: str, prev_resp: str, current_state: Optional[str]
 ) -> Optional[JsonData]:
-    """Extracts API parameters from a schema based on user text and previous response.
-
-    Args:
-        param_schema (JsonData): A snippet of the OpenAPI parameter schema relevant to this operation.
-        text (str): The original user text query.
-        prev_resp (str): The previous API response.
-
-    Returns:
-        Optional[JsonData]: The extracted JSON parameters, if successful.
-
-    This function constructs a prompt with the given inputs and passes it to
-    an LLM to generate a JSON string containing the parameters. It then parses
-    this to extract a JSON payload matching the schema structure.
-    """
-
-    _DEFAULT_TEMPLATE = """In order to facilitate the sequential execution of a highly intelligent language model with a series of APIs, we furnish the vital information required for executing the next API call.
-
-    The initial input at the onset of the process: {text}
-    The responses obtained from previous API calls: {prev_resp}
-    A schema for request parameters that defines the expected format: {param_schema}
-
-    The JSON payload, which is used to represent the query parameters and is constructed using the initial input and previous API responses, must be enclosed within triple backticks on both sides. It must strictly adhere to the specified "type/format" guidelines laid out in the schema, and the structure is as follows:"""
-
-    PROMPT = PromptTemplate(
-        input_variables=["prev_resp", "text", "param_schema"],
-        template=_DEFAULT_TEMPLATE,
+    chat = ChatOpenAI(
+        openai_api_key=os.getenv("OPENAI_API_KEY"),
+        model="gpt-3.5-turbo-16k",
+        temperature=0,
     )
-
-    PROMPT.format(
-        prev_resp=prev_resp,
-        text=text,
-        param_schema=param_schema,
+    messages = [
+        SystemMessage(
+            content="You are an intelligent machine learning model that can produce REST API's params / query params in json format, given the json schema, user input, data from previous api calls, and current application state. Respond with json nothing else."
+        ),
+        HumanMessage(content="Json Schema: {}.".format(param_schema)),
+        HumanMessage(content="prev api responses: {}.".format(prev_resp)),
+        HumanMessage(content="User's requirement: {}.".format(text)),
+        HumanMessage(content="Current state: {}.".format(current_state)),
+        HumanMessage(
+            content="Based on the information provided, construct a valid parameter object to be used with python requests library. In cases where user input doesnot contain information for a query, DO NOT add that specific query parameter to the output. If a user doesn't provide a required parameter, generate a relevant one based on their input and current state."
+        ),
+    ]
+    result = chat(messages)
+    logging.info("[OpenCopilot] LLM Body Response: {}".format(result.content))
+    d: Optional[JsonData] = extract_json_payload(result.content)
+    logging.info(
+        "[OpenCopilot] Parsed the json payload: {}, context: {}".format(
+            d, "gen_body_from_schema"
+        )
     )
-
-    chain = LLMChain(llm=llm, prompt=PROMPT, verbose=True)
-    json_string = chain.run(
-        {
-            "param_schema": param_schema,
-            "text": text,
-            "prev_resp": prev_resp,
-        }
-    )
-
-    response = extract_json_payload(json_string)
-    print(f"Query params: {response}")
-    return response
+    return d

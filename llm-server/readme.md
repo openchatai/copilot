@@ -63,6 +63,8 @@ To install Mypy, which is a static type checker for Python, follow these steps:
    MONGODB_URL=mongodb://localhost:27017/opencopilot
    QDRANT_URL=http://localhost:6333  
    STORE=QDRANT
+   QDRANT_API_KEY= # When using cloud hosted version
+   SCORE_THRESHOLD=0.95 # When using pre defined workflows, the confidence score at which the opencopilot should select your workflow. If the score falls below this, the planner will design it's own workflow
    ```
 
    Ensure you replace the placeholders with your actual API keys and configuration settings.

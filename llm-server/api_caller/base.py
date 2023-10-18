@@ -5,7 +5,7 @@ from langchain.utilities.openapi import OpenAPISpec
 
 
 def try_to_match_and_call_api_endpoint(
-        swagger_spec: OpenAPISpec, text: str, headers: Dict[str, str]
+    swagger_spec: OpenAPISpec, text: str, headers: Dict[str, str]
 ) -> str:
     openapi_call_chain = get_openapi_chain(swagger_spec, verbose=True, headers=headers)
 
