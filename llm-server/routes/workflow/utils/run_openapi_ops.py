@@ -10,6 +10,7 @@ from routes.workflow.extractors.transform_api_response import (
 from routes.workflow.extractors.convert_json_to_text import convert_json_to_text
 from utils.process_app_state import process_state
 from prance import ResolvingParser
+import importlib
 
 
 def run_openapi_operations(
@@ -41,6 +42,8 @@ def run_openapi_operations(
                 # else:
                 #     return transform_api_response_from_schema(api_payload.endpoint or "",
                 #                                             api_response.text)
+
+                mod = importlib.import_module("")
                 transformed_response = transform_api_response_from_schema(
                     api_payload.endpoint or "", api_response.text
                 )
