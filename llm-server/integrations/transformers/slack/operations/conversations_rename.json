@@ -1,0 +1,13 @@
+{
+    "channel": {
+        "id": "C012AB3CD",
+        "previous_names": [
+            "specifics",
+            "abstractions",
+            "etc"
+        ],
+        "purpose": {
+            "value": "This part of the workspace is for fun. Make fun here."
+        }
+    }
+}
