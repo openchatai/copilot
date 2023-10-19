@@ -9,11 +9,14 @@ from routes.workflow.extractors.transform_api_response import (
 )
 from routes.workflow.extractors.convert_json_to_text import convert_json_to_text
 from utils.process_app_state import process_state
+from prance import ResolvingParser
+from integrations.load_json_config import load_json_config
+from integrations.transformers.transformer import transform_response
 
 
 def run_openapi_operations(
     record: Any,
-    swagger_json: str,
+    swagger_json: ResolvingParser,
     text: str,
     headers: Any,
     server_base_url: str,
@@ -33,9 +36,20 @@ def run_openapi_operations(
 
                 api_response = make_api_request(headers=headers, **api_payload.__dict__)
 
-                transformed_response = transform_api_response_from_schema(
-                    api_payload.endpoint or "", api_response.text
-                )
+                # if a custom transformer function is defined for this operationId use that, otherwise forward it to the llm
+                # so we don't necessarily have to defined mappers for all api endpoints
+                partial_json = load_json_config(app, operation_id)
+                if not partial_json:
+                    transformed_response = transform_api_response_from_schema(
+                        api_payload.endpoint or "", api_response.text
+                    )
+                else:
+                    api_json = json.loads(api_response.text)
+                    transformed_response = json.dumps(
+                        transform_response(
+                            full_json=api_json, partial_json=partial_json
+                        )
+                    )
 
                 prev_api_response = prev_api_response + transformed_response
                 record_info[operation_id] = json.loads(api_response.text)

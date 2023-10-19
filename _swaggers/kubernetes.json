@@ -1,0 +1,155 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+      "title": "Kubernetes API",
+      "description": "Kubernetes API description",
+      "version": "1.0.0"
+    },
+    "servers": [
+      {
+        "url": "https://kubernetes.default.svc:443/api/v1/"
+      }
+    ],
+    "paths": {
+      "/namespaces": {
+        "get": {
+          "summary": "List all namespaces",
+          "description": "List all namespaces in the cluster.",
+          "operationId": "listNamespaces",
+          "responses": {
+            "200": {
+              "description": "A list of namespaces",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Namespace"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/namespaces/{namespace}": {
+        "get": {
+          "summary": "Get a namespace",
+          "description": "Get a namespace by name.",
+          "operationId": "getNamespace",
+          "parameters": [
+            {
+              "name": "namespace",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "A namespace object",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Namespace"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/pods": {
+        "get": {
+          "summary": "List all pods",
+          "description": "List all pods in the cluster.",
+          "operationId": "listPods",
+          "responses": {
+            "200": {
+              "description": "A list of pods",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Pod"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/pods/{podName}": {
+        "get": {
+          "summary": "Get a pod",
+          "description": "Get a pod by name.",
+          "operationId": "getPod",
+          "parameters": [
+            {
+              "name": "podName",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "A pod object",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Pod"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/deployments": {
+        "get": {
+          "summary": "List all deployments",
+          "description": "List all deployments in the cluster.",
+          "operationId": "listDeployments",
+          "responses": {
+            "200": {
+              "description": "A list of deployments",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Deployment"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/deployments/{deploymentName}": {
+        "get": {
+          "summary": "Get a deployment",
+          "description": "Get a deployment by name.",
+          "operationId": "getDeployment",
+          "parameters": [
+            {
+              "name": "deploymentName",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "2
+  

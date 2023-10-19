@@ -1,0 +1,14 @@
+{
+    "channels": [
+        {
+            "id": "C012AB3CD",
+            "name": "general",
+            "purpose": {
+                "value": "This channel is for team-wide communication and announcements. All team members are in this channel."
+            }
+        }
+    ],
+    "response_metadata": {
+        "next_cursor": "dGVhbTpDMDYxRkE1UEI="
+    }
+}
