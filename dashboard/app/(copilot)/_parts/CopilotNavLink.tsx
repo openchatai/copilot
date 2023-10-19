@@ -21,7 +21,7 @@ export function CopilotLayoutNavLink({
   segment?: string;
 }) {
   return (
-    <TooltipProvider>
+    <TooltipProvider delayDuration={100}>
       <Tooltip>
         <TooltipTrigger asChild>
           <NavLink
