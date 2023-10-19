@@ -1,6 +1,7 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 
+# Additionally allow users to select one board in which they are working, and refresh state only for that board to minimize api calls
 def process_state(headers: Dict[str, Any]) -> Dict[str, Any]:
     import requests
 

@@ -21,15 +21,16 @@ def gen_params_from_schema(
     )
     messages = [
         SystemMessage(
-            content="You are an intelligent machine learning model that can produce REST API's params / query params in json format, given the json schema, user input, data from previous api calls, and current application state. Respond with json nothing else."
+            content="You are an intelligent machine learning model that can produce REST API's params / query params in json format, given the json schema, user input, data from previous api calls, and current application state."
         ),
         HumanMessage(content="Json Schema: {}.".format(param_schema)),
         HumanMessage(content="prev api responses: {}.".format(prev_resp)),
         HumanMessage(content="User's requirement: {}.".format(text)),
         HumanMessage(content="Current state: {}.".format(current_state)),
         HumanMessage(
-            content="Based on the information provided, construct a valid parameter object to be used with python requests library. In cases where user input doesnot contain information for a query, DO NOT add that specific query parameter to the output. If a user doesn't provide a required parameter, generate a relevant one based on their input and current state."
+            content="Based on the information provided, construct a valid parameter object to be used with python requests library. In cases where user input doesnot contain information for a query, DO NOT add that specific query parameter to the output. If a user doesn't provide a required parameter, use sensible defaults for required params, and leave optional params."
         ),
+        HumanMessage(content="Your output must be a valid json"),
     ]
     result = chat(messages)
     logging.info("[OpenCopilot] LLM Body Response: {}".format(result.content))
