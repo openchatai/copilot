@@ -75,7 +75,7 @@ export function Search() {
                 }}
                 ref={searchImputRef}
                 id="search-copilots"
-                className="border-none font-medium focus-visible:!ring-transparent"
+                className="border-none font-medium shadow-none focus-visible:!ring-transparent"
                 placeholder="Search Copilots..."
               />
             </TooltipTrigger>
