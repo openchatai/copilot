@@ -69,12 +69,12 @@ def handle_request(data: Dict[str, Any]) -> Any:
 
     # need to test if prance works with document saved in mongodb
 
-    if swagger_url:
+    if swagger_url.startswith("http:") or swagger_url.startswith("https:"):
         swagger_doc = ResolvingParser(url=swagger_url)
     elif swagger_doc:
         swagger_doc = ResolvingParser(spec_string=swagger_doc)
     else:
-        raise ValueError("Must provide either a spec URL or string")
+        swagger_doc = ResolvingParser(url=shared_folder + swagger_url)
     try:
         logging.info(
             "[OpenCopilot] Trying to figure out if the user request require 1) APIs calls 2) If yes how many "
