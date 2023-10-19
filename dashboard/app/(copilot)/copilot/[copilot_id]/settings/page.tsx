@@ -1,11 +1,22 @@
+"use client";
 import React from "react";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { HeaderShell } from "@/components/domain/HeaderShell";
-
+import { useCopilot } from "../../_context/CopilotProvider";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 export default function GeneralSettingsPage() {
+  const { token, id: copilotId, name: copilotName } = useCopilot();
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
       <HeaderShell className="items-center justify-between">
@@ -28,25 +39,38 @@ export default function GeneralSettingsPage() {
                 Copilot Name
               </Label>
               <div className="flex items-center gap-2">
-                <Input className="w-4/5" />
+                <Input className="w-10/12" defaultValue={copilotName} />
                 <p className="text-xs">
                   Lorem ipsum dolor sit, amet consectetur adipisicing elit.
                   Culpa, a totam earum rem suscipit illum voluptas facere
                 </p>
               </div>
             </div>
-            <Separator className="my-2" />
+          </section>
 
-            <div className="space-y-1.5 px-8 py-5">
-              <Label className="text-base font-semibold text-accent-foreground/80">
-                Copilot Id
-              </Label>
-              <div className="flex items-center gap-2">
-                <Input className="w-4/5" />
-                <p className="text-xs">
-                  Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                  Culpa, a totam earum rem suscipit illum voluptas facere
-                </p>
+          <section className="block ">
+            <h2 className="mb-4 text-base font-bold text-accent-foreground">
+              Metadata
+            </h2>
+            <div className="rounded-lg border border-border bg-white shadow shadow-accent">
+              <div className="space-y-1.5 px-8 py-5">
+                <Label className="text-base font-semibold text-accent-foreground/80">
+                  Token
+                </Label>
+                <div className="flex items-center justify-between gap-2">
+                  <Input className="flex" defaultValue={token} />
+                  <Button variant="outline">Copy</Button>
+                </div>
+              </div>
+              <Separator className="my-2" />
+              <div className="space-y-1.5 px-8 py-5">
+                <Label className="text-base font-semibold text-accent-foreground/80">
+                  Copilot Id
+                </Label>
+                <div className="flex items-center justify-between gap-2">
+                  <Input className="flex" defaultValue={copilotId} />
+                  <Button variant="outline">Copy</Button>
+                </div>
               </div>
             </div>
           </section>
@@ -65,9 +89,28 @@ export default function GeneralSettingsPage() {
                     This action can't be reverted. Please proceed with caution.
                   </p>
                 </div>
-                <Button variant="destructive" size={"sm"}>
-                  Delete
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" size={"sm"}>
+                      Delete
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      Are you sure you want to delete this assistant?
+                    </AlertDialogHeader>
+                    <AlertDialogDescription>
+                      This action can't be reverted. Please proceed with
+                      caution.
+                    </AlertDialogDescription>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel asChild>
+                        <Button variant="outline">Cancel</Button>
+                      </AlertDialogCancel>
+                      <Button variant="destructive">Delete</Button>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           </section>

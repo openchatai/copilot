@@ -8,6 +8,7 @@ import { SearchModal } from "./(main)/_parts/SearchModal";
 import React from "react";
 import { JotaiProvider } from "./_store/JotaiProvider";
 import { SWRProvider } from "./swr-provider";
+import { Toaster } from "@/components/ui/toaster";
 const opensans = Open_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
@@ -50,6 +51,8 @@ export default function RootLayout({
 
             {/* search modal */}
             <SearchModal />
+            {/* Toaster */}
+            <Toaster />
           </body>
         </html>
       </JotaiProvider>
