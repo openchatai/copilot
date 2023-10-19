@@ -13,8 +13,8 @@ export type CopilotType = {
   prompt_message: string;
   enhanced_privacy: boolean;
   smart_sync: boolean;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
   deleted_at?: Date;
   swagger_url: string;
   is_premade_demo_template: boolean;
