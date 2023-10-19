@@ -41,12 +41,12 @@ export type ValidatorResponseType = {
 };
 
 export async function listCopilots() {
-  return instance.get<CopilotType[]>("/copilots");
+  return await instance.get<CopilotType[]>("/copilots");
 }
 
 export async function getCopilot(id: string) {
   if (!id) throw new Error("Copilot id is required");
-  return instance.get<{ chatbot: CopilotType }>(`/copilots/${id}`);
+  return await instance.get<{ chatbot: CopilotType }>(`/copilot/${id}`);
 }
 
 export async function deleteCopilot(id: string) {
