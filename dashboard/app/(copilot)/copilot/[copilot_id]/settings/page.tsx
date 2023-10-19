@@ -21,21 +21,33 @@ export default function GeneralSettingsPage() {
       </HeaderShell>
 
       <div className="flex-1 overflow-auto bg-accent/25 px-4 py-8">
-        <div className="container max-w-screen-sm space-y-10">
+        <div className="container max-w-screen-md space-y-10">
           <section className="block rounded-lg border border-border bg-white shadow shadow-accent">
-            <div className="space-y-1 px-8 py-5">
-              <Label className="text-base font-semibold text-accent-foreground/50">
+            <div className="space-y-1.5 px-8 py-5">
+              <Label className="text-base font-semibold text-accent-foreground/80">
                 Copilot Name
               </Label>
-              <Input />
+              <div className="flex items-center gap-2">
+                <Input className="w-4/5" />
+                <p className="text-xs">
+                  Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+                  Culpa, a totam earum rem suscipit illum voluptas facere
+                </p>
+              </div>
             </div>
             <Separator className="my-2" />
 
-            <div className="space-y-1 px-8 py-5">
-              <Label className="text-base font-semibold text-accent-foreground/50">
+            <div className="space-y-1.5 px-8 py-5">
+              <Label className="text-base font-semibold text-accent-foreground/80">
                 Copilot Id
               </Label>
-              <Input />
+              <div className="flex items-center gap-2">
+                <Input className="w-4/5" />
+                <p className="text-xs">
+                  Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+                  Culpa, a totam earum rem suscipit illum voluptas facere
+                </p>
+              </div>
             </div>
           </section>
 

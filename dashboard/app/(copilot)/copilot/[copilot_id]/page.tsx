@@ -1,3 +1,4 @@
+"use client";
 import CodeBlock from "@/components/domain/CodeBlock";
 import { HeaderShell } from "@/components/domain/HeaderShell";
 import {
@@ -11,8 +12,11 @@ import { Button } from "@/components/ui/button";
 import { ShieldAlert, Wand2, Inspect } from "lucide-react";
 import Link from "next/link";
 import React from "react";
+import { useCopilot } from "../_context/CopilotProvider";
 
 function InstallationSection() {
+  const { token: CopilotToken } = useCopilot();
+
   return (
     <section className="rounded-lg border bg-white shadow-sm">
       <AccordionItem value="installation">
@@ -42,7 +46,7 @@ function InstallationSection() {
   const options = {
      apiUrl: "https://yourdomain.com/api" // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:5000/api
      initialMessages: ["How are the things"], // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
-     token: "your_copilot_token_goes_here", // you can get your token from the dashboard
+     token: ${CopilotToken}, // you can get your token from the dashboard
      triggerSelector: "#triggerSelector", // the selector of the element that will trigger the copilot when clicked
      headers: {
        // optional: you can pass your authentication tokens to the copilot or any other header you want to send with every request
@@ -87,16 +91,17 @@ function TryItSection() {
   );
 }
 
-export default async function CopilotPage() {
+export default function CopilotPage() {
+  const { name: CopilotName } = useCopilot();
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
       <HeaderShell className="bg-white">
         <h1 className="text-lg font-bold text-accent-foreground">
-          Copilot's Name
+          {CopilotName}
         </h1>
       </HeaderShell>
       <div className="flex-1 overflow-auto">
-        <div className="container max-w-screen-md p-8">
+        <div className="container max-w-screen-lg p-8">
           <Alert variant="info" className="mb-5">
             <ShieldAlert className="h-6 w-6" />
             <AlertTitle>Attention</AlertTitle>
@@ -105,7 +110,11 @@ export default async function CopilotPage() {
               the needed headers to enable OpenCopilot from accessing it
             </AlertDescription>
           </Alert>
-          <Accordion type="single" className="max-w-full space-y-5">
+          <Accordion
+            type="single"
+            className="max-w-full space-y-5"
+            defaultValue="installation"
+          >
             <InstallationSection />
             <TryItSection />
           </Accordion>

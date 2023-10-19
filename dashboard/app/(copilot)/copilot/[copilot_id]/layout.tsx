@@ -24,6 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import { CopilotProvider } from "../_context/CopilotProvider";
 
 type Props = {
   children: React.ReactNode;
@@ -110,7 +111,9 @@ export default function CopilotLayout({ children, params }: Props) {
         </div>
       </aside>
       <main className="flex flex-1 flex-col overflow-hidden">
-        <div className="flex-1 h-full max-w-full bg-primary-foreground">{children}</div>
+        <div className="h-full max-w-full flex-1 bg-primary-foreground">
+          <CopilotProvider>{children}</CopilotProvider>
+        </div>
       </main>
     </div>
   );

@@ -8,18 +8,12 @@ import {
   ClosableDivProvider,
   CloseBtn,
 } from "@/components/headless/ClosableDiv";
-import { CopilotCardSmall } from "@/components/domain/CopilotCardSmall";
 import { HeaderShell } from "@/components/domain/HeaderShell";
 import { Search } from "./_parts/Search";
 import Link from "next/link";
+import { CopilotsContainer } from "./_parts/CopilotsContainer";
 
-type Props = {
-  searchParams: {
-    q: string;
-  };
-};
-
-export default async function HomePage({ searchParams }: Props) {
+export default async function HomePage() {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
       <HeaderShell>
@@ -46,12 +40,14 @@ export default async function HomePage({ searchParams }: Props) {
                 <h1 className="text-lg font-bold text-accent-foreground">
                   Learn Opencopilot with video tutorials
                 </h1>
-                <p>
+                <p className="line-clamp-1">
                   In this course you’ll find everything you need to get started
                   with Opencopilot from the ground up.
                 </p>
               </div>
-              <Button>Get it</Button>
+              <Button asChild>
+                <Link href="https://opencopilot.so/#tuts">Learn</Link>
+              </Button>
             </div>
             <CloseBtn className="absolute -right-1 -top-1 rounded-full border border-border bg-white p-1 opacity-0 shadow group-hover:opacity-100 ">
               <XIcon className="h-4 w-4" />
@@ -59,13 +55,7 @@ export default async function HomePage({ searchParams }: Props) {
           </ClosableDiv>
         </ClosableDivProvider>
         <Search />
-        <div className="grid grid-cols-2 gap-8 py-4 xl:grid-cols-4">
-          <CopilotCardSmall />
-          <CopilotCardSmall />
-          <CopilotCardSmall />
-          <CopilotCardSmall />
-          <CopilotCardSmall />
-        </div>
+        <CopilotsContainer />
       </div>
     </div>
   );
