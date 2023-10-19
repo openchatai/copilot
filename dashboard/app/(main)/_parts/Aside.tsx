@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import SelectWorkspace from "./SelectWorkspace";
 import { NavLink } from "@/components/ui/NavLink";
+import Link from "next/link";
 
 export default function Aside() {
   return (
@@ -20,7 +21,7 @@ export default function Aside() {
         <ul className="space-y-1 px-2">
           <li>
             <NavLink
-              href={"/"}
+              href="/"
               className="flex items-center rounded-md border px-3 py-2 text-base text-accent-foreground transition duration-150 ease-in-out"
               activeClassName="border-gray-300 bg-accent font-semibold"
               inactiveClassName="border-transparent hover:border-gray-300 font-normal opacity-80 hover:bg-accent flex w-full items-center justify-between gap-1 rounded px-4 py-2 text-sm font-normal text-accent-foreground hover:bg-card-foreground"
@@ -29,14 +30,17 @@ export default function Aside() {
                 <Bot className="h-4 w-4" />
                 <span>Copilots</span>
               </div>
-              <span className="text-sm">2</span>
             </NavLink>
           </li>
         </ul>
 
         <ul className="space-y-1 px-2">
           <li>
-            <button className="group flex w-full items-center justify-between gap-1 rounded px-4 py-2 text-base font-light text-accent-foreground transition duration-150 ease-in-out hover:bg-card-foreground">
+            <Link
+              href="https://opencopilot.so/#tuts"
+              target="_blank"
+              className="group flex w-full items-center justify-between gap-1 rounded px-4 py-2 text-base font-light text-accent-foreground transition duration-150 ease-in-out hover:bg-card-foreground"
+            >
               <div className="flex flex-1 items-center gap-2">
                 <PlaySquare className="h-4 w-4" />
                 <span>Learn</span>
@@ -44,30 +48,38 @@ export default function Aside() {
               <span className="text-sm opacity-0 group-hover:opacity-100">
                 <ExternalLink className="h-4 w-4" />
               </span>
-            </button>
+            </Link>
           </li>
           <li>
-            <button className="group flex w-full items-center justify-between gap-1 rounded px-4 py-2 text-base font-light text-accent-foreground transition duration-150 ease-in-out hover:bg-card-foreground">
+            <Link
+              href="https://github.com/openchatai/OpenCopilot/releases"
+              target="_blank"
+              className="group flex w-full items-center justify-between gap-1 rounded px-4 py-2 text-base font-light text-accent-foreground transition duration-150 ease-in-out hover:bg-card-foreground"
+            >
               <div className="flex flex-1 items-center gap-2">
-                <ScrollText className="h-5 w-5" />
+                <ScrollText className="h-4 w-4" />
                 <span>Changelog</span>
               </div>
               <span className="text-sm font-normal opacity-0 group-hover:opacity-100">
                 <ExternalLink className="h-4 w-4" />
               </span>
-            </button>
+            </Link>
           </li>
 
           <li>
-            <button className="group flex w-full items-center justify-between gap-1 rounded px-4 py-2 text-base font-normal text-accent-foreground transition duration-150 ease-in-out hover:bg-card-foreground">
+            <Link
+              href="https://github.com/openchatai/OpenCopilot"
+              target="_blank"
+              className="group flex w-full items-center justify-between gap-1 rounded px-4 py-2 text-base font-light text-accent-foreground transition duration-150 ease-in-out hover:bg-card-foreground"
+            >
               <div className="flex flex-1 items-center gap-2">
-                <GithubIcon className="h-5 w-5" />
+                <GithubIcon className="h-4 w-4" />
                 <span>Github</span>
               </div>
               <span className="text-sm font-normal opacity-0 group-hover:opacity-100">
                 <ExternalLink className="h-4 w-4" />
               </span>
-            </button>
+            </Link>
           </li>
         </ul>
 
@@ -88,9 +100,9 @@ export default function Aside() {
       <div className="border-t border-border px-5 py-4 hover:bg-card-foreground">
         <div className="flex items-center gap-2">
           <Avatar>
-            <AvatarFallback>AH</AvatarFallback>
+            <AvatarFallback>U</AvatarFallback>
           </Avatar>
-          <h2 className="line-clamp-1 text-sm font-semibold">Ahmad Hassan</h2>
+          <h2 className="line-clamp-1 text-sm font-semibold">User</h2>
         </div>
       </div>
     </aside>
