@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import React, { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-
+import { useHotkeys } from "react-hotkeys-hook";
 const sortFilter = [
   { label: "Last Viewed", value: "last-viewed" },
   { label: "Date Created", value: "date-created" },
@@ -31,7 +31,12 @@ export type Filter = {
 export const QUERY_KEY = "q";
 export const SORT_KEY = "sort";
 export function Search() {
+  const searchImputRef = React.useRef<HTMLInputElement>(null);
   const searchParams = useSearchParams();
+  useHotkeys("/", (ev) => {
+    ev.preventDefault();
+    searchImputRef.current?.focus();
+  });
   const [filter, setFilter] = React.useState<Filter>({
     query: searchParams.get(QUERY_KEY) ?? "",
     sort: (searchParams.get(SORT_KEY) ?? "last-viewed") as Filter["sort"],
@@ -68,6 +73,7 @@ export function Search() {
                     };
                   });
                 }}
+                ref={searchImputRef}
                 id="search-copilots"
                 className="border-none font-medium focus-visible:!ring-transparent"
                 placeholder="Search Copilots..."

@@ -41,6 +41,7 @@
     "react-dom": "^18",
     "react-dropzone": "^14.2.3",
     "react-hook-form": "^7.47.0",
+    "react-hotkeys-hook": "^4.4.1",
     "react-syntax-highlighter": "^15.5.0",
     "react-use-wizard": "^2.2.3",
     "swr": "^2.2.4",
