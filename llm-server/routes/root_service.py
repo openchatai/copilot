@@ -28,6 +28,7 @@ import json
 from api_caller.base import try_to_match_and_call_api_endpoint
 from models.repository.chat_history_repo import create_chat_history
 from utils.process_app_state import process_state
+from prance import ResolvingParser
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -64,8 +65,16 @@ def handle_request(data: Dict[str, Any]) -> Any:
 
     swagger_doc: Dict[str, Any] = mongo.swagger_files.find_one(
         {"meta.swagger_url": swagger_url}, {"meta": 0, "_id": 0}
-    ) or json.loads(fetch_swagger_text(swagger_url))
+    )
 
+    # need to test if prance works with document saved in mongodb
+
+    if swagger_url.startswith("http:") or swagger_url.startswith("https:"):
+        swagger_doc = ResolvingParser(url=swagger_url)
+    elif swagger_doc:
+        swagger_doc = ResolvingParser(spec_string=swagger_doc)
+    else:
+        swagger_doc = ResolvingParser(url=shared_folder + swagger_url)
     try:
         logging.info(
             "[OpenCopilot] Trying to figure out if the user request require 1) APIs calls 2) If yes how many "
@@ -90,7 +99,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
                 )
             else:
                 _workflow = create_workflow_from_operation_ids(
-                    bot_response.ids, SWAGGER_SPEC=swagger_doc
+                    bot_response.ids, swagger_doc
                 )
             output = run_workflow(
                 _workflow,

@@ -53,8 +53,7 @@ def join_conversations(chat_histories: List[ChatHistory]) -> str:
     return conversation
 
 
-def get_summaries(_swagger_doc: str) -> str:
-    swagger_doc = ResolvingParser(spec_string=_swagger_doc)
+def get_summaries(swagger_doc: ResolvingParser) -> str:
     servers = ", ".join(
         [s["url"] for s in swagger_doc.specification.get("servers", [])]
     )
@@ -65,7 +64,10 @@ def get_summaries(_swagger_doc: str) -> str:
         for method in operations:
             operation = operations[method]
             try:
-                summary = f"- {operation['operationId']} - {operation['summary']}\n"
+                if 'summary' in operation:
+                    summary = f"- {operation['operationId']} - {operation['summary']}\n"
+                else:
+                    summary = f"- {operation['operationId']} - {operation['description']}\n"
                 if "requestBody" in operation:
                     content_types = operation["requestBody"]["content"]
                     if "application/json" in content_types:
@@ -128,7 +130,7 @@ def generate_consolidated_requirement(
 
 
 def hasSingleIntent(
-    swagger_doc: Any,
+    swagger_doc: ResolvingParser,
     user_requirement: str,
     session_id: str,
     current_state: Optional[str],
