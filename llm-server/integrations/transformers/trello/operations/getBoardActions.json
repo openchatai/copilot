@@ -1,0 +1,22 @@
+[
+    {
+        "id": "65319c6b92bf1b422bd60ccd",
+        "data": {
+            "board": {
+                "id": "65319c6b92bf1b422bd60c92",
+                "name": "funnyboard",
+                "shortLink": "tWYvQoe4"
+            },
+            "organization": {
+                "id": "6519f17138a53167b7c275d4",
+                "name": "Shanur Rahman's workspace"
+            }
+        },
+        "type": "addToOrganizationBoard",
+        "date": "2023-10-19T21:15:23.187Z",
+        "memberCreator": {
+            "id": "6519dd999edcb809563b815c",
+            "fullName": "Shanur Rahman"
+        }
+    }
+]
