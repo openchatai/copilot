@@ -1,0 +1,21 @@
+{
+    "channel": {
+        "created": 1449252889,
+        "creator": "W012A3BCD",
+        "id": "C012AB3CD",
+        "is_archived": false,
+        "is_channel": true,
+        "is_ext_shared": false,
+        "is_general": true,
+        "name": "general",
+        "previous_names": [
+            "specifics"
+        ],
+        "purpose": {
+            "creator": "W012A3BCD",
+            "last_set": 1449709364,
+            "value": "This part of the workspace is for fun. Make fun here."
+        }
+    },
+    "ok": true
+}

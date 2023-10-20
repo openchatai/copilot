@@ -1,0 +1,12 @@
+{
+    "user": {
+        "color": "9f69e7",
+        "profile": {
+            "email": "spengler@ghostbusters.example.com",
+            "image_192": "https://.../avatar/e3b51ca72dee4ef87916ae2b9240df50.jpg",
+            "team": "T012AB3C4"
+        },
+        "real_name": "Egon Spengler",
+        "team_id": "T012AB3C4"
+    }
+}
