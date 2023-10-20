@@ -3,13 +3,6 @@ import { DropZone } from "@/components/domain/DropZone";
 import { HeaderShell } from "@/components/domain/HeaderShell";
 import Roadmap from "@/components/ui/Roadmap";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import React from "react";
@@ -27,7 +20,6 @@ import {
   RadioGroupPrimitiveItem,
 } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Popover } from "@/components/ui/popover";
 import {
   Tooltip,
   TooltipContent,

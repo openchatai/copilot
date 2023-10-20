@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/popover";
 import { AlertCircle } from "lucide-react";
 import { contexts } from "./_parts/data/contexts";
+import { TextDisplay } from "@/components/headless/TextDisplay";
 export default function CopilotContextSettingsPage() {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
@@ -70,13 +71,13 @@ export default function CopilotContextSettingsPage() {
         <div className="h-full flex-1 overflow-auto px-4 py-8">
           <div className="mt-2 space-y-2">
             {contexts.map((context) => (
-              <Alert key={context.id}>
+              <Alert key={context.id} className="transition-all">
                 <div className="flex flex-col space-y-1">
                   <AlertTitle className="text-lg font-semibold">
                     {context.name}
                   </AlertTitle>
                   <AlertDescription className="text-sm text-muted-foreground">
-                    {context.content}
+                    <TextDisplay text={context.content} wordCount={20} />
                   </AlertDescription>
                 </div>
                 <div className="flex items-center justify-end">
