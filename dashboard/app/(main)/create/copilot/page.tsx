@@ -15,13 +15,46 @@ import Link from "next/link";
 import React from "react";
 import { Wizard, useWizard } from "react-use-wizard";
 import { ValidateSwaggerStep } from "./_parts/ValidateSwaggerStep";
-import { Check, CheckCheck } from "lucide-react";
-import { CopilotType, createCopilot, createDemoCopilot } from "@/data/copilot";
+import { Cat, Check, CheckCheck, Slack, Trello } from "lucide-react";
+import { CopilotType, createCopilot } from "@/data/copilot";
 import _ from "lodash";
 import { atom, useAtom } from "jotai";
 import { toast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  RadioGroup,
+  RadioGroupPrimitiveItem,
+} from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Popover } from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+const premadeTemplates = [
+  {
+    id: "pet_store",
+    name: "Pet Store",
+    description: "Simple Pet store templeate with crud operations",
+    icon: <Cat className="h-6 w-6" />,
+  },
+  {
+    id: "terllo_clone",
+    name: "Trello Clone",
+    description: "A clone of trello with some basic operations",
+    icon: <Trello className="h-6 w-6" />,
+  },
+
+  {
+    id: "slack_clone",
+    name: "Slack Clone",
+    description: "A clone of slack with some basic operations",
+    icon: <Slack className="h-6 w-6" />,
+  },
+];
 const CreatedCopilotAtom = atom<CopilotType | null>(null);
 const swaggerAtom = atom<File[] | null>(null);
 function Header() {
@@ -141,10 +174,14 @@ function UploadSwaggerStep() {
       </p>
       <Tabs defaultValue="upload">
         <TabsList>
-          <TabsTrigger value="upload" className="flex-1">Upload Swagger</TabsTrigger>
-          <TabsTrigger value="premade" className="flex-1">Pre-made Copilots</TabsTrigger>
+          <TabsTrigger value="upload" className="flex-1">
+            Upload Swagger
+          </TabsTrigger>
+          <TabsTrigger value="premade" className="flex-1">
+            Pre-made Copilots
+          </TabsTrigger>
         </TabsList>
-        <TabsContent value="upload">
+        <TabsContent value="upload" className="min-h-[10rem]">
           <div className="my-5">
             <DropZone
               multiple={false}
@@ -186,8 +223,8 @@ function UploadSwaggerStep() {
             </div>
           </div>
         </TabsContent>
-        <TabsContent value="premade">
-          <Dialog>
+        <TabsContent value="premade" className="min-h-[10rem]">
+          {/* <Dialog>
             <DialogTrigger asChild>
               <Button
                 className="mb-6 h-fit whitespace-normal py-2"
@@ -232,7 +269,29 @@ function UploadSwaggerStep() {
                 </Button>
               </DialogFooter>
             </DialogContent>
-          </Dialog>
+          </Dialog> */}
+          <Label className="my-4 block text-base font-semibold text-accent-foreground">
+            Choose a pre-made template
+          </Label>
+          <RadioGroup className="grid grid-cols-4 gap-2">
+            {_.map(premadeTemplates, ({ id, name, icon, description }) => (
+              <TooltipProvider key={id}>
+                <Tooltip>
+                  <RadioGroupPrimitiveItem
+                    value={id}
+                    asChild
+                    className="flex aspect-square flex-col items-center justify-center gap-2 rounded-lg border border-border p-3 shadow-sm transition-all data-[state=checked]:border-primary data-[state=checked]:text-primary data-[state=checked]:shadow-inner data-[state=checked]:shadow-primary-foreground"
+                  >
+                    <TooltipTrigger>
+                      <span className="text-2xl drop-shadow">{icon}</span>
+                      <span className="text-sm font-semibold">{name}</span>
+                    </TooltipTrigger>
+                  </RadioGroupPrimitiveItem>
+                  <TooltipContent>{description}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            ))}
+          </RadioGroup>
         </TabsContent>
       </Tabs>
       <footer className="flex w-full items-center justify-between gap-5 pt-5">
