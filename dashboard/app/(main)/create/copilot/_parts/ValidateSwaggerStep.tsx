@@ -135,8 +135,10 @@ export function ValidateSwaggerStep() {
                 <RmItem
                   label={
                     <>
-                      Operation ID{" "}
-                      <Badge variant="destructive">please fix</Badge>
+                      Operation ID
+                      <Badge className="px-2" variant="destructive">
+                        please fix
+                      </Badge>
                     </>
                   }
                 >
@@ -200,8 +202,10 @@ export function ValidateSwaggerStep() {
                 <RmItem
                   label={
                     <>
-                      Validating your swagger file{" "}
-                      <Badge variant="success">great success</Badge>
+                      Validating your swagger file
+                      <Badge variant="success" className="px-2">
+                        great success
+                      </Badge>
                     </>
                   }
                   success
@@ -217,7 +221,10 @@ export function ValidateSwaggerStep() {
                 <RmItem
                   label={
                     <>
-                      Names <Badge variant={"destructive"}>please fix</Badge>
+                      Names{" "}
+                      <Badge variant="destructive" className="px-2">
+                        please fix
+                      </Badge>
                     </>
                   }
                 >
@@ -282,7 +289,9 @@ export function ValidateSwaggerStep() {
                   label={
                     <>
                       Description
-                      <Badge variant="success">great success</Badge>
+                      <Badge variant="success" className="px-2">
+                        great success
+                      </Badge>
                     </>
                   }
                   success
@@ -298,8 +307,10 @@ export function ValidateSwaggerStep() {
                 <RmItem
                   label={
                     <>
-                      Description{" "}
-                      <Badge variant="destructive">please fix</Badge>
+                      Description
+                      <Badge className="px-2" variant="destructive">
+                        please fix
+                      </Badge>
                     </>
                   }
                 >
@@ -364,7 +375,9 @@ export function ValidateSwaggerStep() {
                   label={
                     <>
                       Validating your swagger file
-                      <Badge variant="success">great success</Badge>
+                      <Badge className="px-2" variant="success">
+                        great success
+                      </Badge>
                     </>
                   }
                   success
@@ -381,7 +394,9 @@ export function ValidateSwaggerStep() {
                   label={
                     <>
                       Too many endpoints
-                      <Badge variant="secondary">recommendation</Badge>
+                      <Badge className="px-2" variant="secondary">
+                        recommendation
+                      </Badge>
                     </>
                   }
                 >
@@ -395,7 +410,9 @@ export function ValidateSwaggerStep() {
                   label={
                     <>
                       Good number of endpoints
-                      <Badge variant="success">great success</Badge>
+                      <Badge className="px-2" variant="success">
+                        great success
+                      </Badge>
                     </>
                   }
                   success
@@ -412,7 +429,9 @@ export function ValidateSwaggerStep() {
                   label={
                     <>
                       {authorization}
-                      <Badge variant="secondary">recommendation</Badge>
+                      <Badge className="px-2" variant="secondary">
+                        recommendation
+                      </Badge>
                     </>
                   }
                 >
@@ -425,7 +444,9 @@ export function ValidateSwaggerStep() {
                   label={
                     <>
                       Supported Authorization
-                      <Badge variant="success">great success</Badge>
+                      <Badge className="px-2" variant="success">
+                        great success
+                      </Badge>
                     </>
                   }
                   success
@@ -441,7 +462,7 @@ export function ValidateSwaggerStep() {
             label={
               <>
                 No endpoints
-                <Badge variant="destructive">please fix</Badge>
+                <Badge variant="destructive" className="px-2">please fix</Badge>
               </>
             }
           >

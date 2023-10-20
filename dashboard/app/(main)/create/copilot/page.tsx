@@ -16,7 +16,14 @@ import React from "react";
 import { Wizard, useWizard } from "react-use-wizard";
 import { ValidateSwaggerStep } from "./_parts/ValidateSwaggerStep";
 import { Check, CheckCheck } from "lucide-react";
-
+import { CopilotType, createCopilot, createDemoCopilot } from "@/data/copilot";
+import _ from "lodash";
+import { atom, useAtom } from "jotai";
+import { toast } from "@/components/ui/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+const CreatedCopilotAtom = atom<CopilotType | null>(null);
+const swaggerAtom = atom<File[] | null>(null);
 function Header() {
   const { stepCount, activeStep, goToStep } = useWizard();
   const steps = Array.from({ length: stepCount }).map((_, i) => ({
@@ -27,7 +34,7 @@ function Header() {
     isLast: i === stepCount - 1,
   }));
   return (
-    <div className="my-4">
+    <div className="mb-4 mt-8">
       <ul className="relative flex w-full justify-between">
         <div className="absolute left-0 top-1/2 -mt-px h-0.5 w-full bg-slate-200" />
         {steps.map((step, i) => (
@@ -88,99 +95,146 @@ function IntroStep() {
           ]}
         />
       </div>
-      <div className="flex items-center justify-end" onClick={nextStep}>
-        <Button>Let's do it!</Button>
+      <div className="flex items-center justify-end">
+        <Button onClick={nextStep}>Let's do it!</Button>
       </div>
     </div>
   );
 }
 function UploadSwaggerStep() {
-  const { nextStep, previousStep } = useWizard();
-
+  const { nextStep, previousStep, handleStep } = useWizard();
+  const [swaggerFile, setSwaggerFile] = useAtom(swaggerAtom);
+  const [copilot, setCopilot] = useAtom(CreatedCopilotAtom);
+  handleStep(async () => {
+    if (_.isEmpty(swaggerFile) || !swaggerFile || !swaggerFile?.[0]) {
+      return;
+    }
+    const response = await createCopilot({ swagger_file: swaggerFile[0] });
+    if (response.status === 200) {
+      setCopilot(response.data.chatbot);
+      toast({
+        title: "Copilot created successfully",
+        description:
+          "We created a copilot for you, you can now continue the process",
+        variant: "default",
+      });
+      return true;
+    }
+  });
   return (
     <div>
       <h2 className="mb-6 text-3xl font-bold text-accent-foreground">
         Upload your swagger.json file ✨
       </h2>
+
+      {copilot && (
+        <Alert variant="info" className="my-2">
+          <AlertTitle>Copilot Created Successfully</AlertTitle>
+          <AlertDescription>
+            You have created <strong>{copilot?.name}</strong>
+          </AlertDescription>
+        </Alert>
+      )}
       <p className="mb-4">
         You copilot will use these APIs to communicate with your product and
         execute actions
       </p>
-      <div className="my-5">
-        <DropZone
-          multiple={false}
-          onDrop={(files) => {
-            console.log(files);
-          }}
-        />
-      </div>
-
-      <div className="flex-center my-8 w-full">
-        <span>
-          <strong>🪄 OR 🪄</strong>
-        </span>
-      </div>
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button className="mb-6 h-fit whitespace-normal py-2" size="fluid">
-            Use our pre-made demo swagger file to try it out quickly <br />{" "}
-            (🐶pet store SaaS system)
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader className="flex w-full items-center justify-center border-none text-4xl">
-            <span>🐶🐕</span>
-          </DialogHeader>
-          <div className="mt-5 px-5">
-            <h2 className="text-center text-lg font-semibold">
-              Pet Store Demo
-            </h2>
-            <p className="mt-2 text-center text-sm">
-              In this pet store you can add, delete, update and view pets, you
-              can also search and manage inventory, and finally you can place
-              orders . We already configured the APIs and the backend, you can
-              test it almost immediately.
-            </p>
+      <Tabs defaultValue="upload">
+        <TabsList>
+          <TabsTrigger value="upload" className="flex-1">Upload Swagger</TabsTrigger>
+          <TabsTrigger value="premade" className="flex-1">Pre-made Copilots</TabsTrigger>
+        </TabsList>
+        <TabsContent value="upload">
+          <div className="my-5">
+            <DropZone
+              multiple={false}
+              maxFiles={1}
+              accept={{ json: ["application/json"] }}
+              value={swaggerFile || []}
+              onChange={setSwaggerFile}
+            />
           </div>
-          <DialogFooter className="mt-4">
-            <Button>
-              <span>Let's do it</span>
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      <div className="mb-8 mt-4 flex items-center justify-between space-x-6">
-        <div>
-          <div className="mb-1 text-sm font-medium text-slate-800">
-            Important Instructions
+          <div className="mb-8 mt-4 flex items-center justify-between space-x-6">
+            <div>
+              <div className="mb-1 text-sm font-medium text-slate-800">
+                Important Instructions
+              </div>
+              <div className="text-xs">
+                <ul>
+                  <li>
+                    ✅ Make sure each{" "}
+                    <strong>endpoint have description and operation id</strong>,
+                    results will be significantly better with a good description
+                  </li>
+                  <li>
+                    ✅ Make sure that the swagger file is valid, the system
+                    might not be able to parse invalid files,{" "}
+                    <Link href="https://editor.swagger.io/" target="_blank">
+                      use this tool validate your schema
+                    </Link>
+                  </li>
+                  <li>
+                    ✅ Do not add any Authorization layers, we will show you how
+                    to authorize your own requests by yourself
+                  </li>
+                  <li>
+                    ✅ This *very* new product, so many things does not make
+                    sense/work at this stage{" "}
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
-          <div className="text-xs">
-            <ul>
-              <li>
-                ✅ Make sure each{" "}
-                <strong>endpoint have description and operation id</strong>,
-                results will be significantly better with a good description
-              </li>
-              <li>
-                ✅ Make sure that the swagger file is valid, the system might
-                not be able to parse invalid files,{" "}
-                <Link href="https://editor.swagger.io/" target="_blank">
-                  use this tool validate your schema
-                </Link>
-              </li>
-              <li>
-                ✅ Do not add any Authorization layers, we will show you how to
-                authorize your own requests by yourself
-              </li>
-              <li>
-                ✅ This *very* new product, so many things does not make
-                sense/work at this stage{" "}
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
+        </TabsContent>
+        <TabsContent value="premade">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                className="mb-6 h-fit whitespace-normal py-2"
+                size="fluid"
+              >
+                Use our pre-made demo swagger file to try it out quickly <br />{" "}
+                (🐶pet store SaaS system)
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader className="flex w-full items-center justify-center border-none text-4xl">
+                <span>🐶🐕</span>
+              </DialogHeader>
+              <div className="mt-5 px-5">
+                <h2 className="text-center text-lg font-semibold">
+                  Pet Store Demo
+                </h2>
+                <p className="mt-2 text-center text-sm">
+                  In this pet store you can add, delete, update and view pets,
+                  you can also search and manage inventory, and finally you can
+                  place orders . We already configured the APIs and the backend,
+                  you can test it almost immediately.
+                </p>
+              </div>
+              <DialogFooter className="mt-4">
+                <Button
+                  onClick={async () => {
+                    if (!copilot) {
+                      const { data: demoCopilotData } =
+                        await createDemoCopilot();
+                      setCopilot(demoCopilotData.chatbot);
+                      toast({
+                        title: "Demo Copilot created successfully",
+                        description:
+                          "We created a demo copilot for you, you can now continue the process",
+                        variant: "default",
+                      });
+                    }
+                  }}
+                >
+                  Let's do it
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </TabsContent>
+      </Tabs>
       <footer className="flex w-full items-center justify-between gap-5 pt-5">
         <Button
           variant={"ghost"}
@@ -190,7 +244,9 @@ function UploadSwaggerStep() {
           Back
         </Button>
 
-        <Button onClick={nextStep}>Next Step {`->`}</Button>
+        <Button hidden={copilot?.is_premade_demo_template} onClick={nextStep}>
+          Next Step
+        </Button>
       </footer>
     </div>
   );
@@ -200,7 +256,7 @@ function FinishStep() {
     <div>
       <h2 className="mb-6 flex flex-col items-center justify-center gap-2 font-bold">
         <span className="inline-flex rounded-full bg-emerald-100 fill-current p-2.5 text-6xl text-emerald-500">
-          <CheckCheck className="w-[1em] h-[1em]"/>
+          <CheckCheck className="h-[1em] w-[1em]" />
         </span>
         <span className="text-3xl">Thats it! 🙌</span>
       </h2>

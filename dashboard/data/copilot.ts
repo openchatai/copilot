@@ -40,6 +40,11 @@ export type ValidatorResponseType = {
   };
 };
 
+export type DemoCopilot = {
+  swagger_url: string;
+  chatbot: CopilotType;
+};
+
 export async function listCopilots() {
   return await instance.get<CopilotType[]>("/copilots");
 }
@@ -63,8 +68,19 @@ export async function validateSwagger(bot_id: string) {
   if (!bot_id) throw new Error("Bot id is required");
   return instance.get<ValidatorResponseType>(`/copilot/${bot_id}/validator`);
 }
+// http://localhost:8888/backend/api/copilot/swagger/pre-made
+export async function createDemoCopilot() {
+  return instance.get<DemoCopilot>(`/copilot/swagger/pre-made`);
+}
 
-export type DemoCopilot = {
-  swagger_url: string;
-  chatbot: CopilotType;
-};
+export async function createCopilot({ swagger_file }: { swagger_file: File }) {
+  const data = new FormData();
+  data.append("swagger_file", swagger_file);
+  return instance.post<{
+    chatbot: CopilotType;
+  }>("/copilot/swagger", data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+}

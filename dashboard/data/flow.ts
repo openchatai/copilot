@@ -41,10 +41,10 @@ interface PaginatedWorkflows {
   total_workflows: number;
 }
 
-export const getWorkflowsByBotId = (bot_id: string, page: number = 1) => {
-  return instance.get<PaginatedWorkflows>(`/get/b/${bot_id}?page=${page}`);
+// http://localhost:8888/backend/flows/get/b/:bot_id?page=1
+export const getWorkflowsByBotId = async (bot_id: string, page: number = 1) => {
+  return await instance.get<PaginatedWorkflows>(`/get/b/${bot_id}?page=${page}`);
 };
-
 export const getWorkflowById = (id: string) => {
   return instance.get<Workflow>(`/${id}`);
 };

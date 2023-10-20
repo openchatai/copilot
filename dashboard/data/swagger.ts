@@ -78,13 +78,12 @@ type Method = {
 
 export async function getSwaggerData(page: number = 1, pageSize: number = 10) {
   try {
-    const response = await instance.get<PaginatedSwaggerResponse>("", {
+    return await instance.get<PaginatedSwaggerResponse>("", {
       params: {
         page,
         page_size: pageSize,
       },
     });
-    return response;
   } catch (error: any) {
     throw new Error(`Error fetching Swagger data: ${error.message}`);
   }
@@ -134,9 +133,9 @@ export const getTrasnformedSwagger = (id: string) => {
     ]
   >(`/transform/${id}`);
 };
-
-export const getSwaggerByBotId = (bot_id: string) => {
-  return instance.get<SwaggerType>(`/get/b/${bot_id}`);
+// http://localhost:8888/backend/swagger_api/get/b/:bot_id
+export const getSwaggerByBotId = async (bot_id: string) => {
+  return await instance.get<SwaggerType>(`/get/b/${bot_id}`);
 };
 /** As of now, we don't have to call this api from the frontend. This will internally be called from the backend */
 export async function uploadSwaggerFile(id: string, file: File) {
