@@ -1,0 +1,16 @@
+{
+    "messages": {
+        "matches": [
+            {
+                "channel": {
+                    "id": "C12345678",
+                    "name": "general"
+                },
+                "permalink": "https://hitchhikers.slack.com/archives/C12345678/p1508284197000015",
+                "user": "U2U85N1RV",
+                "username": "roach"
+            }
+        ]
+    },
+    "query": "The meaning of life the universe and everything"
+}

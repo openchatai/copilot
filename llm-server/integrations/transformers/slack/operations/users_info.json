@@ -1,0 +1,13 @@
+{
+    "user": {
+        "id": "W012A3CDE",
+        "profile": {
+            "email": "spengler@ghostbusters.example.com",
+            "image_original": "https://.../avatar/e3b51ca72dee4ef87916ae2b9240df50.jpg",
+            "status_text": "Print is dead",
+            "team": "T012AB3C4"
+        },
+        "real_name": "Egon Spengler",
+        "team_id": "T012AB3C4"
+    }
+}

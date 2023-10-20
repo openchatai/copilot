@@ -1,0 +1,16 @@
+{
+    "channel": {
+        "creator": "W012A3BCD",
+        "id": "C012AB3CD",
+        "name": "general",
+        "previous_names": [
+            "specifics",
+            "abstractions",
+            "etc"
+        ],
+        "purpose": {
+            "last_set": 1449709364,
+            "value": "This part of the workspace is for fun. Make fun here."
+        }
+    }
+}
