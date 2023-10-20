@@ -882,15 +882,6 @@
                 "operationId": "chat_getPermalink",
                 "parameters": [
                     {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `none`",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "channel",
                         "in": "query",
                         "description": "The ID of the conversation or channel containing the message",
@@ -2370,14 +2361,6 @@
                 "operationId": "conversations_history",
                 "parameters": [
                     {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `conversations:history`",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "channel",
                         "in": "query",
                         "description": "Conversation ID to fetch history for.",
@@ -2508,14 +2491,6 @@
                 },
                 "operationId": "conversations_info",
                 "parameters": [
-                    {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `conversations:read`",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
                     {
                         "name": "channel",
                         "in": "query",
@@ -3083,14 +3058,6 @@
                 "operationId": "conversations_list",
                 "parameters": [
                     {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `conversations:read`",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "exclude_archived",
                         "in": "query",
                         "description": "Set to `true` to exclude archived channels from the list",
@@ -3352,14 +3319,6 @@
                 },
                 "operationId": "conversations_members",
                 "parameters": [
-                    {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `conversations:read`",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
                     {
                         "name": "channel",
                         "in": "query",
@@ -3697,14 +3656,6 @@
                 },
                 "operationId": "conversations_replies",
                 "parameters": [
-                    {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `conversations:history`",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
                     {
                         "name": "channel",
                         "in": "query",
@@ -4343,14 +4294,6 @@
                 "operationId": "dnd_info",
                 "parameters": [
                     {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `dnd:read`",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "user",
                         "in": "query",
                         "description": "User to fetch status for (defaults to current user)",
@@ -4423,14 +4366,9 @@
                         "application/x-www-form-urlencoded": {
                             "schema": {
                                 "required": [
-                                    "num_minutes",
-                                    "token"
+                                    "num_minutes"
                                 ],
                                 "properties": {
-                                    "token": {
-                                        "type": "string",
-                                        "description": "Authentication token. Requires scope: `dnd:write`"
-                                    },
                                     "num_minutes": {
                                         "type": "string",
                                         "description": "Number of minutes, from now, to snooze until."
@@ -4501,14 +4439,6 @@
                 },
                 "operationId": "dnd_teamInfo",
                 "parameters": [
-                    {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `dnd:read`",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
                     {
                         "name": "users",
                         "in": "query",
@@ -4589,17 +4519,7 @@
                     "url": "https://api.slack.com/methods/emoji.list"
                 },
                 "operationId": "emoji_list",
-                "parameters": [
-                    {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `emoji:read`",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
+                "parameters": [],
                 "responses": {
                     "200": {
                         "description": "Typical success response",
@@ -4937,15 +4857,6 @@
                 "operationId": "pins_list",
                 "parameters": [
                     {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `pins:read`",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "channel",
                         "in": "query",
                         "description": "Channel to get pinned items for.",
@@ -5257,15 +5168,6 @@
                 "operationId": "reactions_get",
                 "parameters": [
                     {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `reactions:read`",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "channel",
                         "in": "query",
                         "description": "Channel where the message to get reactions for was posted.",
@@ -5387,15 +5289,6 @@
                 },
                 "operationId": "reactions_list",
                 "parameters": [
-                    {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `reactions:read`",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
                     {
                         "name": "user",
                         "in": "query",
@@ -5992,14 +5885,6 @@
                 "operationId": "reminders_info",
                 "parameters": [
                     {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `reminders:read`",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "reminder",
                         "in": "query",
                         "description": "The ID of the reminder",
@@ -6067,16 +5952,7 @@
                     "url": "https://api.slack.com/methods/reminders.list"
                 },
                 "operationId": "reminders_list",
-                "parameters": [
-                    {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `reminders:read`",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
+                "parameters": [],
                 "responses": {
                     "200": {
                         "description": "Typical success response",
@@ -6137,15 +6013,6 @@
                 },
                 "operationId": "rtm_connect",
                 "parameters": [
-                    {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `rtm:stream`",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
                     {
                         "name": "batch_presence_aware",
                         "in": "query",
@@ -6233,15 +6100,6 @@
                 },
                 "operationId": "search_messages",
                 "parameters": [
-                    {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `search:read`",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
                     {
                         "name": "count",
                         "in": "query",
@@ -6522,14 +6380,6 @@
                 "operationId": "stars_list",
                 "parameters": [
                     {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `stars:read`",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "count",
                         "in": "query",
                         "schema": {
@@ -6729,15 +6579,6 @@
                 },
                 "operationId": "team_profile_get",
                 "parameters": [
-                    {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `users.profile:read`",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
                     {
                         "name": "visibility",
                         "in": "query",
@@ -7193,15 +7034,6 @@
                         }
                     },
                     {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `usergroups:read`",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "include_count",
                         "in": "query",
                         "description": "Include the number of users in each User Group.",
@@ -7495,15 +7327,6 @@
                 "operationId": "usergroups_users_list",
                 "parameters": [
                     {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `usergroups:read`",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "include_disabled",
                         "in": "query",
                         "description": "Allow results that involve disabled User Groups.",
@@ -7719,14 +7542,6 @@
                 "operationId": "users_conversations",
                 "parameters": [
                     {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `conversations:read`",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "user",
                         "in": "query",
                         "description": "Browse conversations by a specific user ID's membership. Non-public channels are restricted to those where the calling user shares membership.",
@@ -7900,15 +7715,8 @@
                     "content": {
                         "application/x-www-form-urlencoded": {
                             "schema": {
-                                "required": [
-                                    "token"
-                                ],
-                                "properties": {
-                                    "token": {
-                                        "type": "string",
-                                        "description": "Authentication token. Requires scope: `users.profile:write`"
-                                    }
-                                }
+                                "required": [],
+                                "properties": {}
                             }
                         }
                     },
@@ -7974,15 +7782,6 @@
                 },
                 "operationId": "users_getPresence",
                 "parameters": [
-                    {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `users:read`",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
                     {
                         "name": "user",
                         "in": "query",
@@ -8053,16 +7852,7 @@
                     "url": "https://api.slack.com/methods/users.identity"
                 },
                 "operationId": "users_identity",
-                "parameters": [
-                    {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `identity.basic`",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
+                "parameters": [],
                 "responses": {
                     "200": {
                         "description": "You will receive at a minimum the following information:",
@@ -8127,15 +7917,6 @@
                 },
                 "operationId": "users_info",
                 "parameters": [
-                    {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `users:read`",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
                     {
                         "name": "include_locale",
                         "in": "query",
@@ -8251,14 +8032,6 @@
                 },
                 "operationId": "users_list",
                 "parameters": [
-                    {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `users:read`",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
                     {
                         "name": "limit",
                         "in": "query",
@@ -8428,15 +8201,6 @@
                 "operationId": "users_lookupByEmail",
                 "parameters": [
                     {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `users:read.email`",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "email",
                         "in": "query",
                         "description": "An email address belonging to a user in the workspace",
@@ -8544,15 +8308,6 @@
                 },
                 "operationId": "users_profile_get",
                 "parameters": [
-                    {
-                        "name": "token",
-                        "in": "query",
-                        "description": "Authentication token. Requires scope: `users.profile:read`",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
                     {
                         "name": "include_labels",
                         "in": "query",
@@ -8839,14 +8594,8 @@
                     "content": {
                         "application/x-www-form-urlencoded": {
                             "schema": {
-                                "required": [
-                                    "token"
-                                ],
+                                "required": [],
                                 "properties": {
-                                    "token": {
-                                        "type": "string",
-                                        "description": "Authentication token. Requires scope: `users.profile:write`"
-                                    },
                                     "crop_w": {
                                         "type": "string",
                                         "description": "Width/height of crop box (always square)"
