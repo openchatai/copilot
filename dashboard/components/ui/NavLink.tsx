@@ -2,7 +2,11 @@
 import React from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { usePathname, useSelectedLayoutSegments } from "next/navigation";
+import {
+  usePathname,
+  useSearchParams,
+  useSelectedLayoutSegments,
+} from "next/navigation";
 
 type RenderProps = {
   isActive: boolean;
@@ -19,6 +23,19 @@ interface Props
     | (({ isActive }: RenderProps) => React.JSX.Element);
 }
 
+function pathnamePlusSearchParams(
+  pathname: string,
+  searchParams?: URLSearchParams,
+) {
+  const $searchParams = searchParams?.toString();
+  const $pathname = pathname.endsWith("/") ? pathname : pathname + "/";
+  const $pathnamePlusSearchParams = $searchParams
+    ? `${$pathname}?${$searchParams}`
+    : $pathname;
+
+  return $pathnamePlusSearchParams;
+}
+
 export const NavLink = React.forwardRef<React.ElementRef<typeof Link>, Props>(
   (
     {
@@ -32,10 +49,16 @@ export const NavLink = React.forwardRef<React.ElementRef<typeof Link>, Props>(
     _ref,
   ) => {
     const pathname = usePathname();
+    const searchParams = useSearchParams();
     const segments = useSelectedLayoutSegments();
+    const $pathnamePlusSearchParams = pathnamePlusSearchParams(
+      pathname,
+      searchParams,
+    );
     const isActive = segment
       ? segments.includes(segment)
-      : props.href === pathname;
+      : props.href === $pathnamePlusSearchParams;
+
     return (
       <Link
         {...props}
