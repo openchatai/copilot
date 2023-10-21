@@ -15,7 +15,7 @@ import Loading from "../loading";
 import { useSearchParams } from "next/navigation";
 import { Filter, QUERY_KEY, SORT_KEY } from "./Search";
 import _ from "lodash";
-import Image from "next/image";
+import { EmptyBlock } from "@/components/domain/EmptyBlock";
 
 function customSort(list: CopilotType[], sortBy: Filter["sort"]) {
   if (sortBy === "last-viewed") {
@@ -47,17 +47,11 @@ export function CopilotsContainer() {
     sort,
   );
   return _.isEmpty($copilots) ? (
-    <div className="flex-center flex-col gap-2 py-4 animate-in fade-in">
-      <Image
-        src="/random_icons_2.svg"
-        width={60}
-        height={60}
-        alt="Random icon"
-      />
+    <EmptyBlock>
       <p className="text-center text-gray-400">
         No copilots found for your search
       </p>
-    </div>
+    </EmptyBlock>
   ) : (
     <div className="grid grid-cols-2 gap-8 py-4 xl:grid-cols-4">
       {$copilots?.map((copilot) => {
