@@ -83,7 +83,9 @@ def handle_request(data: Dict[str, Any]) -> Any:
         current_state = process_state(app, headers)
 
         logging.info(f"Received app configuration: {app}")
-        bot_response = hasSingleIntent(swagger_doc, text, session_id, current_state)
+        bot_response = hasSingleIntent(
+            swagger_doc, text, session_id, current_state, app
+        )
         if len(bot_response.ids) >= 1:
             logging.info(
                 "[OpenCopilot] Apparently, the user request require calling one or more API endpoint "
