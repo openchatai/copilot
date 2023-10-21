@@ -80,7 +80,7 @@
         "description": "Retrieve a Trello board by its ID.",
         "parameters": [
           {
-            "name": "id",
+            "name": "boardId",
             "in": "path",
             "description": "The ID of the Trello board.",
             "required": true,
@@ -110,7 +110,7 @@
         "operationId": "updateBoard",
         "parameters": [
           {
-            "name": "id",
+            "name": "boardId",
             "in": "path",
             "description": "The ID of the Trello board to update.",
             "required": true,
