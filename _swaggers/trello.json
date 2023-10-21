@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "version": "1.0.0",
+    "version": "1.0.0", 
     "title": "Trello API",
     "description": "This Swagger specification documents the Trello API, which provides a set of endpoints for interacting with Trello boards, cards, and other resources.\n"
   },
@@ -11,6 +11,35 @@
     }
   ],
   "paths": {
+    "/members/me": {
+      "get": {
+        "summary": "Fetch all boards",
+        "operationId": "fetchAllBoards",
+        "parameters": [
+          {
+            "name": "boards",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "open"
+            },
+            "description": "List all boards"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "example": {
+                  
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/boards": {
       "post": {
         "summary": "Create a new Trello board",
@@ -43,14 +72,14 @@
         }
       }
     },
-    "/boards/{id}": {
+    "/boards/{boardId}": {
       "delete": {
         "summary": "Delete a Trello board by ID",
         "operationId": "deleteBoard",
         "description": "Delete a Trello board by ID",
         "parameters": [
           {
-            "name": "id",
+            "name": "boardId",
             "in": "path",
             "description": "The ID of the Trello board to delete.",
             "required": true,
@@ -80,7 +109,7 @@
         "description": "Retrieve a Trello board by its ID.",
         "parameters": [
           {
-            "name": "id",
+            "name": "boardId",
             "in": "path",
             "description": "The ID of the Trello board.",
             "required": true,
@@ -110,7 +139,7 @@
         "operationId": "updateBoard",
         "parameters": [
           {
-            "name": "id",
+            "name": "boardId",
             "in": "path",
             "description": "The ID of the Trello board to update.",
             "required": true,
@@ -247,14 +276,14 @@
         }
       }
     },
-    "/boards/{id}/cards": {
+    "/boards/{boardId}/cards": {
       "get": {
         "summary": "Get cards on a Trello board",
         "operationId": "getBoardCards",
-        "description": "This endpoint allows you to retrieve cards on a Trello board by its ID.",
+        "description": "Retrieve cards on a Trello board by board id.",
         "parameters": [
           {
-            "name": "id",
+            "name": "boardId",
             "in": "path",
             "description": "The ID of the Trello board for which you want to retrieve cards.",
             "required": true,
@@ -279,14 +308,14 @@
         }
       }
     },
-    "/boards/{id}/cards/{filter}": {
+    "/boards/{boardId}/cards/{filter}": {
       "get": {
         "summary": "Get filtered cards on a Trello board",
         "operationId": "getFilteredBoardCards",
         "description": "This endpoint allows you to retrieve filtered cards on a Trello board by its ID and a filter value.",
         "parameters": [
           {
-            "name": "id",
+            "name": "boardId",
             "in": "path",
             "description": "The ID of the Trello board for which you want to retrieve filtered cards.",
             "required": true,
@@ -321,6 +350,61 @@
       }
     },
     "/cards/{id}": {
+      "put": {
+        "summary": "Update a card by card id",
+        "operationId": "updateCard",
+        "description": "Updates the specified card",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the Trello card to update.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "The new name for the card",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "desc",
+            "in": "query",
+            "description": "The new description of the card.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "idList",
+            "in": "query",
+            "description": "The ID of the list where the card should be created (REQUIRED).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "idBoard",
+            "in": "query",
+            "description": "The ID of the board the card should be on.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Card updated successfully"  
+          }
+        }
+      },
       "delete": {
         "summary": "Delete a Trello card by ID",
         "operationId": "deleteCard",
