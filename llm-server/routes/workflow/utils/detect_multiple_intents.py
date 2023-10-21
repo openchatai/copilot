@@ -64,10 +64,12 @@ def get_summaries(swagger_doc: ResolvingParser) -> str:
         for method in operations:
             operation = operations[method]
             try:
-                if 'summary' in operation:
+                if "summary" in operation:
                     summary = f"- {operation['operationId']} - {operation['summary']}\n"
                 else:
-                    summary = f"- {operation['operationId']} - {operation['description']}\n"
+                    summary = (
+                        f"- {operation['operationId']} - {operation['description']}\n"
+                    )
                 if "requestBody" in operation:
                     content_types = operation["requestBody"]["content"]
                     if "application/json" in content_types:
@@ -153,7 +155,7 @@ def hasSingleIntent(
     conversation_str = join_conversations(history)
     messages = [
         SystemMessage(
-            content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. To accomplish the task, you will be provided with information about the existing state of the application. A user input and list of api summaries. If the user is asking you to perform a `CRUD` operation, provide the list of operation ids of api calls needed in the `ids` field of the json. `bot_message` should consist of a straightforward sentence, free from any special characters. Note that the application uses current state as a cache, so if information is found in cache do not add that api call in `ids` list. Your response MUST be a valid minified json"
+            content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. To accomplish the task, you will be provided with information about the existing state of the application. A user input and list of api summaries. If the user is asking you to perform a `CRUD` operation, provide the list of operation ids of api calls needed in the `ids` field of the json. `bot_message` should consist of a straightforward sentence, free from any special characters. Note that the application uses current state as a cache, if you don't find the required information in the cache, you should try to find an api call to fetch that information. Your response MUST be a valid minified json"
         ),
         current_state
         and HumanMessage(

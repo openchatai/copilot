@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "version": "1.0.0",
+    "version": "1.0.0", 
     "title": "Trello API",
     "description": "This Swagger specification documents the Trello API, which provides a set of endpoints for interacting with Trello boards, cards, and other resources.\n"
   },
@@ -251,7 +251,7 @@
       "get": {
         "summary": "Get cards on a Trello board",
         "operationId": "getBoardCards",
-        "description": "This endpoint allows you to retrieve cards on a Trello board by its ID.",
+        "description": "Retrieve cards on a Trello board by board id.",
         "parameters": [
           {
             "name": "id",
@@ -321,6 +321,38 @@
       }
     },
     "/cards/{id}": {
+      "put": {
+        "summary": "Update a card",
+        "description": "Updates the specified card",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the card to update",
+            "required": true,
+            "type": "string" 
+          },
+          {
+            "name": "key",
+            "in": "query",
+            "description": "Trello API key",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "description": "Trello API token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Card updated successfully"  
+          }
+        }
+      },
       "delete": {
         "summary": "Delete a Trello card by ID",
         "operationId": "deleteCard",
