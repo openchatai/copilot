@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.1",
-    "@openchatai/copilot-flows-editor": "^1.4.0",
+    "@openchatai/copilot-flows-editor": "^1.5.2",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-avatar": "^1.0.4",

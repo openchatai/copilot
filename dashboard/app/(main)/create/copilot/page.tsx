@@ -8,7 +8,7 @@ import Link from "next/link";
 import React from "react";
 import { Wizard, useWizard } from "react-use-wizard";
 import { ValidateSwaggerStep } from "./_parts/ValidateSwaggerStep";
-import { Cat, Check, CheckCheck, Slack, Trello } from "lucide-react";
+import { Cat, Check, CheckCheck, Trello } from "lucide-react";
 import { CopilotType, createCopilot } from "@/data/copilot";
 import _ from "lodash";
 import { atom, useAtom } from "jotai";
@@ -34,17 +34,10 @@ const premadeTemplates = [
     icon: <Cat className="h-6 w-6" />,
   },
   {
-    id: "terllo_clone",
-    name: "Trello Clone",
-    description: "A clone of trello with some basic operations",
+    id: "trello",
+    name: "Trello",
+    description: "Terelo close",
     icon: <Trello className="h-6 w-6" />,
-  },
-
-  {
-    id: "slack_clone",
-    name: "Slack Clone",
-    description: "A clone of slack with some basic operations",
-    icon: <Slack className="h-6 w-6" />,
   },
 ];
 const CreatedCopilotAtom = atom<CopilotType | null>(null);
@@ -146,6 +139,8 @@ function UploadSwaggerStep() {
       return true;
     }
   });
+  const [template, setTemplete] = React.useState<string>();
+  console.log(template);
   return (
     <div>
       <h2 className="mb-6 text-3xl font-bold text-accent-foreground">
@@ -165,10 +160,13 @@ function UploadSwaggerStep() {
         execute actions
       </p>
       <Tabs defaultValue="upload">
-        <TabsList>
+        <TabsList className="relative">
           <TabsTrigger value="upload" className="flex-1">
             Upload Swagger
           </TabsTrigger>
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none rounded-full bg-muted p-1.5 text-sm font-semibold uppercase text-accent-foreground">
+            OR
+          </div>
           <TabsTrigger value="premade" className="flex-1">
             Pre-made Copilots
           </TabsTrigger>
@@ -216,56 +214,15 @@ function UploadSwaggerStep() {
           </div>
         </TabsContent>
         <TabsContent value="premade" className="min-h-[10rem]">
-          {/* <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                className="mb-6 h-fit whitespace-normal py-2"
-                size="fluid"
-              >
-                Use our pre-made demo swagger file to try it out quickly <br />{" "}
-                (🐶pet store SaaS system)
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader className="flex w-full items-center justify-center border-none text-4xl">
-                <span>🐶🐕</span>
-              </DialogHeader>
-              <div className="mt-5 px-5">
-                <h2 className="text-center text-lg font-semibold">
-                  Pet Store Demo
-                </h2>
-                <p className="mt-2 text-center text-sm">
-                  In this pet store you can add, delete, update and view pets,
-                  you can also search and manage inventory, and finally you can
-                  place orders . We already configured the APIs and the backend,
-                  you can test it almost immediately.
-                </p>
-              </div>
-              <DialogFooter className="mt-4">
-                <Button
-                  onClick={async () => {
-                    if (!copilot) {
-                      const { data: demoCopilotData } =
-                        await createDemoCopilot();
-                      setCopilot(demoCopilotData.chatbot);
-                      toast({
-                        title: "Demo Copilot created successfully",
-                        description:
-                          "We created a demo copilot for you, you can now continue the process",
-                        variant: "default",
-                      });
-                    }
-                  }}
-                >
-                  Let's do it
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog> */}
           <Label className="my-4 block text-base font-semibold text-accent-foreground">
             Choose a pre-made template
           </Label>
-          <RadioGroup className="grid grid-cols-4 gap-2">
+          <RadioGroup
+            value={template}
+            name="premade_template"
+            onValueChange={setTemplete}
+            className="grid grid-cols-4 gap-2"
+          >
             {_.map(premadeTemplates, ({ id, name, icon, description }) => (
               <TooltipProvider key={id}>
                 <Tooltip>
@@ -288,7 +245,7 @@ function UploadSwaggerStep() {
       </Tabs>
       <footer className="flex w-full items-center justify-between gap-5 pt-5">
         <Button
-          variant={"ghost"}
+          variant="ghost"
           onClick={previousStep}
           className="flex items-center justify-center gap-1 underline"
         >

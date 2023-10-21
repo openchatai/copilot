@@ -64,7 +64,8 @@ export function CopilotsContainer() {
         const copilotUrl = "/copilot/" + copilot.id;
         const createdSince = timeSince(copilot.created_at);
         return (
-          <div
+          <Link
+            href={copilotUrl}
             className="transition-transform animate-in fade-in slide-in-from-top-2 xl:aspect-square"
             key={copilot.id}
           >
@@ -89,18 +90,15 @@ export function CopilotsContainer() {
               </div>
             </div>
             <div className="mt-1.5 ps-1">
-              <Link
-                href={copilotUrl}
-                className="line-clamp-1 text-ellipsis whitespace-nowrap text-sm font-semibold"
-              >
+              <h2 className="line-clamp-1 text-ellipsis whitespace-nowrap text-sm font-semibold">
                 {copilot.name}
-              </Link>
+              </h2>
               <p className="text-xs text-gray-400">
                 created{" "}
                 <span className="font-semibold">{createdSince} ago</span>
               </p>
             </div>
-          </div>
+          </Link>
         );
       })}
     </div>
