@@ -11,6 +11,35 @@
     }
   ],
   "paths": {
+    "/members/me": {
+      "get": {
+        "summary": "Fetch all boards",
+        "operationId": "fetchAllBoards",
+        "parameters": [
+          {
+            "name": "boards",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "open"
+            },
+            "description": "List all boards"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "example": {
+                  
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/boards": {
       "post": {
         "summary": "Create a new Trello board",
