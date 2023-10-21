@@ -159,7 +159,7 @@ def hasSingleIntent(
         ),
         current_state
         and HumanMessage(
-            content="Here is the current state of the application: {}".format(
+            content="Here is the current state of the application, You can always find the ids and names of board, lists and cards in the current state here, do not make api calls for these things: {}".format(
                 current_state
             )
         ),
