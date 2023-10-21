@@ -43,14 +43,14 @@
         }
       }
     },
-    "/boards/{id}": {
+    "/boards/{boardId}": {
       "delete": {
         "summary": "Delete a Trello board by ID",
         "operationId": "deleteBoard",
         "description": "Delete a Trello board by ID",
         "parameters": [
           {
-            "name": "id",
+            "name": "boardId",
             "in": "path",
             "description": "The ID of the Trello board to delete.",
             "required": true,
@@ -247,14 +247,14 @@
         }
       }
     },
-    "/boards/{id}/cards": {
+    "/boards/{boardId}/cards": {
       "get": {
         "summary": "Get cards on a Trello board",
         "operationId": "getBoardCards",
         "description": "Retrieve cards on a Trello board by board id.",
         "parameters": [
           {
-            "name": "id",
+            "name": "boardId",
             "in": "path",
             "description": "The ID of the Trello board for which you want to retrieve cards.",
             "required": true,
@@ -279,14 +279,14 @@
         }
       }
     },
-    "/boards/{id}/cards/{filter}": {
+    "/boards/{boardId}/cards/{filter}": {
       "get": {
         "summary": "Get filtered cards on a Trello board",
         "operationId": "getFilteredBoardCards",
         "description": "This endpoint allows you to retrieve filtered cards on a Trello board by its ID and a filter value.",
         "parameters": [
           {
-            "name": "id",
+            "name": "boardId",
             "in": "path",
             "description": "The ID of the Trello board for which you want to retrieve filtered cards.",
             "required": true,
