@@ -22,9 +22,7 @@ type Flow = {
 };
 
 type Workflow = {
-  _id: {
-    $oid: string;
-  };
+  _id: string;
   opencopilot: string;
   info: {
     title: string;
@@ -40,10 +38,11 @@ interface PaginatedWorkflows {
   page_size: number;
   total_workflows: number;
 }
-
 // http://localhost:8888/backend/flows/get/b/:bot_id?page=1
 export const getWorkflowsByBotId = async (bot_id: string, page: number = 1) => {
-  return await instance.get<PaginatedWorkflows>(`/get/b/${bot_id}?page=${page}`);
+  return await instance.get<PaginatedWorkflows>(
+    `/get/b/${bot_id}?page=${page}`,
+  );
 };
 export const getWorkflowById = (id: string) => {
   return instance.get<Workflow>(`/${id}`);
@@ -54,9 +53,12 @@ export const createWorkflowFromSwagger = (
 ): Promise<Workflow> => {
   return instance.post(`/u/${swaggerUrl}`);
 };
-
-export const createWorkflowByBotId = (bot_id: string, data: any) => {
-  return instance.post<Workflow>(`/b/${bot_id}`, data);
+// http://localhost:8888/backend/flows/b/:bot_id
+export const createWorkflowByBotId = async (bot_id: string, data: any) => {
+  return await instance.post<{
+    message: "Workflow created";
+    workflow_id: string;
+  }>(`/b/${bot_id}`, data);
 };
 
 export const getWorkflowsBySwagger = (swagger_url: string) => {
@@ -67,8 +69,14 @@ export const updateWorkflowById = (id: string, data: Partial<Workflow>) => {
   return instance.put<Workflow>(`/${id}`, data);
 };
 
-export const deleteWorkflowById = (id: string) => {
-  return instance.delete<void>(`/${id}`);
+// http://localhost:8888/backend/flows/:workflow_id
+export const deleteWorkflowById = async (id: string) => {
+  if (!id) {
+    throw new Error("id is required");
+  }
+  return await instance.delete<{
+    message: string;
+  }>(`/${id}`);
 };
 
 export const runWorkflow = (data: any) => {
