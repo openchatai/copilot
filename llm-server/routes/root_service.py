@@ -81,6 +81,8 @@ def handle_request(data: Dict[str, Any]) -> Any:
             "of them"
         )
         current_state = process_state(app, headers)
+        
+        logging.info(f"Received app configuration: {app}")
         bot_response = hasSingleIntent(swagger_doc, text, session_id, current_state)
         if len(bot_response.ids) >= 1:
             logging.info(
