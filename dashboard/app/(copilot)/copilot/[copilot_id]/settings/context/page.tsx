@@ -20,7 +20,7 @@ export default function CopilotContextSettingsPage() {
         <h1 className="text-lg font-bold text-secondary-foreground">Context</h1>
         <div className="space-x-2">
           <Button size="sm">Save</Button>
-          <Button size="sm" variant="secondary">
+          <Button size="sm" variant="destructive">
             Cancel
           </Button>
         </div>

@@ -25,7 +25,7 @@ export default function GeneralSettingsPage() {
         </h1>
         <div className="space-x-2">
           <Button size="sm">Save</Button>
-          <Button size="sm" variant="secondary">
+          <Button size="sm" variant="destructive">
             Cancel
           </Button>
         </div>
