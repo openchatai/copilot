@@ -52,7 +52,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
     base_prompt = data.get("base_prompt", "")
     headers = data.get("headers", {})
     server_base_url = cast(str, data.get("server_base_url", ""))
-    app = cast(Optional[str], data.get("app"))
+    app = headers["X-App-Name"] or None
 
     logging.info("[OpenCopilot] Got the following user request: {}".format(text))
     for required_field, error_msg in [

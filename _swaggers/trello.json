@@ -15,6 +15,7 @@
       "get": {
         "summary": "Fetch all boards",
         "operationId": "fetchAllBoards",
+        "description": "Fetches all boards in my account",
         "parameters": [
           {
             "name": "boards",
