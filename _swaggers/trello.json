@@ -326,25 +326,38 @@
         "description": "Updates the specified card",
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the card to update",
-            "required": true,
-            "type": "string" 
+            "name": "name",
+            "in": "query",
+            "description": "The new name for the card",
+            "schema": {
+              "type": "string"
+            }
           },
           {
-            "name": "key",
+            "name": "desc",
             "in": "query",
-            "description": "Trello API key",
-            "required": true,
-            "type": "string"
+            "description": "The new description of the card.",
+            "schema": {
+              "type": "string"
+            }
           },
           {
-            "name": "token",
+            "name": "idList",
             "in": "query",
-            "description": "Trello API token",
+            "description": "The ID of the list where the card should be created (REQUIRED).",
             "required": true,
-            "type": "string"
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "idBoard",
+            "in": "query",
+            "description": "The ID of the board the card should be on.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
