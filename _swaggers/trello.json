@@ -322,9 +322,19 @@
     },
     "/cards/{id}": {
       "put": {
-        "summary": "Update a card",
+        "summary": "Update a card by card id",
+        "operationId": "updateCard",
         "description": "Updates the specified card",
         "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the Trello card to update.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "name",
             "in": "query",
