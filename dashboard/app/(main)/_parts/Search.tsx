@@ -22,6 +22,7 @@ const sortFilter = [
   { label: "Last Viewed", value: "last-viewed" },
   { label: "Date Created", value: "date-created" },
   { label: "Alphapetically", value: "alphapetically" },
+  { label: "None", value: "none" },
 ] as const;
 
 export type Filter = {
@@ -39,7 +40,7 @@ export function Search() {
   });
   const [filter, setFilter] = React.useState<Filter>({
     query: searchParams.get(QUERY_KEY) ?? "",
-    sort: (searchParams.get(SORT_KEY) ?? "last-viewed") as Filter["sort"],
+    sort: (searchParams.get(SORT_KEY) ?? "none") as Filter["sort"],
   });
   const { replace } = useRouter();
 
@@ -47,13 +48,14 @@ export function Search() {
     // to not to override other params
     const params = new URLSearchParams(searchParams);
     if (filter) {
-      filter.query.length > 0 && params.set(QUERY_KEY, filter.query);
-      filter.query.length > 0 && params.set(SORT_KEY, filter.sort);
+      params.set(QUERY_KEY, filter.query);
+      filter.sort.length > 0 &&
+        filter.sort != "none" &&
+        params.set(SORT_KEY, filter.sort);
     }
     params.size > 0 && replace(`/?${params.toString()}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter, searchParams]);
-
   return (
     <div className="flex items-center justify-between gap-5 py-5">
       <div className="flex flex-1 items-center gap-1">
