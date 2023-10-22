@@ -22,11 +22,11 @@ export default function Aside() {
           <li>
             <NavLink
               href="/"
-              className="flex items-center rounded-md border px-3 py-2 text-base text-accent-foreground transition duration-150 ease-in-out"
-              activeClassName="border-gray-300 bg-accent font-semibold"
-              inactiveClassName="border-transparent hover:border-gray-300 font-normal opacity-80 hover:bg-accent flex w-full items-center justify-between gap-1 rounded px-4 py-2 text-sm font-normal text-accent-foreground hover:bg-card-foreground"
+              className="flex items-center rounded-md border text-base font-normal text-accent-foreground transition duration-150 ease-in-out px-4 py-2"
+              activeClassName="border-gray-300 bg-accent"
+              inactiveClassName="border-transparent hover:border-gray-300 opacity-80 hover:bg-accent text-sm hover:bg-card-foreground"
             >
-              <div className="flex flex-1 items-center gap-2">
+              <div className="flex items-center gap-2">
                 <Bot className="h-4 w-4" />
                 <span>Copilots</span>
               </div>
