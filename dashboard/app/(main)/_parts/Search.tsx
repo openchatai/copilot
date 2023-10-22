@@ -42,16 +42,18 @@ export function Search() {
     sort: (searchParams.get(SORT_KEY) ?? "last-viewed") as Filter["sort"],
   });
   const { replace } = useRouter();
+
   useEffect(() => {
     // to not to override other params
     const params = new URLSearchParams(searchParams);
     if (filter) {
-      params.set(QUERY_KEY, filter.query);
-      params.set(SORT_KEY, filter.sort);
+      filter.query.length > 0 && params.set(QUERY_KEY, filter.query);
+      filter.query.length > 0 && params.set(SORT_KEY, filter.sort);
     }
-    replace(`/?${params.toString()}`);
+    params.size > 0 && replace(`/?${params.toString()}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter, searchParams]);
+
   return (
     <div className="flex items-center justify-between gap-5 py-5">
       <div className="flex flex-1 items-center gap-1">
