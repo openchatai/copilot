@@ -53,7 +53,7 @@ jsonpointer==2.4
 jsonschema==4.19.0
 jsonschema-spec==0.2.4
 jsonschema-specifications==2023.7.1
-langchain==0.0.300
+langchain==0.0.321
 langcodes==3.3.0
 langsmith==0.0.40
 lazy-object-proxy==1.9.0
