@@ -48,10 +48,12 @@ export async function getCopilot(id: string) {
   if (!id) throw new Error("Copilot id is required");
   return await instance.get<{ chatbot: CopilotType }>(`/copilot/${id}`);
 }
-
+// http://localhost:8888/backend/api/copilot/:id
 export async function deleteCopilot(id: string) {
   if (!id) throw new Error("Copilot id is required");
-  return instance.delete(`/copilot/${id}`);
+  return instance.delete<{
+    success: string;
+  }>(`/copilot/${id}`);
 }
 
 export async function updateCopilot(id: string, copilot: Partial<CopilotType>) {

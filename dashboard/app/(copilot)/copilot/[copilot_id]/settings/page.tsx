@@ -15,8 +15,24 @@ import {
   AlertDialogHeader,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { deleteCopilot } from "@/data/copilot";
+import _ from "lodash";
+import { useRouter } from "next/navigation";
+import { toast } from "@/components/ui/use-toast";
 export default function GeneralSettingsPage() {
   const { token, id: copilotId, name: copilotName } = useCopilot();
+  const { replace } = useRouter();
+  async function handleDelete() {
+    const response = await deleteCopilot(copilotId);
+    if (response.data.success) {
+      toast({
+        variant: "success",
+        title: "Copilot deleted",
+        description: "Your copilot has been deleted successfully.",
+      });
+      _.delay(() => replace("/"), 1000);
+    }
+  }
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
       <HeaderShell className="items-center justify-between">
@@ -91,7 +107,7 @@ export default function GeneralSettingsPage() {
                 </div>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="destructive" size={"sm"}>
+                    <Button variant="destructive" size="sm">
                       Delete
                     </Button>
                   </AlertDialogTrigger>
@@ -107,7 +123,9 @@ export default function GeneralSettingsPage() {
                       <AlertDialogCancel asChild>
                         <Button variant="outline">Cancel</Button>
                       </AlertDialogCancel>
-                      <Button variant="destructive">Delete</Button>
+                      <Button variant="destructive" onClick={handleDelete}>
+                        Delete
+                      </Button>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
