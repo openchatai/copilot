@@ -8,17 +8,19 @@ import Link from "next/link";
 import React from "react";
 import { Wizard, useWizard } from "react-use-wizard";
 import { ValidateSwaggerStep } from "./_parts/ValidateSwaggerStep";
-import { Cat, Check, CheckCheck, Trello } from "lucide-react";
-import { CopilotType, createCopilot } from "@/data/copilot";
+import { Cat, Check, CheckCheck } from "lucide-react";
+import {
+  CopilotType,
+  PetStoreCopilotType,
+  createCopilot,
+  createPetstoreTemplate,
+} from "@/data/copilot";
+import type { AxiosResponse } from "axios";
 import _ from "lodash";
-import { atom, useAtom } from "jotai";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { toast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  RadioGroup,
-  RadioGroupPrimitiveItem,
-} from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import {
   Tooltip,
@@ -26,22 +28,48 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-const premadeTemplates = [
-  {
-    id: "pet_store",
-    name: "Pet Store",
-    description: "Simple Pet store templeate with crud operations",
-    icon: <Cat className="h-6 w-6" />,
-  },
-  {
-    id: "trello",
-    name: "Trello",
-    description: "Terelo close",
-    icon: <Trello className="h-6 w-6" />,
-  },
-];
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import Loader from "@/components/ui/Loader";
+
+type PremadeTemplate<T> = {
+  id: string;
+  name: string;
+  description: string;
+  icon: React.ReactNode;
+  // we dont know the type of the response it depends on the selected template so we want to keep it generic
+  creatorFn: (...args: any[]) => Promise<AxiosResponse<T>>;
+};
+const petStoreTemplate: PremadeTemplate<PetStoreCopilotType> = {
+  id: "pet_store",
+  name: "Pet Store",
+  description: "Simple Pet store templeate with crud operations",
+  icon: <Cat className="h-6 w-6" />,
+  creatorFn: createPetstoreTemplate,
+};
+const premadeTemplates = [petStoreTemplate];
+const loadingAtom = atom(false);
 const CreatedCopilotAtom = atom<CopilotType | null>(null);
 const swaggerAtom = atom<File[] | null>(null);
+const selectedTemplateAtomKey = atom<string | undefined>(undefined);
+
+const WizardDataStateAtom = atom((get) => ({
+  createdCopilot: get(CreatedCopilotAtom),
+  swaggerFile: _.first(get(swaggerAtom)),
+  selectedTemplate: premadeTemplates.find(
+    (temp) => temp.id === get(selectedTemplateAtomKey),
+  ),
+  is_premade_demo_template: get(CreatedCopilotAtom)?.is_premade_demo_template,
+}));
+
 function Header() {
   const { stepCount, activeStep, goToStep } = useWizard();
   const steps = Array.from({ length: stepCount }).map((_, i) => ({
@@ -120,38 +148,89 @@ function IntroStep() {
   );
 }
 function UploadSwaggerStep() {
-  const { nextStep, previousStep, handleStep } = useWizard();
-  const [swaggerFile, setSwaggerFile] = useAtom(swaggerAtom);
-  const [copilot, setCopilot] = useAtom(CreatedCopilotAtom);
-  handleStep(async () => {
-    if (_.isEmpty(swaggerFile) || !swaggerFile || !swaggerFile?.[0]) {
-      return;
-    }
-    const response = await createCopilot({ swagger_file: swaggerFile[0] });
-    if (response.status === 200) {
-      setCopilot(response.data.chatbot);
-      toast({
-        title: "Copilot created successfully",
-        description:
-          "We created a copilot for you, you can now continue the process",
-        variant: "default",
-      });
-      return true;
-    }
+  const { nextStep, previousStep } = useWizard();
+  const [swaggerFiles, setSwaggerFiles] = useAtom(swaggerAtom);
+  const setCopilot = useSetAtom(CreatedCopilotAtom);
+  const [loading, setLoading] = useAtom(loadingAtom);
+  const {
+    createdCopilot,
+    selectedTemplate,
+    swaggerFile,
+    is_premade_demo_template,
+  } = useAtomValue(WizardDataStateAtom);
+  console.log({
+    is_premade_demo_template,
+    createdCopilot,
+    selectedTemplate,
+    swaggerFile,
   });
-  const [template, setTemplete] = React.useState<string>();
-  console.log(template);
+  const [templateKey, setTempleteKey] = useAtom(selectedTemplateAtomKey);
+  // if user selects template and then uploads swagger file, we will use the template
+  const bothSelected = selectedTemplate && swaggerFile;
+
+  async function handleCreateCopilot() {
+    setLoading(true);
+    if (!swaggerFile && !selectedTemplate) {
+      toast({
+        title: "No swagger file uploaded or template selected",
+        description:
+          "Please upload a swagger file to continue, or select a template",
+        variant: "destructive",
+      });
+    } else {
+      if (!createdCopilot) {
+        const template = selectedTemplate;
+        if (template) {
+          const res = await template.creatorFn();
+          if (res.data) {
+            setCopilot(res.data.chatbot);
+          }
+        } else {
+          const res = await createCopilot({ swagger_file: swaggerFile });
+          if (res.data) {
+            setCopilot(res.data.chatbot);
+          }
+        }
+        // if copilot created successfully.
+        // we will go to the next step
+        if (createdCopilot) {
+          toast({
+            title: "Copilot Created Successfully",
+            description: "You have created your copilot successfully",
+            variant: "success",
+          });
+          await _.after(1000, nextStep)();
+        }
+      } else {
+        await _.after(1000, nextStep)();
+      }
+    }
+    setLoading(false);
+  }
+
+  function handleRadioChange(value: string) {
+    if (value === templateKey && templateKey !== "undefined") {
+      setTempleteKey(undefined);
+    } else {
+      setTempleteKey(value);
+    }
+  }
   return (
-    <div>
+    <div className="relative p-1">
+      {loading && (
+        <div className="flex-center absolute inset-0 z-40 bg-white/20 backdrop-blur-sm">
+          <Loader />
+        </div>
+      )}
       <h2 className="mb-6 text-3xl font-bold text-accent-foreground">
         Upload your swagger.json file ✨
       </h2>
 
-      {copilot && (
+      {createdCopilot && (
         <Alert variant="info" className="my-2">
           <AlertTitle>Copilot Created Successfully</AlertTitle>
           <AlertDescription>
-            You have created <strong>{copilot?.name}</strong>
+            You have created <strong>{createdCopilot?.name}</strong>
           </AlertDescription>
         </Alert>
       )}
@@ -177,8 +256,8 @@ function UploadSwaggerStep() {
               multiple={false}
               maxFiles={1}
               accept={{ json: ["application/json"] }}
-              value={swaggerFile || []}
-              onChange={setSwaggerFile}
+              value={swaggerFiles || []}
+              onChange={setSwaggerFiles}
             />
           </div>
           <div className="mb-8 mt-4 flex items-center justify-between space-x-6">
@@ -217,30 +296,26 @@ function UploadSwaggerStep() {
           <Label className="my-4 block text-base font-semibold text-accent-foreground">
             Choose a pre-made template
           </Label>
-          <RadioGroup
-            value={template}
-            name="premade_template"
-            onValueChange={setTemplete}
-            className="grid grid-cols-4 gap-2"
-          >
+          <div className="grid grid-cols-4 gap-2">
             {_.map(premadeTemplates, ({ id, name, icon, description }) => (
               <TooltipProvider key={id}>
                 <Tooltip>
-                  <RadioGroupPrimitiveItem
-                    value={id}
-                    asChild
-                    className="flex aspect-square flex-col items-center justify-center gap-2 rounded-lg border border-border p-3 shadow-sm transition-all data-[state=checked]:border-primary data-[state=checked]:text-primary data-[state=checked]:shadow-inner data-[state=checked]:shadow-primary-foreground"
-                  >
-                    <TooltipTrigger>
+                  <TooltipTrigger asChild>
+                    <button
+                      data-value={id}
+                      data-state={id === templateKey ? "checked" : "unchecked"}
+                      onClick={() => handleRadioChange(id)}
+                      className="flex aspect-square flex-col items-center justify-center gap-2 rounded-lg border border-border p-3 shadow-sm transition-all data-[state=checked]:border-primary data-[state=checked]:text-primary data-[state=checked]:shadow-inner data-[state=checked]:shadow-primary-foreground"
+                    >
                       <span className="text-2xl drop-shadow">{icon}</span>
                       <span className="text-sm font-semibold">{name}</span>
-                    </TooltipTrigger>
-                  </RadioGroupPrimitiveItem>
+                    </button>
+                  </TooltipTrigger>
                   <TooltipContent>{description}</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             ))}
-          </RadioGroup>
+          </div>
         </TabsContent>
       </Tabs>
       <footer className="flex w-full items-center justify-between gap-5 pt-5">
@@ -251,10 +326,46 @@ function UploadSwaggerStep() {
         >
           Back
         </Button>
-
-        <Button hidden={copilot?.is_premade_demo_template} onClick={nextStep}>
-          Next Step
-        </Button>
+        {/* user didn't select both */}
+        {!bothSelected && (
+          <Button
+            onClick={handleCreateCopilot}
+            className="flex items-center justify-center gap-1"
+          >
+            Create Copilot
+          </Button>
+        )}
+        {/* user selected both, and no copilot */}
+        {!createdCopilot && bothSelected && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button className="flex items-center justify-center gap-1">
+                Create Copilot
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Are you sure you want to create this copilot?
+                </AlertDialogTitle>
+              </AlertDialogHeader>
+              <AlertDialogDescription>
+                You are about to create a copilot with a pre-made template, this
+                will override your current swagger file.
+              </AlertDialogDescription>
+              <AlertDialogFooter>
+                <AlertDialogCancel asChild>
+                  <Button variant="destructive" size="sm">
+                    Cancel
+                  </Button>
+                </AlertDialogCancel>
+                <Button onClick={handleCreateCopilot} size="sm">
+                  Create Copilot
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
       </footer>
     </div>
   );

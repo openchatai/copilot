@@ -40,11 +40,6 @@ export type ValidatorResponseType = {
   };
 };
 
-export type DemoCopilot = {
-  swagger_url: string;
-  chatbot: CopilotType;
-};
-
 export async function listCopilots() {
   return await instance.get<CopilotType[]>("/copilots");
 }
@@ -68,10 +63,6 @@ export async function validateSwagger(bot_id: string) {
   if (!bot_id) throw new Error("Bot id is required");
   return instance.get<ValidatorResponseType>(`/copilot/${bot_id}/validator`);
 }
-// http://localhost:8888/backend/api/copilot/swagger/pre-made
-export async function createDemoCopilot() {
-  return instance.get<DemoCopilot>(`/copilot/swagger/pre-made`);
-}
 
 export async function createCopilot({ swagger_file }: { swagger_file: File }) {
   const data = new FormData();
@@ -83,4 +74,16 @@ export async function createCopilot({ swagger_file }: { swagger_file: File }) {
       "Content-Type": "multipart/form-data",
     },
   });
+}
+
+// premade Templates
+
+// http://localhost:8888/backend/api/copilot/swagger/pre-made
+export type PetStoreCopilotType = {
+  swagger_url: string;
+  chatbot: CopilotType;
+};
+
+export async function createPetstoreTemplate() {
+  return await instance.get<PetStoreCopilotType>(`/copilot/swagger/pre-made`);
 }

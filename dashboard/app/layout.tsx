@@ -12,7 +12,7 @@ import { Toaster } from "@/components/ui/toaster";
 const opensans = Open_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
-  fallback: ["system-ui", "Roboto", "sans-serif"],
+  fallback: ["Roboto", "sans-serif"],
 });
 
 export const metadata: Metadata = {

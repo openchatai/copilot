@@ -21,8 +21,9 @@ export default function Aside() {
         <ul className="space-y-1 px-2">
           <li>
             <NavLink
+              segment="main"
               href="/"
-              className="flex items-center rounded-md border text-base font-normal text-accent-foreground transition duration-150 ease-in-out px-4 py-2"
+              className="flex items-center rounded-md border px-4 py-2 text-base font-normal text-accent-foreground transition duration-150 ease-in-out"
               activeClassName="border-gray-300 bg-accent"
               inactiveClassName="border-transparent hover:border-gray-300 opacity-80 hover:bg-accent text-sm hover:bg-card-foreground"
             >
