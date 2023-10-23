@@ -71,7 +71,7 @@ mypy-extensions==0.4.3
 nltk==3.8.1
 numexpr==2.8.4
 numpy==1.25.1
-openai==0.27.8
+openai==0.28.1
 openapi-schema-pydantic==1.2.4
 openapi-schema-validator==0.6.0
 openapi-spec-validator==0.6.0
