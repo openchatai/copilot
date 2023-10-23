@@ -17,7 +17,7 @@ confection==0.1.0
 cymem==2.0.7
 dataclasses-json==0.5.9
 deptry==0.12.0
-dill==0.3.6
+dill==0.3.7
 dnspython==2.4.2
 elastic-transport==8.4.0
 elasticsearch==8.8.2
