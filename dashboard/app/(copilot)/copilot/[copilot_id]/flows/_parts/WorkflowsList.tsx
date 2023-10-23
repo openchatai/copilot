@@ -8,6 +8,7 @@ import _ from "lodash";
 import Link from "next/link";
 import React from "react";
 import useSwr from "swr";
+
 export function WorkflowsList({ copilot_id }: { copilot_id: string }) {
   const flowsBase = `/copilot/${copilot_id}/flows`;
   const { data: flows, isLoading } = useSwr(
@@ -34,13 +35,15 @@ export function WorkflowsList({ copilot_id }: { copilot_id: string }) {
       })}
     </ul>
   ) : (
-    <EmptyBlock>
-      <p className="text-center">
-        <span>No workflows yet.</span>
-        <Button variant="link" size="sm" asChild>
-          <Link href={flowsBase}>create new one</Link>
-        </Button>
-      </p>
-    </EmptyBlock>
+    <div className="px-2">
+      <EmptyBlock>
+        <p className="text-center">
+          <span>No workflows yet.</span>
+          <Button variant="link" size="sm" asChild>
+            <Link href={flowsBase}>create new one</Link>
+          </Button>
+        </p>
+      </EmptyBlock>
+    </div>
   );
 }
