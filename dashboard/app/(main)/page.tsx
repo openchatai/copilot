@@ -24,7 +24,6 @@ export default async function HomePage() {
             </h1>
           </div>
           <div className="space-x-2">
-            <Button variant="secondary">Invite</Button>
             <Button asChild>
               <Link href="create/copilot">Create Copilot</Link>
             </Button>

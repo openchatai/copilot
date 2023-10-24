@@ -34,7 +34,10 @@ export default function LogoMenu() {
         <DropdownMenuItem onClick={() => setSearchModal(true)}>
           Search
         </DropdownMenuItem>
-        <DropdownMenuItem>Chat with the Copilot</DropdownMenuItem>
+        <DropdownMenuItem>Open example Dashboard</DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href={"/create/copilot"}>Create New Copilot</Link>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

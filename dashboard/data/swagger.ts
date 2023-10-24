@@ -137,6 +137,10 @@ export const getTrasnformedSwagger = (id: string) => {
 export const getSwaggerByBotId = async (bot_id: string) => {
   return await instance.get<SwaggerType>(`/get/b/${bot_id}`);
 };
+export const getSwaggerfromSwaggerUrl = async (swagger_url: string) => {
+  return await instance.get<SwaggerType>(swagger_url);
+};
+
 /** As of now, we don't have to call this api from the frontend. This will internally be called from the backend */
 export async function uploadSwaggerFile(id: string, file: File) {
   const formData = new FormData();

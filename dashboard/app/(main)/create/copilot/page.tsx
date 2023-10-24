@@ -11,7 +11,6 @@ import { ValidateSwaggerStep } from "./_parts/ValidateSwaggerStep";
 import { Check, CheckCheck } from "lucide-react";
 import { CopilotType, createCopilot } from "@/data/copilot";
 import _ from "lodash";
-import { useAtomValue } from "jotai";
 import { toast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -33,7 +32,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import Loader from "@/components/ui/Loader";
-import { WizardDataStateAtom } from "./_parts/atoms";
 import { premadeTemplates } from "./_parts/premade";
 import {
   CreateCopilotProvider,
@@ -135,6 +133,8 @@ function UploadSwaggerStep() {
   const swaggerFile = _.first(swaggerFiles);
   const bothSelected = selectedTemplate && swaggerFile;
   // if user selects template and then uploads swagger file, we will use the template
+
+  // spagetti 🍝
   async function handleCreateCopilot() {
     setLoading(true);
     if (!swaggerFile && !selectedTemplate) {
@@ -144,6 +144,7 @@ function UploadSwaggerStep() {
           "Please upload a swagger file to continue, or select a template",
         variant: "destructive",
       });
+      return;
     } else {
       if (!createdCopilot) {
         const template = selectedTemplate;
@@ -151,26 +152,27 @@ function UploadSwaggerStep() {
           const res = await template.creatorFn();
           if (res.data) {
             setCopilot(res.data.chatbot);
+            toast({
+              title: "Copilot Created Successfully",
+              description: "You have created your copilot successfully",
+              variant: "success",
+            });
+            _.delay(nextStep, 1000);
           }
-        } else {
-          // @ts-ignore
-          const res = await createCopilot({ swagger_file: swaggerFiles });
+        } else if (swaggerFile) {
+          const res = await createCopilot({
+            swagger_file: swaggerFile,
+          });
           if (res.data) {
             setCopilot(res.data.chatbot);
+            toast({
+              title: "Copilot Created Successfully",
+              description: "You have created your copilot successfully",
+              variant: "success",
+            });
+            _.delay(nextStep, 1000);
           }
         }
-        // if copilot created successfully.
-        // we will go to the next step
-        if (createdCopilot) {
-          toast({
-            title: "Copilot Created Successfully",
-            description: "You have created your copilot successfully",
-            variant: "success",
-          });
-          _.delay(nextStep, 1000);
-        }
-      } else {
-        _.delay(nextStep, 1000);
       }
     }
     setLoading(false);
@@ -296,45 +298,58 @@ function UploadSwaggerStep() {
         >
           Back
         </Button>
-        {/* user didn't select both */}
-        {!bothSelected && (
-          <Button
-            onClick={handleCreateCopilot}
-            className="flex items-center justify-center gap-1"
-          >
-            Create Copilot
-          </Button>
-        )}
-        {/* user selected both, and no copilot */}
-        {!createdCopilot && bothSelected && (
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button className="flex items-center justify-center gap-1">
+        {createdCopilot ? (
+          <>
+            <Button
+              onClick={nextStep}
+              className="flex items-center justify-center gap-1"
+            >
+              Next
+            </Button>
+          </>
+        ) : (
+          <>
+            {/* user didn't select both */}
+            {!bothSelected && (
+              <Button
+                onClick={handleCreateCopilot}
+                className="flex items-center justify-center gap-1"
+              >
                 Create Copilot
               </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>
-                  Are you sure you want to create this copilot?
-                </AlertDialogTitle>
-              </AlertDialogHeader>
-              <AlertDialogDescription>
-                You are about to create a copilot with a pre-made template, this
-                will override your current swagger file.
-              </AlertDialogDescription>
-              <AlertDialogFooter>
-                <AlertDialogCancel asChild>
-                  <Button variant="destructive" size="sm">
-                    Cancel
+            )}
+            {/* user selected both, and no copilot */}
+            {!createdCopilot && bothSelected && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button className="flex items-center justify-center gap-1">
+                    Create Copilot
                   </Button>
-                </AlertDialogCancel>
-                <Button onClick={handleCreateCopilot} size="sm">
-                  Create Copilot
-                </Button>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you sure you want to create this copilot?
+                    </AlertDialogTitle>
+                  </AlertDialogHeader>
+                  <AlertDialogDescription>
+                    You are about to create a copilot with a pre-made template,
+                    this will override your current swagger file.
+                  </AlertDialogDescription>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel asChild>
+                      <Button variant="destructive" size="sm">
+                        Cancel
+                      </Button>
+                    </AlertDialogCancel>
+                    <Button onClick={handleCreateCopilot} size="sm">
+                      Create Copilot
+                    </Button>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+          </>
         )}
       </footer>
     </div>

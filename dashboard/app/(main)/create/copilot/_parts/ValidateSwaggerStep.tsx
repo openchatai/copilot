@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/table";
 import { validateSwagger } from "@/data/copilot";
 import Link from "next/link";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Check } from "lucide-react";
 import { useWizard } from "react-use-wizard";
 import {
@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import _ from "lodash";
 import { useCreateCopilot } from "./CreateCopilotProvider";
+import Loader from "@/components/ui/Loader";
 function RmItem({
   label,
   children,
@@ -70,9 +71,10 @@ export function ValidateSwaggerStep() {
     state: { createdCopilot, validatorResponse },
     dispatch,
   } = useCreateCopilot();
-
   const { previousStep, nextStep } = useWizard();
+  const [isLoading, setLoading] = useState(false);
   async function validate() {
+    setLoading(true);
     if (createdCopilot && !validatorResponse) {
       const { data: validationsData } = await validateSwagger(
         createdCopilot.id,
@@ -84,6 +86,7 @@ export function ValidateSwaggerStep() {
         });
       }
     }
+    setLoading(false);
   }
   useEffect(() => {
     validate();
@@ -103,7 +106,7 @@ export function ValidateSwaggerStep() {
     !_.isEmpty(ep_missing_operation_id) ||
     !_.isEmpty(ep_missing_name) ||
     !_.isEmpty(ep_missing_description);
-  
+
   return (
     <div>
       <h2 className="mb-6 text-3xl font-bold text-accent-foreground">
@@ -113,351 +116,367 @@ export function ValidateSwaggerStep() {
         We will validate your Swagger file to make sure you will get the best
         results
       </p>
-      <div className="mt-5">
-        {all_eps && all_eps.length > 0 ? (
-          <ul>
-            <>
-              {ep_missing_operation_id && ep_missing_operation_id.length > 0 ? (
-                <RmItem
-                  label={
-                    <>
-                      Operation ID
-                      <Badge className="ms-1.5 px-2" variant="destructive">
-                        please fix
-                      </Badge>
-                    </>
-                  }
-                >
-                  Some of your endpoints does not have an operation ID. it's
-                  required for the LLM to identify your endpoints.
-                  <Link
-                    className="block font-bold"
-                    href="https://swagger.io/docs/specification/paths-and-operations/"
-                  >
-                    Learn how to fix? {`->`}
-                  </Link>
-                  <Accordion type="multiple" className="mt-2">
-                    <AccordionItem value="eps">
-                      <AccordionTrigger>
-                        see which endpoints to fix
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead className="p-2">
-                                <div className="text-left font-semibold">
-                                  Path
-                                </div>
-                              </TableHead>
-                              <TableHead className="p-2">
-                                <div className="text-center font-semibold">
-                                  Type
-                                </div>
-                              </TableHead>
-                              <TableHead className="p-2">
-                                <div className="text-center font-semibold">
-                                  Operation Id
-                                </div>
-                              </TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {ep_missing_operation_id.map((ep) => (
-                              <TableRow key={ep.path}>
-                                <TableHead className="p-2">
-                                  <div className="text-left">{ep.path}</div>
-                                </TableHead>
-                                <TableHead className="p-2">
-                                  <div className="text-center">{ep.type}</div>
-                                </TableHead>
-                                <TableHead className="p-2">
-                                  <div className="text-center">
-                                    {ep.operationId}
-                                  </div>
-                                </TableHead>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </RmItem>
-              ) : (
-                <RmItem
-                  label={
-                    <>
-                      Validating your swagger file
-                      <Badge variant="success" className="ms-1.5 px-2">
-                        great success
-                      </Badge>
-                    </>
-                  }
-                  success
-                >
-                  All your endpoints have an operation ID. This is great for the
-                  LLM to identify your endpoints.
-                </RmItem>
-              )}
-            </>
+      {isLoading ? (
+        <div className="flex-center mt-5 p-5">
+          <Loader />
+        </div>
+      ) : (
+        <>
+          <div className="mt-5">
+            {all_eps && all_eps.length > 0 ? (
+              <ul>
+                <>
+                  {ep_missing_operation_id &&
+                  ep_missing_operation_id.length > 0 ? (
+                    <RmItem
+                      label={
+                        <>
+                          Operation ID
+                          <Badge className="ms-1.5 px-2" variant="destructive">
+                            please fix
+                          </Badge>
+                        </>
+                      }
+                    >
+                      Some of your endpoints does not have an operation ID. it's
+                      required for the LLM to identify your endpoints.
+                      <Link
+                        className="block font-bold"
+                        href="https://swagger.io/docs/specification/paths-and-operations/"
+                      >
+                        Learn how to fix? {`->`}
+                      </Link>
+                      <Accordion type="multiple" className="mt-2">
+                        <AccordionItem value="eps">
+                          <AccordionTrigger>
+                            see which endpoints to fix
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead className="p-2">
+                                    <div className="text-left font-semibold">
+                                      Path
+                                    </div>
+                                  </TableHead>
+                                  <TableHead className="p-2">
+                                    <div className="text-center font-semibold">
+                                      Type
+                                    </div>
+                                  </TableHead>
+                                  <TableHead className="p-2">
+                                    <div className="text-center font-semibold">
+                                      Operation Id
+                                    </div>
+                                  </TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {ep_missing_operation_id.map((ep) => (
+                                  <TableRow key={ep.path}>
+                                    <TableHead className="p-2">
+                                      <div className="text-left">{ep.path}</div>
+                                    </TableHead>
+                                    <TableHead className="p-2">
+                                      <div className="text-center">
+                                        {ep.type}
+                                      </div>
+                                    </TableHead>
+                                    <TableHead className="p-2">
+                                      <div className="text-center">
+                                        {ep.operationId}
+                                      </div>
+                                    </TableHead>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+                    </RmItem>
+                  ) : (
+                    <RmItem
+                      label={
+                        <>
+                          Validating your swagger file
+                          <Badge variant="success" className="ms-1.5 px-2">
+                            great success
+                          </Badge>
+                        </>
+                      }
+                      success
+                    >
+                      All your endpoints have an operation ID. This is great for
+                      the LLM to identify your endpoints.
+                    </RmItem>
+                  )}
+                </>
 
-            <>
-              {ep_missing_description && ep_missing_description.length > 0 ? (
-                <RmItem
-                  label={
-                    <>
-                      Names{" "}
-                      <Badge variant="destructive" className="ms-1.5 px-2">
-                        please fix
-                      </Badge>
-                    </>
-                  }
-                >
-                  Some of your endpoints does not have a description. it's
-                  highly recommended to add a description to your endpoints
-                  <Link
-                    className="block font-bold"
-                    href="https://swagger.io/docs/specification/paths-and-operations/"
-                  >
-                    Learn how to fix? {`->`}
-                  </Link>
-                  <Accordion type="multiple" className="mt-2">
-                    <AccordionItem value="eps">
-                      <AccordionTrigger>
-                        see which endpoints to fix
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead className="p-2">
-                                <div className="text-left font-semibold">
-                                  Path
-                                </div>
-                              </TableHead>
-                              <TableHead className="p-2">
-                                <div className="text-center font-semibold">
-                                  Type
-                                </div>
-                              </TableHead>
-                              <TableHead className="p-2">
-                                <div className="text-center font-semibold">
-                                  Operation Id
-                                </div>
-                              </TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {ep_missing_description.map((ep) => (
-                              <TableRow key={ep.path}>
-                                <TableHead className="p-2">
-                                  <div className="text-left">{ep.path}</div>
-                                </TableHead>
-                                <TableHead className="p-2">
-                                  <div className="text-center">{ep.type}</div>
-                                </TableHead>
-                                <TableHead className="p-2">
-                                  <div className="text-center">
-                                    {ep.operationId}
-                                  </div>
-                                </TableHead>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </RmItem>
-              ) : (
-                <RmItem
-                  label={
-                    <>
-                      Description
-                      <Badge variant="success" className="ms-1.5 px-2">
-                        great success
-                      </Badge>
-                    </>
-                  }
-                  success
-                >
-                  All your endpoints have a description. This is great for the
-                  LLM to understand what your endpoints do.
-                </RmItem>
-              )}
-            </>
+                <>
+                  {ep_missing_description &&
+                  ep_missing_description.length > 0 ? (
+                    <RmItem
+                      label={
+                        <>
+                          Names{" "}
+                          <Badge variant="destructive" className="ms-1.5 px-2">
+                            please fix
+                          </Badge>
+                        </>
+                      }
+                    >
+                      Some of your endpoints does not have a description. it's
+                      highly recommended to add a description to your endpoints
+                      <Link
+                        className="block font-bold"
+                        href="https://swagger.io/docs/specification/paths-and-operations/"
+                      >
+                        Learn how to fix? {`->`}
+                      </Link>
+                      <Accordion type="multiple" className="mt-2">
+                        <AccordionItem value="eps">
+                          <AccordionTrigger>
+                            see which endpoints to fix
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead className="p-2">
+                                    <div className="text-left font-semibold">
+                                      Path
+                                    </div>
+                                  </TableHead>
+                                  <TableHead className="p-2">
+                                    <div className="text-center font-semibold">
+                                      Type
+                                    </div>
+                                  </TableHead>
+                                  <TableHead className="p-2">
+                                    <div className="text-center font-semibold">
+                                      Operation Id
+                                    </div>
+                                  </TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {ep_missing_description.map((ep) => (
+                                  <TableRow key={ep.path}>
+                                    <TableHead className="p-2">
+                                      <div className="text-left">{ep.path}</div>
+                                    </TableHead>
+                                    <TableHead className="p-2">
+                                      <div className="text-center">
+                                        {ep.type}
+                                      </div>
+                                    </TableHead>
+                                    <TableHead className="p-2">
+                                      <div className="text-center">
+                                        {ep.operationId}
+                                      </div>
+                                    </TableHead>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+                    </RmItem>
+                  ) : (
+                    <RmItem
+                      label={
+                        <>
+                          Description
+                          <Badge variant="success" className="ms-1.5 px-2">
+                            great success
+                          </Badge>
+                        </>
+                      }
+                      success
+                    >
+                      All your endpoints have a description. This is great for
+                      the LLM to understand what your endpoints do.
+                    </RmItem>
+                  )}
+                </>
 
-            <>
-              {ep_missing_name && ep_missing_name.length > 0 ? (
-                <RmItem
-                  label={
-                    <>
-                      Description
-                      <Badge className="ms-1.5 px-2" variant="destructive">
-                        please fix
-                      </Badge>
-                    </>
-                  }
-                >
-                  Some of your endpoints does not have a description. it's
-                  highly recommended to add a description to your endpoints
-                  <Link
-                    className="block font-bold"
-                    href="https://swagger.io/docs/specification/paths-and-operations/"
-                  >
-                    Learn how to fix? {`->`}
-                  </Link>
-                  <Accordion type="multiple" className="mt-2">
-                    <AccordionItem value="eps">
-                      <AccordionTrigger>
-                        see which endpoints to fix
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead className="p-2">
-                                <div className="text-left font-semibold">
-                                  Path
-                                </div>
-                              </TableHead>
-                              <TableHead className="p-2">
-                                <div className="text-center font-semibold">
-                                  Type
-                                </div>
-                              </TableHead>
-                              <TableHead className="p-2">
-                                <div className="text-center font-semibold">
-                                  Operation Id
-                                </div>
-                              </TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {ep_missing_name.map((ep) => (
-                              <TableRow key={ep.path}>
-                                <TableHead className="p-2">
-                                  <div className="text-left">{ep.path}</div>
-                                </TableHead>
-                                <TableHead className="p-2">
-                                  <div className="text-center">{ep.type}</div>
-                                </TableHead>
-                                <TableHead className="p-2">
-                                  <div className="text-center">
-                                    {ep.operationId}
-                                  </div>
-                                </TableHead>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </RmItem>
-              ) : (
-                <RmItem
-                  label={
-                    <>
-                      Validating your swagger file
-                      <Badge className="ms-1.5 px-2" variant="success">
-                        great success
-                      </Badge>
-                    </>
-                  }
-                  success
-                >
-                  All your endpoints have an operation ID. This is great for the
-                  LLM to identify your endpoints.
-                </RmItem>
-              )}
-            </>
+                <>
+                  {ep_missing_name && ep_missing_name.length > 0 ? (
+                    <RmItem
+                      label={
+                        <>
+                          Description
+                          <Badge className="ms-1.5 px-2" variant="destructive">
+                            please fix
+                          </Badge>
+                        </>
+                      }
+                    >
+                      Some of your endpoints does not have a description. it's
+                      highly recommended to add a description to your endpoints
+                      <Link
+                        className="block font-bold"
+                        href="https://swagger.io/docs/specification/paths-and-operations/"
+                      >
+                        Learn how to fix? {`->`}
+                      </Link>
+                      <Accordion type="multiple" className="mt-2">
+                        <AccordionItem value="eps">
+                          <AccordionTrigger>
+                            see which endpoints to fix
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead className="p-2">
+                                    <div className="text-left font-semibold">
+                                      Path
+                                    </div>
+                                  </TableHead>
+                                  <TableHead className="p-2">
+                                    <div className="text-center font-semibold">
+                                      Type
+                                    </div>
+                                  </TableHead>
+                                  <TableHead className="p-2">
+                                    <div className="text-center font-semibold">
+                                      Operation Id
+                                    </div>
+                                  </TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {ep_missing_name.map((ep) => (
+                                  <TableRow key={ep.path}>
+                                    <TableHead className="p-2">
+                                      <div className="text-left">{ep.path}</div>
+                                    </TableHead>
+                                    <TableHead className="p-2">
+                                      <div className="text-center">
+                                        {ep.type}
+                                      </div>
+                                    </TableHead>
+                                    <TableHead className="p-2">
+                                      <div className="text-center">
+                                        {ep.operationId}
+                                      </div>
+                                    </TableHead>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+                    </RmItem>
+                  ) : (
+                    <RmItem
+                      label={
+                        <>
+                          Validating your swagger file
+                          <Badge className="ms-1.5 px-2" variant="success">
+                            great success
+                          </Badge>
+                        </>
+                      }
+                      success
+                    >
+                      All your endpoints have an operation ID. This is great for
+                      the LLM to identify your endpoints.
+                    </RmItem>
+                  )}
+                </>
 
-            <>
-              {all_eps && all_eps.length > 15 ? (
-                <RmItem
-                  label={
-                    <>
-                      Too many endpoints
-                      <Badge className="ms-1.5 px-2" variant="secondary">
-                        recommendation
-                      </Badge>
-                    </>
-                  }
-                >
-                  You swagger file contain too many endpoints. we are still not
-                  capable of parsing large swagger files, please pick your most
-                  important endpoints and try it (we recommend less than 15
-                  endpoints)
-                </RmItem>
-              ) : (
-                <RmItem
-                  label={
-                    <>
-                      Good number of endpoints
-                      <Badge className="ms-1.5 px-2" variant="success">
-                        great success
-                      </Badge>
-                    </>
-                  }
-                  success
-                >
-                  {all_eps.length} endpoints is a good number to start with. You
-                  can always add more later.
-                </RmItem>
-              )}
-            </>
+                <>
+                  {all_eps && all_eps.length > 15 ? (
+                    <RmItem
+                      label={
+                        <>
+                          Too many endpoints
+                          <Badge className="ms-1.5 px-2" variant="secondary">
+                            recommendation
+                          </Badge>
+                        </>
+                      }
+                    >
+                      You swagger file contain too many endpoints. we are still
+                      not capable of parsing large swagger files, please pick
+                      your most important endpoints and try it (we recommend
+                      less than 15 endpoints)
+                    </RmItem>
+                  ) : (
+                    <RmItem
+                      label={
+                        <>
+                          Good number of endpoints
+                          <Badge className="ms-1.5 px-2" variant="success">
+                            great success
+                          </Badge>
+                        </>
+                      }
+                      success
+                    >
+                      {all_eps.length} endpoints is a good number to start with.
+                      You can always add more later.
+                    </RmItem>
+                  )}
+                </>
 
-            <>
-              {authorization ? (
-                <RmItem
-                  label={
-                    <>
-                      {authorization}
-                      <Badge className="ms-1.5 px-2" variant="secondary">
-                        recommendation
-                      </Badge>
-                    </>
-                  }
-                >
-                  Your swagger file contains {authorization} authorization. Our
-                  system is still in early beta and might struggle with
-                  {authorization} authorization. but let's give it a try.
-                </RmItem>
-              ) : (
-                <RmItem
-                  label={
-                    <>
-                      Supported Authorization
-                      <Badge className="ms-1.5 px-2" variant="success">
-                        great success
-                      </Badge>
-                    </>
-                  }
-                  success
-                >
-                  Your swagger file does not contain any authorization, you are
-                  goodto go.
-                </RmItem>
-              )}
-            </>
-          </ul>
-        ) : (
-          <RmItem
-            label={
-              <>
-                No endpoints
-                <Badge variant="destructive" className="ms-1.5 px-2">
-                  please fix
-                </Badge>
-              </>
-            }
-          >
-            the file contains 0 endpoints
-          </RmItem>
-        )}
-      </div>
+                <>
+                  {authorization ? (
+                    <RmItem
+                      label={
+                        <>
+                          {authorization}
+                          <Badge className="ms-1.5 px-2" variant="secondary">
+                            recommendation
+                          </Badge>
+                        </>
+                      }
+                    >
+                      Your swagger file contains {authorization} authorization.
+                      Our system is still in early beta and might struggle with
+                      {authorization} authorization. but let's give it a try.
+                    </RmItem>
+                  ) : (
+                    <RmItem
+                      label={
+                        <>
+                          Supported Authorization
+                          <Badge className="ms-1.5 px-2" variant="success">
+                            great success
+                          </Badge>
+                        </>
+                      }
+                      success
+                    >
+                      Your swagger file does not contain any authorization, you
+                      are goodto go.
+                    </RmItem>
+                  )}
+                </>
+              </ul>
+            ) : (
+              <RmItem
+                label={
+                  <>
+                    No endpoints
+                    <Badge variant="destructive" className="ms-1.5 px-2">
+                      please fix
+                    </Badge>
+                  </>
+                }
+              >
+                the file contains 0 endpoints
+              </RmItem>
+            )}
+          </div>
+        </>
+      )}
 
       <footer className="mt-5 flex w-full items-center justify-between gap-5 pt-5">
         <Button variant="ghost" onClick={previousStep} className="underline">

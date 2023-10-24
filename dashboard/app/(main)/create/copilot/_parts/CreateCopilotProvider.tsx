@@ -68,7 +68,13 @@ function reducer(state: State, action: Action) {
 }
 
 function CreateCopilotProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = React.useReducer(reducer, {});
+  const [state, dispatch] = React.useReducer(reducer, {
+    isLoading: false,
+    swaggerFiles: [],
+    templateKey: undefined,
+    createdCopilot: undefined,
+    validatorResponse: undefined,
+  });
   return (
     <CreateCopilotSafeProvider value={{ state, dispatch }}>
       {children}

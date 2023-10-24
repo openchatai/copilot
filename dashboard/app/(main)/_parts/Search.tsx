@@ -73,7 +73,7 @@ export function Search() {
                   setFilter((prev) => {
                     return {
                       ...prev,
-                      query: event.target.value,
+                      query: event.target.value.trim(),
                     };
                   });
                 }}

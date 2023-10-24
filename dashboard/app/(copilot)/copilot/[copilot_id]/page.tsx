@@ -35,7 +35,7 @@ function InstallationSection() {
         </AccordionTrigger>
         <AccordionContent className="px-8 py-6">
           <p className="mb-2 font-medium">
-            Paste this code snippet before the closing{" "}
+            Paste this code snippet before the closing
             <strong>{`</body>`}</strong> tag on all pages you want the widget to
             appear. Remember to version to run your Assistant.
           </p>
@@ -44,9 +44,9 @@ function InstallationSection() {
   // be aware to call this function when the document/window is ready.
 
   const options = {
-     apiUrl: "https://yourdomain.com/api" // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:5000/api
+     apiUrl: "http://localhost:8888/backend/api" // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:5000/api
      initialMessages: ["How are the things"], // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
-     token: ${CopilotToken}, // you can get your token from the dashboard
+     token: "${CopilotToken}", // you can get your token from the dashboard
      triggerSelector: "#triggerSelector", // the selector of the element that will trigger the copilot when clicked
      headers: {
        // optional: you can pass your authentication tokens to the copilot or any other header you want to send with every request
@@ -64,6 +64,8 @@ function InstallationSection() {
 }
 
 function TryItSection() {
+  const { token: CopilotToken } = useCopilot();
+
   return (
     <section className="rounded-lg border bg-white shadow-sm">
       <AccordionItem value="try-share">
@@ -81,9 +83,14 @@ function TryItSection() {
           </div>
         </AccordionTrigger>
         <AccordionContent className="px-8 py-6">
-          <p className="mb-2">1- Here is an example Dashboard to test it out</p>
+          <p className="mb-2">Try your copilot on our example dashboard</p>
           <Button asChild variant="link">
-            <Link href="/copilot/1">Open Dashboard</Link>
+            <Link
+              target="_blank"
+              href={"http://localhost:8888/backend" + "/demo/" + CopilotToken}
+            >
+              Open Dashboard
+            </Link>
           </Button>
         </AccordionContent>
       </AccordionItem>
@@ -92,13 +99,23 @@ function TryItSection() {
 }
 
 export default function CopilotPage() {
-  const { name: CopilotName } = useCopilot();
+  const { name: CopilotName, token: CopilotToken } = useCopilot();
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
-      <HeaderShell className="bg-white">
+      <HeaderShell className="justify-between bg-white">
         <h1 className="text-lg font-bold text-accent-foreground">
           {CopilotName}
         </h1>
+        <div className="space-x-2">
+          <Button>
+            <Link
+              target="_blank"
+              href={"http://localhost:8888/backend" + "/demo/" + CopilotToken}
+            >
+              Test on example dashboard
+            </Link>
+          </Button>
+        </div>
       </HeaderShell>
       <div className="flex-1 overflow-auto">
         <div className="container max-w-screen-lg p-8">

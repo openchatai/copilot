@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 
 export default function SelectWorkspace() {
   return (
-    <Select value="default1">
+    <Select value="default" disabled>
       <SelectTrigger className="w-full h-full outline-none flex items-center justify-between px-4 hover:bg-card-foreground font-semibold">
         <SelectValue placeholder="Select a workspace" />
         <SelectPrimitiveIcon asChild>
@@ -28,8 +28,7 @@ export default function SelectWorkspace() {
       <SelectContent className="p-0">
         <SelectGroup>
           <SelectLabel>Workspaces</SelectLabel>
-          <SelectItem value="default1">Your Workspace 1</SelectItem>
-          <SelectItem value="default2">Your Workspace 2</SelectItem>
+          <SelectItem value="default">Default Workspace</SelectItem>
         </SelectGroup>
         <SelectSeparator />
         <SelectGroup>

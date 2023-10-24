@@ -2,7 +2,6 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Bot,
   ScrollText,
-  Settings,
   GithubIcon,
   PlaySquare,
   ExternalLink,
@@ -83,27 +82,13 @@ export default function Aside() {
             </Link>
           </li>
         </ul>
-
-        <ul className="space-y-1 px-2">
-          <li>
-            <NavLink
-              className="group flex w-full items-center justify-between gap-1 rounded px-4 py-2 text-base font-normal text-accent-foreground hover:bg-card-foreground"
-              href="/settings"
-            >
-              <div className="flex flex-1 items-center gap-2">
-                <Settings className="h-4 w-4" />
-                <span>Settings</span>
-              </div>
-            </NavLink>
-          </li>
-        </ul>
       </div>
       <div className="border-t border-border px-5 py-4 hover:bg-card-foreground">
         <div className="flex items-center gap-2">
           <Avatar>
-            <AvatarFallback>U</AvatarFallback>
+            <AvatarFallback>LU</AvatarFallback>
           </Avatar>
-          <h2 className="line-clamp-1 text-sm font-semibold">User</h2>
+          <h2 className="line-clamp-1 text-sm font-semibold">Local User</h2>
         </div>
       </div>
     </aside>

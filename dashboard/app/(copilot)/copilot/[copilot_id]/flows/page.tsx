@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import {
   CodePreview,
   Controller,
@@ -7,44 +7,68 @@ import {
   useController,
   transformPaths,
   trasnformEndpointNodesData,
+  transformaEndpointToNode,
 } from "@openchatai/copilot-flows-editor";
 import { HeaderShell } from "@/components/domain/HeaderShell";
 import { useCopilot } from "../../_context/CopilotProvider";
 import useSwr from "swr";
-import { getSwaggerByBotId } from "@/data/swagger";
+import { getSwaggerfromSwaggerUrl } from "@/data/swagger";
 import { Button } from "@/components/ui/button";
 import {
   createWorkflowByBotId,
   deleteWorkflowById,
-  getWorkflowsByBotId,
+  getWorkflowById,
 } from "@/data/flow";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "@/components/ui/use-toast";
 import _ from "lodash";
 
 function Header() {
-  const { id: copilotId, name: copilotName } = useCopilot();
+  const {
+    id: copilotId,
+    name: copilotName,
+    swagger_url: SwaggerUrl,
+  } = useCopilot();
   const { loadPaths, state } = useController();
   const saerchParams = useSearchParams();
   const workflow_id = saerchParams.get("workflow_id");
-  // editing => workflow_id // creating => undefined
   const isEditing = !!workflow_id;
-
-  useSwr(
-    copilotId + "swagger",
-    async () => await getSwaggerByBotId(copilotId),
+  const { replace } = useRouter();
+  const [loading, setLoading] = useState(false);
+  // editing => workflow_id // creating => undefined
+  console.log(SwaggerUrl);
+  const { isLoading: isSwaggerLoading } = useSwr(
+    SwaggerUrl,
+    getSwaggerfromSwaggerUrl,
     {
       onSuccess: (data) => {
+        if (!data) return;
         loadPaths(transformPaths(data.data.paths));
       },
     },
   );
-
+  const isLoading = isSwaggerLoading || loading;
   async function handleSave() {}
-  async function handleDelete() {}
-
+  async function handleDelete() {
+    if (!isEditing || !workflow_id) return;
+    setLoading(true);
+    const { data } = await deleteWorkflowById(workflow_id);
+    if (data) {
+      console.log(data);
+      toast({
+        title: "Workflow deleted",
+        description: "Your workflow has been deleted.",
+        variant: "success",
+      });
+      replace(`/copilot/${copilotId}/flows`, {
+        scroll: false,
+      });
+      setLoading(false);
+    }
+  }
   async function handleCreate() {
     if (isEditing) return;
+    setLoading(true);
     const firstFlow = _.first(state.flows);
     const steps = trasnformEndpointNodesData(firstFlow?.steps || []);
 
@@ -75,23 +99,35 @@ function Header() {
         description: "Your workflow has been created.",
         variant: "success",
       });
+      replace(`/copilot/${copilotId}/flows/?workflow_id=${data.workflow_id}`, {
+        scroll: false,
+      });
+      setLoading(false);
     }
   }
   return (
-    <HeaderShell className="justify-between gap-2 ">
+    <HeaderShell className="justify-between gap-2">
       <h1 className="text-lg font-bold text-accent-foreground">
         {copilotName}
       </h1>
       {isEditing ? (
         <div className="space-x-1">
-          <Button onClick={handleSave}>Save</Button>
-          <Button onClick={handleDelete} variant="destructive">
+          <Button onClick={handleSave} disabled={isLoading}>
+            Save
+          </Button>
+          <Button
+            onClick={handleDelete}
+            disabled={isLoading}
+            variant="destructive"
+          >
             Delete
           </Button>
         </div>
       ) : (
         <div className="space-x-1">
-          <Button onClick={handleCreate}>Create</Button>
+          <Button onClick={handleCreate} disabled={isLoading}>
+            Create
+          </Button>
         </div>
       )}
     </HeaderShell>
@@ -103,13 +139,35 @@ export default function FlowsPage({
 }: {
   params: { copilot_id: string };
 }) {
-  useSwr(
-    copilot_id + "/workflows",
-    async () => await getWorkflowsByBotId(copilot_id),
-  );
+  const saerchParams = useSearchParams();
+  const workflow_id = saerchParams.get("workflow_id");
+  const isEditing = !!workflow_id;
+
+  const { data: workflowData } = useSwr(workflow_id, getWorkflowById);
+  console.log(workflowData?.data.flows[0]);
   return (
     // @ts-ignore
-    <Controller maxFlows={1}>
+    <Controller
+      maxFlows={1}
+      initialState={{
+        flows: [
+          {
+            id: "flow-1",
+            name: "",
+            createdAt: 123564654,
+            description: "",
+            updatedAt: 123564654,
+            steps: [
+              {
+                id: "fick",
+                data: {},
+              },
+            ],
+          },
+        ],
+        paths: [],
+      }}
+    >
       <div className="flex h-full w-full flex-col">
         <Header />
         <div className="relative flex h-full w-full flex-1 items-start justify-between">
