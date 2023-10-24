@@ -13,9 +13,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ValidatorResponseType } from "@/data/copilot";
+import { ValidatorResponseType, validateSwagger } from "@/data/copilot";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
 import { Check } from "lucide-react";
 import { useWizard } from "react-use-wizard";
 import {
@@ -28,6 +28,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useAtom, useAtomValue } from "jotai";
+import { Validations, WizardDataStateAtom } from "./atoms";
 function RmItem({
   label,
   children,
@@ -64,60 +66,32 @@ function RmItem({
 }
 
 export function ValidateSwaggerStep() {
+  const { createdCopilot } = useAtomValue(WizardDataStateAtom);
+  const [validatorResponse, setValidatorResponse] = useAtom(Validations);
   const { previousStep, nextStep } = useWizard();
-  const validatorResponse: ValidatorResponseType = {
-    all_endpoints: [],
-    chatbot_id: "25460",
-    validations: {
-      auth_type: "none",
-      endpoints_without_description: [
-        {
-          name: "/api/v1/health",
-          operationId: "health",
-          description: "",
-          requestBody: {},
-          path: "/api/v1/health",
-          requestParameters: {},
-          responseBody: {},
-          type: "get",
-        },
-      ],
-      endpoints_without_name: [
-        {
-          name: "/api/v1/health",
-          operationId: "health",
-          description: "",
-          requestBody: {},
-          path: "/api/v1/health",
-          requestParameters: {},
-          responseBody: {},
-          type: "get",
-        },
-      ],
-      endpoints_without_operation_id: [
-        {
-          name: "/api/v1/health",
-          operationId: "health",
-          description: "",
-          requestBody: {},
-          path: "/api/v1/health",
-          requestParameters: {},
-          responseBody: {},
-          type: "get",
-        },
-      ],
-    },
-  };
+  async function validate() {
+    if (createdCopilot) {
+      const { data: validationsData } = await validateSwagger(
+        createdCopilot.id,
+      );
+      if (validationsData) {
+        setValidatorResponse(validationsData);
+      }
+    }
+  }
+  useEffect(() => {
+    validate();
+  }, []);
   const ep_missing_operation_id =
-    validatorResponse.validations.endpoints_without_operation_id;
+    validatorResponse?.validations.endpoints_without_operation_id;
 
-  const ep_missing_name = validatorResponse.validations.endpoints_without_name;
+  const ep_missing_name = validatorResponse?.validations.endpoints_without_name;
 
   const ep_missing_description =
-    validatorResponse.validations.endpoints_without_description;
+    validatorResponse?.validations.endpoints_without_description;
 
-  const all_eps = validatorResponse.all_endpoints;
-  const authorization = validatorResponse.validations.auth_type;
+  const all_eps = validatorResponse?.all_endpoints;
+  const authorization = validatorResponse?.validations.auth_type;
   return (
     <div>
       <h2 className="mb-6 text-3xl font-bold text-accent-foreground">
@@ -462,7 +436,9 @@ export function ValidateSwaggerStep() {
             label={
               <>
                 No endpoints
-                <Badge variant="destructive" className="px-2">please fix</Badge>
+                <Badge variant="destructive" className="px-2">
+                  please fix
+                </Badge>
               </>
             }
           >

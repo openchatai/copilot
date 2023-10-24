@@ -15,13 +15,14 @@ import {
   AlertDialogHeader,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { deleteCopilot } from "@/data/copilot";
+import { deleteCopilot, updateCopilot } from "@/data/copilot";
 import _ from "lodash";
 import { useRouter } from "next/navigation";
 import { toast } from "@/components/ui/use-toast";
+import { CopyButton } from "@/components/headless/CopyButton";
 export default function GeneralSettingsPage() {
   const { token, id: copilotId, name: copilotName } = useCopilot();
-  const { replace } = useRouter();
+  const { replace, refresh } = useRouter();
   async function handleDelete() {
     const response = await deleteCopilot(copilotId);
     if (response.data.success) {
@@ -33,16 +34,28 @@ export default function GeneralSettingsPage() {
       _.delay(() => replace("/"), 1000);
     }
   }
+  const [Name, setName] = React.useState(copilotName);
+  async function handleSave() {
+    if (Name === copilotName || Name.trim().length < 1) return;
+    const { data: respData } = await updateCopilot(copilotId, { name: Name });
+    if (respData.chatbot) {
+      toast({
+        variant: "success",
+        title: "Copilot updated",
+        description: "Your copilot has been updated successfully.",
+      });
+      _.delay(refresh, 500);
+    }
+  }
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden">
+    <div className="flex h-full w-full flex-col overflow-hidden [&_input]:font-semibold">
       <HeaderShell className="items-center justify-between">
         <h1 className="text-lg font-bold text-secondary-foreground">
           General settings
         </h1>
         <div className="space-x-2">
-          <Button size="sm">Save</Button>
-          <Button size="sm" variant="destructive">
-            Cancel
+          <Button size="sm" onClick={handleSave}>
+            Save
           </Button>
         </div>
       </HeaderShell>
@@ -55,7 +68,14 @@ export default function GeneralSettingsPage() {
                 Copilot Name
               </Label>
               <div className="flex items-center gap-2">
-                <Input className="w-10/12" defaultValue={copilotName} />
+                <Input
+                  className="w-10/12"
+                  defaultValue={copilotName}
+                  onChange={(ev) => {
+                    setName(ev.target.value);
+                  }}
+                  value={Name}
+                />
                 <p className="text-xs">
                   Lorem ipsum dolor sit, amet consectetur adipisicing elit.
                   Culpa, a totam earum rem suscipit illum voluptas facere
@@ -74,8 +94,10 @@ export default function GeneralSettingsPage() {
                   Token
                 </Label>
                 <div className="flex items-center justify-between gap-2">
-                  <Input className="flex" defaultValue={token} />
-                  <Button variant="outline">Copy</Button>
+                  <Input className="flex" readOnly defaultValue={token} />
+                  <Button variant="outline" asChild>
+                    <CopyButton text={token}>Copy</CopyButton>
+                  </Button>
                 </div>
               </div>
               <Separator className="my-2" />
@@ -84,8 +106,10 @@ export default function GeneralSettingsPage() {
                   Copilot Id
                 </Label>
                 <div className="flex items-center justify-between gap-2">
-                  <Input className="flex" defaultValue={copilotId} />
-                  <Button variant="outline">Copy</Button>
+                  <Input className="flex" readOnly defaultValue={copilotId} />
+                  <Button variant="outline" asChild>
+                    <CopyButton text={copilotId}>Copy</CopyButton>
+                  </Button>
                 </div>
               </div>
             </div>

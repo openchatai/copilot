@@ -8,16 +8,10 @@ import Link from "next/link";
 import React from "react";
 import { Wizard, useWizard } from "react-use-wizard";
 import { ValidateSwaggerStep } from "./_parts/ValidateSwaggerStep";
-import { Cat, Check, CheckCheck } from "lucide-react";
-import {
-  CopilotType,
-  PetStoreCopilotType,
-  createCopilot,
-  createPetstoreTemplate,
-} from "@/data/copilot";
-import type { AxiosResponse } from "axios";
+import { Check, CheckCheck } from "lucide-react";
+import { createCopilot } from "@/data/copilot";
 import _ from "lodash";
-import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { toast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -39,36 +33,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import Loader from "@/components/ui/Loader";
-
-type PremadeTemplate<T> = {
-  id: string;
-  name: string;
-  description: string;
-  icon: React.ReactNode;
-  // we dont know the type of the response it depends on the selected template so we want to keep it generic
-  creatorFn: (...args: any[]) => Promise<AxiosResponse<T>>;
-};
-const petStoreTemplate: PremadeTemplate<PetStoreCopilotType> = {
-  id: "pet_store",
-  name: "Pet Store",
-  description: "Simple Pet store templeate with crud operations",
-  icon: <Cat className="h-6 w-6" />,
-  creatorFn: createPetstoreTemplate,
-};
-const premadeTemplates = [petStoreTemplate];
-const loadingAtom = atom(false);
-const CreatedCopilotAtom = atom<CopilotType | null>(null);
-const swaggerAtom = atom<File[] | null>(null);
-const selectedTemplateAtomKey = atom<string | undefined>(undefined);
-
-const WizardDataStateAtom = atom((get) => ({
-  createdCopilot: get(CreatedCopilotAtom),
-  swaggerFile: _.first(get(swaggerAtom)),
-  selectedTemplate: premadeTemplates.find(
-    (temp) => temp.id === get(selectedTemplateAtomKey),
-  ),
-  is_premade_demo_template: get(CreatedCopilotAtom)?.is_premade_demo_template,
-}));
+import {
+  CreatedCopilotAtom,
+  WizardDataStateAtom,
+  loadingAtom,
+  selectedTemplateAtomKey,
+  swaggerAtom,
+} from "./_parts/atoms";
+import { premadeTemplates } from "./_parts/premade";
 
 function Header() {
   const { stepCount, activeStep, goToStep } = useWizard();
@@ -186,6 +158,7 @@ function UploadSwaggerStep() {
             setCopilot(res.data.chatbot);
           }
         } else {
+          // @ts-ignore
           const res = await createCopilot({ swagger_file: swaggerFile });
           if (res.data) {
             setCopilot(res.data.chatbot);
@@ -199,10 +172,10 @@ function UploadSwaggerStep() {
             description: "You have created your copilot successfully",
             variant: "success",
           });
-          await _.after(1000, nextStep)();
+          _.delay(nextStep, 1000);
         }
       } else {
-        await _.after(1000, nextStep)();
+        _.delay(nextStep, 1000);
       }
     }
     setLoading(false);

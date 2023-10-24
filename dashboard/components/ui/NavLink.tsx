@@ -32,7 +32,6 @@ function pathnamePlusSearchParams(
   const $pathnamePlusSearchParams = $searchParams
     ? `${$pathname}?${$searchParams}`
     : $pathname;
-
   return $pathnamePlusSearchParams;
 }
 
@@ -55,9 +54,12 @@ export const NavLink = React.forwardRef<React.ElementRef<typeof Link>, Props>(
       pathname,
       searchParams,
     );
+    const href = props.href.toString().endsWith("/")
+      ? props.href
+      : props.href + "/";
     const isActive = segment
       ? segments.includes(segment)
-      : props.href === $pathnamePlusSearchParams;
+      : href === $pathnamePlusSearchParams;
 
     return (
       <Link
