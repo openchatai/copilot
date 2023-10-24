@@ -13,15 +13,39 @@ import {
 import { AlertCircle } from "lucide-react";
 import { contexts } from "./_parts/data/contexts";
 import { TextDisplay } from "@/components/headless/TextDisplay";
+import { updateCopilot } from "@/data/copilot";
+import { useCopilot } from "../../../_context/CopilotProvider";
+import { toast } from "@/components/ui/use-toast";
+
 export default function CopilotContextSettingsPage() {
+  const { id: copilotId, name: copilotName, prompt_message } = useCopilot();
+  const [context, setContext] = React.useState(prompt_message);
+  async function handleUpdateContext() {
+    const { status } = await updateCopilot(copilotId, {
+      prompt_message: context,
+      // [ "The name field is required." ]
+      name: copilotName,
+    });
+    if (status === 200) {
+      toast({
+        title: "Context updated successfully",
+        variant: "success",
+      });
+    } else {
+      toast({
+        title: "Failed to update context",
+        variant: "destructive",
+      });
+    }
+  }
+
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
       <HeaderShell className="items-center justify-between">
         <h1 className="text-lg font-bold text-secondary-foreground">Context</h1>
         <div className="space-x-2">
-          <Button size="sm">Save</Button>
-          <Button size="sm" variant="destructive">
-            Cancel
+          <Button size="sm" onClick={handleUpdateContext}>
+            Save
           </Button>
         </div>
       </HeaderShell>
@@ -42,7 +66,10 @@ export default function CopilotContextSettingsPage() {
                 minRows={3}
                 maxRows={8}
                 className="leading-relaxed"
-                defaultValue={contexts.at(0)?.content}
+                value={context}
+                onChange={(e) => {
+                  setContext(e.target.value);
+                }}
               />
               <PopoverContentPrimitive
                 asChild
@@ -81,7 +108,13 @@ export default function CopilotContextSettingsPage() {
                   </AlertDescription>
                 </div>
                 <div className="flex items-center justify-end">
-                  <Button size="sm" className="mt-2">
+                  <Button
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => {
+                      setContext(context.content);
+                    }}
+                  >
                     Select
                   </Button>
                 </div>
