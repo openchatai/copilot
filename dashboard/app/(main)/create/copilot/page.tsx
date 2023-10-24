@@ -5,13 +5,13 @@ import Roadmap from "@/components/ui/Roadmap";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { Wizard, useWizard } from "react-use-wizard";
 import { ValidateSwaggerStep } from "./_parts/ValidateSwaggerStep";
 import { Check, CheckCheck } from "lucide-react";
-import { createCopilot } from "@/data/copilot";
+import { CopilotType, createCopilot } from "@/data/copilot";
 import _ from "lodash";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { toast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -33,14 +33,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import Loader from "@/components/ui/Loader";
-import {
-  CreatedCopilotAtom,
-  WizardDataStateAtom,
-  loadingAtom,
-  selectedTemplateAtomKey,
-  swaggerAtom,
-} from "./_parts/atoms";
+import { WizardDataStateAtom } from "./_parts/atoms";
 import { premadeTemplates } from "./_parts/premade";
+import {
+  CreateCopilotProvider,
+  useCreateCopilot,
+} from "./_parts/CreateCopilotProvider";
 
 function Header() {
   const { stepCount, activeStep, goToStep } = useWizard();
@@ -121,25 +119,22 @@ function IntroStep() {
 }
 function UploadSwaggerStep() {
   const { nextStep, previousStep } = useWizard();
-  const [swaggerFiles, setSwaggerFiles] = useAtom(swaggerAtom);
-  const setCopilot = useSetAtom(CreatedCopilotAtom);
-  const [loading, setLoading] = useAtom(loadingAtom);
   const {
-    createdCopilot,
-    selectedTemplate,
-    swaggerFile,
-    is_premade_demo_template,
-  } = useAtomValue(WizardDataStateAtom);
-  console.log({
-    is_premade_demo_template,
-    createdCopilot,
-    selectedTemplate,
-    swaggerFile,
-  });
-  const [templateKey, setTempleteKey] = useAtom(selectedTemplateAtomKey);
-  // if user selects template and then uploads swagger file, we will use the template
-  const bothSelected = selectedTemplate && swaggerFile;
+    state: { swaggerFiles, createdCopilot, templateKey },
+    dispatch,
+  } = useCreateCopilot();
+  const setCopilot = (copilot: CopilotType) => {
+    dispatch({ type: "SET_COPILOT", payload: copilot });
+  };
+  const [loading, setLoading] = useState(false);
+  const selectedTemplate = _.find(premadeTemplates, { id: templateKey });
+  const setTempleteKey = (templateKey: string | undefined) => {
+    dispatch({ type: "CHANGE_TEMPLATE_KEY", payload: templateKey });
+  };
 
+  const swaggerFile = _.first(swaggerFiles);
+  const bothSelected = selectedTemplate && swaggerFile;
+  // if user selects template and then uploads swagger file, we will use the template
   async function handleCreateCopilot() {
     setLoading(true);
     if (!swaggerFile && !selectedTemplate) {
@@ -159,7 +154,7 @@ function UploadSwaggerStep() {
           }
         } else {
           // @ts-ignore
-          const res = await createCopilot({ swagger_file: swaggerFile });
+          const res = await createCopilot({ swagger_file: swaggerFiles });
           if (res.data) {
             setCopilot(res.data.chatbot);
           }
@@ -230,7 +225,9 @@ function UploadSwaggerStep() {
               maxFiles={1}
               accept={{ json: ["application/json"] }}
               value={swaggerFiles || []}
-              onChange={setSwaggerFiles}
+              onChange={(files) => {
+                dispatch({ type: "ADD_SWAGGER", payload: files });
+              }}
             />
           </div>
           <div className="mb-8 mt-4 flex items-center justify-between space-x-6">
@@ -344,6 +341,10 @@ function UploadSwaggerStep() {
   );
 }
 function FinishStep() {
+  const {
+    state: { createdCopilot },
+  } = useCreateCopilot();
+  const BaseCopilot = `/copilot/${createdCopilot?.id}`;
   return (
     <div>
       <h2 className="mb-6 flex flex-col items-center justify-center gap-2 font-bold">
@@ -354,7 +355,7 @@ function FinishStep() {
       </h2>
       <div className="mx-auto mt-5 w-fit">
         <Button asChild>
-          <Link href="">Open your copilot 🔥 {`->`}</Link>
+          <Link href={BaseCopilot}>Open your copilot 🔥</Link>
         </Button>
       </div>
     </div>
@@ -372,12 +373,14 @@ export default function CreateCopilotPage() {
 
       <div className="flex-center w-full flex-1 shrink-0 overflow-auto p-5">
         <div className="mx-auto mb-5 h-full w-full max-w-lg [&>div]:pb-8">
-          <Wizard header={<Header />}>
-            <IntroStep />
-            <UploadSwaggerStep />
-            <ValidateSwaggerStep />
-            <FinishStep />
-          </Wizard>
+          <CreateCopilotProvider>
+            <Wizard header={<Header />}>
+              <IntroStep />
+              <UploadSwaggerStep />
+              <ValidateSwaggerStep />
+              <FinishStep />
+            </Wizard>
+          </CreateCopilotProvider>
         </div>
       </div>
     </div>

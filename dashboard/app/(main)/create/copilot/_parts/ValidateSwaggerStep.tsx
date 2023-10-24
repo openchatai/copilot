@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ValidatorResponseType, validateSwagger } from "@/data/copilot";
+import { validateSwagger } from "@/data/copilot";
 import Link from "next/link";
 import React, { useEffect } from "react";
 import { Check } from "lucide-react";
@@ -28,8 +28,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useAtom, useAtomValue } from "jotai";
-import { Validations, WizardDataStateAtom } from "./atoms";
+import _ from "lodash";
+import { useCreateCopilot } from "./CreateCopilotProvider";
 function RmItem({
   label,
   children,
@@ -46,8 +46,8 @@ function RmItem({
 
         <div className="absolute left-0 rounded-full">
           {success ? (
-            <span className="flex-center h-5 w-5 rounded-full bg-indigo-500">
-              <Check className="fill-current text-white" />
+            <span className="flex-center rounded-full bg-indigo-500 p-0.5">
+              <Check className="h-4 w-4 text-white" />
             </span>
           ) : (
             <span className="flex-center h-5 w-5 rounded-full bg-rose-500"></span>
@@ -66,21 +66,28 @@ function RmItem({
 }
 
 export function ValidateSwaggerStep() {
-  const { createdCopilot } = useAtomValue(WizardDataStateAtom);
-  const [validatorResponse, setValidatorResponse] = useAtom(Validations);
+  const {
+    state: { createdCopilot, validatorResponse },
+    dispatch,
+  } = useCreateCopilot();
+
   const { previousStep, nextStep } = useWizard();
   async function validate() {
-    if (createdCopilot) {
+    if (createdCopilot && !validatorResponse) {
       const { data: validationsData } = await validateSwagger(
         createdCopilot.id,
       );
       if (validationsData) {
-        setValidatorResponse(validationsData);
+        dispatch({
+          type: "SET_VALIDATIONS",
+          payload: validationsData,
+        });
       }
     }
   }
   useEffect(() => {
     validate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const ep_missing_operation_id =
     validatorResponse?.validations.endpoints_without_operation_id;
@@ -92,6 +99,11 @@ export function ValidateSwaggerStep() {
 
   const all_eps = validatorResponse?.all_endpoints;
   const authorization = validatorResponse?.validations.auth_type;
+  const there_are_errors =
+    !_.isEmpty(ep_missing_operation_id) ||
+    !_.isEmpty(ep_missing_name) ||
+    !_.isEmpty(ep_missing_description);
+  
   return (
     <div>
       <h2 className="mb-6 text-3xl font-bold text-accent-foreground">
@@ -101,7 +113,7 @@ export function ValidateSwaggerStep() {
         We will validate your Swagger file to make sure you will get the best
         results
       </p>
-      <div className="mt-5 [&_.badge]:ms-1">
+      <div className="mt-5">
         {all_eps && all_eps.length > 0 ? (
           <ul>
             <>
@@ -110,7 +122,7 @@ export function ValidateSwaggerStep() {
                   label={
                     <>
                       Operation ID
-                      <Badge className="px-2" variant="destructive">
+                      <Badge className="ms-1.5 px-2" variant="destructive">
                         please fix
                       </Badge>
                     </>
@@ -177,7 +189,7 @@ export function ValidateSwaggerStep() {
                   label={
                     <>
                       Validating your swagger file
-                      <Badge variant="success" className="px-2">
+                      <Badge variant="success" className="ms-1.5 px-2">
                         great success
                       </Badge>
                     </>
@@ -196,7 +208,7 @@ export function ValidateSwaggerStep() {
                   label={
                     <>
                       Names{" "}
-                      <Badge variant="destructive" className="px-2">
+                      <Badge variant="destructive" className="ms-1.5 px-2">
                         please fix
                       </Badge>
                     </>
@@ -263,7 +275,7 @@ export function ValidateSwaggerStep() {
                   label={
                     <>
                       Description
-                      <Badge variant="success" className="px-2">
+                      <Badge variant="success" className="ms-1.5 px-2">
                         great success
                       </Badge>
                     </>
@@ -282,7 +294,7 @@ export function ValidateSwaggerStep() {
                   label={
                     <>
                       Description
-                      <Badge className="px-2" variant="destructive">
+                      <Badge className="ms-1.5 px-2" variant="destructive">
                         please fix
                       </Badge>
                     </>
@@ -349,7 +361,7 @@ export function ValidateSwaggerStep() {
                   label={
                     <>
                       Validating your swagger file
-                      <Badge className="px-2" variant="success">
+                      <Badge className="ms-1.5 px-2" variant="success">
                         great success
                       </Badge>
                     </>
@@ -368,7 +380,7 @@ export function ValidateSwaggerStep() {
                   label={
                     <>
                       Too many endpoints
-                      <Badge className="px-2" variant="secondary">
+                      <Badge className="ms-1.5 px-2" variant="secondary">
                         recommendation
                       </Badge>
                     </>
@@ -384,7 +396,7 @@ export function ValidateSwaggerStep() {
                   label={
                     <>
                       Good number of endpoints
-                      <Badge className="px-2" variant="success">
+                      <Badge className="ms-1.5 px-2" variant="success">
                         great success
                       </Badge>
                     </>
@@ -403,7 +415,7 @@ export function ValidateSwaggerStep() {
                   label={
                     <>
                       {authorization}
-                      <Badge className="px-2" variant="secondary">
+                      <Badge className="ms-1.5 px-2" variant="secondary">
                         recommendation
                       </Badge>
                     </>
@@ -418,7 +430,7 @@ export function ValidateSwaggerStep() {
                   label={
                     <>
                       Supported Authorization
-                      <Badge className="px-2" variant="success">
+                      <Badge className="ms-1.5 px-2" variant="success">
                         great success
                       </Badge>
                     </>
@@ -436,7 +448,7 @@ export function ValidateSwaggerStep() {
             label={
               <>
                 No endpoints
-                <Badge variant="destructive" className="px-2">
+                <Badge variant="destructive" className="ms-1.5 px-2">
                   please fix
                 </Badge>
               </>
@@ -451,32 +463,39 @@ export function ValidateSwaggerStep() {
         <Button variant="ghost" onClick={previousStep} className="underline">
           Back
         </Button>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button size="sm">Next Step</Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Make it better</AlertDialogTitle>
-              <AlertDialogDescription>
-                Make sure that all recommendations are taken into consideration.
-                as it will help you to get the best out of the platform.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogTrigger asChild onClick={nextStep}>
-                <Button size="sm" variant="destructive">
-                  Yes, continue
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogCancel asChild>
-                <Button size="sm" variant="outline">
-                  Let me fix it
-                </Button>
-              </AlertDialogCancel>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        {there_are_errors ? (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="sm">Next Step</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Make it better</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Make sure that all recommendations are taken into
+                  consideration. as it will help you to get the best out of the
+                  platform.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogTrigger asChild onClick={nextStep}>
+                  <Button size="sm" variant="destructive">
+                    Yes, continue
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogCancel asChild>
+                  <Button size="sm" variant="outline">
+                    Let me fix it
+                  </Button>
+                </AlertDialogCancel>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        ) : (
+          <Button size="sm" onClick={nextStep}>
+            Next Step
+          </Button>
+        )}
       </footer>
     </div>
   );

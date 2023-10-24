@@ -3,7 +3,6 @@ import _ from "lodash";
 import { premadeTemplates } from "./premade";
 import { CopilotType, ValidatorResponseType } from "@/data/copilot";
 
-export const loadingAtom = atom(false);
 export const CreatedCopilotAtom = atom<CopilotType | null>(null);
 export const swaggerAtom = atom<File[] | null>(null);
 export const selectedTemplateAtomKey = atom<string | undefined>(undefined);
