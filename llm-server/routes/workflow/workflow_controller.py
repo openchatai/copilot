@@ -6,15 +6,10 @@ from bson import ObjectId, json_util
 from copilot_exceptions.handle_exceptions_and_errors import handle_exceptions_and_errors
 from utils.vector_db.add_workflow import add_workflow_data_to_qdrant
 from flask import Blueprint, request, jsonify
-from langchain.docstore.document import Document
 from opencopilot_types.workflow_type import WorkflowDataType
-from routes.workflow.typings.run_workflow_input import WorkflowData
 from routes.workflow.validate_json import validate_json
-from routes.workflow.utils import run_workflow
 from utils.db import Database
-from utils.get_embeddings import get_embeddings
 from utils.vector_db.get_vector_store import get_vector_store
-from utils.vector_db.init_vector_store import init_vector_store
 from utils.vector_db.store_options import StoreOptions
 
 db_instance = Database()
@@ -157,22 +152,3 @@ def update_workflow(workflow_id: str) -> Any:
 def delete_workflow(workflow_id: str) -> Any:
     mongo.workflows.delete_one({"_id": workflow_id})
     return jsonify({"message": "Workflow deleted"}), 200
-
-
-@workflow.route("/run_workflow", methods=["POST"])
-@handle_exceptions_and_errors
-def run_workflow_controller() -> Any:
-    data = request.get_json()
-
-    swagger_url = data.get("swagger_url")
-    swagger_json = mongo.swagger_files.find_one({"meta.swagger_url": swagger_url})
-    result = run_workflow(
-        WorkflowData(
-            text=data.get("text"),
-            headers=data.get("headers", {}),
-            server_base_url=data["server_base_url"],
-            swagger_url=data.get("swagger_url"),
-        ),
-        swagger_json,
-    )
-    return result

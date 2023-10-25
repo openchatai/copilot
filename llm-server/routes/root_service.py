@@ -3,14 +3,7 @@ import os
 from typing import Dict, Any, cast, Optional
 
 import logging
-import traceback
 from dotenv import load_dotenv
-from langchain.chains.openai_functions import create_structured_output_chain
-from langchain.chat_models import ChatOpenAI
-from langchain.prompts import ChatPromptTemplate
-from langchain.utilities.openapi import OpenAPISpec
-from models.models import AiResponseFormat
-from prompts.base import api_base_prompt, non_api_base_prompt
 from routes.workflow.typings.run_workflow_input import WorkflowData
 from routes.workflow.utils import (
     run_workflow,
@@ -29,6 +22,9 @@ from api_caller.base import try_to_match_and_call_api_endpoint
 from models.repository.chat_history_repo import create_chat_history
 from utils.process_app_state import process_state
 from prance import ResolvingParser
+from utils.vector_db.add_workflow import add_workflow_data_to_qdrant
+from uuid import uuid4
+
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -101,7 +97,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
                 )
             else:
                 _workflow = create_workflow_from_operation_ids(
-                    bot_response.ids, swagger_doc
+                    bot_response.ids, swagger_doc, text
                 )
             output = run_workflow(
                 _workflow,
@@ -109,6 +105,13 @@ def handle_request(data: Dict[str, Any]) -> Any:
                 WorkflowData(text, headers, server_base_url, swagger_url, app),
                 app,
             )
+
+            # if a flow doesnot already exist and run_workflow was successful, include this
+            if document is None:
+                mongo.auto_gen_workflows.insert_one(
+                    {"workflow": _workflow, "swagger_url": swagger_url}
+                )
+                add_workflow_data_to_qdrant(str(uuid4()), _workflow, swagger_url)
 
             create_chat_history(swagger_url, session_id, True, text)
             # bot response
@@ -138,40 +141,4 @@ def handle_request(data: Dict[str, Any]) -> Any:
             "[OpenCopilot] Something went wrong when try to get how many calls is required"
         )
 
-    logging.info(
-        "[OpenCopilot] The user request will be handled by single API call or otherwise a normal text response"
-    )
-
-    swagger_spec = OpenAPISpec.from_text(fetch_swagger_text(swagger_url))
-
-    try:
-        logging.info(
-            "[OpenCopilot] Trying to match the request to a single API endpoint"
-        )
-        json_output = try_to_match_and_call_api_endpoint(swagger_spec, text, headers)
-
-        formatted_response = json.dumps(json_output, indent=4)
-        logging.info(
-            "[OpenCopilot] We were able to match and call the API endpoint, the response was: {}".format(
-                formatted_response
-            )
-        )
-    except Exception as e:
-        logging.info(
-            "[OpenCopilot] Failed to call the single API endpoint - so we will fallback to normal text "
-            "response"
-        )
-        logging.error(f"{FAILED_TO_CALL_API_ENDPOINT}: {str(e)}")
-        logging.error("Exception traceback:\n" + traceback.format_exc())
-        json_output = None
-
-    llm = ChatOpenAI(model="gpt-3.5-turbo-0613", temperature=0)
-
-    prompt_msgs = (
-        non_api_base_prompt(base_prompt, text)
-        if json_output is None
-        else api_base_prompt(base_prompt, text, json_output)
-    )
-    prompt = ChatPromptTemplate(messages=prompt_msgs)
-    chain = create_structured_output_chain(AiResponseFormat, llm, prompt, verbose=False)
-    return chain.run(question=text).dict()
+        return {"response": None, "error": str(e)}

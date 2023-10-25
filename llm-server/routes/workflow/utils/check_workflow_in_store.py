@@ -12,7 +12,7 @@ def check_workflow_in_store(
     text: str, namespace: str
 ) -> Tuple[Optional[Document], Optional[float]]:
     score_threshold = os.getenv("SCORE_THRESHOLD", 0.95)
-    vector_store = get_vector_store(StoreOptions(namespace))
+    vector_store = get_vector_store(StoreOptions(namespace.split("/")[-1]))
 
     try:
         result = vector_store.similarity_search_with_relevance_scores(
