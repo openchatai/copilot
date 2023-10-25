@@ -155,7 +155,8 @@ def update_workflow(workflow_id: str) -> Any:
 
 @workflow.route("/<workflow_id>", methods=["DELETE"])
 def delete_workflow(workflow_id: str) -> Any:
-    mongo.workflows.delete_one({"_id": workflow_id})
+    data = mongo.workflows.delete_one({"_id": ObjectId(workflow_id)})
+    print(f"{data}")
     return jsonify({"message": "Workflow deleted"}), 200
 
 
