@@ -29,6 +29,9 @@ from api_caller.base import try_to_match_and_call_api_endpoint
 from models.repository.chat_history_repo import create_chat_history
 from utils.process_app_state import process_state
 from prance import ResolvingParser
+from utils.vector_db.add_workflow import add_workflow_data_to_qdrant
+from uuid import uuid4
+
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -101,7 +104,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
                 )
             else:
                 _workflow = create_workflow_from_operation_ids(
-                    bot_response.ids, swagger_doc
+                    bot_response.ids, swagger_doc, text
                 )
             output = run_workflow(
                 _workflow,
@@ -109,6 +112,11 @@ def handle_request(data: Dict[str, Any]) -> Any:
                 WorkflowData(text, headers, server_base_url, swagger_url, app),
                 app,
             )
+
+            mongo.auto_gen_workflows.insert_one({"workflow": _workflow, "swagger_url": swagger_url})
+            
+            # saving this, to avoid llm call for similar queries
+            add_workflow_data_to_qdrant(uuid4(), _workflow, swagger_url)
 
             create_chat_history(swagger_url, session_id, True, text)
             # bot response
