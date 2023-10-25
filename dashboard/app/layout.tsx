@@ -1,48 +1,22 @@
-import Toaster from "@/ui/components/headless/toast/Toaster";
-import "styles/globals.css";
-import { Inter } from "next/font/google";
-import cn from "@/ui/utils/cn";
-import ThemeProvider from "@/ui/providers/ThemeProvider";
-import { SWRConfigProvider } from "@/ui/providers/SWRConfigProvider";
-import { RouterEventsProvider } from "@/ui/router-events";
-import { TopLoader } from "@/ui/partials/TopLoader";
-import { OnlineProvider } from "@/ui/providers/OnlineStateProvider";
+import { cn } from "@/lib/utils";
+import "./globals.css";
 import type { Metadata } from "next";
-
-const inter = Inter({
+import { Open_Sans } from "next/font/google";
+import { Tv2 } from "lucide-react";
+import { IS_DEV } from "@/lib/consts";
+import { SearchModal } from "./(main)/_parts/SearchModal";
+import React from "react";
+import { JotaiProvider } from "./_store/JotaiProvider";
+import { SWRProvider } from "./swr-provider";
+import { Toaster } from "@/components/ui/toaster";
+const opensans = Open_Sans({
   subsets: ["latin"],
-  fallback: ["system-ui", "Roboto", "sans-serif"],
-  display: "swap",
-  variable: "--font-inter",
+  weight: ["400", "500", "600", "700", "800"],
+  fallback: ["Roboto", "sans-serif"],
 });
 
 export const metadata: Metadata = {
-  title: "OpenCopilot - Build your own ChatGPT",
-  description:
-    "OpenCopilot - Build your own ChatGPT for yor website, PDF files, Notion and many more integrations for free, no coding required!",
-  viewport:
-    "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0",
-  keywords: [
-    "OpenCopilot",
-    "OpenCopilot-ai",
-    "Chat-GPT",
-    "Chat Widgets",
-    "customer support",
-    "AI-bots",
-    "ai-chatbots",
-  ],
-  robots: "index, follow",
-  authors: [
-    {
-      name: "OpenChatai",
-      url: "https://openchat.so",
-    },
-    {
-      name: "openchatai",
-      url: "https://github.com/openchatai",
-    },
-  ],
-  category: "Chatbots",
+  title: "Opencopilot",
 };
 
 export default function RootLayout({
@@ -51,25 +25,37 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <OnlineProvider>
-      <RouterEventsProvider>
-        <SWRConfigProvider>
-          <html lang="en" suppressHydrationWarning>
-            <body
-              className={cn(
-                inter.variable,
-                "font-inter antialiased bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 min-h-screen min-w-full"
-              )}
-            >
-              <ThemeProvider>
-                <TopLoader color="#6366f1" />
-                {children}
-              </ThemeProvider>
-              <Toaster />
-            </body>
-          </html>
-        </SWRConfigProvider>
-      </RouterEventsProvider>
-    </OnlineProvider>
+    <SWRProvider>
+      <JotaiProvider>
+        <html lang="en">
+          <body
+            className={cn(
+              opensans.className,
+              "h-screen min-h-screen w-screen overflow-hidden scroll-smooth bg-background text-accent-foreground antialiased",
+              IS_DEV && "debug-screens",
+            )}
+          >
+            {children}
+            {/* browser too small message */}
+            <div className="fixed inset-0 z-[500] flex items-center justify-center bg-primary-foreground/70 p-5 backdrop-blur md:!hidden">
+              <div className="flex flex-col items-center justify-center text-lg">
+                <span>
+                  <Tv2 className="h-20 w-20 text-primary" />
+                </span>
+                <h2 className="font-semibold">Your browser is too small</h2>
+                <p className="text-base font-medium">
+                  Resize your browser to at least 900px wide to continue.
+                </p>
+              </div>
+            </div>
+
+            {/* search modal */}
+            <SearchModal />
+            {/* Toaster */}
+            <Toaster />
+          </body>
+        </html>
+      </JotaiProvider>
+    </SWRProvider>
   );
 }

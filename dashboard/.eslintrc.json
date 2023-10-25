@@ -1,6 +1,11 @@
 {
-  "extends": ["next","next/core-web-vitals"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "next/core-web-vitals"
+  ],
   "rules": {
-    "react/no-unescaped-entities":0
+    "react/no-unescaped-entities": "off",
+    "no-unused-vars": "warn"
   }
 }

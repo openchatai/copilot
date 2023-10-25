@@ -54,8 +54,26 @@ def create_workflow(swagger_url: str) -> Any:
     )
 
 
-@workflow.route("/b/<bot_id>", methods=["GET"])
-def get_workflows(bot_id: str) -> Any:
+@workflow.route("/b/<bot_id>", methods=["GET", "POST"])
+@validate_json(workflow_schema)
+@handle_exceptions_and_errors
+def create_workflow_by_bot_id(bot_id: str) -> Any:
+    workflow_data = cast(WorkflowDataType, request.json)
+    swagger_url = ""
+    workflow_data["bot_id"] = bot_id
+    workflows = mongo.workflows
+    workflow_id = workflows.insert_one(workflow_data).inserted_id
+
+    add_workflow_data_to_qdrant(workflow_id, workflow_data, swagger_url)
+
+    return (
+        jsonify({"message": "Workflow created", "workflow_id": str(workflow_id)}),
+        201,
+    )
+
+
+@workflow.route("/get/b/<bot_id>", methods=["GET"])
+def get_workflows_by_bot_id(bot_id: str) -> Any:
     # Define default page and page_size values
     page = int(request.args.get("page", 1))
     page_size = int(request.args.get("page_size", 10))
