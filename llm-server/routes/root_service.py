@@ -106,12 +106,12 @@ def handle_request(data: Dict[str, Any]) -> Any:
                 app,
             )
 
-            mongo.auto_gen_workflows.insert_one(
-                {"workflow": _workflow, "swagger_url": swagger_url}
-            )
-
-            # saving this, to avoid llm call for similar queries
-            add_workflow_data_to_qdrant(str(uuid4()), _workflow, swagger_url)
+            # if a flow doesnot already exist and run_workflow was successful, include this
+            if document is None:
+                mongo.auto_gen_workflows.insert_one(
+                    {"workflow": _workflow, "swagger_url": swagger_url}
+                )
+                add_workflow_data_to_qdrant(str(uuid4()), _workflow, swagger_url)
 
             create_chat_history(swagger_url, session_id, True, text)
             # bot response
