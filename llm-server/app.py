@@ -3,6 +3,7 @@ import logging
 from flask import Flask, request, jsonify, Response
 from routes.workflow.workflow_controller import workflow
 from routes._swagger.controller import _swagger
+from routes.chat.chat_controller import chat_workflow
 from typing import Any, Tuple
 from utils.config import Config
 from utils.__sql import sql_db
@@ -14,6 +15,7 @@ app = Flask(__name__)
 
 app.register_blueprint(workflow, url_prefix="/workflow")
 app.register_blueprint(_swagger, url_prefix="/swagger_api")
+app.register_blueprint(chat_workflow, url_prefix="/chat")
 
 
 app.config.from_object(Config)
