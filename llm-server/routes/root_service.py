@@ -84,7 +84,6 @@ def handle_request(data: Dict[str, Any]) -> Any:
                 swagger_url,
                 app,
                 session_id,
-                document,
             )
 
         elif len(bot_response.ids) == 0:
@@ -147,15 +146,23 @@ def handle_existing_workflow(
     swagger_doc: ResolvingParser,
     session_id: str,
 ) -> Dict[str, Any]:
+    # use user defined workflows if exists, if not use auto_gen_workflow
     _workflow = mongo.workflows.find_one(
         {"_id": ObjectId(document.metadata["workflow_id"])}
     )
+
+    if _workflow is None:
+        _workflow = mongo.auto_gen_workflows.find_one(
+            {"_id": ObjectId(document.metadata["workflow_id"])}
+        )
+
     output = run_workflow(
         _workflow,
         swagger_doc,
         WorkflowData(text, headers, server_base_url, swagger_url, app),
         app,
     )
+
     create_chat_history(swagger_url, session_id, True, text)
     create_chat_history(
         swagger_url, session_id, False, output["response"] or output["error"]
@@ -172,7 +179,6 @@ def handle_api_calls(
     swagger_url: str,
     app: str,
     session_id: str,
-    document: Optional[Document],
 ) -> Dict[str, Any]:
     _workflow = create_workflow_from_operation_ids(ids, swagger_doc, text)
     output = run_workflow(
@@ -182,11 +188,9 @@ def handle_api_calls(
         app,
     )
 
-    if document is None:
-        mongo.auto_gen_workflows.insert_one(
-            {"workflow": _workflow, "swagger_url": swagger_url}
-        )
-        add_workflow_data_to_qdrant(str(uuid4()), _workflow, swagger_url)
+    _workflow["swagger_url"] = swagger_url
+    m_workflow = mongo.auto_gen_workflows.insert_one(_workflow)
+    add_workflow_data_to_qdrant(m_workflow.inserted_id, _workflow, swagger_url)
 
     create_chat_history(swagger_url, session_id, True, text)
     create_chat_history(

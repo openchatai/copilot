@@ -1,4 +1,5 @@
 import json
+from opencopilot_types.workflow_type import WorkflowDataType
 from routes.workflow.generate_openapi_payload import generate_openapi_payload
 from utils.make_api_call import make_api_request
 import traceback
@@ -15,7 +16,7 @@ from integrations.transformers.transformer import transform_response
 
 
 def run_openapi_operations(
-    record: Any,
+    record: WorkflowDataType,
     swagger_json: ResolvingParser,
     text: str,
     headers: Any,

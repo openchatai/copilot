@@ -10,7 +10,7 @@ from opencopilot_types.workflow_type import (
 
 def create_workflow_from_operation_ids(
     op_ids: List[str], swagger_doc: ResolvingParser, user_input: str
-) -> Any:
+) -> WorkflowDataType:
     flows = []
 
     for op_id in op_ids:
