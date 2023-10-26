@@ -25,6 +25,7 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { CopilotProvider } from "../_context/CopilotProvider";
+import Link from "next/link";
 
 type Props = {
   children: React.ReactNode;
@@ -93,8 +94,21 @@ export default function CopilotLayout({ children, params }: Props) {
                   className="mb-2"
                 >
                   <DropdownMenuLabel>Help</DropdownMenuLabel>
-                  <DropdownMenuItem>Docs</DropdownMenuItem>
-                  <DropdownMenuItem>OpenCopilot academy</DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="https://docs.opencopilot.so/" target="_blank">
+                      Docs
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="https://opencopilot.so/#tuts" target="_blank">
+                      Tutorials
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="https://github.com/openchatai/OpenCopilot/issues/new/choose" target="_blank">
+                      Raise a GitHub issue
+                    </Link>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
                 <TooltipContent side="right">Help</TooltipContent>
               </Tooltip>
