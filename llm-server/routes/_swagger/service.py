@@ -1,3 +1,4 @@
+from http.client import HTTPException
 import json
 import yaml
 
@@ -10,6 +11,9 @@ from flask import Request
 
 
 def add_swagger_file(request: Request, id: str) -> Dict[str, str]:
+    url = request.data.get("swagger_url")
+    if url is None:
+        raise HTTPException(status_code=400, detail="swagger_url is required")
     if request.content_type == "application/json":
         # JSON file
         file_content = request.get_json()
@@ -38,7 +42,11 @@ def add_swagger_file(request: Request, id: str) -> Dict[str, str]:
         return {"error": "Unsupported content type"}
 
     # Insert into MongoDB
-    file_content["bot_id"] = id
+    file_content["meta"] = {
+        "url": url,
+        "bot_id": id
+    }
+    
     inserted_id = mongo.swagger_files.insert_one(file_content).inserted_id
 
     return {"message": "File added successfully", id: str(inserted_id)}

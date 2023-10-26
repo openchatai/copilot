@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Facades\Http;
 
 class ChatbotController extends Controller
 {
@@ -28,21 +29,26 @@ class ChatbotController extends Controller
     {
         $fileName = Str::random(20) . ".json";
         $request->getSwaggerFile()->storeAs($fileName, ['disk' => 'shared_volume']);
-
+    
         $chatbot = $this->createCopilot(
             $request->getName(),
             $fileName,
             $request->getPromptMessage(),
             $request->getWebsite(),
         );
-
+    
+        // Prepare the data for the POST request
+        $server_url = env('LLM_SERVER_ENDPOINT', 'http://llm-server:8002') . "/swagger_api/b/" . $chatbot->getId()->toString();
+        // Send a POST request to the microservice
+        $response = Http::post($server_url, ['swagger_url' => $fileName]);
+    
         if (request()->wantsJson()) {
             return response()->json([
                 'file_name' => $fileName,
                 'chatbot' => $chatbot->toArray()
             ]);
         }
-
+    
         return redirect()->route('onboarding.003-step-validator', ['id' => $chatbot->getId()->toString()]);
     }
 
