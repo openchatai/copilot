@@ -38,7 +38,7 @@ class ChatbotController extends Controller
         );
     
         // Prepare the data for the POST request
-        $server_url = env('LLM_SERVER_ENDPOINT', 'http://llm-server:8002') . "/swagger_api/b/" . $chatbot->getId()->toString();
+        $server_url = env('LLM_SERVER_ENDPOINT', 'http://llm-server:8002') . "/swagger_api/init/b/" . $chatbot->getId()->toString();
         // Send a POST request to the microservice
         $response = Http::post($server_url, ['swagger_url' => $fileName]);
     
