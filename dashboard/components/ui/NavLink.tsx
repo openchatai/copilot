@@ -7,7 +7,7 @@ import {
   useSearchParams,
   useSelectedLayoutSegments,
 } from "next/navigation";
-
+// @TODO:Needs some refacroring.
 type RenderProps = {
   isActive: boolean;
 };
@@ -61,7 +61,9 @@ export const NavLink = React.forwardRef<React.ElementRef<typeof Link>, Props>(
       : props.href + "/";
     const isActive = segment
       ? segments.includes(segment)
-      : href === (matchSearchParams ? $pathnamePlusSearchParams : pathname);
+      : href ===
+        (matchSearchParams ? $pathnamePlusSearchParams : pathname + "/");
+
     return (
       <Link
         {...props}
@@ -74,6 +76,7 @@ export const NavLink = React.forwardRef<React.ElementRef<typeof Link>, Props>(
           </>
         }
         ref={_ref}
+        data-active={isActive}
         className={cn(
           className,
           isActive ? activeClassName : inactiveClassName,
