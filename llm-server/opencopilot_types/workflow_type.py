@@ -1,4 +1,4 @@
-from typing import TypedDict, List, Dict, Any
+from typing import TypedDict, List, Dict, Any, Optional
 
 
 class WorkflowStepType(TypedDict):
@@ -18,6 +18,7 @@ class WorkflowFlowType(TypedDict):
 
 
 class WorkflowDataType(TypedDict):
+    swagger_url: Optional[str]
     opencopilot: str
     info: Dict[str, Any]
     flows: List[WorkflowFlowType]
