@@ -83,15 +83,18 @@ function TryItSection() {
           </div>
         </AccordionTrigger>
         <AccordionContent className="px-8 py-6">
-          <p className="mb-2">Try your copilot on our example dashboard</p>
-          <Button asChild variant="link">
-            <Link
-              target="_blank"
-              href={"http://localhost:8888/backend" + "/demo/" + CopilotToken}
-            >
-              Open Dashboard
-            </Link>
-          </Button>
+          <p className="mb-2">
+            Try your copilot on our {" "}
+            <Button asChild variant="link" className="p-0">
+              <Link
+                target="_blank"
+                href={"http://localhost:8888/backend" + "/demo/" + CopilotToken}
+              >
+                example dashboard
+              </Link>
+            </Button>
+            .
+          </p>
         </AccordionContent>
       </AccordionItem>
     </section>

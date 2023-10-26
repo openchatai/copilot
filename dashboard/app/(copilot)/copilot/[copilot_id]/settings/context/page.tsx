@@ -16,7 +16,7 @@ import { TextDisplay } from "@/components/headless/TextDisplay";
 import { updateCopilot } from "@/data/copilot";
 import { useCopilot } from "../../../_context/CopilotProvider";
 import { toast } from "@/components/ui/use-toast";
-
+import { mutate } from "swr";
 export default function CopilotContextSettingsPage() {
   const { id: copilotId, name: copilotName, prompt_message } = useCopilot();
   const [context, setContext] = React.useState(prompt_message);
@@ -31,6 +31,7 @@ export default function CopilotContextSettingsPage() {
         title: "Context updated successfully",
         variant: "success",
       });
+      mutate(copilotId);
     } else {
       toast({
         title: "Failed to update context",
