@@ -20,9 +20,10 @@ import _ from "lodash";
 import { useRouter } from "next/navigation";
 import { toast } from "@/components/ui/use-toast";
 import { CopyButton } from "@/components/headless/CopyButton";
+import { mutate } from "swr";
 export default function GeneralSettingsPage() {
   const { token, id: copilotId, name: copilotName } = useCopilot();
-  const { replace, refresh } = useRouter();
+  const { replace } = useRouter();
   async function handleDelete() {
     const response = await deleteCopilot(copilotId);
     if (response.data.success) {
@@ -44,7 +45,7 @@ export default function GeneralSettingsPage() {
         title: "Copilot updated",
         description: "Your copilot has been updated successfully.",
       });
-      _.delay(refresh, 500);
+      mutate(copilotId);
     }
   }
   return (
