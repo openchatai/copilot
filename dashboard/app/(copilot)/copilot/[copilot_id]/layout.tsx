@@ -61,21 +61,13 @@ export default function CopilotLayout({ children, params }: Props) {
             <CopilotLayoutNavLink
               href={copilotBase + "/conversations"}
               IconComponent={MessagesSquare}
-              label={
-                <>
-                  Conversations <strong className="text-white">30</strong>
-                </>
-              }
+              label="Conversations"
             />
 
             <CopilotLayoutNavLink
               href={copilotBase + "/flows"}
               IconComponent={Workflow}
-              label={
-                <>
-                  Flows <strong className="text-white">20</strong>
-                </>
-              }
+              label="Flows"
             />
           </div>
         </div>
