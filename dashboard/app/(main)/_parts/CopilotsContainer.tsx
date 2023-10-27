@@ -53,7 +53,7 @@ export function CopilotsContainer() {
             You don't have any copilots yet
           </p>
           <Button size="sm" asChild>
-            <Link href="/copilot/create">Create a new copilot</Link>
+            <Link href="/create/copilot">Create a new copilot</Link>
           </Button>
         </>
       ) : (
