@@ -32,7 +32,12 @@ def run_openapi_operations(
                 # refresh state after every api call, we can look into optimizing this later as well
                 operation_id = step.get("open_api_operation_id")
                 api_payload = generate_openapi_payload(
-                    swagger_json, text, operation_id, prev_api_response, current_state
+                    swagger_json,
+                    text,
+                    operation_id,
+                    prev_api_response,
+                    app,
+                    current_state,
                 )
 
                 api_response = make_api_request(headers=headers, **api_payload.__dict__)
