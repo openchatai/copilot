@@ -27,15 +27,17 @@ def gen_body_from_schema(
 
     messages = [
         SystemMessage(
-            content="You are an intelligent machine learning model that can produce REST API's body in json format, given the json schema, dummy json payload, user input, data from previous api calls, and current state information stored in the current_state variable."
+            content="You are an intelligent machine learning model that can produce REST API's body in json format"
         ),
-        HumanMessage(content="Json Schema: {}".format(body_schema)),
-        HumanMessage(content="Dummy json payload: {}".format(example)),
+        HumanMessage(
+            content="You will be given swagger schema, user input, data from previous api calls, and current state information stored in the current_state variable. You should use the field descriptions provided in the schema to generate the payload."
+        ),
+        HumanMessage(content="Swagger Schema: {}".format(body_schema)),
         HumanMessage(content="User input: {}".format(text)),
         HumanMessage(content="prev api responses: {}".format(prev_api_response)),
-        HumanMessage(content="Current state: {}".format(current_state)),
+        HumanMessage(content="current_state: {}".format(current_state)),
         HumanMessage(
-            content="Given the provided information, generate the appropriate minified JSON payload to use as body for the API request."
+            content="Given the provided information, generate the appropriate minified JSON payload to use as body for the API request. Avoid using fields that are not required, and user input doesnot require it."
         ),
     ]
 

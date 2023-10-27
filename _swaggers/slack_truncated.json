@@ -1249,16 +1249,56 @@
                                 ],
                                 "properties": {
                                     "as_user": {
-                                        "type": "string",
+                                        "type": "boolean",
                                         "description": "Pass true to post the message as the authed user, instead of as a bot. Defaults to false. See [authorship](#authorship) below."
                                     },
                                     "attachments": {
-                                        "type": "string",
-                                        "description": "A JSON-based array of structured attachments, presented as a URL-encoded string."
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "pretext": {
+                                                    "type": "string"
+                                                },
+                                                "text": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "pretext",
+                                                "text"
+                                            ]
+                                        }
                                     },
                                     "blocks": {
-                                        "type": "string",
-                                        "description": "A JSON-based array of structured blocks, presented as a URL-encoded string."
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "type": {
+                                                    "type": "string"
+                                                },
+                                                "text": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "type": {
+                                                            "type": "string"
+                                                        },
+                                                        "text": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "type",
+                                                        "text"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "type",
+                                                "text"
+                                            ]
+                                        }
                                     },
                                     "channel": {
                                         "type": "string",
