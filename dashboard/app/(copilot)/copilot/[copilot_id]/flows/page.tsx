@@ -7,39 +7,30 @@ import {
   useController,
   transformPaths,
   trasnformEndpointNodesData,
-  transformaEndpointToNode,
 } from "@openchatai/copilot-flows-editor";
 import { HeaderShell } from "@/components/domain/HeaderShell";
 import { useCopilot } from "../../_context/CopilotProvider";
-import useSwr from "swr";
-import { getSwaggerfromSwaggerUrl } from "@/data/swagger";
+import useSwr, { mutate } from "swr";
+import { getSwaggerByBotId } from "@/data/swagger";
 import { Button } from "@/components/ui/button";
-import {
-  createWorkflowByBotId,
-  deleteWorkflowById,
-  getWorkflowById,
-} from "@/data/flow";
+import { createWorkflowByBotId, deleteWorkflowById } from "@/data/flow";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "@/components/ui/use-toast";
 import _ from "lodash";
 
 function Header() {
-  const {
-    id: copilotId,
-    name: copilotName,
-    swagger_url: SwaggerUrl,
-  } = useCopilot();
-  const { loadPaths, state } = useController();
-  const saerchParams = useSearchParams();
-  const workflow_id = saerchParams.get("workflow_id");
-  const isEditing = !!workflow_id;
-  const { replace } = useRouter();
-  const [loading, setLoading] = useState(false);
   // editing => workflow_id // creating => undefined
-  console.log(SwaggerUrl);
-  const { isLoading: isSwaggerLoading } = useSwr(
-    SwaggerUrl,
-    getSwaggerfromSwaggerUrl,
+
+  const { replace } = useRouter();
+  const searchParams = useSearchParams();
+  const { id: copilotId, name: copilotName } = useCopilot();
+  const { loadPaths, state, reset: resetFlowEditor } = useController();
+  const workflow_id = searchParams.get("workflow_id");
+  const isEditing = !!workflow_id;
+  const [loading, setLoading] = useState(false);
+  const { isLoading: isSwaggerLoading, mutate: mutateSwagger } = useSwr(
+    copilotId + "swagger_file",
+    async () => getSwaggerByBotId(copilotId),
     {
       onSuccess: (data) => {
         if (!data) return;
@@ -48,13 +39,13 @@ function Header() {
     },
   );
   const isLoading = isSwaggerLoading || loading;
+
   async function handleSave() {}
   async function handleDelete() {
     if (!isEditing || !workflow_id) return;
     setLoading(true);
     const { data } = await deleteWorkflowById(workflow_id);
     if (data) {
-      console.log(data);
       toast({
         title: "Workflow deleted",
         description: "Your workflow has been deleted.",
@@ -63,6 +54,7 @@ function Header() {
       replace(`/copilot/${copilotId}/flows`, {
         scroll: false,
       });
+      mutate(copilotId + "/workflows");
       setLoading(false);
     }
   }
@@ -102,6 +94,7 @@ function Header() {
       replace(`/copilot/${copilotId}/flows/?workflow_id=${data.workflow_id}`, {
         scroll: false,
       });
+      mutate(copilotId + "/workflows");
       setLoading(false);
     }
   }
@@ -128,6 +121,15 @@ function Header() {
           <Button onClick={handleCreate} disabled={isLoading}>
             Create
           </Button>
+          <Button
+            variant="destructive"
+            onClick={() => {
+              confirm("Are you sure??") && resetFlowEditor();
+              mutateSwagger();
+            }}
+          >
+            Reset
+          </Button>
         </div>
       )}
     </HeaderShell>
@@ -139,35 +141,9 @@ export default function FlowsPage({
 }: {
   params: { copilot_id: string };
 }) {
-  const saerchParams = useSearchParams();
-  const workflow_id = saerchParams.get("workflow_id");
-  const isEditing = !!workflow_id;
-
-  const { data: workflowData } = useSwr(workflow_id, getWorkflowById);
-  console.log(workflowData?.data.flows[0]);
   return (
     // @ts-ignore
-    <Controller
-      maxFlows={1}
-      initialState={{
-        flows: [
-          {
-            id: "flow-1",
-            name: "",
-            createdAt: 123564654,
-            description: "",
-            updatedAt: 123564654,
-            steps: [
-              {
-                id: "fick",
-                data: {},
-              },
-            ],
-          },
-        ],
-        paths: [],
-      }}
-    >
+    <Controller maxFlows={1}>
       <div className="flex h-full w-full flex-col">
         <Header />
         <div className="relative flex h-full w-full flex-1 items-start justify-between">
