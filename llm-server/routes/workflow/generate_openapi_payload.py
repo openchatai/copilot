@@ -85,6 +85,7 @@ def generate_openapi_payload(
     text: str,
     _operation_id: str,
     prev_api_response: str,
+    app: Optional[str],
     current_state: Optional[str],
 ) -> ApiInfo:
     (
@@ -119,12 +120,12 @@ def generate_openapi_payload(
     )
 
     if api_info.body_schema:
-        example = gen_ex_from_schema(api_info.body_schema)
+        # example = gen_ex_from_schema(api_info.body_schema)
         api_info.body_schema = gen_body_from_schema(
             json.dumps(api_info.body_schema, separators=(",", ":")),
             text,
             prev_api_response,
-            example,
+            app,
             current_state,
         )
 

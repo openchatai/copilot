@@ -6,6 +6,7 @@ from utils.get_llm import get_llm
 from typing import Any, Optional
 from routes.workflow.extractors.extract_json import extract_json_payload
 from custom_types.t_json import JsonData
+import importlib
 import logging
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -16,7 +17,7 @@ def gen_body_from_schema(
     body_schema: str,
     text: str,
     prev_api_response: str,
-    example: str,
+    app: Optional[str],
     current_state: Optional[str],
 ) -> Any:
     chat = ChatOpenAI(
@@ -24,6 +25,11 @@ def gen_body_from_schema(
         model="gpt-3.5-turbo-16k",
         temperature=0,
     )
+
+    if app:
+        module_name = f"integrations.custom_prompts.{app}"
+        module = importlib.import_module(module_name)
+        api_generation_prompt = getattr(module, "api_generation_prompt")
 
     messages = [
         SystemMessage(
@@ -37,9 +43,12 @@ def gen_body_from_schema(
         HumanMessage(content="prev api responses: {}".format(prev_api_response)),
         HumanMessage(content="current_state: {}".format(current_state)),
         HumanMessage(
-            content="Given the provided information, generate the appropriate minified JSON payload to use as body for the API request. Avoid using fields that are not required, and user input doesnot require it."
+            content="Given the provided information, generate the appropriate minified JSON payload to use as body for the API request. If a user doesn't provide a required parameter, use sensible defaults for required params, and leave optional params"
         ),
     ]
+
+    if api_generation_prompt is not None:
+        messages.append(HumanMessage(content="{}".format(api_generation_prompt)))
 
     result = chat(messages)
 
