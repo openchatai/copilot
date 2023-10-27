@@ -15,9 +15,9 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import React, { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRef } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { atom, useAtom } from "jotai";
 const sortFilter = [
   { label: "Last Viewed", value: "last-viewed" },
   { label: "Date Created", value: "date-created" },
@@ -29,33 +29,20 @@ export type Filter = {
   query: string;
   sort: (typeof sortFilter)[number]["value"];
 };
+export const filterAtom = atom<Filter>({
+  query: "",
+  sort: "none",
+});
 export const QUERY_KEY = "q";
 export const SORT_KEY = "sort";
 export function Search() {
-  const searchImputRef = React.useRef<HTMLInputElement>(null);
-  const searchParams = useSearchParams();
+  const searchImputRef = useRef<HTMLInputElement>(null);
   useHotkeys("/", (ev) => {
     ev.preventDefault();
     searchImputRef.current?.focus();
   });
-  const [filter, setFilter] = React.useState<Filter>({
-    query: searchParams.get(QUERY_KEY) ?? "",
-    sort: (searchParams.get(SORT_KEY) ?? "none") as Filter["sort"],
-  });
-  const { replace } = useRouter();
+  const [filter, setFilter] = useAtom(filterAtom);
 
-  useEffect(() => {
-    // to not to override other params
-    const params = new URLSearchParams(searchParams);
-    if (filter) {
-      params.set(QUERY_KEY, filter.query);
-      filter.sort.length > 0 &&
-        filter.sort != "none" &&
-        params.set(SORT_KEY, filter.sort);
-    }
-    params.size > 0 && replace(`/?${params.toString()}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter, searchParams]);
   return (
     <div className="flex items-center justify-between gap-5 py-5">
       <div className="flex flex-1 items-center gap-1">
