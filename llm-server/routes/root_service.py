@@ -51,7 +51,6 @@ def handle_request(data: Dict[str, Any]) -> Any:
     ) = extract_data(data)
 
     log_user_request(text)
-
     check_required_fields(base_prompt, text, swagger_url)
 
     swagger_doc = get_swagger_doc(swagger_url)
@@ -124,16 +123,17 @@ def check_required_fields(base_prompt: str, text: str, swagger_url: str) -> None
 
 
 def get_swagger_doc(swagger_url: str) -> ResolvingParser:
+    logging.info(f"Swagger url: {swagger_url}")
     swagger_doc: Optional[Dict[str, Any]] = mongo.swagger_files.find_one(
         {"meta.swagger_url": swagger_url}, {"meta": 0, "_id": 0}
     )
 
     if swagger_url.startswith("http:") or swagger_url.startswith("https:"):
         return ResolvingParser(url=swagger_url)
+    elif swagger_url.endswith(".json") or swagger_url.endswith(".yaml"):
+        return ResolvingParser(url=shared_folder + swagger_url)
     elif swagger_doc:
         return ResolvingParser(spec_string=swagger_doc)
-    else:
-        return ResolvingParser(url=shared_folder + swagger_url)
 
 
 def handle_existing_workflow(
