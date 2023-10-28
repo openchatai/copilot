@@ -127,3 +127,4 @@ Werkzeug==3.0.1
 wikipedia==1.4.0
 yarl==1.9.2
 zipp==3.16.2
+selenium==4.14.0
