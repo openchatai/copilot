@@ -30,7 +30,7 @@ services:
       - opencopilot_network
     env_file:
       - llm-server/.env
-    ports: 
+    ports:
       - 8002:8002
     depends_on:
       - mongodb
@@ -65,6 +65,7 @@ services:
       - database:/var/lib/mysql
     networks:
       - opencopilot_network
+
   mongodb:
     image: mongo:latest
     container_name: mongodb
@@ -94,6 +95,15 @@ services:
       - 6334:6334
     volumes:
       - qdrant_storage:/qdrant/storage
+    networks:
+      - opencopilot_network
+
+  selenium:
+    image: selenium/standalone-firefox:4.14.1-20231025
+    ports:
+      - "4444:4444"
+      - "7900:7900"
+    shm_size: 2g
     networks:
       - opencopilot_network
 
