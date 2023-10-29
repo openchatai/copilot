@@ -80,14 +80,23 @@ help:
 	@echo "  $(COLOR_GREEN)install$(COLOR_RESET)            - Install and set up the Docker environment"
 	@echo "  $(COLOR_GREEN)db-setup$(COLOR_RESET)           - Set up the database (fresh migration with seeding)"
 	@echo "  $(COLOR_GREEN)down$(COLOR_RESET)               - Stop and remove all containers"
-	@echo "  $(COLOR_GREEN)exec-backend$(COLOR_RESET)      - Access the backend container's shell"
-	@echo "  $(COLOR_GREEN)exec-dashboard$(COLOR_RESET)    - Access the dashboard container's shell"
-	@echo "  $(COLOR_GREEN)exec-llm-server$(COLOR_RESET)   - Access the llm-server container's shell"
+	@echo "  $(COLOR_GREEN)exec-backend$(COLOR_RESET)       - Access the backend container's shell"
+	@echo "  $(COLOR_GREEN)exec-dashboard$(COLOR_RESET)     - Access the dashboard container's shell"
+	@echo "  $(COLOR_GREEN)exec-llm-server$(COLOR_RESET)    - Access the llm-server container's shell"
 	@echo "  $(COLOR_GREEN)restart$(COLOR_RESET)            - Restart all containers"
 	@echo "  $(COLOR_GREEN)logs$(COLOR_RESET)               - Show container logs"
+	@echo "  $(COLOR_GREEN)purge$(COLOR_RESET)              - Full clean un-install (will remove containers, networks, volumes) "
 	@echo ""
-	@echo "  $(COLOR_YELLOW)help$(COLOR_RESET)               - Display this help message"
+	@echo "  $(COLOR_YELLOW)help$(COLOR_RESET)              - Display this help message"
 	@echo ""
 
+# Add the 'purge' target
+purge:
+	@echo "$(COLOR_BOLD)=== 🟥 Purging all containers, volumes, and network ===$(COLOR_RESET)"
+	$(DOCKER_COMPOSE) down -v --remove-orphans
+	rm -f llm-server/.env
+
+	@echo "$(COLOR_BOLD)=== 🟢 Starting from a clean scratch ===$(COLOR_RESET)"
+	make install
 
 .PHONY: install down
