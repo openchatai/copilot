@@ -1,8 +1,12 @@
 from typing import Dict, Any, Optional
 import requests
+from integrations.database import Database
 
+db_instance = Database()
+mongo = db_instance.get_db()
+import time
 
-def process_state(
+def get_state(
     headers: Dict[str, Any], selected_board_id: Optional[str] = None
 ) -> Dict[str, Any]:
     state: Dict[str, Any] = {
@@ -55,3 +59,24 @@ def process_state(
                     )
 
     return {"state": state["entities"]["data"]}
+
+
+def process_state(headers: Dict[str, Any], selected_board_id: Optional[str] = None) -> Dict[str, Any]:
+    # Get current timestamp
+    now = time.time()
+
+    # Try to find cached data from MongoDB
+    cache = mongo.app_cache.find_one({"app": "trello"}, {"_id": 0})
+
+    # Check if cache exists and is less than 2 minutes old
+    if cache and now - cache["timestamp"] < 600:
+        print("Returning cached data")
+        return cache
+
+    # Update cache object
+    cache = get_state(headers, selected_board_id)
+
+    # Insert into MongoDB
+    mongo.app_cache.replace_one({"app": "slack"}, cache, upsert=True)
+
+    return cache
