@@ -116,15 +116,15 @@ def generate_consolidated_requirement(
     conversation_str = join_conversations(history)
     messages = [
         SystemMessage(
-            content="You are an AI model designed to perform text substitution. You will receive user input. If the user's input contains references such as `the` or `this` etc... you should replace these words with the specific objects or concepts they refer to within the ongoing conversation, if applicable. However, if the user's input already contains all the necessary information, you should return the original user text."
+            content="You are an AI model designed to generate a standalone prompt. The user message may also contain instructions for you as a bot, like generating some content in this message. You should act accordingly"
+        ),
+        HumanMessage(
+            content="You will receive user input. Based on the conversation and the current user prompt, I want you to convert the user prompt into a standalone prompt if the user prompt references something in conversation history."
         ),
         HumanMessage(
             content="Conversation History: ({}), \n\n Current User input: ({}).".format(
                 conversation_str, user_input
             ),
-        ),
-        HumanMessage(
-            content="Give me the user input after substituting the references."
         ),
     ]
     content = chat(messages).content

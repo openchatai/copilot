@@ -56,7 +56,7 @@ def process_state(headers: Dict[str, Any]) -> Dict[str, Any]:
     cache = mongo.app_cache.find_one({"app": "slack"}, {"_id": 0})
 
     # Check if cache exists and is less than 2 minutes old
-    if cache and now - cache["timestamp"] < 120:
+    if cache and now - cache["timestamp"] < 600:
         print("Returning cached data")
         return cache
 
