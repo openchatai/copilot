@@ -163,11 +163,6 @@ def hasSingleIntent(
                 current_state
             )
         ),
-        # HumanMessage(
-        #     content="User this conversation history for lookups if necessary: ({})".format(
-        #         conversation_str
-        #     )
-        # ),
         HumanMessage(
             content="Here's a list of api summaries {}.".format(summaries),
         ),
