@@ -7,7 +7,7 @@ from typing import List
 
 
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
-from langchain.chat_models import ChatOpenAI
+from utils.get_chat_model import get_chat_model
 from routes.workflow.extractors.extract_json import extract_json_payload
 import os
 from dotenv import load_dotenv
@@ -19,7 +19,6 @@ from models.chat_history import ChatHistory
 logging.basicConfig(level=logging.INFO)
 
 load_dotenv()
-
 
 class BotMessage:
     def __init__(self, ids: List[str], bot_message: str):
@@ -103,11 +102,7 @@ def generate_consolidated_requirement(
     Returns:
       A consolidated query string.
     """
-    chat = ChatOpenAI(
-        openai_api_key=os.getenv("OPENAI_API_KEY"),
-        model="gpt-3.5-turbo",
-        temperature=0,
-    )
+    chat = get_chat_model("gpt-3.5-turbo")
 
     history = get_all_chat_history_by_session_id(session_id)
     if len(history) == 0:
@@ -138,12 +133,7 @@ def hasSingleIntent(
     current_state: Optional[str],
 ) -> BotMessage:
     summaries = get_summaries(swagger_doc)
-
-    chat = ChatOpenAI(
-        openai_api_key=os.getenv("OPENAI_API_KEY"),
-        model="gpt-3.5-turbo-16k",
-        temperature=0,
-    )
+    chat = get_chat_model("gpt-3.5-turbo-16k")
 
     consolidated_user_requirement = (
         generate_consolidated_requirement(user_requirement, session_id)
