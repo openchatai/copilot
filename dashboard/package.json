@@ -39,7 +39,7 @@
     "jotai": "^2.4.3",
     "lodash": "^4.17.21",
     "lucide-react": "^0.284.0",
-    "next": "13.5.4",
+    "next": "14.0.0",
     "react": "^18",
     "react-dom": "^18",
     "react-dropzone": "^14.2.3",

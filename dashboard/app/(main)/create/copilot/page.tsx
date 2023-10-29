@@ -8,7 +8,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { Wizard, useWizard } from "react-use-wizard";
 import { ValidateSwaggerStep } from "./_parts/ValidateSwaggerStep";
-import { Check, CheckCheck } from "lucide-react";
+import { Check, CheckCheck, FileVideo } from "lucide-react";
 import { CopilotType, createCopilot } from "@/data/copilot";
 import _ from "lodash";
 import { toast } from "@/components/ui/use-toast";
@@ -37,6 +37,7 @@ import {
   CreateCopilotProvider,
   useCreateCopilot,
 } from "./_parts/CreateCopilotProvider";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 function Header() {
   const { stepCount, activeStep, goToStep } = useWizard();
@@ -378,12 +379,42 @@ function FinishStep() {
 }
 // create/copilot/
 export default function CreateCopilotPage() {
+  const [loaded, setLoaded] = useState(false);
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
-      <HeaderShell>
+      <HeaderShell className="justify-between">
         <h1 className="text-lg font-bold text-accent-foreground">
           Create new Copilot
         </h1>
+        <div>
+          <Dialog>
+            <DialogContent className="overflow-hidden p-0">
+              <div className="relative h-full w-full">
+                {!loaded && (
+                  <div className="flex-center absolute inset-0">
+                    <Loader />
+                  </div>
+                )}
+                <iframe
+                  className={cn(
+                    "aspect-video w-full transition-opacity",
+                    loaded ? "opacity-100" : "opacity-0",
+                  )}
+                  src="https://www.youtube.com/embed/WqcNpE5yTNg?si=5NjK9Tfi3gIIZdJM"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  onLoad={() => setLoaded(true)}
+                />
+              </div>
+            </DialogContent>
+            <DialogTrigger asChild>
+              <Button variant="secondary" className="flex-center gap-2">
+                Watch video tutorial
+                <FileVideo className="h-5 w-5" />
+              </Button>
+            </DialogTrigger>
+          </Dialog>
+        </div>
       </HeaderShell>
 
       <div className="flex-center w-full flex-1 shrink-0 overflow-auto p-5">

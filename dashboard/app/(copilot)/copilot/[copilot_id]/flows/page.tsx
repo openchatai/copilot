@@ -7,28 +7,23 @@ import {
   useController,
   transformPaths,
   trasnformEndpointNodesData,
-  transformaEndpointToNode,
 } from "@openchatai/copilot-flows-editor";
 import { HeaderShell } from "@/components/domain/HeaderShell";
 import { useCopilot } from "../../_context/CopilotProvider";
 import useSwr from "swr";
-import { getSwaggerfromSwaggerUrl } from "@/data/swagger";
+import { getSwaggerByBotId } from "@/data/swagger";
 import { Button } from "@/components/ui/button";
 import {
   createWorkflowByBotId,
   deleteWorkflowById,
-  getWorkflowById,
+  getWorkflowsByBotId,
 } from "@/data/flow";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "@/components/ui/use-toast";
 import _ from "lodash";
 
 function Header() {
-  const {
-    id: copilotId,
-    name: copilotName,
-    swagger_url: SwaggerUrl,
-  } = useCopilot();
+  const { id: copilotId, name: copilotName } = useCopilot();
   const { loadPaths, state } = useController();
   const saerchParams = useSearchParams();
   const workflow_id = saerchParams.get("workflow_id");
@@ -36,10 +31,9 @@ function Header() {
   const { replace } = useRouter();
   const [loading, setLoading] = useState(false);
   // editing => workflow_id // creating => undefined
-  console.log(SwaggerUrl);
   const { isLoading: isSwaggerLoading } = useSwr(
-    SwaggerUrl,
-    getSwaggerfromSwaggerUrl,
+    copilotId + "swagger_file",
+    async () => getSwaggerByBotId(copilotId),
     {
       onSuccess: (data) => {
         if (!data) return;
@@ -143,8 +137,10 @@ export default function FlowsPage({
   const workflow_id = saerchParams.get("workflow_id");
   const isEditing = !!workflow_id;
 
-  const { data: workflowData } = useSwr(workflow_id, getWorkflowById);
-  console.log(workflowData?.data.flows[0]);
+  const { data: workflowData } = useSwr(copilot_id + "/swagger", () =>
+    getWorkflowsByBotId(copilot_id),
+  );
+  console.log(workflowData);
   return (
     // @ts-ignore
     <Controller

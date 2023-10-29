@@ -12,11 +12,12 @@ import useSwr from "swr";
 import { CopilotType, listCopilots } from "@/data/copilot";
 import { timeSince } from "@/lib/timesince";
 import Loading from "../loading";
-import { useSearchParams } from "next/navigation";
-import { Filter, QUERY_KEY, SORT_KEY } from "./Search";
+import { Filter } from "./Search";
 import _ from "lodash";
 import { EmptyBlock } from "@/components/domain/EmptyBlock";
-
+import { filterAtom } from "./Search";
+import { useAtomValue } from "jotai";
+import { Button } from "@/components/ui/button";
 function customSort(list: CopilotType[], sortBy: Filter["sort"]) {
   if (sortBy === "last-viewed") {
     return _.orderBy(list, ["last_viewed", "name"], ["desc", "asc"]);
@@ -32,7 +33,7 @@ function customSort(list: CopilotType[], sortBy: Filter["sort"]) {
 
 export function CopilotsContainer() {
   const { data: copilots, isLoading } = useSwr("copilotsList", listCopilots);
-  const searchParams = useSearchParams();
+  const { sort, query } = useAtomValue(filterAtom);
 
   if (isLoading && !copilots)
     return (
@@ -40,17 +41,26 @@ export function CopilotsContainer() {
         <Loading />
       </div>
     );
-  const query = searchParams.get(QUERY_KEY) || "";
-  const sort = (searchParams.get(SORT_KEY) || "last-viewed") as Filter["sort"];
   const $copilots = customSort(
     _.filter(copilots?.data, (item) => item.name.toLowerCase().includes(query)),
     sort,
   );
   return _.isEmpty($copilots) ? (
     <EmptyBlock>
-      <p className="text-center text-gray-400">
-        No copilots found for your search
-      </p>
+      {_.isEmpty(query) ? (
+        <>
+          <p className="text-center text-gray-400">
+            You don't have any copilots yet
+          </p>
+          <Button size="sm" asChild>
+            <Link href="/create/copilot">Create a new copilot</Link>
+          </Button>
+        </>
+      ) : (
+        <p className="text-center text-gray-400">
+          No copilots found for your search
+        </p>
+      )}
     </EmptyBlock>
   ) : (
     <div className="grid grid-cols-2 gap-8 py-4 xl:grid-cols-4">

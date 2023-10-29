@@ -11,7 +11,7 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
 
 
-def gen_params_from_schema(
+async def gen_params_from_schema(
     param_schema: str, text: str, prev_resp: str, current_state: Optional[str]
 ) -> Optional[JsonData]:
     chat = ChatOpenAI(

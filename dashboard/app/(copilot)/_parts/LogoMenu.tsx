@@ -7,26 +7,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useSetAtom } from "jotai";
 import { searchModalAtom } from "@/app/_store/atoms/searchModal";
+
+// i'm bad at naming things
 export default function LogoMenu() {
   const setSearchModal = useSetAtom(searchModalAtom);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="group relative h-full w-full text-xl text-primary/90"
-        >
+        <button className="group relative aspect-square h-full w-full rounded-lg text-xl text-primary/90 outline-none transition-colors hover:bg-accent hover:text-accent-foreground">
           O
-          <ChevronRight className="absolute bottom-0 right-0 h-4 w-4 rotate-45 fill-current transition-transform group-hover:translate-x-0.5 group-hover:translate-y-0.5" />
-        </Button>
+          <ChevronRight className="absolute bottom-0 right-0 h-5 w-5 rotate-45 fill-current transition-transform group-data-[state=open]:translate-x-0.5 group-data-[state=open]:translate-y-0.5" />
+        </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" sideOffset={2} className="ms-5">
+      <DropdownMenuContent side="bottom" className="-mt-2 ms-12">
         <DropdownMenuItem asChild>
           <Link href="/">Back to dashboard</Link>
         </DropdownMenuItem>
@@ -34,7 +31,6 @@ export default function LogoMenu() {
         <DropdownMenuItem onClick={() => setSearchModal(true)}>
           Search
         </DropdownMenuItem>
-        <DropdownMenuItem>Open example Dashboard</DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href={"/create/copilot"}>Create New Copilot</Link>
         </DropdownMenuItem>

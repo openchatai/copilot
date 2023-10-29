@@ -7,7 +7,7 @@ import {
   useSearchParams,
   useSelectedLayoutSegments,
 } from "next/navigation";
-
+// @TODO:Needs some refacroring.
 type RenderProps = {
   isActive: boolean;
 };
@@ -21,6 +21,7 @@ interface Props
     | React.ReactNode
     // eslint-disable-next-line no-unused-vars
     | (({ isActive }: RenderProps) => React.JSX.Element);
+  matchSearchParams?: boolean;
 }
 
 function pathnamePlusSearchParams(
@@ -43,6 +44,7 @@ export const NavLink = React.forwardRef<React.ElementRef<typeof Link>, Props>(
       segment,
       inactiveClassName,
       children,
+      matchSearchParams = false,
       ...props
     },
     _ref,
@@ -59,7 +61,8 @@ export const NavLink = React.forwardRef<React.ElementRef<typeof Link>, Props>(
       : props.href + "/";
     const isActive = segment
       ? segments.includes(segment)
-      : href === $pathnamePlusSearchParams;
+      : href ===
+        (matchSearchParams ? $pathnamePlusSearchParams : pathname + "/");
 
     return (
       <Link
@@ -73,6 +76,7 @@ export const NavLink = React.forwardRef<React.ElementRef<typeof Link>, Props>(
           </>
         }
         ref={_ref}
+        data-active={isActive}
         className={cn(
           className,
           isActive ? activeClassName : inactiveClassName,
