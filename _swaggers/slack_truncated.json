@@ -1233,7 +1233,7 @@
                 "tags": [
                     "chat"
                 ],
-                "description": "Sends a message to a channel.",
+                "description": "Post messages to public channels, private channels, direct messages, and multi-person direct messages.",
                 "externalDocs": {
                     "description": "API method documentation",
                     "url": "https://api.slack.com/methods/chat.postMessage"
@@ -2262,7 +2262,7 @@
                 "tags": [
                     "conversations"
                 ],
-                "description": "Initiates a public or private channel-based conversation",
+                "description": "Creates a new public or private channel.",
                 "externalDocs": {
                     "description": "API method documentation",
                     "url": "https://api.slack.com/methods/conversations.create"
@@ -3448,7 +3448,7 @@
                 "tags": [
                     "conversations"
                 ],
-                "description": "Opens or resumes a direct message or multi-person direct message.",
+                "description": "Opens or resumes an existing direct message or multi-person direct message.",
                 "externalDocs": {
                     "description": "API method documentation",
                     "url": "https://api.slack.com/methods/conversations.open"

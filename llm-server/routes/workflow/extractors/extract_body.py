@@ -25,7 +25,7 @@ def gen_body_from_schema(
         model="gpt-3.5-turbo-16k",
         temperature=0,
     )
-
+    api_generation_prompt = None
     if app:
         module_name = f"integrations.custom_prompts.{app}"
         module = importlib.import_module(module_name)
@@ -43,7 +43,7 @@ def gen_body_from_schema(
         HumanMessage(content="prev api responses: {}".format(prev_api_response)),
         HumanMessage(content="current_state: {}".format(current_state)),
         HumanMessage(
-            content="Given the provided information, generate the appropriate minified JSON payload to use as body for the API request. If a user doesn't provide a required parameter, use sensible defaults for required params, and leave optional params"
+            content="Given the provided information, generate the appropriate minified JSON payload to use as body for the API request. If a user doesn't provide a required parameter, use sensible defaults for required params, and leave optional params."
         ),
     ]
 
