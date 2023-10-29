@@ -109,7 +109,7 @@ spacy-legacy==3.0.12
 spacy-loggers==1.0.5
 SQLAlchemy==2.0.21
 sqlitedict==2.1.0
-srsly==2.4.6
+srsly==2.4.8
 tenacity==8.2.2
 thinc==8.1.10
 tiktoken==0.4.0
