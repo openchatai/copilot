@@ -102,7 +102,7 @@ def generate_consolidated_requirement(
     Returns:
       A consolidated query string.
     """
-    chat = get_chat_model("gpt-3.5-turbo")
+    chat = get_chat_model("mistral-openorca")
 
     history = get_all_chat_history_by_session_id(session_id)
     if len(history) == 0:
@@ -133,7 +133,7 @@ def hasSingleIntent(
     current_state: Optional[str],
 ) -> BotMessage:
     summaries = get_summaries(swagger_doc)
-    chat = get_chat_model("gpt-3.5-turbo-16k")
+    chat = get_chat_model("mistral-openorca")
 
     consolidated_user_requirement = (
         generate_consolidated_requirement(user_requirement, session_id)
