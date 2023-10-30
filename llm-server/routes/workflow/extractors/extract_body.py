@@ -20,7 +20,7 @@ async def gen_body_from_schema(
     app: Optional[str],
     current_state: Optional[str],
 ) -> Any:
-    chat = get_chat_model("mistral-openorca")
+    chat = get_chat_model("gpt-3.5-turbo-16k")
     api_generation_prompt = None
     if app:
         module_name = f"integrations.custom_prompts.{app}"
