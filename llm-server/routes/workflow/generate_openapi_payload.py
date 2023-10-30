@@ -3,10 +3,9 @@ import os
 import json
 from utils.get_llm import get_llm
 from dotenv import load_dotenv
-from .extractors.example_generator import gen_ex_from_schema
 from routes.workflow.extractors.extract_param import gen_params_from_schema
 from routes.workflow.extractors.extract_body import gen_body_from_schema
-from typing import Dict, Any, Optional
+from typing import Any, Optional
 
 from prance import ResolvingParser
 import asyncio
@@ -17,11 +16,11 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
 
 
-from typing import Dict, Any, Optional, List
+from typing import Any, Optional, List
 
 
 # get path param, query param and json body schema for a given operation id
-from typing import Dict, Optional, List
+from typing import Optional
 from routes.workflow.api_info import ApiInfo
 
 
