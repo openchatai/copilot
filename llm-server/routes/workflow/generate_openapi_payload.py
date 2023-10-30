@@ -9,6 +9,7 @@ from routes.workflow.extractors.extract_body import gen_body_from_schema
 from typing import Dict, Any, Optional
 
 from prance import ResolvingParser
+import asyncio
 
 load_dotenv()
 
@@ -88,48 +89,41 @@ def generate_openapi_payload(
     app: Optional[str],
     current_state: Optional[str],
 ) -> ApiInfo:
-    (
-        a,
-        b,
-        c,
-    ) = swagger_json.version_parsed  # (3,0,2), we can then apply transformation on
-    print(a, b, c)
-    # add transformation for swagger v2
+    async def process_api_info():
+        a, b, c = swagger_json.version_parsed
+        print(a, b, c)
 
-    api_info = get_api_info_by_operation_id(swagger_json.specification, _operation_id)
-
-    api_info.path_params = (
-        {}
-        if not api_info.path_params["properties"]
-        else gen_params_from_schema(
-            json.dumps(api_info.path_params, separators=(",", ":")),
-            text,
-            prev_api_response,
-            current_state,
-        )
-    )
-    api_info.query_params = (
-        {}
-        if not api_info.query_params["properties"]
-        else gen_params_from_schema(
-            json.dumps(api_info.query_params, separators=(",", ":")),
-            text,
-            prev_api_response,
-            current_state,
-        )
-    )
-
-    if api_info.body_schema:
-        # example = gen_ex_from_schema(api_info.body_schema)
-        api_info.body_schema = gen_body_from_schema(
-            json.dumps(api_info.body_schema, separators=(",", ":")),
-            text,
-            prev_api_response,
-            app,
-            current_state,
+        api_info = get_api_info_by_operation_id(
+            swagger_json.specification, _operation_id
         )
 
-    else:
-        api_info.body_schema = {}
+        if api_info.path_params["properties"]:
+            api_info.path_params = await gen_params_from_schema(
+                json.dumps(api_info.path_params, separators=(",", ":")),
+                text,
+                prev_api_response,
+                current_state,
+            )
 
-    return api_info
+        if api_info.query_params["properties"]:
+            api_info.query_params = await gen_params_from_schema(
+                json.dumps(api_info.query_params, separators=(",", ":")),
+                text,
+                prev_api_response,
+                current_state,
+            )
+
+        if api_info.body_schema:
+            api_info.body_schema = await gen_body_from_schema(
+                json.dumps(api_info.body_schema, separators=(",", ":")),
+                text,
+                prev_api_response,
+                app,
+                current_state,
+            )
+        else:
+            api_info.body_schema = {}
+
+        return api_info
+
+    return asyncio.run(process_api_info())

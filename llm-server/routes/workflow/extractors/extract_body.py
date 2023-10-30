@@ -13,7 +13,7 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
 
 
-def gen_body_from_schema(
+async def gen_body_from_schema(
     body_schema: str,
     text: str,
     prev_api_response: str,
