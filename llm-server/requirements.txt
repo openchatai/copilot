@@ -97,7 +97,7 @@ referencing==0.30.2
 regex==2023.6.3
 requests==2.31.0
 rfc3339-validator==0.1.4
-rpds-py==0.10.2
+rpds-py==0.10.6
 ruamel.yaml==0.17.32
 ruamel.yaml.clib==0.2.7
 safetensors==0.3.1
@@ -115,7 +115,7 @@ thinc==8.1.10
 tiktoken==0.4.0
 tokenizers==0.13.3
 tqdm==4.65.0
-transformers==4.30.2
+transformers==4.34.1
 typer==0.9.0
 types-PyYAML==6.0.12.11
 types-requests==2.31.0.2
