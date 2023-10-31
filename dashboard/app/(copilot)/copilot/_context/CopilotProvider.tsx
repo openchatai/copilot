@@ -5,6 +5,7 @@ import { createSafeContext } from "@/lib/createSafeContext";
 import { useParams } from "next/navigation";
 import React from "react";
 import useSwr from "swr";
+import { CopilotNotFound } from "../../_parts/CopilotNotFound";
 const [SafeCopilotProvider, useCopilot] = createSafeContext<CopilotType>(
   "[useCopilot] should be used within a CopilotProvider",
 );
@@ -26,7 +27,7 @@ function CopilotProvider({ children }: { children: React.ReactNode }) {
       </SafeCopilotProvider>
     );
   } else {
-    return <div>copilot not found</div>;
+    return <CopilotNotFound />;
   }
 }
 
