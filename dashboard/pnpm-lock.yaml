@@ -9,8 +9,8 @@ dependencies:
     specifier: ^3.3.1
     version: 3.3.2(react-hook-form@7.47.0)
   '@openchatai/copilot-flows-editor':
-    specifier: ^1.5.2
-    version: 1.5.2(@radix-ui/react-alert-dialog@1.0.5)(@radix-ui/react-dialog@1.0.5)(@radix-ui/react-tooltip@1.0.7)(react-dom@18.2.0)(react@18.2.0)
+    specifier: ^1.6.0
+    version: 1.6.0(@radix-ui/react-alert-dialog@1.0.5)(@radix-ui/react-dialog@1.0.5)(@radix-ui/react-tooltip@1.0.7)(react-dom@18.2.0)(react@18.2.0)
   '@radix-ui/react-accordion':
     specifier: ^1.1.2
     version: 1.1.2(@types/react-dom@18.2.13)(@types/react@18.2.28)(react-dom@18.2.0)(react@18.2.0)
@@ -420,8 +420,8 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.15.0
 
-  /@openchatai/copilot-flows-editor@1.5.2(@radix-ui/react-alert-dialog@1.0.5)(@radix-ui/react-dialog@1.0.5)(@radix-ui/react-tooltip@1.0.7)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-LxjfBQzlkWP5zP5s9XnBlnTVL2gJpHY4ZoEUk9K3R9wDWyH91DqW+z8g76q4m/MP3ydGXc2IJ/R7IE/FchmSUw==}
+  /@openchatai/copilot-flows-editor@1.6.0(@radix-ui/react-alert-dialog@1.0.5)(@radix-ui/react-dialog@1.0.5)(@radix-ui/react-tooltip@1.0.7)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-hntelCGMFJF54EWwPfWc4iQnGcFpRRzUoxctSfoluro9EmdlUp/UicpUmWUWm8AmWfAlnJ32Cpsh/xsXNhIj1Q==}
     peerDependencies:
       '@radix-ui/react-alert-dialog': ^1.0.4
       '@radix-ui/react-dialog': ^1.0.4
