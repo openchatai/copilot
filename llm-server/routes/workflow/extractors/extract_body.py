@@ -1,6 +1,6 @@
 import os
-from langchain.schema import AIMessage, HumanMessage, SystemMessage
-from langchain.chat_models import ChatOpenAI
+from langchain.schema import HumanMessage, SystemMessage
+from utils.get_chat_model import get_chat_model
 from utils.get_llm import get_llm
 
 from typing import Any, Optional
@@ -20,11 +20,7 @@ async def gen_body_from_schema(
     app: Optional[str],
     current_state: Optional[str],
 ) -> Any:
-    chat = ChatOpenAI(
-        openai_api_key=os.getenv("OPENAI_API_KEY"),
-        model="gpt-3.5-turbo-16k",
-        temperature=0,
-    )
+    chat = get_chat_model("gpt-3.5-turbo-16k")
     api_generation_prompt = None
     if app:
         module_name = f"integrations.custom_prompts.{app}"
