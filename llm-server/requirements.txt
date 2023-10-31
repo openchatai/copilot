@@ -113,7 +113,7 @@ srsly==2.4.8
 tenacity==8.2.2
 thinc==8.1.10
 tiktoken==0.4.0
-tokenizers==0.13.3
+tokenizers
 tqdm==4.65.0
 transformers==4.34.1
 typer==0.9.0
