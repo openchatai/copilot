@@ -53,21 +53,37 @@ To install Mypy, which is a static type checker for Python, follow these steps:
 
 1. Ensure you have the "copilot_llm" Flask app repository cloned to your local machine.
 
-2. Create a `.env` file in the root of the "copilot_llm" project to store your environment variables. Here's an example of what your `.env` file might contain:
+2. Create two environment configuration files in the root of the "llm_server": `.env` and `.env.docker`. These files will store your environment variables, and they serve different purposes. Here's an example of what each of these files might contain:
+
+   For the `.env` file (used for local development):
 
    ```shell
    OPENAI_API_TYPE=openai
-   OPENAI_API_KEY=
-   PINECONE_API_KEY=
-   PINECONE_ENV=
+   OPENAI_API_KEY=your_openai_api_key
+   PINECONE_API_KEY=your_pinecone_api_key
+   PINECONE_ENV=your_pinecone_environment
    MONGODB_URL=mongodb://localhost:27017/opencopilot
-   QDRANT_URL=http://localhost:6333  
+   QDRANT_URL=http://localhost:6333
    STORE=QDRANT
-   QDRANT_API_KEY= # When using cloud hosted version
-   SCORE_THRESHOLD=0.95 # When using pre defined workflows, the confidence score at which the opencopilot should select your workflow. If the score falls below this, the planner will design it's own workflow
+   QDRANT_API_KEY=your_qdrant_api_key # If using a cloud-hosted version
+   SCORE_THRESHOLD=0.95 # When using predefined workflows, this is the confidence score at which opencopilot should select your workflow. If the score falls below this, the planner will design its own workflow.
    ```
 
-   Ensure you replace the placeholders with your actual API keys and configuration settings.
+   For the `.env.docker` file (used when running in a Docker container):
+
+   ```shell
+   OPENAI_API_TYPE=openai
+   OPENAI_API_KEY=your_openai_api_key
+   PINECONE_API_KEY=your_pinecone_api_key
+   PINECONE_ENV=your_pinecone_environment
+   MONGODB_URL=mongodb://mongo:27017/opencopilot
+   QDRANT_URL=http://qdrant:6333
+   STORE=QDRANT
+   QDRANT_API_KEY=your_qdrant_api_key # If using a cloud-hosted version
+   SCORE_THRESHOLD=0.95 # When using predefined workflows, this is the confidence score at which opencopilot should select your workflow. If the score falls below this, the planner will design its own workflow.
+   ```
+
+   Please replace the placeholders with your actual API keys and configuration settings in both files. Use the `.env` file for local development and the `.env.docker` file when running in a Docker container.
 
 3. Install project dependencies:
 
