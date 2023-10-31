@@ -57,6 +57,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
 
     try:
         current_state = process_state(app, headers)
+        document = None
         document, score = check_workflow_in_store(text, swagger_url)
 
         if document:
