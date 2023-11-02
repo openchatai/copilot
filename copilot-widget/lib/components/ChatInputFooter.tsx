@@ -1,4 +1,4 @@
-import TextareaAutosize from 'react-textarea-autosize';
+import TextareaAutosize from "react-textarea-autosize";
 import { VscSend } from "react-icons/vsc";
 import { CgRedo } from "react-icons/cg";
 import { useChat } from "../contexts/Controller";
@@ -6,16 +6,17 @@ import { useRef, useState } from "react";
 import { useInitialData } from "../contexts/InitialDataContext";
 import { TbBulb } from "react-icons/tb";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ToolTip";
+import { isEmpty } from "@lib/utils/utils";
 function MessageSuggestions() {
-  const idata = useInitialData();
+  const { data } = useInitialData();
   const { messages, sendMessage } = useChat();
 
   return (
     <>
-      {messages.length === 0 && idata?.data?.inital_questions && (
+      {isEmpty(messages) && !isEmpty(data?.inital_questions) && (
         <div className="opencopilot-flex opencopilot-items-center opencopilot-gap-4 opencopilot-justify-between opencopilot-w-full opencopilot-px-4">
           <div className="opencopilot-flex opencopilot-items-center opencopilot-flex-wrap opencopilot-gap-2 opencopilot-flex-1">
-            {idata.data?.inital_questions.map((q, index) => (
+            {data?.inital_questions.map((q, index) => (
               <button
                 className="opencopilot-text-xs opencopilot-w-fit opencopilot-font-semibold opencopilot-whitespace-nowrap opencopilot-px-2.5 opencopilot-py-1 opencopilot-rounded-full opencopilot-bg-accent opencopilot-text-primary"
                 key={index}
@@ -76,7 +77,7 @@ function ChatInputFooter() {
       <div className="opencopilot-overflow-y-auto opencopilot-w-full ">
         <MessageSuggestions />
       </div>
-      <div className="opencopilot-w-full opencopilot-flex opencopilot-items-center opencopilot-transition-all opencopilot-justify-between focus-within:opencopilot-ring-1 focus-within:opencopilot-ring-primary opencopilot-gap-2 opencopilot-bg-accent opencopilot-p-2 opencopilot-rounded-2xl">
+      <div className="opencopilot-w-full opencopilot-flex opencopilot-items-center opencopilot-ring-[#334155] opencopilot-transition-all opencopilot-justify-between opencopilot-ring-1 opencopilot-overflow-hidden focus-within:opencopilot-ring-primary opencopilot-gap-2 opencopilot-bg-accent opencopilot-p-2 opencopilot-rounded-2xl">
         <div className="opencopilot-flex-1">
           <TextareaAutosize
             dir="auto"
@@ -93,7 +94,7 @@ function ChatInputFooter() {
             rows={1}
             value={input}
             onChange={handleTextareaChange}
-            className="opencopilot-w-full opencopilot-resize-none opencopilot-bg-transparent focus-visible:opencopilot-outline-none opencopilot-border-none focus:opencopilot-outline-none focus:opencopilot-border-none opencopilot-max-h-[200px] opencopilot-scrollbar-thin opencopilot-leading-tight opencopilot-whitespace-pre-wrap opencopilot-py-1.5 opencopilot-px-4 placeholder:opencopilot-align-middle opencopilot-overflow-auto opencopilot-outline-none opencopilot-text-accent2 opencopilot-text-[14px] placeholder:opencopilot-text-xs opencopilot-font-normal"
+            className="opencopilot-w-full opencopilot-resize-none opencopilot-bg-transparent focus-visible:opencopilot-outline-none opencopilot-border-none focus:opencopilot-outline-none focus:opencopilot-border-none opencopilot-scrollbar-thin opencopilot-leading-tight opencopilot-whitespace-pre-wrap opencopilot-py-1.5 opencopilot-px-4 placeholder:opencopilot-align-middle opencopilot-overflow-auto opencopilot-outline-none opencopilot-text-accent2 opencopilot-text-[14px] placeholder:opencopilot-text-xs opencopilot-font-normal"
           />
         </div>
         <div className="opencopilot-flex opencopilot-items-center opencopilot-justify-center opencopilot-gap-2 opencopilot-h-fit opencopilot-px-2 opencopilot-text-lg">
