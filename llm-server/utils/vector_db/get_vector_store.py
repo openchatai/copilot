@@ -2,7 +2,7 @@ import os
 from langchain.vectorstores.pinecone import Pinecone
 
 from langchain.vectorstores.qdrant import Qdrant
-from langchain.vectorstores import VectorStore
+from langchain.vectorstores.base import VectorStore
 from utils.vector_db.store_type import StoreType
 from utils.vector_db.config import VECTOR_STORE_INDEX_NAME, PINECONE_TEXT_KEY
 from utils.vector_db.store_options import StoreOptions
@@ -30,7 +30,7 @@ def get_vector_store(options: StoreOptions) -> VectorStore:
         client = qdrant_client.QdrantClient(
             url=os.environ["QDRANT_URL"],
             prefer_grpc=True,
-            api_key=os.getenv("QDRANT_API_KEY", ""),
+            api_key=os.getenv("QDRANT_API_KEY", None),
         )
 
         vector_store = Qdrant(

@@ -58,7 +58,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
     try:
         current_state = process_state(app, headers)
         document = None
-        document, score = check_workflow_in_store(text, swagger_url)
+        # document, score = check_workflow_in_store(text, swagger_url)
 
         if document:
             return handle_existing_workflow(
@@ -72,7 +72,9 @@ def handle_request(data: Dict[str, Any]) -> Any:
                 session_id,
             )
 
-        bot_response = hasSingleIntent(swagger_doc, text, session_id, current_state)
+        bot_response = hasSingleIntent(
+            swagger_doc, text, session_id, current_state, app
+        )
 
         if len(bot_response.ids) >= 1:
             return handle_api_calls(
@@ -190,8 +192,8 @@ def handle_api_calls(
     )
 
     _workflow["swagger_url"] = swagger_url
-    m_workflow = mongo.auto_gen_workflows.insert_one(_workflow)
-    add_workflow_data_to_qdrant(m_workflow.inserted_id, _workflow, swagger_url)
+    # m_workflow = mongo.auto_gen_workflows.insert_one(_workflow)
+    # add_workflow_data_to_qdrant(m_workflow.inserted_id, _workflow, swagger_url)
 
     create_chat_history(swagger_url, session_id, True, text)
     create_chat_history(

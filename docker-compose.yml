@@ -29,7 +29,7 @@ services:
     networks:
       - opencopilot_network
     env_file:
-      - llm-server/.env
+      - llm-server/.env.docker
     ports:
       - 8002:8002
     depends_on:
