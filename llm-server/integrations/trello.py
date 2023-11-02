@@ -2,9 +2,11 @@ from typing import Dict, Any, Optional
 import requests
 
 
-def process_state(
-    headers: Dict[str, Any], selected_board_id: Optional[str] = None
-) -> Dict[str, Any]:
+from typing import Dict, Any
+import requests
+
+
+def process_state(headers: Dict[str, Any]) -> Dict[str, Any]:
     state: Dict[str, Any] = {
         "appId": "trello",
         "appName": "Trello",
@@ -23,35 +25,43 @@ def process_state(
         board_id = board["id"]
         board_name = board["name"]
 
-        # Step 2: Get the lists for the current board
-        if not selected_board_id or selected_board_id == board_id:
-            lists_endpoint = f"https://api.trello.com/1/boards/{board_id}/lists"
-            response = requests.get(lists_endpoint, headers=headers)
-            lists_data = response.json()
+        lists_endpoint = f"https://api.trello.com/1/boards/{board_id}/lists"
+        response = requests.get(lists_endpoint, headers=headers)
+        lists_data = response.json()
 
-            for l in lists_data:
-                list_id = l["id"]
-                list_name = l["name"]
+        for l in lists_data:
+            list_id = l["id"]
+            list_name = l["name"]
 
-                # Step 3: Get the cards for the current list
-                cards_endpoint = f"https://api.trello.com/1/lists/{list_id}/cards"
-                response = requests.get(cards_endpoint, headers=headers)
-                cards_data = response.json()
+            # Append the list information to the state's "entities" dictionary
+            state["entities"]["data"].append(
+                {
+                    "boardId": board_id,
+                    "boardName": board_name,
+                    "listId": list_id,
+                    "listName": list_name,
+                }
+            )
 
-                for card in cards_data:
-                    card_id = card["id"]
-                    card_name = card["name"]
+            # Step 3: Get the cards for the current list
+            cards_endpoint = f"https://api.trello.com/1/lists/{list_id}/cards"
+            response = requests.get(cards_endpoint, headers=headers)
+            cards_data = response.json()
 
-                    # Append the data to the state's "entities" dictionary
-                    state["entities"]["data"].append(
-                        {
-                            "boardId": board_id,
-                            "boardName": board_name,
-                            "listId": list_id,
-                            "listName": list_name,
-                            "cardId": card_id,
-                            "cardName": card_name,
-                        }
-                    )
+            for card in cards_data:
+                card_id = card["id"]
+                card_name = card["name"]
 
-    return {"state": state["entities"]["data"]}
+                # Append the card information to the state's "entities" dictionary
+                state["entities"]["data"].append(
+                    {
+                        "boardId": board_id,
+                        "boardName": board_name,
+                        "listId": list_id,
+                        "listName": list_name,
+                        "cardId": card_id,
+                        "cardName": card_name,
+                    }
+                )
+
+    return state
