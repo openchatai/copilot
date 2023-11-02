@@ -39,7 +39,7 @@ export default function KnowledgeLayout({ children, params }: Props) {
             <AddDataSource />
           </div>
         </HeaderShell>
-        <div className="w-full flex-1 overflow-auto bg-accent/25 px-4 py-8">
+        <div className="w-full flex-1 overflow-auto bg-accent/25">
           {children}
         </div>
       </div>
