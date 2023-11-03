@@ -5,7 +5,6 @@ from utils.get_llm import get_llm
 
 from typing import Any, Optional
 from routes.workflow.extractors.extract_json import extract_json_payload
-from custom_types.t_json import JsonData
 import importlib
 import logging
 
@@ -20,7 +19,7 @@ async def gen_body_from_schema(
     app: Optional[str],
     current_state: Optional[str],
 ) -> Any:
-    chat = get_chat_model("gpt-3.5-turbo-16k")
+    chat = get_chat_model(os.getenv("CHAT_PLANNER_MODEL", "gpt-3.5-turbo-16k"))
     api_generation_prompt = None
     if app:
         module_name = f"integrations.custom_prompts.{app}"
@@ -38,7 +37,9 @@ async def gen_body_from_schema(
         HumanMessage(content="User input: {}".format(text)),
         HumanMessage(content="prev api responses: {}".format(prev_api_response)),
         HumanMessage(content="current_state: {}".format(current_state)),
-        HumanMessage(content="If the user is asking to generate values for some fields, likes product descriptions, jokes etc add them."),
+        HumanMessage(
+            content="If the user is asking to generate values for some fields, likes product descriptions, jokes etc add them."
+        ),
         HumanMessage(
             content="Given the provided information, generate the appropriate minified JSON payload to use as body for the API request. If a user doesn't provide a required parameter, use sensible defaults for required params, and leave optional params."
         ),

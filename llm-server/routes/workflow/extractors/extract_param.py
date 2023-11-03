@@ -3,7 +3,6 @@ from langchain.chat_models import ChatOpenAI
 from routes.workflow.extractors.extract_json import extract_json_payload
 from utils.get_chat_model import get_chat_model
 from utils.get_llm import get_llm
-from custom_types.t_json import JsonData
 from typing import Optional, Any
 import logging
 from langchain.schema import HumanMessage, SystemMessage
@@ -14,8 +13,8 @@ llm = get_llm()
 
 async def gen_params_from_schema(
     param_schema: str, text: str, prev_resp: str, current_state: Optional[str]
-) -> Optional[JsonData]:
-    chat = get_chat_model("gpt-3.5-turbo-16k")
+) -> Optional[Any]:
+    chat = get_chat_model(os.getenv("CHAT_EXECUTOR_MODEL", "gpt-3.5-turbo-16k"))
     messages = [
         SystemMessage(
             content="You are an intelligent machine learning model that can produce REST API's params / query params in json format for trello, given the json schema, user input, data from previous api calls, and current application state."

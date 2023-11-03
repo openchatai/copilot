@@ -5,6 +5,8 @@ from typing import Optional
 
 import os
 
+local_ip = os.getenv("LOCAL_IP", "localhost")
+
 
 def get_chat_model(prop: str) -> ChatOpenAI:
     if prop == "gpt-3.5-turbo":
@@ -22,7 +24,10 @@ def get_chat_model(prop: str) -> ChatOpenAI:
         )
 
     elif prop == "mistral-openorca":
-        return ChatOllama(model="mistral-openorca", temperature=0)
+        print(f"Returning instance of mistral-openorca")
+        return ChatOllama(
+            model="mistral-openorca", temperature=0, base_url=f"http://{local_ip}:11434"
+        )
     elif prop == "llama2":
         return ChatOpenAI(model="llama2", temperature=0)
     else:

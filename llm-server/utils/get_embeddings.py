@@ -3,9 +3,11 @@ from enums.embedding_provider import EmbeddingProvider
 import os
 from dotenv import load_dotenv
 from langchain.embeddings.base import Embeddings
-from langchain.embeddings import LlamaCppEmbeddings
+from langchain.embeddings.ollama import OllamaEmbeddings
 
 load_dotenv()
+
+local_ip = os.getenv("LOCAL_IP", "localhost")
 
 
 def get_embedding_provider() -> str:
@@ -40,7 +42,14 @@ def get_openai_embedding() -> Embeddings:
 
 def get_llama2_embedding() -> Embeddings:
     """Gets embeddings using the llama2 embedding provider."""
-    return LlamaCppEmbeddings(model_path="llama-2-7b-chat.ggmlv3.q4_K_M.bin")
+    return OllamaEmbeddings(base_url=f"http://{local_ip}:11434", model="llama2")
+
+
+def get_openorca7B() -> Embeddings:
+    """Gets embeddings using the llama2 embedding provider."""
+    return OllamaEmbeddings(
+        base_url="http://{local_ip}:11434", model="mistral-openorca"
+    )
 
 
 def choose_embedding_provider() -> Embeddings:
