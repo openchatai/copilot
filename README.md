@@ -18,7 +18,7 @@
 # 🔥 OpenCopilot [early beta]
 
 ---- 
-OpenCopilot allows you to have your own product's AI copilot. It integrates with your underlying APIs and is able to execute API calls whenever needed. It uses LLMs to determine if the user's request requires calling an API endpoint. Then, it decides which endpoint to call and passes the appropriate payload based on the given API definition.
+OpenCopilot allows you to have your own product's AI copilot. It integrates with your underlying APIs and can execute API calls whenever needed. It uses LLMs to determine if the user's request requires calling an API endpoint. Then, it decides which endpoint to call and passes the appropriate payload based on the given API definition.
 
 ## How does it work?
 - Provide your API/backend definition, including your public endpoints and how to call them. Currently, OpenCopilot supports Swagger OpenAPI 3.0. We're also working on a UI to allow you to dynamically add endpoints.
@@ -92,7 +92,7 @@ https://github.com/openchatai/OpenCopilot/assets/32633162/3bf5c24d-572c-4a42-9e4
 [Watch this video from Shopify:](http://www.youtube.com/watch?v=HVvbY7A7lIQ)
 
 [![IMAGE ALT TEXT](https://github.com/openchatai/OpenCopilot/assets/32633162/edebbaa6-eba5-4f72-b88d-cf0d690fffa8)](http://www.youtube.com/watch?v=HVvbY7A7lIQ "Video Title")
-(OpenCopilot is not affiliated with Shopify, and they do not use OpenCopilot, it's just a demo on what copilots are capable of)
+(OpenCopilot is not affiliated with Shopify, and they do not use OpenCopilot, it's just a demo of what copilots are capable of)
 
 
 ## AI Copilot: a growing trend
@@ -140,6 +140,6 @@ We love hearing from you! Got any cool ideas or requests? We're all ears! So, if
 - The dashboard server is reachable via http://localhost:8888/ or http://localhost:8888/dashboard
  
 
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind are welcome!
 
 
