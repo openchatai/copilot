@@ -18,7 +18,7 @@ async def gen_params_from_schema(
     chat = get_chat_model("gpt-3.5-turbo-16k")
     messages = [
         SystemMessage(
-            content="You are an intelligent machine learning model that can produce REST API's params / query params in json format for trello, given the json schema, user input, data from previous api calls, and current application state."
+            content="You are an intelligent machine learning model that can produce REST API's params / query params in json format, given the json schema, user input, data from previous api calls, and current application state."
         ),
         HumanMessage(content="Json Schema: {}.".format(param_schema)),
         HumanMessage(content="prev api responses: {}.".format(prev_resp)),
