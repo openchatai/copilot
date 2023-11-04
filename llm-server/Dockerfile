@@ -1,19 +1,23 @@
-# Use an official Python runtime as the base image
-FROM python:3.9-slim
+# Use the PyPy slim image as the base
+FROM pypy:3.9-slim
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /app
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \ 
+     build-essential gcc
 
-# Copy the requirements file into the container at /app
+RUN apt-get update && apt-get install -y cmake && apt-get install -y libopenblas-dev
+RUN apt install -y rustc cargo
+RUN pip install --upgrade pip
+# Copy requirements and install
 COPY requirements.txt /app/
-
-# Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the current directory contents into the container at /app
+# Copy app code
 COPY . /app/
 
-EXPOSE 8002
+EXPOSE 8002 
 
-# -u To prevent log accumulation, execute app.py with unbuffered output as soon as the container starts up.
-CMD ["python", "-u" ,"app.py"]
+# Run app with unbuffered logs
+CMD ["pypy", "-u", "app.py"]

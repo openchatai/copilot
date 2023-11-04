@@ -143,3 +143,8 @@ We love hearing from you! Got any cool ideas or requests? We're all ears! So, if
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
 
 
+
+
+Convert the app to c executable
+install nuitka
+`python -m nuitka --onefile --standalone --follow-imports app.py`
