@@ -27,3 +27,13 @@ def get_presigned_url() -> Response:
         return url
     except Exception as e:
         return str(e), 500  # Handle errors appropriately
+
+
+# This is a test function, shouldn't be used in production.
+@upload_controller.route("/file/<name>", methods=["GET"])
+def get_object_by_name(name: str) -> Response:
+    try:
+        object = client.get_object("opencopilot", name)
+        return object
+    except Exception as e:
+        return str(e), 500  # Handle errors appropriately
