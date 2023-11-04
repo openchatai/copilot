@@ -1,2 +1,10 @@
-## This will contain background jobs, common to openchat and opencopilot
-## celery -A celery_app worker --loglevel=info
+# Background Jobs for OpenChat and OpenCoPilot
+
+This repository hosts a collection of background jobs shared by both the OpenChat and OpenCoPilot projects. Our primary aim is to offer a resource-efficient native C image that can be effortlessly stored on Docker Hub.
+
+## Running the Celery Worker
+
+To activate the Celery worker for this project, use the following command:
+
+```bash
+celery -A celery_app worker --loglevel=info
