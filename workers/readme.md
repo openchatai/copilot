@@ -7,8 +7,7 @@ This repository hosts a collection of background jobs shared by both the OpenCha
 To activate the Celery worker for this project, use the following command:
 
 ```bash
-export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
-celery -A celery_app worker --loglevel=info
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES && celery -A celery_app worker --loglevel=info
 
 ```
 ---
@@ -18,3 +17,8 @@ celery -A celery_app worker --loglevel=info
 
 
 `python -m nuitka --onefile --standalone --follow-imports app.py`
+
+
+
+## Resume from this error
+Foreign key associated with column 'pdf_data_sources.chatbot_id' could not find table 'chatbots' with which to generate a foreign key to target column 'id'
