@@ -25,8 +25,8 @@ export default function ChatHeader() {
                 <RxCross2 size={19} />
               </DialogTrigger>
               <DialogContent>
-                <DialogHeader>Are you sure?</DialogHeader>
-                <div className="opencopilot-space-y-1">
+                <DialogHeader className="opencopilot-mx-auto">Are you sure?</DialogHeader>
+                <div className="opencopilot-space-y-1.5">
                   <DialogClose
                     onClick={() => {
                       // Close the widget after 500ms, IDK why but it solves the focus trap issue
@@ -38,7 +38,7 @@ export default function ChatHeader() {
                   >
                     <span>Exit</span>
                   </DialogClose>
-                  <DialogClose className="opencopilot-block opencopilot-w-full opencopilot-px-2 opencopilot-shadow opencopilot-py-1 opencopilot-border opencopilot-border-accent2 opencopilot-rounded-md opencopilot-text-black">
+                  <DialogClose className="opencopilot-block opencopilot-w-full opencopilot-px-2 opencopilot-py-1 opencopilot-rounded-md opencopilot-text-black">
                     <span>Cancel</span>
                   </DialogClose>
                 </div>
