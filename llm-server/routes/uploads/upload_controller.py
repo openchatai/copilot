@@ -43,18 +43,21 @@ def get_object_by_name(name: str) -> Response:
         return str(e), 500  # Handle errors appropriately
 
 
-# This is a test function, shouldn't be used in production.
-@upload_controller.route("/file/ingest/<name>", methods=["GET", "POST"])
-def start_file_ingestion(name: str) -> Response:
+@upload_controller.route("/file/ingest", methods=["GET", "POST"])
+def start_file_ingestion() -> Response:
     try:
-        bot_id = request.data.get("bot_id", None)
-        file_url = request.data.get("file_url", None)
+        bot_id = request.form.get("bot_id")
+        file_url = request.form.get("file_url")
+
         if not bot_id:
-            raise "Bot id is required"
+            raise Exception("Bot id is required")
         
         if not file_url:
-            raise "File url is required"
+            raise Exception("File url is required")
         
+        # Assuming process_file accepts bot_id and file_url as arguments
         process_file(bot_id, file_url)
+        
+        return "File ingestion started successfully", 200  # Return a success response
     except Exception as e:
-        return str(e), 500  # Handle errors appropriately
+        return str(e), 500  # Handle errors appropriately and return an error response

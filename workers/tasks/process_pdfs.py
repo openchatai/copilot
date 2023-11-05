@@ -1,27 +1,25 @@
 from celery import shared_task
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.document_loaders import PyPDFium2Loader
+from repos.pdf_data_sources import insert_pdf_data_source
 
 from shared_libs.get_embeddings import get_embeddings
 from shared_libs.interfaces import StoreOptions
 from shared_libs.init_vector_store import init_vector_store
 from langchain.document_loaders import PyPDFium2Loader
-from typing import List
-
-@shared_task
-def process_pdfs(urls: List[str], namespace: str):
-    for url in urls:
-        try:
-            process_one_pdf(url, namespace)
-        except Exception as e:
-            print(f"Error processing {url}:", e)
 
 
 # @Todo: add the url in the filename in the context of vectordatabase and also mongo/sql, we need to check if this file exists in the metadata, if yes we delete and reindex it. This will also be helpful in migrations
-def process_one_pdf(url: str, namespace: str):
-    loader = PyPDFium2Loader(url)
-    raw_docs = loader.load()
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200, length_function=len)
-    docs = text_splitter.split_documents(raw_docs)
-    embeddings = get_embeddings()
-    init_vector_store(docs, embeddings, StoreOptions(namespace=namespace))
+@shared_task
+def process_pdf(url: str, namespace: str, bot_id: str):
+    try:
+        loader = PyPDFium2Loader(url)
+        raw_docs = loader.load()
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200, length_function=len)
+        docs = text_splitter.split_documents(raw_docs)
+        embeddings = get_embeddings()
+        init_vector_store(docs, embeddings, StoreOptions(namespace=namespace))
+
+        insert_pdf_data_source(chatbot_id=bot_id, files=url, folder_name=namespace)
+    except Exception as e:
+        print(f"Error processing {url}:", e)
