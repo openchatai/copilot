@@ -1,4 +1,5 @@
 from flask import Blueprint, Response, request
+from routes.uploads.upload_service import process_file
 
 upload = Blueprint("upload", __name__)
 from minio import Minio
@@ -22,6 +23,9 @@ upload_controller = Blueprint("uploads", __name__)
 @upload_controller.route("/presignedUrl", methods=["GET", "POST"])
 def get_presigned_url() -> Response:
     filename = request.args.get("name")
+    
+    # this will be the folder name where all files related to this bot go, add validation
+
     try:
         url = client.presigned_put_object("opencopilot", filename)
         return url
@@ -35,5 +39,22 @@ def get_object_by_name(name: str) -> Response:
     try:
         object = client.get_object("opencopilot", name)
         return object
+    except Exception as e:
+        return str(e), 500  # Handle errors appropriately
+
+
+# This is a test function, shouldn't be used in production.
+@upload_controller.route("/file/ingest/<name>", methods=["GET", "POST"])
+def start_file_ingestion(name: str) -> Response:
+    try:
+        bot_id = request.data.get("bot_id", None)
+        file_url = request.data.get("file_url", None)
+        if not bot_id:
+            raise "Bot id is required"
+        
+        if not file_url:
+            raise "File url is required"
+        
+        process_file(bot_id, file_url)
     except Exception as e:
         return str(e), 500  # Handle errors appropriately

@@ -9,16 +9,16 @@ from langchain.document_loaders import PyPDFium2Loader
 from typing import List
 
 @shared_task
-def pdf_reader(urls: List[str], namespace: str):
+def process_pdfs(urls: List[str], namespace: str):
     for url in urls:
         try:
-            one_pdf_reader(url, namespace)
+            process_one_pdf(url, namespace)
         except Exception as e:
             print(f"Error processing {url}:", e)
 
 
 # @Todo: add the url in the filename in the context of vectordatabase and also mongo/sql, we need to check if this file exists in the metadata, if yes we delete and reindex it. This will also be helpful in migrations
-def one_pdf_reader(url: str, namespace: str):
+def process_one_pdf(url: str, namespace: str):
     loader = PyPDFium2Loader(url)
     raw_docs = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200, length_function=len)

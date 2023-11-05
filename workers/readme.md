@@ -14,3 +14,6 @@ celery -A celery_app worker --loglevel=info
 
 
 ## This has to be converted to c binary executable, may even want to convert it into cython
+
+
+`python -m nuitka --onefile --standalone --follow-imports app.py`
