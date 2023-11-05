@@ -8,3 +8,9 @@ To activate the Celery worker for this project, use the following command:
 
 ```bash
 celery -A celery_app worker --loglevel=info
+
+```
+---
+
+
+## This has to be converted to c binary executable, may even want to convert it into cython

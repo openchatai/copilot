@@ -1,0 +1,18 @@
+version: '3.9'
+services:
+  redis:
+    image: redis:latest
+    container_name: redis_cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - opencopilot_network
+  
+
+networks:
+  opencopilot_network:
+
+volumes:
+  redis_data:
