@@ -102,3 +102,27 @@
     display: none; /* Safari and Chrome */
   }
 }
+.loading-el {
+  position: relative;
+  overflow: hidden;
+  pointer-events: none;
+  color: transparent;
+}
+.loading-el::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  @apply bg-white opacity-50;
+}
+
+.loading-el::before {
+  content: "";
+  position: absolute;
+  z-index: 11;
+  translate: -50% -50%;
+  top: 50%;
+  left: 50%;
+  border-width: 3px;
+  @apply h-5 w-5 animate-spin rounded-full border-primary border-t-transparent;
+}
