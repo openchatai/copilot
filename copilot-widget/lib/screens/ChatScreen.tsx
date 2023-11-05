@@ -15,7 +15,7 @@ import { Map } from "../utils/Map";
 function ChatScreen() {
   const scrollElementRef = useRef(null);
   const [setPos] = useScrollToPercentage(scrollElementRef);
-  const { messages, loading, error } = useChat();
+  const { messages, loading, failedMessage } = useChat();
   const config = useConfigData();
   const initialMessage = config?.initialMessage;
   useEffect(() => {
@@ -32,7 +32,7 @@ function ChatScreen() {
       <ChatHeader />
       <main
         ref={scrollElementRef}
-        className="opencopilot-flex-1 opencopilot-w-full opencopilot-shrink-0 opencopilot-overflow-auto opencopilot-scrollbar-thin opencopilot-scroll-smooth"
+        className="opencopilot-flex-1 opencopilot-w-full opencopilot-overflow-x-hidden opencopilot-shrink-0 opencopilot-overflow-auto opencopilot-scrollbar-thin opencopilot-scroll-smooth"
       >
         <div className="opencopilot-flex opencopilot-h-fit opencopilot-mt-auto opencopilot-flex-col opencopilot-py-2 opencopilot-max-h-full opencopilot-items-center opencopilot-gap-1 last:fade-in-right">
           {
@@ -48,6 +48,7 @@ function ChatScreen() {
                   return (
                     <BotTextMessage
                       timestamp={message.timestamp}
+                      id={message.id}
                       key={index}
                       message={message.response.text}
                     />
@@ -56,6 +57,7 @@ function ChatScreen() {
                 return (
                   <UserMessage
                     key={index}
+                    id={message.id}
                     timestamp={message.timestamp}
                     content={message.content}
                   />
@@ -64,7 +66,7 @@ function ChatScreen() {
             }}
           />
           {loading && <BotMessageLoading />}
-          {error && <BotMessageError />}
+          {failedMessage && <BotMessageError message={failedMessage} />}
         </div>
       </main>
       <ChatInputFooter />
