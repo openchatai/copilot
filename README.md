@@ -128,7 +128,7 @@ Our goal is to empower every SaaS product with the ability to have their own AI 
 - [x] Chat memory.
 - [x] Vector DB support for large Swagger files.
 - [ ] Plugins system to support different types of authentications.
-- [ ] Offline LLMs.
+- [x] Offline LLMs.
 - [ ] Ability to ingest text data, PDF files, websites, and extra data sources.
 
 We love hearing from you! Got any cool ideas or requests? We're all ears! So, if you have something in mind, give us a shout! 
