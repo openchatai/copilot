@@ -9,6 +9,9 @@ from typing import Any, Tuple
 from utils.config import Config
 from utils.__sql import sql_db
 from flask_cors import CORS
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 

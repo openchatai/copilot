@@ -1,11 +1,8 @@
 from langchain.embeddings.openai import OpenAIEmbeddings
 from enums.embedding_provider import EmbeddingProvider
 import os
-from dotenv import load_dotenv
 from langchain.embeddings.base import Embeddings
 from langchain.embeddings import LlamaCppEmbeddings
-
-load_dotenv()
 
 
 def get_embedding_provider() -> str:

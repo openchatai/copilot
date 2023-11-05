@@ -2,7 +2,6 @@ import re
 import os
 import json
 from utils.get_llm import get_llm
-from dotenv import load_dotenv
 from routes.workflow.extractors.extract_param import gen_params_from_schema
 from routes.workflow.extractors.extract_body import gen_body_from_schema
 from typing import Any, Optional
@@ -10,7 +9,6 @@ from typing import Any, Optional
 from prance import ResolvingParser
 import asyncio
 
-load_dotenv()
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()

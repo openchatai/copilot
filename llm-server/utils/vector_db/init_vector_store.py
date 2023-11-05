@@ -8,12 +8,9 @@ from utils.vector_db.store_type import StoreType
 from langchain.embeddings.base import Embeddings
 from utils.vector_db.store_options import StoreOptions
 from langchain.vectorstores.pinecone import Pinecone
-from dotenv import load_dotenv
 
 init_lock = threading.Lock()
 
-# Load environment variables from .env file
-load_dotenv()
 VECTOR_STORE_INDEX_NAME = "temp"
 
 initialized = False

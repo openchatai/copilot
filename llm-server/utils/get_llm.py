@@ -1,14 +1,11 @@
 from langchain.llms import AzureOpenAI, OpenAI
 import os
-from dotenv import load_dotenv
 from langchain.llms import LlamaCpp
 from langchain.llms.base import BaseLLM
 
 from langchain.callbacks.manager import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from typing import Dict, Callable
-
-load_dotenv()
 
 
 def get_llama_llm() -> BaseLLM:

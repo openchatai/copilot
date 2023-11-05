@@ -10,10 +10,6 @@ from utils.get_embeddings import get_embeddings
 from utils.vector_db.init_vector_store import initialize_pinecone
 import qdrant_client
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
 
 def get_vector_store(options: StoreOptions) -> VectorStore:
     """Gets the vector store for the given options."""

@@ -3,7 +3,7 @@ from database_setup import create_database_schema
 from dotenv import load_dotenv
 
 import os
-load_dotenv()
+load_dotenv("../llm-server/.env")
 
 create_database_schema()
 app = Celery(

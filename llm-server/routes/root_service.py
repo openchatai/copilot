@@ -2,7 +2,6 @@ import os
 from typing import Dict, Any, cast, Optional, List, Tuple
 
 import logging
-from dotenv import load_dotenv
 from opencopilot_types.workflow_type import WorkflowDataType
 from routes.workflow.typings.run_workflow_input import WorkflowData
 from routes.workflow.utils import (
@@ -13,7 +12,6 @@ from routes.workflow.utils import (
 )
 from bson import ObjectId
 import os
-from dotenv import load_dotenv
 from typing import Dict, Any, cast
 from utils.db import Database
 import json
@@ -27,7 +25,6 @@ from langchain.docstore.document import Document
 db_instance = Database()
 mongo = db_instance.get_db()
 
-load_dotenv()
 shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
 
 # Define constants for error messages
