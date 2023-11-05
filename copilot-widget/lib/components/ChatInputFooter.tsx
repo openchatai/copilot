@@ -6,7 +6,7 @@ import { useRef, useState } from "react";
 import { useInitialData } from "../contexts/InitialDataContext";
 import { TbBulb } from "react-icons/tb";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ToolTip";
-import { isEmpty } from "@lib/utils/utils";
+import { getId, isEmpty } from "@lib/utils/utils";
 function MessageSuggestions() {
   const { data } = useInitialData();
   const { messages, sendMessage } = useChat();
@@ -24,6 +24,7 @@ function MessageSuggestions() {
                   sendMessage({
                     from: "user",
                     content: q,
+                    id: getId(),
                   });
                 }}
               >
@@ -69,6 +70,7 @@ function ChatInputFooter() {
       sendMessage({
         from: "user",
         content: input,
+        id: getId(),
       });
     }
   }
@@ -77,7 +79,7 @@ function ChatInputFooter() {
       <div className="opencopilot-overflow-y-auto opencopilot-w-full ">
         <MessageSuggestions />
       </div>
-      <div className="opencopilot-w-full opencopilot-flex opencopilot-items-center opencopilot-ring-[#334155] opencopilot-transition-all opencopilot-justify-between opencopilot-ring-1 opencopilot-overflow-hidden focus-within:opencopilot-ring-primary opencopilot-gap-2 opencopilot-bg-accent opencopilot-p-2 opencopilot-rounded-2xl">
+      <div className="opencopilot-w-full opencopilot-flex opencopilot-items-center opencopilot-ring-[#334155]/60 opencopilot-transition-colors opencopilot-justify-between opencopilot-ring-1 opencopilot-overflow-hidden focus-within:opencopilot-ring-primary opencopilot-gap-2 opencopilot-bg-accent opencopilot-p-2 opencopilot-rounded-2xl">
         <div className="opencopilot-flex-1">
           <TextareaAutosize
             dir="auto"
