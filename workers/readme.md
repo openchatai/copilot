@@ -7,6 +7,7 @@ This repository hosts a collection of background jobs shared by both the OpenCha
 To activate the Celery worker for this project, use the following command:
 
 ```bash
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 celery -A celery_app worker --loglevel=info
 
 ```
