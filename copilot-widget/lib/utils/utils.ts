@@ -13,4 +13,12 @@ function isEmpty(value: string | object | any[] | undefined): boolean {
   }
   return false;
 }
-export { isEmpty };
+
+function getId(): string {
+  return Math.random().toString(36).substring(2, 15);
+}
+
+function getLast<T>(arr: T[]): T | undefined {
+  return arr[arr.length - 1];
+}
+export { isEmpty, getId, getLast };
