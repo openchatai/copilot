@@ -1,10 +1,9 @@
-from utils.__sql import sql_db
 from sqlalchemy import Column, String, DateTime, Boolean, Integer
 import datetime
 from uuid import uuid4
+from get_declarative_base import Base
 
-
-class ChatHistory(sql_db.Model):
+class ChatHistory(Base):
     __tablename__ = "chat_history"
 
     id = Column(Integer, primary_key=True, autoincrement=True)

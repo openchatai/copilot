@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, cast, List
 from utils.__sql import sql_db
-from models.chat_history import ChatHistory
+from workers.shared.models import ChatHistory
 
 
 def create_chat_history(

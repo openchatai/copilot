@@ -13,6 +13,17 @@ pip install opencopilot_db
 
 ## Usage
 
+**To create pool of connections use the following**
+```py
+from shared.models import create_database_schema
+from dotenv import load_dotenv
+
+import os
+load_dotenv("../llm-server/.env")
+
+create_database_schema()
+```
+
 ### Importing the Models
 
 ```python
