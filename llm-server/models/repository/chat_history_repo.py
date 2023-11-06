@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Optional, cast, List
-from utils.__sql import sql_db
-from workers.shared.models import ChatHistory
+from opencopilot_db import ChatHistory
 
 
 def create_chat_history(

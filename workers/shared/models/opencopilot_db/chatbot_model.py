@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, Boolean, DateTime, Text
 from datetime import datetime
 import uuid
-from get_declarative_base import Base
+from .get_declarative_base import Base
 
 class Chatbot(Base):
     __tablename__ = 'chatbots'

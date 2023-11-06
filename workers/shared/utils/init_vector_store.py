@@ -1,13 +1,10 @@
 from langchain.docstore.document import Document
 from langchain.vectorstores.qdrant import Qdrant
-from shared_libs.store_type import StoreType
+from shared.utils.store_type import StoreType
 from langchain.embeddings.openai import OpenAIEmbeddings
-from shared_libs.interfaces import StoreOptions
+from shared.utils.interfaces import StoreOptions
 from langchain.vectorstores.pinecone import Pinecone
 import os
-import threading
-init_lock = threading.Lock()
-
 
 def init_vector_store(docs: list[Document], embeddings: OpenAIEmbeddings, options: StoreOptions) -> None:
     store_type = StoreType[os.environ['STORE']]

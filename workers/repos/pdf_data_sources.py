@@ -1,6 +1,6 @@
 from sqlalchemy.orm import sessionmaker
-from shared.models.pdf_data_source_model import PdfDataSource
-from shared.models.database_setup import engine
+from shared.models.opencopilot_db.pdf_data_source_model import PdfDataSource
+from shared.models.opencopilot_db.pdf_data_source_model import engine
 # Create a session to interact with the database
 Session = sessionmaker(bind=engine)
 

@@ -3,11 +3,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.document_loaders import PyPDFium2Loader
 from repos.pdf_data_sources import insert_pdf_data_source
 
-# from share.get_embeddings import get_embeddings
-# from shared_libs.interfaces import StoreOptions
-# from shared_libs.init_vector_store import init_vector_store
 from langchain.document_loaders import PyPDFium2Loader
-
 from shared.utils import get_embeddings, init_vector_store
 from shared.utils.interfaces import StoreOptions
 

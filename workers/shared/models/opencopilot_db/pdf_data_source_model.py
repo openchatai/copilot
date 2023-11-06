@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
-from models.get_declarative_base import Base
+from .get_declarative_base import Base
 
 class PdfDataSource(Base):
     __tablename__ = 'pdf_data_sources'

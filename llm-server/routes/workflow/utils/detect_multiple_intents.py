@@ -13,7 +13,7 @@ import os
 import logging
 from prance import ResolvingParser
 from models.repository.chat_history_repo import get_all_chat_history_by_session_id
-from workers.models.chat_history import ChatHistory
+from opencopilot_db import ChatHistory
 
 logging.basicConfig(level=logging.INFO)
 

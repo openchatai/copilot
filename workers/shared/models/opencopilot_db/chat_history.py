@@ -1,7 +1,8 @@
 from sqlalchemy import Column, String, DateTime, Boolean, Integer
 import datetime
 from uuid import uuid4
-from get_declarative_base import Base
+# from shared.get_declarative_base import Base
+from .get_declarative_base import Base
 
 class ChatHistory(Base):
     __tablename__ = "chat_history"

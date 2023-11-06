@@ -78,7 +78,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Publish guide
 ```
-python setup.py sdist
 pip install twine
+python setup.py sdist bdist_wheel
 twine upload dist/*
+rm -rf build dist opencopilot_db.egg-info
 ```
