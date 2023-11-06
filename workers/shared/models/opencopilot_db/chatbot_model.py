@@ -2,7 +2,7 @@ from sqlalchemy import Column, String, Boolean, DateTime, Text
 from datetime import datetime
 import uuid
 from .get_declarative_base import Base
-
+from .database_setup import engine
 class Chatbot(Base):
     __tablename__ = 'chatbots'
 
@@ -18,3 +18,5 @@ class Chatbot(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=True)
     updated_at = Column(DateTime, onupdate=datetime.utcnow, nullable=True)
     deleted_at = Column(DateTime, nullable=True)
+
+Base.metadata.create_all(engine)
