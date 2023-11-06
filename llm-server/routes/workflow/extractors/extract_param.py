@@ -2,7 +2,7 @@ import os
 from langchain.chat_models import ChatOpenAI
 from routes.workflow.extractors.extract_json import extract_json_payload
 from utils.get_chat_model import get_chat_model
-from utils.get_llm import get_llm
+from opencopilot_utils import get_llm
 from custom_types.t_json import JsonData
 from typing import Optional, Any
 import logging
