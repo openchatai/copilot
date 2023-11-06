@@ -79,3 +79,7 @@ You've provided the steps for publishing your library, which are correct. Here's
 Your library will then be published on PyPI and accessible to the Python community.
 
 Ensure that you've included a `README.md` file with a project description, and that your `setup.py` includes the necessary metadata, as shown in the previous responses.
+
+
+remove dist
+rm -rf build dist opencopilot_utils.egg-info

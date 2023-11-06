@@ -1,9 +1,7 @@
 from typing import Any
 from opencopilot_types.workflow_type import WorkflowDataType
-from utils.vector_db.store_options import StoreOptions
+from opencopilot_utils import StoreOptions, get_embeddings, init_vector_store
 from langchain.docstore.document import Document
-from utils.get_embeddings import get_embeddings
-from utils.vector_db.init_vector_store import init_vector_store
 
 
 def add_workflow_data_to_qdrant(

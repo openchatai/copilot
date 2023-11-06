@@ -4,7 +4,7 @@ from langchain.document_loaders import PyPDFium2Loader
 from repos.pdf_data_sources import insert_pdf_data_source
 
 from langchain.document_loaders import PyPDFium2Loader
-from shared.utils import get_embeddings, init_vector_store
+from shared.utils.opencopilot_utils import get_embeddings, init_vector_store
 from shared.utils.interfaces import StoreOptions
 
 # @Todo: add the url in the filename in the context of vectordatabase and also mongo/sql, we need to check if this file exists in the metadata, if yes we delete and reindex it. This will also be helpful in migrations

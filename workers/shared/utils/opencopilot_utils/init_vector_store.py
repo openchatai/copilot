@@ -1,8 +1,8 @@
 from langchain.docstore.document import Document
 from langchain.vectorstores.qdrant import Qdrant
-from shared.utils.store_type import StoreType
+from .store_type import StoreType
 from langchain.embeddings.openai import OpenAIEmbeddings
-from shared.utils.interfaces import StoreOptions
+from .interfaces import StoreOptions
 import os
 
 def init_vector_store(docs: list[Document], embeddings: OpenAIEmbeddings, options: StoreOptions) -> None:

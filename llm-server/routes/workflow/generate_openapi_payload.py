@@ -1,7 +1,7 @@
 import re
 import os
 import json
-from utils.get_llm import get_llm
+from opencopilot_utils import get_llm
 from routes.workflow.extractors.extract_param import gen_params_from_schema
 from routes.workflow.extractors.extract_body import gen_body_from_schema
 from typing import Any, Optional
