@@ -14,8 +14,8 @@ type InitialDataContextType = {
   refetch: () => void;
 };
 
-const InitialDataContext = createContext<InitialDataContextType | undefined>(
-  undefined
+const InitialDataContext = createContext<InitialDataContextType>(
+  {} as InitialDataContextType
 );
 
 export function InitialDataProvider({ children }: { children: ReactNode }) {
@@ -33,7 +33,7 @@ export function InitialDataProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     loadData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -49,7 +49,7 @@ export function InitialDataProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export const useInitialData = (): InitialDataContextType | undefined => {
+export const useInitialData = (): InitialDataContextType => {
   const context = useContext(InitialDataContext);
   if (!context) {
     console.warn("Error loading initial data....");

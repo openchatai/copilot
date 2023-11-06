@@ -7,6 +7,10 @@ import { FaRegUserCircle } from "react-icons/fa";
 import { format } from "timeago.js";
 import cn from "../utils/cn";
 import formatTimeFromTimestamp from "../utils/formatTime";
+import { useCopyToClipboard } from "@lib/hooks/useCopy";
+import { HiOutlineClipboard, HiOutlineClipboardCheck } from "react-icons/hi";
+import { FailedMessage, useChat } from "@lib/contexts/Controller";
+import { getLast } from "@lib/utils/utils";
 function BotIcon({ error }: { error?: boolean }) {
   return (
     <img
@@ -33,20 +37,24 @@ function UserIcon() {
 export function BotTextMessage({
   message,
   timestamp,
+  id,
 }: {
   message: string;
   timestamp?: number;
+  id?: string;
 }) {
   const { displayText } = useTypeWriter({
     text: message,
     every: 0.0001,
     shouldStart: true,
   });
-
+  const [copied, copy] = useCopyToClipboard();
+  const { messages } = useChat();
+  const isLast = getLast(messages)?.id === id;
   return (
-    <div className="opencopilot-p-2 opencopilot-w-full">
+    <div className="opencopilot-p-2 group opencopilot-w-full">
       <div
-        className="opencopilot-flex opencopilot-items-start opencopilot-gap-3 opencopilot-w-full"
+        className="opencopilot-flex opencopilot-select-none opencopilot-items-start opencopilot-gap-3 opencopilot-w-full"
         dir="auto"
       >
         <BotIcon />
@@ -63,15 +71,27 @@ export function BotTextMessage({
           </div>
         </div>
       </div>
-      <div className="opencopilot-w-full opencopilot-ps-[52px]">
-        <div>
-          {timestamp && (
-            <span className="opencopilot-text-xs opencopilot-m-0 group-last-of-type:opencopilot-inline opencopilot-hidden">
-              Bot · {format(timestamp)}
-            </span>
-          )}
+      {isLast && (
+        <div className="opencopilot-w-full opencopilot-ps-10 opencopilot-flex opencopilot-items-center opencopilot-justify-between">
+          <div>
+            {timestamp && (
+              <span className="opencopilot-text-xs opencopilot-m-0">
+                Bot · {format(timestamp)}
+              </span>
+            )}
+          </div>
+          <button
+            className="opencopilot-text-lg opencopilot-justify-self-end"
+            onClick={() => copy(displayText)}
+          >
+            {copied ? (
+              <HiOutlineClipboardCheck className="opencopilot-text-emerald-500" />
+            ) : (
+              <HiOutlineClipboard />
+            )}
+          </button>
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -105,11 +125,12 @@ export function UserMessage({
 }: {
   content: string;
   timestamp?: number;
+  id?: string;
 }) {
   return (
     <div
       dir="auto"
-      className="opencopilot-w-full last-of-type:opencopilot-mb-10 opencopilot-bg-accent opencopilot-p-2 opencopilot-flex opencopilot-gap-3 opencopilot-items-center"
+      className="opencopilot-w-full opencopilot-overflow-x-auto opencopilot-max-w-full last-of-type:opencopilot-mb-10 opencopilot-bg-accent opencopilot-p-2 opencopilot-flex opencopilot-gap-3 opencopilot-items-center"
     >
       <UserIcon />
       <div>
@@ -128,12 +149,11 @@ export function UserMessage({
   );
 }
 
-export function BotMessageError() {
+export function BotMessageError({ message }: { message?: FailedMessage }) {
   const { displayText } = useTypeWriter({
     text: "Error sending the message.",
     every: 0.001,
   });
-
   return (
     <div className="opencopilot-clear-both opencopilot-w-full opencopilot-p-2">
       <div className="opencopilot-flex opencopilot-items-center opencopilot-gap-3 opencopilot-w-full">

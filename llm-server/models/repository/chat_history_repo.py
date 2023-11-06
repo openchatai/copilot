@@ -54,9 +54,10 @@ def get_all_chat_history_by_session_id(
     Returns:
       A list of ChatHistory objects, sorted by created_at in descending order.
     """
-
+    session = Session()
     chats = (
-        ChatHistory.query.filter_by(session_id=session_id)
+        session.query(ChatHistory)
+        .filter_by(session_id=session_id)
         .order_by(ChatHistory.created_at.desc())
         .limit(limit)
         .offset(offset)
@@ -79,9 +80,9 @@ def get_all_chat_history(limit: int = 10, offset: int = 0) -> List[ChatHistory]:
     Returns:
       A list of ChatHistory objects.
     """
-
-    chats = ChatHistory.query.limit(limit).offset(offset).all()
-    return cast(List[ChatHistory], chats)
+    with Session() as session:
+        chats = session.query(ChatHistory).limit(limit).offset(offset).all()
+        return cast(List[ChatHistory], chats)
 
 
 def update_chat_history(
@@ -104,7 +105,7 @@ def update_chat_history(
       The updated ChatHistory object.
     """
     with Session() as session:
-        chat_history = ChatHistory.query.get(chat_history_id)
+        chat_history = session.query(ChatHistory).get(chat_history_id)
         chat_history.chatbot_id = chatbot_id or chat_history.chatbot_id
         chat_history.session_id = session_id or chat_history.session_id
         chat_history.from_user = from_user or chat_history.from_user
@@ -123,6 +124,6 @@ def delete_chat_history(chat_history_id: str) -> None:
       chat_history_id: The ID of the chat history record to delete.
     """
     with Session() as session:
-        chat_history = ChatHistory.query.get(chat_history_id)
+        chat_history = session.query(ChatHistory).get(chat_history_id)
         session.delete(chat_history)
         session.commit()

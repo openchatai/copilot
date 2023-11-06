@@ -143,10 +143,10 @@ def hasSingleIntent(
         SystemMessage(
             content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. To accomplish the task, you will be provided with information about the existing state of the application. A user input and list of api summaries. If the user is asking you to perform a `CRUD` operation, provide the list of operation ids of api calls needed in the `ids` field of the json. `bot_message` should consist of a straightforward sentence, free from any special characters. Note that the application uses current state as a cache, if you don't find the required information in the cache, you should try to find an api call to fetch that information. Your response MUST be a valid minified json"
         ),
-        (app == "trello")
-        and HumanMessage(
-            content="You can find board id, board name, list id, list name, card id, card name in the current state."
-        ),
+        # (app == "trello")
+        # and HumanMessage(
+        #     content="You can find board id, board name, list id, list name, card id, card name in the current state."
+        # ),
         current_state
         and HumanMessage(
             content="Here is the current state of the application: {}".format(
