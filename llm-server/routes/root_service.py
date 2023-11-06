@@ -2,7 +2,6 @@ import os
 from typing import Dict, Any, cast, Optional, List, Tuple
 
 import logging
-from dotenv import load_dotenv
 from opencopilot_types.workflow_type import WorkflowDataType
 from routes.workflow.typings.run_workflow_input import WorkflowData
 from routes.workflow.utils import (
@@ -13,7 +12,6 @@ from routes.workflow.utils import (
 )
 from bson import ObjectId
 import os
-from dotenv import load_dotenv
 from typing import Dict, Any, cast
 from utils.db import Database
 import json
@@ -29,7 +27,6 @@ import traceback
 db_instance = Database()
 mongo = db_instance.get_db()
 
-load_dotenv()
 shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
 
 # Define constants for error messages
@@ -213,16 +210,16 @@ def handle_no_api_call(
 
 
 def handle_exception(e: Exception) -> Dict[str, Any]:
-
     error_info = {
         "error": str(e),
         "traceback": traceback.format_exc(),
     }
-    
-    print(error_info)
-    
-    logging.error("[OpenCopilot] Something went wrong when trying to get how many calls are required", exc_info=True)
 
-    
+    print(error_info)
+
+    logging.error(
+        "[OpenCopilot] Something went wrong when trying to get how many calls are required",
+        exc_info=True,
+    )
 
     return {"response": None, "error": str(e)}

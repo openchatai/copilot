@@ -10,15 +10,12 @@ from langchain.schema import AIMessage, HumanMessage, SystemMessage
 from utils.get_chat_model import get_chat_model
 from routes.workflow.extractors.extract_json import extract_json_payload
 import os
-from dotenv import load_dotenv
 import logging
 from prance import ResolvingParser
 from models.repository.chat_history_repo import get_all_chat_history_by_session_id
-from models.chat_history import ChatHistory
+from opencopilot_db import ChatHistory
 
 logging.basicConfig(level=logging.INFO)
-
-load_dotenv()
 
 
 class BotMessage:

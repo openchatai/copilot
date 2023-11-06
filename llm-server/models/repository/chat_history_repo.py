@@ -1,7 +1,12 @@
 from datetime import datetime
 from typing import Optional, cast, List
-from utils.__sql import sql_db
-from models.chat_history import ChatHistory
+from opencopilot_db import ChatHistory, engine
+from sqlalchemy.orm import sessionmaker
+from datetime import datetime
+from typing import Optional
+
+
+Session = sessionmaker(bind=engine)
 
 
 def create_chat_history(
@@ -22,19 +27,18 @@ def create_chat_history(
       The newly created ChatHistory object.
     """
 
-    chat_history = ChatHistory(
-        chatbot_id=chatbot_id,
-        session_id=session_id,
-        from_user=from_user,
-        message=message,
-    )
-    sql_db.session.add(chat_history)
-    sql_db.session.commit()
+    with Session() as session:
+        chat_history = ChatHistory(
+            chatbot_id=chatbot_id,
+            session_id=session_id,
+            from_user=from_user,
+            message=message,
+        )
+
+        session.add(chat_history)
+        session.commit()
+
     return chat_history
-
-
-from datetime import datetime
-from typing import Optional
 
 
 def get_all_chat_history_by_session_id(
@@ -50,9 +54,10 @@ def get_all_chat_history_by_session_id(
     Returns:
       A list of ChatHistory objects, sorted by created_at in descending order.
     """
-
+    session = Session()
     chats = (
-        ChatHistory.query.filter_by(session_id=session_id)
+        session.query(ChatHistory)
+        .filter_by(session_id=session_id)
         .order_by(ChatHistory.created_at.desc())
         .limit(limit)
         .offset(offset)
@@ -75,9 +80,9 @@ def get_all_chat_history(limit: int = 10, offset: int = 0) -> List[ChatHistory]:
     Returns:
       A list of ChatHistory objects.
     """
-
-    chats = ChatHistory.query.limit(limit).offset(offset).all()
-    return cast(List[ChatHistory], chats)
+    with Session() as session:
+        chats = session.query(ChatHistory).limit(limit).offset(offset).all()
+        return cast(List[ChatHistory], chats)
 
 
 def update_chat_history(
@@ -99,14 +104,16 @@ def update_chat_history(
     Returns:
       The updated ChatHistory object.
     """
+    with Session() as session:
+        chat_history = session.query(ChatHistory).get(chat_history_id)
+        chat_history.chatbot_id = chatbot_id or chat_history.chatbot_id
+        chat_history.session_id = session_id or chat_history.session_id
+        chat_history.from_user = from_user or chat_history.from_user
+        chat_history.message = message or chat_history.message
+        chat_history.updated_at = datetime.now()
 
-    chat_history = ChatHistory.query.get(chat_history_id)
-    chat_history.chatbot_id = chatbot_id or chat_history.chatbot_id
-    chat_history.session_id = session_id or chat_history.session_id
-    chat_history.from_user = from_user or chat_history.from_user
-    chat_history.message = message or chat_history.message
-    chat_history.updated_at = datetime.now()
-    sql_db.session.commit()
+        session.add(chat_history)
+        session.commit()
     return cast(ChatHistory, chat_history)
 
 
@@ -116,7 +123,7 @@ def delete_chat_history(chat_history_id: str) -> None:
     Args:
       chat_history_id: The ID of the chat history record to delete.
     """
-
-    chat_history = ChatHistory.query.get(chat_history_id)
-    sql_db.session.delete(chat_history)
-    sql_db.session.commit()
+    with Session() as session:
+        chat_history = session.query(ChatHistory).get(chat_history_id)
+        session.delete(chat_history)
+        session.commit()
