@@ -23,6 +23,8 @@ from prance import ResolvingParser
 from utils.vector_db.add_workflow import add_workflow_data_to_qdrant
 from uuid import uuid4
 from langchain.docstore.document import Document
+import traceback
+
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -211,7 +213,16 @@ def handle_no_api_call(
 
 
 def handle_exception(e: Exception) -> Dict[str, Any]:
-    logging.info(
-        "[OpenCopilot] Something went wrong when trying to get how many calls are required"
-    )
+
+    error_info = {
+        "error": str(e),
+        "traceback": traceback.format_exc(),
+    }
+    
+    print(error_info)
+    
+    logging.error("[OpenCopilot] Something went wrong when trying to get how many calls are required", exc_info=True)
+
+    
+
     return {"response": None, "error": str(e)}
