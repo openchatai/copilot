@@ -1,5 +1,5 @@
 from celery import Celery
-from shared.models import create_database_schema
+from shared.models.opencopilot_db import create_database_schema
 from dotenv import load_dotenv
 
 import os
