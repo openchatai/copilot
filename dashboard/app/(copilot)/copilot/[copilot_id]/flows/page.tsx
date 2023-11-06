@@ -1,31 +1,48 @@
 "use client";
 import React, { useState } from "react";
-import {
-  CodePreview,
-  Controller,
-  FlowArena,
-  useController,
-  transformPaths,
-} from "@openchatai/copilot-flows-editor";
 import { HeaderShell } from "@/components/domain/HeaderShell";
 import { useCopilot } from "../../_context/CopilotProvider";
 import useSwr, { mutate } from "swr";
 import { getSwaggerByBotId } from "@/data/swagger";
 import { Button } from "@/components/ui/button";
-import { createWorkflowByBotId, deleteWorkflowById } from "@/data/flow";
+import {
+  createWorkflowByBotId,
+  deleteWorkflowById,
+  getWorkflowById,
+} from "@/data/flow";
 import { useRouter } from "next/navigation";
 import { toast } from "@/components/ui/use-toast";
 import _ from "lodash";
 import { useIsEditing } from "./_parts/useIsEditing";
+import {
+  Controller,
+  FlowArena,
+  transformPaths,
+  useController,
+} from "@/components/domain/flows-editor";
 
 function Header() {
   // editing => workflow_id // creating => undefined
   const [isEditing, workflow_id] = useIsEditing();
   const { replace } = useRouter();
   const { id: copilotId, name: copilotName } = useCopilot();
-  const { loadPaths, reset: resetFlowEditor, getData } = useController();
-
-  const [loading, setLoading] = useState(false);
+  const {
+    loadPaths,
+    reset: resetFlowEditor,
+    getData,
+    loadFlows,
+    state,
+  } = useController();
+  useSwr(workflow_id, getWorkflowById, {
+    onSuccess: (data) => {
+      const first = _.first(data.data.flows);
+      if (first) {
+        console.log(first);
+        // @ts-ignore
+        loadFlows([first]);
+      }
+    },
+  });
   const { isLoading: isSwaggerLoading, mutate: mutateSwagger } = useSwr(
     copilotId + "swagger_file",
     async () => getSwaggerByBotId(copilotId),
@@ -36,6 +53,8 @@ function Header() {
       },
     },
   );
+  console.log(state);
+  const [loading, setLoading] = useState(false);
   const isLoading = isSwaggerLoading || loading;
 
   async function handleSave() {}
@@ -131,22 +150,14 @@ function Header() {
     </HeaderShell>
   );
 }
-export default function FlowsPage({
-  params: { copilot_id },
-}: {
-  params: { copilot_id: string };
-}) {
-  const [isEditing, workflow_id] = useIsEditing();
-  console.log({ isEditing, workflow_id });
-  const [state, setState] = useState<any>();
+export default function FlowsPage() {
   return (
     // @ts-ignore
-    <Controller maxFlows={1} initialState={state} onChange={setState}>
+    <Controller maxFlows={1}>
       <div className="flex h-full w-full flex-col">
         <Header />
         <div className="relative flex h-full w-full flex-1 items-start justify-between">
           <FlowArena />
-          <CodePreview />
         </div>
       </div>
     </Controller>
