@@ -25,6 +25,7 @@ export function WorkflowsList({ copilot_id }: { copilot_id: string }) {
           <li key={i} className="h-fit w-full">
             <NavLink
               href={flowsBase + "/?workflow_id=" + workflow._id}
+              matchSearchParams
               className="flex items-center rounded border px-4 py-2 text-sm font-medium text-accent-foreground transition duration-150 ease-in-out "
               activeClassName="border-gray-300 bg-accent"
             >

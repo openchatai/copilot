@@ -41,11 +41,13 @@ function CodeBlock({
             padding: "20px 24px",
             color: "#ddd",
             fontFamily: '"Fira Code"',
-            fontSize: "13px",
+            fontSize: "14px",
             margin: "0px",
             borderRadius: "0.5rem",
+            fontWeight: 500,
           },
         }}
+        wrapLongLines
       >
         {code}
       </SyntaxHighlighter>

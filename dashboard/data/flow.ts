@@ -44,8 +44,8 @@ export const getWorkflowsByBotId = async (bot_id: string, page: number = 1) => {
     `/get/b/${bot_id}?page=${page}`,
   );
 };
-export const getWorkflowById = (id: string) => {
-  return instance.get<Workflow>(`/${id}`);
+export const getWorkflowById = async (id: string) => {
+  return await instance.get<Workflow>(`/${id}`);
 };
 
 export const createWorkflowFromSwagger = (
