@@ -3,7 +3,7 @@ from typing import Optional, cast, List
 from opencopilot_db import ChatHistory, engine, pdf_data_source_model
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Tuple
 
 Session = sessionmaker(bind=engine)
 
@@ -126,3 +126,35 @@ def delete_chat_history(chat_history_id: str) -> None:
         chat_history = session.query(ChatHistory).get(chat_history_id)
         session.delete(chat_history)
         session.commit()
+
+
+def get_chat_history_for_retrieval_chain(
+    session_id: str, limit: Optional[int] = None
+) -> List[Tuple[str, str]]:
+    """Fetches limited ChatHistory entries by session ID and converts to chat_history format.
+
+    Args:
+        session_id (str): The session ID to fetch chat history for
+        limit (int, optional): Maximum number of entries to retrieve
+
+    Returns:
+        list[tuple[str, str]]: List of tuples of (user_query, bot_response)
+    """
+
+    # Query and limit results if a limit is provided
+    query = ChatHistory.objects.filter(session_id=session_id).order_by("created_at")
+    if limit:
+        query = query[:limit]
+
+    chat_history = []
+
+    user_query = None
+    for entry in query:
+        if entry.from_user:
+            user_query = entry.message
+        else:
+            if user_query is not None:
+                chat_history.append((user_query, entry.message))
+                user_query = None
+
+    return chat_history

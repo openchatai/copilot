@@ -11,20 +11,29 @@ from routes.workflow.utils import (
     hasSingleIntent,
     create_workflow_from_operation_ids,
 )
+from opencopilot_utils import get_llm, StoreOptions
 from bson import ObjectId
 import os
 from typing import Dict, Any, cast
 from routes.workflow.utils.router import get_action_type
 from utils.db import Database
 import json
-from models.repository.chat_history_repo import create_chat_history
+from models.repository.chat_history_repo import (
+    create_chat_history,
+    get_chat_history_for_retrieval_chain,
+)
+from utils.get_chat_model import get_chat_model
 from utils.process_app_state import process_state
 from prance import ResolvingParser
 from utils.vector_db.add_workflow import add_workflow_data_to_qdrant
 from uuid import uuid4
 from langchain.docstore.document import Document
 import traceback
-
+from langchain.schema import HumanMessage, SystemMessage
+from opencopilot_utils.get_vector_store import get_vector_store
+from langchain.vectorstores.base import VectorStore
+from langchain.prompts import PromptTemplate
+from langchain.chains import ConversationalRetrievalChain
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -49,6 +58,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
         headers,
         server_base_url,
         app,
+        bot_id,
     ) = extract_data(data)
 
     log_user_request(text)
@@ -73,7 +83,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
                 session_id,
             )
 
-        action = get_action_type(text, swagger_url)
+        action = get_action_type(text, bot_id)
         if action == ActionType.ASSISTANT_ACTION:
             bot_response = hasSingleIntent(
                 swagger_doc, text, session_id, current_state, app
@@ -97,15 +107,94 @@ def handle_request(data: Dict[str, Any]) -> Any:
                 )
 
         elif action == ActionType.KNOWLEDGE_BASE_QUERY:
-            pass
+            sanitized_question = text.strip().replace("\n", " ")
+            vector_store = get_vector_store(StoreOptions(namespace=bot_id))
+            mode = "assistant"
+            chain = getConversationRetrievalChain(vector_store, mode, base_prompt)
+            chat_history = get_chat_history_for_retrieval_chain(session_id, limit=40)
+            response = chain(
+                {"question": sanitized_question, "chat_history": chat_history},
+                return_only_outputs=True,
+            )
+            return {"response": response["answer"]}
+
         elif action == ActionType.GENERAL_QUERY:
-            pass
+            chat = get_chat_model("gpt-3.5-turbo")
+
+            messages = [
+                SystemMessage(
+                    content="You are an ai assistant, that answers general queries in <= 3 sentences"
+                ),
+                HumanMessage(content=f"Answer the following: {text}"),
+            ]
+
+            content = chat(messages).content
+            return {"response": content}
 
     except Exception as e:
         return handle_exception(e)
 
 
 # Helper Functions
+
+
+def get_condense_prompt_by_mode(mode: str) -> str:
+    condense_prompts = {
+        "assistant": """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
+
+    Chat History:
+    {chat_history}
+    Follow Up Input: {question}
+    Standalone question:""",
+        "pair_programmer": """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.  
+
+    Chat History:
+    {chat_history}
+    Follow Up Input: {question}
+    Standalone question:""",
+    }
+
+    if mode in condense_prompts:
+        return condense_prompts[mode]
+
+    return """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
+
+    Chat History:
+    {chat_history} 
+    Follow Up Input: {question}
+    Standalone question:"""
+
+
+def get_qa_prompt_by_mode(mode: str, initial_prompt: Optional[str]) -> str:
+    qa_prompts = {
+        "assistant": initial_prompt,
+        "pair_programmer": """You are a helpful AI programmer. you will be given the content of git repository and your should answer questions about the code in the given context.
+    You must answer with code when asked to write one, and you must answer with a markdown file when asked to write one, if the question is not about the code in the context, answer with "I only answer questions about the code in the given context".
+    
+    {context}
+    
+    Question: {question}
+    Helpful answer in markdown:""",
+    }
+
+    if mode in qa_prompts:
+        return qa_prompts[mode]
+
+    return initial_prompt if initial_prompt else ""
+
+
+def getConversationRetrievalChain(vector_store: VectorStore, mode, initial_prompt: str):
+    llm = get_llm()
+    template = get_qa_prompt_by_mode(mode, initial_prompt=initial_prompt)
+    prompt = PromptTemplate.from_template(template)
+    chain = ConversationalRetrievalChain.from_llm(
+        llm,
+        chain_type="stuff",
+        retriever=vector_store.as_retriever(),
+        verbose=True,
+        combine_docs_chain_kwargs={"prompt": prompt},
+    )
+    return chain
 
 
 def extract_data(data: Dict[str, Any]) -> Tuple:
@@ -116,7 +205,17 @@ def extract_data(data: Dict[str, Any]) -> Tuple:
     headers = data.get("headers", {})
     server_base_url = cast(str, data.get("server_base_url", ""))
     app = headers.get("X-App-Name") or None
-    return text, swagger_url, session_id, base_prompt, headers, server_base_url, app
+    bot_id = data.get("bot_id", None)
+    return (
+        text,
+        swagger_url,
+        session_id,
+        base_prompt,
+        headers,
+        server_base_url,
+        app,
+        bot_id,
+    )
 
 
 def log_user_request(text: str) -> None:

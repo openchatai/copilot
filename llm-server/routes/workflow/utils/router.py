@@ -15,9 +15,9 @@ from prance import ResolvingParser
 chat = get_chat_model("gpt-3.5-turbo")
 
 
-def get_relevant_docs(text: str, namespace: str) -> Optional[str]:
+def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
     score_threshold = float(os.getenv("SCORE_THRESHOLD_KB", 0.75))
-    vector_store: VectorStore = get_vector_store(StoreOptions(namespace.split("/")[-1]))
+    vector_store: VectorStore = get_vector_store(StoreOptions(bot_id))
 
     try:
         result = vector_store.similarity_search_with_relevance_scores(
@@ -74,9 +74,8 @@ def classify_text(user_requirement: str, context: str) -> ActionType:
     return ActionType.GENERAL_QUERY
 
 
-def get_action_type(user_requirement: str, url: str) -> ActionType:
-    namespace = url.split("/")[-1]
-    context = get_relevant_docs(user_requirement, namespace) or []
+def get_action_type(user_requirement: str, bot_id: str) -> ActionType:
+    context = get_relevant_docs(user_requirement, bot_id) or []
 
     route = classify_text(user_requirement, context)
 

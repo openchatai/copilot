@@ -4,8 +4,8 @@ from langchain.document_loaders import PyPDFium2Loader
 from repos.pdf_data_sources import insert_pdf_data_source
 
 from langchain.document_loaders import PyPDFium2Loader
-from shared.utils.opencopilot_utils import get_embeddings, init_vector_store
-from shared.utils.interfaces import StoreOptions
+from shared.utils.opencopilot_utils import get_embeddings, init_vector_store, StoreOptions
+
 
 # @Todo: add the url in the filename in the context of vectordatabase and also mongo/sql, we need to check if this file exists in the metadata, if yes we delete and reindex it. This will also be helpful in migrations
 @shared_task
@@ -13,7 +13,9 @@ def process_pdf(url: str, bot_id: str):
     try:
         loader = PyPDFium2Loader(url)
         raw_docs = loader.load()
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200, length_function=len)
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000, chunk_overlap=200, length_function=len
+        )
         docs = text_splitter.split_documents(raw_docs)
         embeddings = get_embeddings()
         init_vector_store(docs, embeddings, StoreOptions(namespace=bot_id))
