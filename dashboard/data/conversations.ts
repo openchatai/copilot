@@ -1,6 +1,6 @@
 import axios from "axios";
 const instance = axios.create({
-  baseURL: "http://localhost:8888/backend",
+  baseURL: "http://localhost:8888/backend/chat",
 });
 export type ConversationType = {
   id: string;
@@ -13,5 +13,5 @@ export type ConversationType = {
 
 export async function getConversationBySessionId(sessionId: string) {
   if (!sessionId) return;
-  return await instance.get<ConversationType[]>(`/chat/session/${sessionId}/chats`);
+  return await instance.get<ConversationType[]>(`/sessions/${sessionId}/chats`);
 }
