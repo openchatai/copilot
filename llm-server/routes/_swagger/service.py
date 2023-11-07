@@ -1,4 +1,6 @@
+from http.client import HTTPException
 import json
+from routes.root_service import get_swagger_doc
 import yaml
 
 from utils.db import Database
@@ -7,6 +9,16 @@ db_instance = Database()
 mongo = db_instance.get_db()
 from typing import Dict
 from flask import Request
+
+
+def save_swaggerfile_to_mongo(filename: str, bot_id: str) -> bool:
+    swagger_doc = get_swagger_doc(swagger_url=filename)
+    spec = swagger_doc.specification
+    spec["meta"] = {"bot_id": bot_id, "swagger_url": filename}
+
+    result = mongo.swagger_files.insert_one(spec)
+
+    return result.acknowledged
 
 
 def add_swagger_file(request: Request, id: str) -> Dict[str, str]:
@@ -37,8 +49,6 @@ def add_swagger_file(request: Request, id: str) -> Dict[str, str]:
     else:
         return {"error": "Unsupported content type"}
 
-    # Insert into MongoDB
-    file_content["bot_id"] = id
     inserted_id = mongo.swagger_files.insert_one(file_content).inserted_id
 
     return {"message": "File added successfully", id: str(inserted_id)}

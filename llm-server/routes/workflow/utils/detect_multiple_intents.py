@@ -4,10 +4,10 @@ import re
 from typing import Any, Dict, Union, cast
 from typing import Any, Dict, Optional, Union, cast
 from typing import List
-
+from langchain.chat_models import ChatOpenAI
 
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
-from langchain.chat_models import ChatOpenAI
+from utils.get_chat_model import get_chat_model
 from routes.workflow.extractors.extract_json import extract_json_payload
 import os
 from dotenv import load_dotenv
@@ -103,11 +103,7 @@ def generate_consolidated_requirement(
     Returns:
       A consolidated query string.
     """
-    chat = ChatOpenAI(
-        openai_api_key=os.getenv("OPENAI_API_KEY"),
-        model="gpt-3.5-turbo",
-        temperature=0,
-    )
+    chat = get_chat_model("gpt-3.5-turbo")
 
     history = get_all_chat_history_by_session_id(session_id)
     if len(history) == 0:
@@ -116,15 +112,15 @@ def generate_consolidated_requirement(
     conversation_str = join_conversations(history)
     messages = [
         SystemMessage(
-            content="You are an AI model designed to perform text substitution. You will receive user input. If the user's input contains references such as `the` or `this` etc... you should replace these words with the specific objects or concepts they refer to within the ongoing conversation, if applicable. However, if the user's input already contains all the necessary information, you should return the original user text."
+            content="You are an AI model designed to generate a standalone prompt. The user message may also contain instructions for you as a bot, like generating some content in this message. You should act accordingly"
+        ),
+        HumanMessage(
+            content="You will receive user input. Based on the conversation and the current user prompt, I want you to convert the user prompt into a standalone prompt if the user prompt references something in conversation history."
         ),
         HumanMessage(
             content="Conversation History: ({}), \n\n Current User input: ({}).".format(
                 conversation_str, user_input
             ),
-        ),
-        HumanMessage(
-            content="Give me the user input after substituting the references."
         ),
     ]
     content = chat(messages).content
@@ -136,38 +132,30 @@ def hasSingleIntent(
     user_requirement: str,
     session_id: str,
     current_state: Optional[str],
+    app: str,
 ) -> BotMessage:
     summaries = get_summaries(swagger_doc)
-
-    chat = ChatOpenAI(
-        openai_api_key=os.getenv("OPENAI_API_KEY"),
-        model="gpt-3.5-turbo-16k",
-        temperature=0,
-    )
+    chat = get_chat_model("gpt-3.5-turbo-16k")
 
     consolidated_user_requirement = (
         generate_consolidated_requirement(user_requirement, session_id)
         or user_requirement
     )
 
-    # history = get_all_chat_history_by_session_id(session_id, 4)
-
-    # conversation_str = join_conversations(history)
     messages = [
         SystemMessage(
             content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. To accomplish the task, you will be provided with information about the existing state of the application. A user input and list of api summaries. If the user is asking you to perform a `CRUD` operation, provide the list of operation ids of api calls needed in the `ids` field of the json. `bot_message` should consist of a straightforward sentence, free from any special characters. Note that the application uses current state as a cache, if you don't find the required information in the cache, you should try to find an api call to fetch that information. Your response MUST be a valid minified json"
         ),
+        # (app == "trello")
+        # and HumanMessage(
+        #     content="You can find board id, board name, list id, list name, card id, card name in the current state."
+        # ),
         current_state
         and HumanMessage(
             content="Here is the current state of the application: {}".format(
                 current_state
             )
         ),
-        # HumanMessage(
-        #     content="User this conversation history for lookups if necessary: ({})".format(
-        #         conversation_str
-        #     )
-        # ),
         HumanMessage(
             content="Here's a list of api summaries {}.".format(summaries),
         ),

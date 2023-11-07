@@ -152,7 +152,6 @@ function Header() {
 }
 export default function FlowsPage() {
   return (
-    // @ts-ignore
     <Controller maxFlows={1}>
       <div className="flex h-full w-full flex-col">
         <Header />

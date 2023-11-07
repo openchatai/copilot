@@ -10,6 +10,7 @@ db_instance = Database()
 mongo = db_instance.get_db()
 _swagger = Blueprint("_swagger", __name__)
 
+
 @_swagger.route("/u/<swagger_url>", methods=["GET"])
 def get_swagger_files(swagger_url: str) -> Response:
     # Validate and parse page and page_size query params
@@ -58,6 +59,14 @@ def get_swagger_files_by_bot_id(bot_id: str) -> Response:
 @_swagger.route("/b/<id>", methods=["GET", "POST"])
 def add_swagger_file(id) -> Response:
     result = swagger_service.add_swagger_file(request, id)
+    return jsonify(result)
+
+
+@_swagger.route("/init/b/<bot_id>", methods=["GET", "POST"])
+def add_init_swagger_file(bot_id: str) -> Response:
+    body = request.get_json()
+    swagger_url = body["swagger_url"]
+    result = swagger_service.save_swaggerfile_to_mongo(swagger_url, bot_id)
     return jsonify(result)
 
 

@@ -1,4 +1,5 @@
 import json
+from opencopilot_types.workflow_type import WorkflowDataType
 from routes.workflow.generate_openapi_payload import generate_openapi_payload
 from utils.make_api_call import make_api_request
 import traceback
@@ -15,7 +16,7 @@ from integrations.transformers.transformer import transform_response
 
 
 def run_openapi_operations(
-    record: Any,
+    record: WorkflowDataType,
     swagger_json: ResolvingParser,
     text: str,
     headers: Any,
@@ -24,14 +25,19 @@ def run_openapi_operations(
 ) -> str:
     prev_api_response = ""
     record_info = {"Workflow Name": record.get("name")}
+    current_state = process_state(app, headers)
     for flow in record.get("flows", []):
         for step in flow.get("steps"):
             try:
                 # refresh state after every api call, we can look into optimizing this later as well
-                current_state = process_state(app, headers)
                 operation_id = step.get("open_api_operation_id")
                 api_payload = generate_openapi_payload(
-                    swagger_json, text, operation_id, prev_api_response, current_state
+                    swagger_json,
+                    text,
+                    operation_id,
+                    prev_api_response,
+                    app,
+                    current_state,
                 )
 
                 api_response = make_api_request(headers=headers, **api_payload.__dict__)

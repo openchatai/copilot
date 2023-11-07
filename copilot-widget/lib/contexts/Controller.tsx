@@ -4,12 +4,16 @@ import { useAxiosInstance } from "./axiosInstance";
 import { useConfigData } from "./ConfigData";
 import { useSoundEffectes } from "../hooks/useSoundEffects";
 import { Message } from "@lib/types";
-
+import { getId } from "@lib/utils/utils";
+export type FailedMessage = {
+  message: Message;
+  reason?: string;
+};
 interface ChatContextProps {
   messages: Message[];
   sendMessage: (message: Message) => void;
   loading: boolean;
-  error: boolean;
+  failedMessage: FailedMessage | null;
   reset: () => void;
 }
 
@@ -19,7 +23,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const sfx = useSoundEffectes();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [failedMessage, setError] = useState<FailedMessage | null>(null);
   const { axiosInstance } = useAxiosInstance();
   const config = useConfigData();
   const addMessage = (message: Message) => {
@@ -40,20 +44,32 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   const sendMessage = async (message: Message) => {
     // send user message
-    setError(false);
-    addMessage(message);
-
+    if (message.from === "user") {
+      addMessage(message);
+    }
+    setError(null);
+    setLoading(true);
     try {
-      // Make the API call to send the message
-      // we want to set loading for the bot message to be sent.
-      setLoading(true);
-      const response = await axiosInstance.post<
-        Extract<Message, { from: "bot" }>
-      >("/chat/send", { ...message, headers: config?.headers });
-      addMessage({ ...response.data, from: "bot" });
-    } catch (error) {
-      console.error("Error sending the message:");
-      setError(true);
+      const { data, status, statusText } = await axiosInstance.post(
+        "/chat/send",
+        {
+          ...message,
+          headers: config?.headers,
+        }
+      );
+      if (status === 200) {
+        addMessage({ ...data, id: getId(), from: "bot" });
+      } else {
+        setError({
+          message,
+          reason: statusText,
+        });
+      }
+    } catch (error: any) {
+      setError({
+        message,
+        reason: error?.message,
+      });
     } finally {
       setLoading(false);
     }
@@ -66,7 +82,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     messages,
     sendMessage,
     loading,
-    error,
+    failedMessage,
     reset,
   };
 
