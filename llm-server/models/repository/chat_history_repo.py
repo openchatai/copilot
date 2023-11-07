@@ -1,10 +1,9 @@
 from datetime import datetime
 from typing import Optional, cast, List
-from opencopilot_db import ChatHistory, engine
+from opencopilot_db import ChatHistory, engine, pdf_data_source_model
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 from typing import Optional
-
 
 Session = sessionmaker(bind=engine)
 
