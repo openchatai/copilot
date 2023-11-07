@@ -43,10 +43,7 @@ def combine_page_contents(results: List[Tuple[Document, float]]) -> Optional[str
     return combined_contents
 
 
-def find_correct_route(user_requirement: str, namespace: str) -> ActionType:
-    results = get_relevant_docs(user_requirement, namespace) or []
-
-    context = combine_page_contents(results)
+def classify_text(user_requirement: str, namespace: str, context: str) -> ActionType:
     messages = [
         SystemMessage(
             content="You are a multi-label classification model, that can classify the user input into - '{}', '{}', '{}'".format(
@@ -89,3 +86,19 @@ def find_correct_route(user_requirement: str, namespace: str) -> ActionType:
     return (
         ActionType.ASSISTANT_ACTION
     )  # Provide a default action if none of the conditions are met
+
+
+def execute_correct_llm_call(user_requirement: str, namespace: str):
+    results = get_relevant_docs(user_requirement, namespace) or []
+    context = combine_page_contents(results)
+
+    route = classify_text(user_requirement, namespace, context)
+
+    if route == ActionType.ASSISTANT_ACTION:
+        pass
+
+    elif route == ActionType.KNOWLEDGE_BASE_QUERY:
+        pass
+
+    elif route == ActionType.GENERAL_QUERY:
+        pass
