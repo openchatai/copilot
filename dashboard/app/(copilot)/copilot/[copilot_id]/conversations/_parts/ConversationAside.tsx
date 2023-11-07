@@ -5,7 +5,7 @@ import { Bookmark, CheckCircle, Trash2 } from "lucide-react";
 
 export function ConversationAside() {
   return (
-    <aside className="h-full w-full max-w-xs border-l border-border">
+    <aside className="hidden h-full w-full max-w-xs border-l border-border xl:inline">
       <section className="border-y border-border">
         <div className="px-4 py-8 text-center">
           <div className="flex-center -space-x-2">
@@ -38,7 +38,7 @@ export function ConversationAside() {
               <Bookmark className="h-4 w-4" />
             </button>
             <button className="flex w-full items-center justify-between px-1 py-2 text-sm text-destructive">
-              <span className="text-xs font-semibold">Delete </span>
+              <span className="text-xs font-semibold">Delete</span>
               <Trash2 className="h-4 w-4" />
             </button>
           </div>
