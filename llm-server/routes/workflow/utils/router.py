@@ -95,10 +95,13 @@ def execute_correct_llm_call(user_requirement: str, namespace: str):
     route = classify_text(user_requirement, namespace, context)
 
     if route == ActionType.ASSISTANT_ACTION:
+        # use handle single intent function call
         pass
 
     elif route == ActionType.KNOWLEDGE_BASE_QUERY:
+        # use the conversation retrieval qa chain here
         pass
 
     elif route == ActionType.GENERAL_QUERY:
+        # use the general chain
         pass
