@@ -185,7 +185,21 @@ def get_qa_prompt_by_mode(mode: str, initial_prompt: Optional[str]) -> str:
 
 def getConversationRetrievalChain(vector_store: VectorStore, mode, initial_prompt: str):
     llm = get_llm()
-    template = get_qa_prompt_by_mode(mode, initial_prompt=initial_prompt)
+    # template = get_qa_prompt_by_mode(mode, initial_prompt=initial_prompt)
+
+    # using standard template for now
+    template = """ Given the conversation history and question below, provide a concise answer based on the relevant documents:
+
+        Conversation History:
+        {chat_history} 
+
+        Question: {question}
+
+        Context:
+        {context}
+
+        Concise Answer:
+    """
     prompt = PromptTemplate.from_template(template)
     chain = ConversationalRetrievalChain.from_llm(
         llm,
