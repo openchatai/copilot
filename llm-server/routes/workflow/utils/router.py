@@ -3,24 +3,19 @@ from typing import Any
 from langchain.schema import HumanMessage, SystemMessage
 
 # push it to the library
-from opencopilot_utils import get_vector_store, StoreOptions
+from opencopilot_utils.get_vector_store import get_vector_store
+from opencopilot_utils import StoreOptions
+from custom_types.action_type import ActionType
 from utils import get_chat_model
 from typing import Optional, Tuple, List
 from langchain.docstore.document import Document
-from enum import Enum
 from langchain.vectorstores.base import VectorStore
-
+from prance import ResolvingParser
 
 chat = get_chat_model("gpt-3.5-turbo")
 
 
-class ActionType(Enum):
-    ASSISTANT_ACTION = "assistant_action"
-    KNOWLEDGE_BASE_QUERY = "knowledge_base_query"
-    GENERAL_QUERY = "general_query"
-
-
-def get_relevant_docs(text: str, namespace: str):
+def get_relevant_docs(text: str, namespace: str) -> Optional[str]:
     score_threshold = float(os.getenv("SCORE_THRESHOLD_KB", 0.75))
     vector_store: VectorStore = get_vector_store(StoreOptions(namespace.split("/")[-1]))
 
@@ -29,44 +24,39 @@ def get_relevant_docs(text: str, namespace: str):
             text, score_threshold=score_threshold
         )
 
-        return result
+        if result and len(result) > 0:
+            (document, score) = result[0]
+            return document.page_content
+
+        return None
 
     except Exception as e:
         logging.info(f"[Error] {e}")
         return None
 
 
-def combine_page_contents(results: List[Tuple[Document, float]]) -> Optional[str]:
-    if results is None:
-        return None
-    combined_contents = "\n\n".join(document.page_content for document, _ in results)
-    return combined_contents
-
-
-def classify_text(user_requirement: str, namespace: str, context: str) -> ActionType:
+def classify_text(user_requirement: str, context: str) -> ActionType:
     messages = [
         SystemMessage(
-            content="You are a multi-label classification model, that can classify the user input into - '{}', '{}', '{}'".format(
-                ActionType.ASSISTANT_ACTION,
-                ActionType.KNOWLEDGE_BASE_QUERY,
-                ActionType.GENERAL_QUERY,
-            )
+            content="You are a multi-label classification model. Your reply should only be one of the allowed keywords"
         ),
         HumanMessage(
-            content="""
-                You must output one of '{}', '{}', '{}'
-                If the user is asking for a question, information, etc... that can be answered from this context 
-                ```
-                {}
-                ```
-                output 'knowledge_base',
-                If the user is asking some general question
-            """.format(
-                ActionType.ASSISTANT_ACTION,
-                ActionType.KNOWLEDGE_BASE_QUERY,
-                ActionType.GENERAL_QUERY,
-                context,  # this comes from the vector database
-            )
+            content=f"""
+                You must output one of '{ActionType.ASSISTANT_ACTION.value}', '{ActionType.KNOWLEDGE_BASE_QUERY.value}', '{ActionType.GENERAL_QUERY.value}' based on the following conditions
+            """
+        ),
+        HumanMessage(
+            content=f"""
+                If the user's requirement would require making an API call to a third-party service, return the output as: {ActionType.ASSISTANT_ACTION.value}. 
+                
+                Actions such as performing tasks, listing items, displaying information, and managing additions/removals are all categorized as assistant actions etc, are all assistant actions
+            """
+        ),
+        HumanMessage(
+            content=f"""
+                If the user's requirement is related to this context ```{context}```, output: {ActionType.KNOWLEDGE_BASE_QUERY.value}
+                If you are unsure, output: {ActionType.GENERAL_QUERY.value}
+            """
         ),
         HumanMessage(
             content="Here's the user input {}".format(user_requirement),
@@ -80,28 +70,14 @@ def classify_text(user_requirement: str, namespace: str, context: str) -> Action
 
     elif ActionType.KNOWLEDGE_BASE_QUERY.value in content:
         return ActionType.KNOWLEDGE_BASE_QUERY
-    elif ActionType.GENERAL_QUERY.value in content:
-        return ActionType.GENERAL_QUERY
 
-    return (
-        ActionType.ASSISTANT_ACTION
-    )  # Provide a default action if none of the conditions are met
+    return ActionType.GENERAL_QUERY
 
 
-def execute_correct_llm_call(user_requirement: str, namespace: str):
-    results = get_relevant_docs(user_requirement, namespace) or []
-    context = combine_page_contents(results)
+def get_action_type(user_requirement: str, url: str) -> ActionType:
+    namespace = url.split("/")[-1]
+    context = get_relevant_docs(user_requirement, namespace) or []
 
-    route = classify_text(user_requirement, namespace, context)
+    route = classify_text(user_requirement, context)
 
-    if route == ActionType.ASSISTANT_ACTION:
-        # use handle single intent function call
-        pass
-
-    elif route == ActionType.KNOWLEDGE_BASE_QUERY:
-        # use the conversation retrieval qa chain here
-        pass
-
-    elif route == ActionType.GENERAL_QUERY:
-        # use the general chain
-        pass
+    return route

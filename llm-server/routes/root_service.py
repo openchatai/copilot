@@ -2,6 +2,7 @@ import os
 from typing import Dict, Any, cast, Optional, List, Tuple
 
 import logging
+from custom_types.action_type import ActionType
 from opencopilot_types.workflow_type import WorkflowDataType
 from routes.workflow.typings.run_workflow_input import WorkflowData
 from routes.workflow.utils import (
@@ -13,6 +14,7 @@ from routes.workflow.utils import (
 from bson import ObjectId
 import os
 from typing import Dict, Any, cast
+from routes.workflow.utils.router import get_action_type
 from utils.db import Database
 import json
 from models.repository.chat_history_repo import create_chat_history
@@ -58,7 +60,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
         current_state = process_state(app, headers)
         document = None
         # document, score = check_workflow_in_store(text, swagger_url)
-
+        # this is disabled now, but this should trigger if workflow is already defined for this kind of user request
         if document:
             return handle_existing_workflow(
                 document,
@@ -71,26 +73,33 @@ def handle_request(data: Dict[str, Any]) -> Any:
                 session_id,
             )
 
-        bot_response = hasSingleIntent(
-            swagger_doc, text, session_id, current_state, app
-        )
-
-        if len(bot_response.ids) >= 1:
-            return handle_api_calls(
-                bot_response.ids,
-                swagger_doc,
-                text,
-                headers,
-                server_base_url,
-                swagger_url,
-                app,
-                session_id,
+        action = get_action_type(text, swagger_url)
+        if action == ActionType.ASSISTANT_ACTION:
+            bot_response = hasSingleIntent(
+                swagger_doc, text, session_id, current_state, app
             )
 
-        elif len(bot_response.ids) == 0:
-            return handle_no_api_call(
-                swagger_url, session_id, text, bot_response.bot_message
-            )
+            if len(bot_response.ids) >= 1:
+                return handle_api_calls(
+                    bot_response.ids,
+                    swagger_doc,
+                    text,
+                    headers,
+                    server_base_url,
+                    swagger_url,
+                    app,
+                    session_id,
+                )
+
+            elif len(bot_response.ids) == 0:
+                return handle_no_api_call(
+                    swagger_url, session_id, text, bot_response.bot_message
+                )
+
+        elif action == ActionType.KNOWLEDGE_BASE_QUERY:
+            pass
+        elif action == ActionType.GENERAL_QUERY:
+            pass
 
     except Exception as e:
         return handle_exception(e)
