@@ -36,6 +36,19 @@ services:
       - mongodb
       - qdrant
 
+  workers:
+    restart: unless-stopped
+    build:
+      context: ./workers
+      dockerfile: Dockerfile
+    networks:
+      - opencopilot_network
+    env_file:
+      - llm-server/.env
+    depends_on:
+      - mysql
+      - qdrant
+
   dashboard:
     restart: unless-stopped
     build:
