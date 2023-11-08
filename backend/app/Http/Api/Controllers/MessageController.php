@@ -69,7 +69,7 @@ class MessageController extends Controller
         try {
             $client = new Client();
             $response = $client->post('http://llm-server:8002/handle', [
-                'json' => ['session_id' => $sessionId, 'text' => $message, 'swagger_url' => $bot->getSwaggerUrl(), 'headers' => $request->input('headers'), 'base_prompt' => $bot->getPromptMessage()],
+                'json' => ['session_id' => $sessionId, 'text' => $message, 'swagger_url' => $bot->getSwaggerUrl(), 'headers' => $request->input('headers'), 'base_prompt' => $bot->getPromptMessage(), 'bot_id' => (string) $bot->getId()],
             ]);
 
             // Retrieve the response from the Flask endpoint
