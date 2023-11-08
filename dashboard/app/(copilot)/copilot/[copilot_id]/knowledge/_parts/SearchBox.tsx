@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
-import { atom, useAtom } from "jotai";
+import { useAtom } from "jotai";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SearchIcon } from "lucide-react";
+import { SearchIcon, X } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -11,32 +11,46 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useHotkeys } from "react-hotkeys-hook";
-export const searchQueryAtom = atom("");
+import _ from "lodash";
+import { searchQueryAtom } from "./searchAtom";
+
 export function SearchBox() {
-  const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
+  const [search, setSearchQuery] = useAtom(searchQueryAtom);
   const searchInputRef = React.useRef<HTMLInputElement>(null);
   useHotkeys("/", (ev) => {
     ev.preventDefault();
     searchInputRef.current?.focus();
   });
   return (
-    <div className="flex flex-1 items-center gap-1">
-      <Label htmlFor="search-copilots">
-        <SearchIcon className="h-5 w-5 opacity-50" />
+    <div className="relative flex flex-1 items-center gap-4">
+      <Label
+        htmlFor="search-copilots"
+        className="flex-center absolute left-2 h-full"
+      >
+        {_.isEmpty(search) ? (
+          <SearchIcon className="h-4 w-4 opacity-50 animate-in fade-in" />
+        ) : (
+          <X
+            className="h-4 w-4 opacity-50 animate-in fade-in"
+            role="button"
+            onClick={() => setSearchQuery("")}
+          />
+        )}
       </Label>
       <TooltipProvider disableHoverableContent>
         <Tooltip>
           <TooltipTrigger asChild>
             <Input
               ref={searchInputRef}
-              value={searchQuery}
-              onChange={(event) => {
-                setSearchQuery(event.target.value.trim());
-              }}
+              value={search}
+              onChange={_.throttle(
+                (ev) => setSearchQuery(ev.target.value),
+                200,
+              )}
               type="text"
+              className="pl-9"
               id="search-copilots"
-              className="max-w-xs flex-1 border-none font-medium shadow-none focus-visible:!ring-transparent"
-              placeholder="Search Copilots..."
+              placeholder="Search Knowleadge Data..."
             />
           </TooltipTrigger>
           <TooltipContent>
