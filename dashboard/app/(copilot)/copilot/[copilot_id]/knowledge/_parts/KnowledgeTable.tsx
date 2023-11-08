@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -31,6 +31,9 @@ import {
 import _ from "lodash";
 import { timeSince } from "@/lib/timesince";
 import { Button } from "@/components/ui/button";
+import { useAtomValue } from "jotai";
+import { searchQueryAtom } from "./searchAtom";
+import { EmptyBlock } from "@/components/domain/EmptyBlock";
 export type DataSources = {
   id: string;
   name: string;
@@ -77,7 +80,9 @@ const columns: ColumnDef<DataSources>[] = [
       </div>
     ),
     cell: ({ row }) => (
-      <span className="text-accent-foreground">{row.getValue("name")}</span>
+      <span className="line-clamp-1 w-full whitespace-nowrap text-accent-foreground">
+        {row.getValue("name")}
+      </span>
     ),
   },
   {
@@ -106,14 +111,18 @@ const data: DataSources[] = [
     status: "pending",
     type: "URL",
   },
+  {
+    id: "2",
+    date: "2021-10-01T00:00:00.000Z",
+    name: "Your Website url",
+    status: "error",
+    type: "URL",
+  },
 ];
 export function KnowledgeTable() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
   const table = useReactTable({
     data,
@@ -132,7 +141,14 @@ export function KnowledgeTable() {
       columnVisibility,
       rowSelection,
     },
+    enableFilters: true,
+    enableColumnFilters: true,
+    enableSorting: true,
   });
+  const searchName = useAtomValue(searchQueryAtom);
+  useEffect(() => {
+    table.getColumn("name")?.setFilterValue(searchName.toLowerCase());
+  }, [searchName, table]);
   const selection = table.getSelectedRowModel();
   return (
     <HoverCard open={!_.isEmpty(selection.rows)}>
@@ -158,10 +174,14 @@ export function KnowledgeTable() {
 
         <HoverCardTrigger asChild>
           <TableBody className="odd:bg-white">
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+            {!_.isEmpty(table.getRowModel().rows) ? (
+              table.getRowModel().rows.map((row, i) => (
                 <TableRow
                   key={row.id}
+                  className="bg-white animate-in fade-in-50 transition-all"
+                  style={{
+                    animationDelay: `max(${i * 50}ms, 100ms)`,
+                  }}
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
@@ -179,11 +199,8 @@ export function KnowledgeTable() {
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-16 text-center"
-                >
-                  No results.
+                <TableCell colSpan={columns.length} className="p-5 text-center">
+                  <EmptyBlock>No results.</EmptyBlock>
                 </TableCell>
               </TableRow>
             )}
