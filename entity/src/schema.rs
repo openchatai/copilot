@@ -64,7 +64,7 @@ diesel::table! {
         queue -> Nullable<Varchar>,
         #[max_length = 255]
         payload -> Nullable<Varchar>,
-        attempts -> Nullable<Tinyint>,
+        attempts -> Nullable<Integer>,
         reserved_at -> Nullable<Integer>,
         available_at -> Nullable<Integer>,
         created_at -> Nullable<Integer>,
