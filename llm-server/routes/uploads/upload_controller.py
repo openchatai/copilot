@@ -26,12 +26,7 @@ client = Minio(
 upload_controller = Blueprint("uploads", __name__)
 
 
-@upload_controller.route("/presignedUrl", methods=["GET", "POST"])
-def get_presigned_url() -> Response:
-    filename = request.args.get("name")
-
-    # this will be the folder name where all files related to this bot go, add validation
-
+def get_presigned_url(filename: str) -> Response:
     try:
         url = client.presigned_put_object("opencopilot", filename)
         return url
@@ -53,23 +48,35 @@ def upload_file():
     filename = secure_filename(file.filename)
     file.save(filename)
 
+    result = None
     try:
         # Upload the file to MinIO server
-        client.fput_object("opencopilot", filename, filename)
+        result = client.fput_object("opencopilot", filename, filename)
     except Exception as err:
         return jsonify({"error": f"MinIO upload error: {err.message}"}), 500
     finally:
         # Remove the temporary file
         os.remove(filename)
 
-    return jsonify({"success": "File uploaded successfully"}), 200
+    return (
+        jsonify(
+            {
+                "success": "File uploaded successfully",
+                "filename": result and result.object_name,
+                "presigned_url": client.presigned_get_object(
+                    "opencopilot", file.filename
+                ),
+            }
+        ),
+        200,
+    )
 
 
 # This is a test function, shouldn't be used in production.
 @upload_controller.route("/file/<name>", methods=["GET"])
 def get_object_by_name(name: str) -> Response:
     try:
-        object = client.get_object("opencopilot", name)
+        object = get_presigned_url(name)
         return object
     except Exception as e:
         return str(e), 500  # Handle errors appropriately
