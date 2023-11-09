@@ -29,7 +29,7 @@ services:
     networks:
       - opencopilot_network
     env_file:
-      - llm-server/.env
+      - llm-server/.env.docker
     ports:
       - 8002:8002
     depends_on:
@@ -55,9 +55,12 @@ services:
       - opencopilot_network
     env_file:
       - llm-server/.env.docker
+    # worker will also check for some database tables, this is a hacky solution
+    command: sh -c "sleep 30 && celery -A celery_app worker --loglevel=info"
     depends_on:
       - mysql
       - qdrant
+      - backend
 
   dashboard:
     restart: unless-stopped
