@@ -3,7 +3,7 @@ use crate::schema::pdf_data_sources;
 #[derive(Queryable, Insertable)]
 #[diesel(table_name = pdf_data_sources)]
 pub struct PdfDataSource {
-    pub id: i32,
+    pub id: String,
     pub chatbot_id: String,
     pub files: Option<serde_json::Value>,
     pub files_info: Option<serde_json::Value>,
