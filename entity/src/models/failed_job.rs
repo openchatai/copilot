@@ -1,6 +1,9 @@
-use diesel::Queryable;
 
-#[derive(Queryable)]
+use diesel::{Queryable, prelude::Insertable};
+use crate::schema::failed_jobs;
+
+#[derive(Queryable, Insertable)]
+#[diesel(table_name = failed_jobs)]
 pub struct FailedJob {
     pub id: u64,
     pub uuid: String,
