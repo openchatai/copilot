@@ -55,6 +55,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         {
           ...message,
           headers: config?.headers,
+          user: config?.user,
         }
       );
       if (status === 200) {
