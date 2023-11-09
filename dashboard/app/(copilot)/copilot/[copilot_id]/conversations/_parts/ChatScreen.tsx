@@ -12,7 +12,7 @@ function UserMessage({ message }: { message: string }) {
 function CopilotMessage({ message }: { message: string }) {
   return (
     <div className="flex w-full flex-row items-center justify-start gap-2">
-      <Avatar size="medium">
+      <Avatar size="large" className="sticky top-0">
         <AvatarFallback>C</AvatarFallback>
       </Avatar>
       <p className="w-fit max-w-sm rounded-lg bg-secondary px-4 py-3 text-sm text-accent-foreground">
@@ -23,7 +23,7 @@ function CopilotMessage({ message }: { message: string }) {
 }
 function ChatDivider({ content }: { content: string }) {
   return (
-    <div className="relative block h-px w-full bg-secondary my-4">
+    <div className="relative my-4 block h-px w-full bg-secondary">
       <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-xs">
         {content}
       </span>
