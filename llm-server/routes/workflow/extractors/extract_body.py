@@ -1,7 +1,7 @@
 import os
 from langchain.schema import HumanMessage, SystemMessage
 from utils.get_chat_model import get_chat_model
-from utils.get_llm import get_llm
+from opencopilot_utils import get_llm
 
 from typing import Any, Optional
 from routes.workflow.extractors.extract_json import extract_json_payload
@@ -38,6 +38,9 @@ async def gen_body_from_schema(
         HumanMessage(content="User input: {}".format(text)),
         HumanMessage(content="prev api responses: {}".format(prev_api_response)),
         HumanMessage(content="current_state: {}".format(current_state)),
+        HumanMessage(
+            content="If the user is asking to generate values for some fields, likes product descriptions, jokes etc add them."
+        ),
         HumanMessage(
             content="Given the provided information, generate the appropriate minified JSON payload to use as body for the API request. If a user doesn't provide a required parameter, use sensible defaults for required params, and leave optional params."
         ),

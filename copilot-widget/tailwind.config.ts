@@ -1,6 +1,13 @@
 /** @type {import('tailwindcss').Config} */
 import { Config } from "tailwindcss";
-import { white, transparent, black, rose, current } from "tailwindcss/colors";
+import {
+  white,
+  transparent,
+  black,
+  rose,
+  current,
+  emerald,
+} from "tailwindcss/colors";
 const config: Config = {
   content: [
     "./src/**/*.{tsx,ts,html}",
@@ -19,6 +26,7 @@ const config: Config = {
       black,
       rose,
       current,
+      emerald,
     },
     extend: {
       fontFamily: {

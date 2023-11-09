@@ -1,11 +1,8 @@
 import os, logging
 from langchain.chat_models import ChatOpenAI
-from dotenv import load_dotenv
 from langchain.schema import HumanMessage, SystemMessage
 from typing import Any
 from routes.workflow.extractors.extract_json import extract_json_payload
-
-load_dotenv()
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 

@@ -1,12 +1,11 @@
 import os, logging, json
 from langchain.chat_models import ChatOpenAI
-from dotenv import load_dotenv
 from langchain.schema import HumanMessage, SystemMessage
 from typing import Any
 from routes.workflow.extractors.extract_json import extract_json_payload
 from routes.lossy_compressors.truncate_json import truncate_json
 
-load_dotenv()
+from opencopilot_db import ChatHistory
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 

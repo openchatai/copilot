@@ -1,10 +1,11 @@
-from utils.__sql import sql_db
 from sqlalchemy import Column, String, DateTime, Boolean, Integer
 import datetime
 from uuid import uuid4
+# from shared.get_declarative_base import Base
+from .get_declarative_base import Base
+from .database_setup import engine
 
-
-class ChatHistory(sql_db.Model):
+class ChatHistory(Base):
     __tablename__ = "chat_history"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -16,3 +17,5 @@ class ChatHistory(sql_db.Model):
     updated_at = Column(
         DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
     )
+
+Base.metadata.create_all(engine)

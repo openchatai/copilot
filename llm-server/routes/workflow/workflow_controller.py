@@ -9,8 +9,7 @@ from flask import Blueprint, request, jsonify
 from opencopilot_types.workflow_type import WorkflowDataType
 from routes.workflow.validate_json import validate_json
 from utils.db import Database
-from utils.vector_db.get_vector_store import get_vector_store
-from utils.vector_db.store_options import StoreOptions
+from opencopilot_utils import get_vector_store, StoreOptions
 
 db_instance = Database()
 mongo = db_instance.get_db()

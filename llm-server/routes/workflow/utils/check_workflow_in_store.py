@@ -3,8 +3,7 @@ from typing import Any, Dict, Optional
 from langchain.vectorstores.base import VectorStore
 from langchain.docstore.document import Document
 from typing import Tuple
-from utils.vector_db.get_vector_store import get_vector_store
-from utils.vector_db.store_options import StoreOptions
+from opencopilot_utils import get_vector_store, StoreOptions
 import logging, os
 
 

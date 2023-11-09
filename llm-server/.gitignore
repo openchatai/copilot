@@ -150,3 +150,8 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 .env.local
+
+app.bin
+app.build/
+app.dist/
+app.onefile-build/

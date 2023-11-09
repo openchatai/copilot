@@ -29,12 +29,38 @@ services:
     networks:
       - opencopilot_network
     env_file:
-      - llm-server/.env
+      - llm-server/.env.docker
     ports:
       - 8002:8002
     depends_on:
       - mongodb
       - qdrant
+  
+  redis:
+    image: redis:latest
+    container_name: redis_cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - opencopilot_network
+
+  workers:
+    restart: unless-stopped
+    build:
+      context: ./workers
+      dockerfile: Dockerfile
+    networks:
+      - opencopilot_network
+    env_file:
+      - llm-server/.env.docker
+    # worker will also check for some database tables, this is a hacky solution
+    command: sh -c "sleep 30 && celery -A celery_app worker --loglevel=info"
+    depends_on:
+      - mysql
+      - qdrant
+      - backend
 
   dashboard:
     restart: unless-stopped
@@ -88,6 +114,20 @@ services:
     networks:
       - opencopilot_network
 
+  minio:
+    image: bitnami/minio:latest
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - 'minio_data:/data'
+    environment:
+      - MINIO_ROOT_USER=miniouser
+      - MINIO_ROOT_PASSWORD=miniopass
+      - MINIO_DEFAULT_BUCKETS=opencopilot
+    networks:
+      - opencopilot_network
+
   qdrant:
     image: qdrant/qdrant
     ports:
@@ -130,3 +170,6 @@ volumes:
   database:
   mongodb_data:
   qdrant_storage:
+  redis_data:
+  minio_data:
+    driver: local
