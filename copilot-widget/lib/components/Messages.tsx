@@ -11,6 +11,7 @@ import { useCopyToClipboard } from "@lib/hooks/useCopy";
 import { HiOutlineClipboard, HiOutlineClipboardCheck } from "react-icons/hi";
 import { FailedMessage, useChat } from "@lib/contexts/Controller";
 import { getLast } from "@lib/utils/utils";
+import { useConfigData } from "@lib/contexts/ConfigData";
 function BotIcon({ error }: { error?: boolean }) {
   return (
     <img
@@ -25,12 +26,20 @@ function BotIcon({ error }: { error?: boolean }) {
 }
 
 function UserIcon() {
+  const config = useConfigData();
   return (
-    <div className="opencopilot-rounded-lg opencopilot-shrink-0 opencopilot-bg-accent opencopilot-h-7 opencopilot-w-7 opencopilot-object-cover opencopilot-aspect-square hover:opencopilot-shadow opencopilot-border-primary-light opencopilot-border opencopilot-flex opencopilot-items-center opencopilot-justify-center">
-      <span className="opencopilot-text-xl opencopilot-text-primary opencopilot-fill-current">
-        <FaRegUserCircle />
-      </span>
-    </div>
+    <Tooltip>
+      <TooltipContent hidden={!config?.user} side="top" align="center">
+        {config?.user?.name}
+      </TooltipContent>
+      <TooltipTrigger asChild>
+        <div className="opencopilot-rounded-lg opencopilot-shrink-0 opencopilot-bg-accent opencopilot-h-7 opencopilot-w-7 opencopilot-object-cover opencopilot-aspect-square hover:opencopilot-shadow opencopilot-border-primary-light opencopilot-border opencopilot-flex opencopilot-items-center opencopilot-justify-center">
+          <span className="opencopilot-text-xl opencopilot-text-primary opencopilot-fill-current">
+            <FaRegUserCircle />
+          </span>
+        </div>
+      </TooltipTrigger>
+    </Tooltip>
   );
 }
 
