@@ -1,0 +1,9 @@
+CREATE TABLE failed_jobs (
+  id VARCHAR(255) PRIMARY KEY,
+  uuid VARCHAR(255) NOT NULL,
+  connection VARCHAR(255) NOT NULL, 
+  queue VARCHAR(255) NOT NULL,
+  payload TEXT NOT NULL,
+  exception TEXT NOT NULL,
+  failed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

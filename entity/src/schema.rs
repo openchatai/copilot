@@ -41,6 +41,37 @@ diesel::table! {
 }
 
 diesel::table! {
+    failed_jobs (id) {
+        #[max_length = 255]
+        id -> Varchar,
+        #[max_length = 255]
+        uuid -> Varchar,
+        #[max_length = 255]
+        connection -> Varchar,
+        #[max_length = 255]
+        queue -> Varchar,
+        payload -> Text,
+        exception -> Text,
+        failed_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    jobs (id) {
+        #[max_length = 255]
+        id -> Varchar,
+        #[max_length = 255]
+        queue -> Nullable<Varchar>,
+        #[max_length = 255]
+        payload -> Nullable<Varchar>,
+        attempts -> Nullable<Tinyint>,
+        reserved_at -> Nullable<Integer>,
+        available_at -> Nullable<Integer>,
+        created_at -> Nullable<Integer>,
+    }
+}
+
+diesel::table! {
     pdf_data_sources (id) {
         #[max_length = 255]
         id -> Varchar,
@@ -60,5 +91,7 @@ diesel::table! {
 diesel::allow_tables_to_appear_in_same_query!(
     chatbot_settings,
     chatbots,
+    failed_jobs,
+    jobs,
     pdf_data_sources,
 );
