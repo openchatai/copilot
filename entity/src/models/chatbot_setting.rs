@@ -1,6 +1,7 @@
-use diesel::Queryable;
-
-#[derive(Queryable)]
+use diesel::{Queryable, prelude::Insertable};
+use crate::schema::chatbot_settings;
+#[derive(Queryable, Insertable)]
+#[diesel(table_name = chatbot_settings)]
 pub struct ChatbotSetting {
     pub id: String,
     pub chatbot_id: String,

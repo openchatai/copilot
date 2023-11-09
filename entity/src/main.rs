@@ -1,4 +1,6 @@
 pub mod models;
+pub mod controllers;
+pub mod schema;
 
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 use diesel::prelude::*;

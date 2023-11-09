@@ -1,7 +1,22 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
-    chatbot (id) {
+    chatbot_settings (id) {
+        #[max_length = 255]
+        id -> Varchar,
+        #[max_length = 36]
+        chatbot_id -> Nullable<Char>,
+        #[max_length = 255]
+        name -> Nullable<Varchar>,
+        #[max_length = 255]
+        value -> Nullable<Varchar>,
+        created_at -> Nullable<Timestamp>,
+        updated_at -> Nullable<Timestamp>,
+    }
+}
+
+diesel::table! {
+    chatbots (id) {
         #[max_length = 255]
         id -> Varchar,
         #[max_length = 255]
@@ -26,22 +41,7 @@ diesel::table! {
 }
 
 diesel::table! {
-    chatbot_settings (id) {
-        #[max_length = 255]
-        id -> Varchar,
-        #[max_length = 36]
-        chatbot_id -> Nullable<Char>,
-        #[max_length = 255]
-        name -> Nullable<Varchar>,
-        #[max_length = 255]
-        value -> Nullable<Varchar>,
-        created_at -> Nullable<Timestamp>,
-        updated_at -> Nullable<Timestamp>,
-    }
-}
-
-diesel::table! {
-    pdf_data_source (id) {
+    pdf_data_sources (id) {
         #[max_length = 255]
         id -> Varchar,
         #[max_length = 255]
@@ -58,7 +58,7 @@ diesel::table! {
 }
 
 diesel::allow_tables_to_appear_in_same_query!(
-    chatbot,
     chatbot_settings,
-    pdf_data_source,
+    chatbots,
+    pdf_data_sources,
 );

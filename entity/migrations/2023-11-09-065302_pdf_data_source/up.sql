@@ -1,4 +1,4 @@
-CREATE TABLE pdf_data_source (
+CREATE TABLE pdf_data_sources (
   id VARCHAR(255) PRIMARY KEY,
   chatbot_id VARCHAR(255),
   files JSON, 

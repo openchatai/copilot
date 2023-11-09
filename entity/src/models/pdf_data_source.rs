@@ -1,6 +1,7 @@
-use diesel::Queryable;
-
-#[derive(Queryable)]
+use diesel::{Queryable, prelude::Insertable};
+use crate::schema::pdf_data_sources;
+#[derive(Queryable, Insertable)]
+#[diesel(table_name = pdf_data_sources)]
 pub struct PdfDataSource {
     pub id: i32,
     pub chatbot_id: String,
