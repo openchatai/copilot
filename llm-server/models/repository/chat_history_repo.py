@@ -1,10 +1,9 @@
 from datetime import datetime
 from typing import Optional, cast, List
-from opencopilot_db import ChatHistory, engine
+from opencopilot_db import ChatHistory, engine, pdf_data_source_model
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
-from typing import Optional
-
+from typing import Optional, Tuple
 
 Session = sessionmaker(bind=engine)
 
@@ -67,7 +66,7 @@ def get_all_chat_history_by_session_id(
     # Sort the chat history records by created_at in descending order.
     chats.sort(key=lambda chat: chat.created_at)
 
-    return cast(List[ChatHistory], chats)
+    return chats
 
 
 def get_all_chat_history(limit: int = 10, offset: int = 0) -> List[ChatHistory]:
@@ -82,7 +81,7 @@ def get_all_chat_history(limit: int = 10, offset: int = 0) -> List[ChatHistory]:
     """
     with Session() as session:
         chats = session.query(ChatHistory).limit(limit).offset(offset).all()
-        return cast(List[ChatHistory], chats)
+        return chats
 
 
 def update_chat_history(
@@ -105,16 +104,23 @@ def update_chat_history(
       The updated ChatHistory object.
     """
     with Session() as session:
-        chat_history = session.query(ChatHistory).get(chat_history_id)
-        chat_history.chatbot_id = chatbot_id or chat_history.chatbot_id
-        chat_history.session_id = session_id or chat_history.session_id
-        chat_history.from_user = from_user or chat_history.from_user
-        chat_history.message = message or chat_history.message
+        chat_history: ChatHistory = session.query(ChatHistory).get(chat_history_id)
+
+        if chatbot_id is not None:
+            chat_history.chatbot_id = chatbot_id
+        if session_id is not None:
+            chat_history.session_id = session_id
+        if from_user is not None:
+            chat_history.from_user = from_user
+        if message is not None:
+            chat_history.message = message
+
         chat_history.updated_at = datetime.now()
 
         session.add(chat_history)
         session.commit()
-    return cast(ChatHistory, chat_history)
+
+    return chat_history
 
 
 def delete_chat_history(chat_history_id: str) -> None:
@@ -127,3 +133,39 @@ def delete_chat_history(chat_history_id: str) -> None:
         chat_history = session.query(ChatHistory).get(chat_history_id)
         session.delete(chat_history)
         session.commit()
+
+
+def get_chat_history_for_retrieval_chain(
+    session_id: str, limit: Optional[int] = None
+) -> List[Tuple[str, str]]:
+    """Fetches limited ChatHistory entries by session ID and converts to chat_history format.
+
+    Args:
+        session_id (str): The session ID to fetch chat history for
+        limit (int, optional): Maximum number of entries to retrieve
+
+    Returns:
+        list[tuple[str, str]]: List of tuples of (user_query, bot_response)
+    """
+    with Session() as session:
+        # Query and limit results if a limit is provided
+        query = (
+            session.query(ChatHistory)
+            .filter(ChatHistory.session_id == session_id)  # Fixed filter condition
+            .order_by(ChatHistory.created_at)  # Fixed order_by condition
+        )
+        if limit:
+            query = query.limit(limit)  # Fixed limit condition
+
+        chat_history = []
+
+        user_query = None
+        for entry in query:
+            if entry.from_user:
+                user_query = entry.message
+            else:
+                if user_query is not None:
+                    chat_history.append((user_query, entry.message))
+                    user_query = None
+
+    return chat_history
