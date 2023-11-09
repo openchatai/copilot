@@ -8,6 +8,7 @@ from routes.chat.chat_controller import chat_workflow
 from typing import Any, Tuple
 from utils.config import Config
 from flask_cors import CORS
+from routes.data_source.data_source_controller import datasource_workflow
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -19,23 +20,11 @@ logging.basicConfig(level=logging.INFO)
 
 
 app = Flask(__name__)
-CORS(app, resources={r"/uploads/*": {"origins": "http://127.0.0.1:8081"}})
-
-
-# completely disable cors for saas, we need to enable this on nginx dynamically for every partner that registers on the app
-@app.after_request
-def add_cors_headers(response):
-    response.headers["Access-Control-Allow-Origin"] = "http://127.0.0.1:8081"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-    return response
-
-
 app.register_blueprint(workflow, url_prefix="/workflow")
 app.register_blueprint(_swagger, url_prefix="/swagger_api")
 app.register_blueprint(chat_workflow, url_prefix="/chat")
 app.register_blueprint(upload_controller, url_prefix="/uploads")
-
+app.register_blueprint(datasource_workflow, url_prefix="/data_sources")
 
 app.config.from_object(Config)
 from routes.root_service import handle_request
