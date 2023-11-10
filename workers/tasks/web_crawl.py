@@ -11,12 +11,22 @@ from shared.utils.opencopilot_utils.interfaces import StoreOptions
 
 selenium_grid_url = os.getenv("SELENIUM_GRID_URL", "http://localhost:4444/wd/hub")
 
-def is_valid_url(url):
-    """Returns True if the URL is valid, False otherwise."""
+def is_valid_url(url, target_url):
+    """Returns True if the URL is valid and the root of both URLs are the same, False otherwise."""
 
     # Regular expression for matching valid URLs.
     regex = re.compile(r'^(?:http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&:/~+#-])$')
-    return regex.match(url) is not None
+
+    # Check if the URL is valid.
+    if regex.match(url) is None:
+        return False
+
+    # Get the root of the URL.
+    url_root = regex.match(url).group(1)
+    target_url_root = regex.match(target_url).group(1)
+
+    # Check if the root of both URLs are the same.
+    return url_root == target_url_root
 
 def scrape_website_in_depth(url, bot_id: str, depth=1, driver=None):
     """Scrapes a website in depth, recursively following all of the linked pages.
@@ -42,7 +52,7 @@ def scrape_website_in_depth(url, bot_id: str, depth=1, driver=None):
     # Extract all of the unique URLs from the current page.
     unique_urls = []
     for link in soup.find_all("a"):
-        if "href" in link.attrs and link["href"] not in unique_urls and is_valid_url(link["href"]):
+        if "href" in link.attrs and link["href"] not in unique_urls and is_valid_url(link["href"], url):
             unique_urls.append(link["href"])
 
     # If the depth has not been reached, recursively scrape all of the linked pages.
@@ -66,6 +76,7 @@ def scrape_website_in_depth(url, bot_id: str, depth=1, driver=None):
 @shared_task
 def web_crawl(url, bot_id: str):
     try:
+        print(f"Received: {url}, {bot_id}")
         options = Options()
         driver = webdriver.Remote(command_executor=selenium_grid_url, options=options)
         driver.set_script_timeout(300)
