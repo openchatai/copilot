@@ -8,6 +8,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 from shared.utils.opencopilot_utils import get_embeddings, init_vector_store
 from shared.utils.opencopilot_utils.interfaces import StoreOptions
+from repos.website_data_sources import create_website_data_source, update_website_data_source_status_by_url
 
 selenium_grid_url = os.getenv("SELENIUM_GRID_URL", "http://localhost:4444/wd/hub")
 
@@ -59,10 +60,11 @@ def scrape_website_in_depth(url, bot_id: str, depth=1, driver=None):
     if depth > 1:
         for unique_url in unique_urls:
             driver.refresh()
+            create_website_data_source(chatbot_id=bot_id, ingest_status="PENDING", url=unique_url)
             scrape_website_in_depth(unique_url, depth - 1, driver)
 
     text = soup.get_text()
-    
+
     # push to vector db
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000, chunk_overlap=200, length_function=len
@@ -71,16 +73,18 @@ def scrape_website_in_depth(url, bot_id: str, depth=1, driver=None):
     docs = text_splitter.create_documents([text])
     embeddings = get_embeddings()
     init_vector_store(docs, embeddings, StoreOptions(namespace=bot_id))
-
+    update_website_data_source_status_by_url(url=url, status="SUCCESS")
 
 @shared_task
 def web_crawl(url, bot_id: str):
+    options = Options()
+    driver = webdriver.Remote(command_executor=selenium_grid_url, options=options)
     try:
         print(f"Received: {url}, {bot_id}")
-        options = Options()
-        driver = webdriver.Remote(command_executor=selenium_grid_url, options=options)
+
         driver.set_script_timeout(300)
         driver.set_page_load_timeout(300)
+        create_website_data_source(chatbot_id=bot_id, ingest_status="PENDING", url=url)
         scrape_website_in_depth(url, bot_id, 15, driver)
     except Exception as e:
         logging.error(f"Failed to crawl website: {e}")
