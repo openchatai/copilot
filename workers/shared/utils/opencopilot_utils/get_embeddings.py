@@ -3,7 +3,7 @@ from .embedding_type import EmbeddingProvider
 import os
 from langchain.embeddings.base import Embeddings
 
-import os
+import os, warnings
 
 
 def get_embedding_provider():
@@ -33,7 +33,6 @@ def get_openai_embedding():
 
     return OpenAIEmbeddings(openai_api_key=openai_api_key, chunk_size=1)
 
-
 def choose_embedding_provider():
     """Chooses and returns the appropriate embedding provider instance."""
     embedding_provider = get_embedding_provider()
@@ -41,7 +40,9 @@ def choose_embedding_provider():
     if embedding_provider == EmbeddingProvider.azure.value:
         return get_azure_embedding()
     
-    elif embedding_provider == EmbeddingProvider.OPENAI.value:
+    elif embedding_provider == EmbeddingProvider.OPENAI.value or embedding_provider is None:
+        if embedding_provider is None:
+            warnings.warn("No embedding provider specified. Defaulting to OpenAI.")
         return get_openai_embedding()
 
     else:
