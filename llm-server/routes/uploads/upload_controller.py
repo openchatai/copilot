@@ -3,6 +3,7 @@ from werkzeug.utils import secure_filename
 import secrets
 from flask import request, jsonify
 from routes.uploads.celery_service import celery
+import validators
 
 upload = Blueprint("upload", __name__)
 import os, json, uuid
@@ -71,12 +72,18 @@ def start_file_ingestion() -> Response:
 
         for filename in filenames:
             # Check if the file extension is PDF
-            if not filename.lower().endswith(".pdf"):
-                continue  # Skip non-PDF files
+            if filename.lower().endswith(".pdf"):
+                celery.send_task(
+                    "tasks.process_pdfs.process_pdf", args=[filename, bot_id]
+                )
+            elif validators.url(filename):
+                celery.send_task("tasks.web_crawl.web_crawl", args=[filename, bot_id])
+            else:
+                print(f"Received: {filename}, is neither a pdf nor a url. ")
 
-            # Call the ingestion method only for PDF files
-            celery.send_task("tasks.process_pdfs.process_pdf", args=[filename, bot_id])
-
-        return "File ingestion started successfully", 200  # Return a success response
+        return (
+            "Datasource ingestion started successfully",
+            200,
+        )
     except Exception as e:
         return str(e), 500  # Handle errors appropriately and return an error response
