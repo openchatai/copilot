@@ -53,6 +53,8 @@ services:
       dockerfile: Dockerfile
     networks:
       - opencopilot_network
+    volumes:
+      - shared_data:/app/shared_data
     env_file:
       - llm-server/.env.docker
     # worker will also check for some database tables, this is a hacky solution
