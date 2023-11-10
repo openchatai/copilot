@@ -2,8 +2,11 @@ from celery import shared_task
 from selenium import webdriver
 from bs4 import BeautifulSoup
 
+import os
 from selenium.webdriver.firefox.options import Options
 
+
+selenium_grid_url = os.getenv("SELENIUM_GRID_URL", "http://localhost:4444/wd/hub")
 def scrape_website_in_depth(url, depth=1, driver=None):
   """Scrapes a website in depth, recursively following all of the linked pages.
 
@@ -20,7 +23,7 @@ def scrape_website_in_depth(url, depth=1, driver=None):
 
   if driver is None:
     options = Options()
-    driver = webdriver.Remote(command_executor="http://localhost:4444/wd/hub", options=options)
+    driver = webdriver.Remote(command_executor=selenium_grid_url, options=options)
 
   # Navigate to the URL to scrape.
   driver.get(url)
@@ -34,8 +37,10 @@ def scrape_website_in_depth(url, depth=1, driver=None):
   # Extract all of the unique URLs from the current page.
   unique_urls = []
   for link in soup.find_all('a'):
-    if link['href'] not in unique_urls:
+    print(link)
+    if 'href' in link.attrs and link['href'] not in unique_urls:
       unique_urls.append(link['href'])
+
 
   # If the depth has not been reached, recursively scrape all of the linked pages.
   if depth > 1:
@@ -43,12 +48,15 @@ def scrape_website_in_depth(url, depth=1, driver=None):
       pages.extend(scrape_website_in_depth(unique_url, depth - 1, driver))
 
     # call pdf data source endpoint from here
-  pages.append(soup.get_text())
-
-  return pages
+  if driver is not None:
+    driver.quit()
+  text = soup.get_text()
+  print(text)
 
 
 @shared_task
 def web_crawl(url):
     # Implement your web crawling logic here
     return scrape_website_in_depth(url, 15)
+
+scrape_website_in_depth("https://en.wikipedia.org/wiki/Shah_Rukh_Khan", 1)

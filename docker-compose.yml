@@ -127,7 +127,8 @@ services:
       - opencopilot_network
 
   selenium:
-    image: selenium/standalone-firefox:4.14.1-20231025
+    # image: selenium/standalone-firefox:4.14.1-20231025
+    image: seleniarm/standalone-firefox:4.1.2-20220222
     ports:
       - "4444:4444"
       - "7900:7900"
