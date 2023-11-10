@@ -1,6 +1,5 @@
 from celery import shared_task
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.document_loaders import PyPDFium2Loader
 from repos.pdf_data_sources import insert_pdf_data_source
 
 from langchain.document_loaders import PyPDFium2Loader

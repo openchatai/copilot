@@ -4,6 +4,10 @@ from bs4 import BeautifulSoup
 
 import os, re, logging
 from selenium.webdriver.firefox.options import Options
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+from shared.utils.opencopilot_utils import get_embeddings, init_vector_store
+from shared.utils.opencopilot_utils.interfaces import StoreOptions
 
 selenium_grid_url = os.getenv("SELENIUM_GRID_URL", "http://localhost:4444/wd/hub")
 
@@ -14,7 +18,7 @@ def is_valid_url(url):
     regex = re.compile(r'^(?:http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&:/~+#-])$')
     return regex.match(url) is not None
 
-def scrape_website_in_depth(url, depth=1, driver=None):
+def scrape_website_in_depth(url, bot_id: str, depth=1, driver=None):
     """Scrapes a website in depth, recursively following all of the linked pages.
 
     Args:
@@ -48,17 +52,25 @@ def scrape_website_in_depth(url, depth=1, driver=None):
             scrape_website_in_depth(unique_url, depth - 1, driver)
 
     text = soup.get_text()
-    print(text)
+    
+    # push to vector db
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000, chunk_overlap=200, length_function=len
+    )
+    
+    docs = text_splitter.create_documents([text])
+    embeddings = get_embeddings()
+    init_vector_store(docs, embeddings, StoreOptions(namespace=bot_id))
 
 
 @shared_task
-def web_crawl(url):
+def web_crawl(url, bot_id: str):
     try:
         options = Options()
         driver = webdriver.Remote(command_executor=selenium_grid_url, options=options)
         driver.set_script_timeout(300)
         driver.set_page_load_timeout(300)
-        scrape_website_in_depth(url, 15, driver)
+        scrape_website_in_depth(url, bot_id, 15, driver)
     except Exception as e:
         logging.error(f"Failed to crawl website: {e}")
     finally:
