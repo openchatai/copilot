@@ -4,8 +4,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "/app/shared_data")
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+SHARED_FOLDER = os.getenv("SHARED_FOLDER", "/app/shared_data")
+os.makedirs(SHARED_FOLDER, exist_ok=True)
 celery = Celery(
     "opencopilot_celery",
     broker=os.getenv("CELERY_BROKER", "redis://localhost:6379/0"),

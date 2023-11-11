@@ -6,10 +6,10 @@ from langchain.document_loaders import PyPDFium2Loader
 from shared.utils.opencopilot_utils import get_embeddings, init_vector_store, StoreOptions, get_file_path
 
 @shared_task
-def process_pdf(filename: str, bot_id: str):
+def process_pdf(file_name: str, bot_id: str):
     try:
-        insert_pdf_data_source(chatbot_id=bot_id, filename=filename, folder_name=bot_id, status="PENDING")
-        loader = PyPDFium2Loader(get_file_path(filename))
+        insert_pdf_data_source(chatbot_id=bot_id, file_name=file_name, status="PENDING")
+        loader = PyPDFium2Loader(get_file_path(file_name))
         raw_docs = loader.load()
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=1000, chunk_overlap=200, length_function=len
@@ -18,10 +18,10 @@ def process_pdf(filename: str, bot_id: str):
         embeddings = get_embeddings()
         init_vector_store(docs, embeddings, StoreOptions(namespace=bot_id))
 
-        update_pdf_data_source_status(chatbot_id=bot_id, file_name=filename, status="COMPLETED")
+        update_pdf_data_source_status(chatbot_id=bot_id, file_name=file_name, status="COMPLETED")
     except Exception as e:
-        update_pdf_data_source_status(chatbot_id=bot_id, file_name=filename, status="FAILED")
-        print(f"Error processing {filename}:", e)
+        update_pdf_data_source_status(chatbot_id=bot_id, file_name=file_name, status="FAILED")
+        print(f"Error processing {file_name}:", e)
 
 
 @shared_task

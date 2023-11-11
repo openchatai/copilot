@@ -8,8 +8,8 @@ import validators
 upload = Blueprint("upload", __name__)
 import os, json, uuid
 
-UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "/app/shared_data")
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+SHARED_FOLDER = os.getenv("SHARED_FOLDER", "/app/shared_data")
+os.makedirs(SHARED_FOLDER, exist_ok=True)
 
 upload_controller = Blueprint("uploads", __name__)
 
@@ -36,7 +36,7 @@ def upload_file():
     # Generate a unique filename
     unique_filename = generate_unique_filename(file.filename)
     file_path = os.path.join(
-        os.getenv("UPLOAD_FOLDER", "/app/shared_data"), unique_filename
+        os.getenv("SHARED_FOLDER", "/app/shared_data"), unique_filename
     )
 
     try:

@@ -5,7 +5,7 @@ from typing import List
 # Create a session to interact with the database
 Session = sessionmaker(bind=engine)
 
-def insert_pdf_data_source(chatbot_id: str, files: List[str], file_name: str, status: str):
+def insert_pdf_data_source(chatbot_id: str, file_name: str, status: str):
     with Session() as session:
         pdf_data_source = PdfDataSource(
             chatbot_id=chatbot_id,

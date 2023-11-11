@@ -2,7 +2,7 @@ from sqlalchemy.orm import sessionmaker
 from shared.models.opencopilot_db.pdf_data_source_model import PdfDataSource
 from shared.models.opencopilot_db.database_setup import engine
 from shared.models.opencopilot_db.website_data_source import WebsiteDataSource
-from typing import List
+from typing import List, Optional
 # Create a session to interact with the database
 Session = sessionmaker(bind=engine)
 
@@ -15,11 +15,16 @@ def create_website_data_source(chatbot_id: str, url: str, ingest_status: str):
     return website_data_source
 
 
-def update_website_data_source_status_by_url(url: str, status: str):
+def update_website_data_source_status_by_url(url: str, status: str, error: Optional[str] = None):
     Session = sessionmaker(bind=engine)
     session = Session()
     website_data_source = session.query(WebsiteDataSource).filter_by(url=url).first()
     website_data_source.ingest_status = status
+    
+    
+    if error is not None:
+      website_data_source.error = error
+      
     session.commit()
     return website_data_source
 
