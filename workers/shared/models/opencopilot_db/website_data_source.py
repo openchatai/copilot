@@ -14,6 +14,7 @@ class WebsiteDataSource(Base):
     updated_at = Column(DateTime, onupdate=datetime.utcnow, nullable=True)
     ingest_status = Column(String(255), default='success')
     url = Column(String(255), nullable=False)
+    error = Column(String(1024))
     
     
 Base.metadata.create_all(engine)

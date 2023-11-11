@@ -9,12 +9,10 @@ class PdfDataSource(Base):
 
     id = Column(Integer, primary_key=True)
     chatbot_id = Column(String(255), nullable=False)
-    files = Column(JSON)
-    files_info = Column(JSON, nullable=True)
-    folder_name = Column(String(255), nullable=True)
+    file_name = Column(String(255))
     created_at = Column(DateTime, default=datetime.utcnow, nullable=True)
     updated_at = Column(DateTime, onupdate=datetime.utcnow, nullable=True)
-    ingest_status = Column(String(255), default='success')
+    status = Column(String(255), default='success')
     
     
 Base.metadata.create_all(engine)

@@ -1,14 +1,18 @@
 from celery import shared_task
 from selenium import webdriver
 from bs4 import BeautifulSoup
+import traceback
 
 import os, re, logging
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.remote.webdriver import BaseWebDriver
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 from shared.utils.opencopilot_utils import get_embeddings, init_vector_store
 from shared.utils.opencopilot_utils.interfaces import StoreOptions
-from repos.website_data_sources import create_website_data_source, update_website_data_source_status_by_url
+from repos.website_data_sources import create_website_data_source, get_website_data_source_by_id, update_website_data_source_status_by_url
+from typing import Set
+from collections import deque
 
 selenium_grid_url = os.getenv("SELENIUM_GRID_URL", "http://localhost:4444/wd/hub")
 
@@ -29,64 +33,105 @@ def is_valid_url(url, target_url):
     # Check if the root of both URLs are the same.
     return url_root == target_url_root
 
-def scrape_website_in_depth(url, bot_id: str, depth=1, driver=None):
-    """Scrapes a website in depth, recursively following all of the linked pages.
+def scrape_website_in_bfs(url: str, bot_id: str, unique_urls: Set[str], max_pages: int) -> int:
+    """Scrapes a website in breadth-first order, following all of the linked pages.
 
     Args:
       url: The URL of the website to scrape.
-      depth: The maximum depth to scrape.
-      driver: An optional WebDriver object. If this argument is omitted, a new WebDriver object will be created.
+      max_pages: The maximum number of pages to scrape.
 
     Returns:
-      A list of all of the scraped pages.
+      The total number of scraped pages.
     """
 
-    # Navigate to the URL to scrape.
-    driver.get(url)
+    driver: BaseWebDriver = None
+    total_pages_scraped = 0
+    visited_urls = set()
+    queue = deque([url])
 
-    # Get the text of the current page.
-    page_source = driver.page_source
+    try:
+        while queue:
+            url = queue.popleft()
+            if url in visited_urls or total_pages_scraped >= max_pages:
+                continue
+            
+            create_website_data_source(chatbot_id=bot_id, ingest_status="PENDING", url=url)
+            visited_urls.add(url)
+            unique_urls.add(url)
+            total_pages_scraped += 1
 
-    # Parse the HTML of the current page.
-    soup = BeautifulSoup(page_source, "lxml")
+            if driver is None:
+                driver = get_web_driver()
 
-    # Extract all of the unique URLs from the current page.
-    unique_urls = []
-    for link in soup.find_all("a"):
-        if "href" in link.attrs and link["href"] not in unique_urls and is_valid_url(link["href"], url):
-            unique_urls.append(link["href"])
+            driver.get(url)
+            page_source = driver.page_source
+            soup = BeautifulSoup(page_source, "lxml")
 
-    # If the depth has not been reached, recursively scrape all of the linked pages.
-    if depth > 1:
-        for unique_url in unique_urls:
-            driver.refresh()
-            create_website_data_source(chatbot_id=bot_id, ingest_status="PENDING", url=unique_url)
-            scrape_website_in_depth(unique_url, depth - 1, driver)
+            for link in soup.find_all("a"):
+                if "href" in link.attrs:
+                    next_url = link["href"]
+                    if next_url.startswith("http") and next_url not in visited_urls:
+                        queue.append(next_url)
 
-    text = soup.get_text()
+            text = soup.get_text()
 
-    # push to vector db
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000, chunk_overlap=200, length_function=len
-    )
+            print(text)
+            # push to vector db
+            text_splitter = RecursiveCharacterTextSplitter(
+                chunk_size=1000, chunk_overlap=200, length_function=len
+            )
+
+            docs = text_splitter.create_documents([text])
+            embeddings = get_embeddings()
+            init_vector_store(docs, embeddings, StoreOptions(namespace=bot_id))
+            update_website_data_source_status_by_url(url=url, status="SUCCESS")
+
+        if driver is not None:
+            driver.quit()
+
+    except Exception as e:
+        if driver is not None:
+            driver.quit()
+        update_website_data_source_status_by_url(url=url, status="FAILED", error=str(e))
+
+    return total_pages_scraped
+
+def get_web_driver():
+    options = Options()
+    driver = webdriver.Remote(command_executor=selenium_grid_url, options=options)    
+    driver.set_script_timeout(300)
+    driver.set_page_load_timeout(300)    
+    return driver
     
-    docs = text_splitter.create_documents([text])
-    embeddings = get_embeddings()
-    init_vector_store(docs, embeddings, StoreOptions(namespace=bot_id))
-    update_website_data_source_status_by_url(url=url, status="SUCCESS")
-
+    
 @shared_task
 def web_crawl(url, bot_id: str):
-    options = Options()
-    driver = webdriver.Remote(command_executor=selenium_grid_url, options=options)
     try:
         print(f"Received: {url}, {bot_id}")
-
-        driver.set_script_timeout(300)
-        driver.set_page_load_timeout(300)
         create_website_data_source(chatbot_id=bot_id, ingest_status="PENDING", url=url)
-        scrape_website_in_depth(url, bot_id, 15, driver)
+        unique_urls: set = set()
+        scrape_website_in_bfs(url, bot_id, unique_urls, 2)
     except Exception as e:
-        logging.error(f"Failed to crawl website: {e}")
-    finally:
-        driver.quit()
+        traceback.print_exc()
+        
+        
+@shared_task
+def resume_failed_website_scrape(website_data_source_id: str):
+    """Resumes a failed website scrape.
+
+    Args:
+      website_data_source_id: The ID of the website data source to resume scraping.
+    """
+
+    # Get the website data source.
+    website_data_source = get_website_data_source_by_id(website_data_source_id)
+
+    # Get the URL of the website to scrape.
+    url = website_data_source.url
+
+    # Create a new WebDriver object.
+    driver = webdriver.Chrome()
+
+    # Scrape the website.
+    unique_urls: set = set()
+    scrape_website_in_bfs(url, website_data_source.bot_id, unique_urls, 1)

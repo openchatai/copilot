@@ -8,8 +8,8 @@ import validators
 upload = Blueprint("upload", __name__)
 import os, json, uuid
 
-UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "/app/shared_data")
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+SHARED_FOLDER = os.getenv("SHARED_FOLDER", "/app/shared_data")
+os.makedirs(SHARED_FOLDER, exist_ok=True)
 
 upload_controller = Blueprint("uploads", __name__)
 
@@ -36,7 +36,7 @@ def upload_file():
     # Generate a unique filename
     unique_filename = generate_unique_filename(file.filename)
     file_path = os.path.join(
-        os.getenv("UPLOAD_FOLDER", "/app/shared_data"), unique_filename
+        os.getenv("SHARED_FOLDER", "/app/shared_data"), unique_filename
     )
 
     try:
@@ -87,3 +87,55 @@ def start_file_ingestion() -> Response:
         )
     except Exception as e:
         return str(e), 500  # Handle errors appropriately and return an error response
+
+
+@upload_controller.route("/web/retry", methods=["POST"])
+def retry_failed_web_crawl():
+    """Re-runs a failed web crawling task.
+
+    Args:
+      website_data_source_id: The ID of the website data source to resume crawling.
+
+    Returns:
+      A JSON object with the following fields:
+        status: The status of the web crawling task.
+        error: The error message, if any.
+    """
+
+    website_data_source_id = request.json["website_data_source_id"]
+
+    try:
+        celery.send_task(
+            "web_crawl.resume_failed_website_scrape", args=[website_data_source_id]
+        )
+
+        return jsonify({"status": "retrying", "error": None})
+    except Exception as e:
+        return jsonify({"status": "failed", "error": str(e)})
+
+
+@upload_controller.route("/pdf/retry", methods=["POST"])
+def retry_failed_pdf_crawl():
+    """Re-runs a failed PDF crawl.
+
+    Args:
+      chatbot_id: The ID of the chatbot.
+      file_name: The name of the PDF file to crawl.
+
+    Returns:
+      A JSON object with the following fields:
+        status: The status of the PDF crawl.
+        error: The error message, if any.
+    """
+
+    chatbot_id = request.json["chatbot_id"]
+    file_name = request.json["file_name"]
+
+    try:
+        celery.send_task(
+            "pdf_crawl.retry_failed_pdf_crawl", args=[chatbot_id, file_name]
+        )
+
+        return jsonify({"status": "retrying", "error": None})
+    except Exception as e:
+        return jsonify({"status": "failed", "error": str(e)})
