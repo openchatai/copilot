@@ -19,4 +19,4 @@ class Chatbot(Base):
     updated_at = Column(DateTime, onupdate=datetime.utcnow, nullable=True)
     deleted_at = Column(DateTime, nullable=True)
 
-Base.metadata.create_all(engine)
+# Base.metadata.create_all(engine)

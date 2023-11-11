@@ -9,14 +9,13 @@ from typing import Optional, Tuple
 Session = sessionmaker(bind=engine)
 
 
-
 def get_all_datasource_by_bot_id(
     bot_id: str, limit: int = 20, offset: int = 0
 ) -> List[ChatHistory]:
     session = Session()
     datasources = (
         session.query(PdfDataSource)
-        .filter_by(bot_id=bot_id)
+        .filter_by(chatbot_id=bot_id)
         .order_by(PdfDataSource.created_at.desc())
         .limit(limit)
         .offset(offset)
