@@ -11,7 +11,7 @@ datasource_workflow = Blueprint("datasource", __name__)
 
 
 @datasource_workflow.route("/b/<bot_id>", methods=["GET"])
-def get_session_chats(bot_id: str) -> Response:
+def get_data_sources(bot_id: str) -> Response:
     limit = request.args.get("limit", 20)
     offset = request.args.get("offset", 0)
 
@@ -24,9 +24,9 @@ def get_session_chats(bot_id: str) -> Response:
             {
                 "id": ds.id,
                 "chatbot_id": ds.created_at,
-                "files": ds.from_user,
-                "ingest_status": ds.id,
-                "created_at": ds.created_at
+                "files": ds.file_name,
+                "status": ds.status,
+                "updated_at": ds.updated_at,
             }
         )
 
