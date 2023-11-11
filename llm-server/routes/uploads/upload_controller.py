@@ -3,12 +3,13 @@ from werkzeug.utils import secure_filename
 import secrets
 from flask import request, jsonify
 from routes.uploads.celery_service import celery
+import validators
 
 upload = Blueprint("upload", __name__)
 import os, json, uuid
 
-UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "/app/shared_data")
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+SHARED_FOLDER = os.getenv("SHARED_FOLDER", "/app/shared_data")
+os.makedirs(SHARED_FOLDER, exist_ok=True)
 
 upload_controller = Blueprint("uploads", __name__)
 
@@ -35,7 +36,7 @@ def upload_file():
     # Generate a unique filename
     unique_filename = generate_unique_filename(file.filename)
     file_path = os.path.join(
-        os.getenv("UPLOAD_FOLDER", "/app/shared_data"), unique_filename
+        os.getenv("SHARED_FOLDER", "/app/shared_data"), unique_filename
     )
 
     try:
@@ -71,12 +72,70 @@ def start_file_ingestion() -> Response:
 
         for filename in filenames:
             # Check if the file extension is PDF
-            if not filename.lower().endswith(".pdf"):
-                continue  # Skip non-PDF files
+            if filename.lower().endswith(".pdf"):
+                celery.send_task(
+                    "tasks.process_pdfs.process_pdf", args=[filename, bot_id]
+                )
+            elif validators.url(filename):
+                celery.send_task("tasks.web_crawl.web_crawl", args=[filename, bot_id])
+            else:
+                print(f"Received: {filename}, is neither a pdf nor a url. ")
 
-            # Call the ingestion method only for PDF files
-            celery.send_task("tasks.process_pdfs.process_pdf", args=[filename, bot_id])
-
-        return "File ingestion started successfully", 200  # Return a success response
+        return (
+            "Datasource ingestion started successfully",
+            200,
+        )
     except Exception as e:
         return str(e), 500  # Handle errors appropriately and return an error response
+
+
+@upload_controller.route("/web/retry", methods=["POST"])
+def retry_failed_web_crawl():
+    """Re-runs a failed web crawling task.
+
+    Args:
+      website_data_source_id: The ID of the website data source to resume crawling.
+
+    Returns:
+      A JSON object with the following fields:
+        status: The status of the web crawling task.
+        error: The error message, if any.
+    """
+
+    website_data_source_id = request.json["website_data_source_id"]
+
+    try:
+        celery.send_task(
+            "web_crawl.resume_failed_website_scrape", args=[website_data_source_id]
+        )
+
+        return jsonify({"status": "retrying", "error": None})
+    except Exception as e:
+        return jsonify({"status": "failed", "error": str(e)})
+
+
+@upload_controller.route("/pdf/retry", methods=["POST"])
+def retry_failed_pdf_crawl():
+    """Re-runs a failed PDF crawl.
+
+    Args:
+      chatbot_id: The ID of the chatbot.
+      file_name: The name of the PDF file to crawl.
+
+    Returns:
+      A JSON object with the following fields:
+        status: The status of the PDF crawl.
+        error: The error message, if any.
+    """
+
+    chatbot_id = request.json["chatbot_id"]
+    file_name = request.json["file_name"]
+
+    try:
+        celery.send_task(
+            "pdf_crawl.retry_failed_pdf_crawl", args=[chatbot_id, file_name]
+        )
+
+        return jsonify({"status": "retrying", "error": None})
+    except Exception as e:
+        return jsonify({"status": "failed", "error": str(e)})
