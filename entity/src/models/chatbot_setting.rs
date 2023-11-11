@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+#[derive(Deserialize, Serialize)]
 pub struct ChatbotSetting {
     pub id: String,
     pub chatbot_id: String,
