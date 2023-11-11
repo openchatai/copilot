@@ -1,37 +1,25 @@
 from flask import Blueprint, Response, request
-from routes.uploads.upload_service import process_file
 from werkzeug.utils import secure_filename
-from flask import Flask, request, jsonify
+import secrets
+from flask import request, jsonify
+from routes.uploads.celery_service import celery
 
 upload = Blueprint("upload", __name__)
-from minio import Minio
-import os
-import json
+import os, json, uuid
 
-minio_server = os.environ.get("MINIO_SERVER", "localhost:9000")
-minio_access_key = os.environ.get("MINIO_SERVER_ACCESS_KEY", "CnLRRDsK02lrsdvi3KtT")
-minio_secret_key = os.environ.get(
-    "MINIO_SERVER_SECRET_KEY", "rCmztWX9O35YaVUG1lEooBOjXHEMXqjz7H9cTbHb"
-)
+UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "/app/shared_data")
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-
-print(f"{minio_access_key}: {minio_secret_key}")
-minio_secure = bool(int(os.environ.get("MINIO_SECURE", 1)))
-# minio_port = int(os.environ.get("MINIO_PORT", 9000))
-
-# Instantiate a Minio client with the retrieved or default values
-client = Minio(
-    minio_server, access_key=minio_access_key, secret_key=minio_secret_key, secure=False
-)
 upload_controller = Blueprint("uploads", __name__)
 
 
-def get_presigned_url(filename: str) -> Response:
-    try:
-        url = client.presigned_put_object("opencopilot", filename)
-        return url
-    except Exception as e:
-        return str(e), 500  # Handle errors appropriately
+def generate_unique_filename(filename):
+    # Generate a random prefix using secrets module
+    random_prefix = secrets.token_hex(4)  # Adjust the length of the prefix as needed
+
+    # Combine the random prefix and the secure filename
+    unique_filename = f"{random_prefix}_{secure_filename(filename)}"
+    return unique_filename
 
 
 @upload_controller.route("/server/upload", methods=["POST"])
@@ -44,42 +32,28 @@ def upload_file():
     if file.filename == "":
         return jsonify({"error": "No selected file"}), 400
 
-    # Generate a secure filename and save the file to a temporary location
-    filename = secure_filename(file.filename)
-    file.save(filename)
+    # Generate a unique filename
+    unique_filename = generate_unique_filename(file.filename)
+    file_path = os.path.join(
+        os.getenv("UPLOAD_FOLDER", "/app/shared_data"), unique_filename
+    )
 
-    result = None
     try:
-        # Upload the file to MinIO server
-        result = client.fput_object("opencopilot", filename, filename)
-    except Exception as err:
-        return jsonify({"error": f"MinIO upload error: {err.message}"}), 500
-    finally:
-        # Remove the temporary file
-        os.remove(filename)
+        # Save the file to the shared folder
+        file.save(file_path)
+    except Exception as e:
+        return jsonify({"error": f"Failed to save file: {str(e)}"}), 500
 
     return (
         jsonify(
             {
                 "success": "File uploaded successfully",
-                "filename": result and result.object_name,
-                "presigned_url": client.presigned_get_object(
-                    "opencopilot", file.filename
-                ),
+                "filename": unique_filename,
+                "file_path": file_path,
             }
         ),
         200,
     )
-
-
-# This is a test function, shouldn't be used in production.
-@upload_controller.route("/file/<name>", methods=["GET"])
-def get_object_by_name(name: str) -> Response:
-    try:
-        object = get_presigned_url(name)
-        return object
-    except Exception as e:
-        return str(e), 500  # Handle errors appropriately
 
 
 @upload_controller.route("/file/ingest", methods=["GET", "POST"])
@@ -87,16 +61,21 @@ def start_file_ingestion() -> Response:
     try:
         data = json.loads(request.data)
         bot_id = data.get("bot_id")
-        file_urls = data.get("file_urls")
+        filenames = data.get("filenames")
 
         if not bot_id:
             raise Exception("Bot id is required")
 
-        if not file_urls:
-            raise Exception("File url is required")
+        if not filenames:
+            raise Exception("File names required")
 
-        # Assuming process_file accepts bot_id and file_url as arguments
-        process_file(urls=file_urls, namespace=bot_id)
+        for filename in filenames:
+            # Check if the file extension is PDF
+            if not filename.lower().endswith(".pdf"):
+                continue  # Skip non-PDF files
+
+            # Call the ingestion method only for PDF files
+            celery.send_task("tasks.process_pdfs.process_pdf", args=[filename, bot_id])
 
         return "File ingestion started successfully", 200  # Return a success response
     except Exception as e:

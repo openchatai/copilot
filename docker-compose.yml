@@ -53,6 +53,8 @@ services:
       dockerfile: Dockerfile
     networks:
       - opencopilot_network
+    volumes:
+      - shared_data:/app/shared_data
     env_file:
       - llm-server/.env.docker
     # worker will also check for some database tables, this is a hacky solution
@@ -111,20 +113,6 @@ services:
       - "8080:8080"
     depends_on:
       - mysql
-    networks:
-      - opencopilot_network
-
-  minio:
-    image: bitnami/minio:latest
-    ports:
-      - '9000:9000'
-      - '9001:9001'
-    volumes:
-      - minio_data:/bitnami/minio/data
-    environment:
-      - MINIO_ROOT_USER=miniouser
-      - MINIO_ROOT_PASSWORD=miniopass
-      - MINIO_DEFAULT_BUCKETS=opencopilot
     networks:
       - opencopilot_network
 
