@@ -8,7 +8,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 from shared.utils.opencopilot_utils import get_embeddings, init_vector_store
 from shared.utils.opencopilot_utils.interfaces import StoreOptions
-from repos.website_data_sources import create_website_data_source, update_website_data_source_status_by_url
+from repos.website_data_sources import create_website_data_source, get_website_data_source_by_id, update_website_data_source_status_by_url
 
 selenium_grid_url = os.getenv("SELENIUM_GRID_URL", "http://localhost:4444/wd/hub")
 
@@ -41,39 +41,42 @@ def scrape_website_in_depth(url, bot_id: str, depth=1, driver=None):
       A list of all of the scraped pages.
     """
 
-    # Navigate to the URL to scrape.
-    driver.get(url)
+    try:
+        # Navigate to the URL to scrape.
+        driver.get(url)
 
-    # Get the text of the current page.
-    page_source = driver.page_source
+        # Get the text of the current page.
+        page_source = driver.page_source
 
-    # Parse the HTML of the current page.
-    soup = BeautifulSoup(page_source, "lxml")
+        # Parse the HTML of the current page.
+        soup = BeautifulSoup(page_source, "lxml")
 
-    # Extract all of the unique URLs from the current page.
-    unique_urls = []
-    for link in soup.find_all("a"):
-        if "href" in link.attrs and link["href"] not in unique_urls and is_valid_url(link["href"], url):
-            unique_urls.append(link["href"])
+        # Extract all of the unique URLs from the current page.
+        unique_urls = []
+        for link in soup.find_all("a"):
+            if "href" in link.attrs and link["href"] not in unique_urls and is_valid_url(link["href"], url):
+                unique_urls.append(link["href"])
 
-    # If the depth has not been reached, recursively scrape all of the linked pages.
-    if depth > 1:
-        for unique_url in unique_urls:
-            driver.refresh()
-            create_website_data_source(chatbot_id=bot_id, ingest_status="PENDING", url=unique_url)
-            scrape_website_in_depth(unique_url, depth - 1, driver)
+        # If the depth has not been reached, recursively scrape all of the linked pages.
+        if depth > 1:
+            for unique_url in unique_urls:
+                driver.refresh()
+                create_website_data_source(chatbot_id=bot_id, ingest_status="PENDING", url=unique_url)
+                scrape_website_in_depth(unique_url, depth - 1, driver)
 
-    text = soup.get_text()
+        text = soup.get_text()
 
-    # push to vector db
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000, chunk_overlap=200, length_function=len
-    )
-    
-    docs = text_splitter.create_documents([text])
-    embeddings = get_embeddings()
-    init_vector_store(docs, embeddings, StoreOptions(namespace=bot_id))
-    update_website_data_source_status_by_url(url=url, status="SUCCESS")
+        # push to vector db
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000, chunk_overlap=200, length_function=len
+        )
+
+        docs = text_splitter.create_documents([text])
+        embeddings = get_embeddings()
+        init_vector_store(docs, embeddings, StoreOptions(namespace=bot_id))
+        update_website_data_source_status_by_url(url=url, status="SUCCESS")
+    except Exception as e:
+        update_website_data_source_status_by_url(url=url, status="FAILED", error=str(e))
 
 @shared_task
 def web_crawl(url, bot_id: str):
@@ -90,3 +93,27 @@ def web_crawl(url, bot_id: str):
         logging.error(f"Failed to crawl website: {e}")
     finally:
         driver.quit()
+        
+        
+@shared_task
+def resume_failed_website_scrape(website_data_source_id: str):
+    """Resumes a failed website scrape.
+
+    Args:
+      website_data_source_id: The ID of the website data source to resume scraping.
+    """
+
+    # Get the website data source.
+    website_data_source = get_website_data_source_by_id(website_data_source_id)
+
+    # Get the URL of the website to scrape.
+    url = website_data_source.url
+
+    # Create a new WebDriver object.
+    driver = webdriver.Chrome()
+
+    # Scrape the website.
+    scrape_website_in_depth(url, bot_id=website_data_source.chatbot_id, depth=1, driver=driver)
+
+    # Close the WebDriver object.
+    driver.close()

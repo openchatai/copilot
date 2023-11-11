@@ -22,3 +22,20 @@ def update_website_data_source_status_by_url(url: str, status: str):
     website_data_source.ingest_status = status
     session.commit()
     return website_data_source
+
+
+def get_website_data_source_by_id(website_data_source_id: str):
+    """Gets a website data source by its ID.
+
+    Args:
+      website_data_source_id: The ID of the website data source to get.
+
+    Returns:
+      The website data source, or `None` if no website data source with the given ID is found.
+    """
+
+    website_data_source = WebsiteDataSource.query(
+        WebsiteDataSource.id == website_data_source_id
+    ).get()
+
+    return website_data_source
