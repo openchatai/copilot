@@ -1,7 +1,4 @@
-use diesel::{Queryable, prelude::Insertable};
-use crate::schema::jobs;
-#[derive(Queryable, Insertable)]
-#[table_name="jobs"]
+
 struct Job {
     id: String,
     queue: Option<String>,
