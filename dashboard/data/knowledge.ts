@@ -25,15 +25,16 @@ export async function ingestDataSources(filenames: string[], bot_id: string) {
   });
 }
 
+type Datasource = {
+  chatbot_id: string;
+  id: string;
+  source: string;
+  status: string;
+  updated_at: string;
+}
 export async function getDataSourcesByBotId(bot_id: string) {
   return await instance.get<{
-    pdf_sources: any[];
-    web_sources: {
-      chatbot_id: string;
-      id: string;
-      source: string;
-      status: string;
-      updated_at: string;
-    }[];
+    pdf_sources: Datasource[];
+    web_sources: Datasource[];
   }>(`/data_sources/b/${bot_id}`);
 }
