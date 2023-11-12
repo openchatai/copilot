@@ -1,9 +1,10 @@
 import { SubNavLink } from "@/app/(copilot)/_parts/SubNavLink";
 import { HeaderShell } from "@/components/domain/HeaderShell";
-import { Library } from "lucide-react";
+import { Library, Link2 } from "lucide-react";
 import React from "react";
 import { SearchBox } from "./_parts/SearchBox";
 import { AddDataSource } from "./_parts/AddDataSource";
+import Link from "next/link";
 type Props = {
   children: React.ReactNode;
   params: {
@@ -29,6 +30,14 @@ export default function KnowledgeLayout({ children, params }: Props) {
               Icon={Library}
               label="Data Sources"
             />
+            <Link
+              href="https://docs.opencopilot.so/"
+              target="_blank"
+              className="flex items-center rounded-md border-gray-300 border px-3 py-2 text-sm text-accent-foreground transition duration-150 ease-in-out"
+            >
+              <Link2 className="mr-2 h-5 w-5" />
+              Docs
+            </Link>
           </ul>
         </div>
       </div>
