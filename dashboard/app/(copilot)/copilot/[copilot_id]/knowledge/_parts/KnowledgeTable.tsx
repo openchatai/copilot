@@ -127,12 +127,25 @@ export function KnowledgeTable() {
   } = useSWR<DataSources[]>(copilotId + '/data_sources', async () => {
     const resp = await getDataSourcesByBotId(copilotId);
     const data: DataSources[] = [];
+    console.log(resp.data)
     if (resp.data.web_sources) {
       resp.data.web_sources.forEach((item) => {
         data.push({
           id: item.id,
           name: item.source,
           type: "URL",
+          status: item.status,
+          date: item.updated_at,
+          source: item.source,
+        });
+      });
+    }
+    if (resp.data.pdf_sources) {
+      resp.data.pdf_sources.forEach((item) => {
+        data.push({
+          id: item.id,
+          name: item.source,
+          type: "File",
           status: item.status,
           date: item.updated_at,
           source: item.source,
