@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,7 +8,6 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { atom, useAtom, useSetAtom } from "jotai";
-import { Textarea } from "@/components/ui/textarea";
 import { DropZone } from "@/components/domain/DropZone";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
@@ -20,11 +19,43 @@ import {
   AlertDialogDescription,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { ArrowRightLeft, Plus, RefreshCcw, Trash } from "lucide-react";
+import { ingestDataSources } from "@/data/knowledge";
+import { useCopilot } from "../../../_context/CopilotProvider";
+import _ from "lodash";
+import { toast } from "@/components/ui/use-toast";
+import { mutate } from "swr";
+import { Arrow } from "@radix-ui/react-popover";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 type DialogTypes = "url" | "file" | null;
 const activeDialog = atom<DialogTypes>(null);
-
+const loading = atom(false);
 function AddUrlDataSource() {
   const [dialog, setDialog] = useAtom(activeDialog);
+  const [urls, setUrls] = useState<string[]>([""]);
+  const [isLoading, setIsLoading] = useAtom(loading);
+  const { id: copilotId } = useCopilot();
+  async function handleAddingUrls() {
+    setIsLoading(true);
+    const newUrls = urls.filter((u) => u.trim() !== "");
+    if (_.isEmpty(newUrls)) return;
+    try {
+      const resp = await ingestDataSources(newUrls, copilotId);
+      if (resp.status === 200) {
+        toast({
+          title: "Data source(s) added successfully",
+          variant: "success"
+        });
+        setDialog(null);
+        setUrls([""]);
+      }
+    } catch (error) {
+      console.log(error)
+    }
+    setIsLoading(false);
+  }
+
   return (
     <AlertDialog
       open={dialog === "url"}
@@ -39,12 +70,48 @@ function AddUrlDataSource() {
         <AlertDialogDescription>
           add one or more URLs to scrape
         </AlertDialogDescription>
-        <Textarea minRows={4} placeholder="https://example.com/page" />
+        <div className="grid gap-2">
+          {urls.map((url, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <Input
+                className="flex-1"
+                value={url}
+                onChange={(e) => {
+                  const newUrls = [...urls];
+                  newUrls[i] = e.target.value.trim();
+                  setUrls(newUrls);
+                }}
+                placeholder="https://example.com"
+              />
+              <div className="flex items-center gap-2">
+                <Button
+                  disabled={urls.length === 1}
+                  onClick={() => setUrls(urls.filter((u, j) => i !== j))}
+                  variant="destructive"
+                  size="icon"
+                >
+                  <Trash className="h-4 w-4" />
+                </Button>
+                <Button
+                  onClick={() => {
+                    setUrls([...urls, ""]);
+                  }}
+                  size="icon"
+                  variant="ghost"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
         <AlertDialogFooter>
           <AlertDialogCancel asChild>
             <Button variant="ghost">Cancel</Button>
           </AlertDialogCancel>
-          <Button variant="default">Add</Button>
+          <Button variant="default"
+            onClick={handleAddingUrls}
+          >Add</Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -95,11 +162,12 @@ function AddFileDataSource() {
 }
 
 export function AddDataSource() {
+  const { id: copilotId } = useCopilot();
   const setDialog = useSetAtom(activeDialog);
   useHotkeys("shift+u", () => setDialog("url"));
   useHotkeys("shift+f", () => setDialog("file"));
   return (
-    <>
+    <div className="flex items-center gap-2">
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button>Add Data Source</Button>
@@ -127,6 +195,19 @@ export function AddDataSource() {
       </DropdownMenu>
       <AddUrlDataSource />
       <AddFileDataSource />
-    </>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => mutate(copilotId + '/data_sources')}>
+              <RefreshCcw className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Refresh</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </div>
   );
 }
