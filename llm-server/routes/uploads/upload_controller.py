@@ -76,6 +76,10 @@ def start_file_ingestion() -> Response:
                 celery.send_task(
                     "tasks.process_pdfs.process_pdf", args=[filename, bot_id]
                 )
+            elif filename.lower().endswith(".md"):
+                celery.send_task(
+                    "tasks.process_markdown.process_markdown", args=[filename, bot_id]
+                )
             elif validators.url(filename):
                 celery.send_task("tasks.web_crawl.web_crawl", args=[filename, bot_id])
             else:
