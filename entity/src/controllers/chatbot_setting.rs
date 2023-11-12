@@ -1,7 +1,7 @@
-use crate::{AppState, schemas::chatbot::{ChatbotCreateRequest, FilterOptions}, models::chatbot::Chatbot};
+use crate::{AppState, models::chatbot_setting::ChatbotSetting, schemas::chatbot_settings::ChatbotSettingSchema};
 
 
-use actix_web::{delete, get, post, web, HttpResponse, Responder};
+use actix_web::{get, post, web, HttpResponse, Responder};
 use serde_json::json;
 
 
@@ -14,18 +14,18 @@ async fn health_checker_handler() -> impl Responder {
 
 #[post("/chatbot_setting")]
 pub async fn create_chatbot_setting_handler(
-    body: web::Json<ChatbotCreateRequest>,
+    body: web::Json<ChatbotSettingSchema>,
     data: web::Data<AppState>,
 ) -> HttpResponse {
     let query_result =
-        sqlx::query(r#"INSERT INTO chatbots (name,token,website,status) VALUES (?, ?, ?, ?)"#)
-            .bind(body.name.clone())
-            .bind(body.token.clone())
-            .bind(body.website.clone())
-            .bind(body.status.clone())
-            .execute(&data.db)
-            .await
-            .map_err(|err: sqlx::Error| err.to_string());
+    sqlx::query(r#"INSERT INTO chatbot_settings (id,chatbot_id,name,value) VALUES (?, ?, ?, ?)"#)
+        .bind(body.id.to_owned())
+        .bind(body.chatbot_id.to_owned())
+        .bind(body.name.to_owned())
+        .bind(body.value.to_owned())
+        .execute(&data.db)
+        .await
+        .map_err(|err: sqlx::Error| err.to_string());
 
     if let Err(err) = query_result {
             if err.contains("Duplicate entry") {
@@ -47,7 +47,7 @@ async fn get_chatbot_setting_handler(
     data: web::Data<AppState>,
 ) -> HttpResponse {
     let chatbot_id = path.into_inner().to_string();
-    let query_result = sqlx::query_as!(Chatbot, r#"SELECT * FROM chatbots WHERE id = ?"#, chatbot_id)
+    let query_result = sqlx::query_as!(ChatbotSetting, r#"SELECT * FROM chatbot_settings WHERE id = ?"#, chatbot_id)
         .fetch_one(&data.db)
         .await;
 
@@ -60,6 +60,6 @@ pub fn config(conf: &mut web::ServiceConfig) {
     let scope = web::scope("/api")
         .service(health_checker_handler)
         .service(create_chatbot_setting_handler)
-        .service(get_chatbot_setting_handler)
+        .service(get_chatbot_setting_handler);
     conf.service(scope);
 }
