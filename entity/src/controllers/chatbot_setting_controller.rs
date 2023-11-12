@@ -1,4 +1,4 @@
-use crate::{AppState, models::chatbot_setting::ChatbotSetting, schemas::chatbot_settings::ChatbotSettingSchema};
+use crate::{AppState, models::chatbot_setting_model::ChatbotSetting, schemas::chatbot_settings_schema::CreateChatbotSetting};
 
 
 use actix_web::{get, post, web, HttpResponse, Responder};
@@ -14,7 +14,7 @@ async fn health_checker_handler() -> impl Responder {
 
 #[post("/chatbot_setting")]
 pub async fn create_chatbot_setting_handler(
-    body: web::Json<ChatbotSettingSchema>,
+    body: web::Json<CreateChatbotSetting>,
     data: web::Data<AppState>,
 ) -> HttpResponse {
     let query_result =

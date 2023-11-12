@@ -39,8 +39,8 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(AppState { db: pool.clone() }))
-            .configure(controllers::chatbot::config)
-            .configure(controllers::chatbot_setting::config)
+            .configure(controllers::chatbot_controller::config)
+            .configure(controllers::chatbot_setting_controller::config)
             .wrap(Logger::default())
     })
     .bind(("127.0.0.1", 8000))?

@@ -1,2 +1,2 @@
-pub mod chatbot;
-pub mod chatbot_settings;
+pub mod chatbot_schema;
+pub mod chatbot_settings_schema;

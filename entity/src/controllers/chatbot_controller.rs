@@ -1,4 +1,4 @@
-use crate::{AppState, schemas::chatbot::{ChatbotCreateRequest, FilterOptions}, models::chatbot::Chatbot};
+use crate::{AppState, schemas::chatbot_schema::{ChatbotCreateRequest, FilterOptions}, models::chatbot_model::Chatbot};
 
 
 use actix_web::{delete, get, post, web, HttpResponse, Responder};
