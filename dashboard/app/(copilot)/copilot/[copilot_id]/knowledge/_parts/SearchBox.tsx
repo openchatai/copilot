@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useHotkeys } from "react-hotkeys-hook";
 import _ from "lodash";
-import { searchQueryAtom } from "./searchAtom";
+import { searchQuery, searchQueryAtom } from "./searchAtom";
 import {
   HoverCard,
   HoverCardContent,
@@ -21,47 +21,12 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
-function extractQuery(text: string, allowedKeys?: string[]) {
-  let q = text;
-  const filters = new Set<{
-    key: string;
-    v: string;
-    allowed: boolean;
-  }>();
-
-  const pattern = /(\w+):'([^']*)'/g;
-  const matches = text.match(pattern);
-  if (matches) {
-    matches.forEach((ma) => {
-      const [key, val] = ma.split(":");
-
-      if (key && val) {
-        q = q.replace(ma, "").trim();
-        const v = val.trim().replace(/['"]/g, "");
-        filters.add({
-          key,
-          v,
-          allowed: allowedKeys ? allowedKeys.includes(key) : true,
-        });
-      }
-    });
-  }
-  return {
-    text: q,
-    filters: Array.from(filters),
-  };
-}
-
-const allowedKeys = ["type", "tags", "title", "description", "content"];
-const searchQuery = atom((get) => {
-  const s = get(searchQueryAtom);
-  return extractQuery(s, allowedKeys);
-});
 export function SearchBox() {
-  const [search, setSearchQuery] = useAtom(searchQueryAtom);
+  const [search, setSearchQuery] = useAtom(searchQuery);
   const searchInputRef = React.useRef<HTMLInputElement>(null);
   const [focused, setFocused] = useState(false);
-  const query = useAtomValue(searchQuery);
+  const query = useAtomValue(searchQueryAtom);
+  console.log(query);
   useHotkeys("/", (ev) => {
     ev.preventDefault();
     searchInputRef.current?.focus();

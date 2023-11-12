@@ -176,10 +176,24 @@ export function KnowledgeTable() {
     enableColumnFilters: true,
     enableSorting: true,
   });
-  const searchName = useAtomValue(searchQueryAtom);
+  const query = useAtomValue(searchQueryAtom);
+  // :spagetti:
+  // @TODO: refactor this
   useEffect(() => {
-    table.getColumn("name")?.setFilterValue(searchName.toLowerCase());
-  }, [searchName, table]);
+    const name = query.text;
+    const type = query.filters.filter((item) => item.key === "type")
+    if (name) {
+      table.getColumn("name")?.setFilterValue(name);
+    } else {
+      table.getColumn("name")?.setFilterValue('');
+    }
+    if (type.length) {
+      table.getColumn("type")?.setFilterValue(type?.[0]?.v || '');
+    } else {
+      table.getColumn("type")?.setFilterValue('');
+    }
+
+  }, [query]);
   const selection = table?.getSelectedRowModel();
   return (
     <HoverCard open={!_.isEmpty(selection.rows)}>
