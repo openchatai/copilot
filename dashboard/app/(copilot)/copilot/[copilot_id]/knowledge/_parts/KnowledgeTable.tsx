@@ -34,12 +34,17 @@ import { Button } from "@/components/ui/button";
 import { useAtomValue } from "jotai";
 import { searchQueryAtom } from "./searchAtom";
 import { EmptyBlock } from "@/components/domain/EmptyBlock";
+import useSWR from "swr";
+import { getDataSourcesByBotId } from "@/data/knowledge";
+import { useCopilot } from "../../../_context/CopilotProvider";
+import Link from "next/link";
 export type DataSources = {
   id: string;
   name: string;
   type: string;
-  status: "pending" | "error" | "success";
+  status: string;
   date: Date | number | string;
+  source: string;
 };
 const columns: ColumnDef<DataSources>[] = [
   {
@@ -80,9 +85,7 @@ const columns: ColumnDef<DataSources>[] = [
       </div>
     ),
     cell: ({ row }) => (
-      <span className="line-clamp-1 w-full whitespace-nowrap text-accent-foreground">
-        {row.getValue("name")}
-      </span>
+      row.getValue("name")
     ),
   },
   {
@@ -102,30 +105,45 @@ const columns: ColumnDef<DataSources>[] = [
     header: "Date",
     cell: ({ row }) => <span>{timeSince(row.getValue("date"))} ago</span>,
   },
-];
-const data: DataSources[] = [
   {
-    id: "1",
-    date: "2021-10-01T00:00:00.000Z",
-    name: "Your Website title",
-    status: "pending",
-    type: "URL",
-  },
-  {
-    id: "2",
-    date: "2021-10-01T00:00:00.000Z",
-    name: "Your Website url",
-    status: "error",
-    type: "URL",
-  },
+    accessorKey: "source",
+    header: "Source",
+    cell: ({ row }) => <Link href={row.getValue("source")} target="_blank" className="text-primary">
+      visit
+    </Link>,
+  }
 ];
 export function KnowledgeTable() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const {
+    id: copilotId,
+  } = useCopilot();
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
+  const {
+    data: dataSources,
+    isLoading
+  } = useSWR<DataSources[]>(copilotId + '/data_sources', async () => {
+    const resp = await getDataSourcesByBotId(copilotId);
+    const data: DataSources[] = [];
+    if (resp.data.web_sources) {
+      resp.data.web_sources.forEach((item) => {
+        data.push({
+          id: item.id,
+          name: item.source,
+          type: "URL",
+          status: item.status,
+          date: item.updated_at,
+          source: item.source,
+        });
+      });
+    }
+
+    return data
+  })
   const table = useReactTable({
-    data,
+    data: dataSources || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -149,7 +167,7 @@ export function KnowledgeTable() {
   useEffect(() => {
     table.getColumn("name")?.setFilterValue(searchName.toLowerCase());
   }, [searchName, table]);
-  const selection = table.getSelectedRowModel();
+  const selection = table?.getSelectedRowModel();
   return (
     <HoverCard open={!_.isEmpty(selection.rows)}>
       <Table wrapperClassName="rounded-none">
@@ -162,9 +180,9 @@ export function KnowledgeTable() {
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                   </TableHead>
                 );
               })}
@@ -187,7 +205,9 @@ export function KnowledgeTable() {
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className="px-8 data-[role=checkbox]:w-2 data-[role=checkbox]:pl-8"
+                      data-name={cell.column.id}
+                      data-role={cell.column.id === "select" ? "checkbox" : "cell"}
+                      className={"px-8 data-[role=checkbox]:w-2 data-[role=checkbox]:pl-8 data-[name=name]:max-w-xs data-[name=name]:line-clamp-1"}
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
