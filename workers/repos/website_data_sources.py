@@ -6,10 +6,10 @@ from typing import List, Optional
 # Create a session to interact with the database
 Session = sessionmaker(bind=engine)
 
-def create_website_data_source(chatbot_id: str, url: str, ingest_status: str):
+def create_website_data_source(chatbot_id: str, url: str, status: str):
     Session = sessionmaker(bind=engine)
     session = Session()
-    website_data_source = WebsiteDataSource(chatbot_id=chatbot_id, url=url, ingest_status=ingest_status)
+    website_data_source = WebsiteDataSource(chatbot_id=chatbot_id, url=url, status=status)
     session.add(website_data_source)
     session.commit()
     return website_data_source
@@ -19,7 +19,7 @@ def update_website_data_source_status_by_url(url: str, status: str, error: Optio
     Session = sessionmaker(bind=engine)
     session = Session()
     website_data_source = session.query(WebsiteDataSource).filter_by(url=url).first()
-    website_data_source.ingest_status = status
+    website_data_source.status = status
     
     
     if error is not None:

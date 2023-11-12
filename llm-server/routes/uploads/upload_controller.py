@@ -8,7 +8,7 @@ import validators
 upload = Blueprint("upload", __name__)
 import os, json, uuid
 
-SHARED_FOLDER = os.getenv("SHARED_FOLDER", "/app/shared_data")
+SHARED_FOLDER = os.getenv("SHARED_FOLDER", "/app/shared_data/")
 os.makedirs(SHARED_FOLDER, exist_ok=True)
 
 upload_controller = Blueprint("uploads", __name__)
@@ -36,7 +36,7 @@ def upload_file():
     # Generate a unique filename
     unique_filename = generate_unique_filename(file.filename)
     file_path = os.path.join(
-        os.getenv("SHARED_FOLDER", "/app/shared_data"), unique_filename
+        os.getenv("SHARED_FOLDER", "/app/shared_data/"), unique_filename
     )
 
     try:
@@ -75,6 +75,10 @@ def start_file_ingestion() -> Response:
             if filename.lower().endswith(".pdf"):
                 celery.send_task(
                     "tasks.process_pdfs.process_pdf", args=[filename, bot_id]
+                )
+            elif filename.lower().endswith(".md"):
+                celery.send_task(
+                    "tasks.process_markdown.process_markdown", args=[filename, bot_id]
                 )
             elif validators.url(filename):
                 celery.send_task("tasks.web_crawl.web_crawl", args=[filename, bot_id])

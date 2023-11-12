@@ -55,7 +55,7 @@ def scrape_website_in_bfs(url: str, bot_id: str, unique_urls: Set[str], max_page
             if url in visited_urls or total_pages_scraped >= max_pages:
                 continue
             
-            create_website_data_source(chatbot_id=bot_id, ingest_status="PENDING", url=url)
+            create_website_data_source(chatbot_id=bot_id, status="PENDING", url=url)
             visited_urls.add(url)
             unique_urls.add(url)
             total_pages_scraped += 1
@@ -108,7 +108,7 @@ def get_web_driver():
 def web_crawl(url, bot_id: str):
     try:
         print(f"Received: {url}, {bot_id}")
-        create_website_data_source(chatbot_id=bot_id, ingest_status="PENDING", url=url)
+        create_website_data_source(chatbot_id=bot_id, status="PENDING", url=url)
         unique_urls: set = set()
         scrape_website_in_bfs(url, bot_id, unique_urls, 2)
     except Exception as e:
