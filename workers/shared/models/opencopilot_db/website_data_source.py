@@ -12,7 +12,7 @@ class WebsiteDataSource(Base):
     chatbot_id = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=True)
     updated_at = Column(DateTime, onupdate=datetime.utcnow, nullable=True)
-    ingest_status = Column(String(255), default='success')
+    status = Column(String(255), default='PENDING')
     url = Column(String(255), nullable=False)
     error = Column(String(1024))
     
