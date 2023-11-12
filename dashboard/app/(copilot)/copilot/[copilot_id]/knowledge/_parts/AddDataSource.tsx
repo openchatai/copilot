@@ -20,13 +20,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
-import { ArrowRightLeft, Plus, RefreshCcw, Trash } from "lucide-react";
-import { ingestDataSources } from "@/data/knowledge";
+import { Plus, RefreshCcw, Trash } from "lucide-react";
+import { ingestDataSources, uploadFile } from "@/data/knowledge";
 import { useCopilot } from "../../../_context/CopilotProvider";
 import _ from "lodash";
 import { toast } from "@/components/ui/use-toast";
 import { mutate } from "swr";
-import { Arrow } from "@radix-ui/react-popover";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 type DialogTypes = "url" | "file" | null;
 const activeDialog = atom<DialogTypes>(null);
@@ -120,6 +119,30 @@ function AddUrlDataSource() {
 
 function AddFileDataSource() {
   const [dialog, setDialog] = useAtom(activeDialog);
+  const [files, setFile] = useState<File[]>();
+  const {
+    id: copilotId,
+  } = useCopilot();
+  async function handleAddingFile() {
+    if (!files || _.isEmpty(files)) return;
+    const re = await Promise.allSettled(files.map((f) => uploadFile(f)));
+    const success = re.map((r) => {
+      if (r.status === 'fulfilled') {
+        return r.value
+      }
+    }).filter((r) => r !== undefined);
+    if (success.length > 0) {
+      // @ts-ignore
+      const resp = await ingestDataSources(success.map((f) => f?.filename), copilotId);
+      if (resp.status === 200) {
+        toast({
+          title: "Data source(s) added successfully",
+          variant: "success"
+        });
+        setDialog(null);
+      }
+    }
+  }
   return (
     <AlertDialog
       open={dialog === "file"}
@@ -141,7 +164,9 @@ function AddFileDataSource() {
           add a file to upload and scrape data from.
         </AlertDialogDescription>
         <DropZone
-          maxFiles={1}
+          maxFiles={5}
+          value={files}
+          onChange={(files) => setFile(files)}
           accept={{
             json: ["application/json"],
             html: ["text/html"],
@@ -154,7 +179,9 @@ function AddFileDataSource() {
           <AlertDialogCancel asChild>
             <Button variant="ghost">Cancel</Button>
           </AlertDialogCancel>
-          <Button variant="default">Add</Button>
+          <Button variant="default"
+            onClick={handleAddingFile}
+          >Add</Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
