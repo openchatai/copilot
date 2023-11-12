@@ -17,22 +17,23 @@ export async function uploadFile(file: File) {
   });
   return response.data;
 }
-// success => Datasource ingestion started successfully.
-export async function ingestDataSources(file_names: string[], bot_id: string) {
-  return await instance.post<string>(`/data/ingest`, {
-    file_names,
+// success => Datasource ingestion started successfully.http://127.0.0.1:8888/backend/uploads/file/ingest
+export async function ingestDataSources(filenames: string[], bot_id: string) {
+  return await instance.post<string>("/uploads/file/ingest", {
+    filenames,
     bot_id,
   });
 }
 
 export async function getDataSourcesByBotId(bot_id: string) {
-  return await instance.get<
-    {
+  return await instance.get<{
+    pdf_sources: any[];
+    web_sources: {
       chatbot_id: string;
-      files: string;
-      id: number;
+      id: string;
+      source: string;
       status: string;
       updated_at: string;
-    }[]
-  >(`/data_sources/b/${bot_id}`);
+    }[];
+  }>(`/data_sources/b/${bot_id}`);
 }
