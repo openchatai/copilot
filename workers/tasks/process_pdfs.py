@@ -4,6 +4,7 @@ from repos.pdf_data_sources import insert_pdf_data_source, update_pdf_data_sourc
 
 from langchain.document_loaders import PyPDFium2Loader
 from shared.utils.opencopilot_utils import get_embeddings, init_vector_store, StoreOptions, get_file_path
+from shared.utils.opencopilot_utils import get_original_filename
 
 @shared_task
 def process_pdf(file_name: str, bot_id: str):
@@ -15,6 +16,10 @@ def process_pdf(file_name: str, bot_id: str):
             chunk_size=1000, chunk_overlap=200, length_function=len
         )
         docs = text_splitter.split_documents(raw_docs)
+        
+        for doc in docs:
+            doc.metadata["original_filename"] = get_original_filename(file_name)
+            docs.save(doc)
         embeddings = get_embeddings()
         init_vector_store(docs, embeddings, StoreOptions(namespace=bot_id))
 
