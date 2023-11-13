@@ -1,14 +1,14 @@
 from sqlalchemy import Column, Integer, String, JSON, DateTime, ForeignKey, ARRAY
 from .database_setup import engine
 from datetime import datetime
-import os
+from uuid import uuid4
 
 from .get_declarative_base import Base
 
 class WebsiteDataSource(Base):
     __tablename__ = 'website_data_sources'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(String(36), primary_key=True, default=uuid4)
     chatbot_id = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=True)
     updated_at = Column(DateTime, onupdate=datetime.utcnow, nullable=True)
