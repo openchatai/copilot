@@ -66,8 +66,8 @@ def handle_request(data: Dict[str, Any]) -> Any:
     swagger_doc = None
     try:
         current_state = process_state(app, headers)
-        document = None
-        # document, score = check_workflow_in_store(text, swagger_url)
+        # document = None
+        document, score = check_workflow_in_store(text, swagger_url)
         # this is disabled now, but this should trigger if workflow is already defined for this kind of user request
         if document:
             swagger_doc = get_swagger_doc(swagger_url)
