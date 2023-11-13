@@ -71,7 +71,7 @@ function AddUrlDataSource() {
   ] = useState(false);
   const { id: copilotId } = useCopilot();
 
-  const onSubmit: SubmitHandler<addUrlFormType> = async (data, ev) => {
+  const onSubmit: SubmitHandler<addUrlFormType> = async (data) => {
     setLoading(true);
     const urls = data.urls.map((u) => u.value);
     try {
@@ -119,8 +119,8 @@ function AddUrlDataSource() {
               fields.map((field, index) => {
                 const errorMessage = form.formState.errors.urls?.[index]?.value?.message;
                 const isValid = form.formState.errors.urls?.[index]?.value === undefined;
-                return <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-2 w-full" key={field.id}>
+                return <div className="flex flex-col gap-1" key={field.id}>
+                  <div className="flex items-center gap-2 w-full">
                     <Input
                       {...form.register(`urls.${index}.value`)}
                       className="flex-1"
