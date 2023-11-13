@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { atom, useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SearchIcon, X } from "lucide-react";
