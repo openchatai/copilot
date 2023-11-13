@@ -8,7 +8,14 @@ use uuid::Uuid;
 use actix_web::{delete, get, post, web, HttpResponse, Responder};
 use serde_json::json;
 
-
+#[utoipa::path(
+    get,
+    path = "/api/healthchecker",
+    tag = "Health Checker Endpoint",
+    responses(
+        (status = 200, description= "Authenticated User", body = Response),       
+    )
+)]
 #[get("/healthchecker")]
 async fn health_checker_handler() -> impl Responder {
     const MESSAGE: &str = "Build Simple CRUD API with Rust, SQLX, MySQL, and Actix Web";
@@ -17,6 +24,18 @@ async fn health_checker_handler() -> impl Responder {
 }
 
 
+#[utoipa::path(
+    operation_id = "create_chat_history",
+    post,
+    path = "/api/chat_history",
+    // params(
+    //     ("name" = String, Path, description = "Name of the template.")
+    // ),
+    request_body(content = CreateChatHistoryDto, content_type = "application/json"),
+    responses(
+        (status = 204, description = "Chat History Created Successfully", body = None),
+    )
+)]
 #[post("/chat_history")]
 async fn create_chat_history(
     chat_history: web::Json<CreateChatHistoryDto>, 
@@ -56,6 +75,18 @@ async fn create_chat_history(
     HttpResponse::Created().finish()
 }
 
+
+#[utoipa::path(
+    operation_id = "get_chat_history",
+    post,
+    path = "/api/chat_history/{id}",
+    params(
+        ("id" = String, Path, description = "id of chat history")
+    ),
+    responses(
+        (status = 204, description = "Chat History Created Successfully", body = ChatHistoryDto),
+    )
+)]
 #[get("/chat_history/{id}")]
 async fn get_chat_history(
     data: web::Data<AppState>,  
@@ -75,6 +106,18 @@ async fn get_chat_history(
     HttpResponse::Ok().finish()
 }
 
+
+#[utoipa::path(
+    operation_id = "delete_chat_history",
+    post,
+    path = "/api/chat_history/{id}",
+    params(
+        ("id" = String, Path, description = "id of chat history")
+    ),
+    responses(
+        (status = 204, description = "Chat History Created Successfully"),
+    )
+)]
 #[delete("/chat_history/{id}")] 
 async fn delete_chat_history(
     id: web::Path<String>, 

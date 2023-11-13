@@ -1,6 +1,7 @@
 use serde::{Serialize, Deserialize};
+use utoipa::ToSchema;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct ChatbotCreateRequest {
     pub name: String,
     pub token: String,
@@ -12,7 +13,7 @@ pub struct ChatbotCreateRequest {
 }
 
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct ChatbotUpdateRequest {
     pub id: String,
     pub name: Option<String>,
@@ -26,7 +27,7 @@ pub struct ChatbotUpdateRequest {
 
 
 // ChatbotDeleteRequest schema
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct ChatbotDeleteRequest {
     pub id: String,
 }

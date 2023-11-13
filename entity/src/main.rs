@@ -1,6 +1,7 @@
 pub mod models;
 pub mod controllers;
 pub mod schemas;
+pub mod api_doc;
 
 use actix_web::middleware::Logger;
 use actix_web::{ web, App, HttpServer};
@@ -40,6 +41,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(web::Data::new(AppState { db: pool.clone() }))
             .configure(controllers::chatbot_controller::config)
+            .configure(controllers::chatbot_setting_controller::config)
             .configure(controllers::chatbot_setting_controller::config)
             .wrap(Logger::default())
     })

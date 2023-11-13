@@ -1,7 +1,8 @@
 use chrono::NaiveDateTime;
 use serde::{Serialize, Deserialize};
+use utoipa::ToSchema;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct CreateChatbotSetting {
     pub id: String,
     pub chatbot_id: String,
