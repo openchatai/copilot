@@ -8,6 +8,7 @@ use dotenv::dotenv;
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use utoipa_swagger_ui::SwaggerUi;
+use chrono::NaiveDateTime;
 
 use crate::controllers::chat_history_controller::{__path_health_checker_handler, __path_create_chat_history, __path_delete_chat_history, __path_get_chat_history};
 

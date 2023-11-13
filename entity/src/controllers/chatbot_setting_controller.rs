@@ -66,7 +66,7 @@ pub async fn create_chatbot_setting_handler(
         ("id" = String, Path, description = "id of chatbot setting")
     ),
     responses(
-        (status = 200, description = "Chatbot Setting Found Successfully", body = ChatbotSetting),
+        (status = 200, description = "Chatbot Setting Found Successfully", body = CreateChatbotSetting),
         (status = 404, description = "Chatbot Setting Not Found", body = ()),
     )
 )]
