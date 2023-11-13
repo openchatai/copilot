@@ -27,34 +27,73 @@ import _ from "lodash";
 import { toast } from "@/components/ui/use-toast";
 import { mutate } from "swr";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useFieldArray, useForm, SubmitHandler } from "react-hook-form";
+import { Form } from "@/components/ui/form";
+import * as zod from 'zod';
+import {
+  zodResolver
+} from '@hookform/resolvers/zod'
 type DialogTypes = "url" | "file" | null;
 const activeDialog = atom<DialogTypes>(null);
-const loading = atom(false);
+
+const addUrlFormSchema = zod.object({
+  urls: zod.array(zod.object({
+    value: zod.string().url("Invalid URL, please provide a valid one")
+  }))
+})
+type addUrlFormType = zod.infer<typeof addUrlFormSchema>
 function AddUrlDataSource() {
+  const form = useForm({
+    mode: "onBlur",
+    defaultValues: {
+      urls: [{
+        value: ""
+      }],
+    },
+    resolver: zodResolver(addUrlFormSchema),
+  })
+  const {
+    fields, remove: removeField,
+    append: appendField,
+  } = useFieldArray({
+    name: "urls",
+    control: form.control,
+    rules: {
+      minLength: 1,
+      required: "Url is required"
+    }
+  })
+
   const [dialog, setDialog] = useAtom(activeDialog);
-  const [urls, setUrls] = useState<string[]>([""]);
-  const [isLoading, setIsLoading] = useAtom(loading);
+  const [
+    loading,
+    setLoading
+  ] = useState(false);
   const { id: copilotId } = useCopilot();
-  async function handleAddingUrls() {
-    setIsLoading(true);
-    const newUrls = urls.filter((u) => u.trim() !== "");
-    if (_.isEmpty(newUrls)) return;
+
+  const onSubmit: SubmitHandler<addUrlFormType> = async (data, ev) => {
+    setLoading(true);
+    const urls = data.urls.map((u) => u.value);
     try {
-      const resp = await ingestDataSources(newUrls, copilotId);
+      const resp = await ingestDataSources(urls, copilotId);
       if (resp.status === 200) {
         toast({
           title: "Data source(s) added successfully",
           variant: "success"
         });
-        setDialog(null);
-        setUrls([""]);
+        _.delay(() => setDialog(null), 2000)
+      } else {
+        toast({
+          title: "Error adding data source(s)",
+          variant: "destructive"
+        });
       }
-    } catch (error) {
-      console.log(error)
-    }
-    setIsLoading(false);
-  }
 
+    } catch (error) {
+      setLoading(false);
+    }
+    setLoading(false);
+  }
   return (
     <AlertDialog
       open={dialog === "url"}
@@ -69,49 +108,52 @@ function AddUrlDataSource() {
         <AlertDialogDescription>
           add one or more URLs to scrape
         </AlertDialogDescription>
-        <div className="grid gap-2">
-          {urls.map((url, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <Input
-                className="flex-1"
-                value={url}
-                onChange={(e) => {
-                  const newUrls = [...urls];
-                  newUrls[i] = e.target.value.trim();
-                  setUrls(newUrls);
-                }}
-                placeholder="https://example.com"
-              />
-              <div className="flex items-center gap-2">
-                <Button
-                  disabled={urls.length === 1}
-                  onClick={() => setUrls(urls.filter((u, j) => i !== j))}
-                  variant="destructive"
-                  size="icon"
-                >
-                  <Trash className="h-4 w-4" />
-                </Button>
-                <Button
-                  onClick={() => {
-                    setUrls([...urls, ""]);
-                  }}
-                  size="icon"
-                  variant="ghost"
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
-        <AlertDialogFooter>
-          <AlertDialogCancel asChild>
-            <Button variant="ghost">Cancel</Button>
-          </AlertDialogCancel>
-          <Button variant="default"
-            onClick={handleAddingUrls}
-          >Add</Button>
-        </AlertDialogFooter>
+        <Form
+          {...form}
+        >
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-3"
+          >
+            {
+              fields.map((field, index) => {
+                const errorMessage = form.formState.errors.urls?.[index]?.value?.message;
+                const isValid = form.formState.errors.urls?.[index]?.value === undefined;
+                return <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2 w-full" key={field.id}>
+                    <Input
+                      {...form.register(`urls.${index}.value`)}
+                      className="flex-1"
+                      data-valid={isValid}
+                      placeholder="https://example.com"
+                    />
+                    <div className="space-x-2">
+                      <Button variant="destructive" size="icon"
+                        disabled={fields.length === 1}
+                        onClick={() => removeField(index)}>
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                      <Button variant="outline" size="icon" onClick={() => appendField({
+                        value: ""
+                      })}>
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>{errorMessage && <p className="text-xs font-medium text-destructive">{errorMessage}</p>}
+                </div>
+              })
+            }
+            <AlertDialogFooter>
+              <AlertDialogCancel asChild>
+                <Button variant="ghost">Cancel</Button>
+              </AlertDialogCancel>
+              <Button variant="default" onClick={form.handleSubmit(onSubmit)} type="submit"
+                disabled={!form.formState.isValid}
+                loading={loading}
+              >Add</Button>
+            </AlertDialogFooter>
+          </form>
+        </Form>
       </AlertDialogContent>
     </AlertDialog>
   );
