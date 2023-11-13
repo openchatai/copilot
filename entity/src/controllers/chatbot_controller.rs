@@ -1,10 +1,16 @@
 use crate::{AppState, schemas::chatbot_schema::{ChatbotCreateRequest, FilterOptions}, models::chatbot_model::Chatbot};
 
-
 use actix_web::{delete, get, post, web, HttpResponse, Responder};
 use serde_json::json;
 
-
+#[utoipa::path(
+    get,
+    path = "/healthchecker",
+    tag = "Health Checker Endpoint",
+    responses(
+        (status = 200, description = "Authenticated User", body = Response),
+    )
+)]
 #[get("/healthchecker")]
 async fn health_checker_handler() -> impl Responder {
     const MESSAGE: &str = "Build Simple CRUD API with Rust, SQLX, MySQL, and Actix Web";
@@ -12,6 +18,17 @@ async fn health_checker_handler() -> impl Responder {
     HttpResponse::Ok().json(json!({"status": "success","message": MESSAGE}))
 }
 
+#[utoipa::path(
+    operation_id = "create_chatbot",
+    post,
+    path = "/chatbot",
+    request_body(content = ChatbotCreateRequest, content_type = "application/json"),
+    responses(
+        (status = 200, description = "Chatbot Created Successfully", body = ()),
+        (status = 400, description = "Chatbot with that title already exists", body = ()),
+        (status = 500, description = "Internal Server Error", body = ()),
+    )
+)]
 #[post("/chatbot")]
 pub async fn create_chatbot_handler(
     body: web::Json<ChatbotCreateRequest>,
@@ -41,6 +58,18 @@ pub async fn create_chatbot_handler(
     HttpResponse::Ok().finish()
 }
 
+#[utoipa::path(
+    operation_id = "get_chatbot",
+    get,
+    path = "/chatbot/{id}",
+    params(
+        ("id" = String, Path, description = "id of chatbot")
+    ),
+    responses(
+        (status = 200, description = "Chatbot Found Successfully", body = Chatbot),
+        (status = 404, description = "Chatbot Not Found", body = ()),
+    )
+)]
 #[get("/chatbot/{id}")]
 async fn get_chatbot_handler(
     path: web::Path<String>,
@@ -51,9 +80,25 @@ async fn get_chatbot_handler(
         .fetch_one(&data.db)
         .await;
 
-    HttpResponse::Ok().json(query_result.unwrap())
+    match query_result {
+        Ok(chatbot) => HttpResponse::Ok().json(chatbot),
+        Err(sqlx::Error::RowNotFound) => HttpResponse::NotFound().finish(),
+        Err(err) => HttpResponse::InternalServerError().json(err.to_string()),
+    }
 }
 
+#[utoipa::path(
+    operation_id = "list_chatbots",
+    get,
+    path = "/chatbots",
+    params(
+        ("limit" = Option<i32>, Query, description = "Limit the number of chatbots returned"),
+        ("page" = Option<i32>, Query, description = "The page number of chatbots to return"),
+    ),
+    responses(
+        (status = 200, description = "Chatbots Found Successfully", body = Json<Vec<Chatbot>>),
+    )
+)]
 #[get("/chatbots")]
 pub async fn list_chatbot_handler(
     opts: web::Query<FilterOptions>,
@@ -81,6 +126,20 @@ pub async fn list_chatbot_handler(
 }
 
 
+
+#[utoipa::path(
+    operation_id = "delete_chatbot",
+    delete,
+    path = "/chatbots/{id}",
+    params(
+        ("id" = String, Path, description = "id of chatbot")
+    ),
+    responses(
+        (status = 204, description = "Chatbot Deleted Successfully"),
+        (status = 404, description = "Chatbot Not Found"),
+        (status = 500, description = "Internal Server Error"),
+    )
+)]
 #[delete("/chatbots/{id}")]
 async fn delete_chatbot_handler(
     path: web::Path<String>,
@@ -118,3 +177,4 @@ pub fn config(conf: &mut web::ServiceConfig) {
 
     conf.service(scope);
 }
+

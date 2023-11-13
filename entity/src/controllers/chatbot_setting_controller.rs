@@ -1,10 +1,16 @@
 use crate::{AppState, models::chatbot_setting_model::ChatbotSetting, schemas::chatbot_settings_schema::CreateChatbotSetting};
 
-
 use actix_web::{get, post, web, HttpResponse, Responder};
 use serde_json::json;
 
-
+#[utoipa::path(
+    get,
+    path = "/healthchecker",
+    tag = "Health Checker Endpoint",
+    responses(
+        (status = 200, description = "Authenticated User", body = Response),
+    )
+)]
 #[get("/healthchecker")]
 async fn health_checker_handler() -> impl Responder {
     const MESSAGE: &str = "Build Simple CRUD API with Rust, SQLX, MySQL, and Actix Web";
@@ -12,6 +18,17 @@ async fn health_checker_handler() -> impl Responder {
     HttpResponse::Ok().json(json!({"status": "success","message": MESSAGE}))
 }
 
+#[utoipa::path(
+    operation_id = "create_chatbot_setting",
+    post,
+    path = "/chatbot_setting",
+    request_body(content = CreateChatbotSetting, content_type = "application/json"),
+    responses(
+        (status = 200, description = "Chatbot Setting Created Successfully", body = ()),
+        (status = 400, description = "Chatbot Setting with that title already exists", body = ()),
+        (status = 500, description = "Internal Server Error", body = ()),
+    )
+)]
 #[post("/chatbot_setting")]
 pub async fn create_chatbot_setting_handler(
     body: web::Json<CreateChatbotSetting>,
@@ -41,6 +58,18 @@ pub async fn create_chatbot_setting_handler(
     HttpResponse::Ok().finish()
 }
 
+#[utoipa::path(
+    operation_id = "get_chatbot_setting",
+    get,
+    path = "/chatbot_setting/{id}",
+    params(
+        ("id" = String, Path, description = "id of chatbot setting")
+    ),
+    responses(
+        (status = 200, description = "Chatbot Setting Found Successfully", body = ChatbotSetting),
+        (status = 404, description = "Chatbot Setting Not Found", body = ()),
+    )
+)]
 #[get("/chatbot_setting/{id}")]
 async fn get_chatbot_setting_handler(
     path: web::Path<String>,
@@ -51,7 +80,11 @@ async fn get_chatbot_setting_handler(
         .fetch_one(&data.db)
         .await;
 
-    HttpResponse::Ok().json(query_result.unwrap())
+    match query_result {
+        Ok(chatbot_setting) => HttpResponse::Ok().json(chatbot_setting),
+        Err(sqlx::Error::RowNotFound) => HttpResponse::NotFound().finish(),
+        Err(err) => HttpResponse::InternalServerError().json(err.to_string()),
+    }
 }
 
 

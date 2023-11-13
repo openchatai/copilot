@@ -13,7 +13,7 @@ use serde_json::json;
     path = "/api/healthchecker",
     tag = "Health Checker Endpoint",
     responses(
-        (status = 200, description= "Authenticated User", body = Response),       
+        (status = 200, description= "Authenticated User"),       
     )
 )]
 #[get("/healthchecker")]
@@ -28,12 +28,9 @@ async fn health_checker_handler() -> impl Responder {
     operation_id = "create_chat_history",
     post,
     path = "/api/chat_history",
-    // params(
-    //     ("name" = String, Path, description = "Name of the template.")
-    // ),
     request_body(content = CreateChatHistoryDto, content_type = "application/json"),
     responses(
-        (status = 204, description = "Chat History Created Successfully", body = None),
+        (status = 204, description = "Chat History Created Successfully", body = ()),
     )
 )]
 #[post("/chat_history")]
