@@ -63,15 +63,14 @@ def handle_request(data: Dict[str, Any]) -> Any:
 
     log_user_request(text)
     check_required_fields(base_prompt, text, swagger_url)
-
-    swagger_doc = get_swagger_doc(swagger_url)
-
+    swagger_doc = None
     try:
         current_state = process_state(app, headers)
         document = None
         # document, score = check_workflow_in_store(text, swagger_url)
         # this is disabled now, but this should trigger if workflow is already defined for this kind of user request
         if document:
+            swagger_doc = get_swagger_doc(swagger_url)
             return handle_existing_workflow(
                 document,
                 text,
@@ -84,7 +83,9 @@ def handle_request(data: Dict[str, Any]) -> Any:
             )
 
         action = get_action_type(text, bot_id)
+        logging.info(f"Triggered action: {action}")
         if action == ActionType.ASSISTANT_ACTION:
+            swagger_doc = get_swagger_doc(swagger_url)
             bot_response = hasSingleIntent(
                 swagger_doc, text, session_id, current_state, app
             )
