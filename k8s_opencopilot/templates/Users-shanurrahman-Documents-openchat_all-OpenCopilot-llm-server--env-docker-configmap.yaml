@@ -10,7 +10,7 @@ data:
   LOCAL_IP: host.docker.internal
   MONGODB_URL: mongodb://dbuser:dbpass@mongodb:27017
   MYSQL_URI: mysql+pymysql://dbuser:dbpass@mysql:3306/opencopilot
-  OPENAI_API_KEY: *****
+  OPENAI_API_KEY: **7Wp
   OPENAI_API_TYPE: openai
   PINECONE_API_KEY: ""
   PINECONE_ENV: ""

@@ -1,0 +1,8 @@
+name: k8s_opencopilot
+description: A generated Helm Chart for k8s_opencopilot from Skippbox Kompose
+version: 0.0.1
+apiVersion: v2
+keywords:
+  - k8s_opencopilot
+sources:
+home:
