@@ -80,6 +80,9 @@ module.exports = {
         aside: "var(--aside-width)",
         header: "var(--header-height)",
       },
+      minWidth: {
+        "trigger-anchor": "var(--radix-popper-anchor-width)",
+      },
     },
   },
   plugins: [

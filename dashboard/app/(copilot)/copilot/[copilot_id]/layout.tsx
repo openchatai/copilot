@@ -13,6 +13,7 @@ import {
   MessagesSquare,
   Settings,
   Workflow,
+  BrainCog,
 } from "lucide-react";
 import React from "react";
 import LogoMenu from "../../_parts/LogoMenu";
@@ -58,13 +59,16 @@ export default function CopilotLayout({ children, params }: Props) {
               IconComponent={Settings}
               label="Settings"
             />
-
             <CopilotLayoutNavLink
               href={copilotBase + "/conversations"}
               IconComponent={MessagesSquare}
               label="Conversations"
             />
-
+            <CopilotLayoutNavLink
+              href={copilotBase + "/knowledge"}
+              IconComponent={BrainCog}
+              label="Knowledge Base"
+            />
             <CopilotLayoutNavLink
               href={copilotBase + "/flows"}
               IconComponent={Workflow}
@@ -105,7 +109,10 @@ export default function CopilotLayout({ children, params }: Props) {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="https://github.com/openchatai/OpenCopilot/issues/new/choose" target="_blank">
+                    <Link
+                      href="https://github.com/openchatai/OpenCopilot/issues/new/choose"
+                      target="_blank"
+                    >
                       Raise a GitHub issue
                     </Link>
                   </DropdownMenuItem>

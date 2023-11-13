@@ -11,7 +11,7 @@ const Textarea = React.forwardRef<React.ElementRef<"textarea">, TextareaProps>(
     return (
       <TextareaAutosize
         className={cn(
-          "flex resize-none w-full rounded-md border border-input bg-background p-3 text-sm ring-offset-background transition-colors placeholder:text-muted-foreground focus-visible:border-primary focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+          "flex w-full resize-none rounded-md border border-muted-foreground/70 bg-background p-3 text-sm ring-offset-background transition-colors placeholder:text-muted-foreground focus-visible:border-primary focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
           className,
         )}
         {...props}
