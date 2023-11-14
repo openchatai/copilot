@@ -51,6 +51,8 @@ OPENAI_API_KEY=YOUR_TOKEN_HERE
 MYSQL_URI=mysql+pymysql://dbuser:dbpass@mysql:3306/opencopilot
 ```
 
+---
+```
 make install
 ```
 
