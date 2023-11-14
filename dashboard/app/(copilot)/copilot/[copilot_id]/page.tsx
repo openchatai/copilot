@@ -139,7 +139,7 @@ export default function CopilotPage() {
           </Accordion>
         </div>
         <div className="h-full w-fit p-2">
-          <Widget />
+          <Widget token={CopilotToken} />
         </div>
       </div>
     </div>
