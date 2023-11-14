@@ -1,6 +1,6 @@
 import os
 
-from shared.utils.opencopilot_utils.configs import ENV_CONFIGS
+from .configs import ENV_CONFIGS
 
 def get_file_path(filename):
     # Construct the full file path based on the UPLOAD_FOLDER and filename

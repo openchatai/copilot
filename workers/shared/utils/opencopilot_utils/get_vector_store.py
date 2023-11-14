@@ -4,7 +4,7 @@ from langchain.vectorstores.pinecone import Pinecone
 from langchain.vectorstores.qdrant import Qdrant
 from langchain.vectorstores.base import VectorStore
 
-from shared.utils.opencopilot_utils.configs import ENV_CONFIGS
+from .configs import ENV_CONFIGS
 from .store_type import StoreType
 from .interfaces import StoreOptions
 from .get_embeddings import get_embeddings

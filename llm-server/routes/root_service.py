@@ -23,7 +23,7 @@ from models.repository.chat_history_repo import (
     create_chat_history,
     get_chat_history_for_retrieval_chain,
 )
-from utils.get_chat_model import get_chat_model
+from opencopilot_utils import get_chat_model
 from utils.process_app_state import process_state
 from prance import ResolvingParser
 from utils.vector_db.add_workflow import add_workflow_data_to_qdrant
@@ -105,7 +105,10 @@ def handle_request(data: Dict[str, Any]) -> Any:
                     swagger_url, session_id, text, bot_response.bot_message
                 )
 
-        elif action == ActionType.KNOWLEDGE_BASE_QUERY:
+        elif (
+            action == ActionType.KNOWLEDGE_BASE_QUERY
+            or action == ActionType.GENERAL_QUERY
+        ):
             sanitized_question = text.strip().replace("\n", " ")
             vector_store = get_vector_store(StoreOptions(namespace=bot_id))
             mode = "assistant"
@@ -117,18 +120,20 @@ def handle_request(data: Dict[str, Any]) -> Any:
             )
             return {"response": response["answer"]}
 
-        elif action == ActionType.GENERAL_QUERY:
-            chat = get_chat_model("gpt-3.5-turbo")
+        # elif action == ActionType.GENERAL_QUERY:
+        #     chat = get_chat_model("gpt-3.5-turbo")
 
-            messages = [
-                SystemMessage(
-                    content="You are an ai assistant, that answers general queries in <= 3 sentences"
-                ),
-                HumanMessage(content=f"Answer the following: {text}"),
-            ]
+        #     messages = [
+        #         SystemMessage(
+        #             content="You are an ai assistant, that answers general queries in <= 3 sentences"
+        #         ),
+        #         HumanMessage(content=f"Answer the following: {text}"),
+        #     ]
 
-            content = chat(messages).content
-            return {"response": content}
+        #     content = chat(messages).content
+        #     return {"response": content}
+        logging.error(f"Unhandled classification {action}")
+        raise action
 
     except Exception as e:
         return handle_exception(e)
@@ -187,7 +192,7 @@ def getConversationRetrievalChain(vector_store: VectorStore, mode, initial_promp
     # template = get_qa_prompt_by_mode(mode, initial_prompt=initial_prompt)
 
     # using standard template for now
-    template = """ Given the conversation history and question below, provide a concise answer based on the relevant documents:
+    template = """ Given the conversation history and question below, provide a concise answer based on the relevant documents, If you don't know the answer, say that you don't know the answer, don't make one up:
 
         Conversation History:
         {chat_history} 

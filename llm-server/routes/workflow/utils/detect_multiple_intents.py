@@ -7,7 +7,7 @@ from typing import List
 from langchain.chat_models import ChatOpenAI
 
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
-from utils.get_chat_model import get_chat_model
+from opencopilot_utils import get_chat_model
 from routes.workflow.extractors.extract_json import extract_json_payload
 import os
 import logging

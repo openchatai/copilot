@@ -7,7 +7,7 @@ from opencopilot_utils import StoreOptions
 from opencopilot_utils.get_vector_store import get_vector_store
 import logging, os
 
-from opencopilot_utils.config import ENV_CONFIGS
+from opencopilot_utils import ENV_CONFIGS
 
 
 def check_workflow_in_store(

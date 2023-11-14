@@ -4,9 +4,8 @@ from langchain.schema import HumanMessage, SystemMessage
 
 # push it to the library
 from opencopilot_utils.get_vector_store import get_vector_store
-from opencopilot_utils import StoreOptions
+from opencopilot_utils import StoreOptions, get_chat_model
 from custom_types.action_type import ActionType
-from utils import get_chat_model
 from typing import Optional, Tuple, List
 from langchain.docstore.document import Document
 from langchain.vectorstores.base import VectorStore

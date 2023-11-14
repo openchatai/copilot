@@ -2,7 +2,7 @@ import logging
 from langchain.schema import HumanMessage, SystemMessage
 from typing import Any
 
-from utils.get_chat_model import get_chat_model
+from opencopilot_utils import get_chat_model
 
 
 def convert_json_to_text(user_input: str, api_response: str) -> str:

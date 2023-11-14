@@ -1,6 +1,6 @@
 import os
 from langchain.schema import HumanMessage, SystemMessage
-from utils.get_chat_model import get_chat_model
+from opencopilot_utils import get_chat_model
 from opencopilot_utils import get_llm
 
 from typing import Any, Optional

@@ -4,7 +4,7 @@ from langchain.schema import HumanMessage, SystemMessage
 from typing import Any
 from routes.workflow.extractors.extract_json import extract_json_payload
 from routes.lossy_compressors.truncate_json import truncate_json
-from utils.get_chat_model import get_chat_model
+from opencopilot_utils import get_chat_model
 
 
 def transform_api_response_from_schema(server_url: str, responseText: str) -> str:
