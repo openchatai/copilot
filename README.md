@@ -51,15 +51,6 @@ OPENAI_API_KEY=YOUR_TOKEN_HERE
 MYSQL_URI=mysql+pymysql://dbuser:dbpass@mysql:3306/opencopilot
 ```
 
-- gpt-4: Ideal for more complex tasks, but may have slower processing times.
-- gpt-3.5-turbo-16k: This model is significantly faster compared to GPT-4.
-```env
-PLAN_AND_EXECUTE_MODEL=gpt-3.5-turbo-16k
-```
-
-- After updating your API key, navigate to the repository folder and run the following command (for macOS or Linux):
-
-```
 make install
 ```
 

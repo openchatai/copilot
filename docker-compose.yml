@@ -29,7 +29,7 @@ services:
     networks:
       - opencopilot_network
     env_file:
-      - llm-server/.env.docker
+      - llm-server/.env
     ports:
       - 8002:8002
     depends_on:
@@ -56,7 +56,7 @@ services:
     volumes:
       - shared_data:/app/shared_data
     env_file:
-      - llm-server/.env.docker
+      - llm-server/.env
     # worker will also check for some database tables, this is a hacky solution
     command: sh -c "celery -A celery_app worker --loglevel=info"
     depends_on:
