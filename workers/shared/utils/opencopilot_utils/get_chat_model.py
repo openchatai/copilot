@@ -1,6 +1,6 @@
 from langchain.chat_models import ChatOpenAI, ChatOllama, ChatAnthropic
 import os
-from opencopilot_utils import ENV_CONFIGS
+from .configs import ENV_CONFIGS
 from .chat_models import CHAT_MODELS
 
 localip = os.getenv("LOCAL_IP", "localhost")

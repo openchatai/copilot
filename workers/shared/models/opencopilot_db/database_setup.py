@@ -5,7 +5,7 @@ import os
 from shared.utils.opencopilot_utils import ENV_CONFIGS
 
 # Replace these values with your MySQL server details
-db_url = ENV_CONFIGS.MONGODB_URL
+db_url = ENV_CONFIGS.MYSQL_URI
 
 # Create a function to define the connection creator
 def connection_creator():
