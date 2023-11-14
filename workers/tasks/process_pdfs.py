@@ -1,23 +1,41 @@
 from celery import shared_task
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.document_loaders import PyPDFium2Loader
-from repos.pdf_data_sources import insert_pdf_data_source
+from repos.pdf_data_sources import insert_pdf_data_source, update_pdf_data_source_status
 
 from langchain.document_loaders import PyPDFium2Loader
-from shared.utils.opencopilot_utils import get_embeddings, init_vector_store
-from shared.utils.interfaces import StoreOptions
+from shared.utils.opencopilot_utils import get_embeddings, init_vector_store, StoreOptions, get_file_path
 
-# @Todo: add the url in the filename in the context of vectordatabase and also mongo/sql, we need to check if this file exists in the metadata, if yes we delete and reindex it. This will also be helpful in migrations
 @shared_task
-def process_pdf(url: str, bot_id: str):
+def process_pdf(file_name: str, bot_id: str):
     try:
-        loader = PyPDFium2Loader(url)
+        insert_pdf_data_source(chatbot_id=bot_id, file_name=file_name, status="PENDING")
+        loader = PyPDFium2Loader(get_file_path(file_name))
         raw_docs = loader.load()
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200, length_function=len)
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000, chunk_overlap=200, length_function=len
+        )
         docs = text_splitter.split_documents(raw_docs)
         embeddings = get_embeddings()
         init_vector_store(docs, embeddings, StoreOptions(namespace=bot_id))
 
-        insert_pdf_data_source(chatbot_id=bot_id, files=url, folder_name=bot_id)
+        update_pdf_data_source_status(chatbot_id=bot_id, file_name=file_name, status="COMPLETED")
     except Exception as e:
-        print(f"Error processing {url}:", e)
+        update_pdf_data_source_status(chatbot_id=bot_id, file_name=file_name, status="FAILED")
+        print(f"Error processing {file_name}:", e)
+
+
+@shared_task
+def retry_failed_pdf_crawl(chatbot_id: str, file_name: str):
+    """Re-runs a failed PDF crawl.
+
+    Args:
+      chatbot_id: The ID of the chatbot.
+      file_name: The name of the PDF file to crawl.
+    """
+
+    update_pdf_data_source_status(chatbot_id=chatbot_id, file_name=file_name, status="PENDING")
+    try:
+        process_pdf(filename=file_name, bot_id=chatbot_id)
+    except Exception as e:
+        update_pdf_data_source_status(chatbot_id=chatbot_id, file_name=file_name, status="FAILED")
+        print(f"Error reprocessing {file_name}:", e)

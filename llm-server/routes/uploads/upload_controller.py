@@ -1,47 +1,60 @@
 from flask import Blueprint, Response, request
-from routes.uploads.upload_service import process_file
+from werkzeug.utils import secure_filename
+import secrets
+from flask import request, jsonify
+from routes.uploads.celery_service import celery
+import validators
 
 upload = Blueprint("upload", __name__)
-from minio import Minio
-import os
-import json
+import os, json, uuid
 
-minio_server = os.environ.get("MINIO_SERVER", "localhost:9000")
-minio_access_key = os.environ.get("MINIO_ACCESS_KEY", "Olw9PacGWKI1fgxxkrzc")
-minio_secret_key = os.environ.get(
-    "MINIO_SECRET_KEY", "QIvuZM3wBiKoHZxKtnocJaYgEI50M4qT1ndXzIdR"
-)
-minio_secure = bool(int(os.environ.get("MINIO_SECURE", 1)))
-# minio_port = int(os.environ.get("MINIO_PORT", 9000))
+SHARED_FOLDER = os.getenv("SHARED_FOLDER", "/app/shared_data/")
+os.makedirs(SHARED_FOLDER, exist_ok=True)
 
-# Instantiate a Minio client with the retrieved or default values
-client = Minio(
-    minio_server, access_key=minio_access_key, secret_key=minio_secret_key, secure=False
-)
 upload_controller = Blueprint("uploads", __name__)
 
 
-@upload_controller.route("/presignedUrl", methods=["GET", "POST"])
-def get_presigned_url() -> Response:
-    filename = request.args.get("name")
+def generate_unique_filename(filename):
+    # Generate a random prefix using secrets module
+    random_prefix = secrets.token_hex(4)  # Adjust the length of the prefix as needed
 
-    # this will be the folder name where all files related to this bot go, add validation
+    # Combine the random prefix and the secure filename
+    unique_filename = f"{random_prefix}_{secure_filename(filename)}"
+    return unique_filename
+
+
+@upload_controller.route("/server/upload", methods=["POST"])
+def upload_file():
+    if "file" not in request.files:
+        return jsonify({"error": "No file part"}), 400
+
+    file = request.files["file"]
+
+    if file.filename == "":
+        return jsonify({"error": "No selected file"}), 400
+
+    # Generate a unique filename
+    unique_filename = generate_unique_filename(file.filename)
+    file_path = os.path.join(
+        os.getenv("SHARED_FOLDER", "/app/shared_data/"), unique_filename
+    )
 
     try:
-        url = client.presigned_put_object("opencopilot", filename)
-        return url
+        # Save the file to the shared folder
+        file.save(file_path)
     except Exception as e:
-        return str(e), 500  # Handle errors appropriately
+        return jsonify({"error": f"Failed to save file: {str(e)}"}), 500
 
-
-# This is a test function, shouldn't be used in production.
-@upload_controller.route("/file/<name>", methods=["GET"])
-def get_object_by_name(name: str) -> Response:
-    try:
-        object = client.get_object("opencopilot", name)
-        return object
-    except Exception as e:
-        return str(e), 500  # Handle errors appropriately
+    return (
+        jsonify(
+            {
+                "success": "File uploaded successfully",
+                "filename": unique_filename,
+                "file_path": file_path,
+            }
+        ),
+        200,
+    )
 
 
 @upload_controller.route("/file/ingest", methods=["GET", "POST"])
@@ -49,17 +62,84 @@ def start_file_ingestion() -> Response:
     try:
         data = json.loads(request.data)
         bot_id = data.get("bot_id")
-        file_urls = data.get("file_urls")
+        filenames = data.get("filenames")
 
         if not bot_id:
             raise Exception("Bot id is required")
 
-        if not file_urls:
-            raise Exception("File url is required")
+        if not filenames:
+            raise Exception("File names required")
 
-        # Assuming process_file accepts bot_id and file_url as arguments
-        process_file(urls=file_urls, namespace=bot_id)
+        for filename in filenames:
+            # Check if the file extension is PDF
+            if filename.lower().endswith(".pdf"):
+                celery.send_task(
+                    "tasks.process_pdfs.process_pdf", args=[filename, bot_id]
+                )
+            elif filename.lower().endswith(".md"):
+                celery.send_task(
+                    "tasks.process_markdown.process_markdown", args=[filename, bot_id]
+                )
+            elif validators.url(filename):
+                celery.send_task("tasks.web_crawl.web_crawl", args=[filename, bot_id])
+            else:
+                print(f"Received: {filename}, is neither a pdf nor a url. ")
 
-        return "File ingestion started successfully", 200  # Return a success response
+        return (
+            "Datasource ingestion started successfully",
+            200,
+        )
     except Exception as e:
         return str(e), 500  # Handle errors appropriately and return an error response
+
+
+@upload_controller.route("/web/retry", methods=["POST"])
+def retry_failed_web_crawl():
+    """Re-runs a failed web crawling task.
+
+    Args:
+      website_data_source_id: The ID of the website data source to resume crawling.
+
+    Returns:
+      A JSON object with the following fields:
+        status: The status of the web crawling task.
+        error: The error message, if any.
+    """
+
+    website_data_source_id = request.json["website_data_source_id"]
+
+    try:
+        celery.send_task(
+            "web_crawl.resume_failed_website_scrape", args=[website_data_source_id]
+        )
+
+        return jsonify({"status": "retrying", "error": None})
+    except Exception as e:
+        return jsonify({"status": "failed", "error": str(e)})
+
+
+@upload_controller.route("/pdf/retry", methods=["POST"])
+def retry_failed_pdf_crawl():
+    """Re-runs a failed PDF crawl.
+
+    Args:
+      chatbot_id: The ID of the chatbot.
+      file_name: The name of the PDF file to crawl.
+
+    Returns:
+      A JSON object with the following fields:
+        status: The status of the PDF crawl.
+        error: The error message, if any.
+    """
+
+    chatbot_id = request.json["chatbot_id"]
+    file_name = request.json["file_name"]
+
+    try:
+        celery.send_task(
+            "pdf_crawl.retry_failed_pdf_crawl", args=[chatbot_id, file_name]
+        )
+
+        return jsonify({"status": "retrying", "error": None})
+    except Exception as e:
+        return jsonify({"status": "failed", "error": str(e)})

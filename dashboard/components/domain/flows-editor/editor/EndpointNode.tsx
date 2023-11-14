@@ -25,7 +25,6 @@ import {
 import { updateNodesPositions } from "../utils";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import _ from "lodash";
 
 const HideHandleStyles = {
   background: "transparent",
