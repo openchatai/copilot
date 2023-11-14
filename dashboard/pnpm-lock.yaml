@@ -6,8 +6,14 @@ settings:
 
 dependencies:
   '@hookform/resolvers':
-    specifier: ^3.3.2
+    specifier: ^3.3.1
     version: 3.3.2(react-hook-form@7.47.0)
+  '@openchatai/copilot-flows-editor':
+    specifier: ^1.5.2
+    version: 1.6.0(@radix-ui/react-alert-dialog@1.0.5)(@radix-ui/react-dialog@1.0.5)(@radix-ui/react-tooltip@1.0.7)(react-dom@18.2.0)(react@18.2.0)
+  '@openchatai/copilot-widget':
+    specifier: ^1.1.0
+    version: 1.1.0(react-dom@18.2.0)(react@18.2.0)
   '@radix-ui/react-accordion':
     specifier: ^1.1.2
     version: 1.1.2(@types/react-dom@18.2.13)(@types/react@18.2.28)(react-dom@18.2.0)(react@18.2.0)
@@ -422,6 +428,32 @@ packages:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.15.0
+
+  /@openchatai/copilot-flows-editor@1.6.0(@radix-ui/react-alert-dialog@1.0.5)(@radix-ui/react-dialog@1.0.5)(@radix-ui/react-tooltip@1.0.7)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-hntelCGMFJF54EWwPfWc4iQnGcFpRRzUoxctSfoluro9EmdlUp/UicpUmWUWm8AmWfAlnJ32Cpsh/xsXNhIj1Q==}
+    peerDependencies:
+      '@radix-ui/react-alert-dialog': ^1.0.4
+      '@radix-ui/react-dialog': ^1.0.4
+      '@radix-ui/react-tooltip': ^1.0.6
+      react: ^18.x
+      react-dom: ^18.x
+    dependencies:
+      '@radix-ui/react-alert-dialog': 1.0.5(@types/react-dom@18.2.13)(@types/react@18.2.28)(react-dom@18.2.0)(react@18.2.0)
+      '@radix-ui/react-dialog': 1.0.5(@types/react-dom@18.2.13)(@types/react@18.2.28)(react-dom@18.2.0)(react@18.2.0)
+      '@radix-ui/react-tooltip': 1.0.7(@types/react-dom@18.2.13)(@types/react@18.2.28)(react-dom@18.2.0)(react@18.2.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /@openchatai/copilot-widget@1.1.0(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-j2YPpywIp3uPrFiGx2vsmlvfpXdKQYWH+R3Xgl0zP/qh5Kog2tLLFN5tq6v4VpWy9Evm8WT3cElTigZhyRj0dg==}
+    peerDependencies:
+      react: ^18.x
+      react-dom: ^18.x
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
 
   /@radix-ui/number@1.0.1:
     resolution: {integrity: sha512-T5gIdVO2mmPW3NNhjNgEP3cqMXjXL9UbO0BzWcXfvdBs+BohbQxvd/K5hSVKmn9/lbTdsQVKbUcP5WLCwvUbBg==}
