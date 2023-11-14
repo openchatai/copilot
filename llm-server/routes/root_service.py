@@ -16,6 +16,7 @@ from bson import ObjectId
 import os
 from typing import Dict, Any, cast
 from routes.workflow.utils.router import get_action_type
+from opencopilot_utils import ENV_CONFIGS
 from utils.db import Database
 import json
 from models.repository.chat_history_repo import (
@@ -37,8 +38,6 @@ from langchain.chains import ConversationalRetrievalChain
 
 db_instance = Database()
 mongo = db_instance.get_db()
-
-shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
 
 # Define constants for error messages
 BASE_PROMPT_REQUIRED = "base_prompt is required"
@@ -71,7 +70,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
             current_state = process_state(app, headers)
             # document = None
             swagger_doc = get_swagger_doc(swagger_url)
-            
+
             document, score = check_workflow_in_store(text, swagger_url)
             if document:
                 return handle_existing_workflow(
@@ -84,7 +83,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
                     swagger_doc,
                     session_id,
                 )
-                
+
             bot_response = hasSingleIntent(
                 swagger_doc, text, session_id, current_state, app
             )
@@ -255,7 +254,7 @@ def get_swagger_doc(swagger_url: str) -> ResolvingParser:
     if swagger_url.startswith("http:") or swagger_url.startswith("https:"):
         return ResolvingParser(url=swagger_url)
     elif swagger_url.endswith(".json") or swagger_url.endswith(".yaml"):
-        return ResolvingParser(url=shared_folder + swagger_url)
+        return ResolvingParser(url=ENV_CONFIGS.SHARED_FOLDER + swagger_url)
     elif swagger_doc:
         return ResolvingParser(spec_string=swagger_doc)
 

@@ -9,12 +9,13 @@ from selenium.webdriver.remote.webdriver import BaseWebDriver
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 from shared.utils.opencopilot_utils import get_embeddings, init_vector_store
+from shared.utils.opencopilot_utils.configs import ENV_CONFIGS
 from shared.utils.opencopilot_utils.interfaces import StoreOptions
 from repos.website_data_sources import create_website_data_source, get_website_data_source_by_id, update_website_data_source_status_by_url
 from typing import Set
 from collections import deque
 
-selenium_grid_url = os.getenv("SELENIUM_GRID_URL", "http://localhost:4444/wd/hub")
+selenium_grid_url = ENV_CONFIGS.SELENIUM_GRID_URL
 
 def is_valid_url(url, target_url):
     """Returns True if the URL is valid and the root of both URLs are the same, False otherwise."""

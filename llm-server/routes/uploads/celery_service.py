@@ -2,12 +2,14 @@ import os
 from celery import Celery
 import logging
 
+from opencopilot_utils import ENV_CONFIGS
+
 logger = logging.getLogger(__name__)
 
-SHARED_FOLDER = os.getenv("SHARED_FOLDER", "/app/shared_data")
+SHARED_FOLDER = ENV_CONFIGS.SHARED_FOLDER
 os.makedirs(SHARED_FOLDER, exist_ok=True)
 celery = Celery(
     "opencopilot_celery",
-    broker=os.getenv("CELERY_BROKER", "redis://localhost:6379/0"),
-    backend=os.getenv("CELERY_BACKEND", "redis://localhost:6379/1"),
+    broker=ENV_CONFIGS.CELERY_BROKER,
+    backend=ENV_CONFIGS.CELERY_BACKEND,
 )

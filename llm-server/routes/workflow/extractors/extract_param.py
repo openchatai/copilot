@@ -8,7 +8,6 @@ from typing import Optional, Any
 import logging
 from langchain.schema import HumanMessage, SystemMessage
 
-openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
 
 

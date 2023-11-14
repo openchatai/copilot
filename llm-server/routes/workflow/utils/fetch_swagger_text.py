@@ -1,7 +1,9 @@
 import json, requests, yaml, os
 from typing import Dict, Any, cast
 
-shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
+from opencopilot_utils import ENV_CONFIGS
+
+shared_folder = ENV_CONFIGS.SHARED_FOLDER
 
 import json
 import yaml

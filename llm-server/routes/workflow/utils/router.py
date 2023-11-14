@@ -12,11 +12,13 @@ from langchain.docstore.document import Document
 from langchain.vectorstores.base import VectorStore
 from prance import ResolvingParser
 
+from opencopilot_utils import ENV_CONFIGS
+
 chat = get_chat_model("gpt-3.5-turbo")
 
 
 def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
-    score_threshold = float(os.getenv("SCORE_THRESHOLD_KB", 0.75))
+    score_threshold = ENV_CONFIGS.SCORE_THRESHOLD_KB
     vector_store: VectorStore = get_vector_store(StoreOptions(bot_id))
 
     try:

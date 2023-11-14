@@ -5,10 +5,12 @@ from flask import request, jsonify
 from routes.uploads.celery_service import celery
 import validators
 
+from opencopilot_utils import ENV_CONFIGS
+
 upload = Blueprint("upload", __name__)
 import os, json, uuid
 
-SHARED_FOLDER = os.getenv("SHARED_FOLDER", "/app/shared_data/")
+SHARED_FOLDER = ENV_CONFIGS.SHARED_FOLDER
 os.makedirs(SHARED_FOLDER, exist_ok=True)
 
 upload_controller = Blueprint("uploads", __name__)
@@ -35,9 +37,7 @@ def upload_file():
 
     # Generate a unique filename
     unique_filename = generate_unique_filename(file.filename)
-    file_path = os.path.join(
-        os.getenv("SHARED_FOLDER", "/app/shared_data/"), unique_filename
-    )
+    file_path = os.path.join(ENV_CONFIGS.SHARED_FOLDER, unique_filename)
 
     try:
         # Save the file to the shared folder

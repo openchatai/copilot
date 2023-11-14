@@ -2,9 +2,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.pool import QueuePool
 from sqlalchemy.ext.declarative import declarative_base  # Import declarative_base
 import os
+from shared.utils.opencopilot_utils import ENV_CONFIGS
 
 # Replace these values with your MySQL server details
-db_url = os.getenv("MYSQL_URI", "mysql+pymysql://dbuser:dbpass@localhost:3307/opencopilot")
+db_url = ENV_CONFIGS.MONGODB_URL
 
 # Create a function to define the connection creator
 def connection_creator():

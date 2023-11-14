@@ -7,13 +7,14 @@ from opencopilot_utils import StoreOptions
 from opencopilot_utils.get_vector_store import get_vector_store
 import logging, os
 
+from opencopilot_utils.config import ENV_CONFIGS
+
 
 def check_workflow_in_store(
     text: str, namespace: str
 ) -> Tuple[Optional[Document], Optional[float]]:
-
     try:
-        score_threshold = float(os.getenv("SCORE_THRESHOLD", "0.95"))
+        score_threshold = ENV_CONFIGS.SCORE_THRESHOLD
         vector_store = get_vector_store(StoreOptions(namespace.split("/")[-1]))
         result = vector_store.similarity_search_with_relevance_scores(
             text, score_threshold=score_threshold

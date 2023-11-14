@@ -9,8 +9,10 @@ from typing import Any, Optional
 from prance import ResolvingParser
 import asyncio
 
+from opencopilot_utils import ENV_CONFIGS
 
-openai_api_key = os.getenv("OPENAI_API_KEY")
+
+openai_api_key = ENV_CONFIGS.OPENAI_API_KEY
 llm = get_llm()
 
 

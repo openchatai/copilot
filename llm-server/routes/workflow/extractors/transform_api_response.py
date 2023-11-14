@@ -4,17 +4,11 @@ from langchain.schema import HumanMessage, SystemMessage
 from typing import Any
 from routes.workflow.extractors.extract_json import extract_json_payload
 from routes.lossy_compressors.truncate_json import truncate_json
-
-
-openai_api_key = os.getenv("OPENAI_API_KEY")
+from utils.get_chat_model import get_chat_model
 
 
 def transform_api_response_from_schema(server_url: str, responseText: str) -> str:
-    chat = ChatOpenAI(
-        openai_api_key=os.getenv("OPENAI_API_KEY"),
-        model="gpt-3.5-turbo-16k",
-        temperature=0,
-    )
+    chat = get_chat_model("gpt-3.5-turbo-16k")
 
     responseText = truncate_json(json.loads(responseText))
     messages = [

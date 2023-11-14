@@ -6,7 +6,6 @@ from routes.uploads.upload_controller import upload_controller
 from routes._swagger.controller import _swagger
 from routes.chat.chat_controller import chat_workflow
 from typing import Any, Tuple
-from utils.config import Config
 from flask_cors import CORS
 from routes.data_source.data_source_controller import datasource_workflow
 from dotenv import load_dotenv
@@ -26,7 +25,6 @@ app.register_blueprint(chat_workflow, url_prefix="/chat")
 app.register_blueprint(upload_controller, url_prefix="/uploads")
 app.register_blueprint(datasource_workflow, url_prefix="/data_sources")
 
-app.config.from_object(Config)
 from routes.root_service import handle_request
 
 

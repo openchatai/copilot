@@ -9,7 +9,6 @@ from custom_types.t_json import JsonData
 import importlib
 import logging
 
-openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
 
 
