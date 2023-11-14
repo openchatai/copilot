@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 function UserMessage({ message }: { message: string }) {
   return (
     <div className="flex w-full flex-row items-center justify-end gap-2">
-      <p className="w-fit max-w-sm rounded-lg bg-primary px-4 py-3 text-sm text-white">
+      <p className="w-fit max-w-sm rounded-lg bg-primary px-4 py-3 text-sm select-none text-white">
         {message}
       </p>
     </div>
@@ -15,7 +15,7 @@ function CopilotMessage({ message }: { message: string }) {
       <Avatar size="large" className="sticky top-0">
         <AvatarFallback>C</AvatarFallback>
       </Avatar>
-      <p className="w-fit max-w-sm rounded-lg bg-secondary px-4 py-3 text-sm text-accent-foreground">
+      <p className="w-fit max-w-sm rounded-lg bg-secondary px-4 py-3 text-sm text-accent-foreground select-none">
         {message}
       </p>
     </div>
