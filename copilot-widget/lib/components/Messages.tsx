@@ -15,7 +15,7 @@ function BotIcon({ error }: { error?: boolean }) {
   return (
     <img
       className={cn(
-        "opencopilot-h-7 opencopilot-w-7 opencopilot-rounded-lg opencopilot-object-cover opencopilot-aspect-square hover:opencopilot-shadow",
+        "opencopilot-h-7 opencopilot-w-7 opencopilot-rounded-lg opencopilot-shrink-0 opencopilot-object-cover opencopilot-aspect-square hover:opencopilot-shadow",
         error && "border opencopilot-border-rose-500 opencopilot-shadow-none"
       )}
       src="https://cdn.dribbble.com/users/281679/screenshots/14897126/media/f52c47307ac2daa0c727b1840c41d5ab.png?compress=1&resize=1600x1200&vertical=center"
@@ -52,7 +52,7 @@ export function BotTextMessage({
   const { messages } = useChat();
   const isLast = getLast(messages)?.id === id;
   return (
-    <div className="opencopilot-p-2 group opencopilot-w-full">
+    <div className="opencopilot-p-2 group opencopilot-w-full opencopilot-shrink-0">
       <div
         className="opencopilot-flex opencopilot-select-none opencopilot-items-start opencopilot-gap-3 opencopilot-w-full"
         dir="auto"
@@ -99,7 +99,7 @@ export function BotTextMessage({
 export function BotMessageLoading() {
   const { displayText } = useTypeWriter({ text: "Bot is Thinking..." });
   return (
-    <div className="opencopilot-p-2 opencopilot-flex opencopilot-items-center opencopilot-gap-3 opencopilot-w-full">
+    <div className="opencopilot-p-2 opencopilot-flex opencopilot-items-center opencopilot-shrink-0 opencopilot-gap-3 opencopilot-w-full">
       <div className="loading opencopilot-flex-col opencopilot-w-7 opencopilot-flex opencopilot-h-7 opencopilot-bg-accent opencopilot-text-primary opencopilot-rounded-lg opencopilot-shrink-0 opencopilot-mt-auto flex-center">
         <Grid
           height="15"
@@ -130,7 +130,7 @@ export function UserMessage({
   return (
     <div
       dir="auto"
-      className="opencopilot-w-full opencopilot-overflow-x-auto opencopilot-max-w-full last-of-type:opencopilot-mb-10 opencopilot-bg-accent opencopilot-p-2 opencopilot-flex opencopilot-gap-3 opencopilot-items-center"
+      className="opencopilot-w-full opencopilot-overflow-x-auto opencopilot-shrink-0 opencopilot-max-w-full last-of-type:opencopilot-mb-10 opencopilot-bg-accent opencopilot-p-2 opencopilot-flex opencopilot-gap-3 opencopilot-items-center"
     >
       <UserIcon />
       <div>
@@ -155,7 +155,7 @@ export function BotMessageError({ message }: { message?: FailedMessage }) {
     every: 0.001,
   });
   return (
-    <div className="opencopilot-clear-both opencopilot-w-full opencopilot-p-2">
+    <div className="opencopilot-clear-both opencopilot-shrink-0 opencopilot-w-full opencopilot-p-2">
       <div className="opencopilot-flex opencopilot-items-center opencopilot-gap-3 opencopilot-w-full">
         <BotIcon error />
         <div className="opencopilot-text-rose-500 opencopilot-text-sm">
