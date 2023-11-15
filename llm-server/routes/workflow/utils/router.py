@@ -38,7 +38,7 @@ def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
 def classify_text(user_requirement: str, context: str) -> ActionType:
     messages = [
         SystemMessage(
-            content=f"You are an ai assistant that outputs one of the following keywords based on instruction - {ActionType.ASSISTANT_ACTION.value}, {ActionType.KNOWLEDGE_BASE_QUERY.value} or {ActionType.GENERAL_QUERY.value}"
+            content=f"Categorize user input in one of three types based on the instructions below - {ActionType.ASSISTANT_ACTION.value}, {ActionType.KNOWLEDGE_BASE_QUERY.value} or {ActionType.GENERAL_QUERY.value}"
         ),
         HumanMessage(
             content=f"""
