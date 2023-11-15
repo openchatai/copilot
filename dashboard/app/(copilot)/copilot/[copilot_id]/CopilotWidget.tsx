@@ -12,7 +12,9 @@ export default function Widget({
             apiUrl: "http://localhost:8888/backend/api",
             token,
             initialMessage: "Hey Pal!",
-            headers: {},
+            headers: {
+                "X-Copilot": "copilot"
+            },
         }}
     >
         <div className="[&>div]:static [&>div]:!max-h-full [&>div]:!h-full h-full overflow-hidden border-border border rounded-lg">
