@@ -44,9 +44,10 @@ def classify_text(user_requirement: str, context: str) -> ActionType:
             content=f"""
                 If the user's requirement would require making an API call to a third-party service, return the output as: {ActionType.ASSISTANT_ACTION.value}. 
                 
-                Actions such as performing tasks, listing items, displaying information, and managing additions/removals are categorized as assistant actions etc
+                Actions such as performing tasks, listing items, displaying information, and managing additions/removals etc.. are categorized as assistant actions
             """
         ),
+        HumanMessage(content=f"Here's the user requirement - {user_requirement}"),
         HumanMessage(
             content=f"""
                 If the user is not asking the bot to take any action, and api call is not required it will be a {ActionType.GENERAL_QUERY.value}
