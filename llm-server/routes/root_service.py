@@ -34,6 +34,7 @@ from opencopilot_utils.get_vector_store import get_vector_store
 from langchain.vectorstores.base import VectorStore
 from langchain.prompts import PromptTemplate
 from langchain.chains import ConversationalRetrievalChain
+from utils import struct_log
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -71,7 +72,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
             current_state = process_state(app, headers)
             # document = None
             swagger_doc = get_swagger_doc(swagger_url)
-            
+
             document, score = check_workflow_in_store(text, bot_id)
             if document:
                 return handle_existing_workflow(
@@ -133,11 +134,10 @@ def handle_request(data: Dict[str, Any]) -> Any:
 
         #     content = chat(messages).content
         #     return {"response": content}
-        logging.error(f"Unhandled classification {action}")
         raise action
 
     except Exception as e:
-        return handle_exception(e)
+        return handle_exception(e, "handle_request")
 
 
 # Helper Functions
@@ -336,17 +336,6 @@ def handle_no_api_call(
     return {"response": bot_message}
 
 
-def handle_exception(e: Exception) -> Dict[str, Any]:
-    error_info = {
-        "error": str(e),
-        "traceback": traceback.format_exc(),
-    }
-
-    print(error_info)
-
-    logging.error(
-        "[OpenCopilot] Something went wrong when trying to get how many calls are required",
-        exc_info=True,
-    )
-
-    return {"response": None, "error": str(e)}
+def handle_exception(e: Exception, event: str) -> Dict[str, Any]:
+    struct_log.exception(payload={}, error=str(e), event="/handle_request")
+    return {"response": None, "error": "An error occured in hand"}

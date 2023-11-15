@@ -1,4 +1,4 @@
-import json
+import json, inspect
 from opencopilot_types.workflow_type import WorkflowDataType
 from routes.workflow.generate_openapi_payload import generate_openapi_payload
 from utils.make_api_call import make_api_request
@@ -13,6 +13,7 @@ from utils.process_app_state import process_state
 from prance import ResolvingParser
 from integrations.load_json_config import load_json_config
 from integrations.transformers.transformer import transform_response
+from utils import struct_log
 
 
 def run_openapi_operations(
@@ -61,14 +62,16 @@ def run_openapi_operations(
                 record_info[operation_id] = json.loads(api_response.text)
 
             except Exception as e:
-                logging.error("Error making API call", exc_info=True)
-
-                error_info = {
-                    "operation_id": operation_id,
-                    "error": str(e),
-                    "traceback": traceback.format_exc(),
-                }
-                record_info[operation_id] = error_info
+                struct_log.exception(
+                    payload={
+                        text,
+                        headers,
+                        server_base_url,
+                        app,
+                    },
+                    error=str(e),
+                    event="/check_workflow_in_store",
+                )
 
                 # At this point we will retry the operation with hierarchical planner
                 raise e

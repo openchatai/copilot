@@ -25,6 +25,7 @@ app.register_blueprint(datasource_workflow, url_prefix="/data_sources")
 app.config.from_object(Config)
 from routes.root_service import handle_request
 
+
 ## TODO: Implement caching for the swagger file content (no need to load it everytime)
 @app.route("/handle", methods=["POST", "OPTIONS"])
 def handle() -> Response:
@@ -33,15 +34,10 @@ def handle() -> Response:
         response = handle_request(data)
         return jsonify(response)
     except Exception as e:
-        struct_log.error("Error in /handle", payload=data, error=str(e))
+        struct_log.exception(
+            app="OPENCOPILOT", payload=data, error=str(e), event="/handle"
+        )
         return jsonify({"response": "Something went wrong, check the logs!!"})
-
-
-@app.errorhandler(500)
-def internal_server_error(error: Any) -> Tuple[str, int]:
-    # Log the error to the console
-    print(error)
-    return "Internal Server Error", 500
 
 
 if __name__ == "__main__":
