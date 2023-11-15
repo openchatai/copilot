@@ -21,7 +21,7 @@ spec:
       initContainers:
         - name: download-config
           image: curlimages/curl
-          command: ["sh", "-c", "curl -o /nginx-config/nginx.conf https://raw.githubusercontent.com/openchatai/OpenCopilot/main/nginx/nginx.conf"]
+          command: ["sh", "-c", "curl -o /nginx-config/nginx.conf https://raw.githubusercontent.com/openchatai/OpenCopilot/feat/k8s/nginx/nginx_k8s.conf"]
           volumeMounts:
             - mountPath: /nginx-config
               name: nginx-config-volume

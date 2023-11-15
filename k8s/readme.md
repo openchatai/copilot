@@ -1,3 +1,5 @@
+## set OPENAI_API_KEY in configmap.yaml
+
 ## Deploying Opencopilot to Kubernetes
 
 ---

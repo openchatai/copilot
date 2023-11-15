@@ -28,6 +28,10 @@ spec:
       containers:
         - image: codebanesr/dashboard:arm_edge
           name: dashboard
+          ports:
+            - containerPort: 8000
+              hostPort: 8000
+              protocol: TCP
           resources: {}
           volumeMounts:
             - mountPath: /app/shared_data

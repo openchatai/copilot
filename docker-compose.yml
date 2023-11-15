@@ -6,6 +6,8 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     image: codebanesr/backend:arm_edge  # Add this line
+    ports:
+      - 5000:5000
     depends_on:
       - llm-server
       - mysql
@@ -73,6 +75,8 @@ services:
       context: ./dashboard
       dockerfile: Dockerfile
     image: codebanesr/dashboard:arm_edge  # Add this line
+    ports:
+      - 8000:8000
     volumes:
       - shared_data:/app/shared_data
     networks:

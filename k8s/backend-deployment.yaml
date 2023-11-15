@@ -39,6 +39,10 @@ spec:
               value: dbuser
           image: codebanesr/backend:arm_edge
           name: backend
+          ports:
+            - containerPort: 5000
+              hostPort: 5000
+              protocol: TCP
           resources: {}
           volumeMounts:
             - mountPath: /app/shared_data

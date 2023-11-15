@@ -1,7 +1,7 @@
 apiVersion: v1
 data:
-  CELERY_BACKEND: redis://redis:6379/1
-  CELERY_BROKER: redis://redis:6379/0
+  CELERY_BACKEND: redis://redis.default.svc.cluster.local:6379/1
+  CELERY_BROKER: redis://redis.default.svc.cluster.local:6379/0
   COPILOT_MODE: interactive
   LANGCHAIN_API_KEY: TOKEN_GOES_HERE
   LANGCHAIN_ENDPOINT: https://api.smith.langchain.com
@@ -10,7 +10,7 @@ data:
   LOCAL_IP: http://host.docker.internal
   MONGODB_URL: mongodb://dbuser:dbpass@mongodb.default.svc.cluster.local:27017
   MYSQL_URI: mysql+pymysql://dbuser:dbpass@mysql.default.svc.cluster.local:3307/opencopilot
-  OPENAI_API_KEY: sk-*****
+  OPENAI_API_KEY: sk-****
   OPENAI_API_TYPE: openai
   PINECONE_API_KEY: ""
   PINECONE_ENV: ""
@@ -23,5 +23,8 @@ kind: ConfigMap
 metadata:
   creationTimestamp: null
   labels:
-    io.kompose.service: llm-server-envsconfig
-  name: envsconfig
+    io.kompose.service: llm-server-configmap
+  name: configmap
+
+
+# llm-server.default.svc.cluster.local:8002

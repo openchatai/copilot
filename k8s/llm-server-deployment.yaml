@@ -31,97 +31,97 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   key: CELERY_BACKEND
-                  name: envsconfig
+                  name: configmap
             - name: CELERY_BROKER
               valueFrom:
                 configMapKeyRef:
                   key: CELERY_BROKER
-                  name: envsconfig
+                  name: configmap
             - name: COPILOT_MODE
               valueFrom:
                 configMapKeyRef:
                   key: COPILOT_MODE
-                  name: envsconfig
+                  name: configmap
             - name: LANGCHAIN_API_KEY
               valueFrom:
                 configMapKeyRef:
                   key: LANGCHAIN_API_KEY
-                  name: envsconfig
+                  name: configmap
             - name: LANGCHAIN_ENDPOINT
               valueFrom:
                 configMapKeyRef:
                   key: LANGCHAIN_ENDPOINT
-                  name: envsconfig
+                  name: configmap
             - name: LANGCHAIN_PROJECT
               valueFrom:
                 configMapKeyRef:
                   key: LANGCHAIN_PROJECT
-                  name: envsconfig
+                  name: configmap
             - name: LANGCHAIN_TRACING_V2
               valueFrom:
                 configMapKeyRef:
                   key: LANGCHAIN_TRACING_V2
-                  name: envsconfig
+                  name: configmap
             - name: LOCAL_IP
               valueFrom:
                 configMapKeyRef:
                   key: LOCAL_IP
-                  name: envsconfig
+                  name: configmap
             - name: MONGODB_URL
               valueFrom:
                 configMapKeyRef:
                   key: MONGODB_URL
-                  name: envsconfig
+                  name: configmap
             - name: MYSQL_URI
               valueFrom:
                 configMapKeyRef:
                   key: MYSQL_URI
-                  name: envsconfig
+                  name: configmap
             - name: OPENAI_API_KEY
               valueFrom:
                 configMapKeyRef:
                   key: OPENAI_API_KEY
-                  name: envsconfig
+                  name: configmap
             - name: OPENAI_API_TYPE
               valueFrom:
                 configMapKeyRef:
                   key: OPENAI_API_TYPE
-                  name: envsconfig
+                  name: configmap
             - name: PINECONE_API_KEY
               valueFrom:
                 configMapKeyRef:
                   key: PINECONE_API_KEY
-                  name: envsconfig
+                  name: configmap
             - name: PINECONE_ENV
               valueFrom:
                 configMapKeyRef:
                   key: PINECONE_ENV
-                  name: envsconfig
+                  name: configmap
             - name: QDRANT_URL
               valueFrom:
                 configMapKeyRef:
                   key: QDRANT_URL
-                  name: envsconfig
+                  name: configmap
             - name: SCORE_THRESHOLD
               valueFrom:
                 configMapKeyRef:
                   key: SCORE_THRESHOLD
-                  name: envsconfig
+                  name: configmap
             - name: SELENIUM_GRID_URL
               valueFrom:
                 configMapKeyRef:
                   key: SELENIUM_GRID_URL
-                  name: envsconfig
+                  name: configmap
             - name: SHARED_FOLDER
               valueFrom:
                 configMapKeyRef:
                   key: SHARED_FOLDER
-                  name: envsconfig
+                  name: configmap
             - name: STORE
               valueFrom:
                 configMapKeyRef:
                   key: STORE
-                  name: envsconfig
+                  name: configmap
           image: codebanesr/llm-server:arm_edge
           name: llm-server
           ports:
