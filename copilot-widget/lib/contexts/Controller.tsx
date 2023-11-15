@@ -54,7 +54,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         "/chat/send",
         {
           ...message,
-          headers: config?.headers,
+          headers: config?.headers || [],
           user: config?.user,
         }
       );
