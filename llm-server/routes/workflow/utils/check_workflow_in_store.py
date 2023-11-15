@@ -11,7 +11,6 @@ import logging, os
 def check_workflow_in_store(
     text: str, namespace: str
 ) -> Tuple[Optional[Document], Optional[float]]:
-
     try:
         score_threshold = float(os.getenv("SCORE_THRESHOLD", "0.95"))
         vector_store = get_vector_store(StoreOptions(namespace.split("/")[-1]))
