@@ -1,13 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert --out=k8s
-    kompose.version: 1.31.2 (HEAD)
-  creationTimestamp: null
+  name: nginx
   labels:
     io.kompose.service: nginx
-  name: nginx
 spec:
   replicas: 1
   selector:
@@ -17,14 +13,18 @@ spec:
     type: Recreate
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert --out=k8s
-        kompose.version: 1.31.2 (HEAD)
-      creationTimestamp: null
       labels:
-        io.kompose.network/opencopilot-opencopilot-network: "true"
         io.kompose.service: nginx
     spec:
+      securityContext:
+        runAsUser: 0  # Set the user ID (UID) to 0 for root
+      initContainers:
+        - name: download-config
+          image: curlimages/curl
+          command: ["sh", "-c", "curl -o /nginx-config/nginx.conf https://raw.githubusercontent.com/openchatai/OpenCopilot/main/nginx/nginx.conf"]
+          volumeMounts:
+            - mountPath: /nginx-config
+              name: nginx-config-volume
       containers:
         - image: nginx
           name: nginx
@@ -34,11 +34,9 @@ spec:
               protocol: TCP
           resources: {}
           volumeMounts:
-            - mountPath: /etc/nginx/nginx.conf
-              name: nginx-claim0
+            - mountPath: /etc/nginx
+              name: nginx-config-volume
       restartPolicy: Always
       volumes:
-        - name: nginx-claim0
-          persistentVolumeClaim:
-            claimName: nginx-claim0
-status: {}
+        - name: nginx-config-volume
+          emptyDir: {}
