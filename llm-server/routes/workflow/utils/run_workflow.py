@@ -4,6 +4,7 @@ from routes.workflow.utils.run_openapi_ops import run_openapi_operations
 from opencopilot_types.workflow_type import WorkflowDataType
 
 import logging, json
+from utils import struct_log
 
 
 def run_workflow(
@@ -28,7 +29,15 @@ def run_workflow(
             app,
         )
     except Exception as e:
-        logging.error("[OpenCopilot] Custom planner failed: %s", e)
+        struct_log.exception(
+            payload={
+                headers,
+                server_base_url,
+                app,
+            },
+            error=str(e),
+            event="/run_workflow",
+        )
         error = str(e)
 
     output = {"response": result if not error else "", "error": error}
