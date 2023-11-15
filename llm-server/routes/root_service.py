@@ -71,8 +71,8 @@ def handle_request(data: Dict[str, Any]) -> Any:
             current_state = process_state(app, headers)
             # document = None
             swagger_doc = get_swagger_doc(swagger_url)
-            
-            document, score = check_workflow_in_store(text, swagger_url)
+
+            document, score = check_workflow_in_store(text, bot_id)
             if document:
                 return handle_existing_workflow(
                     document,
@@ -84,7 +84,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
                     swagger_doc,
                     session_id,
                 )
-                
+
             bot_response = hasSingleIntent(
                 swagger_doc, text, session_id, current_state, app
             )
@@ -106,7 +106,10 @@ def handle_request(data: Dict[str, Any]) -> Any:
                     swagger_url, session_id, text, bot_response.bot_message
                 )
 
-        elif action == ActionType.KNOWLEDGE_BASE_QUERY or action == ActionType.GENERAL_QUERY:
+        elif (
+            action == ActionType.KNOWLEDGE_BASE_QUERY
+            or action == ActionType.GENERAL_QUERY
+        ):
             sanitized_question = text.strip().replace("\n", " ")
             vector_store = get_vector_store(StoreOptions(namespace=bot_id))
             mode = "assistant"

@@ -16,10 +16,9 @@ chat = get_chat_model("gpt-3.5-turbo")
 
 
 def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
-    score_threshold = float(os.getenv("SCORE_THRESHOLD_KB", 0.75))
-    vector_store: VectorStore = get_vector_store(StoreOptions(bot_id))
-
     try:
+        score_threshold = float(os.getenv("SCORE_THRESHOLD_KB", 0.75))
+        vector_store: VectorStore = get_vector_store(StoreOptions(bot_id))
         result = vector_store.similarity_search_with_relevance_scores(
             text, score_threshold=score_threshold
         )
