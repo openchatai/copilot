@@ -1,6 +1,7 @@
 import os
 from langchain.chat_models import ChatOpenAI
 from routes.workflow.extractors.extract_json import extract_json_payload
+from utils.chat_models import CHAT_MODELS
 from utils.get_chat_model import get_chat_model
 from opencopilot_utils import get_llm
 from custom_types.t_json import JsonData
@@ -15,7 +16,7 @@ llm = get_llm()
 async def gen_params_from_schema(
     param_schema: str, text: str, prev_resp: str, current_state: Optional[str]
 ) -> Optional[JsonData]:
-    chat = get_chat_model("gpt-3.5-turbo-16k")
+    chat = get_chat_model(CHAT_MODELS.mistral_openorca)
     messages = [
         SystemMessage(
             content="You are an intelligent machine learning model that can produce REST API's params / query params in json format, given the json schema, user input, data from previous api calls, and current application state."
