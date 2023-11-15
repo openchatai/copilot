@@ -5,6 +5,12 @@ from bson import ObjectId
 import routes._swagger.service as swagger_service
 
 from utils.db import Database
+from qdrant_client import QdrantClient
+from qdrant_client.http import models
+
+import os
+
+client = QdrantClient(url=os.getenv("QDRANT_URL", "http://qdrant:6333"))
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -66,6 +72,11 @@ def add_swagger_file(id) -> Response:
 def add_init_swagger_file(bot_id: str) -> Response:
     body = request.get_json()
     swagger_url = body["swagger_url"]
+    client.create_collection(
+        collection_name=bot_id,
+        vectors_config=models.VectorParams(size=1536, distance=models.Distance.COSINE),
+    )
+
     result = swagger_service.save_swaggerfile_to_mongo(swagger_url, bot_id)
     return jsonify(result)
 
