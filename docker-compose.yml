@@ -5,6 +5,9 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    image: codebanesr/backend:arm_edge  # Add this line
+    ports:
+      - 5000:5000
     depends_on:
       - llm-server
       - mysql
@@ -24,12 +27,13 @@ services:
     build:
       context: ./llm-server
       dockerfile: Dockerfile
+    image: codebanesr/llm-server:arm_edge  # Add this line
     volumes:
       - shared_data:/app/shared_data
     networks:
       - opencopilot_network
     env_file:
-      - llm-server/.env
+      - llm-server/.env.docker
     ports:
       - 8002:8002
     depends_on:
@@ -51,12 +55,13 @@ services:
     build:
       context: ./workers
       dockerfile: Dockerfile
+    image: codebanesr/workers:arm_edge  # Add this line
     networks:
       - opencopilot_network
     volumes:
       - shared_data:/app/shared_data
     env_file:
-      - llm-server/.env
+      - llm-server/.env.docker
     # worker will also check for some database tables, this is a hacky solution
     command: sh -c "celery -A celery_app worker --loglevel=info"
     depends_on:
@@ -69,6 +74,9 @@ services:
     build:
       context: ./dashboard
       dockerfile: Dockerfile
+    image: codebanesr/dashboard:arm_edge  # Add this line
+    ports:
+      - 8000:8000
     volumes:
       - shared_data:/app/shared_data
     networks:
@@ -80,7 +88,7 @@ services:
   mysql:
     restart: unless-stopped
     platform: linux/x86_64
-    image: "mysql:5.7"
+    image: "mysql:8"
     ports:
       - "3307:3306"
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
