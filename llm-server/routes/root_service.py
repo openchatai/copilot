@@ -72,7 +72,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
             # document = None
             swagger_doc = get_swagger_doc(swagger_url)
             
-            document, score = check_workflow_in_store(text, swagger_url)
+            document, score = check_workflow_in_store(text, bot_id)
             if document:
                 return handle_existing_workflow(
                     document,
