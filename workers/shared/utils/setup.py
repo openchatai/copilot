@@ -5,7 +5,7 @@ with open("readme.md", "r", encoding="utf-8") as readme_file:
 
 setup(
     name="opencopilot_utils",
-    version="1.0.18",
+    version="1.0.19",
     packages=find_packages(),
     install_requires=[
         "langchain"

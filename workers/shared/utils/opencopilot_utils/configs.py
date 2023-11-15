@@ -1,6 +1,5 @@
 import os
 from typing import NamedTuple, Optional
-from dotenv import load_dotenv
 
 VECTOR_STORE_INDEX_NAME = os.environ.get("VECTOR_STORE_INDEX_NAME", "dummy")
 PINECONE_NAMESPACE = "bot-test"

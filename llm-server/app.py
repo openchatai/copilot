@@ -1,6 +1,12 @@
 import logging
-
 from flask import Flask, request, jsonify, Response
+from dotenv import load_dotenv
+
+load_dotenv()
+from opencopilot_utils import ENV_CONFIGS
+
+logging.error(f"This is env:::: ENV_CONFIGS.MYSQL_URI: {ENV_CONFIGS.MYSQL_URI}")
+
 from routes.workflow.workflow_controller import workflow
 from routes.uploads.upload_controller import upload_controller
 from routes._swagger.controller import _swagger
@@ -8,13 +14,11 @@ from routes.chat.chat_controller import chat_workflow
 from typing import Any, Tuple
 from flask_cors import CORS
 from routes.data_source.data_source_controller import datasource_workflow
-from dotenv import load_dotenv
 
-load_dotenv()
 from opencopilot_db import create_database_schema
 
-create_database_schema()
 
+create_database_schema()
 logging.basicConfig(level=logging.INFO)
 
 

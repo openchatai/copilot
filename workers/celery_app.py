@@ -1,8 +1,9 @@
+from dotenv import load_dotenv
+
+load_dotenv()
 from celery import Celery
 from shared.models.opencopilot_db import create_database_schema
 from shared.utils.opencopilot_utils import ENV_CONFIGS
-
-import os
 
 create_database_schema()
 app = Celery(
