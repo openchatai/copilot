@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+</head>
+
+<body>
+    <h1>File Upload</h1>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+        <label for="fileInput">Choose File:</label>
+        <input type="file" id="fileInput" name="file" accept=".pdf">
+        <br>
+        <button type="button" onclick="uploadFile()">Upload</button>
+    </form>
+
+    <script>
+        function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('http://127.0.0.1:5000/uploads/server/upload', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('File uploaded successfully:', data);
+
+                    // Call the next endpoint with the filename
+                    const filename = data.filename;
+                    const ingestData = {
+                        bot_id: 'abracadabra',
+                        filenames: [filename]
+                    };
+
+                    fetch('http://127.0.0.1:5000/uploads/file/ingest', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(ingestData)
+                    })
+                        .then(response => response.text())
+                        .then(result => console.log(result))
+                        .catch(error => console.error('Error ingesting file:', error));
+                })
+                .catch(error => console.error('Error uploading file:', error));
+        }
+    </script>
+</body>
+
+</html>

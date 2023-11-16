@@ -3,7 +3,7 @@ import { ReactNode, createContext, useContext } from "react";
 
 export type ConfigDataContextType = Pick<
   Options,
-  "token" | "initialMessage" | "headers" | "apiUrl"
+  "token" | "initialMessage" | "headers" | "apiUrl" | "user" | "defaultOpen"
 >;
 
 const ConfigDataContext = createContext<ConfigDataContextType | undefined>(

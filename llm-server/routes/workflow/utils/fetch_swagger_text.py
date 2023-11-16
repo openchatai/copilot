@@ -1,13 +1,12 @@
 import json, requests, yaml, os
 from typing import Dict, Any, cast
-from dotenv import load_dotenv
 
-load_dotenv()
 shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
 
 import json
 import yaml
 from yaml.parser import ParserError
+
 
 def fetch_swagger_text(swagger_url: str) -> str:
     if swagger_url.startswith("https://"):
@@ -16,13 +15,13 @@ def fetch_swagger_text(swagger_url: str) -> str:
             try:
                 # Try parsing the content as JSON
                 json_content = json.loads(response.text)
-                return json.dumps(json_content, separators=(',', ':'))
+                return json.dumps(json_content, separators=(",", ":"))
             except json.JSONDecodeError:
                 try:
                     # Try parsing the content as YAML
                     yaml_content = yaml.safe_load(response.text)
                     if isinstance(yaml_content, dict):
-                        return json.dumps(yaml_content, separators=(',', ':'))
+                        return json.dumps(yaml_content, separators=(",", ":"))
                     else:
                         raise Exception("Invalid YAML content")
                 except ParserError:
@@ -36,13 +35,13 @@ def fetch_swagger_text(swagger_url: str) -> str:
             try:
                 # Try parsing the content as JSON
                 json_content = json.loads(content)
-                return json.dumps(json_content, separators=(',', ':'))
+                return json.dumps(json_content, separators=(",", ":"))
             except json.JSONDecodeError:
                 try:
                     # Try parsing the content as YAML
                     yaml_content = yaml.safe_load(content)
                     if isinstance(yaml_content, dict):
-                        return json.dumps(yaml_content, separators=(',', ':'))
+                        return json.dumps(yaml_content, separators=(",", ":"))
                     else:
                         raise Exception("Invalid YAML content")
                 except ParserError:

@@ -1,15 +1,11 @@
 "use client";
-
 import * as React from "react";
 import {
   Bot,
-  CreditCard,
   FileStack,
   HelpCircle,
-  Settings,
   User,
 } from "lucide-react";
-
 import {
   CommandDialog,
   CommandEmpty,

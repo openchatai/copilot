@@ -1,11 +1,7 @@
 # type: ignore
 from pymongo import MongoClient
 from pymongo.database import Database as PyMongoDatabase
-from dotenv import load_dotenv
-
 import os
-
-load_dotenv()
 
 
 class Database:

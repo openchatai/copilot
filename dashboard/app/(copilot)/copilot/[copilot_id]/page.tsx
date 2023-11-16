@@ -13,6 +13,9 @@ import { ShieldAlert, Wand2, Inspect } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { useCopilot } from "../_context/CopilotProvider";
+import dynamic from "next/dynamic";
+
+const Widget = dynamic(() => import("./CopilotWidget"));
 
 function InstallationSection() {
   const { token: CopilotToken } = useCopilot();
@@ -42,9 +45,8 @@ function InstallationSection() {
           <CodeBlock
             code={`<script>
   // be aware to call this function when the document/window is ready.
-
   const options = {
-     apiUrl: "http://localhost:8888/backend/api" // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:5000/api
+     apiUrl: "http://localhost:8888/backend/api", // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:5000/api
      initialMessages: ["How are the things"], // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
      token: "${CopilotToken}", // you can get your token from the dashboard
      triggerSelector: "#triggerSelector", // the selector of the element that will trigger the copilot when clicked
@@ -110,18 +112,15 @@ export default function CopilotPage() {
           {CopilotName}
         </h1>
         <div className="space-x-2">
-          <Button>
-            <Link
-              target="_blank"
-              href={"http://localhost:8888/backend" + "/demo/" + CopilotToken}
-            >
-              Test on example dashboard
-            </Link>
+          <Button
+            id="triggerSelector"
+          >
+            Chat with the Copilot
           </Button>
         </div>
       </HeaderShell>
-      <div className="flex-1 overflow-auto">
-        <div className="container max-w-screen-lg p-8">
+      <div className="flex-1 flex flex-row justify-between overflow-hidden">
+        <div className="flex-1 max-w-screen-lg p-8 max-h-full overflow-auto">
           <Alert variant="info" className="mb-5">
             <ShieldAlert className="h-6 w-6" />
             <AlertTitle>Attention</AlertTitle>
@@ -138,6 +137,9 @@ export default function CopilotPage() {
             <InstallationSection />
             <TryItSection />
           </Accordion>
+        </div>
+        <div className="h-full w-fit py-5 px-10">
+          <Widget token={CopilotToken} />
         </div>
       </div>
     </div>

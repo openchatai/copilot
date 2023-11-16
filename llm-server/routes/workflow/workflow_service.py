@@ -3,16 +3,13 @@ from utils.db import Database
 
 db_instance = Database()
 mongo = db_instance.get_db()
-from dotenv import load_dotenv
-
-load_dotenv()
 import os
 
 SCORE_THRESHOLD = float(os.getenv("SCORE_THRESOLD", 0.88))
 
 
 def get_valid_url(
-        api_payload: Dict[str, Union[str, None]], server_base_url: Optional[str]
+    api_payload: Dict[str, Union[str, None]], server_base_url: Optional[str]
 ) -> str:
     if "endpoint" in api_payload:
         endpoint = api_payload["endpoint"]

@@ -7,18 +7,16 @@ from typing import List
 from langchain.chat_models import ChatOpenAI
 
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
+from utils.chat_models import CHAT_MODELS
 from utils.get_chat_model import get_chat_model
 from routes.workflow.extractors.extract_json import extract_json_payload
 import os
-from dotenv import load_dotenv
 import logging
 from prance import ResolvingParser
 from models.repository.chat_history_repo import get_all_chat_history_by_session_id
-from models.chat_history import ChatHistory
+from opencopilot_db import ChatHistory
 
 logging.basicConfig(level=logging.INFO)
-
-load_dotenv()
 
 
 class BotMessage:
@@ -103,7 +101,7 @@ def generate_consolidated_requirement(
     Returns:
       A consolidated query string.
     """
-    chat = get_chat_model("gpt-3.5-turbo")
+    chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo)
 
     history = get_all_chat_history_by_session_id(session_id)
     if len(history) == 0:
@@ -135,7 +133,7 @@ def hasSingleIntent(
     app: str,
 ) -> BotMessage:
     summaries = get_summaries(swagger_doc)
-    chat = get_chat_model("gpt-3.5-turbo-16k")
+    chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
     consolidated_user_requirement = (
         generate_consolidated_requirement(user_requirement, session_id)
@@ -145,10 +143,6 @@ def hasSingleIntent(
     messages = [
         SystemMessage(
             content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. To accomplish the task, you will be provided with information about the existing state of the application. A user input and list of api summaries. If the user is asking you to perform a `CRUD` operation, provide the list of operation ids of api calls needed in the `ids` field of the json. `bot_message` should consist of a straightforward sentence, free from any special characters. Note that the application uses current state as a cache, if you don't find the required information in the cache, you should try to find an api call to fetch that information. Your response MUST be a valid minified json"
-        ),
-        (app == "trello")
-        and HumanMessage(
-            content="You can find board id, board name, list id, list name, card id, card name in the current state."
         ),
         current_state
         and HumanMessage(

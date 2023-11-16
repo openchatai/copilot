@@ -56,13 +56,11 @@ export const NavLink = React.forwardRef<React.ElementRef<typeof Link>, Props>(
       pathname,
       searchParams,
     );
-    const href = props.href.toString().endsWith("/")
-      ? props.href
-      : props.href + "/";
+
     const isActive = segment
       ? segments.includes(segment)
-      : href ===
-        (matchSearchParams ? $pathnamePlusSearchParams : pathname + "/");
+      : props.href ===
+        (matchSearchParams ? $pathnamePlusSearchParams : pathname);
 
     return (
       <Link
