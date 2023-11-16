@@ -104,7 +104,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
 
             elif len(bot_response.ids) == 0:
                 return handle_no_api_call(
-                    swagger_url, session_id, text, bot_response.bot_message
+                    bot_id, session_id, text, bot_response.bot_message
                 )
 
         elif (
@@ -308,6 +308,7 @@ def handle_api_calls(
     swagger_url: str,
     app: str,
     session_id: str,
+    bot_id: str,
 ) -> Dict[str, Any]:
     _workflow = create_workflow_from_operation_ids(ids, swagger_doc, text)
     output = run_workflow(
@@ -321,18 +322,18 @@ def handle_api_calls(
     # m_workflow = mongo.auto_gen_workflows.insert_one(_workflow)
     # add_workflow_data_to_qdrant(m_workflow.inserted_id, _workflow, swagger_url)
 
-    create_chat_history(swagger_url, session_id, True, text)
+    create_chat_history(bot_id, session_id, True, text)
     create_chat_history(
-        swagger_url, session_id, False, output["response"] or output["error"]
+        bot_id, session_id, False, output["response"] or output["error"]
     )
     return output
 
 
 def handle_no_api_call(
-    swagger_url: str, session_id: str, text: str, bot_message: str
+    bot_id: str, session_id: str, text: str, bot_message: str
 ) -> Dict[str, str]:
-    create_chat_history(swagger_url, session_id, True, text)
-    create_chat_history(swagger_url, session_id, False, bot_message)
+    create_chat_history(bot_id, session_id, True, text)
+    create_chat_history(bot_id, session_id, False, bot_message)
     return {"response": bot_message}
 
 
