@@ -38,19 +38,17 @@ def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
 def classify_text(user_requirement: str, context: str) -> ActionType:
     messages = [
         SystemMessage(
-            content=f"Categorize user input in one of three types based on the instructions below - {ActionType.ASSISTANT_ACTION.value}, {ActionType.KNOWLEDGE_BASE_QUERY.value} or {ActionType.GENERAL_QUERY.value}"
+            content=f"You are a classification model, which when given user input can classify it into one of the three types below"
         ),
         HumanMessage(
             content=f"""
-                If the user's requirement would require making an API call to a third-party service, return the output as: {ActionType.ASSISTANT_ACTION.value}. 
-                
-                Actions such as performing tasks, listing items, displaying information, and managing additions/removals etc.. are categorized as assistant actions
+                If the user asks you to list something, show or delete something. You should output {ActionType.ASSISTANT_ACTION.value} because these require making api calls. Otherwise output {ActionType.KNOWLEDGE_BASE_QUERY.value}
             """
         ),
         HumanMessage(content=f"Here's the user requirement - {user_requirement}"),
         HumanMessage(
             content=f"""
-                If the user is not asking the bot to take any action, and api call is not required it will be a {ActionType.GENERAL_QUERY.value}
+                Now output the classification you think is best
             """
         ),
     ]
