@@ -6,12 +6,12 @@ from typing import Tuple
 from opencopilot_utils import StoreOptions
 from opencopilot_utils.get_vector_store import get_vector_store
 import logging, os
+from utils import struct_log
 
 
 def check_workflow_in_store(
     text: str, namespace: str
 ) -> Tuple[Optional[Document], Optional[float]]:
-
     try:
         score_threshold = float(os.getenv("SCORE_THRESHOLD", "0.95"))
         vector_store = get_vector_store(StoreOptions(namespace.split("/")[-1]))
@@ -23,5 +23,9 @@ def check_workflow_in_store(
         return document, score
 
     except Exception as e:
-        logging.error(f"[Error] {e}, {namespace}")
+        struct_log.exception(
+            payload={"text": text, "namespace": namespace},
+            error=str(e),
+            event="/check_workflow_in_store",
+        )
         return None, None

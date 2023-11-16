@@ -13,6 +13,9 @@ import { ShieldAlert, Wand2, Inspect } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { useCopilot } from "../_context/CopilotProvider";
+import dynamic from "next/dynamic";
+
+const Widget = dynamic(() => import("./CopilotWidget"));
 
 function InstallationSection() {
   const { token: CopilotToken } = useCopilot();
@@ -109,18 +112,15 @@ export default function CopilotPage() {
           {CopilotName}
         </h1>
         <div className="space-x-2">
-          <Button>
-            <Link
-              target="_blank"
-              href={"http://localhost:8888/backend" + "/demo/" + CopilotToken}
-            >
-              Test on example dashboard
-            </Link>
+          <Button
+            id="triggerSelector"
+          >
+            Chat with the Copilot
           </Button>
         </div>
       </HeaderShell>
-      <div className="flex-1 overflow-auto">
-        <div className="container max-w-screen-lg p-8">
+      <div className="flex-1 flex flex-row justify-between gap-2 overflow-hidden">
+        <div className="container flex-1 max-w-screen-lg p-8 max-h-full overflow-auto">
           <Alert variant="info" className="mb-5">
             <ShieldAlert className="h-6 w-6" />
             <AlertTitle>Attention</AlertTitle>
@@ -137,6 +137,9 @@ export default function CopilotPage() {
             <InstallationSection />
             <TryItSection />
           </Accordion>
+        </div>
+        <div className="h-full w-fit p-2">
+          <Widget token={CopilotToken} />
         </div>
       </div>
     </div>

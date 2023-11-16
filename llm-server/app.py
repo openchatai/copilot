@@ -1,5 +1,3 @@
-import logging
-
 from flask import Flask, request, jsonify, Response
 from routes.workflow.workflow_controller import workflow
 from routes.uploads.upload_controller import upload_controller
@@ -7,6 +5,7 @@ from routes._swagger.controller import _swagger
 from routes.chat.chat_controller import chat_workflow
 from typing import Any, Tuple
 from utils.config import Config
+from utils.get_logger import struct_log
 from flask_cors import CORS
 from routes.data_source.data_source_controller import datasource_workflow
 from dotenv import load_dotenv
@@ -15,9 +14,6 @@ load_dotenv()
 from opencopilot_db import create_database_schema
 
 create_database_schema()
-
-logging.basicConfig(level=logging.INFO)
-
 
 app = Flask(__name__)
 app.register_blueprint(workflow, url_prefix="/workflow")
@@ -38,14 +34,10 @@ def handle() -> Response:
         response = handle_request(data)
         return jsonify(response)
     except Exception as e:
-        return jsonify({"response": str(e)})
-
-
-@app.errorhandler(500)
-def internal_server_error(error: Any) -> Tuple[str, int]:
-    # Log the error to the console
-    print(error)
-    return "Internal Server Error", 500
+        struct_log.exception(
+            app="OPENCOPILOT", payload=data, error=str(e), event="/handle"
+        )
+        return jsonify({"response": "Something went wrong, check the logs!!"})
 
 
 if __name__ == "__main__":
