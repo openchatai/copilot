@@ -101,7 +101,7 @@ def generate_consolidated_requirement(
     Returns:
       A consolidated query string.
     """
-    chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
+    chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo)
 
     history = get_all_chat_history_by_session_id(session_id)
     if len(history) == 0:
