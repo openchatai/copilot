@@ -10,6 +10,7 @@ export default function Widget({
     return <Root
         options={{
             apiUrl: "http://localhost:8888/backend/api",
+            defaultOpen: true,
             token,
             initialMessage: "Hey Pal!",
             headers: {
@@ -17,7 +18,7 @@ export default function Widget({
             },
         }}
     >
-        <div className="[&>div]:static [&>div]:!max-h-full [&>div]:!h-full h-full overflow-hidden border-border border rounded-lg">
+        <div className="[&>div]:static [&>div]:!max-h-full [&>div]:!h-full h-full overflow-hidden [&>div]:!border-border [&>div]:!border rounded-lg">
             <CopilotWidget
                 triggerSelector="#triggerSelector"
             />
