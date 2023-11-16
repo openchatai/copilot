@@ -1,3 +1,3 @@
 import { atom } from "jotai";
 
-export const activeConversationId = atom<string | null>(null);
+export const activeSessionId = atom<string | null>(null);
