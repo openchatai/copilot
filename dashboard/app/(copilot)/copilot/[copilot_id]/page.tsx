@@ -119,8 +119,8 @@ export default function CopilotPage() {
           </Button>
         </div>
       </HeaderShell>
-      <div className="flex-1 flex flex-row justify-between gap-2 overflow-hidden">
-        <div className="container flex-1 max-w-screen-lg p-8 max-h-full overflow-auto">
+      <div className="flex-1 flex flex-row justify-between overflow-hidden">
+        <div className="flex-1 max-w-screen-lg p-8 max-h-full overflow-auto">
           <Alert variant="info" className="mb-5">
             <ShieldAlert className="h-6 w-6" />
             <AlertTitle>Attention</AlertTitle>
@@ -138,7 +138,7 @@ export default function CopilotPage() {
             <TryItSection />
           </Accordion>
         </div>
-        <div className="h-full w-fit p-2">
+        <div className="h-full w-fit py-5 px-10">
           <Widget token={CopilotToken} />
         </div>
       </div>
