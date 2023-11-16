@@ -1,0 +1,1108 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "GuildQuality API Documentation",
+        "description": "GuildQuality offers several methods for retrieving data from and adding data to your GuildQuality account.\n\n# Authentication\nEach request to the API is authenticated by an API bearer token which is unique to each member account. To activate your API credentials, go to Account > API.\n\nOnce your API credentials have been activated, make sure to keep them guarded. Anyone who has access to them will have access to your survey data as long as the credentials remain active. If you ever need new credentials for any reason, deactivate your current credentials then you’ll be provided with option to request new ones. Credentials are available on the API section of the Settings page of the GuildQuality app.\n\n# Error Codes\n<table>\n<colgroup>\n<col width=\"30%\">\n<col width=\"70%\">\n</colgroup>\n<thead>\n<tr>\n<th>Status code</th>\n<th>Meaning</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>400</td>\n<td>Malformed parameters or other bad request.</td>\n</tr>\n<tr>\n<td>401</td>\n<td>Unauthorized. (Login is required.  Check Bearer token is correct.)</td>\n</tr>\n<tr>\n<td>422</td>\n<td>Unprocessable Entity.  (Validation error.  Check error message for specific valiation.)</td>\n</tr>\n</tbody>\n</table>\n\n# Rate limit\nAPI requests are limited to 300 requests per minute.  If requests from a unique IP exceed that limit, then the IP will be blocked for 1 minute.",
+        "contact": {},
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "https://sandbox.www.guildquality.com"
+        }
+    ],
+    "tags": [],
+    "paths": {
+        "/company-api/v3/children": {
+            "get": {
+                "summary": "Get Company Children",
+                "description": "Returns child accounts for a given account.",
+                "operationId": "getCompanyChildren",
+                "responses": {
+                    "200": {
+                        "description": "Get Company Children",
+                        "headers": {
+                            "X-RateLimit-Remaining": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Server": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Connection": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Content-Encoding": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Set-Cookie": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Vary": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Expires": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "X-RateLimit-Limit": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Content-Length": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Date": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "X-Powered-By": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "example": [
+                                                {
+                                                    "createdAt": "2017-01-10T23:23:39-05:00",
+                                                    "id": 908534,
+                                                    "name": "Alpha Construction"
+                                                },
+                                                {
+                                                    "createdAt": "2019-06-21T17:16:58-04:00",
+                                                    "id": 403593,
+                                                    "name": "24-7 Restorations"
+                                                },
+                                                {
+                                                    "createdAt": "2019-09-05T15:43:39-04:00",
+                                                    "id": 796431,
+                                                    "name": "Master Craftz"
+                                                }
+                                            ],
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "createdAt": {
+                                                        "type": "string",
+                                                        "example": "2017-01-10T23:23:39-05:00"
+                                                    },
+                                                    "id": {
+                                                        "type": "number",
+                                                        "example": 908534
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Alpha Construction"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-codegen-request-body-name": "body"
+            }
+        },
+        "/company-api/v3/custom-fields": {
+            "get": {
+                "summary": "Get Custom Fields",
+                "description": "Returns available custom fields and values for an account.",
+                "operationId": "getCustomFields",
+                "responses": {
+                    "200": {
+                        "description": "Get Custom Fields",
+                        "headers": {
+                            "X-RateLimit-Remaining": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Server": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Connection": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Content-Encoding": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Set-Cookie": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Vary": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Expires": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "X-RateLimit-Limit": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Content-Length": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Date": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "X-Powered-By": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "example": [
+                                        {
+                                            "id": 14,
+                                            "label": "Region",
+                                            "values": [
+                                                {
+                                                    "id": 9342,
+                                                    "value": "East"
+                                                },
+                                                {
+                                                    "id": 9340,
+                                                    "value": "North"
+                                                },
+                                                {
+                                                    "id": 9341,
+                                                    "value": "South"
+                                                },
+                                                {
+                                                    "id": 9343,
+                                                    "value": "West"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": 210,
+                                            "label": "Team Name",
+                                            "values": [
+                                                {
+                                                    "id": 14336,
+                                                    "value": "T Mobile"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "number",
+                                                "example": 14
+                                            },
+                                            "label": {
+                                                "type": "string",
+                                                "example": "Region"
+                                            },
+                                            "values": {
+                                                "type": "array",
+                                                "example": [
+                                                    {
+                                                        "id": 9342,
+                                                        "value": "East"
+                                                    },
+                                                    {
+                                                        "id": 9340,
+                                                        "value": "North"
+                                                    },
+                                                    {
+                                                        "id": 9341,
+                                                        "value": "South"
+                                                    },
+                                                    {
+                                                        "id": 9343,
+                                                        "value": "West"
+                                                    }
+                                                ],
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "number",
+                                                            "example": 9342
+                                                        },
+                                                        "value": {
+                                                            "type": "string",
+                                                            "example": "East"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-codegen-request-body-name": "body"
+            }
+        },
+        "/company-api/v3/project-user-roles": {
+            "get": {
+                "summary": "Get Project User Roles",
+                "description": "Get Project User Roles",
+                "operationId": "getProjectUserRoles",
+                "responses": {
+                    "200": {
+                        "description": "Get Project User Roles",
+                        "headers": {
+                            "X-RateLimit-Remaining": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Server": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Connection": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Content-Encoding": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Set-Cookie": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Vary": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Expires": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "X-RateLimit-Limit": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Content-Length": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Date": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "X-Powered-By": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "example": [
+                                                {
+                                                    "id": 1,
+                                                    "name": "Project Manager"
+                                                },
+                                                {
+                                                    "id": 2,
+                                                    "name": "Salesperson"
+                                                }
+                                            ],
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "number",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Project Manager"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-codegen-request-body-name": "body"
+            }
+        },
+        "/company-api/v3/reports": {
+            "get": {
+                "summary": "Get Reports",
+                "description": "Return company reports.",
+                "operationId": "getReports",
+                "responses": {
+                    "200": {
+                        "description": "Get all Reports",
+                        "headers": {
+                            "X-RateLimit-Remaining": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Server": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Connection": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Content-Encoding": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Vary": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "X-RateLimit-Limit": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Content-Length": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Date": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "phpdebugbar-id": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "X-Powered-By": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "example": [
+                                                {
+                                                    "id": 7783,
+                                                    "name": "3 stars or less, only Value"
+                                                },
+                                                {
+                                                    "id": 33354,
+                                                    "name": "Chris's Report Card"
+                                                },
+                                                {
+                                                    "id": 7558,
+                                                    "name": "GQI"
+                                                },
+                                                {
+                                                    "id": 115,
+                                                    "name": "Monthly Report"
+                                                },
+                                                {
+                                                    "id": 96103,
+                                                    "name": "New report"
+                                                },
+                                                {
+                                                    "id": 24176,
+                                                    "name": "Sales Rep"
+                                                },
+                                                {
+                                                    "id": 472,
+                                                    "name": "Schedule & Budget"
+                                                },
+                                                {
+                                                    "id": 11,
+                                                    "name": "Test Report"
+                                                }
+                                            ],
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "number",
+                                                        "example": 7783
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "3 stars or less, only Value"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/company-api/v3/review-summary": {
+            "get": {
+                "summary": "Get Review Summary",
+                "description": "Return affiliate summary review data grouped by company. The following data is returned:\n\n- Company information\n- Total number of completed surveys\n- Breakdown of review data including average and stars received\n- Satisfactory data by question",
+                "operationId": "getReviewSummary",
+                "parameters": [
+                    {
+                        "name": "filterByCompanyIds",
+                        "in": "query",
+                        "description": "(Optional) For partner/parent accounts, filter by affiliate/child company id<br/>\nFormat: INT",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "(Optional) Specify to paginate company reviews 100 companies at a time.  A value of 1 will return companies 1 to 100; a value of 2 will return companies 101 to 200; etc.  Next, Previous, etc. meta data is also returned.<br/>\nFormat: INT",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {}
+                    }
+                },
+                "x-codegen-request-body-name": "body"
+            }
+        },
+        "/company-api/v3/reviews": {
+            "get": {
+                "summary": "Get Reviews",
+                "description": "Return company reviews.",
+                "operationId": "getReviews",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "(Optional) Specifies the max number of reviews to return<br/>\nNote: When a limit is specified, the response body will not be paginated<br/>\nFormat: INT",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "since",
+                        "in": "query",
+                        "description": "(Optional) Return all completed reviews since the given date<br/>\nFormat: YYYY-MM-DD\n",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "until",
+                        "in": "query",
+                        "description": "(Optional) Return all completed reviews before the given date<br/>\nFormat: YYYY-MM-DD",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "dateFilter",
+                        "in": "query",
+                        "description": "(Optional) Specify which date to use when filter by since and/or until dates<br/>\nFormat: enum(‘reviewedAt’, lastActivityAt’)<br/>\nDefault: reviewedAt",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filterByCompanyIds",
+                        "in": "query",
+                        "description": "(Optional) For partner/parent accounts, filter by affiliate/child company id<br/>\nFormat: INT",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {}
+                    }
+                },
+                "x-codegen-request-body-name": "body"
+            }
+        },
+        "/company-api/v3/reviews/{reviewId}": {
+            "get": {
+                "summary": "Get Review",
+                "description": "Return company reviews.",
+                "operationId": "getReview",
+                "parameters": [
+                    {
+                        "name": "reviewId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {}
+                    }
+                },
+                "x-codegen-request-body-name": "body"
+            }
+        },
+        "/company-api/v3/survey-templates": {
+            "get": {
+                "summary": "Get Survey Templates",
+                "description": "Returns available survey templates for an account.",
+                "operationId": "getSurveyTemplates",
+                "parameters": [
+                    {
+                        "name": "archived",
+                        "in": "query",
+                        "description": "(Optional) Include archived survey templates<br/>\nFormat: To include archived survey templates set this parameter to 1.  To exclude them, don’t include the parameter or set it to 0.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get Survey Templates including archived",
+                        "headers": {
+                            "X-RateLimit-Remaining": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Server": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Connection": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Content-Encoding": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Set-Cookie": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Vary": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Expires": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "X-RateLimit-Limit": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Content-Length": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Date": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "X-Powered-By": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "example": [
+                                                {
+                                                    "archivedAt": "2021-09-08T10:19:21-04:00",
+                                                    "id": 231,
+                                                    "name": "Email-only smart survey",
+                                                    "schedule": "4 weeks after the project end date",
+                                                    "smartQuestionsMuted": false,
+                                                    "surveyProcess": "email"
+                                                },
+                                                {
+                                                    "id": 232,
+                                                    "name": "Finished project survey",
+                                                    "schedule": "4 weeks after the project end date",
+                                                    "smartQuestionsMuted": false,
+                                                    "surveyProcess": "email"
+                                                },
+                                                {
+                                                    "archivedAt": "2021-09-08T10:19:21-04:00",
+                                                    "id": 1185,
+                                                    "name": "In progress",
+                                                    "schedule": "10 days after the project start date",
+                                                    "smartQuestionsMuted": false,
+                                                    "surveyProcess": "full"
+                                                },
+                                                {
+                                                    "id": 2861,
+                                                    "name": "Prospect survey",
+                                                    "schedule": "0 days after the project creation date",
+                                                    "smartQuestionsMuted": true,
+                                                    "surveyProcess": "full"
+                                                }
+                                            ],
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "archivedAt": {
+                                                        "type": "string",
+                                                        "example": "2021-09-08T10:19:21-04:00"
+                                                    },
+                                                    "id": {
+                                                        "type": "number",
+                                                        "example": 231
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Email-only smart survey"
+                                                    },
+                                                    "schedule": {
+                                                        "type": "string",
+                                                        "example": "4 weeks after the project end date"
+                                                    },
+                                                    "smartQuestionsMuted": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
+                                                    "surveyProcess": {
+                                                        "type": "string",
+                                                        "example": "email"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-codegen-request-body-name": "body"
+            }
+        },
+        "/company-api/v3/surveys": {
+            "get": {
+                "summary": "Get Surveys",
+                "description": "Return company surveys.",
+                "operationId": "getSurveys",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "(Optional) Return all surveys with the given status<br/>\nFormat: enum(‘completed’, ‘scheduled’, ‘in-progress’, ‘no-response’, 'abandoned')",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "(Optional) Specifies the max number of surveys to return<br/>\nNote: When a limit is specified, the response body will not be paginated<br/>\nFormat: INT",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "since",
+                        "in": "query",
+                        "description": "(Optional) Return surveys since the given date<br/>\nFormat: YYYY-MM-DD\n",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "until",
+                        "in": "query",
+                        "description": "(Optional) Return surveys before the given date<br/>\nFormat: YYYY-MM-DD",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "questions",
+                        "in": "query",
+                        "description": "(Optional) Return all question data included on returned surveys<br/>\nFormat: To include questions set this parameter to 1.  To exclude them, don’t include the parameter or set it to 0.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "orderBy",
+                        "in": "query",
+                        "description": "(Optional) Specify which date to use for DESC ordering<br/>\nFormat: enum(‘endedAt’, 'sendAt’, 'createdAt')<br/>\nDefault: sendAt",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "dateFilter",
+                        "in": "query",
+                        "description": "(Optional) Specify which date to use when filter by since and/or until dates<br/>\nFormat: enum(‘endedAt’, 'sendAt’, 'createdAt')<br/>\nDefault: endedAt",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "reportId",
+                        "in": "query",
+                        "description": "(Optional) Return all surveys associated with a specific report<br/>\nFormat: INT",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "projectIds",
+                        "in": "query",
+                        "description": "(Optional) Return all surveys associated with specific project ids<br/>\nFormat: INT, comma separated",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "contactIds",
+                        "in": "query",
+                        "description": "(Optional) Return all surveys for the projects associated with specific contact ids<br/>\nFormat: INT, comma separated",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "externalIds",
+                        "in": "query",
+                        "description": "(Optional) Return all surveys for the projects associated with specific external ids<br/>\nFormat: STRING, comma separated",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "contactEmails",
+                        "in": "query",
+                        "description": "(Optional) Return all surveys for the projects associated with specific contact emails<br/>\nFormat: STRING, comma separated",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filterByCompanyIds",
+                        "in": "query",
+                        "description": "(Optional) For partner/parent accounts, filter by affiliate/child company id<br/>\nFormat: INT",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get all Surveys",
+                        "headers": {
+                            "X-RateLimit-Remaining": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Server": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Connection": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Content-Encoding": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Set-Cookie": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Vary": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Expires": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "X-RateLimit-Limit": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Content-Length": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Date": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "X-Powered-By": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "content": {}
+                    }
+                },
+                "x-codegen-request-body-name": "body"
+            }
+        },
+        "/company-api/v3/surveys/{surveyId}": {
+            "get": {
+                "summary": "Get Survey",
+                "description": "Returns data for a single survey.",
+                "operationId": "getSurvey",
+                "parameters": [
+                    {
+                        "name": "surveyId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "questions",
+                        "in": "query",
+                        "description": "(Optional) Return all question data included on returned surveys<br/>\nFormat: To include questions set this parameter to 1.  To exclude them, don’t include the parameter or set it to 0.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {}
+                    }
+                },
+                "x-codegen-request-body-name": "body"
+            }
+        },
+        "/company-api/v3/team": {
+            "get": {
+                "summary": "Get Team",
+                "description": "Returns team members defined in an account.",
+                "operationId": "getTeam",
+                "responses": {
+                    "200": {
+                        "description": "Get Team",
+                        "headers": {
+                            "X-RateLimit-Remaining": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Server": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Connection": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Content-Encoding": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Set-Cookie": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Vary": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Expires": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "X-RateLimit-Limit": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Content-Length": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Date": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "X-Powered-By": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "content": {}
+                    }
+                },
+                "x-codegen-request-body-name": "body"
+            }
+        }
+    },
+    "components": {},
+    "x-original-swagger-version": "2.0"
+}

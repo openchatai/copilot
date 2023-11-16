@@ -110,7 +110,7 @@ def web_crawl(url, bot_id: str):
         print(f"Received: {url}, {bot_id}")
         create_website_data_source(chatbot_id=bot_id, status="PENDING", url=url)
         unique_urls: set = set()
-        scrape_website_in_bfs(url, bot_id, unique_urls, 2)
+        scrape_website_in_bfs(url, bot_id, unique_urls, 5)
     except Exception as e:
         traceback.print_exc()
         
