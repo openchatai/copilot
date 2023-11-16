@@ -55,6 +55,7 @@
     "swr": "^2.2.4",
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.7",
+    "timeago.js": "^4.0.2",
     "zod": "^3.22.3"
   },
   "devDependencies": {
