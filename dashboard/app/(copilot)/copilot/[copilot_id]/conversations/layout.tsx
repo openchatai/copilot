@@ -1,7 +1,5 @@
-import { HeaderShell } from "@/components/domain/HeaderShell";
-import { Button } from "@/components/ui/button";
-import { RefreshCcw } from "lucide-react";
 import React from "react";
+import { ListConversations } from "./_parts/ListConverations";
 
 type Props = {
   children: React.ReactNode;
@@ -13,15 +11,15 @@ type Props = {
 export default function SettingsLayout({ children, params }: Props) {
   const copilotBase = `/copilot/${params.copilot_id}/conversations`;
   return (
-    <div className="flex h-full flex-col overflow-hidden">
-      <HeaderShell className="justify-between">
-        <h1 className="text-lg font-bold text-secondary-foreground">
-          Conversations
-        </h1>
-        <Button size="icon" variant="secondary" className="hidden">
-          <RefreshCcw className="h-6 w-6" />
-        </Button>
-      </HeaderShell>
+    <div className="flex h-full flex-row overflow-hidden">
+      <div className="flex h-full w-full max-w-xs shrink-0 flex-col items-start border-r bg-primary-foreground">
+        <div className="flex-center h-header shrink-0 justify-start border-b px-6">
+          <h1 className="text-lg font-bold text-secondary-foreground">
+            Conversations
+          </h1>
+        </div>
+        <ListConversations />
+      </div>
       <div className="h-full flex-1 overflow-auto">{children}</div>
     </div>
   );
