@@ -154,6 +154,8 @@ export function KnowledgeTable() {
     }
 
     return data
+  }, {
+    refreshInterval: 1000 * 10
   })
   const table = useReactTable({
     data: dataSources || [],
