@@ -1,5 +1,6 @@
 import os
 from langchain.schema import HumanMessage, SystemMessage
+from utils.chat_models import CHAT_MODELS
 from utils.get_chat_model import get_chat_model
 from opencopilot_utils import get_llm
 
@@ -20,7 +21,7 @@ async def gen_body_from_schema(
     app: Optional[str],
     current_state: Optional[str],
 ) -> Any:
-    chat = get_chat_model("gpt-3.5-turbo-16k")
+    chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
     api_generation_prompt = None
     if app:
         module_name = f"integrations.custom_prompts.{app}"

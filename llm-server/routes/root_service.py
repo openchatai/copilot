@@ -123,7 +123,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
             return {"response": response["answer"]}
 
         # elif action == ActionType.GENERAL_QUERY:
-        #     chat = get_chat_model("gpt-3.5-turbo")
+        #     chat = get_chat_model(CHAT_MODELS.mistral_openorca)
 
         #     messages = [
         #         SystemMessage(
@@ -338,4 +338,4 @@ def handle_no_api_call(
 
 def handle_exception(e: Exception, event: str) -> Dict[str, Any]:
     struct_log.exception(payload={}, error=str(e), event="/handle_request")
-    return {"response": None, "error": "An error occured in hand"}
+    return {"response": None, "error": "An error occured in handle request"}

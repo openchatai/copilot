@@ -5,9 +5,9 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    image: codebanesr/backend:arm_edge  # Add this line
+    image: codebanesr/backend:latest  # Add this line
     ports:
-      - 5000:5000
+      - 5001:5000
     depends_on:
       - llm-server
       - mysql
@@ -27,7 +27,7 @@ services:
     build:
       context: ./llm-server
       dockerfile: Dockerfile
-    image: codebanesr/llm-server:arm_edge  # Add this line
+    image: codebanesr/llm-server:latest  # Add this line
     volumes:
       - shared_data:/app/shared_data
     networks:
@@ -55,7 +55,7 @@ services:
     build:
       context: ./workers
       dockerfile: Dockerfile
-    image: codebanesr/workers:arm_edge  # Add this line
+    image: codebanesr/workers:latest  # Add this line
     networks:
       - opencopilot_network
     volumes:
@@ -74,7 +74,7 @@ services:
     build:
       context: ./dashboard
       dockerfile: Dockerfile
-    image: codebanesr/dashboard:arm_edge  # Add this line
+    image: codebanesr/dashboard:latest  # Add this line
     ports:
       - 8000:8000
     volumes:
