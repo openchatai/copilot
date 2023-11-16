@@ -4,6 +4,7 @@ export type Options = {
   initialMessage: string;
   triggerSelector: string;
   apiUrl: string;
+  defaultOpen?: boolean;
   user?: {
     name?: string;
   };
