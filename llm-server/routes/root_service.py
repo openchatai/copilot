@@ -18,10 +18,7 @@ from typing import Dict, Any, cast
 from routes.workflow.utils.router import get_action_type
 from utils.db import Database
 import json
-from models.repository.chat_history_repo import (
-    create_chat_history,
-    get_chat_history_for_retrieval_chain,
-)
+from models.repository.chat_history_repo import get_chat_history_for_retrieval_chain
 from utils.get_chat_model import get_chat_model
 from utils.process_app_state import process_state
 from prance import ResolvingParser
@@ -84,6 +81,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
                     app,
                     swagger_doc,
                     session_id,
+                    bot_id
                 )
 
             bot_response = hasSingleIntent(
@@ -103,9 +101,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
                 )
 
             elif len(bot_response.ids) == 0:
-                return handle_no_api_call(
-                    bot_id, session_id, text, bot_response.bot_message
-                )
+                return handle_no_api_call(bot_response.bot_message)
 
         elif (
             action == ActionType.KNOWLEDGE_BASE_QUERY
@@ -274,6 +270,7 @@ def handle_existing_workflow(
     app: str,
     swagger_doc: ResolvingParser,
     session_id: str,
+    bot_id: str
 ) -> Dict[str, Any]:
     # use user defined workflows if exists, if not use auto_gen_workflow
     _workflow = mongo.workflows.find_one(
@@ -292,10 +289,6 @@ def handle_existing_workflow(
         app,
     )
 
-    create_chat_history(swagger_url, session_id, True, text)
-    create_chat_history(
-        swagger_url, session_id, False, output["response"] or output["error"]
-    )
     return output
 
 
@@ -322,18 +315,12 @@ def handle_api_calls(
     # m_workflow = mongo.auto_gen_workflows.insert_one(_workflow)
     # add_workflow_data_to_qdrant(m_workflow.inserted_id, _workflow, swagger_url)
 
-    create_chat_history(bot_id, session_id, True, text)
-    create_chat_history(
-        bot_id, session_id, False, output["response"] or output["error"]
-    )
     return output
 
 
 def handle_no_api_call(
-    bot_id: str, session_id: str, text: str, bot_message: str
+    bot_message: str
 ) -> Dict[str, str]:
-    create_chat_history(bot_id, session_id, True, text)
-    create_chat_history(bot_id, session_id, False, bot_message)
     return {"response": bot_message}
 
 

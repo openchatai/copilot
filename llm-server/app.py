@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, Response
+from models.repository.chat_history_repo import create_chat_history
 from routes.workflow.workflow_controller import workflow
 from routes.uploads.upload_controller import upload_controller
 from routes._swagger.controller import _swagger
@@ -23,7 +24,7 @@ app.register_blueprint(upload_controller, url_prefix="/uploads")
 app.register_blueprint(datasource_workflow, url_prefix="/data_sources")
 
 app.config.from_object(Config)
-from routes.root_service import handle_request
+from routes.root_service import extract_data, handle_request
 
 
 ## TODO: Implement caching for the swagger file content (no need to load it everytime)
@@ -32,6 +33,10 @@ def handle() -> Response:
     data = request.get_json()
     try:
         response = handle_request(data)
+        create_chat_history(data["bot_id"], data["session_id"], True, data["text"])
+        create_chat_history(
+            data["bot_id"], data["session_id"], False, response["response"] or response["error"]
+        )
         return jsonify(response)
     except Exception as e:
         struct_log.exception(
