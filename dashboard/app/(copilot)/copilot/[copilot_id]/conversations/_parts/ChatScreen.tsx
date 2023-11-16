@@ -1,23 +1,39 @@
+'use client';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useAtomValue } from "jotai";
+import { activeSessionId } from "./atoms";
+import useSWR from "swr";
+import { ChatMessageType, getConversationBySessionId } from "@/data/conversations";
+import Loader from "@/components/ui/Loader";
+import { format } from 'timeago.js';
+import { EmptyBlock } from "@/components/domain/EmptyBlock";
 
-function UserMessage({ message }: { message: string }) {
+function UserMessage({ message, created_at }: ChatMessageType) {
   return (
     <div className="flex w-full flex-row items-center justify-end gap-2">
-      <p className="w-fit max-w-sm rounded-lg bg-primary px-4 py-3 text-sm select-none text-white">
-        {message}
-      </p>
+      <div className="flex flex-col items-end">
+        <p className="w-fit max-w-sm rounded-lg bg-primary px-4 py-3 text-sm select-none text-white">
+          {message}
+        </p>
+        <span className="text-xs">
+          {format(created_at)}
+        </span>
+      </div>
     </div>
   );
 }
-function CopilotMessage({ message }: { message: string }) {
+function CopilotMessage({ message, created_at }: ChatMessageType) {
   return (
-    <div className="flex w-full flex-row items-center justify-start gap-2">
+    <div className="flex w-full flex-row items-start justify-start gap-2 relative">
       <Avatar size="large" className="sticky top-0">
         <AvatarFallback>C</AvatarFallback>
       </Avatar>
-      <p className="w-fit max-w-sm rounded-lg bg-secondary px-4 py-3 text-sm text-accent-foreground select-none">
-        {message}
-      </p>
+      <div className="flex items-start flex-col gap-1.5">
+        <p className="w-fit max-w-sm rounded-lg bg-secondary px-4 py-3 text-sm text-accent-foreground select-none">
+          {message}
+        </p>
+        <span className="text-xs">{format(created_at)}</span>
+      </div>
     </div>
   );
 }
@@ -32,23 +48,29 @@ function ChatDivider({ content }: { content: string }) {
 }
 
 export function ChatScreen() {
+  const activeid = useAtomValue(activeSessionId);
+  const {
+    data: chat,
+    isLoading
+  } = useSWR(activeid, getConversationBySessionId)
   return (
     <div className="flex-1 space-y-3 overflow-auto p-4 font-medium">
-      <UserMessage message="Hello" />
-      <CopilotMessage message="Hello. I am Copilot. How can I help you?" />
-      <UserMessage message="I need to submit a complaint" />
-      <CopilotMessage message="Ok sure, which method do u prefer, talking to me or filling a form ?" />
-      <UserMessage message="Talking to you" />
-      <CopilotMessage message="Ok, please tell me your complaint" />
-      <UserMessage message="I have a problem with my order" />
-      <CopilotMessage message="Ok, please tell me your order number" />
-      <UserMessage message="123456789" />
-      <CopilotMessage message="Oh i see, looks like the address is wrong." />
-      <CopilotMessage message="Please confirm your address" />
-      <UserMessage message="123, Main Street, New York" />
-      <CopilotMessage message="Ok, I have updated your address." />
-      <UserMessage message="Thank you" />
-      <ChatDivider content="Conversation Ended" />
+      {
+        isLoading && <Loader className="h-full flex-center" />
+      }
+      {
+        chat ? chat?.data.map((c, i) => {
+          if (c.from_user) {
+            return <UserMessage key={i} {...c} />
+          } else if (!c.from_user) {
+            return <CopilotMessage key={i} {...c} />
+          }
+        }) : <EmptyBlock>
+          <p className="text-center text-sm">
+            Select a conversation to start chatting
+          </p>
+        </EmptyBlock>
+      }
     </div>
   );
 }
