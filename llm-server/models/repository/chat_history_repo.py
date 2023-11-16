@@ -1,9 +1,12 @@
 from datetime import datetime
-from typing import Optional, cast, List
+from typing import Optional, cast, List, Dict, Union
 from opencopilot_db import ChatHistory, engine, pdf_data_source_model
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 from typing import Optional, Tuple
+from sqlalchemy import distinct
+from sqlalchemy.orm import class_mapper
+
 
 Session = sessionmaker(bind=engine)
 
@@ -169,3 +172,60 @@ def get_chat_history_for_retrieval_chain(
                     user_query = None
 
     return chat_history
+
+
+def get_unique_sessions_with_first_message_by_bot_id(
+    bot_id: str, limit: int = 20, offset: int = 0
+) -> List[Dict[str, Union[str, Optional[ChatHistory]]]]:
+    """
+    Retrieve unique session_ids for a given bot_id with pagination,
+    along with the first message in each session.
+
+    Args:
+        bot_id (str): The bot_id for which to retrieve session_ids.
+        limit (int, optional): The maximum number of results to return. Defaults to 20.
+        offset (int, optional): The number of results to skip from the beginning. Defaults to 0.
+        session (Session, optional): The SQLAlchemy session. Defaults to None.
+
+    Returns:
+        List[Dict[str, Union[str, Optional[ChatHistory]]]]: A list of dictionaries containing
+        unique session_ids and their first messages.
+    """
+    # If a session is not provided, create a new one
+    session = Session()
+
+    # Use distinct to get unique session_ids
+    unique_session_ids = (
+        session.query(distinct(ChatHistory.session_id))
+        .filter_by(chatbot_id=bot_id)
+        .limit(limit)
+        .offset(offset)
+        .all()
+    )
+
+    result_list = []
+
+    for session_id in unique_session_ids:
+        # Get the first message in each session
+        first_message = (
+            session.query(ChatHistory)
+            .filter_by(chatbot_id=bot_id, session_id=session_id[0])
+            .order_by(ChatHistory.created_at.asc())
+            .first()
+        )
+
+        # Convert ChatHistory object to a dictionary
+        if first_message:
+            first_message_dict = {
+                column.key: getattr(first_message, column.key)
+                for column in class_mapper(ChatHistory).mapped_table.columns
+            }
+        else:
+            first_message_dict = None
+
+        # Create a dictionary with session_id and first_message
+        result_dict = {"session_id": session_id[0], "first_message": first_message_dict}
+
+        result_list.append(result_dict)
+
+    return result_list
