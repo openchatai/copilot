@@ -81,7 +81,7 @@ function AddUrlDataSource() {
           title: "Data source(s) added successfully",
           variant: "success"
         });
-        _.delay(() => setDialog(null), 2000)
+        _.delay(() => setDialog(null), 1000)
       } else {
         toast({
           title: "Error adding data source(s)",
