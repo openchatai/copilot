@@ -37,7 +37,7 @@ spec:
               value: "3306"
             - name: DB_USERNAME
               value: dbuser
-          image: codebanesr/backend:arm_edge
+          image: codebanesr/backend:latest
           name: backend
           ports:
             - containerPort: 5000
@@ -47,6 +47,18 @@ spec:
           volumeMounts:
             - mountPath: /app/shared_data
               name: shared-data
+
+      initContainers:
+        - name: php-migrations
+          image: codebanesr/backend:latest
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              php artisan cache:clear
+              php artisan config:cache
+              php artisan migrate
+              php artisan key:generate
+              php artisan storage:link
       restartPolicy: Always
       volumes:
         - name: shared-data

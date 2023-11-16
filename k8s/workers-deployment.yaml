@@ -126,7 +126,7 @@ spec:
                 configMapKeyRef:
                   key: STORE
                   name: configmap
-          image: codebanesr/workers:arm_edge
+          image: codebanesr/workers:latest
           name: workers
           resources: {}
           volumeMounts:
