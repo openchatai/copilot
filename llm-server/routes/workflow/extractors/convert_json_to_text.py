@@ -10,7 +10,7 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 
 
 def convert_json_to_text(user_input: str, api_response: str) -> str:
-    chat = get_chat_model(CHAT_MODELS.mistral_openorca)
+    chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo)
 
     messages = [
         SystemMessage(

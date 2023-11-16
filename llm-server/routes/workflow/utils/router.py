@@ -13,7 +13,7 @@ from langchain.docstore.document import Document
 from langchain.vectorstores.base import VectorStore
 from prance import ResolvingParser
 
-chat = get_chat_model(CHAT_MODELS.mistral_openorca)
+chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo)
 
 
 def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
