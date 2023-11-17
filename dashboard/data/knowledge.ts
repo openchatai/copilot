@@ -29,7 +29,7 @@ type Datasource = {
   chatbot_id: string;
   id: string;
   source: string;
-  status: string;
+  status: "SUCCESS" | "COMPLETED" | "FAILED" | "PENDING";
   updated_at: string;
 }
 export async function getDataSourcesByBotId(bot_id: string) {
