@@ -16,6 +16,7 @@ from bson import ObjectId
 import os
 from typing import Dict, Any, cast
 from routes.workflow.utils.router import get_action_type
+from utils.chat_models import CHAT_MODELS
 from utils.db import Database
 import json
 from models.repository.chat_history_repo import get_chat_history_for_retrieval_chain
@@ -46,6 +47,8 @@ FAILED_TO_FETCH_SWAGGER_CONTENT = "Failed to fetch Swagger content"
 FILE_NOT_FOUND = "File not found"
 FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
 
+chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo)
+
 
 def handle_request(data: Dict[str, Any]) -> Any:
     (
@@ -63,7 +66,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
     check_required_fields(base_prompt, text, swagger_url)
     swagger_doc = None
     try:
-        action = get_action_type(text, bot_id)
+        action = get_action_type(text, bot_id, session_id)
         logging.info(f"Triggered action: {action}")
         if action == ActionType.ASSISTANT_ACTION:
             current_state = process_state(app, headers)
@@ -103,10 +106,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
             elif len(bot_response.ids) == 0:
                 return handle_no_api_call(bot_response.bot_message)
 
-        elif (
-            action == ActionType.KNOWLEDGE_BASE_QUERY
-            or action == ActionType.GENERAL_QUERY
-        ):
+        elif action == ActionType.KNOWLEDGE_BASE_QUERY:
             sanitized_question = text.strip().replace("\n", " ")
             vector_store = get_vector_store(StoreOptions(namespace="knowledgebase"))
             mode = "assistant"
@@ -120,18 +120,16 @@ def handle_request(data: Dict[str, Any]) -> Any:
             )
             return {"response": response["answer"]}
 
-        # elif action == ActionType.GENERAL_QUERY:
-        #     chat = get_chat_model(CHAT_MODELS.mistral_openorca)
+        elif action == ActionType.GENERAL_QUERY:
+            messages = [
+                SystemMessage(
+                    content="You are an ai assistant, that answers general queries in <= 3 sentences"
+                ),
+                HumanMessage(content=f"Answer the following: {text}"),
+            ]
 
-        #     messages = [
-        #         SystemMessage(
-        #             content="You are an ai assistant, that answers general queries in <= 3 sentences"
-        #         ),
-        #         HumanMessage(content=f"Answer the following: {text}"),
-        #     ]
-
-        #     content = chat(messages).content
-        #     return {"response": content}
+            content = chat(messages).content
+            return {"response": content}
         raise action
 
     except Exception as e:

@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Optional, Tuple
 from sqlalchemy import distinct
 from sqlalchemy.orm import class_mapper
-
+from langchain.schema import BaseMessage, AIMessage, HumanMessage
 
 Session = sessionmaker(bind=engine)
 
@@ -70,6 +70,18 @@ def get_all_chat_history_by_session_id(
     chats.sort(key=lambda chat: chat.created_at)
 
     return chats
+
+
+def get_chat_message_as_llm_conversation(session_id: str) -> List[BaseMessage]:
+    chats = get_all_chat_history_by_session_id(session_id, 100)
+    conversations: List[BaseMessage] = []
+    for chat in chats:
+        if chat.from_user == True:
+            conversations.append(HumanMessage(content=chat.message))
+        elif chat.from_user == False:
+            conversations.append(AIMessage(content=chat.message))
+
+    return conversations
 
 
 def get_all_chat_history(limit: int = 10, offset: int = 0) -> List[ChatHistory]:
