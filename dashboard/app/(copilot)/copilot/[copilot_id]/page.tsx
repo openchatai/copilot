@@ -55,6 +55,9 @@ function InstallationSection() {
        Authorization: "Bearer your_auth_token_goes_here",
        AnyKey: "AnyValue"
      },
+     user:{
+      name:"Default User"
+     }
    }
    window.addEventListener("DOMContentLoaded", ()=>initAiCoPilot(options)); // window.onload
 </script>`}
