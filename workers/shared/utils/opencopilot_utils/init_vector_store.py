@@ -7,8 +7,11 @@ import os
 
 def init_vector_store(docs: list[Document], embeddings: OpenAIEmbeddings, options: StoreOptions) -> None:
     store_type = StoreType[os.environ['STORE']]
+    
+    for doc in docs:
+        doc.metadata.update(options.metadata)
+        
     if store_type == StoreType.QDRANT:
-        print("called qdrant.from_documents")
         Qdrant.from_documents(docs, embeddings, collection_name=options.namespace, url=os.environ['QDRANT_URL'])
     else:
         valid_stores = ", ".join(StoreType._member_names())

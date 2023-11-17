@@ -7,12 +7,16 @@ from typing import List
 from langchain.chat_models import ChatOpenAI
 
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
+from utils.chat_models import CHAT_MODELS
 from utils.get_chat_model import get_chat_model
 from routes.workflow.extractors.extract_json import extract_json_payload
 import os
 import logging
 from prance import ResolvingParser
-from models.repository.chat_history_repo import get_all_chat_history_by_session_id
+from models.repository.chat_history_repo import (
+    get_all_chat_history_by_session_id,
+    get_chat_message_as_llm_conversation,
+)
 from opencopilot_db import ChatHistory
 
 logging.basicConfig(level=logging.INFO)
@@ -88,42 +92,6 @@ def get_summaries(swagger_doc: ResolvingParser) -> str:
     return summaries_str
 
 
-def generate_consolidated_requirement(
-    user_input: str, session_id: str
-) -> Optional[str]:
-    """Generates a consolidated query from chat history and an AI chat.
-
-    Args:
-      chat_history: A list of Message objects representing the chat history.
-      ai_chat: A ChatOpenAI object representing the AI chat.
-
-    Returns:
-      A consolidated query string.
-    """
-    chat = get_chat_model("gpt-3.5-turbo")
-
-    history = get_all_chat_history_by_session_id(session_id)
-    if len(history) == 0:
-        return None
-
-    conversation_str = join_conversations(history)
-    messages = [
-        SystemMessage(
-            content="You are an AI model designed to generate a standalone prompt. The user message may also contain instructions for you as a bot, like generating some content in this message. You should act accordingly"
-        ),
-        HumanMessage(
-            content="You will receive user input. Based on the conversation and the current user prompt, I want you to convert the user prompt into a standalone prompt if the user prompt references something in conversation history."
-        ),
-        HumanMessage(
-            content="Conversation History: ({}), \n\n Current User input: ({}).".format(
-                conversation_str, user_input
-            ),
-        ),
-    ]
-    content = chat(messages).content
-    return content
-
-
 def hasSingleIntent(
     swagger_doc: ResolvingParser,
     user_requirement: str,
@@ -132,31 +100,40 @@ def hasSingleIntent(
     app: str,
 ) -> BotMessage:
     summaries = get_summaries(swagger_doc)
-    chat = get_chat_model("gpt-3.5-turbo-16k")
-
-    consolidated_user_requirement = (
-        generate_consolidated_requirement(user_requirement, session_id)
-        or user_requirement
-    )
+    chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
     messages = [
         SystemMessage(
-            content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. To accomplish the task, you will be provided with information about the existing state of the application. A user input and list of api summaries. If the user is asking you to perform a `CRUD` operation, provide the list of operation ids of api calls needed in the `ids` field of the json. `bot_message` should consist of a straightforward sentence, free from any special characters. Note that the application uses current state as a cache, if you don't find the required information in the cache, you should try to find an api call to fetch that information. Your response MUST be a valid minified json"
-        ),
-        current_state
-        and HumanMessage(
-            content="Here is the current state of the application: {}".format(
-                current_state
-            )
-        ),
-        HumanMessage(
-            content="Here's a list of api summaries {}.".format(summaries),
-        ),
-        HumanMessage(
-            content="user requirement: {}".format(consolidated_user_requirement)
-        ),
-        HumanMessage(
-            content="""Reply in the following json format ```{
+            content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. To accomplish the task, you will be provided with information about the existing state of the application and list of api summaries. If the user is asking you to perform a `CRUD` operation, provide the list of operation ids of api calls needed in the `ids` field of the json. `bot_message` should consist of a straightforward sentence, free from any special characters. Note that the application uses current state as a cache, if you don't find the required information in the cache, you should try to find an api call to fetch that information. Your response MUST be a valid minified json"
+        )
+    ]
+
+    # old conversations go here
+    prev_conversations = []
+    if session_id:
+        prev_conversations = get_chat_message_as_llm_conversation(session_id)
+
+    if len(prev_conversations) > 0:
+        messages.extend(prev_conversations)
+
+    if current_state:
+        messages.extend(
+            [
+                HumanMessage(
+                    content="Here is the current state of the application: {}".format(
+                        current_state
+                    )
+                )
+            ]
+        )
+
+    messages.extend(
+        [
+            HumanMessage(
+                content="Here's a list of api summaries {}.".format(summaries),
+            ),
+            HumanMessage(
+                content="""Reply in the following json format ```{
                 "ids": [
                     "list",
                     "of",
@@ -165,11 +142,13 @@ def hasSingleIntent(
                 ],
                 "bot_message": "Bot response here" 
             }```"""
-        ),
-        HumanMessage(
-            content="If the user's question can be answered directly without making API calls, please respond appropriately in the `bot_message` section of the response and leaving the `ids` field empty ([])."
-        ),
-    ]
+            ),
+            HumanMessage(
+                content="If the question can be answered directly without making API calls, please respond appropriately in the `bot_message` section of the response and leaving the `ids` field empty ([])."
+            ),
+            HumanMessage(content=user_requirement),
+        ]
+    )
 
     result = chat([x for x in messages if x is not None])
     logging.info(

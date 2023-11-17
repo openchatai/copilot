@@ -1,5 +1,6 @@
 import { ReactNode, createContext, useContext } from "react";
 import useToggle from "../hooks/useToggle";
+import { useConfigData } from "./ConfigData";
 
 const StateContext = createContext<ReturnType<typeof useToggle> | undefined>(
   undefined
@@ -15,6 +16,7 @@ export function useWidgetStateContext(): ReturnType<typeof useToggle> {
 }
 
 export default function WidgetState({ children }: { children: ReactNode }) {
-  const data = useToggle(false)
+  const cdata = useConfigData()
+  const data = useToggle(cdata?.defaultOpen || false)
   return <StateContext.Provider value={data}>{children}</StateContext.Provider>;
 }

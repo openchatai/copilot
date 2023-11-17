@@ -27,6 +27,7 @@ def get_vector_store(options: StoreOptions) -> VectorStore:
         vector_store = Qdrant(
             client, collection_name=options.namespace, embeddings=embedding
         )
+        
         # vector_store = Qdrant.from_documents([], embedding, url='http://localhost:6333', collection=options.namespace)
 
     else:

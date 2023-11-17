@@ -16,7 +16,7 @@ def process_markdown(file_name: str, bot_id: str):
         )
         docs = text_splitter.split_documents(raw_docs)
         embeddings = get_embeddings()
-        init_vector_store(docs, embeddings, StoreOptions(namespace=bot_id))
+        init_vector_store(docs, embeddings, StoreOptions(namespace="knowledgebase", metadata={"bot_id": bot_id}))
 
         update_pdf_data_source_status(chatbot_id=bot_id, file_name=file_name, status="COMPLETED")
     except Exception as e:

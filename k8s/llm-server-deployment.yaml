@@ -122,7 +122,7 @@ spec:
                 configMapKeyRef:
                   key: STORE
                   name: configmap
-          image: codebanesr/llm-server:arm_edge
+          image: codebanesr/llm-server:latest
           name: llm-server
           ports:
             - containerPort: 8002

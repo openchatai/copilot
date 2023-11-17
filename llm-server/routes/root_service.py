@@ -16,12 +16,10 @@ from bson import ObjectId
 import os
 from typing import Dict, Any, cast
 from routes.workflow.utils.router import get_action_type
+from utils.chat_models import CHAT_MODELS
 from utils.db import Database
 import json
-from models.repository.chat_history_repo import (
-    create_chat_history,
-    get_chat_history_for_retrieval_chain,
-)
+from models.repository.chat_history_repo import get_chat_history_for_retrieval_chain
 from utils.get_chat_model import get_chat_model
 from utils.process_app_state import process_state
 from prance import ResolvingParser
@@ -49,6 +47,8 @@ FAILED_TO_FETCH_SWAGGER_CONTENT = "Failed to fetch Swagger content"
 FILE_NOT_FOUND = "File not found"
 FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
 
+chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo)
+
 
 def handle_request(data: Dict[str, Any]) -> Any:
     (
@@ -66,7 +66,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
     check_required_fields(base_prompt, text, swagger_url)
     swagger_doc = None
     try:
-        action = get_action_type(text, bot_id)
+        action = get_action_type(text, bot_id, session_id)
         logging.info(f"Triggered action: {action}")
         if action == ActionType.ASSISTANT_ACTION:
             current_state = process_state(app, headers)
@@ -84,6 +84,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
                     app,
                     swagger_doc,
                     session_id,
+                    bot_id,
                 )
 
             bot_response = hasSingleIntent(
@@ -100,21 +101,19 @@ def handle_request(data: Dict[str, Any]) -> Any:
                     swagger_url,
                     app,
                     session_id,
+                    bot_id,
                 )
 
             elif len(bot_response.ids) == 0:
-                return handle_no_api_call(
-                    swagger_url, session_id, text, bot_response.bot_message
-                )
+                return handle_no_api_call(bot_response.bot_message)
 
-        elif (
-            action == ActionType.KNOWLEDGE_BASE_QUERY
-            or action == ActionType.GENERAL_QUERY
-        ):
+        elif action == ActionType.KNOWLEDGE_BASE_QUERY:
             sanitized_question = text.strip().replace("\n", " ")
-            vector_store = get_vector_store(StoreOptions(namespace=bot_id))
+            vector_store = get_vector_store(StoreOptions(namespace="knowledgebase"))
             mode = "assistant"
-            chain = getConversationRetrievalChain(vector_store, mode, base_prompt)
+            chain = getConversationRetrievalChain(
+                vector_store, mode, base_prompt, bot_id
+            )
             chat_history = get_chat_history_for_retrieval_chain(session_id, limit=40)
             response = chain(
                 {"question": sanitized_question, "chat_history": chat_history},
@@ -122,18 +121,16 @@ def handle_request(data: Dict[str, Any]) -> Any:
             )
             return {"response": response["answer"]}
 
-        # elif action == ActionType.GENERAL_QUERY:
-        #     chat = get_chat_model("gpt-3.5-turbo")
+        elif action == ActionType.GENERAL_QUERY:
+            messages = [
+                SystemMessage(
+                    content="You are an ai assistant, that answers general queries in <= 3 sentences"
+                ),
+                HumanMessage(content=f"Answer the following: {text}"),
+            ]
 
-        #     messages = [
-        #         SystemMessage(
-        #             content="You are an ai assistant, that answers general queries in <= 3 sentences"
-        #         ),
-        #         HumanMessage(content=f"Answer the following: {text}"),
-        #     ]
-
-        #     content = chat(messages).content
-        #     return {"response": content}
+            content = chat(messages).content
+            return {"response": content}
         raise action
 
     except Exception as e:
@@ -188,7 +185,9 @@ def get_qa_prompt_by_mode(mode: str, initial_prompt: Optional[str]) -> str:
     return initial_prompt if initial_prompt else ""
 
 
-def getConversationRetrievalChain(vector_store: VectorStore, mode, initial_prompt: str):
+def getConversationRetrievalChain(
+    vector_store: VectorStore, mode, initial_prompt: str, bot_id: str
+):
     llm = get_llm()
     # template = get_qa_prompt_by_mode(mode, initial_prompt=initial_prompt)
 
@@ -209,7 +208,9 @@ def getConversationRetrievalChain(vector_store: VectorStore, mode, initial_promp
     chain = ConversationalRetrievalChain.from_llm(
         llm,
         chain_type="stuff",
-        retriever=vector_store.as_retriever(),
+        retriever=vector_store.as_retriever(
+            search_kwargs={"filter": {"bot_id": bot_id}}
+        ),
         verbose=True,
         combine_docs_chain_kwargs={"prompt": prompt},
     )
@@ -274,6 +275,7 @@ def handle_existing_workflow(
     app: str,
     swagger_doc: ResolvingParser,
     session_id: str,
+    bot_id: str,
 ) -> Dict[str, Any]:
     # use user defined workflows if exists, if not use auto_gen_workflow
     _workflow = mongo.workflows.find_one(
@@ -292,10 +294,6 @@ def handle_existing_workflow(
         app,
     )
 
-    create_chat_history(swagger_url, session_id, True, text)
-    create_chat_history(
-        swagger_url, session_id, False, output["response"] or output["error"]
-    )
     return output
 
 
@@ -308,6 +306,7 @@ def handle_api_calls(
     swagger_url: str,
     app: str,
     session_id: str,
+    bot_id: str,
 ) -> Dict[str, Any]:
     _workflow = create_workflow_from_operation_ids(ids, swagger_doc, text)
     output = run_workflow(
@@ -321,21 +320,13 @@ def handle_api_calls(
     # m_workflow = mongo.auto_gen_workflows.insert_one(_workflow)
     # add_workflow_data_to_qdrant(m_workflow.inserted_id, _workflow, swagger_url)
 
-    create_chat_history(swagger_url, session_id, True, text)
-    create_chat_history(
-        swagger_url, session_id, False, output["response"] or output["error"]
-    )
     return output
 
 
-def handle_no_api_call(
-    swagger_url: str, session_id: str, text: str, bot_message: str
-) -> Dict[str, str]:
-    create_chat_history(swagger_url, session_id, True, text)
-    create_chat_history(swagger_url, session_id, False, bot_message)
+def handle_no_api_call(bot_message: str) -> Dict[str, str]:
     return {"response": bot_message}
 
 
 def handle_exception(e: Exception, event: str) -> Dict[str, Any]:
     struct_log.exception(payload={}, error=str(e), event="/handle_request")
-    return {"response": None, "error": "An error occured in hand"}
+    return {"response": None, "error": "An error occured in handle request"}

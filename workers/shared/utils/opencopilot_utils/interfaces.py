@@ -1,5 +1,8 @@
-from typing import Optional
+from typing import Optional, Literal, Dict
 
 class StoreOptions:
-    def __init__(self, namespace: Optional[str] = None):
+    ALLOWED_NAMESPACES = Literal["swagger", "knowledgebase"]
+
+    def __init__(self, namespace: ALLOWED_NAMESPACES, metadata: Dict[str, str] = {}):
         self.namespace = namespace
+        self.metadata = metadata
