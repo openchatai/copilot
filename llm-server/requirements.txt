@@ -10,7 +10,7 @@ bcrypt==4.0.1
 billiard==4.1.0
 blinker==1.6.3
 cachetools==5.3.2
-celery==5.3.5
+celery==5.3.4
 certifi==2023.7.22
 chardet==5.2.0
 charset-normalizer==3.3.1
