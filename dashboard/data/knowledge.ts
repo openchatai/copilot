@@ -25,7 +25,7 @@ export async function ingestDataSources(filenames: string[], bot_id: string) {
   });
 }
 
-type Datasource = {
+export type Datasource = {
   chatbot_id: string;
   id: string;
   source: string;
