@@ -14,7 +14,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Minus, Trash2, ChevronsUpDown } from "lucide-react";
+import { Minus, Trash2, ChevronsUpDown, RotateCcw, CheckCircle, XCircle, RotateCw } from "lucide-react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -29,20 +29,20 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import _ from "lodash";
-import { timeSince } from "@/lib/timesince";
 import { Button } from "@/components/ui/button";
 import { useAtomValue } from "jotai";
 import { searchQueryAtom } from "./searchAtom";
 import { EmptyBlock } from "@/components/domain/EmptyBlock";
 import useSWR from "swr";
-import { getDataSourcesByBotId } from "@/data/knowledge";
+import { Datasource, getDataSourcesByBotId } from "@/data/knowledge";
 import { useCopilot } from "../../../_context/CopilotProvider";
 import Link from "next/link";
+import { format } from 'timeago.js'
 export type DataSources = {
   id: string;
   name: string;
   type: string;
-  status: string;
+  status: Datasource['status'];
   date: Date | number | string;
   source: string;
 };
@@ -91,9 +91,20 @@ const columns: ColumnDef<DataSources>[] = [
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("status")}</div>
-    ),
+    cell: ({ row }) => {
+      const status = row.getValue<string>("status").toUpperCase() as DataSources['status'];
+      switch (status) {
+        case "PENDING":
+          return <RotateCw className="h-5 w-5 text-accent-foreground animate-spin" />
+        case "SUCCESS":
+        case "COMPLETED":
+          return <CheckCircle className="h-5 w-5 text-primary" />
+        case "FAILED":
+          return <XCircle className="h-5 w-5 text-destructive" />
+        default:
+          return status;
+      }
+    }
   },
   {
     accessorKey: "type",
@@ -103,7 +114,7 @@ const columns: ColumnDef<DataSources>[] = [
   {
     accessorKey: "date",
     header: "Date",
-    cell: ({ row }) => <span>{timeSince(row.getValue("date"))} ago</span>,
+    cell: ({ row }) => <span>{format(row.getValue("date"), 'en-us')}</span>,
   },
   {
     accessorKey: "source",
@@ -123,11 +134,9 @@ export function KnowledgeTable() {
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
   const {
     data: dataSources,
-    isLoading
   } = useSWR<DataSources[]>(copilotId + '/data_sources', async () => {
     const resp = await getDataSourcesByBotId(copilotId);
     const data: DataSources[] = [];
-    console.log(resp.data)
     if (resp.data.web_sources) {
       resp.data.web_sources.forEach((item) => {
         data.push({
@@ -154,6 +163,8 @@ export function KnowledgeTable() {
     }
 
     return data
+  }, {
+    refreshInterval: 1000 * 10
   })
   const table = useReactTable({
     data: dataSources || [],

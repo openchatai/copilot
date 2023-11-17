@@ -1,4 +1,4 @@
-import json
+import json, inspect
 from opencopilot_types.workflow_type import WorkflowDataType
 from routes.workflow.generate_openapi_payload import generate_openapi_payload
 from utils.make_api_call import make_api_request
@@ -13,6 +13,7 @@ from utils.process_app_state import process_state
 from prance import ResolvingParser
 from integrations.load_json_config import load_json_config
 from integrations.transformers.transformer import transform_response
+from utils import struct_log
 
 
 def run_openapi_operations(
@@ -40,7 +41,18 @@ def run_openapi_operations(
                     current_state,
                 )
 
-                api_response = make_api_request(headers=headers, **api_payload.__dict__)
+                api_response = None
+                try:
+                    struct_log.info(
+                        payload=api_payload.__dict__,
+                        event="make_api_call"
+                    )
+                    
+                    api_response = make_api_request(headers=headers, **api_payload.__dict__)
+
+                except Exception as e:
+                    struct_log.exception(error=str(e), event="make api call failed")
+                    return {}
 
                 # if a custom transformer function is defined for this operationId use that, otherwise forward it to the llm
                 # so we don't necessarily have to defined mappers for all api endpoints
@@ -61,15 +73,15 @@ def run_openapi_operations(
                 record_info[operation_id] = json.loads(api_response.text)
 
             except Exception as e:
-                logging.error("Error making API call", exc_info=True)
+                struct_log.exception(
+                    payload=json.dumps({
+                        text,
+                        headers,
+                        server_base_url,
+                        app,
+                    }),
+                    error=str(e),
+                    event="/check_workflow_in_store",
+                )
 
-                error_info = {
-                    "operation_id": operation_id,
-                    "error": str(e),
-                    "traceback": traceback.format_exc(),
-                }
-                record_info[operation_id] = error_info
-
-                # At this point we will retry the operation with hierarchical planner
-                raise e
     return convert_json_to_text(text, prev_api_response)

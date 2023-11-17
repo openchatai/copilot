@@ -10,6 +10,7 @@ from opencopilot_types.workflow_type import WorkflowDataType
 from routes.workflow.validate_json import validate_json
 from utils.db import Database
 from opencopilot_utils import get_vector_store, StoreOptions
+import logging
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -32,15 +33,17 @@ def get_workflow(workflow_id: str) -> Any:
         return jsonify({"message": "Workflow not found"}), 404
 
 
-@workflow.route("/u/<swagger_url>", methods=["POST"])
+@workflow.route("/u/<swagger_url>/b/<bot_id>", methods=["POST"])
 @validate_json(workflow_schema)
 @handle_exceptions_and_errors
-def create_workflow(swagger_url: str) -> Any:
+def create_workflow(swagger_url: str, bot_id: str) -> Any:
     workflow_data = cast(WorkflowDataType, request.json)
     workflows = mongo.workflows
     workflow_id = workflows.insert_one(workflow_data).inserted_id
 
-    add_workflow_data_to_qdrant(workflow_id, workflow_data, swagger_url)
+    add_workflow_data_to_qdrant(
+        workflow_id, workflow_data, bot_id=workflow_data.get("bot_id")
+    )
 
     return (
         jsonify({"message": "Workflow created", "workflow_id": str(workflow_id)}),
@@ -58,7 +61,7 @@ def create_workflow_by_bot_id(bot_id: str) -> Any:
     workflows = mongo.workflows
     workflow_id = workflows.insert_one(workflow_data).inserted_id
 
-    add_workflow_data_to_qdrant(workflow_id, workflow_data, swagger_url)
+    add_workflow_data_to_qdrant(workflow_id, workflow_data, bot_id)
 
     return (
         jsonify({"message": "Workflow created", "workflow_id": str(workflow_id)}),

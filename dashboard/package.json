@@ -10,7 +10,9 @@
     "clean": "rm -rf .next"
   },
   "dependencies": {
-    "@hookform/resolvers": "^3.3.2",
+    "@hookform/resolvers": "^3.3.1",
+    "@openchatai/copilot-flows-editor": "^1.5.2",
+    "@openchatai/copilot-widget": "^1.2.0",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-avatar": "^1.0.4",
@@ -43,6 +45,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-dropzone": "^14.2.3",
+    "react-error-boundary": "^4.0.11",
     "react-hook-form": "^7.47.0",
     "react-hotkeys-hook": "^4.4.1",
     "react-syntax-highlighter": "^15.5.0",
@@ -52,6 +55,7 @@
     "swr": "^2.2.4",
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.7",
+    "timeago.js": "^4.0.2",
     "zod": "^3.22.3"
   },
   "devDependencies": {

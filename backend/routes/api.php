@@ -26,6 +26,7 @@ Route::post('chat/send', [MessageController::class, 'sendChat']);
 
 
 Route::get('/copilots', [ChatbotController::class, 'index']);
+Route::get('/copilot/{sessions}/c/{id}', [ChatbotController::class, 'sessions']);
 Route::post('/copilot/swagger', [ChatbotController::class, 'handleSwaggerFile']);
 Route::get('/copilot/{id}', [ChatbotSettingController::class, 'generalSettings']);
 Route::delete('/copilot/{id}', [ChatbotSettingController::class, 'deleteBot']);

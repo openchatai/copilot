@@ -3,16 +3,14 @@ from langchain.chat_models import ChatOpenAI
 from langchain.schema import HumanMessage, SystemMessage
 from typing import Any
 from routes.workflow.extractors.extract_json import extract_json_payload
+from utils import get_chat_model
+from utils.chat_models import CHAT_MODELS
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
 
 def convert_json_to_text(user_input: str, api_response: str) -> str:
-    chat = ChatOpenAI(
-        openai_api_key=os.getenv("OPENAI_API_KEY"),
-        model="gpt-3.5-turbo-16k",
-        temperature=0,
-    )
+    chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo)
 
     messages = [
         SystemMessage(

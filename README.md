@@ -104,10 +104,8 @@ Our goal is to empower every SaaS product with the ability to have their own AI 
 - It can transform the response into meaningful text.
 - It can automatically populate certain request payload fields based on the context.
   - For instance, you can request actions like: "Initiate a new case about X problem," and the title field will be automatically filled with the appropriate name.
-- Currently, it does not support calling multiple endpoints simultaneously (feature coming soon).
-- It is not suitable for handling large APIs.
-- It is not equipped to handle complex APIs.
-- It can not remember the chat history (every message is agnostic from previous messages.)
+- It is not suitable for handling large APIs (you will need to write JSON transofrmers to make it work, refer to the docs for more)
+
 
 
 ## 🛣️ Roadmap:

@@ -1,3 +1,4 @@
+@import url("@openchatai/copilot-widget/index.css");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -19,7 +20,7 @@
     --primary-foreground: 0 0% 98%;
     /*  */
     --accent-alt: 200 27% 96%;
-    --secondary: 189 28% 95%;
+    --secondary: 0 0% 96%;
     --secondary-foreground: 0 0% 9%;
 
     --muted: 0 0% 96.1%;
@@ -74,7 +75,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply !border-border;
   }
   body {
     @apply bg-background text-foreground;
