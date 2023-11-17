@@ -83,7 +83,7 @@ def scrape_website_in_bfs(url: str, bot_id: str, unique_urls: Set[str], max_page
 
             docs = text_splitter.create_documents([text])
             embeddings = get_embeddings()
-            init_vector_store(docs, embeddings, StoreOptions(namespace=bot_id))
+            init_vector_store(docs, embeddings, StoreOptions(namespace="knowledgebase", metadata={"bot_id": bot_id}))
             update_website_data_source_status_by_url(url=url, status="SUCCESS")
 
         if driver is not None:
