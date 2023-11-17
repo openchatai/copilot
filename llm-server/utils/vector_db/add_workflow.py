@@ -19,4 +19,14 @@ def add_workflow_data_to_qdrant(
         )
     ]
     embeddings = get_embeddings()
-    init_vector_store(docs, embeddings, StoreOptions(bot_id))
+    init_vector_store(
+        docs,
+        embeddings,
+        StoreOptions(
+            namespace="swagger",
+            metadata={
+                "bot_id": bot_id
+                # "swagger_id": workflow_data.get("swagger_id"),
+            },
+        ),
+    )

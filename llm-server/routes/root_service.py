@@ -81,7 +81,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
                     app,
                     swagger_doc,
                     session_id,
-                    bot_id
+                    bot_id,
                 )
 
             bot_response = hasSingleIntent(
@@ -108,9 +108,11 @@ def handle_request(data: Dict[str, Any]) -> Any:
             or action == ActionType.GENERAL_QUERY
         ):
             sanitized_question = text.strip().replace("\n", " ")
-            vector_store = get_vector_store(StoreOptions(namespace=bot_id))
+            vector_store = get_vector_store(StoreOptions(namespace="knowledgebase"))
             mode = "assistant"
-            chain = getConversationRetrievalChain(vector_store, mode, base_prompt)
+            chain = getConversationRetrievalChain(
+                vector_store, mode, base_prompt, bot_id
+            )
             chat_history = get_chat_history_for_retrieval_chain(session_id, limit=40)
             response = chain(
                 {"question": sanitized_question, "chat_history": chat_history},
@@ -184,7 +186,9 @@ def get_qa_prompt_by_mode(mode: str, initial_prompt: Optional[str]) -> str:
     return initial_prompt if initial_prompt else ""
 
 
-def getConversationRetrievalChain(vector_store: VectorStore, mode, initial_prompt: str):
+def getConversationRetrievalChain(
+    vector_store: VectorStore, mode, initial_prompt: str, bot_id: str
+):
     llm = get_llm()
     # template = get_qa_prompt_by_mode(mode, initial_prompt=initial_prompt)
 
@@ -205,7 +209,9 @@ def getConversationRetrievalChain(vector_store: VectorStore, mode, initial_promp
     chain = ConversationalRetrievalChain.from_llm(
         llm,
         chain_type="stuff",
-        retriever=vector_store.as_retriever(),
+        retriever=vector_store.as_retriever(
+            search_kwargs={"filter": {"bot_id": bot_id}}
+        ),
         verbose=True,
         combine_docs_chain_kwargs={"prompt": prompt},
     )
@@ -270,7 +276,7 @@ def handle_existing_workflow(
     app: str,
     swagger_doc: ResolvingParser,
     session_id: str,
-    bot_id: str
+    bot_id: str,
 ) -> Dict[str, Any]:
     # use user defined workflows if exists, if not use auto_gen_workflow
     _workflow = mongo.workflows.find_one(
@@ -318,9 +324,7 @@ def handle_api_calls(
     return output
 
 
-def handle_no_api_call(
-    bot_message: str
-) -> Dict[str, str]:
+def handle_no_api_call(bot_message: str) -> Dict[str, str]:
     return {"response": bot_message}
 
 
