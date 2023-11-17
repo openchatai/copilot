@@ -101,6 +101,7 @@ def handle_request(data: Dict[str, Any]) -> Any:
                     swagger_url,
                     app,
                     session_id,
+                    bot_id,
                 )
 
             elif len(bot_response.ids) == 0:
