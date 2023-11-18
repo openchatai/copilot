@@ -1,7 +1,6 @@
 from langchain.chat_models import ChatOpenAI
 from langchain.chat_models import ChatOllama, ChatAnthropic
 from .chat_models import CHAT_MODELS
-from typing import Optional
 
 import os
 
