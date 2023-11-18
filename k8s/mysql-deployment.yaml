@@ -42,7 +42,7 @@ spec:
           name: mysql
           ports:
             - containerPort: 3306
-              hostPort: 3307
+              hostPort: 3306
               protocol: TCP
           resources: {}
           volumeMounts:
