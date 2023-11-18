@@ -9,8 +9,8 @@ data:
   LANGCHAIN_TRACING_V2: "true"
   LOCAL_IP: http://host.docker.internal
   MONGODB_URL: mongodb://dbuser:dbpass@mongodb.default.svc.cluster.local:27017
-  MYSQL_URI: mysql+pymysql://dbuser:dbpass@mysql.default.svc.cluster.local:3307/opencopilot
-  OPENAI_API_KEY: sk-****
+  MYSQL_URI: mysql+pymysql://dbuser:dbpass@mysql.default.svc.cluster.local:3306/opencopilot
+  OPENAI_API_KEY: sk-***
   OPENAI_API_TYPE: openai
   PINECONE_API_KEY: ""
   PINECONE_ENV: ""
