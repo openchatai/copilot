@@ -49,3 +49,7 @@ kubectl apply -f k8s
 ## CI/CD Pipelines
 
 Explain the setup and configuration of CI/CD pipelines for your project. Include details about the tools and processes involved in the continuous integration and deployment of your application.
+
+
+## Guide on how to enable monitoring can be found here
+https://linkerd.io/2.14/getting-started/

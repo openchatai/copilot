@@ -19,6 +19,7 @@ spec:
       annotations:
         kompose.cmd: kompose convert --out=k8s
         kompose.version: 1.31.2 (HEAD)
+        linkerd.io/inject: enabled
       creationTimestamp: null
       labels:
         io.kompose.network/opencopilot-opencopilot-network: "true"
