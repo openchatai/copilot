@@ -19,6 +19,7 @@ spec:
     metadata:
       annotations:
         kompose.cmd: kompose convert --out=k8s
+        linkerd.io/inject: enabled
         kompose.version: 1.31.2 (HEAD)
       creationTimestamp: null
       labels:
@@ -30,7 +31,7 @@ spec:
             - name: DB_DATABASE
               value: opencopilot
             - name: DB_HOST
-              value: mysql
+              value: mysql.default.svc.cluster.local
             - name: DB_PASSWORD
               value: dbpass
             - name: DB_PORT
@@ -47,7 +48,7 @@ spec:
           volumeMounts:
             - mountPath: /app/shared_data
               name: shared-data
-
+      # init container for some reason fails to run migrations, but running migrations after execing into the backend container works!!
       initContainers:
         - name: php-migrations
           image: codebanesr/backend:latest
