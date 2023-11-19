@@ -5,6 +5,7 @@ import uuid
 import requests
 from flask import Blueprint, jsonify, render_template, request
 from models.chatbot import Chatbot  # Adjust this import as necessary
+from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.utils import secure_filename
 
 from workers.shared.utils.opencopilot_utils.get_shared_filepath import UPLOAD_FOLDER
@@ -63,4 +64,23 @@ def delete_bot(id):
     return jsonify({
         'success': 'chatbot_deleted'
     })
+
+
+@copilot_workflow.route('/copilot/<id>', methods=['POST', 'PATCH', 'PUT'])
+def general_settings_update(id):
+    bot = Chatbot.query.filter_by(id=id).first_or_404()
+
+    data = request.json
+    if 'name' not in data or data['name'].strip() == '':
+        return jsonify({'error': 'Name is required'}), 400
+
+    bot.name = data['name']
+    bot.prompt_message = data.get('prompt_message', 'AI_COPILOT_INITIAL_PROMPT')  # @todo Adjust default value as needed
+
+    try:
+        bot.save()  # Adjust this to your ORM's save method
+    except SQLAlchemyError as e:
+        return jsonify({'error': str(e)}), 500
+
+    return jsonify({'chatbot': bot.to_dict()})  # Convert chatbot to dictionary
 
