@@ -2,10 +2,12 @@ from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id,
     get_unique_sessions_with_first_message_by_bot_id,
 )
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, abort
 from opencopilot_db import Chatbot
 from utils.db import Database
 from flask import Flask, request, jsonify, Blueprint, request, Response
+from root_service import handle_request  # Import the handle_request method
+
 from operator import itemgetter
 
 db_instance = Database()
@@ -75,3 +77,43 @@ def init_chat():
         "faq": [],  # Replace with actual FAQ data
         "initial_questions": [],  # Replace with actual initial questions
     })
+
+
+@chat_workflow.route('/chat/send', methods=['POST'])
+def send_chat():
+    content = request.json.get('content')
+    if not content or len(content) > 255:
+        abort(400, description="Invalid content")
+
+    session_id = request.headers.get('X-Session-Id', '')
+    headers = request.json.get('headers', {})
+    bot_token = request.headers.get('X-Bot-Token')
+
+    bot = Chatbot.query.filter_by(token=bot_token).first()
+
+    if not bot:
+        return jsonify({
+            "type": "text",
+            "response": {
+                "text": "I'm unable to help you at the moment, please try again later. **code: b404**"
+            }
+        }), 404
+
+    try:
+        # Replace the following with the actual method call and parameters
+        response_data = handle_request(session_id, content, bot.getSwaggerUrl(), headers, bot.getPromptMessage(),
+                                       str(bot.getId()))
+
+        return jsonify({
+            "type": "text",
+            "response": {
+                "text": response_data
+            }
+        })
+    except Exception as e:
+        return jsonify({
+            "type": "text",
+            "response": {
+                "text": f"I'm unable to help you at the moment, please try again later. **code: b500**\n```{e}```"
+            }
+        }), 500
