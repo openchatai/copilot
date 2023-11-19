@@ -83,3 +83,19 @@ To install Mypy, which is a static type checker for Python, follow these steps:
    - Set breakpoints, inspect variables, and more.
 
 Now you can develop your Flask app named "copilot_llm" locally with VS Code debugging, and your `.env` file keeps your API keys and other secrets out of source control. Additionally, Mypy is available for type checking within your Conda environment, helping you maintain a more robust and reliable codebase.
+
+
+--- 
+
+## Use of shared libraries:
+
+- **opencopilot_db**: [Shared Database Models Readme](../workers/shared/models/readme.md)
+  - Contains shared database schema files used in both workers and llm-server.
+
+- **opencopilot_utils**: [Shared Utilities Readme](../workers/shared/utils/readme.md)
+  - Contains utility functions that can be utilized by any of our microservices.
+
+To deploy, follow these steps:
+
+1. Increment the version in `setup.py`.
+2. Use the publish script to publish the new library to the repository.
