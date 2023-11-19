@@ -14,6 +14,7 @@ class Chatbot(Base):
     website = Column(String(255), nullable=True)
     status = Column(String(255), default='draft')
     prompt_message = Column(Text)
+    swagger_url = Column(Text)
     enhanced_privacy = Column(Boolean, default=False)
     smart_sync = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
