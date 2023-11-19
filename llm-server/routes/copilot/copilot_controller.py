@@ -44,3 +44,15 @@ def handle_swagger_file():
             'file_name': filename,
             'chatbot': chatbot.to_dict()  # Convert chatbot to dictionary
         })
+
+
+@copilot_workflow.route('/copilot/<id>', methods=['GET'])
+def general_settings(id):
+    bot = Chatbot.query.filter_by(id=id).first_or_404()
+
+    return jsonify({
+        'chatbot': bot.to_dict()  # Convert chatbot to dictionary
+    })
+
+
+
