@@ -38,8 +38,7 @@ def handle_swagger_file():
                           website=request.form.get('website'))
         # Add your DB commit logic here
 
-        server_url = f"{LLM_SERVER_ENDPOINT}/swagger_api/init/b/{chatbot.id}"
-        response = requests.post(server_url, json={'swagger_url': filename})
+        result = swagger_service.save_swaggerfile_to_mongo(filename, chatbot.id)
 
         return jsonify({
             'file_name': filename,
