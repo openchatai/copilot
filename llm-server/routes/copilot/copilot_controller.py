@@ -55,4 +55,12 @@ def general_settings(id):
     })
 
 
+@copilot_workflow.route('/copilot/<id>', methods=['DELETE'])
+def delete_bot(id):
+    bot = Chatbot.query.filter_by(id=id).first_or_404()
+    bot.delete()
+
+    return jsonify({
+        'success': 'chatbot_deleted'
+    })
 
