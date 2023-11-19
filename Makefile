@@ -36,13 +36,6 @@ install:
 	@echo "$(COLOR_BOLD)=== 🟢 Waiting for services to start (~20 seconds) ===$(COLOR_RESET)"
 	@sleep 20
 
-	@echo "$(COLOR_BOLD)=== 🟢 Clearing backend server config cache & running migrations ===$(COLOR_RESET)"
-	$(DOCKER_COMPOSE) exec backend php artisan cache:clear
-	$(DOCKER_COMPOSE) exec backend php artisan config:cache
-	$(DOCKER_COMPOSE) exec backend php artisan migrate
-	$(DOCKER_COMPOSE) exec backend php artisan key:generate
-	$(DOCKER_COMPOSE) exec backend php artisan storage:link
-
 	@echo "$(COLOR_BOLD)=== Installation completed ===$(COLOR_RESET)"
 	@echo "$(COLOR_BOLD)=== 🔥🔥 You can now access the dashboard at -> http://localhost:8888 ===$(COLOR_RESET)"
 	@echo "$(COLOR_BOLD)=== Enjoy! ===$(COLOR_RESET)"
@@ -52,9 +45,6 @@ db-setup:
 
 down:
 	$(DOCKER_COMPOSE) down --remove-orphans
-
-exec-backend:
-	$(DOCKER_COMPOSE) exec backend bash
 
 exec-dashboard:
 	$(DOCKER_COMPOSE) exec dashboard /bin/sh
