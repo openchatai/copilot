@@ -1,4 +1,5 @@
 # copilot_controller.py
+import json
 import os
 import uuid
 
@@ -7,7 +8,6 @@ from flask import Blueprint, jsonify, render_template, request
 from models.chatbot import Chatbot  # Adjust this import as necessary
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.utils import secure_filename
-
 from workers.shared.utils.opencopilot_utils.get_shared_filepath import UPLOAD_FOLDER
 
 copilot_workflow = Blueprint('copilot', __name__)
@@ -83,4 +83,31 @@ def general_settings_update(id):
         return jsonify({'error': str(e)}), 500
 
     return jsonify({'chatbot': bot.to_dict()})  # Convert chatbot to dictionary
+
+@copilot_workflow.route('/copilot/<id>/validator', methods=['GET'])
+def validator(id):
+    bot = Chatbot.query.filter_by(id=id).first_or_404()
+
+    try:
+        swagger_url = bot.swagger_url  # Adjust attribute name as necessary
+        swagger_content = ""
+
+        if not swagger_url.startswith("https"):
+            # Read the file content from the local system or shared storage
+            with open(swagger_url, 'r') as file:
+                swagger_content = file.read()
+
+        swagger_data = json.loads(swagger_content)
+        parser = SwaggerParser(swagger_data)
+
+    except Exception as e:
+        return jsonify({'error': 'invalid_swagger_file'}), 400
+
+    endpoints = parser.getEndpoints()
+    validations = parser.getValidations(endpoints)
+    return jsonify({
+        'chatbot_id': bot.id,
+        'all_endpoints': endpoints,
+        'validations': validations
+    })
 
