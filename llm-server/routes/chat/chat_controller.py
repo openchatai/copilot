@@ -3,6 +3,7 @@ from models.repository.chat_history_repo import (
     get_unique_sessions_with_first_message_by_bot_id,
 )
 from flask import Blueprint, request, jsonify
+from opencopilot_db import Chatbot
 from utils.db import Database
 from flask import Flask, request, jsonify, Blueprint, request, Response
 from operator import itemgetter
@@ -49,3 +50,28 @@ def get_chat_sessions(bot_id: str) -> Response:
     )
 
     return chat_history_sessions
+
+
+@chat_workflow.route('/chat/init', methods=['GET'])
+def init_chat():
+    bot_token = request.headers.get('X-Bot-Token')
+
+    bot = Chatbot.query.filter_by(token=bot_token).first()
+
+    if not bot:
+        return jsonify({
+            "type": "text",
+            "response": {
+                "text": f"Could not find bot with token {bot_token}"
+            }
+        }), 404
+
+    # Assuming getName() is a method in your Chatbot model.
+    # If it's just an attribute, use `bot.name`.
+    # Also, replace 'faq' and 'initialQuestions' with actual logic or data as needed.
+    return jsonify({
+        "bot_name": bot.getName(),
+        "logo": "logo",
+        "faq": [],  # Replace with actual FAQ data
+        "initial_questions": [],  # Replace with actual initial questions
+    })
