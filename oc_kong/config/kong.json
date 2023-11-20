@@ -8,23 +8,48 @@
       "routes": [
         {
           "paths": ["/workflow/"],
-          "strip_path": true
+          "strip_path": true,
+          "plugins": [
+            {
+              "name": "key-auth"
+            }
+          ]
         },
         {
           "paths": ["/swagger_api/"],
-          "strip_path": true
+          "strip_path": true,
+          "plugins": [
+            {
+              "name": "key-auth"
+            }
+          ]
         },
         {
           "paths": ["/uploads/"],
-          "strip_path": true
+          "strip_path": true,
+          "plugins": [
+            {
+              "name": "key-auth"
+            }
+          ]
         },
         {
           "paths": ["/data_sources/"],
-          "strip_path": true
+          "strip_path": true,
+          "plugins": [
+            {
+              "name": "key-auth"
+            }
+          ]
         },
         {
           "paths": ["/chat/"],
-          "strip_path": true
+          "strip_path": true,
+          "plugins": [
+            {
+              "name": "key-auth"
+            }
+          ]
         }
       ]
     },
@@ -34,7 +59,12 @@
       "routes": [
         {
           "paths": ["/backend/"],
-          "strip_path": true
+          "strip_path": true,
+          "plugins": [
+            {
+              "name": "key-auth"
+            }
+          ]
         }
       ]
     },
@@ -48,7 +78,12 @@
         },
         {
           "paths": ["/llm/"],
-          "strip_path": true
+          "strip_path": true,
+          "plugins": [
+            {
+              "name": "key-auth"
+            }
+          ]
         },
         {
           "paths": ["/"],
