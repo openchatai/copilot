@@ -1,0 +1,10 @@
+{
+  "_format_version": "2.1",
+  "_transform": true,
+  "services": [
+    {
+      "name": "restapiexample-service",
+      "url": "https://dummy.restapiexample.com/employees"
+    }
+  ]
+}

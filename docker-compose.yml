@@ -50,24 +50,24 @@ services:
     networks:
       - opencopilot_network
 
-  workers:
-    restart: unless-stopped
-    build:
-      context: ./workers
-      dockerfile: Dockerfile
-    image: codebanesr/workers:latest  # Add this line
-    networks:
-      - opencopilot_network
-    volumes:
-      - shared_data:/app/shared_data
-    env_file:
-      - llm-server/.env.docker
-    # worker will also check for some database tables, this is a hacky solution
-    command: sh -c "celery -A celery_app worker --loglevel=info"
-    depends_on:
-      - mysql
-      - qdrant
-      - backend
+  # workers:
+  #   restart: unless-stopped
+  #   build:
+  #     context: ./workers
+  #     dockerfile: Dockerfile
+  #   image: codebanesr/workers:latest  # Add this line
+  #   networks:
+  #     - opencopilot_network
+  #   volumes:
+  #     - shared_data:/app/shared_data
+  #   env_file:
+  #     - llm-server/.env.docker
+  #   # worker will also check for some database tables, this is a hacky solution
+  #   command: sh -c "celery -A celery_app worker --loglevel=info"
+  #   depends_on:
+  #     - mysql
+  #     - qdrant
+  #     - backend
 
   dashboard:
     restart: unless-stopped
@@ -134,30 +134,30 @@ services:
     networks:
       - opencopilot_network
 
-  selenium:
-    # image: selenium/standalone-firefox:4.14.1-20231025
-    image: seleniarm/standalone-firefox:4.1.2-20220222
-    ports:
-      - "4444:4444"
-      - "7900:7900"
-    shm_size: 2g
-    networks:
-      - opencopilot_network
+  # selenium:
+  #   # image: selenium/standalone-firefox:4.14.1-20231025
+  #   image: seleniarm/standalone-firefox:4.1.2-20220222
+  #   ports:
+  #     - "4444:4444"
+  #     - "7900:7900"
+  #   shm_size: 2g
+  #   networks:
+  #     - opencopilot_network
 
-  nginx:
-    image: nginx
-    restart: unless-stopped
-    ports:
-      - "8888:80"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-    networks:
-      - opencopilot_network
-    depends_on:
-      - dashboard
-      - llm-server
-      - backend
-      - mysql
+  # nginx:
+  #   image: nginx
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8888:80"
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+  #   networks:
+  #     - opencopilot_network
+  #   depends_on:
+  #     - dashboard
+  #     - llm-server
+  #     - backend
+  #     - mysql
 
 networks:
   opencopilot_network:
