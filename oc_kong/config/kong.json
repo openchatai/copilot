@@ -3,8 +3,58 @@
   "_transform": true,
   "services": [
     {
-      "name": "restapiexample-service",
-      "url": "https://dummy.restapiexample.com/employees"
+      "name": "llm-server",
+      "url": "http://llm-server:8002",
+      "routes": [
+        {
+          "paths": ["/workflow/"],
+          "strip_path": true
+        },
+        {
+          "paths": ["/swagger_api/"],
+          "strip_path": true
+        },
+        {
+          "paths": ["/uploads/"],
+          "strip_path": true
+        },
+        {
+          "paths": ["/data_sources/"],
+          "strip_path": true
+        },
+        {
+          "paths": ["/chat/"],
+          "strip_path": true
+        }
+      ]
+    },
+    {
+      "name": "backend",
+      "url": "http://backend:5000/",
+      "routes": [
+        {
+          "paths": ["/backend/"],
+          "strip_path": true
+        }
+      ]
+    },
+    {
+      "name": "dashboard",
+      "url": "http://dashboard:8000",
+      "routes": [
+        {
+          "paths": ["/dashboard/"],
+          "strip_path": false
+        },
+        {
+          "paths": ["/llm/"],
+          "strip_path": true
+        },
+        {
+          "paths": ["/"],
+          "strip_path": false
+        }
+      ]
     }
   ]
 }
