@@ -1,33 +1,37 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MoreVertical, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAtom } from "jotai";
 import _ from "lodash";
-import { currentlyEditingEndpointIdAtom, swaggerEndpointsAtom } from "./atoms";
 import { Label } from "@/components/ui/label";
 import { SwaggerForm } from "./form";
 import { methodVariants } from "./MethodRenderer";
 import { EmptyBlock } from "@/components/domain/EmptyBlock";
+import { useCreateCopilot } from "../CreateCopilotProvider";
 
 export function SwaggerUi() {
-    const [swaggerUrls, setSwaggerUrls] = useAtom(swaggerEndpointsAtom);
-    const [currentlyEditingEndpointId, setCurrentlyEditingEndpoint] = useAtom(currentlyEditingEndpointIdAtom);
+    const { state, dispatch } = useCreateCopilot();
+    const currentlyEditingEndpointId = state.currentlyEditingEndpointId;
+    const currentlyEditingEndpoint = state.swaggerEndpoints.find((endpoint) => endpoint.id === currentlyEditingEndpointId);
+    const swaggerUrls = state.swaggerEndpoints;
     function addNewEndpoint() {
         setCurrentlyEditingEndpoint(null);
-        setSwaggerUrls((urls) => [...urls, {
-            id: _.uniqueId(),
-            title: "New Endpoint",
-            url: "",
-            method: "GET",
-            summary: "",
-            headers: [],
-            parameters: []
-        }])
+        dispatch({
+            type: "ADD_NEW_ENDPOINT"
+        })
     }
     function handleDelete(id: string) {
-        setSwaggerUrls((urls) => urls.filter((url) => url.id !== id));
+        dispatch({
+            type: "DELETE_SWAGGER_ENDPOINT",
+            payload: id
+        })
     }
-    const currentlyEditingEndpoint = swaggerUrls.find((url) => url.id === currentlyEditingEndpointId);
+    function setCurrentlyEditingEndpoint(id: string | null) {
+        dispatch({
+            type: "SET_CURRENTLY_EDITING_ENDPOINT_ID",
+            payload: id
+        })
+    }
+
     return (
         <>
             <div className="flex items-center justify-between">

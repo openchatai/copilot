@@ -16,10 +16,9 @@ import {
     SelectItem,
 } from "@/components/ui/select";
 import { Plus, X } from "lucide-react";
-import { useAtom, useSetAtom } from "jotai";
-import { currentlyEditingEndpointIdAtom, swaggerEndpointsAtom } from "./atoms";
 import _ from "lodash";
 import { methods } from "./types";
+import { useCreateCopilot } from "../CreateCopilotProvider";
 
 interface FormSelectProps extends UseFormRegisterReturn {
     children?: ReactNode;
@@ -54,9 +53,8 @@ const swaggerFormSchema = zod.object({
 })
 
 export function SwaggerForm({ defaultValues }: { defaultValues: (FormValues & { id: string }) }) {
-
-    const setSwaggerUrls = useSetAtom(swaggerEndpointsAtom);
-    const [currentlyEditingEndpointId, setCurrentlyEditingEndpointId] = useAtom(currentlyEditingEndpointIdAtom);
+    const { state, dispatch } = useCreateCopilot();
+    const currentlyEditingEndpointId = state.currentlyEditingEndpointId;
 
     const form = useForm<FormValues>({
         mode: "onBlur",
@@ -75,22 +73,19 @@ export function SwaggerForm({ defaultValues }: { defaultValues: (FormValues & { 
 
     async function onsubmitHandler(values: FormValues) {
         if (currentlyEditingEndpointId) {
-            setSwaggerUrls((urls) => urls.map((url) => {
-                if (url.id === currentlyEditingEndpointId) {
-                    return {
-                        ...url,
-                        ...values
-                    }
-                }
-                return url;
-            }))
-        } else {
-            setSwaggerUrls((urls) => [...urls, {
-                id: _.uniqueId(),
-                ...values
-            }])
+            // not save but update
+            const index = state.swaggerEndpoints.findIndex((endpoint) => endpoint.id === currentlyEditingEndpointId);
+            const newEndpoints = _.cloneDeep(state.swaggerEndpoints);
+            newEndpoints[index] = { ...values, id: currentlyEditingEndpointId };
+            dispatch({
+                type: "SET_SWAGGER_ENDPOINTS",
+                payload: newEndpoints
+            })
         }
-        setCurrentlyEditingEndpointId(null);
+        dispatch({
+            type: "SET_CURRENTLY_EDITING_ENDPOINT_ID",
+            payload: null
+        })
     }
     console.log(form.formState.errors)
     return (
@@ -206,7 +201,10 @@ export function SwaggerForm({ defaultValues }: { defaultValues: (FormValues & { 
                         </div>
 
                         <AlertDialogFooter className="gap-2">
-                            <AlertDialogCancel onClick={() => setCurrentlyEditingEndpointId(null)}>
+                            <AlertDialogCancel onClick={() => dispatch({
+                                type: "SET_CURRENTLY_EDITING_ENDPOINT_ID",
+                                payload: null
+                            })}>
                                 Cancel
                             </AlertDialogCancel>
                             <AlertDialogAction type="submit">
