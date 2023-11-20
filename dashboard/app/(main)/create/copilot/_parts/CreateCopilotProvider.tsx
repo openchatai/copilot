@@ -21,25 +21,21 @@ type ActionType = typeof actionTypes;
 
 type Action =
   | {
-      type: ActionType["SET_COPILOT"];
-      payload: CopilotType;
-    }
+    type: ActionType["SET_COPILOT"];
+    payload: CopilotType;
+  }
   | {
-      type: ActionType["SET_LOADING"];
-      payload: boolean;
-    }
+    type: ActionType["SET_LOADING"];
+    payload: boolean;
+  }
   | {
-      type: ActionType["ADD_SWAGGER"];
-      payload: File[];
-    }
+    type: ActionType["ADD_SWAGGER"];
+    payload: File[];
+  }
   | {
-      type: ActionType["CHANGE_TEMPLATE_KEY"];
-      payload: string | undefined;
-    }
-  | {
-      type: ActionType["SET_VALIDATIONS"];
-      payload: ValidatorResponseType;
-    };
+    type: ActionType["SET_VALIDATIONS"];
+    payload: ValidatorResponseType;
+  };
 const [CreateCopilotSafeProvider, useCreateCopilot] = createSafeContext<{
   state: State;
   dispatch: React.Dispatch<Action>;
@@ -56,9 +52,6 @@ function reducer(state: State, action: Action) {
         break;
       case actionTypes.ADD_SWAGGER:
         draft.swaggerFiles = action.payload;
-        break;
-      case actionTypes.CHANGE_TEMPLATE_KEY:
-        draft.templateKey = action.payload;
         break;
       case actionTypes.SET_VALIDATIONS:
         draft.validatorResponse = action.payload;

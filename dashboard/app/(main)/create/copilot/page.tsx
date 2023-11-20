@@ -14,13 +14,6 @@ import _ from "lodash";
 import { toast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Label } from "@/components/ui/label";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -32,12 +25,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import Loader from "@/components/ui/Loader";
-import { premadeTemplates } from "./_parts/premade";
 import {
   CreateCopilotProvider,
   useCreateCopilot,
 } from "./_parts/CreateCopilotProvider";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { SwaggerUi } from "./_parts/swagger-form";
 
 function Header() {
   const { stepCount, activeStep, goToStep } = useWizard();
@@ -126,19 +119,11 @@ function UploadSwaggerStep() {
     dispatch({ type: "SET_COPILOT", payload: copilot });
   };
   const [loading, setLoading] = useState(false);
-  const selectedTemplate = _.find(premadeTemplates, { id: templateKey });
-  const setTempleteKey = (templateKey: string | undefined) => {
-    dispatch({ type: "CHANGE_TEMPLATE_KEY", payload: templateKey });
-  };
 
   const swaggerFile = _.first(swaggerFiles);
-  const bothSelected = selectedTemplate && swaggerFile;
-  // if user selects template and then uploads swagger file, we will use the template
-
   // spagetti 🍝
   async function handleCreateCopilot() {
-    setLoading(true);
-    if (!swaggerFile && !selectedTemplate) {
+    if (!swaggerFile) {
       toast({
         title: "No swagger file uploaded or template selected",
         description:
@@ -147,20 +132,9 @@ function UploadSwaggerStep() {
       });
       return;
     } else {
+      setLoading(true);
       if (!createdCopilot) {
-        const template = selectedTemplate;
-        if (template) {
-          const res = await template.creatorFn();
-          if (res.data) {
-            setCopilot(res.data.chatbot);
-            toast({
-              title: "Copilot Created Successfully",
-              description: "You have created your copilot successfully",
-              variant: "success",
-            });
-            _.delay(nextStep, 1000);
-          }
-        } else if (swaggerFile) {
+        if (swaggerFile) {
           const res = await createCopilot({
             swagger_file: swaggerFile,
           });
@@ -179,13 +153,6 @@ function UploadSwaggerStep() {
     setLoading(false);
   }
 
-  function handleRadioChange(value: string) {
-    if (value === templateKey && templateKey !== "undefined") {
-      setTempleteKey(undefined);
-    } else {
-      setTempleteKey(value);
-    }
-  }
   return (
     <div className="relative p-1">
       {loading && (
@@ -217,8 +184,8 @@ function UploadSwaggerStep() {
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none rounded-full bg-muted p-1.5 text-sm font-semibold uppercase text-accent-foreground">
             OR
           </div>
-          <TabsTrigger value="premade" className="flex-1">
-            Pre-made Copilots
+          <TabsTrigger value="swagger-form" className="flex-1">
+            Swagger Def.
           </TabsTrigger>
         </TabsList>
         <TabsContent value="upload" className="min-h-[10rem]">
@@ -265,30 +232,8 @@ function UploadSwaggerStep() {
             </div>
           </div>
         </TabsContent>
-        <TabsContent value="premade" className="min-h-[10rem]">
-          <Label className="my-4 block text-base font-semibold text-accent-foreground">
-            Choose a pre-made template
-          </Label>
-          <div className="grid grid-cols-4 gap-2">
-            {_.map(premadeTemplates, ({ id, name, icon, description }) => (
-              <TooltipProvider key={id}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      data-value={id}
-                      data-state={id === templateKey ? "checked" : "unchecked"}
-                      onClick={() => handleRadioChange(id)}
-                      className="flex aspect-square flex-col items-center justify-center gap-2 rounded-lg border border-border p-3 shadow-sm transition-all data-[state=checked]:border-primary data-[state=checked]:text-primary data-[state=checked]:shadow-inner data-[state=checked]:shadow-primary-foreground"
-                    >
-                      <span className="text-2xl drop-shadow">{icon}</span>
-                      <span className="text-sm font-semibold">{name}</span>
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>{description}</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            ))}
-          </div>
+        <TabsContent value="swagger-form" className="min-h-[10rem]">
+          <SwaggerUi />
         </TabsContent>
       </Tabs>
       <footer className="flex w-full items-center justify-between gap-5 pt-5">
@@ -311,16 +256,14 @@ function UploadSwaggerStep() {
         ) : (
           <>
             {/* user didn't select both */}
-            {!bothSelected && (
-              <Button
-                onClick={handleCreateCopilot}
-                className="flex items-center justify-center gap-1"
-              >
-                Create Copilot
-              </Button>
-            )}
+            <Button
+              onClick={handleCreateCopilot}
+              className="flex items-center justify-center gap-1"
+            >
+              Create Copilot
+            </Button>
             {/* user selected both, and no copilot */}
-            {!createdCopilot && bothSelected && (
+            {/* {!createdCopilot && bothSelected && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button className="flex items-center justify-center gap-1">
@@ -349,7 +292,7 @@ function UploadSwaggerStep() {
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
-            )}
+            )} */}
           </>
         )}
       </footer>
