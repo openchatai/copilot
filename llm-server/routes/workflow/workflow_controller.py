@@ -15,7 +15,7 @@ import logging
 db_instance = Database()
 mongo = db_instance.get_db()
 
-workflow = Blueprint("workflow", __name__)
+workflow = Blueprint("flows", __name__)
 
 json_file_path = os.path.join(os.getcwd(), "routes", "workflow", "workflow_schema.json")
 with open(json_file_path, "r") as workflow_schema_file:
