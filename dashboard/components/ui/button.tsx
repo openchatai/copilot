@@ -26,6 +26,7 @@ const buttonVariants = cva(
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10",
         fluid: "w-full h-10",
+        fit:"w-fit h-fit p-2"
       },
     },
     defaultVariants: {
