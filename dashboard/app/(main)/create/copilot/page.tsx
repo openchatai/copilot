@@ -21,6 +21,7 @@ import {
 } from "./_parts/CreateCopilotProvider";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { SwaggerUi } from "./_parts/swagger-form";
+import { FormValuesWithId } from "./_parts/swagger-form/types";
 
 function Header() {
   const { stepCount, activeStep, goToStep } = useWizard();
@@ -99,17 +100,29 @@ function IntroStep() {
     </div>
   );
 }
+
+function transformFormToSwagger(data: FormValuesWithId[]) {
+  // each endpoint have complete url, i want to extract the base url (which is the most common part)
+  // and the endpoint path
+  if (!data || !data.length) return;
+  const version = "3.0.0";
+  const info = {
+    title: "on the fly swagger",
+    version,
+    description: "on the fly swagger generated via the swagger form",
+  }
+}
+
 function UploadSwaggerStep() {
   const { nextStep, previousStep } = useWizard();
   const {
-    state: { swaggerFiles, createdCopilot, templateKey },
+    state: { swaggerFiles, createdCopilot, swaggerEndpoints },
     dispatch,
   } = useCreateCopilot();
   const setCopilot = (copilot: CopilotType) => {
     dispatch({ type: "SET_COPILOT", payload: copilot });
   };
   const [loading, setLoading] = useState(false);
-
   const swaggerFile = _.first(swaggerFiles);
   // spagetti 🍝
   async function handleCreateCopilot() {
@@ -245,44 +258,12 @@ function UploadSwaggerStep() {
           </>
         ) : (
           <>
-            {/* user didn't select both */}
             <Button
               onClick={handleCreateCopilot}
               className="flex items-center justify-center gap-1"
             >
               Create Copilot
             </Button>
-            {/* user selected both, and no copilot */}
-            {/* {!createdCopilot && bothSelected && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button className="flex items-center justify-center gap-1">
-                    Create Copilot
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you sure you want to create this copilot?
-                    </AlertDialogTitle>
-                  </AlertDialogHeader>
-                  <AlertDialogDescription>
-                    You are about to create a copilot with a pre-made template,
-                    this will override your current swagger file.
-                  </AlertDialogDescription>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel asChild>
-                      <Button variant="destructive" size="sm">
-                        Cancel
-                      </Button>
-                    </AlertDialogCancel>
-                    <Button onClick={handleCreateCopilot} size="sm">
-                      Create Copilot
-                    </Button>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )} */}
           </>
         )}
       </footer>
