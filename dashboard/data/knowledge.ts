@@ -1,6 +1,6 @@
 import axios from "axios";
 const instance = axios.create({
-  baseURL: "http://localhost:8888/backend",
+  baseURL: "http://localhost:8888/llm-server",
 });
 
 export async function uploadFile(file: File) {
