@@ -42,7 +42,7 @@ export function SwaggerUi() {
                     <Plus className="w-5 h-5" />
                 </button>
             </div>
-            <div className="flex items-start flex-col gap-2 overflow-auto max-h-52">
+            <div className="flex items-start flex-col gap-2 overflow-auto max-h-52 p-1.5">
                 {
                     swaggerUrls.length === 0 ?
                         <div className="mx-auto">
@@ -52,15 +52,15 @@ export function SwaggerUi() {
                         </div>
                         :
                         swaggerUrls.map((endpoint, index) => {
-                            return <div key={index} className="w-full p-2 flex items-center justify-between border border-border transition-colors rounded-lg">
-                                <div className="flex-1 flex items-center justify-start shrink-0">
-                                    <div className="flex items-center gap-5 shrink-0">
+                            return <div key={index} className="w-full p-2 shrink-0 flex overflow-hidden max-w-full items-center justify-between border border-border transition-colors rounded-lg">
+                                <div className="flex-1 flex items-center justify-start overflow-hidden shrink-0">
+                                    <div className="flex items-center gap-5 overflow-hidden shrink-0">
                                         <span className={cn(methodVariants({
                                             method: endpoint.method
                                         }))}>
                                             {endpoint.method}
                                         </span>
-                                        <p className="flex-1 whitespace-nowrap line-clamp-1 text-sm">
+                                        <p className="flex-1 line-clamp-1 overflow-ellipsis text-sm">
                                             {endpoint.url || endpoint.title}
                                         </p>
                                     </div>

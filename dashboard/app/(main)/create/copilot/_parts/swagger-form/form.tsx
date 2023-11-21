@@ -5,9 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ReactNode, forwardRef } from "react";
-import zod from 'zod';
 import { useForm, useFieldArray, UseFormRegisterReturn } from "react-hook-form";
-export type FormValues = zod.infer<typeof swaggerFormSchema>
 import {
     Select,
     SelectValue,
@@ -15,9 +13,9 @@ import {
     SelectContent,
     SelectItem,
 } from "@/components/ui/select";
-import { Plus, X } from "lucide-react";
+import { Play, Plus, X } from "lucide-react";
 import _ from "lodash";
-import { methods } from "./types";
+import { FormValues, FormValuesWithId, methods, swaggerFormSchema } from "./types";
 import { useCreateCopilot } from "../CreateCopilotProvider";
 
 interface FormSelectProps extends UseFormRegisterReturn {
@@ -25,6 +23,7 @@ interface FormSelectProps extends UseFormRegisterReturn {
     triggerContent?: ReactNode;
     value?: string;
 }
+
 const FormSelect = forwardRef<HTMLButtonElement, FormSelectProps>(({ name, onChange, required, disabled, children, value }, ref) => {
     return <Select
         name={name}
@@ -36,26 +35,12 @@ const FormSelect = forwardRef<HTMLButtonElement, FormSelectProps>(({ name, onCha
         {children}
     </Select>
 })
-FormSelect.displayName = "FormSelect";
-const swaggerFormSchema = zod.object({
-    url: zod.string().url("Invalid URL, please provide a valid one"),
-    method: zod.enum(methods),
-    title: zod.string(),
-    summary: zod.string(),
-    headers: zod.array(zod.object({
-        key: zod.string(),
-        value: zod.string()
-    })).optional(),
-    parameters: zod.array(zod.object({
-        key: zod.string(),
-        value: zod.string()
-    })).optional()
-})
 
-export function SwaggerForm({ defaultValues }: { defaultValues: (FormValues & { id: string }) }) {
+FormSelect.displayName = "FormSelect";
+
+export function SwaggerForm({ defaultValues }: { defaultValues: FormValuesWithId }) {
     const { state, dispatch } = useCreateCopilot();
     const currentlyEditingEndpointId = state.currentlyEditingEndpointId;
-
     const form = useForm<FormValues>({
         mode: "onBlur",
         resolver: zodResolver(swaggerFormSchema),
@@ -87,15 +72,19 @@ export function SwaggerForm({ defaultValues }: { defaultValues: (FormValues & { 
             payload: null
         })
     }
-    console.log(form.formState.errors)
+
     return (
         <AlertDialog open={!!currentlyEditingEndpointId}>
             <AlertDialogContent asChild>
                 <form onSubmit={form.handleSubmit(onsubmitHandler)}>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>
+                    <AlertDialogHeader className="flex items-center justify-between w-full flex-row">
+                        <AlertDialogTitle className="flex-1">
                             API
                         </AlertDialogTitle>
+                        <Button variant="success" size="sm" type="button">
+                            <Play className="w-5 h-5" />
+                            Test
+                        </Button>
                     </AlertDialogHeader>
                     <div className="w-full space-y-4">
                         <Input placeholder="Title" {...form.register('title')} data-valid={!form.getFieldState('title').invalid} />
@@ -115,7 +104,7 @@ export function SwaggerForm({ defaultValues }: { defaultValues: (FormValues & { 
                                         }
                                     </SelectContent>
                                 </FormSelect>
-                                <Input className="flex-1 border-0 h-full py-1.5" {...form.register('url')} placeholder="API endpoint" />
+                                <Input className="flex-1 border-0 h-full py-1.5 shadow-none" {...form.register('url')} placeholder="API endpoint" />
                             </div>
                             <p className="text-xs text-destructive mt-1">{form.getFieldState('url').error?.message}</p>
                         </div>
@@ -154,7 +143,6 @@ export function SwaggerForm({ defaultValues }: { defaultValues: (FormValues & { 
                                                 {...form.register(`headers.${index}.value`)}
                                             />
                                             <button className="shrink-0 p-2 text-destructive" type="button"
-                                                disabled={headerFields.length === 1}
                                                 onClick={() => removeHeaderField(index)}>
                                                 <X className="w-4 h-4" />
                                             </button>
@@ -190,7 +178,6 @@ export function SwaggerForm({ defaultValues }: { defaultValues: (FormValues & { 
                                                 {...form.register(`parameters.${index}.value`)}
                                             />
                                             <button className="shrink-0 p-2 text-destructive" type="button"
-                                                disabled={parameterFields.length === 1}
                                                 onClick={() => removeParameterField(index)}>
                                                 <X className="w-4 h-4" />
                                             </button>
