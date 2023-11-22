@@ -103,15 +103,7 @@ function CreateCopilotProvider({ children }: { children: React.ReactNode }) {
     createdCopilot: undefined,
     validatorResponse: undefined,
     currentlyEditingEndpointId: null,
-    swaggerEndpoints: [{
-      id: Math.random().toString(),
-      method: "GET",
-      title: "get users",
-      url: "https://api.example.com/v1/users",
-      headers: [],
-      parameters: [],
-      summary: "",
-    }]
+    swaggerEndpoints: []
   });
   return (
     <CreateCopilotSafeProvider value={{ state, dispatch }}>
