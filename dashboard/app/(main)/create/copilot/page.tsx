@@ -100,19 +100,43 @@ function IntroStep() {
     </div>
   );
 }
+// lodash is the best 
+const generateSwaggerDefinition = (formData: FormValuesWithId[]) => {
+  const swaggerDefinition = {
+    openapi: '3.0.0',
+    info: {
+      title: 'Your API',
+      version: '1.0.0',
+      description: 'API description',
+    },
+    paths: {},
+  };
 
-function transformFormToSwagger(data: FormValuesWithId[]) {
-  // each endpoint have complete url, i want to extract the base url (which is the most common part)
-  // and the endpoint path
-  if (!data || !data.length) return;
-  const version = "3.0.0";
-  const info = {
-    title: "on the fly swagger",
-    version,
-    description: "on the fly swagger generated via the swagger form",
-  }
-}
+  _.forEach(formData, (api) => {
+    const { title, url, parameters, headers, summary } = api;
+    const pathId = title.replace(/\s/g, '');
+    _.set(swaggerDefinition.paths, [url, pathId], {
+      summary,
+      description: summary,
+      operationId: pathId,
+      parameters: _.map(parameters, (value, key) => ({
+        name: key,
+        in: 'query',
+        description: `Description for ${key}`,
+        required: true,
+        schema: { type: 'string' },
+      })),
+      headers: _.map(headers, (value, key) => ({
+        name: key,
+        description: `Description for ${key}`,
+        required: true,
+        schema: { type: 'string' },
+      })),
+    });
+  });
 
+  return swaggerDefinition;
+};
 function UploadSwaggerStep() {
   const { nextStep, previousStep } = useWizard();
   const {
@@ -124,38 +148,73 @@ function UploadSwaggerStep() {
   };
   const [loading, setLoading] = useState(false);
   const swaggerFile = _.first(swaggerFiles);
+  const bothSelected = swaggerFile && !_.isEmpty(swaggerEndpoints);
   // spagetti 🍝
   async function handleCreateCopilot() {
-    if (!swaggerFile) {
+    if (!swaggerFile && _.isEmpty(swaggerEndpoints)) {
       toast({
-        title: "No swagger file uploaded or template selected",
+        title: "No swagger file uploaded or created!",
         description:
-          "Please upload a swagger file to continue, or select a template",
+          "Please upload a swagger file to continue, or create one using the form",
         variant: "destructive",
       });
       return;
-    } else {
+    }
+    if (bothSelected) {
+      toast({
+        title: "Both swagger file and swagger definition created!",
+        description:
+          "Please reset one of them to continue, you can't use both at the same time",
+        variant: "destructive",
+      });
+      return;
+    }
+    else {
       setLoading(true);
-      if (!createdCopilot) {
-        if (swaggerFile) {
-          const res = await createCopilot({
-            swagger_file: swaggerFile,
-          });
-          if (res.data) {
-            setCopilot(res.data.chatbot);
-            toast({
-              title: "Copilot Created Successfully",
-              description: "You have created your copilot successfully",
-              variant: "success",
+      try {
+        if (!createdCopilot) {
+          if (swaggerFile) {
+            const res = await createCopilot({
+              swagger_file: swaggerFile,
             });
-            _.delay(nextStep, 1000);
+            if (res.data) {
+              setCopilot(res.data.chatbot);
+              toast({
+                title: "Copilot Created Successfully",
+                description: "You have created your copilot successfully",
+                variant: "success",
+              });
+              _.delay(nextStep, 1000);
+            }
+          }
+          if (!_.isEmpty(swaggerEndpoints)) {
+            const swaggerDefinition = generateSwaggerDefinition(swaggerEndpoints);
+            const swagger_file = new File([JSON.stringify(swaggerDefinition)], "swagger.json", {
+              type: "application/json",
+            })
+            console.log(swagger_file);
+            const res = await createCopilot({
+              swagger_file,
+            });
+            if (res.data) {
+              setCopilot(res.data.chatbot);
+              toast({
+                title: "Copilot Created Successfully",
+                description: "You have created your copilot successfully",
+                variant: "success",
+              });
+              _.delay(nextStep, 1000);
+            }
           }
         }
+      } catch (error) {
+        setLoading(false);
+
       }
+
     }
     setLoading(false);
   }
-
   return (
     <div className="relative p-1">
       {loading && (
@@ -257,11 +316,10 @@ function UploadSwaggerStep() {
             </Button>
           </>
         ) : (
+          // handle if user uploaded swagger file and created swagger definition at the same time.
+          // so user have to choose which one to use.
           <>
-            <Button
-              onClick={handleCreateCopilot}
-              className="flex items-center justify-center gap-1"
-            >
+            <Button onClick={handleCreateCopilot}>
               Create Copilot
             </Button>
           </>
