@@ -10,7 +10,7 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ShieldAlert, Wand2, Inspect } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/lib/router-events";
 import React from "react";
 import { useCopilot } from "../_context/CopilotProvider";
 import dynamic from "next/dynamic";

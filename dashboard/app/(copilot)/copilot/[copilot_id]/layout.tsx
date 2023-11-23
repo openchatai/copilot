@@ -26,7 +26,7 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { CopilotProvider } from "../_context/CopilotProvider";
-import Link from "next/link";
+import { Link } from "@/lib/router-events";
 
 type Props = {
   children: React.ReactNode;

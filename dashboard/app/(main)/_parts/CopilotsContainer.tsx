@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { BotIcon, Terminal } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/lib/router-events";
 import {
   Tooltip,
   TooltipContent,
