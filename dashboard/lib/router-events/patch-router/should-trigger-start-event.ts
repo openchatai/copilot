@@ -1,4 +1,6 @@
 import { addBasePath } from "next/dist/client/add-base-path";
+import React from "react";
+
 function getURL(href: string): URL {
   return new URL(addBasePath(href), location.href);
 }

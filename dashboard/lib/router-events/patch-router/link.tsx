@@ -1,6 +1,6 @@
 import NextLink from "next/link";
 import { forwardRef } from "react";
-
+import React from "react";
 import { onStart } from "../events";
 import { shouldTriggerStartEvent } from "./should-trigger-start-event";
 
