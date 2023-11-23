@@ -4,7 +4,7 @@ import { Library, Link2 } from "lucide-react";
 import React from "react";
 import { SearchBox } from "./_parts/SearchBox";
 import { AddDataSource } from "./_parts/AddDataSource";
-import Link from "next/link";
+import { Link } from "@/lib/router-events";
 type Props = {
   children: React.ReactNode;
   params: {

@@ -5,7 +5,7 @@ import { NavLink } from "@/components/ui/NavLink";
 import { Button } from "@/components/ui/button";
 import { getWorkflowsByBotId } from "@/data/flow";
 import _ from "lodash";
-import Link from "next/link";
+import { Link } from "@/lib/router-events";
 import React from "react";
 import useSwr from "swr";
 

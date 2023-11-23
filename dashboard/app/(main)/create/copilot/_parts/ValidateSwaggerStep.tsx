@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { validateSwagger } from "@/data/copilot";
-import Link from "next/link";
+import { Link } from "@/lib/router-events";
 import React, { useEffect, useState } from "react";
 import { Check } from "lucide-react";
 import { useWizard } from "react-use-wizard";

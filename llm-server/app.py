@@ -19,7 +19,7 @@ from opencopilot_db import create_database_schema
 create_database_schema()
 
 app = Flask(__name__)
-app.register_blueprint(workflow, url_prefix="/workflow")
+app.register_blueprint(workflow, url_prefix="/flows")
 app.register_blueprint(_swagger, url_prefix="/swagger_api")
 app.register_blueprint(chat_workflow, url_prefix="/chat")
 app.register_blueprint(upload_controller, url_prefix="/uploads")
