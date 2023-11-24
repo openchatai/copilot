@@ -6,9 +6,7 @@ from flask import Blueprint, request, jsonify, abort
 from opencopilot_db import Chatbot
 from utils.db import Database
 from flask import Flask, request, jsonify, Blueprint, request, Response
-from root_service import handle_request  # Import the handle_request method
-
-from operator import itemgetter
+from .. import root_service
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -38,9 +36,6 @@ def get_session_chats(session_id: str) -> Response:
         )
 
     return jsonify(chats_filtered)
-
-
-# unique_session_ids = get_unique_session_ids(session)
 
 
 @chat_workflow.route("/b/<bot_id>/chat_sessions", methods=["GET"])
@@ -79,12 +74,11 @@ def init_chat():
 
 @chat_workflow.route('/chat/send', methods=['POST'])
 def send_chat():
+    data = request.get_json()
     content = request.json.get('content')
     if not content or len(content) > 255:
-        abort(400, description="Invalid content")
+        abort(400, description="Invalid content, the size is larger than 255 char")
 
-    session_id = request.headers.get('X-Session-Id', '')
-    headers = request.json.get('headers', {})
     bot_token = request.headers.get('X-Bot-Token')
 
     bot = Chatbot.query.filter_by(token=bot_token).first()
@@ -98,9 +92,7 @@ def send_chat():
         }), 404
 
     try:
-        # Replace the following with the actual method call and parameters
-        response_data = handle_request(session_id, content, bot.getSwaggerUrl(), headers, bot.getPromptMessage(),
-                                       str(bot.getId()))
+        response_data = root_service.handle_request(data)
 
         return jsonify({
             "type": "text",
