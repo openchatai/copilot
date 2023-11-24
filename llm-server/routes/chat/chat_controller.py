@@ -68,11 +68,9 @@ def init_chat():
             }
         }), 404
 
-    # Assuming getName() is a method in your Chatbot model.
-    # If it's just an attribute, use `bot.name`.
-    # Also, replace 'faq' and 'initialQuestions' with actual logic or data as needed.
+    # Replace 'faq' and 'initialQuestions' with actual logic or data as needed.
     return jsonify({
-        "bot_name": bot.getName(),
+        "bot_name": bot.name,
         "logo": "logo",
         "faq": [],  # Replace with actual FAQ data
         "initial_questions": [],  # Replace with actual initial questions
