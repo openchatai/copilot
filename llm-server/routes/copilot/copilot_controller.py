@@ -7,10 +7,11 @@ from flask import Blueprint, jsonify, request
 from opencopilot_db.chatbot import Chatbot
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.utils import secure_filename
-from workers.shared.utils.opencopilot_utils.get_shared_filepath import UPLOAD_FOLDER
 from utils.swagger_parser import SwaggerParser
 
 copilot = Blueprint('copilot', __name__)
+
+UPLOAD_FOLDER = ''
 
 
 @copilot.route('/copilots', methods=['GET'])
