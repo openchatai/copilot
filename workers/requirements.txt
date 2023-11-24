@@ -35,7 +35,7 @@ jsonpatch==1.33
 jsonpointer==2.4
 keyring==24.2.0
 kombu==5.3.2
-langchain==0.0.330
+langchain==0.0.329
 langsmith==0.0.57
 lxml==4.9.3
 Mako==1.2.4

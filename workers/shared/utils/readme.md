@@ -50,36 +50,8 @@ We welcome contributions from the community. If you have suggestions, bug report
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-```
 
 ## Publishing Your Library
 
-You've provided the steps for publishing your library, which are correct. Here's the complete guide for publishing:
-
-1. Create distribution packages:
-
-   ```bash
-   python setup.py sdist bdist_wheel
-   ```
-
-2. Install `twine`, a tool for securely uploading your distribution packages:
-
-   ```bash
-   pip install twine
-   ```
-
-3. Upload your distribution packages to PyPI using `twine`. Replace `dist/*` with the actual paths to your distribution packages:
-
-   ```bash
-   twine upload dist/*
-   ```
-
-4. You'll be prompted to enter your PyPI username and password or your API token. Follow the prompts to complete the upload.
-
-Your library will then be published on PyPI and accessible to the Python community.
-
-Ensure that you've included a `README.md` file with a project description, and that your `setup.py` includes the necessary metadata, as shown in the previous responses.
-
-
-remove dist
-rm -rf build dist opencopilot_utils.egg-info
+Increment the version of the library in setup.py
+Use the publish script [publish.sh](./publish.sh) to publish the library

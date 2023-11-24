@@ -77,9 +77,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 
 ## Publish guide
-```
-pip install twine
-python setup.py sdist bdist_wheel
-twine upload dist/*
-rm -rf build dist opencopilot_db.egg-info
-```
+## Publishing Your Library
+
+Increment the version of the library in setup.py
+Use the publish script [publish.sh](./publish.sh) to publish the library
