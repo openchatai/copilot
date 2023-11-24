@@ -55,7 +55,7 @@ def get_copilot(copilot_id):
     bot = find_one_or_fail_by_id(copilot_id)
 
     return jsonify({
-        'chatbot': bot.to_dict()  # todo Convert chatbot to dictionary
+        'chatbot': chatbot_to_dict(bot)
     })
 
 
