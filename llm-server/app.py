@@ -5,10 +5,8 @@ from routes.copilot.copilot_controller import copilot
 from routes.uploads.upload_controller import upload_controller
 from routes._swagger.controller import _swagger
 from routes.chat.chat_controller import chat_workflow
-from typing import Any, Tuple
 from utils.config import Config
 from utils.get_logger import struct_log
-from flask_cors import CORS
 from routes.data_source.data_source_controller import datasource_workflow
 from dotenv import load_dotenv
 
@@ -33,7 +31,6 @@ from routes.root_service import extract_data, handle_request
 init_qdrant_collections()
 
 
-## TODO: Implement caching for the swagger file content (no need to load it everytime)
 @app.route("/handle", methods=["POST", "OPTIONS"])
 def handle() -> Response:
     data = request.get_json()
