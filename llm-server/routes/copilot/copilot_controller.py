@@ -47,7 +47,7 @@ def handle_swagger_file():
         })
 
 
-@copilot.route('/<id>', methods=['GET'])
+@copilot.route('/<copilot_id>', methods=['GET'])
 def general_settings(copilot_id):
     bot = Chatbot.query.filter_by(id=copilot_id).first_or_404()
 
@@ -56,7 +56,7 @@ def general_settings(copilot_id):
     })
 
 
-@copilot.route('/<id>', methods=['DELETE'])
+@copilot.route('/<copilot_id>', methods=['DELETE'])
 def delete_bot(copilot_id):
     bot = Chatbot.query.filter_by(id=copilot_id).first_or_404()
     bot.delete()
@@ -66,7 +66,7 @@ def delete_bot(copilot_id):
     })
 
 
-@copilot.route('/<id>', methods=['POST', 'PATCH', 'PUT'])
+@copilot.route('/<copilot_id>', methods=['POST', 'PATCH', 'PUT'])
 def general_settings_update(copilot_id):
     bot = Chatbot.query.filter_by(id=copilot_id).first_or_404()
 
@@ -85,7 +85,7 @@ def general_settings_update(copilot_id):
     return jsonify({'chatbot': bot.to_dict()})  # Convert chatbot to dictionary
 
 
-@copilot.route('/<id>/validator', methods=['GET'])
+@copilot.route('/<copilot_id>/validator', methods=['GET'])
 def validator(copilot_id):
     bot = Chatbot.query.filter_by(id=copilot_id).first_or_404()
 
