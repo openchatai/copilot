@@ -2,7 +2,7 @@ from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id,
     get_unique_sessions_with_first_message_by_bot_id,
 )
-from models.chatbot import Chatbot
+from opencopilot_db.chatbot import Chatbot
 
 from utils.db import Database
 from flask import jsonify, Blueprint, request, Response, abort
