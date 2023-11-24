@@ -2,14 +2,13 @@ import json
 import os
 import uuid
 import routes._swagger.service as swagger_service
-import utils.swagger_parser as swagger_parser
 
 from flask import Blueprint, jsonify, request
-from models.chatbot import Chatbot  # Adjust this import as necessary
+from opencopilot_db.chatbot import Chatbot
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.utils import secure_filename
 from workers.shared.utils.opencopilot_utils.get_shared_filepath import UPLOAD_FOLDER
-
+from utils.swagger_parser import SwaggerParser
 
 copilot = Blueprint('copilot', __name__)
 
@@ -99,7 +98,7 @@ def validator(copilot_id):
                 swagger_content = file.read()
 
         swagger_data = json.loads(swagger_content)
-        parser = swagger_parser(swagger_data)
+        parser = SwaggerParser(swagger_data)
 
     except Exception as e:
         return jsonify({'error': 'invalid_swagger_file'}), 400

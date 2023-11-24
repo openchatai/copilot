@@ -79,3 +79,6 @@ class SwaggerParser:
             if scheme_type in [self.NONE, self.API_KEY, self.HTTP, self.OAUTH2]:
                 return scheme_type
         return None
+
+    def get_validations(self, endpoints):
+        pass
