@@ -8,12 +8,12 @@ from werkzeug.utils import secure_filename
 
 import routes._swagger.service as swagger_service
 from models.repository.copilot_repo import (list_all_with_filter, find_or_fail_by_bot_id, find_one_or_fail_by_id,
-                                            create_copilot, chatbot_to_dict)
+                                            create_copilot, chatbot_to_dict, SessionLocal)
 from utils.swagger_parser import SwaggerParser
 
 copilot = Blueprint('copilot', __name__)
 
-UPLOAD_FOLDER = '' # Todo: use the right folder or use upload files container
+UPLOAD_FOLDER = ''  # Todo: use the right folder or use upload files container
 
 
 @copilot.route('/', methods=['GET'])
@@ -54,19 +54,36 @@ def handle_swagger_file():
 def get_copilot(copilot_id):
     bot = find_one_or_fail_by_id(copilot_id)
 
+    if bot is None:
+        return jsonify({
+            'failure': 'chatbot_not_found'
+        }), 404
+
     return jsonify({
         'chatbot': chatbot_to_dict(bot)
     })
 
 
-@copilot.route('/<copilot_id>', methods=['DELETE'])
+@copilot.route('/<string:copilot_id>', methods=['DELETE'])
 def delete_bot(copilot_id):
-    bot = find_or_fail_by_bot_id(copilot_id)
-    bot.delete()
+    session = SessionLocal()
+    try:
+        # Find the bot
+        bot = find_or_fail_by_bot_id(copilot_id)
 
-    return jsonify({
-        'success': 'chatbot_deleted'
-    })
+        # Delete the bot using the session
+        session.delete(bot)
+        session.commit()
+        return jsonify({'success': 'chatbot_deleted'}), 200
+    except ValueError:
+        # If the bot is not found, a ValueError is raised
+        return jsonify({'failure': 'chatbot_not_found'}), 404
+    except SQLAlchemyError as e:
+        # Handle any SQLAlchemy errors
+        session.rollback()
+        return jsonify({'error': 'Database error', 'details': str(e)}), 500
+    finally:
+        session.close()
 
 
 @copilot.route('/<copilot_id>', methods=['POST', 'PATCH', 'PUT'])

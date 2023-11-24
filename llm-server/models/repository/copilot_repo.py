@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from typing import List, Optional, Any
+from typing import List, Optional, Any, Type
 
 from opencopilot_db.chatbot import Chatbot, engine
 from sqlalchemy import exc
@@ -103,7 +103,7 @@ def create_copilot(name: str,
         session.close()
 
 
-def find_one_or_fail_by_id(bot_id: bytes) -> Chatbot:
+def find_one_or_fail_by_id(bot_id: bytes) -> Type[Chatbot]:
     """
     Finds a Chatbot instance by its ID. Raises an exception if the Chatbot is not found.
 
@@ -133,6 +133,7 @@ def find_one_or_fail_by_id(bot_id: bytes) -> Chatbot:
 # Todo: move it to the model once we extract it from the module
 def chatbot_to_dict(chatbot):
     """Convert a Chatbot object to a dictionary."""
+
     return {
         "id": chatbot.id,  # Convert binary to hex string if id is binary
         "name": chatbot.name,
