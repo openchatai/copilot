@@ -1,23 +1,24 @@
-# copilot_controller.py
 import json
 import os
 import uuid
+import routes._swagger.service as swagger_service
+import utils.swagger_parser as swagger_parser
 
-import requests
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, jsonify, request
 from models.chatbot import Chatbot  # Adjust this import as necessary
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.utils import secure_filename
 from workers.shared.utils.opencopilot_utils.get_shared_filepath import UPLOAD_FOLDER
+
 
 copilot_workflow = Blueprint('copilot', __name__)
 
 
 @copilot_workflow.route('/copilots', methods=['GET'])
 def index():
-    chatbots = Chatbot.query.all()  # Fetch all chatbots, adjust query as needed
+    chatbots = Chatbot.query.all()
 
-    return jsonify([chatbot.to_dict() for chatbot in chatbots])  # Convert chatbots to dictionaries if needed
+    return jsonify([chatbot.to_dict() for chatbot in chatbots])
 
 
 @copilot_workflow.route('/copilot/swagger', methods=['POST'])
@@ -37,7 +38,6 @@ def handle_swagger_file():
                           swagger_url=filename,
                           prompt_message=request.form.get('prompt_message'),
                           website=request.form.get('website'))
-        # Add your DB commit logic here
 
         result = swagger_service.save_swaggerfile_to_mongo(filename, chatbot.id)
 
@@ -48,8 +48,8 @@ def handle_swagger_file():
 
 
 @copilot_workflow.route('/copilot/<id>', methods=['GET'])
-def general_settings(id):
-    bot = Chatbot.query.filter_by(id=id).first_or_404()
+def general_settings(copilot_id):
+    bot = Chatbot.query.filter_by(id=copilot_id).first_or_404()
 
     return jsonify({
         'chatbot': bot.to_dict()  # Convert chatbot to dictionary
@@ -57,8 +57,8 @@ def general_settings(id):
 
 
 @copilot_workflow.route('/copilot/<id>', methods=['DELETE'])
-def delete_bot(id):
-    bot = Chatbot.query.filter_by(id=id).first_or_404()
+def delete_bot(copilot_id):
+    bot = Chatbot.query.filter_by(id=copilot_id).first_or_404()
     bot.delete()
 
     return jsonify({
@@ -67,8 +67,8 @@ def delete_bot(id):
 
 
 @copilot_workflow.route('/copilot/<id>', methods=['POST', 'PATCH', 'PUT'])
-def general_settings_update(id):
-    bot = Chatbot.query.filter_by(id=id).first_or_404()
+def general_settings_update(copilot_id):
+    bot = Chatbot.query.filter_by(id=copilot_id).first_or_404()
 
     data = request.json
     if 'name' not in data or data['name'].strip() == '':
@@ -78,15 +78,16 @@ def general_settings_update(id):
     bot.prompt_message = data.get('prompt_message', 'AI_COPILOT_INITIAL_PROMPT')  # @todo Adjust default value as needed
 
     try:
-        bot.save()  # Adjust this to your ORM's save method
+        bot.save()
     except SQLAlchemyError as e:
         return jsonify({'error': str(e)}), 500
 
     return jsonify({'chatbot': bot.to_dict()})  # Convert chatbot to dictionary
 
+
 @copilot_workflow.route('/copilot/<id>/validator', methods=['GET'])
-def validator(id):
-    bot = Chatbot.query.filter_by(id=id).first_or_404()
+def validator(copilot_id):
+    bot = Chatbot.query.filter_by(id=copilot_id).first_or_404()
 
     try:
         swagger_url = bot.swagger_url  # Adjust attribute name as necessary
@@ -98,16 +99,15 @@ def validator(id):
                 swagger_content = file.read()
 
         swagger_data = json.loads(swagger_content)
-        parser = SwaggerParser(swagger_data)
+        parser = swagger_parser(swagger_data)
 
     except Exception as e:
         return jsonify({'error': 'invalid_swagger_file'}), 400
 
-    endpoints = parser.getEndpoints()
-    validations = parser.getValidations(endpoints)
+    endpoints = parser.get_endpoints()
+    validations = parser.get_validations(endpoints)
     return jsonify({
         'chatbot_id': bot.id,
         'all_endpoints': endpoints,
         'validations': validations
     })
-
