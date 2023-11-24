@@ -4,10 +4,12 @@ import uuid
 import routes._swagger.service as swagger_service
 
 from flask import Blueprint, jsonify, request
-from opencopilot_db.chatbot import Chatbot
+from models.repository.copilot_repo import list_all_with_filter, find_or_fail_by_bot_id, find_one_or_fail_by_id
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.utils import secure_filename
 from utils.swagger_parser import SwaggerParser
+from sqlalchemy.orm import sessionmaker
+
 
 copilot = Blueprint('copilot', __name__)
 
@@ -16,7 +18,7 @@ UPLOAD_FOLDER = ''
 
 @copilot.route('/', methods=['GET'])
 def index():
-    chatbots = Chatbot.query.all()
+    chatbots = list_all_with_filter()
 
     return jsonify([chatbot.to_dict() for chatbot in chatbots])
 
@@ -58,7 +60,7 @@ def general_settings(copilot_id):
 
 @copilot.route('/<copilot_id>', methods=['DELETE'])
 def delete_bot(copilot_id):
-    bot = Chatbot.query.filter_by(id=copilot_id).first_or_404()
+    bot = find_or_fail_by_bot_id(copilot_id)
     bot.delete()
 
     return jsonify({
@@ -68,7 +70,7 @@ def delete_bot(copilot_id):
 
 @copilot.route('/<copilot_id>', methods=['POST', 'PATCH', 'PUT'])
 def general_settings_update(copilot_id):
-    bot = Chatbot.query.filter_by(id=copilot_id).first_or_404()
+    bot = find_one_or_fail_by_id(copilot_id)
 
     data = request.json
     if 'name' not in data or data['name'].strip() == '':
