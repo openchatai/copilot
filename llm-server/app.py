@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, Response
 from models.repository.chat_history_repo import create_chat_history
 from routes.workflow.workflow_controller import workflow
+from routes.copilot.copilot_controller import copilot
 from routes.uploads.upload_controller import upload_controller
 from routes._swagger.controller import _swagger
 from routes.chat.chat_controller import chat_workflow
@@ -22,6 +23,7 @@ app = Flask(__name__)
 app.register_blueprint(workflow, url_prefix="/flows")
 app.register_blueprint(_swagger, url_prefix="/swagger_api")
 app.register_blueprint(chat_workflow, url_prefix="/chat")
+app.register_blueprint(copilot, url_prefix="/copilot")
 app.register_blueprint(upload_controller, url_prefix="/uploads")
 app.register_blueprint(datasource_workflow, url_prefix="/data_sources")
 

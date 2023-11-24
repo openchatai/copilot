@@ -1,7 +1,7 @@
 import uuid
 
 from opencopilot_db.database_setup import Base, engine
-from sqlalchemy import Column, String, DateTime, Boolean, Integer, Text, UUID, BINARY
+from sqlalchemy import Column, String, DateTime, BINARY
 import datetime
 
 

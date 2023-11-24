@@ -11,17 +11,17 @@ from werkzeug.utils import secure_filename
 from workers.shared.utils.opencopilot_utils.get_shared_filepath import UPLOAD_FOLDER
 
 
-copilot_workflow = Blueprint('copilot', __name__)
+copilot = Blueprint('copilot', __name__)
 
 
-@copilot_workflow.route('/copilots', methods=['GET'])
+@copilot.route('/copilots', methods=['GET'])
 def index():
     chatbots = Chatbot.query.all()
 
     return jsonify([chatbot.to_dict() for chatbot in chatbots])
 
 
-@copilot_workflow.route('/copilot/swagger', methods=['POST'])
+@copilot.route('/copilot/swagger', methods=['POST'])
 def handle_swagger_file():
     if 'swagger_file' not in request.files:
         return jsonify({"error": "No file part"}), 400
@@ -47,7 +47,7 @@ def handle_swagger_file():
         })
 
 
-@copilot_workflow.route('/copilot/<id>', methods=['GET'])
+@copilot.route('/copilot/<id>', methods=['GET'])
 def general_settings(copilot_id):
     bot = Chatbot.query.filter_by(id=copilot_id).first_or_404()
 
@@ -56,7 +56,7 @@ def general_settings(copilot_id):
     })
 
 
-@copilot_workflow.route('/copilot/<id>', methods=['DELETE'])
+@copilot.route('/copilot/<id>', methods=['DELETE'])
 def delete_bot(copilot_id):
     bot = Chatbot.query.filter_by(id=copilot_id).first_or_404()
     bot.delete()
@@ -66,7 +66,7 @@ def delete_bot(copilot_id):
     })
 
 
-@copilot_workflow.route('/copilot/<id>', methods=['POST', 'PATCH', 'PUT'])
+@copilot.route('/copilot/<id>', methods=['POST', 'PATCH', 'PUT'])
 def general_settings_update(copilot_id):
     bot = Chatbot.query.filter_by(id=copilot_id).first_or_404()
 
@@ -85,7 +85,7 @@ def general_settings_update(copilot_id):
     return jsonify({'chatbot': bot.to_dict()})  # Convert chatbot to dictionary
 
 
-@copilot_workflow.route('/copilot/<id>/validator', methods=['GET'])
+@copilot.route('/copilot/<id>/validator', methods=['GET'])
 def validator(copilot_id):
     bot = Chatbot.query.filter_by(id=copilot_id).first_or_404()
 
