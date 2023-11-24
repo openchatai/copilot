@@ -78,7 +78,7 @@ def create_copilot(name: str,
         Exception: If any exception occurs during the database operation.
     """
     session: Session = SessionLocal()
-    token = 'random' #todo random generation
+    token = 'random'  # todo random generation
     new_chatbot = Chatbot(
         id=uuid.uuid4().bytes,
         name=name,
@@ -128,3 +128,14 @@ def find_one_or_fail_by_id(bot_id: bytes) -> Chatbot:
         print(f"Error occurred: {e}")
     finally:
         session.close()
+
+
+# Todo: move it to the model once we extract it from the module
+def chatbot_to_dict(chatbot):
+    """Convert a Chatbot object to a dictionary."""
+    return {
+        "id": chatbot.id,  # Convert binary to hex string if id is binary
+        "name": chatbot.name,
+        "token": chatbot.token,
+        "website": chatbot.website,
+    }

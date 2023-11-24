@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 
 import routes._swagger.service as swagger_service
 from models.repository.copilot_repo import (list_all_with_filter, find_or_fail_by_bot_id, find_one_or_fail_by_id,
-                                            create_copilot)
+                                            create_copilot, chatbot_to_dict)
 from utils.swagger_parser import SwaggerParser
 
 copilot = Blueprint('copilot', __name__)
@@ -20,7 +20,7 @@ UPLOAD_FOLDER = ''
 def index():
     chatbots = list_all_with_filter()
 
-    return jsonify([chatbot.to_dict() for chatbot in chatbots])
+    return jsonify([chatbot_to_dict(chatbot) for chatbot in chatbots])
 
 
 @copilot.route('/swagger', methods=['POST'])
@@ -31,11 +31,10 @@ def handle_swagger_file():
     file = request.files['swagger_file']
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
-    if file:  # Add your file validation logic here if needed
+    if file:
         filename = secure_filename(str(uuid.uuid4()) + ".json")
         file.save(os.path.join(UPLOAD_FOLDER, filename))
 
-        # Create Chatbot instance and save to DB (adjust as per your application logic)
         chatbot = create_copilot(
             name=request.form.get('name'),
             swagger_url=filename,
