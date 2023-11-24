@@ -18,15 +18,11 @@ from typing import Dict, Any, cast
 from routes.workflow.utils.router import get_action_type
 from utils.chat_models import CHAT_MODELS
 from utils.db import Database
-import json
 from models.repository.chat_history_repo import get_chat_history_for_retrieval_chain
 from utils.get_chat_model import get_chat_model
 from utils.process_app_state import process_state
 from prance import ResolvingParser
-from utils.vector_db.add_workflow import add_workflow_data_to_qdrant
-from uuid import uuid4
 from langchain.docstore.document import Document
-import traceback
 from langchain.schema import HumanMessage, SystemMessage
 from opencopilot_utils.get_vector_store import get_vector_store
 from langchain.vectorstores.base import VectorStore
@@ -64,13 +60,11 @@ def handle_request(data: Dict[str, Any]) -> Any:
 
     log_user_request(text)
     check_required_fields(base_prompt, text, swagger_url)
-    swagger_doc = None
     try:
         action = get_action_type(text, bot_id, session_id)
         logging.info(f"Triggered action: {action}")
         if action == ActionType.ASSISTANT_ACTION:
             current_state = process_state(app, headers)
-            # document = None
             swagger_doc = get_swagger_doc(swagger_url)
 
             document, score = check_workflow_in_store(text, bot_id)
