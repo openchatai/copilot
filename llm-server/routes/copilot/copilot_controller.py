@@ -1,15 +1,15 @@
 import json
 import os
 import uuid
-import routes._swagger.service as swagger_service
 
 from flask import Blueprint, jsonify, request
-from models.repository.copilot_repo import list_all_with_filter, find_or_fail_by_bot_id, find_one_or_fail_by_id
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.utils import secure_filename
-from utils.swagger_parser import SwaggerParser
-from sqlalchemy.orm import sessionmaker
 
+import routes._swagger.service as swagger_service
+from models.repository.copilot_repo import (list_all_with_filter, find_or_fail_by_bot_id, find_one_or_fail_by_id,
+                                            create_copilot)
+from utils.swagger_parser import SwaggerParser
 
 copilot = Blueprint('copilot', __name__)
 
@@ -36,10 +36,12 @@ def handle_swagger_file():
         file.save(os.path.join(UPLOAD_FOLDER, filename))
 
         # Create Chatbot instance and save to DB (adjust as per your application logic)
-        chatbot = Chatbot(name=request.form.get('name'),
-                          swagger_url=filename,
-                          prompt_message=request.form.get('prompt_message'),
-                          website=request.form.get('website'))
+        chatbot = create_copilot(
+            name=request.form.get('name'),
+            swagger_url=filename,
+            prompt_message=request.form.get('prompt_message'),
+            website=request.form.get('website')
+        )
 
         result = swagger_service.save_swaggerfile_to_mongo(filename, chatbot.id)
 
@@ -50,11 +52,11 @@ def handle_swagger_file():
 
 
 @copilot.route('/<copilot_id>', methods=['GET'])
-def general_settings(copilot_id):
-    bot = Chatbot.query.filter_by(id=copilot_id).first_or_404()
+def get_copilot(copilot_id):
+    bot = find_one_or_fail_by_id(copilot_id)
 
     return jsonify({
-        'chatbot': bot.to_dict()  # Convert chatbot to dictionary
+        'chatbot': bot.to_dict()  # todo Convert chatbot to dictionary
     })
 
 
@@ -89,7 +91,7 @@ def general_settings_update(copilot_id):
 
 @copilot.route('/<copilot_id>/validator', methods=['GET'])
 def validator(copilot_id):
-    bot = Chatbot.query.filter_by(id=copilot_id).first_or_404()
+    bot = find_one_or_fail_by_id(copilot_id)
 
     try:
         swagger_url = bot.swagger_url  # Adjust attribute name as necessary
