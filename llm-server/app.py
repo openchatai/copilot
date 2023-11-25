@@ -18,12 +18,13 @@ from opencopilot_db import create_database_schema
 create_database_schema()
 
 app = Flask(__name__)
-app.register_blueprint(workflow, url_prefix="/flows")
-app.register_blueprint(_swagger, url_prefix="/swagger_api")
-app.register_blueprint(chat_workflow, url_prefix="/chat")
-app.register_blueprint(copilot, url_prefix="/copilot")
-app.register_blueprint(upload_controller, url_prefix="/uploads")
-app.register_blueprint(datasource_workflow, url_prefix="/data_sources")
+app.url_map.strict_slashes = False
+app.register_blueprint(workflow, url_prefix="/backend/flows")
+app.register_blueprint(_swagger, url_prefix="/backend/swagger_api")
+app.register_blueprint(chat_workflow, url_prefix="/backend/chat")
+app.register_blueprint(copilot, url_prefix="/backend/copilot")
+app.register_blueprint(upload_controller, url_prefix="/backend/uploads")
+app.register_blueprint(datasource_workflow, url_prefix="/backend/data_sources")
 
 app.config.from_object(Config)
 from routes.root_service import extract_data, handle_request
