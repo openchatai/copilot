@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 from enums.initial_prompt import ChatBotInitialPromptEnum
 import routes._swagger.service as swagger_service
 from models.repository.copilot_repo import (list_all_with_filter, find_or_fail_by_bot_id, find_one_or_fail_by_id,
-                                            create_copilot, chatbot_to_dict, SessionLocal)
+                                            create_copilot, chatbot_to_dict, SessionLocal, update_copilot)
 from utils.swagger_parser import SwaggerParser
 
 copilot = Blueprint('copilot', __name__)
@@ -90,21 +90,35 @@ def delete_bot(copilot_id):
 
 @copilot.route('/<string:copilot_id>', methods=['POST', 'PATCH', 'PUT'])
 def general_settings_update(copilot_id):
-    bot = find_one_or_fail_by_id(copilot_id)
-
-    data = request.json
-    if 'name' not in data or data['name'].strip() == '':
-        return jsonify({'error': 'Name is required'}), 400
-
-    bot.name = data['name']
-    bot.prompt_message = data.get('prompt_message', ChatBotInitialPromptEnum.AI_COPILOT_INITIAL_PROMPT)
-
     try:
-        bot.save()
-    except SQLAlchemyError as e:
-        return jsonify({'error': str(e)}), 500
+        # Ensure the chatbot exists
+        find_one_or_fail_by_id(copilot_id)
 
-    return jsonify({'chatbot': bot.to_dict()})  # Convert chatbot to dictionary
+        data = request.json
+
+        # Validate required 'name' field
+        if 'name' not in data or not data.get('name').strip():
+            return jsonify({'error': 'Name is required'}), 400
+
+        # Call update_copilot with the provided data
+        updated_copilot = update_copilot(
+            copilot_id=copilot_id,
+            name=data.get('name'),
+            prompt_message=data.get('prompt_message'),
+            swagger_url=data.get('swagger_url'),
+            enhanced_privacy=data.get('enhanced_privacy'),
+            smart_sync=data.get('smart_sync'),
+            website=data.get('website')
+        )
+
+        # Return the updated chatbot information
+        return jsonify({'chatbot': updated_copilot})
+    except ValueError as e:
+        # Handle not found error
+        return jsonify({'error': str(e)}), 404
+    except Exception as e:
+        # Handle other exceptions
+        return jsonify({'error': 'An error occurred', 'details': str(e)}), 500
 
 
 @copilot.route('/<string:copilot_id>/validator', methods=['GET'])

@@ -146,3 +146,65 @@ def chatbot_to_dict(chatbot):
         "token": chatbot.token,
         "website": chatbot.website,
     }
+
+
+def update_copilot(copilot_id: str,
+                   name: Optional[str] = None,
+                   prompt_message: Optional[str] = None,
+                   swagger_url: Optional[str] = None,
+                   enhanced_privacy: Optional[bool] = None,
+                   smart_sync: Optional[bool] = None,
+                   website: Optional[str] = None) -> dict[str, Any]:
+    """
+    Updates an existing Chatbot instance in the database.
+
+    Args:
+        copilot_id (str): The ID of the Chatbot to update.
+        name (Optional[str]): New name for the chatbot, if provided.
+        website (Optional[str]): New website URL for the chatbot, if provided.
+        prompt_message (Optional[str]): New default prompt message for the chatbot, if provided.
+        swagger_url (Optional[str]): New URL for the chatbot's Swagger documentation, if provided.
+        enhanced_privacy (Optional[bool]): New flag to indicate enhanced privacy, if provided.
+        smart_sync (Optional[bool]): New flag for smart synchronization, if provided.
+
+    Returns:
+        dict[str, Any]: The updated Chatbot instance.
+
+    Raises:
+        ValueError: If the Chatbot with the given ID is not found.
+        Exception: If any exception occurs during the database operation.
+    """
+    session: Session = SessionLocal()
+
+    try:
+        # Fetch the existing Chatbot
+        chatbot = session.query(Chatbot).filter(Chatbot.id == copilot_id).one()
+
+        # Update fields if new values are provided
+        if name is not None:
+            chatbot.name = name
+        if prompt_message is not None:
+            chatbot.prompt_message = prompt_message
+        if swagger_url is not None:
+            chatbot.swagger_url = swagger_url
+        if enhanced_privacy is not None:
+            chatbot.enhanced_privacy = enhanced_privacy
+        if smart_sync is not None:
+            chatbot.smart_sync = smart_sync
+        if website is not None:
+            chatbot.website = website
+
+        chatbot.updated_at = datetime.datetime.utcnow()
+
+        session.commit()
+        return chatbot_to_dict(chatbot)
+    except exc.NoResultFound:
+        session.rollback()
+        raise ValueError(f"No Chatbot found with id: {copilot_id}")
+    except Exception as e:
+        session.rollback()
+        struct_log.exception(
+            app="OPENCOPILOT", error=str(e), event="update_copilot"
+        )
+    finally:
+        session.close()
