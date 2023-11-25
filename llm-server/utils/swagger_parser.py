@@ -12,6 +12,18 @@ class Endpoint:
         self.response = response
         self.path = path
 
+    def to_dict(self):
+        return {
+            "operation_id": self.operation_id,
+            "type": self.type,
+            "name": self.name,
+            "description": self.description,
+            "request_body": self.request_body,
+            "request_parameters": self.request_parameters,
+            "response": self.response,
+            "path": self.path
+        }
+
 
 def get_post_endpoints_without_request_body(endpoints):
     return [endpoint for endpoint in endpoints if endpoint.type == 'POST' and not endpoint.request_body]

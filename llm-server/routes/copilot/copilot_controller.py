@@ -157,6 +157,6 @@ def validator(copilot_id):
     validations = parser.get_validations(endpoints)
     return jsonify({
         'chatbot_id': bot.id,
-        'all_endpoints': endpoints,
+        'all_endpoints': [endpoint.to_dict() for endpoint in endpoints],
         'validations': validations
     })
