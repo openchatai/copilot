@@ -3,6 +3,7 @@ import os
 import uuid
 
 from flask import Blueprint, jsonify, request
+from prance import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.utils import secure_filename
 from enums.initial_prompt import ChatBotInitialPromptEnum
@@ -32,22 +33,27 @@ def handle_swagger_file():
     if file.filename == '':
         return jsonify({"error": "No selected file."}), 400
     if file:
-        filename = secure_filename(str(uuid.uuid4()) + ".json")
-        file.save(os.path.join(UPLOAD_FOLDER, filename))
+        try:
+            filename = secure_filename(str(uuid.uuid4()) + ".json")
+            file.save(os.path.join(UPLOAD_FOLDER, filename))
 
-        chatbot = create_copilot(
-            name=request.form.get('name', 'My First Copilot'),
-            swagger_url=filename,
-            prompt_message=request.form.get('prompt_message', ChatBotInitialPromptEnum.AI_COPILOT_INITIAL_PROMPT),
-            website=request.form.get('website', 'https://example.com')
-        )
+            chatbot = create_copilot(
+                name=request.form.get('name', 'My First Copilot'),
+                swagger_url=filename,
+                prompt_message=request.form.get('prompt_message', ChatBotInitialPromptEnum.AI_COPILOT_INITIAL_PROMPT),
+                website=request.form.get('website', 'https://example.com')
+            )
 
-        result = swagger_service.save_swaggerfile_to_mongo(filename, chatbot.get('id'))
+            result = swagger_service.save_swaggerfile_to_mongo(filename, chatbot.get('id'))
+        except ValidationError as e:
+            return jsonify({'failure': str(e)}), 400
 
         return jsonify({
             'file_name': filename,
             'chatbot': chatbot
         })
+
+    return jsonify({'failure': 'could_not_handle_swagger_file'}), 400
 
 
 @copilot.route('/<string:copilot_id>', methods=['GET'])
