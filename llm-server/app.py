@@ -27,7 +27,7 @@ app.register_blueprint(upload_controller, url_prefix="/backend/uploads")
 app.register_blueprint(datasource_workflow, url_prefix="/backend/data_sources")
 
 app.config.from_object(Config)
-from routes.root_service import extract_data, handle_request
+from routes.root_service import handle_request
 
 init_qdrant_collections()
 

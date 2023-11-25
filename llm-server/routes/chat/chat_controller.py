@@ -76,13 +76,18 @@ def init_chat():
 @chat_workflow.route('/send', methods=['POST'])
 def send_chat():
     data = request.get_json()
-    content = request.json.get('content')
-    if not content or len(content) > 255:
-        abort(400, description="Invalid content, the size is larger than 255 char")
-
+    message = request.json.get('content')
     bot_token = request.headers.get('X-Bot-Token')
 
+    if not message or len(message) > 255:
+        abort(400, description="Invalid content, the size is larger than 255 char")
+
     bot = find_one_or_fail_by_token(bot_token)
+
+    session_id = request.headers.get('X-Session-Id', '')
+    swagger_url = bot.swagger_url
+    headers = request.headers
+    base_prompt = bot.prompt_message
 
     if not bot:
         return jsonify({
@@ -93,7 +98,15 @@ def send_chat():
         }), 404
 
     try:
-        response_data = root_service.handle_request(data)
+        response_data = root_service.handle_request(
+            text=message,
+            swagger_url=swagger_url,
+            session_id= session_id,
+            base_prompt=base_prompt,
+            bot_id=bot.id,
+            headers=headers,
+
+        )
 
         return jsonify({
             "type": "text",

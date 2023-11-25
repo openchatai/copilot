@@ -45,17 +45,14 @@ FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
 chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo)
 
 
-def handle_request(data: Dict[str, Any]) -> Any:
-    (
-        text,
-        swagger_url,
-        session_id,
-        base_prompt,
-        headers,
-        server_base_url,
-        app,
-        bot_id,
-    ) = extract_data(data)
+def handle_request(text,
+                   swagger_url,
+                   session_id,
+                   base_prompt,
+                   headers,
+                   server_base_url,
+                   app,
+                   bot_id, ) -> Any:
 
     log_user_request(text)
     check_required_fields(base_prompt, text, swagger_url)
