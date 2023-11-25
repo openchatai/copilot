@@ -118,7 +118,7 @@ const generateSwaggerDefinition = (formData: FormValuesWithId[]) => {
     _.set(swaggerDefinition.paths, [url, pathId], {
       summary,
       description: summary,
-      operationId: pathId,
+      operationId: _.camelCase(title),
       parameters: _.map(parameters, (value, key) => ({
         name: key,
         in: 'query',
@@ -238,16 +238,16 @@ function UploadSwaggerStep() {
         You copilot will use these APIs to communicate with your product and
         execute actions
       </p>
-      <Tabs defaultValue="upload">
+      <Tabs defaultValue="swagger-form">
         <TabsList className="relative">
-          <TabsTrigger value="upload" className="flex-1">
-            Upload Swagger
+          <TabsTrigger value="swagger-form" className="flex-1">
+            Via UI
           </TabsTrigger>
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none rounded-full bg-muted p-1.5 text-sm font-semibold uppercase text-accent-foreground">
             OR
           </div>
-          <TabsTrigger value="swagger-form" className="flex-1">
-            Swagger Def.
+          <TabsTrigger value="upload" className="flex-1">
+            Upload Swagger
           </TabsTrigger>
         </TabsList>
         <TabsContent value="upload" className="min-h-[10rem]">
