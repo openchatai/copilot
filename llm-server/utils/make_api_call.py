@@ -1,5 +1,5 @@
 import requests
-from typing import Any, Dict
+from typing import Any, Dict, Optional, List
 from requests import Response
 import logging
 
@@ -25,39 +25,36 @@ def replace_url_placeholders(url: str, values_dict: Dict[str, Any]) -> str:
 
 
 def make_api_request(
-    method,
-    endpoint,
-    body_schema,
-    path_params,
-    query_params,
-    headers,
-    servers,
+    method: str,
+    endpoint: str,
+    body_schema: Optional[Dict[str, Any]],
+    path_params: Optional[Dict[str, str]],
+    query_params: Optional[Dict[str, Any]],
+    headers: Dict[str, str],
+    servers: List[str],
 ) -> Response:
+    url = servers[0] + endpoint
     try:
-        endpoint = replace_url_placeholders(endpoint, path_params)
+        endpoint = replace_url_placeholders(endpoint, path_params or {})
         print(f"Endpoint: {endpoint}")
-        url = servers[0] + endpoint
-        # Create a session and configure it with headers
-        session = requests.Session()
 
-        # Add the "Content-Type" header with the value "application/json" to the headers
+        session = requests.Session()
         headers["Content-Type"] = "application/json"
 
         if headers:
             session.headers.update(headers)
-        # Perform the HTTP request based on the request type
+
         if method == "GET":
-            response = session.get(url, params=query_params)
+            response = session.get(url, params=query_params or {})
         elif method == "POST":
-            response = session.post(url, json=body_schema, params=query_params)
+            response = session.post(url, json=body_schema, params=query_params or {})
         elif method == "PUT":
-            response = session.put(url, json=body_schema, params=query_params)
+            response = session.put(url, json=body_schema, params=query_params or {})
         elif method == "DELETE":
-            response = session.delete(url, params=query_params)
+            response = session.delete(url, params=query_params or {})
         else:
             raise ValueError("Invalid request type. Use GET, POST, PUT, or DELETE.")
 
-        # Raise an exception for HTTP errors (4xx and 5xx)
         response.raise_for_status()
 
         return response
@@ -69,9 +66,9 @@ def make_api_request(
             extra={
                 "headers": headers,
                 "url": url,
-                "params": path_params,
-                "query_params": query_params,
+                "params": path_params or {},
+                "query_params": query_params or {},
                 "method": method,
             },
         )
-        raise (e)
+        raise e

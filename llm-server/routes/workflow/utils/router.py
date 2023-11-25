@@ -1,6 +1,5 @@
-import os, logging, json
-from typing import Any
-from langchain.schema import HumanMessage, SystemMessage
+import os
+from langchain.schema import HumanMessage, SystemMessage, BaseMessage
 
 # push it to the library
 from opencopilot_utils.get_vector_store import get_vector_store
@@ -9,8 +8,7 @@ from custom_types.action_type import ActionType
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from utils.chat_models import CHAT_MODELS
 from utils import get_chat_model
-from typing import Optional, Tuple, List
-from langchain.docstore.document import Document
+from typing import Optional, List
 from langchain.vectorstores.base import VectorStore
 from utils import struct_log
 
@@ -43,12 +41,14 @@ def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
         return None
 
 
-def classify_text(user_requirement: str, context: str, session_id: str) -> ActionType:
-    prev_conversations = []
+def classify_text(
+    user_requirement: str, context: Optional[str], session_id: str
+) -> ActionType:
+    prev_conversations: List[BaseMessage] = []
     if session_id:
         prev_conversations = get_chat_message_as_llm_conversation(session_id)
 
-    messages = [
+    messages: List[BaseMessage] = [
         SystemMessage(
             content=f"""You are a classification model, which when given user input can classify it into one of the three types below. If the user asks you to list something, show or delete something. You should output {ActionType.ASSISTANT_ACTION.value} because these require making api calls.  {ActionType.KNOWLEDGE_BASE_QUERY.value}"""
         )

@@ -1,4 +1,4 @@
-from typing import Any, List, Dict
+from typing import List
 from routes.workflow.utils.get_swagger_op_by_id import get_operation_by_id
 from prance import ResolvingParser
 from opencopilot_types.workflow_type import (
@@ -11,7 +11,7 @@ from opencopilot_types.workflow_type import (
 def create_workflow_from_operation_ids(
     op_ids: List[str], swagger_doc: ResolvingParser, user_input: str
 ) -> WorkflowDataType:
-    flows = []
+    flows: List[WorkflowFlowType] = []
 
     for op_id in op_ids:
         operation = get_operation_by_id(swagger_doc, op_id)
@@ -35,6 +35,7 @@ def create_workflow_from_operation_ids(
         "opencopilot": "0.1",
         "info": {"title": user_input, "version": "1.0.0"},
         "flows": flows,
+        "swagger_url": None,
     }
 
     return workflow

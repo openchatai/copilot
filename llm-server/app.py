@@ -4,17 +4,15 @@ from routes.workflow.workflow_controller import workflow
 from routes.uploads.upload_controller import upload_controller
 from routes._swagger.controller import _swagger
 from routes.chat.chat_controller import chat_workflow
-from typing import Any, Tuple
 from utils.config import Config
 from utils.get_logger import struct_log
-from flask_cors import CORS
 from routes.data_source.data_source_controller import datasource_workflow
 from dotenv import load_dotenv
-
+from opencopilot_db import create_database_schema
 from utils.vector_store_setup import init_qdrant_collections
+from routes.root_service import handle_request
 
 load_dotenv()
-from opencopilot_db import create_database_schema
 
 create_database_schema()
 
@@ -26,7 +24,6 @@ app.register_blueprint(upload_controller, url_prefix="/uploads")
 app.register_blueprint(datasource_workflow, url_prefix="/data_sources")
 
 app.config.from_object(Config)
-from routes.root_service import extract_data, handle_request
 
 init_qdrant_collections()
 
