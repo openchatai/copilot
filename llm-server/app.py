@@ -1,15 +1,13 @@
-from flask import Flask, request, jsonify, Response
-from models.repository.chat_history_repo import create_chat_history
-from routes.workflow.workflow_controller import workflow
-from routes.copilot.copilot_controller import copilot
-from routes.uploads.upload_controller import upload_controller
+from dotenv import load_dotenv
+from flask import Flask
+
 from routes._swagger.controller import _swagger
 from routes.chat.chat_controller import chat_workflow
-from utils.config import Config
-from utils.get_logger import struct_log
+from routes.copilot.copilot_controller import copilot
 from routes.data_source.data_source_controller import datasource_workflow
-from dotenv import load_dotenv
-
+from routes.uploads.upload_controller import upload_controller
+from routes.workflow.workflow_controller import workflow
+from utils.config import Config
 from utils.vector_store_setup import init_qdrant_collections
 
 load_dotenv()
