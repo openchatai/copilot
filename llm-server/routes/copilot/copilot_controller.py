@@ -5,7 +5,7 @@ import uuid
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.utils import secure_filename
-
+from enums.initial_prompt import ChatBotInitialPromptEnum
 import routes._swagger.service as swagger_service
 from models.repository.copilot_repo import (list_all_with_filter, find_or_fail_by_bot_id, find_one_or_fail_by_id,
                                             create_copilot, chatbot_to_dict, SessionLocal)
@@ -38,7 +38,7 @@ def handle_swagger_file():
         chatbot = create_copilot(
             name=request.form.get('name', 'My First Copilot'),
             swagger_url=filename,
-            prompt_message=request.form.get('prompt_message', 'PROMPT'), # todo: copilot prompt enum
+            prompt_message=request.form.get('prompt_message', ChatBotInitialPromptEnum.AI_COPILOT_INITIAL_PROMPT),
             website=request.form.get('website', 'https://example.com')
         )
 
@@ -97,7 +97,7 @@ def general_settings_update(copilot_id):
         return jsonify({'error': 'Name is required'}), 400
 
     bot.name = data['name']
-    bot.prompt_message = data.get('prompt_message', 'AI_COPILOT_INITIAL_PROMPT')  # @todo Adjust default value as needed
+    bot.prompt_message = data.get('prompt_message', ChatBotInitialPromptEnum.AI_COPILOT_INITIAL_PROMPT)
 
     try:
         bot.save()
