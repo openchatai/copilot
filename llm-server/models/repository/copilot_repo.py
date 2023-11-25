@@ -109,12 +109,12 @@ def create_copilot(name: str,
         session.close()
 
 
-def find_one_or_fail_by_id(bot_id: bytes) -> Type[Chatbot]:
+def find_one_or_fail_by_id(bot_id: str) -> Type[Chatbot]:
     """
     Finds a Chatbot instance by its ID. Raises an exception if the Chatbot is not found.
 
     Args:
-        bot_id (bytes): The unique identifier of the Chatbot.
+        bot_id (str): The unique identifier of the Chatbot.
 
     Returns:
         Chatbot: The found Chatbot instance.
@@ -125,10 +125,37 @@ def find_one_or_fail_by_id(bot_id: bytes) -> Type[Chatbot]:
     """
     session: Session = SessionLocal()
     try:
-        bot = session.query(Chatbot).filter(Chatbot.id == bot_id).one()
+        bot = session.query(Chatbot).filter(Chatbot.id == str(bot_id)).one()
         return bot
     except exc.NoResultFound:
         raise ValueError(f"No Chatbot found with id: {bot_id}")
+    except Exception as e:
+        session.rollback()
+        print(f"Error occurred: {e}")
+    finally:
+        session.close()
+
+
+def find_one_or_fail_by_token(bot_token: str) -> Type[Chatbot]:
+    """
+    Finds a Chatbot instance by its ID. Raises an exception if the Chatbot is not found.
+
+    Args:
+        bot_token: The unique identifier of the Chatbot.
+
+    Returns:
+        Chatbot: The found Chatbot instance.
+
+    Raises:
+        ValueError: If no Chatbot is found with the provided ID.
+        Exception: If any other exception occurs during the database operation.
+    """
+    session: Session = SessionLocal()
+    try:
+        bot = session.query(Chatbot).filter(Chatbot.token == str(bot_token)).one()
+        return bot
+    except exc.NoResultFound:
+        raise ValueError(f"No Chatbot found with token: {bot_token}")
     except Exception as e:
         session.rollback()
         print(f"Error occurred: {e}")
@@ -141,7 +168,8 @@ def chatbot_to_dict(chatbot):
     """Convert a Chatbot object to a dictionary."""
 
     return {
-        "id": chatbot.id.hex() if isinstance(chatbot.id, bytes) else chatbot.id,  # Converts binary to hex string if id is binary
+        "id": chatbot.id.hex() if isinstance(chatbot.id, bytes) else chatbot.id,
+        # Converts binary to hex string if id is binary
         "name": chatbot.name,
         "token": chatbot.token,
         "website": chatbot.website,
@@ -149,11 +177,15 @@ def chatbot_to_dict(chatbot):
         "prompt_message": chatbot.prompt_message,
         "enhanced_privacy": chatbot.enhanced_privacy,
         "smart_sync": chatbot.smart_sync,
-        "created_at": chatbot.created_at.isoformat() if chatbot.created_at else None,  # Converts datetime to ISO format string
-        "updated_at": chatbot.updated_at.isoformat() if chatbot.updated_at else None,  # Converts datetime to ISO format string
-        "deleted_at": chatbot.deleted_at.isoformat() if chatbot.deleted_at else None,  # Converts datetime to ISO format string
+        "created_at": chatbot.created_at.isoformat() if chatbot.created_at else None,
+        # Converts datetime to ISO format string
+        "updated_at": chatbot.updated_at.isoformat() if chatbot.updated_at else None,
+        # Converts datetime to ISO format string
+        "deleted_at": chatbot.deleted_at.isoformat() if chatbot.deleted_at else None,
+        # Converts datetime to ISO format string
         "swagger_url": chatbot.swagger_url,
     }
+
 
 def update_copilot(copilot_id: str,
                    name: Optional[str] = None,

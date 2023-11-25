@@ -4,6 +4,7 @@ from models.repository.chat_history_repo import (
 )
 from opencopilot_db.chatbot import Chatbot
 
+from models.repository.copilot_repo import find_one_or_fail_by_id, find_one_or_fail_by_token
 from utils.db import Database
 from flask import jsonify, Blueprint, request, Response, abort
 from .. import root_service
@@ -53,7 +54,7 @@ def get_chat_sessions(bot_id: str) -> Response:
 def init_chat():
     bot_token = request.headers.get('X-Bot-Token')
 
-    bot = Chatbot.query.filter_by(token=bot_token).first()
+    bot = find_one_or_fail_by_token(bot_token)
 
     if not bot:
         return jsonify({
@@ -81,7 +82,7 @@ def send_chat():
 
     bot_token = request.headers.get('X-Bot-Token')
 
-    bot = Chatbot.query.filter_by(token=bot_token).first()
+    bot = find_one_or_fail_by_token(bot_token)
 
     if not bot:
         return jsonify({
