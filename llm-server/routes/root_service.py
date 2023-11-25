@@ -45,16 +45,15 @@ FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
 chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo)
 
 
-def handle_request(
-    text,
-    swagger_url,
-    session_id,
-    base_prompt,
-    headers,
-    server_base_url,
-    app,
-    bot_id,
-) -> Any:
+def handle_request(text,
+                   swagger_url,
+                   session_id,
+                   base_prompt,
+                   headers,
+                   server_base_url,
+                   app,
+                   bot_id, ) -> Any:
+
     log_user_request(text)
     check_required_fields(base_prompt, text, swagger_url)
     try:
@@ -64,7 +63,7 @@ def handle_request(
             current_state = process_state(app, headers)
             swagger_doc = get_swagger_doc(swagger_url)
 
-            document = check_workflow_in_store(text, bot_id)
+            document, score = check_workflow_in_store(text, bot_id)
             if document:
                 return handle_existing_workflow(
                     document,
@@ -177,7 +176,7 @@ def get_qa_prompt_by_mode(mode: str, initial_prompt: Optional[str]) -> str:
 
 
 def getConversationRetrievalChain(
-    vector_store: VectorStore, mode, initial_prompt: str, bot_id: str
+        vector_store: VectorStore, mode, initial_prompt: str, bot_id: str
 ):
     llm = get_llm()
     # template = get_qa_prompt_by_mode(mode, initial_prompt=initial_prompt)
@@ -208,14 +207,14 @@ def getConversationRetrievalChain(
     return chain
 
 
-def extract_data(data: Dict[str, Any]):
+def extract_data(data: Dict[str, Any]) -> Tuple:
     text = cast(str, data.get("text"))
     swagger_url = cast(str, data.get("swagger_url", ""))
     session_id = cast(str, data.get("session_id", ""))
     base_prompt = data.get("base_prompt", "")
     headers = data.get("headers", {})
     server_base_url = cast(str, data.get("server_base_url", ""))
-    app: Optional[str] = headers.get("X-App-Name") or None
+    app = headers.get("X-App-Name") or None
     bot_id = data.get("bot_id", None)
     return (
         text,
@@ -258,15 +257,15 @@ def get_swagger_doc(swagger_url: str) -> ResolvingParser:
 
 
 def handle_existing_workflow(
-    document: Document,  # lagnchaing
-    text: str,
-    headers: Dict[str, Any],
-    server_base_url: str,
-    swagger_url: str,
-    app: str,
-    swagger_doc: ResolvingParser,
-    session_id: str,
-    bot_id: str,
+        document: Document,  # lagnchaing
+        text: str,
+        headers: Dict[str, Any],
+        server_base_url: str,
+        swagger_url: str,
+        app: str,
+        swagger_doc: ResolvingParser,
+        session_id: str,
+        bot_id: str,
 ) -> Dict[str, Any]:
     # use user defined workflows if exists, if not use auto_gen_workflow
     _workflow = mongo.workflows.find_one(
@@ -289,15 +288,15 @@ def handle_existing_workflow(
 
 
 def handle_api_calls(
-    ids: List[str],
-    swagger_doc: ResolvingParser,
-    text: str,
-    headers: Dict[str, Any],
-    server_base_url: str,
-    swagger_url: str,
-    app: str,
-    session_id: str,
-    bot_id: str,
+        ids: List[str],
+        swagger_doc: ResolvingParser,
+        text: str,
+        headers: Dict[str, Any],
+        server_base_url: str,
+        swagger_url: str,
+        app: str,
+        session_id: str,
+        bot_id: str,
 ) -> Dict[str, Any]:
     _workflow = create_workflow_from_operation_ids(ids, swagger_doc, text)
     output = run_workflow(

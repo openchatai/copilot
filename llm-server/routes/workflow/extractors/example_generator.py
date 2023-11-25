@@ -1,8 +1,16 @@
 from typing import Any, Dict, List, Union
+
 import json
+from jsonschema import Draft7Validator, exceptions
+from faker import Faker
 import random
 
+fake = Faker()
+from typing import Any, Dict, List, Union
+import json
+from jsonschema import Draft7Validator, exceptions
 from faker import Faker
+import random
 
 fake = Faker()
 
@@ -88,4 +96,4 @@ def generate_example_json(
 
 
 def gen_ex_from_schema(schema: Any) -> Any:
-    return json.dumps(generate_example_json(schema), separators=(",", ":"))
+    return json.dumps(generate_example_json(schema), separators=(',', ':'))

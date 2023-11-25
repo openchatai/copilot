@@ -1,5 +1,4 @@
 from langchain.chat_models import ChatOpenAI
-from langchain.chat_models.base import BaseChatModel
 from langchain.chat_models import ChatOllama, ChatAnthropic
 from .chat_models import CHAT_MODELS
 
@@ -8,7 +7,7 @@ import os
 localip = os.getenv("LOCAL_IP", "localhost")
 
 
-def get_chat_model(prop: str) -> BaseChatModel:
+def get_chat_model(prop: str) -> ChatOpenAI:
     if prop == CHAT_MODELS.gpt_3_5_turbo:
         return ChatOpenAI(
             openai_api_key=os.getenv("OPENAI_API_KEY"),
@@ -24,7 +23,7 @@ def get_chat_model(prop: str) -> BaseChatModel:
         )
     elif prop == CHAT_MODELS.claude_2_0:
         return ChatAnthropic(
-            anthropic_api_key=os.getenv("CLAUDE_API_KEY", "CLAUDE_API_KEY")  # type: ignore
+            anthropic_api_key=os.getenv("CLAUDE_API_KEY", "CLAUDE_API_KEY")
         )
     elif prop == CHAT_MODELS.mistral_openorca:
         return ChatOllama(
@@ -47,6 +46,4 @@ def get_chat_model(prop: str) -> BaseChatModel:
     elif prop == "llama2":
         return ChatOpenAI(model="llama2", temperature=0)
     else:
-        raise ValueError(
-            "Couldn't match one of the supported models, please refer to llm-server/readme.md"
-        )
+        raise "Couldn't match one of the supported models, please refer llm-server/readme.md"
