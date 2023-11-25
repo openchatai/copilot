@@ -108,10 +108,6 @@ def general_settings_update(copilot_id):
 
         data = request.form
 
-        # Validate required 'name' field
-        if 'name' not in data or not data.get('name').strip():
-            return jsonify({'error': 'Name is required'}), 400
-
         # Call update_copilot with the provided data
         updated_copilot = update_copilot(
             copilot_id=copilot_id,

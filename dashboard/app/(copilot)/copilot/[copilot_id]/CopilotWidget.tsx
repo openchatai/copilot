@@ -20,7 +20,7 @@ export default function Widget({
 
         <Root
             options={{
-                apiUrl: "http://localhost:8888/backend/api",
+                apiUrl: "http://localhost:8888/backend",
                 defaultOpen: true,
                 token,
                 initialMessage: "Hey Pal!",
