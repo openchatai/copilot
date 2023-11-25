@@ -154,7 +154,7 @@ def validator(copilot_id):
         return jsonify({'error': "Failed to load the swagger file for validation. error: " + str(e)}), 400
 
     endpoints = parser.get_endpoints()
-    validations = parser.get_validations(endpoints)
+    validations = parser.get_validations()
     return jsonify({
         'chatbot_id': bot.id,
         'all_endpoints': [endpoint.to_dict() for endpoint in endpoints],
