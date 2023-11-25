@@ -8,7 +8,7 @@ import datetime
 class Chatbot(Base):
     __tablename__ = 'chatbots'
 
-    id = Column(String(36), primary_key=True, default=lambda: uuid.uuid4())
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String(255))
     token = Column(String(255))
     website = Column(String(255), nullable=True)
