@@ -27,30 +27,8 @@ app.register_blueprint(upload_controller, url_prefix="/backend/uploads")
 app.register_blueprint(datasource_workflow, url_prefix="/backend/data_sources")
 
 app.config.from_object(Config)
-from routes.root_service import handle_request
 
 init_qdrant_collections()
-
-
-@app.route("/handle", methods=["POST", "OPTIONS"])
-def handle() -> Response:
-    data = request.get_json()
-    try:
-        response = handle_request(data)
-        create_chat_history(data["bot_id"], data["session_id"], True, data["text"])
-        create_chat_history(
-            data["bot_id"],
-            data["session_id"],
-            False,
-            response["response"] or response["error"],
-        )
-        return jsonify(response)
-    except Exception as e:
-        struct_log.exception(
-            app="OPENCOPILOT", payload=data, error=str(e), event="/handle"
-        )
-        return jsonify({"response": "Something went wrong, check the logs!!"})
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8002, debug=True)

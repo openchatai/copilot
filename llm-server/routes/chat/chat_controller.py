@@ -1,6 +1,6 @@
 from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id,
-    get_unique_sessions_with_first_message_by_bot_id,
+    get_unique_sessions_with_first_message_by_bot_id, create_chat_history,
 )
 from opencopilot_db.chatbot import Chatbot
 
@@ -75,7 +75,6 @@ def init_chat():
 
 @chat_workflow.route('/send', methods=['POST'])
 def send_chat():
-    data = request.get_json()
     message = request.json.get('content')
     bot_token = request.headers.get('X-Bot-Token')
 
@@ -101,11 +100,19 @@ def send_chat():
         response_data = root_service.handle_request(
             text=message,
             swagger_url=swagger_url,
-            session_id= session_id,
+            session_id=session_id,
             base_prompt=base_prompt,
             bot_id=bot.id,
             headers=headers,
+            server_base_url=''  # todo what is this?
+        )
 
+        create_chat_history(bot.id, session_id, True, message)
+        create_chat_history(
+            bot.id,
+            session_id,
+            False,
+            response_data["response"] or response_data["error"],
         )
 
         return jsonify({
