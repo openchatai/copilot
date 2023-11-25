@@ -46,7 +46,7 @@ def handle_swagger_file():
 
         return jsonify({
             'file_name': filename,
-            'chatbot': chatbot  # Convert chatbot to dictionary
+            'chatbot': chatbot
         })
 
 
