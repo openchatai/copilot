@@ -71,9 +71,9 @@ def get_chat_message_as_llm_conversation(session_id: str) -> List[BaseMessage]:
     chats = get_all_chat_history_by_session_id(session_id, 100)
     conversations: List[BaseMessage] = []
     for chat in chats:
-        if chat.from_user is True:
+        if chat.from_user:
             conversations.append(HumanMessage(content=str(chat.message)))
-        elif chat.from_user is False:
+        else:
             conversations.append(AIMessage(content=str(chat.message)))
 
     return conversations
@@ -116,13 +116,13 @@ def update_chat_history(
     with Session() as session:
         chat_history: ChatHistory = session.query(ChatHistory).get(chat_history_id)
 
-        if chatbot_id is not None:
+        if not chatbot_id:
             chat_history.chatbot_id = chatbot_id
-        if session_id is not None:
+        if session_id:
             chat_history.session_id = session_id
-        if from_user is not None:
+        if from_user:
             chat_history.from_user = from_user
-        if message is not None:
+        if message:
             chat_history.message = message
 
         chat_history.updated_at = datetime.now()

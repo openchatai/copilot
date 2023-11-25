@@ -4,11 +4,13 @@ from flask import jsonify, Blueprint, request, Response, abort
 
 from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id,
-    get_unique_sessions_with_first_message_by_bot_id, create_chat_history,
+    get_unique_sessions_with_first_message_by_bot_id,
+    create_chat_history,
 )
 from models.repository.copilot_repo import find_one_or_fail_by_token
 from utils.db import Database
 from .. import root_service
+from utils import struct_log
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -42,8 +44,8 @@ def get_session_chats(session_id: str) -> Response:
 
 @chat_workflow.route("/b/<bot_id>/chat_sessions", methods=["GET"])
 def get_chat_sessions(bot_id: str) -> Response:
-    limit = request.args.get("limit", 20)
-    offset = request.args.get("offset", 0)
+    limit = cast(int, request.args.get("limit", 20))
+    offset = cast(int, request.args.get("offset", 0))
     chat_history_sessions = get_unique_sessions_with_first_message_by_bot_id(
         bot_id, limit, offset
     )
@@ -51,53 +53,64 @@ def get_chat_sessions(bot_id: str) -> Response:
     return chat_history_sessions
 
 
-@chat_workflow.route('/init', methods=['GET'])
+@chat_workflow.route("/init", methods=["GET"])
 def init_chat():
-    bot_token = request.headers.get('X-Bot-Token')
+    bot_token = request.headers.get("X-Bot-Token")
+
+    if not bot_token:
+        return (
+            jsonify(
+                {
+                    "type": "text",
+                    "response": {"text": "Could not find bot token"},
+                }
+            ),
+            404,
+        )
 
     bot = find_one_or_fail_by_token(bot_token)
-
-    if not bot:
-        return jsonify({
-            "type": "text",
-            "response": {
-                "text": f"Could not find bot with token {bot_token}"
-            }
-        }), 404
-
     # Replace 'faq' and 'initialQuestions' with actual logic or data as needed.
-    return jsonify({
-        "bot_name": bot.name,
-        "logo": "logo",
-        "faq": [],  # Replace with actual FAQ data
-        "initial_questions": [],  # Replace with actual initial questions
-    })
+    return jsonify(
+        {
+            "bot_name": bot.name,
+            "logo": "logo",
+            "faq": [],  # Replace with actual FAQ data
+            "initial_questions": [],  # Replace with actual initial questions
+        }
+    )
 
 
-@chat_workflow.route('/send', methods=['POST'])
+@chat_workflow.route("/send", methods=["POST"])
 def send_chat():
-    message = request.json.get('content')
-    bot_token = request.headers.get('X-Bot-Token')
+    message = request.json.get("content")
+    bot_token = request.headers.get("X-Bot-Token")
 
     if not message or len(message) > 255:
         abort(400, description="Invalid content, the size is larger than 255 char")
 
+    if not bot_token:
+        raise ValueError("bot token must be defined! ")
     bot = find_one_or_fail_by_token(bot_token)
 
-    session_id = request.headers.get('X-Session-Id', '')
+    session_id = request.headers.get("X-Session-Id", "")
     swagger_url = bot.swagger_url
     headers = dict(request.headers)
     base_prompt = bot.prompt_message
     app_name = headers.get("X-App-Name") or None
-    server_base_url = cast(str, request.form.get("server_base_url", ""))
+    server_base_url = request.form.get("server_base_url", "")
 
     if not bot:
-        return jsonify({
-            "type": "text",
-            "response": {
-                "text": "I'm unable to help you at the moment, please try again later. **code: b404**"
-            }
-        }), 404
+        return (
+            jsonify(
+                {
+                    "type": "text",
+                    "response": {
+                        "text": "I'm unable to help you at the moment, please try again later. **code: b404**"
+                    },
+                }
+            ),
+            404,
+        )
 
     try:
         response_data = root_service.handle_request(
@@ -119,16 +132,19 @@ def send_chat():
             response_data["response"] or response_data["error"],
         )
 
-        return jsonify({
-            "type": "text",
-            "response": {
-                "text": response_data["response"]
-            }
-        })
+        return jsonify(
+            {"type": "text", "response": {"text": response_data["response"]}}
+        )
     except Exception as e:
-        return jsonify({
-            "type": "text",
-            "response": {
-                "text": f"I'm unable to help you at the moment, please try again later. **code: b500**\n```{e}```"
-            }
-        }), 500
+        struct_log.exception(event="/chat/send", error=str(e))
+        return (
+            jsonify(
+                {
+                    "type": "text",
+                    "response": {
+                        "text": f"I'm unable to help you at the moment, please try again later. **code: b500**\n```{e}```"
+                    },
+                }
+            ),
+            500,
+        )
