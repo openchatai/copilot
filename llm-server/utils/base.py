@@ -28,3 +28,6 @@ def generate_random_token(length=16):
     token = ''.join(secrets.choice(characters) for i in range(length))
     return token
 
+
+def resolve_abs_local_file_path_from(filename: str):
+    return 'shared_data/' + filename

@@ -6,6 +6,7 @@ from flask import Blueprint, jsonify, request
 from prance import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.utils import secure_filename
+from utils.base import resolve_abs_local_file_path_from
 
 import routes._swagger.service as swagger_service
 from enums.initial_prompt import ChatBotInitialPromptEnum
@@ -141,6 +142,7 @@ def validator(copilot_id):
         swagger_content = ""
 
         if not swagger_url.startswith("https"):
+            swagger_url = resolve_abs_local_file_path_from(swagger_url)
             # Read the file content from the local system or shared storage
             with open(swagger_url, 'r') as file:
                 swagger_content = file.read()

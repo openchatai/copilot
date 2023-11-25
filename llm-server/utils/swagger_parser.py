@@ -2,9 +2,9 @@ import json
 
 
 class Endpoint:
-    def __init__(self, operation_id, type, name, description, request_body, request_parameters, response, path):
+    def __init__(self, operation_id, endpoint_type, name, description, request_body, request_parameters, response, path):
         self.operation_id = operation_id
-        self.type = type
+        self.type = endpoint_type
         self.name = name
         self.description = description
         self.request_body = request_body
@@ -60,7 +60,7 @@ class SwaggerParser:
             for method, method_data in path_data.items():
                 endpoint = Endpoint(
                     operation_id=method_data.get('operationId'),
-                    type=method.upper(),
+                    endpoint_type=method.upper(),
                     name=method_data.get('summary'),
                     description=method_data.get('description'),
                     request_body=method_data.get('requestBody'),
