@@ -1,0 +1,11 @@
+parameters:
+    checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
+    ignoreErrors:
+        -
+            message: '#has unknown class OpenSSLAsymmetricKey as its type#'
+            path: src/Credentials/RsaClientCredentials.php
+        -
+            message: '#invalid type OpenSSLAsymmetricKey#'
+            path: src/Credentials/RsaClientCredentials.php
+    reportUnmatchedIgnoredErrors: false

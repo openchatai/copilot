@@ -1,0 +1,6 @@
+{
+    "object": "error",
+    "status": 403,
+    "code": "restricted_resource",
+    "message": "Insufficient permissions for this endpoint."
+  }

@@ -1,0 +1,34 @@
+{
+    "object": "comment",
+    "id": "b52b8ed6-e029-4707-a671-832549c09de3",
+    "parent": {
+      "type": "page_id",
+      "page_id": "5c6a2821-6bb1-4a7e-b6e1-c50111515c3d"
+    },
+    "discussion_id": "f1407351-36f5-4c49-a13c-49f8ba11776d",
+    "created_time": "2022-07-15T20:53:00.000Z",
+    "last_edited_time": "2022-07-15T20:53:00.000Z",
+    "created_by": {
+      "object": "user",
+      "id": "067dee40-6ebd-496f-b446-093c715fb5ec"
+    },
+    "rich_text": [
+      {
+        "type": "text",
+        "text": {
+          "content": "Hello world",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "Hello world",
+        "href": null
+      }
+    ]
+  }

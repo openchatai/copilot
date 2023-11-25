@@ -46,7 +46,7 @@ function InstallationSection() {
             code={`<script>
   // be aware to call this function when the document/window is ready.
   const options = {
-     apiUrl: "http://localhost:8888/backend/api", // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:5000/api
+     apiUrl: "http://localhost:8888/backend", // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:5000/api
      initialMessages: ["How are the things"], // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
      token: "${CopilotToken}", // you can get your token from the dashboard
      triggerSelector: "#triggerSelector", // the selector of the element that will trigger the copilot when clicked

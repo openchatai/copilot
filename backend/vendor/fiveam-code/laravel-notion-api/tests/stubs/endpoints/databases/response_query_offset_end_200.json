@@ -1,0 +1,163 @@
+{
+    "object": "list",
+    "results": [
+      {
+        "object": "page",
+        "id": "1500b7c7-329f-4854-8912-4c6972a8743e",
+        "created_time": "2021-05-24T11:03:00.000Z",
+        "last_edited_time": "2021-05-24T11:13:00.000Z",
+        "parent": {
+          "type": "database_id",
+          "database_id": "8284f3ff-77e2-4d4a-939d-19459e4d6bdc"
+        },
+        "archived": false,
+        "properties": {
+          "Birth year": {
+            "id": "_f<<",
+            "type": "rich_text",
+            "rich_text": [
+              {
+                "type": "text",
+                "text": {
+                  "content": "1917",
+                  "link": null
+                },
+                "annotations": {
+                  "bold": false,
+                  "italic": false,
+                  "strikethrough": false,
+                  "underline": false,
+                  "code": false,
+                  "color": "default"
+                },
+                "plain_text": "1917",
+                "href": null
+              }
+            ]
+          },
+          "Known for": {
+            "id": "aUmo",
+            "type": "multi_select",
+            "multi_select": [
+              {
+                "id": "f55ee1a3-e67f-4793-ba3f-5dac02938a5f",
+                "name": "ENIAC",
+                "color": "purple"
+              },
+              {
+                "id": "2016de6e-5325-4549-8e1a-60ee7570382a",
+                "name": "UNIVAC",
+                "color": "default"
+              },
+              {
+                "id": "55c46053-f87e-40e9-8070-6c398939fed6",
+                "name": "Breakpoints",
+                "color": "red"
+              }
+            ]
+          },
+          "Name": {
+            "id": "title",
+            "type": "title",
+            "title": [
+              {
+                "type": "text",
+                "text": {
+                  "content": "Betty Holberton",
+                  "link": null
+                },
+                "annotations": {
+                  "bold": false,
+                  "italic": false,
+                  "strikethrough": false,
+                  "underline": false,
+                  "code": false,
+                  "color": "default"
+                },
+                "plain_text": "Betty Holberton",
+                "href": null
+              }
+            ]
+          }
+        }
+      },
+      {
+        "object": "page",
+        "id": "ab2a7a85-08a1-4dfc-be89-0e30aeffc0f6",
+        "created_time": "2021-05-24T11:03:02.464Z",
+        "last_edited_time": "2021-05-24T11:12:00.000Z",
+        "parent": {
+          "type": "database_id",
+          "database_id": "8284f3ff-77e2-4d4a-939d-19459e4d6bdc"
+        },
+        "archived": false,
+        "properties": {
+          "Birth year": {
+            "id": "_f<<",
+            "type": "rich_text",
+            "rich_text": [
+              {
+                "type": "text",
+                "text": {
+                  "content": "1906",
+                  "link": null
+                },
+                "annotations": {
+                  "bold": false,
+                  "italic": false,
+                  "strikethrough": false,
+                  "underline": false,
+                  "code": false,
+                  "color": "default"
+                },
+                "plain_text": "1906",
+                "href": null
+              }
+            ]
+          },
+          "Known for": {
+            "id": "aUmo",
+            "type": "multi_select",
+            "multi_select": [
+              {
+                "id": "1ada9715-0139-4c1c-b1af-9d8d2fe80ea2",
+                "name": "COBOL",
+                "color": "orange"
+              },
+              {
+                "id": "2016de6e-5325-4549-8e1a-60ee7570382a",
+                "name": "UNIVAC",
+                "color": "default"
+              }
+            ]
+          },
+          "Name": {
+            "id": "title",
+            "type": "title",
+            "title": [
+              {
+                "type": "text",
+                "text": {
+                  "content": "Grace Hopper",
+                  "link": null
+                },
+                "annotations": {
+                  "bold": false,
+                  "italic": false,
+                  "strikethrough": false,
+                  "underline": false,
+                  "code": false,
+                  "color": "default"
+                },
+                "plain_text": "Grace Hopper",
+                "href": null
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "next_cursor": null,
+    "has_more": false
+  }
+  
