@@ -145,6 +145,7 @@ def chatbot_to_dict(chatbot):
         "name": chatbot.name,
         "token": chatbot.token,
         "website": chatbot.website,
+        "initial_prompt": chatbot.prompt_message,
     }
 
 
