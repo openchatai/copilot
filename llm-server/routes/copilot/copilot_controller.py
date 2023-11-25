@@ -42,11 +42,11 @@ def handle_swagger_file():
             website=request.form.get('website', 'https://example.com')
         )
 
-        result = swagger_service.save_swaggerfile_to_mongo(filename, chatbot.id)
+        result = swagger_service.save_swaggerfile_to_mongo(filename, chatbot.get('id'))
 
         return jsonify({
             'file_name': filename,
-            'chatbot': chatbot.to_dict()  # Convert chatbot to dictionary
+            'chatbot': chatbot  # Convert chatbot to dictionary
         })
 
 
