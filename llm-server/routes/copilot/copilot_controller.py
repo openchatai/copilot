@@ -149,7 +149,7 @@ def validator(copilot_id):
         parser = SwaggerParser(swagger_data)
 
     except Exception as e:
-        return jsonify({'error': 'invalid_swagger_file'}), 400
+        return jsonify({'error': "Failed to load the swagger file for validation. error: " + str(e)}), 400
 
     endpoints = parser.get_endpoints()
     validations = parser.get_validations(endpoints)
