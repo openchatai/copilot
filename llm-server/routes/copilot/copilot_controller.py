@@ -52,12 +52,14 @@ def handle_swagger_file():
 
 @copilot.route('/<string:copilot_id>', methods=['GET'])
 def get_copilot(copilot_id):
-    bot = find_one_or_fail_by_id(copilot_id)
-
-    if bot is None:
-        return jsonify({
-            'failure': 'chatbot_not_found'
-        }), 404
+    try:
+        bot = find_one_or_fail_by_id(copilot_id)
+    except ValueError:
+        # If the bot is not found, a ValueError is raised
+        return jsonify({'failure': 'chatbot_not_found'}), 404
+    except SQLAlchemyError as e:
+        # Handle any SQLAlchemy errors
+        return jsonify({'error': 'Database error', 'details': str(e)}), 500
 
     return jsonify({
         'chatbot': chatbot_to_dict(bot)
