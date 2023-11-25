@@ -1,6 +1,5 @@
 from qdrant_client import QdrantClient, models
 import os
-from opencopilot_utils import get_vector_store, StoreOptions
 
 vector_size = int(os.getenv("VECTOR_SIZE", "1536"))
 
@@ -22,5 +21,5 @@ def init_qdrant_collections():
                 size=vector_size, distance=models.Distance.COSINE
             ),
         )
-    except Exception as e:
-        print(f"Collection already exists, ignoring new collection creation")
+    except Exception:
+        print("Collection already exists, ignoring new collection creation")

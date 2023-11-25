@@ -63,7 +63,7 @@ def handle_request(text,
             current_state = process_state(app, headers)
             swagger_doc = get_swagger_doc(swagger_url)
 
-            document, score = check_workflow_in_store(text, bot_id)
+            document = check_workflow_in_store(text, bot_id)
             if document:
                 return handle_existing_workflow(
                     document,
@@ -207,14 +207,14 @@ def getConversationRetrievalChain(
     return chain
 
 
-def extract_data(data: Dict[str, Any]) -> Tuple:
+def extract_data(data: Dict[str, Any]):
     text = cast(str, data.get("text"))
     swagger_url = cast(str, data.get("swagger_url", ""))
     session_id = cast(str, data.get("session_id", ""))
     base_prompt = data.get("base_prompt", "")
     headers = data.get("headers", {})
     server_base_url = cast(str, data.get("server_base_url", ""))
-    app = headers.get("X-App-Name") or None
+    app: Optional[str] = headers.get("X-App-Name") or None
     bot_id = data.get("bot_id", None)
     return (
         text,
@@ -257,6 +257,7 @@ def get_swagger_doc(swagger_url: str) -> ResolvingParser:
 
 
 def handle_existing_workflow(
+<<<<<<< HEAD
         document: Document,  # lagnchaing
         text: str,
         headers: Dict[str, Any],
@@ -266,6 +267,17 @@ def handle_existing_workflow(
         swagger_doc: ResolvingParser,
         session_id: str,
         bot_id: str,
+=======
+    document: Document,  # lagnchaing
+    text: str,
+    headers: Dict[str, Any],
+    server_base_url: str,
+    swagger_url: str,
+    app: Optional[str],
+    swagger_doc: ResolvingParser,
+    session_id: str,
+    bot_id: str,
+>>>>>>> 9ad8dc26 (Adding strict typings to the codebase)
 ) -> Dict[str, Any]:
     # use user defined workflows if exists, if not use auto_gen_workflow
     _workflow = mongo.workflows.find_one(

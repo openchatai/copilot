@@ -1,22 +1,13 @@
-import json
 import logging
-import re
-from typing import Any, Dict, Union, cast
-from typing import Any, Dict, Optional, Union, cast
+from typing import Any, Dict, Union, cast, Optional
 from typing import List
-from langchain.chat_models import ChatOpenAI
 
-from langchain.schema import AIMessage, HumanMessage, SystemMessage
+from langchain.schema import HumanMessage, SystemMessage, BaseMessage
 from utils.chat_models import CHAT_MODELS
 from utils.get_chat_model import get_chat_model
 from routes.workflow.extractors.extract_json import extract_json_payload
-import os
-import logging
 from prance import ResolvingParser
-from models.repository.chat_history_repo import (
-    get_all_chat_history_by_session_id,
-    get_chat_message_as_llm_conversation,
-)
+from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from opencopilot_db import ChatHistory
 
 logging.basicConfig(level=logging.INFO)
@@ -47,7 +38,7 @@ def join_conversations(chat_histories: List[ChatHistory]) -> str:
 
     conversation = ""
     for chat_history in chat_histories:
-        if chat_history.from_user:
+        if chat_history.from_user is True:
             conversation += f"User: {chat_history.message}\n"
         else:
             conversation += f"Assistant: {chat_history.message}\n"
@@ -102,7 +93,7 @@ def hasSingleIntent(
     summaries = get_summaries(swagger_doc)
     chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
-    messages = [
+    messages: List[BaseMessage] = [
         SystemMessage(
             content="You serve as an AI co-pilot tasked with identifying the correct sequence of API calls necessary to execute a user's action. To accomplish the task, you will be provided with information about the existing state of the application and list of api summaries. If the user is asking you to perform a `CRUD` operation, provide the list of operation ids of api calls needed in the `ids` field of the json. `bot_message` should consist of a straightforward sentence, free from any special characters. Note that the application uses current state as a cache, if you don't find the required information in the cache, you should try to find an api call to fetch that information. Your response MUST be a valid minified json"
         )
@@ -150,7 +141,7 @@ def hasSingleIntent(
         ]
     )
 
-    result = chat([x for x in messages if x is not None])
+    result = chat(messages)
     logging.info(
         "[OpenCopilot] Extracted the needed steps to get the job done: {}".format(
             result.content

@@ -1,11 +1,11 @@
-import json, requests, yaml, os
-from typing import Dict, Any, cast
-
-shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
-
 import json
 import yaml
 from yaml.parser import ParserError
+import requests
+
+import os
+
+shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
 
 
 def fetch_swagger_text(swagger_url: str) -> str:
