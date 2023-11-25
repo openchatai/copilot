@@ -49,7 +49,7 @@ def get_chat_sessions(bot_id: str) -> Response:
     return chat_history_sessions
 
 
-@chat_workflow.route('/chat/init', methods=['GET'])
+@chat_workflow.route('/init', methods=['GET'])
 def init_chat():
     bot_token = request.headers.get('X-Bot-Token')
 
@@ -72,7 +72,7 @@ def init_chat():
     })
 
 
-@chat_workflow.route('/chat/send', methods=['POST'])
+@chat_workflow.route('/send', methods=['POST'])
 def send_chat():
     data = request.get_json()
     content = request.json.get('content')
