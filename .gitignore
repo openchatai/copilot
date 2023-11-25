@@ -20,3 +20,5 @@ yarn-error.log
 /.vscode
 *.pyc
 .dmypy.*
+
+test.html

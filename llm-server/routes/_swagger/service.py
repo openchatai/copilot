@@ -1,8 +1,8 @@
-from http.client import HTTPException
 import json
-from routes.root_service import get_swagger_doc
+
 import yaml
 
+from routes.root_service import get_swagger_doc
 from utils.db import Database
 
 db_instance = Database()
@@ -39,7 +39,7 @@ def add_swagger_file(request: Request, id: str) -> Dict[str, str]:
                 return {"error": "Invalid JSON format in uploaded file"}
 
         elif file.filename and (
-            file.filename.endswith(".yaml") or file.filename.endswith(".yml")
+                file.filename.endswith(".yaml") or file.filename.endswith(".yml")
         ):
             try:
                 file_content = yaml.safe_load(file)
