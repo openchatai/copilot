@@ -1,11 +1,12 @@
 import datetime
 import uuid
-from typing import List, Optional, Any, Type
+from typing import List, Optional, Any, Type, Dict
 
 from opencopilot_db.chatbot import Chatbot, engine
 from sqlalchemy import exc
 from sqlalchemy.orm import sessionmaker, Session
 
+from utils import struct_log
 from utils.base import generate_random_token
 
 # Create a Session factory
@@ -61,7 +62,7 @@ def find_or_fail_by_bot_id(bot_id: bytes) -> Optional[Chatbot]:
 def create_copilot(name: str,
                    prompt_message: str, swagger_url: str,
                    enhanced_privacy: bool = False, smart_sync: bool = False,
-                   website: Optional[str] = None, ) -> Chatbot:
+                   website: Optional[str] = None, ) -> dict[str, Any]:
     """
     Creates a new Chatbot instance and adds it to the database.
 
@@ -98,10 +99,12 @@ def create_copilot(name: str,
     try:
         session.add(new_chatbot)
         session.commit()
-        return new_chatbot
+        return chatbot_to_dict(new_chatbot)
     except Exception as e:
         session.rollback()
-        print(f"Error occurred: {e}")
+        struct_log.exception(
+            app="OPENCOPILOT", error=str(e), event="/swagger"
+        )
     finally:
         session.close()
 
