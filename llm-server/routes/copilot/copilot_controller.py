@@ -50,7 +50,7 @@ def handle_swagger_file():
         })
 
 
-@copilot.route('/<copilot_id>', methods=['GET'])
+@copilot.route('/<string:copilot_id>', methods=['GET'])
 def get_copilot(copilot_id):
     bot = find_one_or_fail_by_id(copilot_id)
 
@@ -86,7 +86,7 @@ def delete_bot(copilot_id):
         session.close()
 
 
-@copilot.route('/<copilot_id>', methods=['POST', 'PATCH', 'PUT'])
+@copilot.route('/<string:copilot_id>', methods=['POST', 'PATCH', 'PUT'])
 def general_settings_update(copilot_id):
     bot = find_one_or_fail_by_id(copilot_id)
 
@@ -105,7 +105,7 @@ def general_settings_update(copilot_id):
     return jsonify({'chatbot': bot.to_dict()})  # Convert chatbot to dictionary
 
 
-@copilot.route('/<copilot_id>/validator', methods=['GET'])
+@copilot.route('/<string:copilot_id>/validator', methods=['GET'])
 def validator(copilot_id):
     bot = find_one_or_fail_by_id(copilot_id)
 
