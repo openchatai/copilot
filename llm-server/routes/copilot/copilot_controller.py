@@ -94,7 +94,7 @@ def general_settings_update(copilot_id):
         # Ensure the chatbot exists
         find_one_or_fail_by_id(copilot_id)
 
-        data = request.json
+        data = request.form
 
         # Validate required 'name' field
         if 'name' not in data or not data.get('name').strip():
