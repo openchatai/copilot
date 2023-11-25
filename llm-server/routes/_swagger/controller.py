@@ -1,5 +1,3 @@
-from typing import Tuple
-
 from bson import ObjectId
 from flask import jsonify, Blueprint, request, Response
 
@@ -12,7 +10,7 @@ _swagger = Blueprint("_swagger", __name__)
 
 
 @_swagger.route("/u/<swagger_url>", methods=["GET"])
-def get_swagger_files(swagger_url: str) -> tuple[Response, int] | Response:
+def get_swagger_files(swagger_url: str) -> Response:
     # Validate and parse page and page_size query params
     try:
         page = int(request.args.get("page", 1))
@@ -47,7 +45,7 @@ def get_swagger_files(swagger_url: str) -> tuple[Response, int] | Response:
 
 
 @_swagger.route("/get/b/<bot_id>", methods=["GET"])
-def get_swagger_files_by_bot_id(bot_id: str) -> tuple[Response, int] | Response:
+def get_swagger_files_by_bot_id(bot_id: str) -> Response:
     swagger_file = mongo.swagger_files.find_one({"meta.bot_id": bot_id})
     if not swagger_file:
         return jsonify({"message": "Swagger file not found"}), 404
@@ -72,7 +70,7 @@ def add_init_swagger_file(bot_id: str) -> Response:
 
 
 @_swagger.route("/<_id>", methods=["GET"])
-def get_swagger_file(_id: str) -> tuple[Response, int] | Response:
+def get_swagger_file(_id: str) -> Response:
     # Validate _id
     if not ObjectId.is_valid(_id):
         return jsonify({"message": "Invalid _id format"}), 400
@@ -86,7 +84,7 @@ def get_swagger_file(_id: str) -> tuple[Response, int] | Response:
 
 
 @_swagger.route("/transform/<_id>", methods=["GET"])
-def get_transformed_swagger_file(_id: str) -> tuple[Response, int] | Response:
+def get_transformed_swagger_file(_id: str) -> Response:
     # Validate _id
     if not ObjectId.is_valid(_id):
         return jsonify({"message": "Invalid _id format"}), 400
@@ -141,7 +139,7 @@ def get_transformed_swagger_file(_id: str) -> tuple[Response, int] | Response:
 
 
 @_swagger.route("/<_id>", methods=["PUT"])
-def update_swagger_file(_id: str) -> tuple[Response, int] | Response:
+def update_swagger_file(_id: str) -> Response:
     if not ObjectId.is_valid(_id):
         return jsonify({"message": "Invalid _id format"}), 400
 
@@ -153,7 +151,7 @@ def update_swagger_file(_id: str) -> tuple[Response, int] | Response:
 
 
 @_swagger.route("/<_id>", methods=["DELETE"])
-def delete_swagger_file(_id: str) -> tuple[Response, int] | Response:
+def delete_swagger_file(_id: str) -> Response:
     if not ObjectId.is_valid(_id):
         return jsonify({"message": "Invalid _id format"}), 400
 
