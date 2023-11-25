@@ -43,15 +43,16 @@ def run_openapi_operations(
 
                 api_response = None
                 try:
-                    struct_log.info(payload=api_payload.__dict__, event="make_api_call")
-
-                    api_response = make_api_request(
-                        headers=headers, **api_payload.__dict__
+                    struct_log.info(
+                        payload=api_payload.__dict__,
+                        event="make_api_call"
                     )
+                    
+                    api_response = make_api_request(headers=headers, **api_payload.__dict__)
 
                 except Exception as e:
                     struct_log.exception(error=str(e), event="make api call failed")
-                    return ""
+                    return {}
 
                 # if a custom transformer function is defined for this operationId use that, otherwise forward it to the llm
                 # so we don't necessarily have to defined mappers for all api endpoints
@@ -73,14 +74,12 @@ def run_openapi_operations(
 
             except Exception as e:
                 struct_log.exception(
-                    payload=json.dumps(
-                        {
-                            text,
-                            headers,
-                            server_base_url,
-                            app,
-                        }
-                    ),
+                    payload=json.dumps({
+                        text,
+                        headers,
+                        server_base_url,
+                        app,
+                    }),
                     error=str(e),
                     event="/check_workflow_in_store",
                 )

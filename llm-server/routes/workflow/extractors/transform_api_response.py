@@ -1,7 +1,8 @@
-import os
-import logging
-import json
+import os, logging, json
+from langchain.chat_models import ChatOpenAI
 from langchain.schema import HumanMessage, SystemMessage
+from typing import Any
+from routes.workflow.extractors.extract_json import extract_json_payload
 from routes.lossy_compressors.truncate_json import truncate_json
 from utils import get_chat_model
 from utils.chat_models import CHAT_MODELS
@@ -13,7 +14,7 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 def transform_api_response_from_schema(server_url: str, responseText: str) -> str:
     chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
-    # responseText = truncate_json(json.loads(responseText))
+    responseText = truncate_json(json.loads(responseText))
     messages = [
         SystemMessage(content="You are a bot capable of comprehending API responses."),
         HumanMessage(
