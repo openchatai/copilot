@@ -26,20 +26,20 @@ def index():
 @copilot.route('/swagger', methods=['POST'])
 def handle_swagger_file():
     if 'swagger_file' not in request.files:
-        return jsonify({"error": "No file part"}), 400
+        return jsonify({"error": "You must upload a swagger file."}), 400
 
     file = request.files['swagger_file']
     if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
+        return jsonify({"error": "No selected file."}), 400
     if file:
         filename = secure_filename(str(uuid.uuid4()) + ".json")
         file.save(os.path.join(UPLOAD_FOLDER, filename))
 
         chatbot = create_copilot(
-            name=request.form.get('name'),
+            name=request.form.get('name', 'My First Copilot'),
             swagger_url=filename,
-            prompt_message=request.form.get('prompt_message'),
-            website=request.form.get('website')
+            prompt_message=request.form.get('prompt_message', 'PROMPT'), # todo: copilot prompt enum
+            website=request.form.get('website', 'https://example.com')
         )
 
         result = swagger_service.save_swaggerfile_to_mongo(filename, chatbot.id)

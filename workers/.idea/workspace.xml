@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a5b96282-820c-459e-94b5-28be0f17b86c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/shared/models/opencopilot_db/chatbot.py" beforeDir="false" afterPath="$PROJECT_DIR$/shared/models/opencopilot_db/chatbot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -6,6 +6,8 @@ from opencopilot_db.chatbot import Chatbot, engine
 from sqlalchemy import exc
 from sqlalchemy.orm import sessionmaker, Session
 
+from utils.base import generate_random_token
+
 # Create a Session factory
 SessionLocal = sessionmaker(bind=engine)
 
@@ -78,9 +80,10 @@ def create_copilot(name: str,
         Exception: If any exception occurs during the database operation.
     """
     session: Session = SessionLocal()
-    token = 'random'  # todo random generation
+    token = generate_random_token(16)
+
     new_chatbot = Chatbot(
-        id=uuid.uuid4().bytes,
+        id=str(uuid.uuid4()),
         name=name,
         token=token,
         website=website,
