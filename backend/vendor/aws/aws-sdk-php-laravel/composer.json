@@ -1,0 +1,44 @@
+{
+    "name": "aws/aws-sdk-php-laravel",
+    "homepage": "http://aws.amazon.com/sdkforphp2",
+    "description": "A simple Laravel 5/6/7/8/9 service provider for including the AWS SDK for PHP.",
+    "keywords": ["laravel", "laravel 5", "laravel 6", "laravel 7", "laravel 8", "laravel 9", "laravel 10", "aws", "amazon", "sdk", "s3", "ec2", "dynamodb"],
+    "type":"library",
+    "license":"Apache-2.0",
+    "authors":[
+        {
+            "name":"Amazon Web Services",
+            "homepage":"http://aws.amazon.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "aws/aws-sdk-php": "~3.0",
+        "illuminate/support": "^5.1 || ^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.0 || ^5.0 || ^9.0",
+        "vlucas/phpdotenv": "^1.0 || ^2.0 || ^3.0 || ^4.0 || ^5.0",
+        "yoast/phpunit-polyfills": "^1.0"
+    },
+    "suggest": {
+        "laravel/framework": "To test the Laravel bindings",
+        "laravel/lumen-framework": "To test the Lumen bindings"
+    },
+    "autoload": {
+        "psr-4": { "Aws\\Laravel\\": "src/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "Aws\\Laravel\\Test\\": "tests/" }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Aws\\Laravel\\AwsServiceProvider"
+            ],
+            "aliases": {
+                "AWS": "Aws\\Laravel\\AwsFacade"
+            }
+        }
+    }
+}

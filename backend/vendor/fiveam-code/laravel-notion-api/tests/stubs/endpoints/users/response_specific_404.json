@@ -1,0 +1,6 @@
+{
+  "object": "error",
+  "status": 404,
+  "code": "object_not_found",
+  "message": "Could not find user with ID: b55c9c91-384d-452b-81db-d1ef79372b79."
+}

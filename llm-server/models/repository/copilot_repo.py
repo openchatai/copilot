@@ -59,10 +59,14 @@ def find_or_fail_by_bot_id(bot_id: bytes) -> Optional[Chatbot]:
         session.close()
 
 
-def create_copilot(name: str,
-                   prompt_message: str, swagger_url: str,
-                   enhanced_privacy: bool = False, smart_sync: bool = False,
-                   website: Optional[str] = None, ) -> dict[str, Any]:
+def create_copilot(
+    name: str,
+    prompt_message: str,
+    swagger_url: str,
+    enhanced_privacy: bool = False,
+    smart_sync: bool = False,
+    website: Optional[str] = None,
+) -> dict[str, Any]:
     """
     Creates a new Chatbot instance and adds it to the database.
 
@@ -93,7 +97,7 @@ def create_copilot(name: str,
         enhanced_privacy=enhanced_privacy,
         smart_sync=smart_sync,
         created_at=datetime.datetime.utcnow(),
-        updated_at=datetime.datetime.utcnow()
+        updated_at=datetime.datetime.utcnow(),
     )
 
     try:
@@ -102,9 +106,7 @@ def create_copilot(name: str,
         return chatbot_to_dict(new_chatbot)
     except Exception as e:
         session.rollback()
-        struct_log.exception(
-            app="OPENCOPILOT", error=str(e), event="/swagger"
-        )
+        struct_log.exception(app="OPENCOPILOT", error=str(e), event="/swagger")
     finally:
         session.close()
 
@@ -187,13 +189,15 @@ def chatbot_to_dict(chatbot):
     }
 
 
-def update_copilot(copilot_id: str,
-                   name: Optional[str] = None,
-                   prompt_message: Optional[str] = None,
-                   swagger_url: Optional[str] = None,
-                   enhanced_privacy: Optional[bool] = None,
-                   smart_sync: Optional[bool] = None,
-                   website: Optional[str] = None) -> dict[str, Any]:
+def update_copilot(
+    copilot_id: str,
+    name: Optional[str] = None,
+    prompt_message: Optional[str] = None,
+    swagger_url: Optional[str] = None,
+    enhanced_privacy: Optional[bool] = None,
+    smart_sync: Optional[bool] = None,
+    website: Optional[str] = None,
+) -> dict[str, Any]:
     """
     Updates an existing Chatbot instance in the database.
 
@@ -242,8 +246,6 @@ def update_copilot(copilot_id: str,
         raise ValueError(f"No Chatbot found with id: {copilot_id}")
     except Exception as e:
         session.rollback()
-        struct_log.exception(
-            app="OPENCOPILOT", error=str(e), event="update_copilot"
-        )
+        struct_log.exception(app="OPENCOPILOT", error=str(e), event="update_copilot")
     finally:
         session.close()

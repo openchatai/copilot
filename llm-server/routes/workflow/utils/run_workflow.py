@@ -3,7 +3,8 @@ from routes.workflow.typings.run_workflow_input import WorkflowData
 from routes.workflow.utils.run_openapi_ops import run_openapi_operations
 from opencopilot_types.workflow_type import WorkflowDataType
 
-import logging, json
+import logging
+import json
 from utils import struct_log
 
 
@@ -31,9 +32,9 @@ def run_workflow(
     except Exception as e:
         struct_log.exception(
             payload={
-                headers,
-                server_base_url,
-                app,
+                "headers": dict(headers),
+                "server_base_url": server_base_url,
+                "app": app,
             },
             error=str(e),
             event="/run_workflow",

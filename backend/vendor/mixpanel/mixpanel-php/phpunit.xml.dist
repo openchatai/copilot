@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false" 
+         bootstrap="vendor/autoload.php"
+         cacheTokens="true"
+         colors="false"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         syntaxCheck="false"
+         verbose="false">
+         
+  <testsuites>
+    <testsuite name="Mixpanel Test">
+      <directory>./test/</directory>
+    </testsuite>
+  </testsuites>
+  
+  <filter>
+    <blacklist>
+      <directory>examples</directory>
+      <directory>vendor</directory>
+      <directory>test</directory>
+    </blacklist>
+  </filter>
+</phpunit>

@@ -1,0 +1,5 @@
+*~
+*.log
+*.lock
+*.idea
+vendor

@@ -1,0 +1,67 @@
+{
+    "name": "fiveam-code/laravel-notion-api",
+    "description": "Laravel Wrapper for the Notion API",
+    "keywords": [
+        "fiveam-code",
+        "laravel-notion-api",
+        "laravel",
+        "notion",
+        "notion-api",
+        "api-wrapper"
+    ],
+    "homepage": "https://github.com/fiveam-code/laravel-notion-api",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Diana Scharf",
+            "email": "hello@dianaweb.dev",
+            "role": "Developer"
+        },
+        {
+            "name": "Johannes Güntner",
+            "email": "johannes.guentner@it-guentner.de",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "guzzlehttp/guzzle": "^7.0.1",
+        "illuminate/support": "^8.0|^9.0|^10.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^6.0|^8.0",
+        "pestphp/pest": "^1.22",
+        "pestphp/pest-plugin-laravel": "^1.3",
+        "phpunit/phpunit": "^9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "FiveamCode\\LaravelNotionApi\\": "src",
+            "FiveamCode\\LaravelNotionApi\\Exceptions\\": "src/Exceptions",
+            "FiveamCode\\LaravelNotionApi\\Endpoints\\": "src/Endpoints"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "FiveamCode\\LaravelNotionApi\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage-html coverage"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "FiveamCode\\LaravelNotionApi\\LaravelNotionApiServiceProvider"
+            ],
+            "aliases": {
+                "Notion": "FiveamCode\\LaravelNotionApi\\NotionFacade"
+            }
+        }
+    }
+}

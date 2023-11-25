@@ -1,0 +1,41 @@
+{
+  "object": "list",
+  "results": [
+    {
+      "object": "database",
+      "id": "668d797c-76fa-4934-9b05-ad288df2d136",
+      "title": "Grocery list",
+      "properties": {
+        "Name": {
+          "id": "testid",
+          "type": "title",
+          "title": {}
+        },
+        "Description": {
+          "id": "testid",
+          "type": "text",
+          "text": {}
+        }
+      }
+    },
+    {
+      "object": "database",
+      "id": "74ba0cb2-732c-4d2f-954a-fcaa0d93a898",
+      "title": "Pantry",
+      "properties": {
+        "Name": {
+          "id": "testid",
+          "type": "title",
+          "title": {}
+        },
+        "Description": {
+          "id": "testid",
+          "type": "rich_text",
+          "rich_text": {}
+        }
+      }
+    }
+  ],
+  "next_cursor": "MTY3NDE4NGYtZTdiYy00NzFlLWE0NjctODcxOTIyYWU3ZmM3",
+  "has_more": false
+}

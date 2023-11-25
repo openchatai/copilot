@@ -1,0 +1,57 @@
+language: php
+
+matrix:
+  include:
+    - php: 7.1
+      dist: bionic
+      env: COMPOSER_OPTS=""
+    - php: 7.1
+      dist: bionic
+      env: COMPOSER_OPTS="--prefer-lowest"
+    - php: 7.2
+      dist: bionic
+      env: COMPOSER_OPTS=""
+    - php: 7.2
+      dist: bionic
+      env: COMPOSER_OPTS="--prefer-lowest"
+    - php: 7.3
+      dist: bionic
+      env: COMPOSER_OPTS=""
+    - php: 7.3
+      dist: bionic
+      env: COMPOSER_OPTS="--prefer-lowest"
+    - php: 7.4
+      dist: bionic
+      env: COMPOSER_OPTS=""
+    - php: 7.4
+      dist: bionic
+      env: COMPOSER_OPTS="--prefer-lowest"
+    - php: 8.0
+      dist: bionic
+      env: COMPOSER_OPTS=""
+    - php: 8.0
+      dist: bionic
+      env: COMPOSER_OPTS="--prefer-lowest"
+    - php: nightly
+      dist: bionic
+      env: COMPOSER_OPTS="--ignore-platform-reqs"
+    - php: nightly
+      dist: bionic
+      env: COMPOSER_OPTS="--ignore-platform-reqs --prefer-lowest"
+  allow_failures:
+    - php: nightly
+      env: COMPOSER_OPTS="--ignore-platform-reqs"
+    - php: nightly
+      env: COMPOSER_OPTS="--ignore-platform-reqs --prefer-lowest"
+
+install:
+  - travis_retry composer update --prefer-dist $COMPOSER_OPTS
+
+script:
+  - composer php-cs-fixer:lint
+  - composer test:unit
+  - composer analyze
+
+after_script:
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - php ocular.phar code-coverage:upload --format=php-clover coverage.xml

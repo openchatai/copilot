@@ -10,7 +10,6 @@ from opencopilot_types.workflow_type import WorkflowDataType
 from routes.workflow.validate_json import validate_json
 from utils.db import Database
 from opencopilot_utils import get_vector_store, StoreOptions
-import logging
 
 db_instance = Database()
 mongo = db_instance.get_db()
