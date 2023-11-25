@@ -1,12 +1,13 @@
+from typing import cast
+
+from flask import jsonify, Blueprint, request, Response, abort
+
 from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id,
     get_unique_sessions_with_first_message_by_bot_id, create_chat_history,
 )
-from opencopilot_db.chatbot import Chatbot
-
-from models.repository.copilot_repo import find_one_or_fail_by_id, find_one_or_fail_by_token
+from models.repository.copilot_repo import find_one_or_fail_by_token
 from utils.db import Database
-from flask import jsonify, Blueprint, request, Response, abort
 from .. import root_service
 
 db_instance = Database()
@@ -85,8 +86,10 @@ def send_chat():
 
     session_id = request.headers.get('X-Session-Id', '')
     swagger_url = bot.swagger_url
-    headers = request.headers
+    headers = dict(request.headers)
     base_prompt = bot.prompt_message
+    app_name = headers.get("X-App-Name") or None
+    server_base_url = cast(str, request.form.get("server_base_url", ""))
 
     if not bot:
         return jsonify({
@@ -104,7 +107,8 @@ def send_chat():
             base_prompt=base_prompt,
             bot_id=bot.id,
             headers=headers,
-            server_base_url=''  # todo what is this?
+            server_base_url=server_base_url,
+            app=app_name,
         )
 
         create_chat_history(bot.id, session_id, True, message)
@@ -118,7 +122,7 @@ def send_chat():
         return jsonify({
             "type": "text",
             "response": {
-                "text": response_data
+                "text": response_data["response"]
             }
         })
     except Exception as e:
