@@ -6,8 +6,9 @@ from flask import Blueprint, jsonify, request
 from prance import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.utils import secure_filename
-from enums.initial_prompt import ChatBotInitialPromptEnum
+
 import routes._swagger.service as swagger_service
+from enums.initial_prompt import ChatBotInitialPromptEnum
 from models.repository.copilot_repo import (list_all_with_filter, find_or_fail_by_bot_id, find_one_or_fail_by_id,
                                             create_copilot, chatbot_to_dict, SessionLocal, update_copilot)
 from utils.swagger_parser import SwaggerParser
@@ -46,7 +47,11 @@ def handle_swagger_file():
 
             result = swagger_service.save_swaggerfile_to_mongo(filename, chatbot.get('id'))
         except ValidationError as e:
-            return jsonify({'failure': str(e)}), 400
+            return jsonify({
+                'failure': 'The copilot was created, but we failed to handle the swagger file duo to some'
+                           ' validation issues, your copilot will work fine but without the ability to'
+                           ' talk with any APIs. error: {}'.format(
+                    str(e))}), 400
 
         return jsonify({
             'file_name': filename,
