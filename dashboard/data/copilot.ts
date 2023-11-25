@@ -41,7 +41,7 @@ export type ValidatorResponseType = {
 };
 
 export async function listCopilots() {
-  return await instance.get<CopilotType[]>("/copilots");
+  return await instance.get<CopilotType[]>("/copilot");
 }
 
 export async function getCopilot(id: string) {
