@@ -5,8 +5,9 @@ services:
     build:
       context: ./llm-server
       dockerfile: Dockerfile
-    image: codebanesr/llm-server:latest  # Add this line
+    image: codebanesr/llm-server:latest
     volumes:
+      - ./llm-server:/app  # Mount the host llm-server directory to /app in the container
       - shared_data:/app/shared_data
     networks:
       - opencopilot_network

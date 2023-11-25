@@ -16,3 +16,5 @@ class ChatBotInitialPromptEnum:
         "you need to answer the question based on the context. Always present your answers "
         "in a nice markdown format to ease reading."
     )
+
+
