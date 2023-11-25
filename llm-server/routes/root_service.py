@@ -1,8 +1,20 @@
+import logging
 import os
+from typing import Dict, Any, cast
 from typing import Optional, List, Tuple
 
-import logging
+from bson import ObjectId
+from langchain.chains import ConversationalRetrievalChain
+from langchain.docstore.document import Document
+from langchain.prompts import PromptTemplate
+from langchain.schema import HumanMessage, SystemMessage
+from langchain.vectorstores.base import VectorStore
+from opencopilot_utils import get_llm, StoreOptions
+from opencopilot_utils.get_vector_store import get_vector_store
+from prance import ResolvingParser
+
 from custom_types.action_type import ActionType
+from models.repository.chat_history_repo import get_chat_history_for_retrieval_chain
 from routes.workflow.typings.run_workflow_input import WorkflowData
 from routes.workflow.utils import (
     run_workflow,
@@ -10,24 +22,12 @@ from routes.workflow.utils import (
     hasSingleIntent,
     create_workflow_from_operation_ids,
 )
-from opencopilot_utils import get_llm, StoreOptions
-from bson import ObjectId
-import os
-from typing import Dict, Any, cast
 from routes.workflow.utils.router import get_action_type
+from utils import struct_log
 from utils.chat_models import CHAT_MODELS
 from utils.db import Database
-from models.repository.chat_history_repo import get_chat_history_for_retrieval_chain
 from utils.get_chat_model import get_chat_model
 from utils.process_app_state import process_state
-from prance import ResolvingParser
-from langchain.docstore.document import Document
-from langchain.schema import HumanMessage, SystemMessage
-from opencopilot_utils.get_vector_store import get_vector_store
-from langchain.vectorstores.base import VectorStore
-from langchain.prompts import PromptTemplate
-from langchain.chains import ConversationalRetrievalChain
-from utils import struct_log
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -179,7 +179,7 @@ def get_qa_prompt_by_mode(mode: str, initial_prompt: Optional[str]) -> str:
 
 
 def getConversationRetrievalChain(
-    vector_store: VectorStore, mode, initial_prompt: str, bot_id: str
+        vector_store: VectorStore, mode, initial_prompt: str, bot_id: str
 ):
     llm = get_llm()
     # template = get_qa_prompt_by_mode(mode, initial_prompt=initial_prompt)
@@ -260,15 +260,15 @@ def get_swagger_doc(swagger_url: str) -> ResolvingParser:
 
 
 def handle_existing_workflow(
-    document: Document,  # lagnchaing
-    text: str,
-    headers: Dict[str, Any],
-    server_base_url: str,
-    swagger_url: str,
-    app: str,
-    swagger_doc: ResolvingParser,
-    session_id: str,
-    bot_id: str,
+        document: Document,  # lagnchaing
+        text: str,
+        headers: Dict[str, Any],
+        server_base_url: str,
+        swagger_url: str,
+        app: str,
+        swagger_doc: ResolvingParser,
+        session_id: str,
+        bot_id: str,
 ) -> Dict[str, Any]:
     # use user defined workflows if exists, if not use auto_gen_workflow
     _workflow = mongo.workflows.find_one(
@@ -291,15 +291,15 @@ def handle_existing_workflow(
 
 
 def handle_api_calls(
-    ids: List[str],
-    swagger_doc: ResolvingParser,
-    text: str,
-    headers: Dict[str, Any],
-    server_base_url: str,
-    swagger_url: str,
-    app: str,
-    session_id: str,
-    bot_id: str,
+        ids: List[str],
+        swagger_doc: ResolvingParser,
+        text: str,
+        headers: Dict[str, Any],
+        server_base_url: str,
+        swagger_url: str,
+        app: str,
+        session_id: str,
+        bot_id: str,
 ) -> Dict[str, Any]:
     _workflow = create_workflow_from_operation_ids(ids, swagger_doc, text)
     output = run_workflow(

@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from typing import List, Optional, Any, Type, Dict
+from typing import List, Optional, Any, Type
 
 from opencopilot_db.chatbot import Chatbot, engine
 from sqlalchemy import exc
