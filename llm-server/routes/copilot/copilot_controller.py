@@ -13,7 +13,7 @@ from utils.swagger_parser import SwaggerParser
 
 copilot = Blueprint('copilot', __name__)
 
-UPLOAD_FOLDER = ''  # Todo: use the right folder or use upload files container
+UPLOAD_FOLDER = 'shared_data'
 
 
 @copilot.route('/', methods=['GET'])
