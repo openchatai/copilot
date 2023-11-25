@@ -141,13 +141,19 @@ def chatbot_to_dict(chatbot):
     """Convert a Chatbot object to a dictionary."""
 
     return {
-        "id": chatbot.id,  # Convert binary to hex string if id is binary
+        "id": chatbot.id.hex() if isinstance(chatbot.id, bytes) else chatbot.id,  # Converts binary to hex string if id is binary
         "name": chatbot.name,
         "token": chatbot.token,
         "website": chatbot.website,
-        "initial_prompt": chatbot.prompt_message,
+        "status": chatbot.status,
+        "prompt_message": chatbot.prompt_message,
+        "enhanced_privacy": chatbot.enhanced_privacy,
+        "smart_sync": chatbot.smart_sync,
+        "created_at": chatbot.created_at.isoformat() if chatbot.created_at else None,  # Converts datetime to ISO format string
+        "updated_at": chatbot.updated_at.isoformat() if chatbot.updated_at else None,  # Converts datetime to ISO format string
+        "deleted_at": chatbot.deleted_at.isoformat() if chatbot.deleted_at else None,  # Converts datetime to ISO format string
+        "swagger_url": chatbot.swagger_url,
     }
-
 
 def update_copilot(copilot_id: str,
                    name: Optional[str] = None,
