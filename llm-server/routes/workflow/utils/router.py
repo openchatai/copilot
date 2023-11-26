@@ -24,7 +24,7 @@ def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
 
         retriever = vector_store.as_retriever(
             search_kwargs={
-                "k": 5,
+                "k": 3,
                 "score_threshold": score_threshold,
                 "filter": {"bot_id": bot_id},
             },
@@ -33,7 +33,14 @@ def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
         result = retriever.get_relevant_documents(text)
 
         if result and len(result) > 0:
-            return result[0].page_content
+            # Assuming result is a list of objects and each object has a page_content attribute
+            all_page_content = "\n".join([item.page_content for item in result])
+
+            # Replace multiple new lines with a single new line
+            cleaned_page_content = "\n".join(
+                line.strip() for line in all_page_content.splitlines() if line.strip()
+            )
+            return cleaned_page_content
 
         return None
 
@@ -58,39 +65,48 @@ def classify_text(
     struct_log.info(
         event="select_classification_prompt",
         app=app,
+        context=context,
+        classification_prompt=custom_classification_prompt,
         selected_prompt=custom_classification_prompt,
     )
 
     messages: List[BaseMessage] = [
         SystemMessage(
-            content=f"Respond with the string '{ActionType.ASSISTANT_ACTION.value}' for questions that are centered around data / api calling etc. Output '{ActionType.KNOWLEDGE_BASE_QUERY.value}' if the question can be answered from the context provided in the chat. For questions related to math / data of an organization / api calls etc output {ActionType.KNOWLEDGE_BASE_QUERY.value}"
-        ),
+            content="You possess the ability to categorize user input into predefined types determined by the user."
+        )
     ]
+
+    # adding prev conversations
+    messages.extend(prev_conversations[-10:])
     if custom_classification_prompt is not None:
-        messages = []
         messages.append(SystemMessage(content=custom_classification_prompt))
+    else:
+        messages.append(
+            HumanMessage(
+                content=f"Respond with the string '{ActionType.ASSISTANT_ACTION.value}' for questions that are centered around data / api calling or questions related to math / data of an organization / api calls etc . Output '{ActionType.KNOWLEDGE_BASE_QUERY.value}' if and only if question can confidently be answered from the context provided in the chat."
+            )
+        )
 
-    if context is not None:
-        messages.append(HumanMessage(content="provided context: {context}"))
-        
+    messages.append(HumanMessage(content=f"provided context: {context}"))
     messages.append(
-            HumanMessage(content=user_requirement),
+        HumanMessage(
+            content="If the user is inquiring about a previous question, produce the same category as output as the one to which this follow-up pertains."
+        )
+    )
+    messages.append(
+        HumanMessage(
+            content=f"If the question cannot be answered from the provided context output {ActionType.ASSISTANT_ACTION.value}"
+        )
     )
 
-    if len(prev_conversations) > 0:
-        messages.extend(prev_conversations)
-
-    messages.extend(
-        [
-            HumanMessage(content=f"knowledgebase: {context}"),
-            HumanMessage(content=f"{user_requirement}"),
-        ]
+    messages.append(
+        HumanMessage(content=user_requirement),
     )
+
     content = chat(messages).content
-    
+
     struct_log.info(
-        event="classification_model_output",
-        data=content,
+        event="classification_model_output", data=content, messages=messages
     )
     if ActionType.ASSISTANT_ACTION.value in content:
         return ActionType.ASSISTANT_ACTION
