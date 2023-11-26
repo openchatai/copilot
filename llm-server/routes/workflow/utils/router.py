@@ -63,7 +63,7 @@ def classify_text(
 
     messages: List[BaseMessage] = [
         SystemMessage(
-            content=f"Respond with the string '{ActionType.ASSISTANT_ACTION.value}' for questions that are centered around data / api calling etc. Output '{ActionType.KNOWLEDGE_BASE_QUERY.value}' if the question can be answered from the context provided in the chat. If nothing matches, output {ActionType.ASSISTANT_ACTION.value}"
+            content=f"Respond with the string '{ActionType.ASSISTANT_ACTION.value}' for questions that are centered around data / api calling etc. Output '{ActionType.KNOWLEDGE_BASE_QUERY.value}' if the question can be answered from the context provided in the chat. For questions related to math / data of an organization / api calls etc output {ActionType.KNOWLEDGE_BASE_QUERY.value}"
         ),
     ]
     if custom_classification_prompt is not None:
