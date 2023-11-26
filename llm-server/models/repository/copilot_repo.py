@@ -42,6 +42,7 @@ def list_all_with_filter(filter_criteria: Optional[Any] = None) -> List[Chatbot]
         return results
     except Exception as e:
         print(f"Error occurred: {e}")
+        raise
     finally:
         session.close()
 
@@ -63,10 +64,11 @@ def create_copilot(
     name: str,
     prompt_message: str,
     swagger_url: str,
+    email: str,
     enhanced_privacy: bool = False,
     smart_sync: bool = False,
     website: Optional[str] = None,
-) -> dict[str, Any]:
+):
     """
     Creates a new Chatbot instance and adds it to the database.
 
@@ -84,34 +86,36 @@ def create_copilot(
     Raises:
         Exception: If any exception occurs during the database operation.
     """
-    session: Session = SessionLocal()
-    token = generate_random_token(16)
+    with SessionLocal() as session:
+        token = generate_random_token(16)
 
-    new_chatbot = Chatbot(
-        id=str(uuid.uuid4()),
-        name=name,
-        token=token,
-        website=website,
-        prompt_message=prompt_message,
-        swagger_url=swagger_url,
-        enhanced_privacy=enhanced_privacy,
-        smart_sync=smart_sync,
-        created_at=datetime.datetime.utcnow(),
-        updated_at=datetime.datetime.utcnow(),
-    )
+        new_chatbot = Chatbot(
+            id=str(uuid.uuid4()),
+            name=name,
+            token=token,
+            website=website,
+            prompt_message=prompt_message,
+            swagger_url=swagger_url,
+            enhanced_privacy=enhanced_privacy,
+            smart_sync=smart_sync,
+            created_at=datetime.datetime.utcnow(),
+            updated_at=datetime.datetime.utcnow(),
+            email=email,
+        )
 
-    try:
-        session.add(new_chatbot)
-        session.commit()
-        return chatbot_to_dict(new_chatbot)
-    except Exception as e:
-        session.rollback()
-        struct_log.exception(app="OPENCOPILOT", error=str(e), event="/swagger")
-    finally:
-        session.close()
+        try:
+            session.add(new_chatbot)
+            session.commit()
+            return chatbot_to_dict(new_chatbot)
+        except Exception as e:
+            session.rollback()
+            struct_log.exception(app="OPENCOPILOT", error=str(e), event="/swagger")
+            raise e
+        finally:
+            session.close()
 
 
-def find_one_or_fail_by_id(bot_id: str) -> Type[Chatbot]:
+def find_one_or_fail_by_id(bot_id: str) -> Chatbot:
     """
     Finds a Chatbot instance by its ID. Raises an exception if the Chatbot is not found.
 
@@ -133,12 +137,12 @@ def find_one_or_fail_by_id(bot_id: str) -> Type[Chatbot]:
         raise ValueError(f"No Chatbot found with id: {bot_id}")
     except Exception as e:
         session.rollback()
-        print(f"Error occurred: {e}")
+        raise e
     finally:
         session.close()
 
 
-def find_one_or_fail_by_token(bot_token: str) -> Type[Chatbot]:
+def find_one_or_fail_by_token(bot_token: str) -> Chatbot:
     """
     Finds a Chatbot instance by its ID. Raises an exception if the Chatbot is not found.
 
@@ -160,13 +164,13 @@ def find_one_or_fail_by_token(bot_token: str) -> Type[Chatbot]:
         raise ValueError(f"No Chatbot found with token: {bot_token}")
     except Exception as e:
         session.rollback()
-        print(f"Error occurred: {e}")
+        raise e
     finally:
         session.close()
 
 
 # Todo: move it to the model once we extract it from the module
-def chatbot_to_dict(chatbot):
+def chatbot_to_dict(chatbot: Chatbot):
     """Convert a Chatbot object to a dictionary."""
 
     return {

@@ -1,7 +1,7 @@
 import uuid
 
 from opencopilot_db.database_setup import Base, engine
-from sqlalchemy import Column, String, DateTime, Boolean, Integer, Text, UUID, BINARY
+from sqlalchemy import Column, String, DateTime, Boolean, Text
 import datetime
 
 
@@ -10,6 +10,7 @@ class Chatbot(Base):
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String(255))
+    email = Column(String(255), nullable=True, default='guest')
     token = Column(String(255))
     website = Column(String(255), nullable=True)
     status = Column(String(255), default='draft')
