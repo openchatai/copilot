@@ -1,8 +1,7 @@
-from flask import request, jsonify, Blueprint, request, Response
-
 from bson import ObjectId
-import routes._swagger.service as swagger_service
+from flask import jsonify, Blueprint, request, Response
 
+import routes._swagger.service as swagger_service
 from utils.db import Database
 
 db_instance = Database()

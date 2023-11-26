@@ -1,9 +1,7 @@
-import json, inspect
+import json
 from opencopilot_types.workflow_type import WorkflowDataType
 from routes.workflow.generate_openapi_payload import generate_openapi_payload
 from utils.make_api_call import make_api_request
-import traceback
-import logging
 from typing import Any, Optional
 from routes.workflow.extractors.transform_api_response import (
     transform_api_response_from_schema,
@@ -24,6 +22,7 @@ def run_openapi_operations(
     server_base_url: str,
     app: Optional[str],
 ) -> str:
+    api_request_data = {}
     prev_api_response = ""
     record_info = {"Workflow Name": record.get("name")}
     current_state = process_state(app, headers)
@@ -41,14 +40,19 @@ def run_openapi_operations(
                     current_state,
                 )
 
+                api_request_data[operation_id] = api_payload.__dict__
                 api_response = None
                 try:
-                    struct_log.info(
-                        payload=api_payload.__dict__,
-                        event="make_api_call"
+                    struct_log.info(payload=api_payload.__dict__, event="make_api_call")
+
+                    api_response = make_api_request(
+                        headers=headers, **api_payload.__dict__
                     )
-                    
-                    api_response = make_api_request(headers=headers, **api_payload.__dict__)
+
+                    try:
+                        api_response.json()
+                    except ValueError:
+                        raise ValueError("API response is not JSON")
 
                 except Exception as e:
                     struct_log.exception(error=str(e), event="make api call failed")
@@ -57,31 +61,41 @@ def run_openapi_operations(
                 # if a custom transformer function is defined for this operationId use that, otherwise forward it to the llm
                 # so we don't necessarily have to defined mappers for all api endpoints
                 partial_json = load_json_config(app, operation_id)
+                struct_log.info(event="load_json_config", json_config=partial_json)
                 if not partial_json:
-                    transformed_response = transform_api_response_from_schema(
+                    struct_log.error(
+                        event="load_json_config",
+                        error="Failed to find a config map, consider adding a config map for this operation id",
+                        operation_id=operation_id,
+                    )
+                    record_info[operation_id] = transform_api_response_from_schema(
                         api_payload.endpoint or "", api_response.text
                     )
                 else:
+                    struct_log.info(
+                        event="api_response",
+                        text=api_response.text,
+                        message="Truncate unnecessary info using json_config provided",
+                    )
                     api_json = json.loads(api_response.text)
-                    transformed_response = json.dumps(
+                    record_info[operation_id] = json.dumps(
                         transform_response(
                             full_json=api_json, partial_json=partial_json
                         )
                     )
 
-                prev_api_response = prev_api_response + transformed_response
-                record_info[operation_id] = json.loads(api_response.text)
-
             except Exception as e:
                 struct_log.exception(
-                    payload=json.dumps({
-                        text,
-                        headers,
-                        server_base_url,
-                        app,
-                    }),
+                    payload=json.dumps(
+                        {
+                            "text": text,
+                            "headers": headers,
+                            "server_base_url": server_base_url,
+                            "app": app,
+                        }
+                    ),
                     error=str(e),
                     event="/check_workflow_in_store",
                 )
 
-    return convert_json_to_text(text, prev_api_response)
+    return convert_json_to_text(text, record_info, app, api_request_data)
