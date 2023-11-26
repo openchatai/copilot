@@ -58,23 +58,29 @@ def classify_text(
     struct_log.info(
         event="select_classification_prompt",
         app=app,
+        context=context,
+        classification_prompt=custom_classification_prompt,
         selected_prompt=custom_classification_prompt,
     )
 
     messages: List[BaseMessage] = [
         SystemMessage(
-            content=f"Respond with the string '{ActionType.ASSISTANT_ACTION.value}' for questions that are centered around data / api calling etc. Output '{ActionType.KNOWLEDGE_BASE_QUERY.value}' if the question can be answered from the context provided in the chat. For questions related to math / data of an organization / api calls etc output {ActionType.KNOWLEDGE_BASE_QUERY.value}"
-        ),
+            content="You are a classification model which can classify the user input into one of the types decided by the user"
+        )
     ]
     if custom_classification_prompt is not None:
-        messages = []
         messages.append(SystemMessage(content=custom_classification_prompt))
+    else:
+        messages.append(
+            HumanMessage(
+                content=f"Respond with the string '{ActionType.ASSISTANT_ACTION.value}' for questions that are centered around data / api calling etc. Output '{ActionType.KNOWLEDGE_BASE_QUERY.value}' if the question can be answered from the context provided in the chat. For questions related to math / data of an organization / api calls etc output {ActionType.KNOWLEDGE_BASE_QUERY.value}"
+            )
+        )
 
-    if context is not None:
-        messages.append(HumanMessage(content="provided context: {context}"))
-        
+    messages.append(HumanMessage(content=f"provided context: {context}"))
+
     messages.append(
-            HumanMessage(content=user_requirement),
+        HumanMessage(content=user_requirement),
     )
 
     if len(prev_conversations) > 0:
@@ -82,12 +88,12 @@ def classify_text(
 
     messages.extend(
         [
-            HumanMessage(content=f"knowledgebase: {context}"),
-            HumanMessage(content=f"{user_requirement}"),
+            HumanMessage(content=f"knowledgebase: ({context})"),
+            HumanMessage(content=f"user_input: ({user_requirement})"),
         ]
     )
     content = chat(messages).content
-    
+
     struct_log.info(
         event="classification_model_output",
         data=content,
@@ -97,7 +103,7 @@ def classify_text(
     elif ActionType.KNOWLEDGE_BASE_QUERY.value in content:
         return ActionType.KNOWLEDGE_BASE_QUERY
     else:
-        return content
+        return ActionType.ASSISTANT_ACTION
 
 
 def get_action_type(
