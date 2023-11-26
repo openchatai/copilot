@@ -19,7 +19,7 @@ export default function LogoMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="group relative aspect-square h-full w-full rounded-lg text-xl text-primary/90 outline-none transition-colors hover:bg-accent hover:text-accent-foreground">
-          O
+          ◄
           <ChevronRight className="absolute bottom-0 right-0 h-5 w-5 rotate-45 fill-current transition-transform group-data-[state=open]:translate-x-0.5 group-data-[state=open]:translate-y-0.5" />
         </button>
       </DropdownMenuTrigger>
