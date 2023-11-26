@@ -35,7 +35,7 @@ export default async function HomePage() {
             <div className="flex items-center justify-between gap-5">
               <div>
                 <h1 className="text-lg font-bold text-accent-foreground">
-                  Learn Opencopilot with video tutorials
+                  Learn OpenCopilot with video tutorials
                 </h1>
                 <p className="line-clamp-1">
                   In this course you’ll find everything you need to get started

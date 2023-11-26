@@ -19,7 +19,7 @@ const opensans = Open_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Opencopilot",
+  title: "OpenCopilot",
 };
 
 export default function RootLayout({
