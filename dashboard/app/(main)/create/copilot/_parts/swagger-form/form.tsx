@@ -265,7 +265,7 @@ export function SwaggerForm({ defaultValues }: { defaultValues?: FormValuesWithI
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="request-body" >
-                                Body
+                                Body (JSON Schema only)
                             </Label>
                             <Textarea id="request-body" {...register('body')} placeholder="Request Body" minRows={4} />
                         </div>
