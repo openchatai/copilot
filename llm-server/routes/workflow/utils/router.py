@@ -1,5 +1,6 @@
 import os
-from langchain.schema import HumanMessage, SystemMessage
+from langchain.schema import HumanMessage, SystemMessage, BaseMessage
+from routes.workflow.extractors.extract_json import extract_json_payload
 
 # push it to the library
 from opencopilot_utils.get_vector_store import get_vector_store
@@ -9,10 +10,9 @@ from integrations.custom_prompts.prompt_loader import load_prompts
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from utils.chat_models import CHAT_MODELS
 from utils import get_chat_model
-from typing import Optional
+from typing import Optional, List, Union
 from langchain.vectorstores.base import VectorStore
-from utils import struct_log
-
+from utils.get_logger import struct_log
 
 chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
@@ -43,8 +43,8 @@ def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
 
 
 def classify_text(
-    user_requirement: str, context: str, session_id: str, app: Optional[str]
-) -> ActionType:
+    user_requirement: str, context: Optional[str], session_id: str, app: Optional[str]
+) -> Union[str, ActionType]:
     prev_conversations = []
     if session_id:
         prev_conversations = get_chat_message_as_llm_conversation(session_id)
@@ -60,40 +60,49 @@ def classify_text(
         app=app,
         selected_prompt=custom_classification_prompt,
     )
-    messages = [
-        SystemMessage(
-            content=f"""You are a classification model, which when given user input can classify it into one of the three types below. If the user asks you to list something, show or delete something. You should output {ActionType.ASSISTANT_ACTION.value} because these require making api calls.  {ActionType.KNOWLEDGE_BASE_QUERY.value}."""
-        )
-    ]
 
+    messages: List[BaseMessage] = [
+        SystemMessage(
+            content=f"Respond with the string '{ActionType.ASSISTANT_ACTION.value}' for questions that are centered around data / api calling etc. Output '{ActionType.KNOWLEDGE_BASE_QUERY.value}' if the question can be answered from the context provided in the chat. If nothing matches, output {ActionType.ASSISTANT_ACTION.value}"
+        ),
+    ]
     if custom_classification_prompt is not None:
+        messages = []
         messages.append(SystemMessage(content=custom_classification_prompt))
+
+    if context is not None:
+        messages.append(HumanMessage(content="provided context: {context}"))
+        
+    messages.append(
+            HumanMessage(content=user_requirement),
+    )
 
     if len(prev_conversations) > 0:
         messages.extend(prev_conversations)
 
     messages.extend(
         [
-            HumanMessage(
-                content=f"Here's the user requirement:```{user_requirement}```, and here's the context: ```{context}```. Now classify the user requirement."
-            ),
+            HumanMessage(content=f"knowledgebase: {context}"),
+            HumanMessage(content=f"{user_requirement}"),
         ]
     )
-
     content = chat(messages).content
-
-    struct_log.info(event="classifier_output", data=content)
-
-    if ActionType.ASSISTANT_ACTION.value in content or context is None:
+    
+    struct_log.info(
+        event="classification_model_output",
+        data=content,
+    )
+    if ActionType.ASSISTANT_ACTION.value in content:
         return ActionType.ASSISTANT_ACTION
-
-    elif context is not None:
+    elif ActionType.KNOWLEDGE_BASE_QUERY.value in content:
         return ActionType.KNOWLEDGE_BASE_QUERY
+    else:
+        return content
 
 
 def get_action_type(
     user_requirement: str, bot_id: str, session_id: str, app: Optional[str]
-) -> ActionType:
+) -> Union[str, ActionType]:
     context = get_relevant_docs(user_requirement, bot_id) or None
 
     route = classify_text(user_requirement, context, session_id, app)

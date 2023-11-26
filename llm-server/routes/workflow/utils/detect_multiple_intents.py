@@ -7,7 +7,7 @@ from routes.workflow.utils.get_swagger_summary import get_summaries
 from utils.chat_models import CHAT_MODELS
 from utils.get_chat_model import get_chat_model
 from routes.workflow.extractors.extract_json import extract_json_payload
-from utils import struct_log
+from utils.get_logger import struct_log
 from prance import ResolvingParser
 from models.repository.chat_history_repo import (
     get_chat_message_as_llm_conversation,
