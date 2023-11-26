@@ -159,7 +159,7 @@ export function SwaggerForm({ defaultValues }: { defaultValues?: FormValuesWithI
                         </Button>
                     </AlertDialogHeader>
                     <div className="w-full space-y-4 flex-1">
-                        <Input placeholder="Title" data-invalid={form.getFieldState('title').invalid}  {...register('title')} />
+                        <Input placeholder="Title, for example (Create a new post)" data-invalid={form.getFieldState('title').invalid}  {...register('title')} />
                         <div className="w-full">
                             <div data-invalid={form.getFieldState('url').invalid || form.getFieldState('method').invalid} className="flex items-center data-[invalid='true']:!border-destructive h-12 gap-0.5 p-1 overflow-hidden border border-border w-full m-0 bg-white shadow-sm rounded-md focus:outline-none text-sm focus-visible:outline-none transition-colors">
                                 <FormSelect value={form.watch('method')} {...register('method')}>
@@ -183,7 +183,7 @@ export function SwaggerForm({ defaultValues }: { defaultValues?: FormValuesWithI
 
                         <div>
                             <div className="w-full relative">
-                                <Textarea {...register('summary')} maxRows={5} data-invalid={form.getFieldState('summary').invalid} placeholder="Summary" minRows={2} />
+                                <Textarea {...register('summary')} maxRows={5} data-invalid={form.getFieldState('summary').invalid} placeholder="Summary, make sure it's cela and easy to understand" minRows={2} />
                                 <span className="absolute -top-2 -right-2 bg-white px-1.5 py-0.5 text-xs rounded-md text-muted-foreground">
                                     {form.watch('summary')?.length || 0}/50
                                 </span>
