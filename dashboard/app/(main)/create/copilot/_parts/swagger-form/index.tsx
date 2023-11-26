@@ -31,7 +31,7 @@ export function SwaggerUi() {
         <div>
             <div className="flex items-center justify-between">
                 <Label className="my-4 text-sm text-accent-foreground">
-                    Use our straight forward form to add new endpoints.
+                    Use our straight forward form to add new endpoints. →
                 </Label>
                 <button onClick={addNewEndpoint}>
                     <Plus className="w-5 h-5" />
