@@ -2,13 +2,9 @@
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter"
     },
-    "python.formatting.provider": "none",
     "editor.formatOnSave": true,
-    "python.pythonPath": "~/anaconda3/envs/copilot/bin",
-    "python.linting.enabled": true,
-    "python.linting.pylintEnabled": false,
-    "python.linting.flake8Enabled": false,
-    "python.linting.mypyEnabled": true,
-    // "python.linting.mypyPath": "",
-    "mypy.configFile": "mypy.toml",
+    "python.analysis.inlayHints.functionReturnTypes": true,
+    "python.analysis.inlayHints.variableTypes": true,
+    // "python.defaultInterpreterPath": "~/anaconda3/envs/llmserver/bin/python",
+    "python.analysis.typeCheckingMode": "basic",
 }

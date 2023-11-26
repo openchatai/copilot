@@ -1,9 +1,9 @@
-from typing import Any, Dict, Optional, Union
+import os
+from typing import Dict, Optional, Union
 from utils.db import Database
 
 db_instance = Database()
 mongo = db_instance.get_db()
-import os
 
 SCORE_THRESHOLD = float(os.getenv("SCORE_THRESOLD", 0.88))
 

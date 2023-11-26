@@ -8,7 +8,7 @@ class WorkflowData:
         text: str,
         headers: Dict[str, str],
         server_base_url: str,
-        swagger_url: str,
+        swagger_url: Optional[str],
         app: Optional[str],
     ) -> None:
         self.text = text

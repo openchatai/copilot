@@ -5,6 +5,7 @@ from opencopilot_utils import get_llm
 from routes.workflow.extractors.extract_param import gen_params_from_schema
 from routes.workflow.extractors.extract_body import gen_body_from_schema
 from typing import Any, Optional
+from routes.workflow.api_info import ApiInfo
 
 from prance import ResolvingParser
 import asyncio
@@ -12,14 +13,6 @@ import asyncio
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
-
-
-from typing import Any, Optional, List
-
-
-# get path param, query param and json body schema for a given operation id
-from typing import Optional
-from routes.workflow.api_info import ApiInfo
 
 
 def get_api_info_by_operation_id(data: Any, target_operation_id: str) -> ApiInfo:
