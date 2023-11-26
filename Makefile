@@ -86,7 +86,4 @@ purge:
 	$(DOCKER_COMPOSE) down -v --remove-orphans
 	rm -f llm-server/.env
 
-	@echo "$(COLOR_BOLD)=== 🟢 Starting from a clean scratch ===$(COLOR_RESET)"
-	make install
-
 .PHONY: install down
