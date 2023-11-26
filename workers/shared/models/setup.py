@@ -5,7 +5,7 @@ with open("readme.md", "r", encoding="utf-8") as readme_file:
 
 setup(
     name="opencopilot_db",
-    version="5.0.0",
+    version="6.0.0-rc.1",
     packages=find_packages(),
     install_requires=[
         "sqlalchemy",

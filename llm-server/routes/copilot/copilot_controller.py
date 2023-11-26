@@ -5,8 +5,11 @@ import uuid
 from flask import Blueprint, jsonify, request
 from prance import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
+from utils.llm_consts import get_username_from_request
 from werkzeug.utils import secure_filename
 from utils.base import resolve_abs_local_file_path_from
+from utils.get_logger import struct_log
+from opencopilot_db.chatbot import Chatbot
 
 import routes._swagger.service as swagger_service
 from enums.initial_prompt import ChatBotInitialPromptEnum
@@ -28,7 +31,9 @@ UPLOAD_FOLDER = "shared_data"
 
 @copilot.route("/", methods=["GET"])
 def index():
-    chatbots = list_all_with_filter()
+    email = get_username_from_request(request)
+    filter_criteria = Chatbot.email == email
+    chatbots = list_all_with_filter(filter_criteria=filter_criteria)
 
     return jsonify([chatbot_to_dict(chatbot) for chatbot in chatbots])
 
@@ -37,7 +42,7 @@ def index():
 def handle_swagger_file():
     if "swagger_file" not in request.files:
         return jsonify({"error": "You must upload a swagger file."}), 400
-
+    struct_log.info(event="handling swagger file", data=request.get_data)
     file = request.files["swagger_file"]
     if file.filename == "":
         return jsonify({"error": "No selected file."}), 400
@@ -53,11 +58,10 @@ def handle_swagger_file():
                     "prompt_message", ChatBotInitialPromptEnum.AI_COPILOT_INITIAL_PROMPT
                 ),
                 website=request.form.get("website", "https://example.com"),
+                email=get_username_from_request(request),
             )
 
-            result = swagger_service.save_swaggerfile_to_mongo(
-                filename, chatbot.get("id")
-            )
+            swagger_service.save_swaggerfile_to_mongo(filename, str(chatbot["id"]))
         except ValidationError as e:
             return (
                 jsonify(
