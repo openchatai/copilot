@@ -1,6 +1,6 @@
 import axios from "axios";
 const instance = axios.create({
-  baseURL: "http://localhost:8888/llm-server/flows",
+  baseURL: "http://localhost:8888/backend/flows",
 });
 type Flow = {
   name: string;

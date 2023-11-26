@@ -1,12 +1,14 @@
-from flask import Blueprint, Response, request
+import os
+import json
+from flask import Blueprint, Response, request, jsonify
 from werkzeug.utils import secure_filename
 import secrets
-from flask import request, jsonify
 from routes.uploads.celery_service import celery
 import validators
+from typing import Optional
 
 upload = Blueprint("upload", __name__)
-import os, json, uuid
+
 
 SHARED_FOLDER = os.getenv("SHARED_FOLDER", "/app/shared_data/")
 os.makedirs(SHARED_FOLDER, exist_ok=True)
@@ -14,24 +16,41 @@ os.makedirs(SHARED_FOLDER, exist_ok=True)
 upload_controller = Blueprint("uploads", __name__)
 
 
-def generate_unique_filename(filename):
-    # Generate a random prefix using secrets module
-    random_prefix = secrets.token_hex(4)  # Adjust the length of the prefix as needed
+def generate_unique_filename(filename: Optional[str]) -> str:
+    """Generate a unique filename with a random prefix.
 
-    # Combine the random prefix and the secure filename
-    unique_filename = f"{random_prefix}_{secure_filename(filename)}"
-    return unique_filename
+    Args:
+        filename: The original filename
+
+    Returns:
+        The unique filename
+    """
+    if filename is None:
+        filename = ""
+
+    random_prefix: str = secrets.token_hex(4)
+    secure_name: str = secure_filename(filename)
+    unique_name: str = f"{random_prefix}_{secure_name}"
+    return unique_name
 
 
 @upload_controller.route("/server/upload", methods=["POST"])
-def upload_file():
+def upload_file() -> Response:
     if "file" not in request.files:
-        return jsonify({"error": "No file part"}), 400
+        return Response(
+            response=json.dumps({"error": "No file part"}),
+            status=400,
+            mimetype="application/json",
+        )
 
     file = request.files["file"]
 
     if file.filename == "":
-        return jsonify({"error": "No selected file"}), 400
+        return Response(
+            response=json.dumps({"error": "No selected file"}),
+            status=400,
+            mimetype="application/json",
+        )
 
     # Generate a unique filename
     unique_filename = generate_unique_filename(file.filename)
@@ -43,17 +62,22 @@ def upload_file():
         # Save the file to the shared folder
         file.save(file_path)
     except Exception as e:
-        return jsonify({"error": f"Failed to save file: {str(e)}"}), 500
+        return Response(
+            response=json.dumps({"error": f"Failed to save file: {str(e)}"}),
+            status=500,
+            mimetype="application/json",
+        )
 
-    return (
-        jsonify(
+    return Response(
+        response=json.dumps(
             {
                 "success": "File uploaded successfully",
                 "filename": unique_filename,
                 "file_path": file_path,
             }
         ),
-        200,
+        status=200,
+        mimetype="application/json",
     )
 
 
@@ -85,12 +109,11 @@ def start_file_ingestion() -> Response:
             else:
                 print(f"Received: {filename}, is neither a pdf nor a url. ")
 
-        return (
-            "Datasource ingestion started successfully",
-            200,
+        return Response(
+            status=200, response="Datasource ingestion started successfully"
         )
     except Exception as e:
-        return str(e), 500  # Handle errors appropriately and return an error response
+        return Response(response=str(e), status=500)
 
 
 @upload_controller.route("/web/retry", methods=["POST"])
@@ -98,24 +121,41 @@ def retry_failed_web_crawl():
     """Re-runs a failed web crawling task.
 
     Args:
-      website_data_source_id: The ID of the website data source to resume crawling.
+      website_data_source_id (str): The ID of the website data source to resume crawling.
 
     Returns:
-      A JSON object with the following fields:
-        status: The status of the web crawling task.
-        error: The error message, if any.
+      Response: A Flask Response object with the following JSON object:
+        {
+          "status": "success" | "failed",
+          "error": error message if any
+        }
     """
 
-    website_data_source_id = request.json["website_data_source_id"]
-
     try:
-        celery.send_task(
-            "web_crawl.resume_failed_website_scrape", args=[website_data_source_id]
+        if request.json:
+            website_data_source_id = request.json["website_data_source_id"]
+            celery.send_task(
+                "web_crawl.resume_failed_website_scrape", args=[website_data_source_id]
+            )
+
+        return Response(
+            status=200,
+            mimetype="application/json",
+            response={
+                "status": "success",
+                "error": None,
+            },
         )
 
-        return jsonify({"status": "retrying", "error": None})
     except Exception as e:
-        return jsonify({"status": "failed", "error": str(e)})
+        return Response(
+            status=500,
+            mimetype="application/json",
+            response={
+                "status": "failed",
+                "error": str(e),
+            },
+        )
 
 
 @upload_controller.route("/pdf/retry", methods=["POST"])
@@ -132,14 +172,32 @@ def retry_failed_pdf_crawl():
         error: The error message, if any.
     """
 
-    chatbot_id = request.json["chatbot_id"]
-    file_name = request.json["file_name"]
-
     try:
-        celery.send_task(
-            "pdf_crawl.retry_failed_pdf_crawl", args=[chatbot_id, file_name]
-        )
+        if request.json:
+            chatbot_id = request.json["chatbot_id"]
+            file_name = request.json["file_name"]
+            celery.send_task(
+                "pdf_crawl.retry_failed_pdf_crawl", args=[chatbot_id, file_name]
+            )
 
-        return jsonify({"status": "retrying", "error": None})
+            return Response(
+                status=415,
+                response={
+                    "status": "415 Unsupported Media Type",
+                    "error": "Unsupported Media Type",
+                },
+                mimetype="application/json",
+            )
+        else:
+            return Response(
+                status=200,
+                response={"status": "retrying", "error": None},
+                mimetype="application/json",
+            )
     except Exception as e:
-        return jsonify({"status": "failed", "error": str(e)})
+        # Handle the exception and return a proper Response object
+        return Response(
+            status=500,
+            response={"status": "failed", "error": str(e)},
+            mimetype="application/json",
+        )

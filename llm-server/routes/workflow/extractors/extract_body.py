@@ -6,7 +6,6 @@ from opencopilot_utils import get_llm
 
 from typing import Any, Optional
 from routes.workflow.extractors.extract_json import extract_json_payload
-from custom_types.t_json import JsonData
 import importlib
 import logging
 

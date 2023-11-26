@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "http://localhost:8888/backend/api",
+  baseURL: "http://localhost:8888/backend/copilot",
 });
 
 export type CopilotType = {
@@ -41,29 +41,29 @@ export type ValidatorResponseType = {
 };
 
 export async function listCopilots() {
-  return await instance.get<CopilotType[]>("/copilots");
+  return await instance.get<CopilotType[]>("/");
 }
 
 export async function getCopilot(id: string) {
   if (!id) throw new Error("Copilot id is required");
-  return await instance.get<{ chatbot: CopilotType }>(`/copilot/${id}`);
+  return await instance.get<{ chatbot: CopilotType }>(`/${id}`);
 }
 // http://localhost:8888/backend/api/copilot/:id
 export async function deleteCopilot(id: string) {
   if (!id) throw new Error("Copilot id is required");
   return instance.delete<{
     success: string;
-  }>(`/copilot/${id}`);
+  }>(`/${id}`);
 }
 
 export async function updateCopilot(id: string, copilot: Partial<CopilotType>) {
   return instance.post<{
     chatbot: CopilotType;
-  }>(`/copilot/${id}`, copilot);
+  }>(`/${id}`, copilot);
 }
 export async function validateSwagger(bot_id: string) {
   if (!bot_id) throw new Error("Bot id is required");
-  return instance.get<ValidatorResponseType>(`/copilot/${bot_id}/validator`);
+  return instance.get<ValidatorResponseType>(`/${bot_id}/validator`);
 }
 
 export async function createCopilot({ swagger_file }: { swagger_file: File }) {
@@ -71,7 +71,7 @@ export async function createCopilot({ swagger_file }: { swagger_file: File }) {
   data.append("swagger_file", swagger_file);
   return instance.post<{
     chatbot: CopilotType;
-  }>("/copilot/swagger", data, {
+  }>("/swagger", data, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -87,5 +87,5 @@ export type PetStoreCopilotType = {
 };
 
 export async function createPetstoreTemplate() {
-  return await instance.get<PetStoreCopilotType>(`/copilot/swagger/pre-made`);
+  return await instance.get<PetStoreCopilotType>(`/swagger/pre-made`);
 }

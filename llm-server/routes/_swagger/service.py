@@ -1,14 +1,13 @@
-from http.client import HTTPException
 import json
-from routes.root_service import get_swagger_doc
 import yaml
+from typing import Dict
+from flask import Request
 
+from routes.root_service import get_swagger_doc
 from utils.db import Database
 
 db_instance = Database()
 mongo = db_instance.get_db()
-from typing import Dict
-from flask import Request
 
 
 def save_swaggerfile_to_mongo(filename: str, bot_id: str) -> bool:

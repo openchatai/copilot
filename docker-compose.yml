@@ -1,34 +1,13 @@
 version: "3"
 services:
-  backend:
-    restart: unless-stopped
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    image: codebanesr/backend:latest  # Add this line
-    ports:
-      - 5001:5000
-    depends_on:
-      - llm-server
-      - mysql
-    environment:
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_DATABASE=opencopilot
-      - DB_USERNAME=dbuser
-      - DB_PASSWORD=dbpass
-    volumes:
-      - shared_data:/app/shared_data
-    networks:
-      - opencopilot_network
-
   llm-server:
     restart: unless-stopped
     build:
       context: ./llm-server
       dockerfile: Dockerfile
-    image: codebanesr/llm-server:latest  # Add this line
+    image: codebanesr/llm-server:latest
     volumes:
+      - ./llm-server:/app  # Mount the host llm-server directory to /app in the container
       - shared_data:/app/shared_data
     networks:
       - opencopilot_network
@@ -67,7 +46,6 @@ services:
     depends_on:
       - mysql
       - qdrant
-      - backend
 
   dashboard:
     restart: unless-stopped
@@ -82,7 +60,6 @@ services:
     networks:
       - opencopilot_network
     depends_on:
-      - backend
       - mysql
 
   mysql:
@@ -156,7 +133,6 @@ services:
     depends_on:
       - dashboard
       - llm-server
-      - backend
       - mysql
 
 networks:

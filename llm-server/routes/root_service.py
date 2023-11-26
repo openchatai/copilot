@@ -1,9 +1,10 @@
 import os
-from typing import Dict, Any, cast, Optional, List, Tuple
+from typing import Dict, Any, Optional, List
 
 import logging
 from custom_types.action_type import ActionType
-from opencopilot_types.workflow_type import WorkflowDataType
+from integrations.custom_prompts.prompt_loader import load_prompts
+from routes.workflow.typings.response_dict import ResponseDict
 from routes.workflow.typings.run_workflow_input import WorkflowData
 from routes.workflow.utils import (
     run_workflow,
@@ -13,21 +14,14 @@ from routes.workflow.utils import (
 )
 from opencopilot_utils import get_llm, StoreOptions
 from bson import ObjectId
-import os
-from typing import Dict, Any, cast
 from routes.workflow.utils.router import get_action_type
 from utils.chat_models import CHAT_MODELS
 from utils.db import Database
-import json
 from models.repository.chat_history_repo import get_chat_history_for_retrieval_chain
 from utils.get_chat_model import get_chat_model
 from utils.process_app_state import process_state
 from prance import ResolvingParser
-from utils.vector_db.add_workflow import add_workflow_data_to_qdrant
-from uuid import uuid4
 from langchain.docstore.document import Document
-import traceback
-from langchain.schema import HumanMessage, SystemMessage
 from opencopilot_utils.get_vector_store import get_vector_store
 from langchain.vectorstores.base import VectorStore
 from langchain.prompts import PromptTemplate
@@ -47,33 +41,39 @@ FAILED_TO_FETCH_SWAGGER_CONTENT = "Failed to fetch Swagger content"
 FILE_NOT_FOUND = "File not found"
 FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
 
-chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo)
+chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
 
-def handle_request(data: Dict[str, Any]) -> Any:
-    (
-        text,
-        swagger_url,
-        session_id,
-        base_prompt,
-        headers,
-        server_base_url,
-        app,
-        bot_id,
-    ) = extract_data(data)
-
+def handle_request(
+    text: str,
+    swagger_url: str,
+    session_id: str,
+    base_prompt: str,
+    bot_id: str,
+    headers: Dict[str, str],
+    server_base_url: str,
+    app: Optional[str],
+) -> ResponseDict:
     log_user_request(text)
     check_required_fields(base_prompt, text, swagger_url)
     swagger_doc = None
     try:
-        action = get_action_type(text, bot_id, session_id)
+        action = get_action_type(text, bot_id, session_id, app)
+        
+        if not isinstance(action, ActionType):
+            return {"response": action, "error": None}
         logging.info(f"Triggered action: {action}")
         if action == ActionType.ASSISTANT_ACTION:
             current_state = process_state(app, headers)
             # document = None
             swagger_doc = get_swagger_doc(swagger_url)
 
-            document, score = check_workflow_in_store(text, bot_id)
+            document = check_workflow_in_store(text, bot_id)
+            struct_log.info(
+                event="handle_request",
+                function_call="handle_existing_workflow",
+                output=document,
+            )
             if document:
                 return handle_existing_workflow(
                     document,
@@ -91,6 +91,10 @@ def handle_request(data: Dict[str, Any]) -> Any:
                 swagger_doc, text, session_id, current_state, app
             )
 
+            # short circuit if the bot did not return a json payload, can happen if api calls were not supposed to be made
+            if isinstance(bot_response, str):
+                return {"error": "", "response": ""}
+
             if len(bot_response.ids) >= 1:
                 return handle_api_calls(
                     bot_response.ids,
@@ -107,31 +111,34 @@ def handle_request(data: Dict[str, Any]) -> Any:
             elif len(bot_response.ids) == 0:
                 return handle_no_api_call(bot_response.bot_message)
 
-        elif action == ActionType.KNOWLEDGE_BASE_QUERY:
+        elif (
+            action == ActionType.KNOWLEDGE_BASE_QUERY
+            or action == ActionType.GENERAL_QUERY
+        ):
             sanitized_question = text.strip().replace("\n", " ")
             vector_store = get_vector_store(StoreOptions(namespace="knowledgebase"))
             mode = "assistant"
             chain = getConversationRetrievalChain(
-                vector_store, mode, base_prompt, bot_id
+                vector_store, mode, base_prompt, bot_id, app
             )
             chat_history = get_chat_history_for_retrieval_chain(session_id, limit=40)
             response = chain(
                 {"question": sanitized_question, "chat_history": chat_history},
                 return_only_outputs=True,
             )
-            return {"response": response["answer"]}
+            return {"response": response["answer"], "error": ""}
 
-        elif action == ActionType.GENERAL_QUERY:
-            messages = [
-                SystemMessage(
-                    content="You are an ai assistant, that answers general queries in <= 3 sentences"
-                ),
-                HumanMessage(content=f"Answer the following: {text}"),
-            ]
+        # elif action == ActionType.GENERAL_QUERY:
+        #     messages = [
+        #         SystemMessage(
+        #             content="You are an ai assistant, that answers general queries in <= 3 sentences"
+        #         ),
+        #         HumanMessage(content=f"Answer the following: {text}"),
+        #     ]
 
-            content = chat(messages).content
-            return {"response": content}
-        raise action
+        #     content = chat(messages).content
+        #     return {"response": content}
+        raise BaseException(action)
 
     except Exception as e:
         return handle_exception(e, "handle_request")
@@ -186,13 +193,25 @@ def get_qa_prompt_by_mode(mode: str, initial_prompt: Optional[str]) -> str:
 
 
 def getConversationRetrievalChain(
-    vector_store: VectorStore, mode, initial_prompt: str, bot_id: str
+    vector_store: VectorStore,
+    mode,
+    initial_prompt: str,
+    bot_id: str,
+    app: Optional[str],
 ):
     llm = get_llm()
     # template = get_qa_prompt_by_mode(mode, initial_prompt=initial_prompt)
+    prompts_templates = load_prompts(app)
 
-    # using standard template for now
-    template = """ Given the conversation history and question below, provide a concise answer based on the relevant documents, If you don't know the answer, say that you don't know the answer, don't make one up:
+    custom_knowlege_base_system_prompt = None
+    if app and prompts_templates:
+        custom_knowlege_base_system_prompt = (
+            prompts_templates.knowledge_base_system_prompt
+        )
+
+    template = (
+        custom_knowlege_base_system_prompt
+        or """ Given the conversation history and question below, provide a concise answer based on the relevant documents, If you don't know the answer, say that you don't know the answer, don't make one up:
 
         Conversation History:
         {chat_history} 
@@ -204,6 +223,7 @@ def getConversationRetrievalChain(
 
         Concise Answer:
     """
+    )
     prompt = PromptTemplate.from_template(template)
     chain = ConversationalRetrievalChain.from_llm(
         llm,
@@ -217,32 +237,13 @@ def getConversationRetrievalChain(
     return chain
 
 
-def extract_data(data: Dict[str, Any]) -> Tuple:
-    text = cast(str, data.get("text"))
-    swagger_url = cast(str, data.get("swagger_url", ""))
-    session_id = cast(str, data.get("session_id", ""))
-    base_prompt = data.get("base_prompt", "")
-    headers = data.get("headers", {})
-    server_base_url = cast(str, data.get("server_base_url", ""))
-    app = headers.get("X-App-Name") or None
-    bot_id = data.get("bot_id", None)
-    return (
-        text,
-        swagger_url,
-        session_id,
-        base_prompt,
-        headers,
-        server_base_url,
-        app,
-        bot_id,
-    )
-
-
 def log_user_request(text: str) -> None:
     logging.info("[OpenCopilot] Got the following user request: {}".format(text))
 
 
-def check_required_fields(base_prompt: str, text: str, swagger_url: str) -> None:
+def check_required_fields(
+    base_prompt: str, text: str, swagger_url: Optional[str]
+) -> None:
     for required_field, error_msg in [
         ("base_prompt", BASE_PROMPT_REQUIRED),
         ("text", TEXT_REQUIRED),
@@ -262,7 +263,7 @@ def get_swagger_doc(swagger_url: str) -> ResolvingParser:
         return ResolvingParser(url=swagger_url)
     elif swagger_url.endswith(".json") or swagger_url.endswith(".yaml"):
         return ResolvingParser(url=shared_folder + swagger_url)
-    elif swagger_doc:
+    else:
         return ResolvingParser(spec_string=swagger_doc)
 
 
@@ -271,12 +272,12 @@ def handle_existing_workflow(
     text: str,
     headers: Dict[str, Any],
     server_base_url: str,
-    swagger_url: str,
-    app: str,
+    swagger_url: Optional[str],
+    app: Optional[str],
     swagger_doc: ResolvingParser,
     session_id: str,
     bot_id: str,
-) -> Dict[str, Any]:
+) -> ResponseDict:
     # use user defined workflows if exists, if not use auto_gen_workflow
     _workflow = mongo.workflows.find_one(
         {"_id": ObjectId(document.metadata["workflow_id"])}
@@ -303,11 +304,11 @@ def handle_api_calls(
     text: str,
     headers: Dict[str, Any],
     server_base_url: str,
-    swagger_url: str,
-    app: str,
+    swagger_url: Optional[str],
+    app: Optional[str],
     session_id: str,
     bot_id: str,
-) -> Dict[str, Any]:
+) -> ResponseDict:
     _workflow = create_workflow_from_operation_ids(ids, swagger_doc, text)
     output = run_workflow(
         _workflow,
@@ -323,10 +324,10 @@ def handle_api_calls(
     return output
 
 
-def handle_no_api_call(bot_message: str) -> Dict[str, str]:
-    return {"response": bot_message}
+def handle_no_api_call(bot_message: str) -> ResponseDict:
+    return {"response": bot_message, "error": "" }
 
 
-def handle_exception(e: Exception, event: str) -> Dict[str, Any]:
+def handle_exception(e: Exception, event: str) -> ResponseDict:
     struct_log.exception(payload={}, error=str(e), event="/handle_request")
-    return {"response": None, "error": "An error occured in handle request"}
+    return {"response": str(e), "error": "An error occured in handle request"}
