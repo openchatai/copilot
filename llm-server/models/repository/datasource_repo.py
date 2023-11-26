@@ -17,7 +17,7 @@ def get_all_pdf_datasource_by_bot_id(
         .limit(limit)
         .offset(offset)
         .all()
-    )[::-1]
+    )
 
     return datasources
 
@@ -33,6 +33,6 @@ def get_all_website_datasource_by_bot_id(
         .limit(limit)
         .offset(offset)
         .all()
-    )[::-1]
+    )
 
     return datasources

@@ -62,7 +62,7 @@ def get_all_chat_history_by_session_id(
         .limit(limit)
         .offset(offset)
         .all()
-    )[::-1]
+    )
 
     return chats
 

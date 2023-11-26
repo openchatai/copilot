@@ -59,7 +59,7 @@ def handle_request(
     swagger_doc = None
     try:
         action = get_action_type(text, bot_id, session_id, app)
-        
+
         if not isinstance(action, ActionType):
             return {"response": action, "error": None}
         logging.info(f"Triggered action: {action}")
@@ -325,7 +325,7 @@ def handle_api_calls(
 
 
 def handle_no_api_call(bot_message: str) -> ResponseDict:
-    return {"response": bot_message, "error": "" }
+    return {"response": bot_message, "error": ""}
 
 
 def handle_exception(e: Exception, event: str) -> ResponseDict:
