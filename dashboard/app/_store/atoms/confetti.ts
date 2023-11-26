@@ -9,5 +9,5 @@ export function useConfetti() {
         setConfetti(true);
         setTimeout(() => setConfetti(false), seconds * 1000);
     }
-    return { confetti, pop };
+    return { confetti, pop, stop: () => setConfetti(false) };
 }
