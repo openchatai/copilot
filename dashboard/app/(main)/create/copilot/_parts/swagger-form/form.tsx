@@ -151,7 +151,7 @@ export function SwaggerForm({ defaultValues }: { defaultValues?: FormValuesWithI
                 <form onSubmit={handleSubmit(onsubmitHandler)}>
                     <AlertDialogHeader className="flex items-center justify-between w-full flex-row">
                         <AlertDialogTitle className="flex-1">
-                            API
+                            Define API action
                         </AlertDialogTitle>
                         <Button variant="success" size="sm" type="button" onClick={testEndpoint} loading={testing} disabled={testing}>
                             <Play className="w-5 h-5" />
@@ -183,7 +183,7 @@ export function SwaggerForm({ defaultValues }: { defaultValues?: FormValuesWithI
 
                         <div>
                             <div className="w-full relative">
-                                <Textarea {...register('summary')} maxRows={5} data-invalid={form.getFieldState('summary').invalid} placeholder="Summary, make sure it's cela and easy to understand" minRows={2} />
+                                <Textarea {...register('summary')} maxRows={5} data-invalid={form.getFieldState('summary').invalid} placeholder="Summary, make sure it's celar and easy to understand" minRows={2} />
                                 <span className="absolute -top-2 -right-2 bg-white px-1.5 py-0.5 text-xs rounded-md text-muted-foreground">
                                     {form.watch('summary')?.length || 0}/50
                                 </span>
