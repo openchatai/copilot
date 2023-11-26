@@ -223,7 +223,7 @@ function UploadSwaggerStep() {
         </div>
       )}
       <h2 className="mb-6 text-3xl font-bold text-accent-foreground">
-        Upload your swagger.json file ✨
+        Define your actions ✨
       </h2>
 
       {createdCopilot && (
@@ -241,7 +241,7 @@ function UploadSwaggerStep() {
       <Tabs defaultValue="swagger-form">
         <TabsList className="relative">
           <TabsTrigger value="swagger-form" className="flex-1">
-            Via UI
+            Add actions via UI
           </TabsTrigger>
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none rounded-full bg-muted p-1.5 text-sm font-semibold uppercase text-accent-foreground">
             OR
