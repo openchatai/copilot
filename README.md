@@ -1,7 +1,5 @@
 <p>
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
+
 <img alt="GitHub Contributors" src="https://img.shields.io/github/contributors/openchatai/opencopilot" />
 <img alt="GitHub Last Commit" src="https://img.shields.io/github/last-commit/openchatai/opencopilot" />
 <img alt="" src="https://img.shields.io/github/repo-size/openchatai/opencopilot" />
