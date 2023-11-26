@@ -36,6 +36,11 @@ install:
 	@echo "$(COLOR_BOLD)=== 🟢 Waiting for services to start (~20 seconds) ===$(COLOR_RESET)"
 	@sleep 20
 
+
+	@echo "$(COLOR_BOLD)=== 🟢 Running Alembic migrations ===$(COLOR_RESET)"
+	$(DOCKER_COMPOSE) exec llm-server sh -c "cd models && python setup_alembic.py && alembic upgrade head"
+
+
 	@echo "$(COLOR_BOLD)=== Installation completed ===$(COLOR_RESET)"
 	@echo "$(COLOR_BOLD)=== 🔥🔥 You can now access the dashboard at -> http://localhost:8888 ===$(COLOR_RESET)"
 	@echo "$(COLOR_BOLD)=== Enjoy! ===$(COLOR_RESET)"
