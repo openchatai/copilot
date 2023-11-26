@@ -77,14 +77,14 @@ function IntroStep() {
         <Roadmap
           items={[
             {
-              label: "Your API definition (Swagger)",
+              label: "Your API definition (actions)",
               description:
                 "We will use this definition to give your copilot the ability of understanding your product.",
             },
             {
               label: "We validate your API definition",
               description:
-                "We will validate your swagger file to make sure that it is valid and that we can understand it.",
+                "We will validate your actions/apis to make sure that it is valid and that we can understand it.",
             },
             {
               label: "You integrate the copilot on your product",
