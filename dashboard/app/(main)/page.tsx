@@ -1,8 +1,6 @@
 import { Button } from "@/components/ui/button";
 import * as React from "react";
-
 import { XIcon } from "lucide-react";
-
 import {
   ClosableDiv,
   ClosableDivProvider,
@@ -10,7 +8,7 @@ import {
 } from "@/components/headless/ClosableDiv";
 import { HeaderShell } from "@/components/domain/HeaderShell";
 import { Search } from "./_parts/Search";
-import Link from "next/link";
+import { Link } from "@/lib/router-events";
 import { CopilotsContainer } from "./_parts/CopilotsContainer";
 
 export default async function HomePage() {

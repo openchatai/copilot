@@ -22,7 +22,7 @@ import { EmptyBlock } from "@/components/domain/EmptyBlock";
 import useSwr from "swr";
 import { listCopilots } from "@/data/copilot";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { Link } from "@/lib/router-events";
 export function SearchModal() {
   const [open, setOpen] = useAtom(searchModalAtom);
   useHotkeys("ctrl+/", (e) => {

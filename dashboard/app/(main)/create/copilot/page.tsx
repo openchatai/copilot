@@ -4,7 +4,7 @@ import { HeaderShell } from "@/components/domain/HeaderShell";
 import Roadmap from "@/components/ui/Roadmap";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { Link } from "@/lib/router-events";
 import React, { useState } from "react";
 import { Wizard, useWizard } from "react-use-wizard";
 import { ValidateSwaggerStep } from "./_parts/ValidateSwaggerStep";
@@ -14,30 +14,14 @@ import _ from "lodash";
 import { toast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Label } from "@/components/ui/label";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import Loader from "@/components/ui/Loader";
-import { premadeTemplates } from "./_parts/premade";
 import {
   CreateCopilotProvider,
   useCreateCopilot,
 } from "./_parts/CreateCopilotProvider";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { SwaggerUi } from "./_parts/swagger-form";
+import { FormValuesWithId } from "./_parts/swagger-form/types";
 
 function Header() {
   const { stepCount, activeStep, goToStep } = useWizard();
@@ -93,14 +77,14 @@ function IntroStep() {
         <Roadmap
           items={[
             {
-              label: "Your API definition (Swagger)",
+              label: "Your API definition (actions)",
               description:
                 "We will use this definition to give your copilot the ability of understanding your product.",
             },
             {
               label: "We validate your API definition",
               description:
-                "We will validate your swagger file to make sure that it is valid and that we can understand it.",
+                "We will validate your actions/apis to make sure that it is valid and that we can understand it.",
             },
             {
               label: "You integrate the copilot on your product",
@@ -116,75 +100,120 @@ function IntroStep() {
     </div>
   );
 }
+// lodash is the best 
+const generateSwaggerDefinition = (formData: FormValuesWithId[]) => {
+  const swaggerDefinition = {
+    openapi: '3.0.0',
+    info: {
+      title: 'Your API',
+      version: '1.0.0',
+      description: 'API description',
+    },
+    paths: {},
+  };
+
+  _.forEach(formData, (api) => {
+    const { title, url, parameters, headers, summary } = api;
+    const pathId = title.replace(/\s/g, '');
+    _.set(swaggerDefinition.paths, [url, pathId], {
+      summary,
+      description: summary,
+      operationId: _.camelCase(title),
+      parameters: _.map(parameters, (value, key) => ({
+        name: key,
+        in: 'query',
+        description: `Description for ${key}`,
+        required: true,
+        schema: { type: 'string' },
+      })),
+      headers: _.map(headers, (value, key) => ({
+        name: key,
+        description: `Description for ${key}`,
+        required: true,
+        schema: { type: 'string' },
+      })),
+    });
+  });
+
+  return swaggerDefinition;
+};
 function UploadSwaggerStep() {
   const { nextStep, previousStep } = useWizard();
   const {
-    state: { swaggerFiles, createdCopilot, templateKey },
+    state: { swaggerFiles, createdCopilot, swaggerEndpoints },
     dispatch,
   } = useCreateCopilot();
   const setCopilot = (copilot: CopilotType) => {
     dispatch({ type: "SET_COPILOT", payload: copilot });
   };
   const [loading, setLoading] = useState(false);
-  const selectedTemplate = _.find(premadeTemplates, { id: templateKey });
-  const setTempleteKey = (templateKey: string | undefined) => {
-    dispatch({ type: "CHANGE_TEMPLATE_KEY", payload: templateKey });
-  };
-
   const swaggerFile = _.first(swaggerFiles);
-  const bothSelected = selectedTemplate && swaggerFile;
-  // if user selects template and then uploads swagger file, we will use the template
-
+  const bothSelected = swaggerFile && !_.isEmpty(swaggerEndpoints);
   // spagetti 🍝
   async function handleCreateCopilot() {
-    setLoading(true);
-    if (!swaggerFile && !selectedTemplate) {
+    if (!swaggerFile && _.isEmpty(swaggerEndpoints)) {
       toast({
-        title: "No swagger file uploaded or template selected",
+        title: "No swagger file uploaded or created!",
         description:
-          "Please upload a swagger file to continue, or select a template",
+          "Please upload a swagger file to continue, or create one using the form",
         variant: "destructive",
       });
       return;
-    } else {
-      if (!createdCopilot) {
-        const template = selectedTemplate;
-        if (template) {
-          const res = await template.creatorFn();
-          if (res.data) {
-            setCopilot(res.data.chatbot);
-            toast({
-              title: "Copilot Created Successfully",
-              description: "You have created your copilot successfully",
-              variant: "success",
+    }
+    if (bothSelected) {
+      toast({
+        title: "Both swagger file and swagger definition created!",
+        description:
+          "Please reset one of them to continue, you can't use both at the same time",
+        variant: "destructive",
+      });
+      return;
+    }
+    else {
+      setLoading(true);
+      try {
+        if (!createdCopilot) {
+          if (swaggerFile) {
+            const res = await createCopilot({
+              swagger_file: swaggerFile,
             });
-            _.delay(nextStep, 1000);
+            if (res.data) {
+              setCopilot(res.data.chatbot);
+              toast({
+                title: "Copilot Created Successfully",
+                description: "You have created your copilot successfully",
+                variant: "success",
+              });
+              _.delay(nextStep, 1000);
+            }
           }
-        } else if (swaggerFile) {
-          const res = await createCopilot({
-            swagger_file: swaggerFile,
-          });
-          if (res.data) {
-            setCopilot(res.data.chatbot);
-            toast({
-              title: "Copilot Created Successfully",
-              description: "You have created your copilot successfully",
-              variant: "success",
+          if (!_.isEmpty(swaggerEndpoints)) {
+            const swaggerDefinition = generateSwaggerDefinition(swaggerEndpoints);
+            const swagger_file = new File([JSON.stringify(swaggerDefinition)], "swagger.json", {
+              type: "application/json",
+            })
+            console.log(swagger_file);
+            const res = await createCopilot({
+              swagger_file,
             });
-            _.delay(nextStep, 1000);
+            if (res.data) {
+              setCopilot(res.data.chatbot);
+              toast({
+                title: "Copilot Created Successfully",
+                description: "You have created your copilot successfully",
+                variant: "success",
+              });
+              _.delay(nextStep, 1000);
+            }
           }
         }
+      } catch (error) {
+        setLoading(false);
+
       }
+
     }
     setLoading(false);
-  }
-
-  function handleRadioChange(value: string) {
-    if (value === templateKey && templateKey !== "undefined") {
-      setTempleteKey(undefined);
-    } else {
-      setTempleteKey(value);
-    }
   }
   return (
     <div className="relative p-1">
@@ -194,7 +223,7 @@ function UploadSwaggerStep() {
         </div>
       )}
       <h2 className="mb-6 text-3xl font-bold text-accent-foreground">
-        Upload your swagger.json file ✨
+        Define your actions ✨
       </h2>
 
       {createdCopilot && (
@@ -209,16 +238,16 @@ function UploadSwaggerStep() {
         You copilot will use these APIs to communicate with your product and
         execute actions
       </p>
-      <Tabs defaultValue="upload">
+      <Tabs defaultValue="swagger-form">
         <TabsList className="relative">
-          <TabsTrigger value="upload" className="flex-1">
-            Upload Swagger
+          <TabsTrigger value="swagger-form" className="flex-1">
+            Add actions via UI
           </TabsTrigger>
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none rounded-full bg-muted p-1.5 text-sm font-semibold uppercase text-accent-foreground">
             OR
           </div>
-          <TabsTrigger value="premade" className="flex-1">
-            Pre-made Copilots
+          <TabsTrigger value="upload" className="flex-1">
+            Upload Swagger
           </TabsTrigger>
         </TabsList>
         <TabsContent value="upload" className="min-h-[10rem]">
@@ -265,30 +294,8 @@ function UploadSwaggerStep() {
             </div>
           </div>
         </TabsContent>
-        <TabsContent value="premade" className="min-h-[10rem]">
-          <Label className="my-4 block text-base font-semibold text-accent-foreground">
-            Choose a pre-made template
-          </Label>
-          <div className="grid grid-cols-4 gap-2">
-            {_.map(premadeTemplates, ({ id, name, icon, description }) => (
-              <TooltipProvider key={id}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      data-value={id}
-                      data-state={id === templateKey ? "checked" : "unchecked"}
-                      onClick={() => handleRadioChange(id)}
-                      className="flex aspect-square flex-col items-center justify-center gap-2 rounded-lg border border-border p-3 shadow-sm transition-all data-[state=checked]:border-primary data-[state=checked]:text-primary data-[state=checked]:shadow-inner data-[state=checked]:shadow-primary-foreground"
-                    >
-                      <span className="text-2xl drop-shadow">{icon}</span>
-                      <span className="text-sm font-semibold">{name}</span>
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>{description}</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            ))}
-          </div>
+        <TabsContent value="swagger-form" className="min-h-[10rem]">
+          <SwaggerUi />
         </TabsContent>
       </Tabs>
       <footer className="flex w-full items-center justify-between gap-5 pt-5">
@@ -309,47 +316,12 @@ function UploadSwaggerStep() {
             </Button>
           </>
         ) : (
+          // handle if user uploaded swagger file and created swagger definition at the same time.
+          // so user have to choose which one to use.
           <>
-            {/* user didn't select both */}
-            {!bothSelected && (
-              <Button
-                onClick={handleCreateCopilot}
-                className="flex items-center justify-center gap-1"
-              >
-                Create Copilot
-              </Button>
-            )}
-            {/* user selected both, and no copilot */}
-            {!createdCopilot && bothSelected && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button className="flex items-center justify-center gap-1">
-                    Create Copilot
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you sure you want to create this copilot?
-                    </AlertDialogTitle>
-                  </AlertDialogHeader>
-                  <AlertDialogDescription>
-                    You are about to create a copilot with a pre-made template,
-                    this will override your current swagger file.
-                  </AlertDialogDescription>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel asChild>
-                      <Button variant="destructive" size="sm">
-                        Cancel
-                      </Button>
-                    </AlertDialogCancel>
-                    <Button onClick={handleCreateCopilot} size="sm">
-                      Create Copilot
-                    </Button>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
+            <Button onClick={handleCreateCopilot}>
+              Create Copilot
+            </Button>
           </>
         )}
       </footer>

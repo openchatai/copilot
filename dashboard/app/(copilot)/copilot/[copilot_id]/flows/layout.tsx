@@ -1,7 +1,7 @@
 import React from "react";
 import { WorkflowsList } from "./_parts/WorkflowsList";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Link } from "@/lib/router-events";
 
 type Props = {
   children: React.ReactNode;

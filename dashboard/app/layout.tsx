@@ -9,6 +9,9 @@ import React from "react";
 import { JotaiProvider } from "./_store/JotaiProvider";
 import { SWRProvider } from "./swr-provider";
 import { Toaster } from "@/components/ui/toaster";
+import { HandleOnComplete } from "@/lib/router-events";
+import { TopLoader } from "@/lib/Toploader";
+
 const opensans = Open_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
@@ -53,6 +56,10 @@ export default function RootLayout({
             <SearchModal />
             {/* Toaster */}
             <Toaster />
+            <TopLoader
+              color="hsl(var(--primary))"
+            />
+            <HandleOnComplete />
           </body>
         </html>
       </JotaiProvider>

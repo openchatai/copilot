@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import SelectWorkspace from "./SelectWorkspace";
 import { NavLink } from "@/components/ui/NavLink";
-import Link from "next/link";
+import { Link } from "@/lib/router-events";
 
 export default function Aside() {
   return (

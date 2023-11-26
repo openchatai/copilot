@@ -36,7 +36,7 @@ import { EmptyBlock } from "@/components/domain/EmptyBlock";
 import useSWR from "swr";
 import { Datasource, getDataSourcesByBotId } from "@/data/knowledge";
 import { useCopilot } from "../../../_context/CopilotProvider";
-import Link from "next/link";
+import { Link } from "@/lib/router-events";
 import { format } from 'timeago.js'
 export type DataSources = {
   id: string;

@@ -8,9 +8,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronRight } from "lucide-react";
-import Link from "next/link";
 import { useSetAtom } from "jotai";
 import { searchModalAtom } from "@/app/_store/atoms/searchModal";
+import { Link } from "@/lib/router-events";
 
 // i'm bad at naming things
 export default function LogoMenu() {
