@@ -1,11 +1,11 @@
 import re
 import json
-from typing import Any
+from typing import Dict, Any, Union
 
 
 def extract_json_payload(
     input_string: str,
-) -> Any:
+) -> Union[str, Dict[str, Any]]:
     match = re.findall(r"{[^{}]*}|\[[^\[\]]*\]", input_string)
 
     try:

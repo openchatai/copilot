@@ -35,7 +35,7 @@ def hasSingleIntent(
     session_id: str,
     current_state: Optional[str],
     app: Optional[str],
-) -> Union[BotMessage, str]:
+) -> BotMessage:
     summaries = get_summaries(swagger_doc)
     chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
@@ -96,7 +96,7 @@ def hasSingleIntent(
     d = extract_json_payload(result.content)
 
     if isinstance(d, str):
-        return d
+        return BotMessage(ids=[], bot_message=d)
 
     struct_log.info(event="extract_json_payload", data=d)
 

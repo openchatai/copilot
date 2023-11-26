@@ -1,14 +1,13 @@
 import json
-
 import yaml
+from typing import Dict
+from flask import Request
 
 from routes.root_service import get_swagger_doc
 from utils.db import Database
 
 db_instance = Database()
 mongo = db_instance.get_db()
-from typing import Dict
-from flask import Request
 
 
 def save_swaggerfile_to_mongo(filename: str, bot_id: str) -> bool:
@@ -39,7 +38,7 @@ def add_swagger_file(request: Request, id: str) -> Dict[str, str]:
                 return {"error": "Invalid JSON format in uploaded file"}
 
         elif file.filename and (
-                file.filename.endswith(".yaml") or file.filename.endswith(".yml")
+            file.filename.endswith(".yaml") or file.filename.endswith(".yml")
         ):
             try:
                 file_content = yaml.safe_load(file)
