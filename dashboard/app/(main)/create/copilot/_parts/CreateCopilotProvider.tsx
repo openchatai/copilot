@@ -5,7 +5,7 @@ import { produce } from "immer";
 import { FormValuesWithId } from "./swagger-form/types";
 
 const Modes = ["CREATE_NEW_ENDPOINT", "EDIT_EXISTING_ENDPOINT"] as const;
-type Modes = typeof Modes[number];
+type ModeType = typeof Modes[number];
 type State = {
   createdCopilot?: CopilotType;
   isLoading?: boolean;
@@ -59,7 +59,7 @@ type Action =
   } | {
     type: "CHANGE_MODE",
     payload: {
-      mode?: Modes,
+      mode?: ModeType,
       endpointId?: string
     }
 
