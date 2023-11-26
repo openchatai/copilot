@@ -1,10 +1,9 @@
-import os, importlib
-from typing import Dict, Any, cast, Optional, List, Tuple
+import os
+from typing import Dict, Any, Optional, List
 
 import logging
 from custom_types.action_type import ActionType
 from integrations.custom_prompts.prompt_loader import load_prompts
-from opencopilot_types.workflow_type import WorkflowDataType
 from routes.workflow.typings.response_dict import ResponseDict
 from routes.workflow.typings.run_workflow_input import WorkflowData
 from routes.workflow.utils import (
@@ -15,21 +14,14 @@ from routes.workflow.utils import (
 )
 from opencopilot_utils import get_llm, StoreOptions
 from bson import ObjectId
-import os
-from typing import Dict, Any, cast, TypedDict
 from routes.workflow.utils.router import get_action_type
 from utils.chat_models import CHAT_MODELS
 from utils.db import Database
-import json
 from models.repository.chat_history_repo import get_chat_history_for_retrieval_chain
 from utils.get_chat_model import get_chat_model
 from utils.process_app_state import process_state
 from prance import ResolvingParser
-from utils.vector_db.add_workflow import add_workflow_data_to_qdrant
-from uuid import uuid4
 from langchain.docstore.document import Document
-import traceback
-from langchain.schema import HumanMessage, SystemMessage
 from opencopilot_utils.get_vector_store import get_vector_store
 from langchain.vectorstores.base import VectorStore
 from langchain.prompts import PromptTemplate
@@ -54,7 +46,7 @@ chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
 def handle_request(
     text: str,
-    swagger_url: Optional[str],
+    swagger_url: str,
     session_id: str,
     base_prompt: str,
     bot_id: str,
@@ -67,6 +59,9 @@ def handle_request(
     swagger_doc = None
     try:
         action = get_action_type(text, bot_id, session_id, app)
+        
+        if not isinstance(action, ActionType):
+            return {"response": action, "error": None}
         logging.info(f"Triggered action: {action}")
         if action == ActionType.ASSISTANT_ACTION:
             current_state = process_state(app, headers)
@@ -131,7 +126,7 @@ def handle_request(
                 {"question": sanitized_question, "chat_history": chat_history},
                 return_only_outputs=True,
             )
-            return {"response": response["answer"]}
+            return {"response": response["answer"], "error": ""}
 
         # elif action == ActionType.GENERAL_QUERY:
         #     messages = [
@@ -268,7 +263,7 @@ def get_swagger_doc(swagger_url: str) -> ResolvingParser:
         return ResolvingParser(url=swagger_url)
     elif swagger_url.endswith(".json") or swagger_url.endswith(".yaml"):
         return ResolvingParser(url=shared_folder + swagger_url)
-    elif swagger_doc:
+    else:
         return ResolvingParser(spec_string=swagger_doc)
 
 
@@ -278,7 +273,7 @@ def handle_existing_workflow(
     headers: Dict[str, Any],
     server_base_url: str,
     swagger_url: Optional[str],
-    app: str,
+    app: Optional[str],
     swagger_doc: ResolvingParser,
     session_id: str,
     bot_id: str,
@@ -310,7 +305,7 @@ def handle_api_calls(
     headers: Dict[str, Any],
     server_base_url: str,
     swagger_url: Optional[str],
-    app: str,
+    app: Optional[str],
     session_id: str,
     bot_id: str,
 ) -> ResponseDict:
@@ -329,10 +324,10 @@ def handle_api_calls(
     return output
 
 
-def handle_no_api_call(bot_message: str) -> Dict[str, str]:
-    return {"response": bot_message}
+def handle_no_api_call(bot_message: str) -> ResponseDict:
+    return {"response": bot_message, "error": "" }
 
 
-def handle_exception(e: Exception, event: str) -> Dict[str, Any]:
+def handle_exception(e: Exception, event: str) -> ResponseDict:
     struct_log.exception(payload={}, error=str(e), event="/handle_request")
     return {"response": str(e), "error": "An error occured in handle request"}
