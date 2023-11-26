@@ -55,7 +55,6 @@ def create_workflow(swagger_url: str, bot_id: str) -> Any:
 @handle_exceptions_and_errors
 def create_workflow_by_bot_id(bot_id: str) -> Any:
     workflow_data = cast(WorkflowDataType, request.json)
-    swagger_url = ""
     workflow_data["bot_id"] = bot_id
     workflows = mongo.workflows
     workflow_id = workflows.insert_one(workflow_data).inserted_id
@@ -138,8 +137,7 @@ def update_workflow(workflow_id: str) -> Any:
     result = mongo.workflows.update_one(
         {"_id": ObjectId(workflow_id)}, {"$set": workflow_data}
     )
-    namespace = "workflows"
-    vector_store = get_vector_store(StoreOptions(namespace))
+    vector_store = get_vector_store(StoreOptions("swagger"))
     vector_store.delete(ids=[workflow_id])
 
     add_workflow_data_to_qdrant(

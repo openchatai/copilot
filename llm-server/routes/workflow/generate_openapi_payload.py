@@ -80,7 +80,7 @@ def generate_openapi_payload(
     current_state: Optional[str],
 ) -> ApiInfo:
     async def process_api_info():
-        a, b, c = swagger_json.version_parsed  # type: ignore
+        a, b, c = swagger_json.version_parsed
         print(a, b, c)
 
         api_info = get_api_info_by_operation_id(

@@ -6,5 +6,5 @@
     "python.analysis.inlayHints.functionReturnTypes": true,
     "python.analysis.inlayHints.variableTypes": true,
     // "python.defaultInterpreterPath": "~/anaconda3/envs/llmserver/bin/python",
-    "python.analysis.typeCheckingMode": "strict",
+    "python.analysis.typeCheckingMode": "basic",
 }

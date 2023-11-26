@@ -1,4 +1,5 @@
-from typing import Any, Dict, Optional
+from typing import Any, Optional
+from routes.workflow.typings.response_dict import ResponseDict
 from routes.workflow.typings.run_workflow_input import WorkflowData
 from routes.workflow.utils.run_openapi_ops import run_openapi_operations
 from opencopilot_types.workflow_type import WorkflowDataType
@@ -13,7 +14,7 @@ def run_workflow(
     swagger_json: Any,
     data: WorkflowData,
     app: Optional[str],
-) -> Dict[str, Any]:
+) -> ResponseDict:
     headers = data.headers or {}
     server_base_url = data.server_base_url
 
@@ -41,7 +42,7 @@ def run_workflow(
         )
         error = str(e)
 
-    output = {"response": result if not error else "", "error": error}
+    output: ResponseDict = {"response": result if not error else "", "error": error}
 
     logging.info(
         "[OpenCopilot] Workflow output %s", json.dumps(output, separators=(",", ":"))

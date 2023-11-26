@@ -3,12 +3,15 @@ from typing import Any, Dict, Union, cast, Optional
 from typing import List
 
 from langchain.schema import HumanMessage, SystemMessage, BaseMessage
+from routes.workflow.utils.get_swagger_summary import get_summaries
 from utils.chat_models import CHAT_MODELS
 from utils.get_chat_model import get_chat_model
 from routes.workflow.extractors.extract_json import extract_json_payload
+from utils import struct_log
 from prance import ResolvingParser
-from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
-from opencopilot_db import ChatHistory
+from models.repository.chat_history_repo import (
+    get_chat_message_as_llm_conversation,
+)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -26,70 +29,13 @@ class BotMessage:
         return cls(cast(List[str], data["ids"]), cast(str, data["bot_message"]))
 
 
-def join_conversations(chat_histories: List[ChatHistory]) -> str:
-    """Joins a list of ChatHistory objects into a single conversation string.
-
-    Args:
-      chat_histories: A list of ChatHistory objects.
-
-    Returns:
-      A string containing the joined conversation.
-    """
-
-    conversation = ""
-    for chat_history in chat_histories:
-        if chat_history.from_user is True:
-            conversation += f"User: {chat_history.message}\n"
-        else:
-            conversation += f"Assistant: {chat_history.message}\n"
-    return conversation
-
-
-def get_summaries(swagger_doc: ResolvingParser) -> str:
-    servers = ", ".join(
-        [s["url"] for s in swagger_doc.specification.get("servers", [])]
-    )
-    summaries_str = "servers:" + servers + "\n"
-    paths = swagger_doc.specification.get("paths")
-    for path in paths:
-        operations = paths[path]
-        for method in operations:
-            operation = operations[method]
-            try:
-                if "summary" in operation:
-                    summary = f"- {operation['operationId']} - {operation['summary']}\n"
-                else:
-                    summary = (
-                        f"- {operation['operationId']} - {operation['description']}\n"
-                    )
-                if "requestBody" in operation:
-                    content_types = operation["requestBody"]["content"]
-                    if "application/json" in content_types:
-                        schema = content_types["application/json"]["schema"]
-                        if "properties" in schema:
-                            params = schema["properties"].keys()
-                        elif "items" in schema:
-                            params = schema["items"]["properties"].keys()
-                    elif "application/octet-stream" in content_types:
-                        params = ["binary data"]
-                    summary += f"  - Body Parameters: {', '.join(params)}\n"
-                summary += f"  - Method: {method}\n"
-                if "parameters" in operation:
-                    params = [p["name"] for p in operation["parameters"]]
-                    summary += f"  - Parameters: {', '.join(params)}\n"
-                summaries_str += summary + "\n"
-            except:
-                pass
-    return summaries_str
-
-
 def hasSingleIntent(
     swagger_doc: ResolvingParser,
     user_requirement: str,
     session_id: str,
     current_state: Optional[str],
-    app: str,
-) -> BotMessage:
+    app: Optional[str],
+) -> Union[BotMessage, str]:
     summaries = get_summaries(swagger_doc)
     chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
@@ -141,18 +87,18 @@ def hasSingleIntent(
         ]
     )
 
-    result = chat(messages)
+    result = chat([x for x in messages if x is not None])
     logging.info(
         "[OpenCopilot] Extracted the needed steps to get the job done: {}".format(
             result.content
         )
     )
-    d: Any = extract_json_payload(result.content)
-    logging.info(
-        "[OpenCopilot] Parsed the json payload: {}, context: {}".format(
-            d, "hasSingleIntent"
-        )
-    )
+    d = extract_json_payload(result.content)
+
+    if isinstance(d, str):
+        return d
+
+    struct_log.info(event="extract_json_payload", data=d)
 
     bot_message = BotMessage.from_dict(d)
     return bot_message

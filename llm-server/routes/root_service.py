@@ -5,6 +5,7 @@ import logging
 from custom_types.action_type import ActionType
 from integrations.custom_prompts.prompt_loader import load_prompts
 from opencopilot_types.workflow_type import WorkflowDataType
+from routes.workflow.typings.response_dict import ResponseDict
 from routes.workflow.typings.run_workflow_input import WorkflowData
 from routes.workflow.utils import (
     run_workflow,
@@ -15,7 +16,7 @@ from routes.workflow.utils import (
 from opencopilot_utils import get_llm, StoreOptions
 from bson import ObjectId
 import os
-from typing import Dict, Any, cast
+from typing import Dict, Any, cast, TypedDict
 from routes.workflow.utils.router import get_action_type
 from utils.chat_models import CHAT_MODELS
 from utils.db import Database
@@ -60,7 +61,7 @@ def handle_request(
     headers: Dict[str, str],
     server_base_url: str,
     app: Optional[str],
-) -> Any:
+) -> ResponseDict:
     log_user_request(text)
     check_required_fields(base_prompt, text, swagger_url)
     swagger_doc = None
@@ -97,7 +98,7 @@ def handle_request(
 
             # short circuit if the bot did not return a json payload, can happen if api calls were not supposed to be made
             if isinstance(bot_response, str):
-                return bot_response
+                return {"error": "", "response": ""}
 
             if len(bot_response.ids) >= 1:
                 return handle_api_calls(
@@ -281,7 +282,7 @@ def handle_existing_workflow(
     swagger_doc: ResolvingParser,
     session_id: str,
     bot_id: str,
-) -> Dict[str, Any]:
+) -> ResponseDict:
     # use user defined workflows if exists, if not use auto_gen_workflow
     _workflow = mongo.workflows.find_one(
         {"_id": ObjectId(document.metadata["workflow_id"])}
@@ -308,11 +309,11 @@ def handle_api_calls(
     text: str,
     headers: Dict[str, Any],
     server_base_url: str,
-    swagger_url: str,
+    swagger_url: Optional[str],
     app: str,
     session_id: str,
     bot_id: str,
-) -> Dict[str, Any]:
+) -> ResponseDict:
     _workflow = create_workflow_from_operation_ids(ids, swagger_doc, text)
     output = run_workflow(
         _workflow,
