@@ -11,6 +11,11 @@ import { SWRProvider } from "./swr-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { HandleOnComplete } from "@/lib/router-events";
 import { TopLoader } from "@/lib/Toploader";
+import dynamic from "next/dynamic";
+
+const Confetti = dynamic(() => import("@/components/domain/confetti-canvas"), {
+  ssr: false,
+});
 
 const opensans = Open_Sans({
   subsets: ["latin"],
@@ -59,6 +64,7 @@ export default function RootLayout({
             <TopLoader
               color="hsl(var(--primary))"
             />
+            <Confetti />
             <HandleOnComplete />
           </body>
         </html>
