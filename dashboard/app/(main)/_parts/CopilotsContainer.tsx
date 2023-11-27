@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/tooltip";
 import useSwr from "swr";
 import { CopilotType, listCopilots } from "@/data/copilot";
-import { timeSince } from "@/lib/timesince";
 import Loading from "../loading";
 import { Filter } from "./Search";
 import _ from "lodash";
@@ -18,6 +17,8 @@ import { EmptyBlock } from "@/components/domain/EmptyBlock";
 import { filterAtom } from "./Search";
 import { useAtomValue } from "jotai";
 import { Button } from "@/components/ui/button";
+import { format } from "timeago.js";
+
 function customSort(list: CopilotType[], sortBy: Filter["sort"]) {
   if (sortBy === "last-viewed") {
     return _.orderBy(list, ["last_viewed", "name"], ["desc", "asc"]);
@@ -66,7 +67,6 @@ export function CopilotsContainer() {
     <div className="grid grid-cols-2 gap-8 py-4 xl:grid-cols-4">
       {$copilots?.map((copilot) => {
         const copilotUrl = "/copilot/" + copilot.id;
-        const createdSince = timeSince(copilot.created_at);
         return (
           <Link
             href={copilotUrl}
@@ -99,7 +99,7 @@ export function CopilotsContainer() {
               </h2>
               <p className="text-xs text-gray-400">
                 created{" "}
-                <span className="font-semibold">{createdSince} ago</span>
+                <span className="font-semibold">{format(copilot.created_at)}</span>
               </p>
             </div>
           </Link>
