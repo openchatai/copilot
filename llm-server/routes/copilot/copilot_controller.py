@@ -121,7 +121,9 @@ def general_settings_update(copilot_id):
         # Ensure the chatbot exists
         find_one_or_fail_by_id(copilot_id)
 
-        data = request.form
+        data = request.json
+        
+        struct_log.info(event="update_copilot", data=data, bot_id=copilot_id)
 
         # Call update_copilot with the provided data
         updated_copilot = update_copilot(

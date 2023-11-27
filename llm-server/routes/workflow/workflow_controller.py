@@ -61,10 +61,8 @@ def create_workflow_by_bot_id(bot_id: str) -> Any:
 
     add_workflow_data_to_qdrant(workflow_id, workflow_data, bot_id)
 
-    return (
-        jsonify({"message": "Workflow created", "workflow_id": str(workflow_id)}),
-        201,
-    )
+    return jsonify({"message": "Workflow created", "workflow_id": str(workflow_id)}), 201
+
 
 
 @workflow.route("/get/b/<bot_id>", methods=["GET"])
