@@ -34,13 +34,9 @@ def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
 
         if result and len(result) > 0:
             # Assuming result is a list of objects and each object has a page_content attribute
-            all_page_content = "\n".join([item.page_content for item in result])
+            all_page_content = "\n\n".join([item.page_content for item in result])
 
-            # Replace multiple new lines with a single new line
-            cleaned_page_content = "\n".join(
-                line.strip() for line in all_page_content.splitlines() if line.strip()
-            )
-            return cleaned_page_content
+            return all_page_content
 
         return None
 

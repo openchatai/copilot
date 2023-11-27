@@ -10,17 +10,24 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 from shared.utils.opencopilot_utils import get_embeddings, init_vector_store
 from shared.utils.opencopilot_utils.interfaces import StoreOptions
-from repos.website_data_sources import create_website_data_source, get_website_data_source_by_id, update_website_data_source_status_by_url
+from repos.website_data_sources import (
+    create_website_data_source,
+    get_website_data_source_by_id,
+    update_website_data_source_status_by_url,
+)
 from typing import Set
 from collections import deque
 
 selenium_grid_url = os.getenv("SELENIUM_GRID_URL", "http://localhost:4444/wd/hub")
 
+
 def is_valid_url(url, target_url):
     """Returns True if the URL is valid and the root of both URLs are the same, False otherwise."""
 
     # Regular expression for matching valid URLs.
-    regex = re.compile(r'^(?:http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&:/~+#-])$')
+    regex = re.compile(
+        r"^(?:http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&:/~+#-])$"
+    )
 
     # Check if the URL is valid.
     if regex.match(url) is None:
@@ -33,7 +40,10 @@ def is_valid_url(url, target_url):
     # Check if the root of both URLs are the same.
     return url_root == target_url_root
 
-def scrape_website_in_bfs(url: str, bot_id: str, unique_urls: Set[str], max_pages: int) -> int:
+
+def scrape_website_in_bfs(
+    url: str, bot_id: str, unique_urls: Set[str], max_pages: int
+) -> int:
     """Scrapes a website in breadth-first order, following all of the linked pages.
 
     Args:
@@ -54,7 +64,7 @@ def scrape_website_in_bfs(url: str, bot_id: str, unique_urls: Set[str], max_page
             url = queue.popleft()
             if url in visited_urls or total_pages_scraped >= max_pages:
                 continue
-            
+
             create_website_data_source(chatbot_id=bot_id, status="PENDING", url=url)
             visited_urls.add(url)
             unique_urls.add(url)
@@ -74,6 +84,10 @@ def scrape_website_in_bfs(url: str, bot_id: str, unique_urls: Set[str], max_page
                         queue.append(next_url)
 
             text = soup.get_text()
+            text = re.sub(
+                r"\s+", " ", text
+            )  # Replace all whitespace with single spaces
+            text = text.strip()  # Trim leading and trailing whitespace
 
             print(text)
             # push to vector db
@@ -83,7 +97,11 @@ def scrape_website_in_bfs(url: str, bot_id: str, unique_urls: Set[str], max_page
 
             docs = text_splitter.create_documents([text])
             embeddings = get_embeddings()
-            init_vector_store(docs, embeddings, StoreOptions(namespace="knowledgebase", metadata={"bot_id": bot_id}))
+            init_vector_store(
+                docs,
+                embeddings,
+                StoreOptions(namespace="knowledgebase", metadata={"bot_id": bot_id}),
+            )
             update_website_data_source_status_by_url(url=url, status="SUCCESS")
 
         if driver is not None:
@@ -96,14 +114,15 @@ def scrape_website_in_bfs(url: str, bot_id: str, unique_urls: Set[str], max_page
 
     return total_pages_scraped
 
+
 def get_web_driver():
     options = Options()
-    driver = webdriver.Remote(command_executor=selenium_grid_url, options=options)    
+    driver = webdriver.Remote(command_executor=selenium_grid_url, options=options)
     driver.set_script_timeout(300)
-    driver.set_page_load_timeout(300)    
+    driver.set_page_load_timeout(300)
     return driver
-    
-    
+
+
 @shared_task
 def web_crawl(url, bot_id: str):
     try:
@@ -113,8 +132,8 @@ def web_crawl(url, bot_id: str):
         scrape_website_in_bfs(url, bot_id, unique_urls, 5)
     except Exception as e:
         traceback.print_exc()
-        
-        
+
+
 @shared_task
 def resume_failed_website_scrape(website_data_source_id: str):
     """Resumes a failed website scrape.
@@ -134,4 +153,4 @@ def resume_failed_website_scrape(website_data_source_id: str):
 
     # Scrape the website.
     unique_urls: set = set()
-    scrape_website_in_bfs(url, website_data_source.bot_id, unique_urls, 1)
+    scrape_website_in_bfs(url, website_data_source.bot_id, unique_urls, 5)
