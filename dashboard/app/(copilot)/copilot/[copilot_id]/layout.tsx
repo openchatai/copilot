@@ -54,6 +54,11 @@ export default function CopilotLayout({ children, params }: Props) {
           <Separator className="my-2" />
           <div className="flex flex-col items-center gap-4">
             <CopilotLayoutNavLink
+              href={copilotBase + "/flows"}
+              IconComponent={Workflow}
+              label="Flows"
+            />
+            <CopilotLayoutNavLink
               href={copilotBase + "/settings"}
               segment="settings"
               IconComponent={Settings}
@@ -68,11 +73,6 @@ export default function CopilotLayout({ children, params }: Props) {
               href={copilotBase + "/knowledge"}
               IconComponent={BrainCog}
               label="Knowledge Base"
-            />
-            <CopilotLayoutNavLink
-              href={copilotBase + "/flows"}
-              IconComponent={Workflow}
-              label="Flows"
             />
           </div>
         </div>
