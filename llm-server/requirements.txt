@@ -60,7 +60,6 @@ jsonschema-path==0.3.1
 jsonschema-specifications==2023.7.1
 kombu==5.3.4
 kubernetes==28.1.0
-langchain==0.0.329
 langsmith==0.0.63
 lazy-object-proxy==1.9.0
 loguru==0.7.2
@@ -79,7 +78,7 @@ openai==0.28.1
 openapi-schema-validator==0.6.2
 openapi-spec-validator==0.7.1
 opencopilot-db==6.0.0rc1
-opencopilot-utils==2.1.0
+opencopilot-utils==2.1.2
 opentelemetry-api==1.21.0
 opentelemetry-exporter-otlp-proto-common==1.21.0
 opentelemetry-exporter-otlp-proto-grpc==1.21.0

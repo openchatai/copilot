@@ -5,7 +5,8 @@ import uuid
 from flask import Blueprint, jsonify, request
 from prance import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
-from utils.llm_consts import get_username_from_request
+from routes.root_service import get_swagger_doc
+from utils.llm_consts import EXPERIMENTAL_FEATURES_ENABLED, get_username_from_request
 from werkzeug.utils import secure_filename
 from utils.base import resolve_abs_local_file_path_from
 from utils.get_logger import struct_log
@@ -61,7 +62,14 @@ def handle_swagger_file():
                 email=get_username_from_request(request),
             )
 
-            swagger_service.save_swaggerfile_to_mongo(filename, str(chatbot["id"]))
+            swagger_doc = get_swagger_doc(filename)
+
+            if EXPERIMENTAL_FEATURES_ENABLED == "YES":
+                swagger_service.save_swagger_paths_to_qdrant(swagger_doc, chatbot["id"])
+
+            swagger_service.save_swaggerfile_to_mongo(
+                filename, str(chatbot["id"]), swagger_doc
+            )
         except ValidationError as e:
             return (
                 jsonify(
@@ -122,7 +130,7 @@ def general_settings_update(copilot_id):
         find_one_or_fail_by_id(copilot_id)
 
         data = request.json
-        
+
         struct_log.info(event="update_copilot", data=data, bot_id=copilot_id)
 
         # Call update_copilot with the provided data
