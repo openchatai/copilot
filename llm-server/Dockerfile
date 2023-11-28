@@ -1,19 +1,17 @@
-# Use an official Python runtime as the base image
-FROM python:3.9-slim
-
-# Set the working directory in the container
+# Common stage
+FROM python:3.9-slim AS common
 WORKDIR /app
-
-# Copy the requirements file into the container at /app
 COPY requirements.txt /app/
-
-# Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the current directory contents into the container at /app
 COPY . /app/
 
+# Development stage
+FROM common AS development
 EXPOSE 8002
+RUN pip install debugpy
+CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", "--wait-for-client", "-m", "flask", "run", "--host=0.0.0.0", "--port=8002", "--reload"]
 
-# -u To prevent log accumulation, execute app.py with unbuffered output as soon as the container starts up.
-CMD ["python", "-u" ,"app.py"]
+# Production stage
+FROM common AS production
+EXPOSE 8002
+CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--port=8002"]

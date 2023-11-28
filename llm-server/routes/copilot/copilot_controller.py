@@ -6,7 +6,7 @@ from flask import Blueprint, jsonify, request
 from prance import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from routes.root_service import get_swagger_doc
-from utils.llm_consts import get_username_from_request
+from utils.llm_consts import EXPERIMENTAL_FEATURES_ENABLED, get_username_from_request
 from werkzeug.utils import secure_filename
 from utils.base import resolve_abs_local_file_path_from
 from utils.get_logger import struct_log
@@ -63,7 +63,9 @@ def handle_swagger_file():
             )
 
             swagger_doc = get_swagger_doc(filename)
-            swagger_service.save_swagger_paths_to_qdrant(swagger_doc, chatbot["id"])
+
+            if EXPERIMENTAL_FEATURES_ENABLED == "YES":
+                swagger_service.save_swagger_paths_to_qdrant(swagger_doc, chatbot["id"])
 
             swagger_service.save_swaggerfile_to_mongo(
                 filename, str(chatbot["id"]), swagger_doc

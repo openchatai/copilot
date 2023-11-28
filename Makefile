@@ -1,4 +1,5 @@
 # Variables
+export TARGET=production
 DOCKER_COMPOSE = docker-compose
 
 # Colors

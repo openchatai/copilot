@@ -8,7 +8,6 @@ from opencopilot_utils.get_vector_store import get_vector_store
 from opencopilot_utils import StoreOptions
 from langchain.docstore.document import Document
 from utils.get_logger import struct_log
-from qdrant_client.http import models
 import os
 from utils.db import Database
 
@@ -39,8 +38,12 @@ def save_swagger_paths_to_qdrant(swagger_doc: ResolvingParser, bot_id: str):
         operations = paths[path]
         for method in operations:
             operation = operations[method]
+            operation["method"] = method
+            operation["path"] = path
             del operation["responses"]
-            document = Document(page_content=operation["description"])
+            document = Document(
+                page_content=f"{operation['summary']}; {operation['description']}"
+            )
             document.metadata["bot_id"] = bot_id
             document.metadata["operation"] = operation
 
