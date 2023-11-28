@@ -32,7 +32,7 @@ export default function GeneralSettingsPage() {
         title: "Copilot deleted",
         description: "Your copilot has been deleted successfully.",
       });
-      _.delay(() => replace("/"), 1000);
+      replace("/")
     }
   }
   const [Name, setName] = React.useState(copilotName);
