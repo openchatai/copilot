@@ -10,8 +10,13 @@ import { HeaderShell } from "@/components/domain/HeaderShell";
 import { Search } from "./_parts/Search";
 import { Link } from "@/lib/router-events";
 import { CopilotsContainer } from "./_parts/CopilotsContainer";
+import { listCopilots } from "@/data/copilot";
+
+export const dynamic = 'force-dynamic'
+export const revalidate = 0;
 
 export default async function HomePage() {
+  const { data: copilots } = await listCopilots();
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
       <HeaderShell>
@@ -52,7 +57,7 @@ export default async function HomePage() {
           </ClosableDiv>
         </ClosableDivProvider>
         <Search />
-        <CopilotsContainer />
+        <CopilotsContainer copilots={copilots} />
       </div>
     </div>
   );
