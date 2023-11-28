@@ -11,9 +11,8 @@ export default function Confetti() {
         confetti ? <ReactConfetti
             width={width}
             height={height}
-            onConfettiComplete={(i) => {
-                console.log(i)
-            }}
+            numberOfPieces={500}
+            recycle={false}
         /> : null
     )
 }

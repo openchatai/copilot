@@ -186,7 +186,7 @@ function UploadSwaggerStep() {
                 description: "You have created your copilot successfully",
                 variant: "success",
               });
-              popConfetti(10)
+              popConfetti(5)
               _.delay(nextStep, 1000);
             }
           }
@@ -206,7 +206,7 @@ function UploadSwaggerStep() {
                 description: "You have created your copilot successfully",
                 variant: "success",
               });
-              popConfetti(10)
+              popConfetti(5)
               _.delay(nextStep, 1000);
             }
           }
