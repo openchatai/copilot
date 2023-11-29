@@ -73,7 +73,7 @@ def classify_text(
     ]
 
     # adding prev conversations
-    messages.extend(prev_conversations[-10:])
+    messages.extend(prev_conversations)
     if custom_classification_prompt is not None:
         messages.append(SystemMessage(content=custom_classification_prompt))
     else:
