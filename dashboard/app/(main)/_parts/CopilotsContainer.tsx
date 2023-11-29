@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React from "react";
 import { BotIcon, Terminal } from "lucide-react";
 import { Link } from "@/lib/router-events";
@@ -8,14 +8,16 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { CopilotType } from "@/data/copilot";
+import useSwr from "swr";
+import { CopilotType, listCopilots } from "@/data/copilot";
+import Loading from "../loading";
 import { Filter } from "./Search";
 import _ from "lodash";
 import { EmptyBlock } from "@/components/domain/EmptyBlock";
 import { filterAtom } from "./Search";
 import { useAtomValue } from "jotai";
-import { format } from "timeago.js";
 import { Button } from "@/components/ui/button";
+import { format } from "timeago.js";
 
 function customSort(list: CopilotType[], sortBy: Filter["sort"]) {
   if (sortBy === "last-viewed") {
@@ -30,12 +32,18 @@ function customSort(list: CopilotType[], sortBy: Filter["sort"]) {
   }
 }
 
-export function CopilotsContainer({ copilots }: {
-  copilots: CopilotType[]
-}) {
+export function CopilotsContainer() {
+  const { data: copilots, isLoading } = useSwr("copilotsList", listCopilots);
   const { sort, query } = useAtomValue(filterAtom);
+
+  if (isLoading && !copilots)
+    return (
+      <div className="flex-center py-4">
+        <Loading />
+      </div>
+    );
   const $copilots = customSort(
-    _.filter(copilots, (item) => item.name.toLowerCase().includes(query)),
+    _.filter(copilots?.data, (item) => item.name.toLowerCase().includes(query)),
     sort,
   );
   return _.isEmpty($copilots) ? (
