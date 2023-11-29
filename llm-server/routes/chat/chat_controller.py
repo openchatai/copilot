@@ -43,7 +43,7 @@ def get_session_chats(session_id: str) -> Response:
 
 
 @chat_workflow.route("/b/<bot_id>/chat_sessions", methods=["GET"])
-def get_chat_sessions(bot_id: str) -> Response:
+def get_chat_sessions(bot_id: str) -> list[dict[str, object]]:
     limit = cast(int, request.args.get("limit", 20))
     offset = cast(int, request.args.get("offset", 0))
     chat_history_sessions = get_unique_sessions_with_first_message_by_bot_id(
