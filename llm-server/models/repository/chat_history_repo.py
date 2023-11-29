@@ -209,6 +209,7 @@ def get_unique_sessions_with_first_message_by_bot_id(
     unique_session_ids = (
         session.query(distinct(ChatHistory.session_id))
         .filter_by(chatbot_id=bot_id)
+        .order_by(ChatHistory.created_at.desc())
         .limit(limit)
         .offset(offset)
         .all()
