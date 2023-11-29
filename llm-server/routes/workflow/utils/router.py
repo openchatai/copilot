@@ -1,5 +1,7 @@
 import os
+import json
 from langchain.schema import HumanMessage, SystemMessage, BaseMessage
+from routes.workflow.utils.detect_multiple_intents import BotMessage
 from routes.workflow.extractors.extract_json import extract_json_payload
 
 # push it to the library
@@ -10,19 +12,21 @@ from integrations.custom_prompts.prompt_loader import load_prompts
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from utils.chat_models import CHAT_MODELS
 from utils import get_chat_model
-from typing import Optional, List, Union
+from typing import Optional, List, Union, cast
 from langchain.vectorstores.base import VectorStore
 from utils.get_logger import struct_log
 
 chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
+knowledgebase: VectorStore = get_vector_store(StoreOptions("knowledgebase"))
+apis: VectorStore = get_vector_store(StoreOptions("apis"))
 
 def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
     try:
         score_threshold = float(os.getenv("SCORE_THRESHOLD_KB", "0.75"))
-        vector_store: VectorStore = get_vector_store(StoreOptions("knowledgebase"))
+        
 
-        retriever = vector_store.as_retriever(
+        kb_retriever = knowledgebase.as_retriever(
             search_kwargs={
                 "k": 3,
                 "score_threshold": score_threshold,
@@ -30,7 +34,7 @@ def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
             },
         )
 
-        result = retriever.get_relevant_documents(text)
+        result = kb_retriever.get_relevant_documents(text)
 
         if result and len(result) > 0:
             # Assuming result is a list of objects and each object has a page_content attribute
@@ -43,80 +47,97 @@ def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
     except Exception as e:
         struct_log.exception(payload=text, error=str(e), event="get_relevant_docs")
         return None
+    
+
+def get_relevant_apis_summaries(text: str, bot_id: str) -> Optional[str]:
+    try:
+        score_threshold = float(os.getenv("SCORE_THRESHOLD_KB", "0.75"))
+        
+
+        apis_retriever = apis.as_retriever(
+            search_kwargs={
+                "k": 5,
+                "score_threshold": score_threshold,
+                "filter": {"bot_id": bot_id},
+            },
+        )
+
+        result = apis_retriever.get_relevant_documents(text)
+        
+        if result and len(result) > 0:
+            return json.dumps(result)
+        else:
+            return None
+        
+        
+    except Exception as e:
+        struct_log.exception(payload=text, error=str(e), event="get_relevant_apis_summaries")
+        return None
 
 
 def classify_text(
-    user_requirement: str, context: Optional[str], session_id: str, app: Optional[str]
-) -> Union[str, ActionType]:
-    prev_conversations = []
-    if session_id:
-        prev_conversations = get_chat_message_as_llm_conversation(session_id)
-
+    session_id: str, app: Optional[str], user_requirement: str, context: Optional[str], api_summaries: Optional[str]
+):
+    if not session_id:
+        raise ValueError("Session id must be defined for chat conversations")
+    
+    prev_conversations = get_chat_message_as_llm_conversation(session_id)
     prompt_templates = load_prompts(app)
-    custom_classification_prompt = None
-
+    system_message_classifier = SystemMessage(content="You are a helpful assistant that classifies text input into one of predefined classes")
     if app and prompt_templates:
-        custom_classification_prompt = prompt_templates.classification_prompt
-
+        system_message_classifier = prompt_templates.system_message_classifier
     struct_log.info(
-        event="select_classification_prompt",
+        event="system_message_classifier",
         app=app,
         context=context,
-        classification_prompt=custom_classification_prompt,
-        selected_prompt=custom_classification_prompt,
+        classification_prompt=system_message_classifier,
+        prev_conversations=prev_conversations
     )
+    messages:List[BaseMessage] = []
+    messages.append(system_message_classifier)
 
-    messages: List[BaseMessage] = [
-        SystemMessage(
-            content="You possess the ability to categorize user input into predefined types determined by the user."
-        )
-    ]
 
-    # adding prev conversations
-    messages.extend(prev_conversations[-10:])
-    if custom_classification_prompt is not None:
-        messages.append(SystemMessage(content=custom_classification_prompt))
+    if context and api_summaries:
+        messages.append(HumanMessage(content=f"Here is some relevant context I found that might be helpful. Here is the context I found - ```{context}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{api_summaries}```. "))
+    elif context:
+        messages.append(HumanMessage(content=f"I found some relevant context that might be helpful. Here is the context: ```{context}```. "))
+    elif api_summaries:
+        messages.append(HumanMessage(content=f"I found API summaries that might be helpful in answering the question. Here are the api summaries: ```{api_summaries}```. "))
     else:
-        messages.append(
-            HumanMessage(
-                content=f"Respond with the string '{ActionType.ASSISTANT_ACTION.value}' for questions that are centered around data / api calling or questions related to math / data of an organization / api calls etc . Output '{ActionType.KNOWLEDGE_BASE_QUERY.value}' if and only if question can confidently be answered from the context provided in the chat."
-            )
-        )
+        pass
+    
+    messages.append(HumanMessage(content="""Based on the information provided to you I want you to answer the questions that follow. Your should respond with a json that looks like the following - 
+    {{
+        "ids": ["list", "of", "apis", "to", "be", "called"],
+        "bot_message": "the answer to the user query if you can confidently answer it from the context provided"
+    }}                
+    """))
+    
+    
+    messages.append(HumanMessage(content=user_requirement))
+        
+    if(len(prev_conversations) > 0):
+        messages.extend(prev_conversations)
+            
+            
+    content = chat(messages=messages).content
+    d = extract_json_payload(cast(str, content))
+    
+    if isinstance(d, str):
+        return BotMessage(ids=[], bot_message=d)
 
-    messages.append(HumanMessage(content=f"provided context: {context}"))
-    messages.append(
-        HumanMessage(
-            content="If the user is inquiring about a previous question, produce the same category as output as the one to which this follow-up pertains."
-        )
-    )
-    messages.append(
-        HumanMessage(
-            content=f"If the question cannot be answered from the provided context output {ActionType.ASSISTANT_ACTION.value}"
-        )
-    )
+    struct_log.info(event="extract_json_payload", data=d)
 
-    messages.append(
-        HumanMessage(content=user_requirement),
-    )
+    bot_message = BotMessage.from_dict(d)
+    return bot_message
 
-    content = chat(messages).content
-
-    struct_log.info(
-        event="classification_model_output", data=content, messages=messages
-    )
-    if ActionType.ASSISTANT_ACTION.value in content:
-        return ActionType.ASSISTANT_ACTION
-    elif ActionType.KNOWLEDGE_BASE_QUERY.value in content:
-        return ActionType.KNOWLEDGE_BASE_QUERY
-    else:
-        return content
 
 
 def get_action_type(
     user_requirement: str, bot_id: str, session_id: str, app: Optional[str]
-) -> Union[str, ActionType]:
+) -> BotMessage:
     context = get_relevant_docs(user_requirement, bot_id) or None
-
-    route = classify_text(user_requirement, context, session_id, app)
+    apis = get_relevant_apis_summaries(user_requirement, bot_id)
+    route = classify_text(user_requirement=user_requirement, context=context, session_id=session_id, app=app, api_summaries=apis)
 
     return route

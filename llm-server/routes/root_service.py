@@ -59,6 +59,7 @@ def handle_request(
     swagger_doc = None
     try:
         action = get_action_type(text, bot_id, session_id, app)
+        return {"error": None, "response": action.bot_message}
 
         if not isinstance(action, ActionType):
             return {"response": action, "error": None}

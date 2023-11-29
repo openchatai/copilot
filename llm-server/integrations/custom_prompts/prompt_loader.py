@@ -17,7 +17,7 @@ class PromptsClass:
         self.knowledge_base_system_prompt = getattr(
             prompts, "knowledge_base_system_prompt"
         )
-        self.classification_prompt = getattr(prompts, "classification_prompt")
+        self.system_message_classifier = getattr(prompts, "system_message_classifier")
         self.api_summarizer = getattr(prompts, "api_summarizer")
         self.api_generation_prompt = getattr(prompts, "api_generation_prompt")
 
