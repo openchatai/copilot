@@ -6,11 +6,9 @@ from flask import Blueprint, jsonify, request
 from prance import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from routes.root_service import get_swagger_doc
-from utils.llm_consts import EXPERIMENTAL_FEATURES_ENABLED, get_username_from_request
 from werkzeug.utils import secure_filename
 from utils.base import resolve_abs_local_file_path_from
 from utils.get_logger import struct_log
-from opencopilot_db.chatbot import Chatbot
 
 import routes._swagger.service as swagger_service
 from enums.initial_prompt import ChatBotInitialPromptEnum
@@ -23,6 +21,7 @@ from models.repository.copilot_repo import (
     SessionLocal,
     update_copilot,
 )
+from utils.llm_consts import EXPERIMENTAL_FEATURES_ENABLED
 from utils.swagger_parser import SwaggerParser
 
 copilot = Blueprint("copilot", __name__)
@@ -32,10 +31,7 @@ UPLOAD_FOLDER = "shared_data"
 
 @copilot.route("/", methods=["GET"])
 def index():
-    email = get_username_from_request(request)
-    filter_criteria = Chatbot.email == email
-    chatbots = list_all_with_filter(filter_criteria=filter_criteria)
-
+    chatbots = list_all_with_filter()
     return jsonify([chatbot_to_dict(chatbot) for chatbot in chatbots])
 
 
@@ -58,8 +54,7 @@ def handle_swagger_file():
                 prompt_message=request.form.get(
                     "prompt_message", ChatBotInitialPromptEnum.AI_COPILOT_INITIAL_PROMPT
                 ),
-                website=request.form.get("website", "https://example.com"),
-                email=get_username_from_request(request),
+                website=request.form.get("website", "https://example.com")
             )
 
             swagger_doc = get_swagger_doc(filename)
