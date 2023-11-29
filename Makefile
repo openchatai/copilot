@@ -50,8 +50,6 @@ install:
 migrate:
 	@echo "$(COLOR_BOLD)=== 🟢 Running Alembic migrations ===$(COLOR_RESET)"
 	$(DOCKER_COMPOSE) exec llm-server sh -c "cd models && python setup_alembic.py && alembic upgrade head"
-db-setup:
-	$(DOCKER_COMPOSE) exec backend php artisan migrate:fresh --seed
 
 down:
 	$(DOCKER_COMPOSE) down --remove-orphans
@@ -80,12 +78,11 @@ help:
 	@echo "  $(COLOR_GREEN)install$(COLOR_RESET)            - Install and set up the Docker environment"
 	@echo "  $(COLOR_GREEN)db-setup$(COLOR_RESET)           - Set up the database (fresh migration with seeding)"
 	@echo "  $(COLOR_GREEN)down$(COLOR_RESET)               - Stop and remove all containers"
-	@echo "  $(COLOR_GREEN)exec-backend$(COLOR_RESET)       - Access the backend container's shell"
 	@echo "  $(COLOR_GREEN)exec-dashboard$(COLOR_RESET)     - Access the dashboard container's shell"
 	@echo "  $(COLOR_GREEN)exec-llm-server$(COLOR_RESET)    - Access the llm-server container's shell"
 	@echo "  $(COLOR_GREEN)restart$(COLOR_RESET)            - Restart all containers"
 	@echo "  $(COLOR_GREEN)logs$(COLOR_RESET)               - Show container logs"
-	@echo "  $(COLOR_GREEN)purge$(COLOR_RESET)              - Full clean un-install (will remove containers, networks, volumes) "
+	@echo "  $(COLOR_GREEN)purge$(COLOR_RESET)              - Full clean un-install (will remove containers, networks, volumes, .env) "
 	@echo ""
 	@echo "  $(COLOR_YELLOW)help$(COLOR_RESET)              - Display this help message"
 	@echo ""

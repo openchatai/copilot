@@ -64,7 +64,6 @@ def create_copilot(
     name: str,
     prompt_message: str,
     swagger_url: str,
-    email: str,
     enhanced_privacy: bool = False,
     smart_sync: bool = False,
     website: Optional[str] = None,
@@ -100,7 +99,7 @@ def create_copilot(
             smart_sync=smart_sync,
             created_at=datetime.datetime.utcnow(),
             updated_at=datetime.datetime.utcnow(),
-            email=email,
+            email='example@example.com',
         )
 
         try:
