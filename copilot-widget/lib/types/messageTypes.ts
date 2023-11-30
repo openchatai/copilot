@@ -1,13 +1,13 @@
 // original shape
 export type Message = {
-  timestamp?: number;
-  id: string;
+  timestamp?: number | Date;
+  id: string | number;
 } & (
-  | { from: "user"; content: string }
-  | ({ from: "bot" } & {
+    | { from: "user"; content: string }
+    | ({ from: "bot" } & {
       type: "text";
       response: {
         text: string;
       };
     })
-);
+  );
