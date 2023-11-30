@@ -2,29 +2,26 @@ import {
   Handle,
   NodeProps,
   Position,
-  useNodeId,
-  useNodes,
   NodeToolbar,
-  useReactFlow,
 } from "reactflow";
 import { useMode } from "../stores/ModeProvider";
-import { memo, useCallback, useMemo } from "react";
+import { memo, useMemo } from "react";
 import { Y, nodedimensions } from "./consts";
 import { PlusIcon, TrashIcon } from "lucide-react";
 import { MethodBtn } from "./MethodRenderer";
 import { NodeData } from "../types/Swagger";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogPrimitiveAction,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { updateNodesPositions } from "../utils";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useController } from "..";
 
 const HideHandleStyles = {
   background: "transparent",
@@ -33,41 +30,27 @@ const HideHandleStyles = {
   border: "none",
 };
 function EndpointNode({ data, zIndex }: NodeProps<NodeData>) {
-  const nodes = useNodes<NodeData>();
-  const { setNodes } = useReactFlow();
-  const nodeId = useNodeId();
-  const nodeObj = nodes.find((n) => n.id === nodeId);
+  const { deleteNode, activeNodes } = useController();
+  const nodeObj = activeNodes?.find((n) => n.id === data.id);
   const { mode, setMode, reset: resetMode } = useMode();
   const isActive = useMemo(() => {
     if (mode.type === "edit-node") {
-      return mode.node.id === nodeId;
+      return mode.nodeId === data.id;
     } else {
       return false;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
-  const isFirstNode = nodes?.[0]?.id === nodeId;
-  const isLastNode = nodes?.[nodes.length - 1]?.id === nodeId;
-  const deleteNode = useCallback(() => {
-    setTimeout(() => {
-      setNodes(
-        updateNodesPositions(
-          nodes.filter((nd) => nd.id !== nodeId),
-          Y,
-        ),
-      );
-      resetMode();
-    }, 300);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const isFirstNode = activeNodes?.[0]?.id === data.id;
+  const isLastNode = activeNodes?.[activeNodes.length - 1]?.id === data.id;
   return (
     <>
       <NodeToolbar align="center" isVisible={isActive} position={Position.Left}>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <button className="rounded-full bg-accent p-2 text-lg text-rose-500 transition-colors">
-              <TrashIcon />
+            <button className="rounded-full bg-white p-2 text-rose-500">
+              <TrashIcon className="w-4 h-4" />
             </button>
           </AlertDialogTrigger>
           <AlertDialogContent>
@@ -75,9 +58,9 @@ function EndpointNode({ data, zIndex }: NodeProps<NodeData>) {
               Are you sure you want to delete this node?
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogAction onClick={deleteNode} asChild>
+              <AlertDialogPrimitiveAction onClick={() => { deleteNode(data.id); resetMode() }} asChild>
                 <Button variant="destructive">Yup!</Button>
-              </AlertDialogAction>
+              </AlertDialogPrimitiveAction>
               <AlertDialogCancel asChild>
                 <Button variant="secondary">Nope!</Button>
               </AlertDialogCancel>
@@ -102,7 +85,7 @@ function EndpointNode({ data, zIndex }: NodeProps<NodeData>) {
       >
         <div
           onClick={() => {
-            nodeObj && setMode({ type: "edit-node", node: nodeObj });
+            nodeObj && setMode({ type: "edit-node", nodeId: data.id });
           }}
           className={cn(
             "group h-full w-full cursor-pointer select-none rounded border bg-white transition-all duration-300 ease-in-out",
@@ -140,7 +123,7 @@ function EndpointNode({ data, zIndex }: NodeProps<NodeData>) {
               className={cn(
                 "rounded bg-[#ddd] p-0.5 text-sm transition-all duration-300 ease-in-out",
                 mode.type === "append-node" &&
-                  "text-primbg-primary bg-primary ring-4 ring-primary/20 ring-offset-transparent",
+                "text-primbg-primary bg-primary ring-4 ring-primary/20 ring-offset-transparent",
               )}
             >
               <PlusIcon />
@@ -159,5 +142,4 @@ function EndpointNode({ data, zIndex }: NodeProps<NodeData>) {
   );
 }
 
-const MemoizedEndpointNode = memo(EndpointNode);
-export default MemoizedEndpointNode;
+export default memo(EndpointNode);

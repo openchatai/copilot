@@ -1,4 +1,3 @@
-import type { Node } from "reactflow";
 import type { NodeData } from "./Swagger";
 
 export type Step = {
@@ -35,6 +34,5 @@ export type FlowType = {
   description?: string;
   createdAt?: number;
   updatedAt?: number;
-  steps: EndpointNodeType[];
+  steps: NodeData[];
 };
-export type EndpointNodeType = Node<NodeData>;

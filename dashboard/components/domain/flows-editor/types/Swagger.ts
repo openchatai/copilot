@@ -77,7 +77,7 @@ export interface Swagger<
 
 export type ExtendedOperation = Omit<
   Operation,
-  "responses" | "requestBody" | "parameters"
+  "responses" | "requestBody"
 > & {
   method: Method;
 };
@@ -88,5 +88,6 @@ export type TransformedPath = {
 };
 
 export type NodeData = ExtendedOperation & {
+  id: string;
   path: string;
 };
