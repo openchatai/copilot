@@ -58,12 +58,12 @@ def get_chat_sessions(bot_id: str) -> list[dict[str, object]]:
 def init_chat():
     bot_token = request.headers.get("X-Bot-Token")
     session_id = request.args.get("session_id")
-    
+
     history = []
     if session_id:
-        chats = get_all_chat_history_by_session_id(session_id, 0, 200)
+        chats = get_all_chat_history_by_session_id(session_id, 200, 0)
         history = sqlalchemy_objs_to_json_array(chats) or []
-        
+
     if not bot_token:
         return (
             jsonify(
@@ -83,7 +83,7 @@ def init_chat():
             "logo": "logo",
             "faq": [],  # Replace with actual FAQ data
             "initial_questions": [],  # Replace with actual initial questions
-            "history": history
+            "history": history,
         }
     )
 
