@@ -103,7 +103,7 @@ export function FlowsList() {
             </form>
           </DialogContent>
           <DialogTrigger
-            asChild
+            className="text-primary"
             onClick={(ev) => {
               if (maxFlows && flows.length >= maxFlows) {
                 alert(`You can only have ${maxFlows} flows at a time.`);
@@ -112,9 +112,7 @@ export function FlowsList() {
               }
             }}
           >
-            <button>
-              <PlusIcon className="text-base" />
-            </button>
+            <PlusIcon className="w-5 h-5" />
           </DialogTrigger>
         </Dialog>
       </div>
@@ -130,10 +128,10 @@ export function FlowsList() {
           <EmptyBlock />
         ) : (
           <ul className="space-y-1 p-2">
-            {flows?.map((flow) => {
+            {flows?.map((flow, i) => {
               const isActive = flow.id === activeFlowId;
               return (
-                <li key={flow.id} data-flow-id={flow.id}>
+                <li key={i} data-flow-id={flow.id}>
                   <div
                     className={cn(
                       "flex w-full items-center justify-between rounded-md p-2 text-left text-base font-semibold transition-all duration-300 ease-in-out hover:bg-slate-100",
@@ -154,7 +152,7 @@ export function FlowsList() {
                         }}
                         className="text-slate-500"
                       >
-                        <Pencil />
+                        <Pencil className="w-4 h-4" />
                       </button>
                       <button
                         className="text-rose-500"
@@ -164,7 +162,7 @@ export function FlowsList() {
                           ) && deleteFlow(flow.id);
                         }}
                       >
-                        <TrashIcon />
+                        <TrashIcon className="w-4 h-4" />
                       </button>
                     </div>
                   </div>

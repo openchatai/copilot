@@ -6,16 +6,13 @@ import {
   useEffect,
 } from "react";
 import { produce } from "immer";
-import { Node } from "reactflow";
-import { ModeProvider } from "./ModeProvider";
-import { TransformedPath } from "../types/Swagger";
-import { genId } from "../utils";
+import { NodeData, TransformedPath } from "../types/Swagger";
 import { ReactFlowProvider } from "reactflow";
-import { EndpointNodeType, Flow, FlowType } from "../types/Flow";
+import { FlowType } from "../types/Flow";
 import { Settings, SettingsProvider } from "./Config";
 import { getDef } from "../utils/getDef";
 import { createSafeContext } from "@/lib/createSafeContext";
-import { transformaEndpointToNode } from "..";
+import genId from 'lodash/uniqueId'
 
 type StateShape = {
   paths: TransformedPath[];
@@ -26,14 +23,16 @@ type StateShape = {
 type ControllerContextType = {
   loadPaths: (paths: TransformedPath[]) => void;
   state: StateShape;
-  activeNodes?: EndpointNodeType[];
+  activeNodes?: NodeData[];
   createFlow: (data: CreateFlowPayload) => void;
   setActiveFlow: (id: string) => void;
-  setNodes: (nodes: Node[]) => void;
   reset: () => void;
   deleteFlow: (id: string) => void;
   getData: () => ReturnType<typeof getDef>;
-  loadFlows: (data: Flow[]) => void;
+  loadData: (data: ReturnType<typeof getDef>) => void;
+  appendNode: (node: NodeData) => void;
+  addNodeBetween: (sourceId: string, targetId: string, node: NodeData) => void;
+  deleteNode: (id: string) => void;
 };
 
 type ActionType =
@@ -41,21 +40,36 @@ type ActionType =
   | { type: "load-paths"; pyload: TransformedPath[] }
   | { type: "set-active-flow"; pyload: string }
   | {
-      type: "create-flow";
-      pyload: {
-        name: string;
-        description?: string;
-        createdAt?: number;
-        focus: boolean;
-      };
-    }
+    type: "create-flow";
+    pyload: {
+      name: string;
+      description?: string;
+      createdAt?: number;
+      focus: boolean;
+    };
+  }
   | {
-      type: "delete-flow";
-      pyload: string;
-    }
+    type: "delete-flow";
+    pyload: string;
+  }
   | { type: "set-flows"; pyload: StateShape["flows"] }
-  | { type: "set-nodes"; payload: Node[] }
-  | { type: "load-flows"; payload: Flow[] };
+  | { type: "load-data"; payload: ReturnType<typeof getDef> } |
+  {
+    type: "append-node",
+    payload: {
+      node: NodeData
+    }
+  } | {
+    type: "delete-node",
+    payload: string
+  } | {
+    type: "add-node-between",
+    payload: {
+      sourceId: string,
+      targetId: string,
+      node: NodeData
+    }
+  }
 
 type CreateFlowPayload = Extract<ActionType, { type: "create-flow" }>["pyload"];
 
@@ -66,8 +80,12 @@ const initialStateValue: StateShape = {
 };
 const [SafeProvider, useController] =
   createSafeContext<ControllerContextType>("");
+
 function stateReducer(state: StateShape, action: ActionType) {
-  if (action.type === "reset") return initialStateValue;
+  if (action.type === "reset") return {
+    ...initialStateValue,
+    paths: state.paths,
+  };
   return produce(state, (draft) => {
     switch (action.type) {
       case "load-paths":
@@ -87,33 +105,40 @@ function stateReducer(state: StateShape, action: ActionType) {
         if (action.pyload.focus) draft.activeFlowId = id;
         break;
       }
-      case "set-nodes":
-        {
-          const flow = draft.flows.find((f) => f.id === state.activeFlowId);
-          if (!flow) return;
-          flow.steps = action.payload;
-          flow.updatedAt = Date.now();
-        }
-        break;
       case "delete-flow":
         draft.flows = draft.flows.filter((f) => f.id !== action.pyload);
         if (draft.activeFlowId === action.pyload) {
           draft.activeFlowId = undefined;
         }
         break;
-      case "load-flows": {
-        const id = genId();
-        if (action.payload) {
-          draft.flows = action.payload.map((f) => ({
-            ...f,
-            id,
-            name: f.name,
-            description: f.description,
-            // @ts-ignore
-            steps: transformaEndpointToNode(f.steps),
-          }));
-          draft.activeFlowId = id;
-        }
+      case "append-node": {
+        if (!draft.activeFlowId) return;
+        const flow = draft.flows.find((f) => f.id === draft.activeFlowId);
+        if (!flow) return;
+        flow.steps.push(action.payload.node);
+        break;
+      }
+      case "delete-node": {
+        if (!draft.activeFlowId) return;
+        const flow = draft.flows.find((f) => f.id === draft.activeFlowId);
+        if (!flow) return;
+        flow.steps = flow.steps.filter((s) => s.id !== action.payload);
+        break;
+      }
+      case "add-node-between": {
+        if (!draft.activeFlowId) return;
+        const flow = draft.flows.find((f) => f.id === draft.activeFlowId);
+        if (!flow) return;
+        const { targetId, node } = action.payload;
+        // add after targetId
+        const index = flow.steps.findIndex((s) => s.id === targetId);
+        flow.steps.splice(index + 1, 0, node);
+        break;
+      }
+      case "load-data": {
+        const { flows } = action.payload;
+        draft.flows = flows;
+        draft.activeFlowId = flows[0]?.id;
         break;
       }
       default:
@@ -140,6 +165,7 @@ function Controller({
   useEffect(() => {
     onChange?.(state);
   }, [state, onChange]);
+
   const loadPaths = useCallback(
     (paths: TransformedPath[]) =>
       dispatch({
@@ -170,14 +196,6 @@ function Controller({
     return flow.steps;
   }, [state]);
 
-  const setNodes = useCallback(
-    (nodes: Node[]) =>
-      dispatch({
-        type: "set-nodes",
-        payload: nodes,
-      }),
-    [],
-  );
   const deleteFlow = useCallback(
     (id: string) =>
       dispatch({
@@ -189,10 +207,40 @@ function Controller({
   // TODO: @bug: when we reset, the nodes(in the arena) are not reset
   const reset = useCallback(() => dispatch({ type: "reset" }), []);
   const getData = useCallback(() => getDef(state.flows), [state]);
-  const loadFlows = useCallback(
-    (data: Flow[]) =>
+  const appendNode = useCallback(
+    (node: NodeData) =>
       dispatch({
-        type: "load-flows",
+        type: "append-node",
+        payload: {
+          node,
+        },
+      }),
+    [],
+  );
+  const addNodeBetween = useCallback(
+    (sourceId: string, targetId: string, node: NodeData) =>
+      dispatch({
+        type: "add-node-between",
+        payload: {
+          sourceId,
+          targetId,
+          node,
+        },
+      }),
+    [],
+  );
+  const deleteNode = useCallback(
+    (id: string) =>
+      dispatch({
+        type: "delete-node",
+        payload: id,
+      }),
+    [],
+  );
+  const loadData = useCallback(
+    (data: ReturnType<typeof getDef>) =>
+      dispatch({
+        type: "load-data",
         payload: data,
       }),
     [],
@@ -200,24 +248,24 @@ function Controller({
   return (
     <ReactFlowProvider>
       <SettingsProvider value={settings}>
-        <ModeProvider>
-          <SafeProvider
-            value={{
-              loadPaths,
-              state,
-              createFlow,
-              setActiveFlow,
-              activeNodes,
-              setNodes,
-              deleteFlow,
-              reset,
-              getData,
-              loadFlows,
-            }}
-          >
-            {children}
-          </SafeProvider>
-        </ModeProvider>
+        <SafeProvider
+          value={{
+            loadPaths,
+            addNodeBetween,
+            state,
+            createFlow,
+            setActiveFlow,
+            activeNodes,
+            appendNode,
+            deleteFlow,
+            reset,
+            deleteNode,
+            getData,
+            loadData,
+          }}
+        >
+          {children}
+        </SafeProvider>
       </SettingsProvider>
     </ReactFlowProvider>
   );

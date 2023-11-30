@@ -1,5 +1,4 @@
 import type { FlowType } from "../types/Flow";
-import { trasnformEndpointNodesData } from "./transformEndpointNodes";
 
 export function getDef(flows: FlowType[]) {
   return {
@@ -12,7 +11,12 @@ export function getDef(flows: FlowType[]) {
       return {
         name: flow.name,
         description: flow.description,
-        steps: trasnformEndpointNodesData(flow.steps),
+        steps: flow.steps.map(({ parameters, ...step }) => ({
+          ...step,
+          open_api_operation_id: step.operationId,
+          operation: "REQUEST"
+        })),
+        id: flow.id,
         requires_confirmation: true,
         on_success: [{}],
         on_failure: [{}],
