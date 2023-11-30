@@ -58,13 +58,13 @@ def get_all_chat_history_by_session_id(
     chats = (
         session.query(ChatHistory)
         .filter_by(session_id=session_id)
-        .order_by(ChatHistory.created_at.desc())
+        .order_by(ChatHistory.id.desc())
         .limit(limit)
         .offset(offset)
         .all()
     )
 
-    return chats
+    return chats[::-1]
 
 
 def get_chat_message_as_llm_conversation(session_id: str) -> List[BaseMessage]:
@@ -163,11 +163,13 @@ def get_chat_history_for_retrieval_chain(
         query = (
             session.query(ChatHistory)
             .filter(ChatHistory.session_id == session_id)
-            .order_by(ChatHistory.created_at)
+            .order_by(ChatHistory.created_at.desc())
         )
 
         if limit:
             query = query.limit(limit)
+
+        query = query.all()[::-1]
 
         chat_history: List[Tuple[str, str]] = []
 
@@ -221,7 +223,7 @@ def get_unique_sessions_with_first_message_by_bot_id(
         first_message = (
             session.query(ChatHistory)
             .filter_by(chatbot_id=bot_id, session_id=session_id[0])
-            .order_by(ChatHistory.created_at.asc())
+            .order_by(ChatHistory.created_at.asc)
             .first()
         )
 
