@@ -1,7 +1,7 @@
 from typing import cast
 
 from flask import jsonify, Blueprint, request, Response, abort
-
+from werkzeug.datastructures import Headers
 from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id,
     get_unique_sessions_with_first_message_by_bot_id,
@@ -20,8 +20,8 @@ chat_workflow = Blueprint("chat", __name__)
 
 @chat_workflow.route("/sessions/<session_id>/chats", methods=["GET"])
 def get_session_chats(session_id: str) -> Response:
-    limit = request.args.get("limit", 20)
-    offset = request.args.get("offset", 0)
+    limit = int(request.args.get("limit", 20))
+    offset = int(request.args.get("offset", 0))
 
     chats = get_all_chat_history_by_session_id(session_id, limit, offset)
 
@@ -83,6 +83,9 @@ def init_chat():
 @chat_workflow.route("/send", methods=["POST"])
 def send_chat():
     message = request.json.get("content")
+    session_id = request.json.get("session_id")
+    headers_from_json = request.json.get("headers", {})
+
     bot_token = request.headers.get("X-Bot-Token")
 
     if not message or len(message) > 255:
@@ -92,11 +95,14 @@ def send_chat():
         raise ValueError("bot token must be defined! ")
     bot = find_one_or_fail_by_token(bot_token)
 
-    session_id = request.headers.get("X-Session-Id", "")
+    app_name = headers_from_json.get("X-App-Name") or None
+
+    if app_name in headers_from_json:
+        del headers_from_json["app_name"]
+
     swagger_url = bot.swagger_url
-    headers = dict(request.headers)
+
     base_prompt = bot.prompt_message
-    app_name = headers.get("X-App-Name") or None
     server_base_url = request.form.get("server_base_url", "")
 
     if not bot:
@@ -119,7 +125,7 @@ def send_chat():
             session_id=session_id,
             base_prompt=base_prompt,
             bot_id=bot.id,
-            headers=headers,
+            headers=headers_from_json,
             server_base_url=server_base_url,
             app=app_name,
         )

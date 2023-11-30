@@ -23,6 +23,11 @@ class PromptsClass:
 
 
 def load_prompts(app_name) -> Optional[PromptsClass]:
-    if not app_name:
+    try:
+        if not app_name:
+            return None
+        return PromptsClass(app_name)
+    except Exception as e:
+        # Handle the exception as per your requirements
+        print(f"An error occurred: {e}")
         return None
-    return PromptsClass(app_name)

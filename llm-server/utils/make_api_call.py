@@ -46,13 +46,17 @@ def make_api_request(
             session.headers.update(headers)
         # Perform the HTTP request based on the request type
         if method == "GET":
-            response = session.get(url, params=query_params)
+            response = session.get(url, params=query_params, timeout=10)
         elif method == "POST":
-            response = session.post(url, json=body_schema, params=query_params)
+            response = session.post(
+                url, json=body_schema, params=query_params, timeout=10
+            )
         elif method == "PUT":
-            response = session.put(url, json=body_schema, params=query_params)
+            response = session.put(
+                url, json=body_schema, params=query_params, timeout=10
+            )
         elif method == "DELETE":
-            response = session.delete(url, params=query_params)
+            response = session.delete(url, params=query_params, timeout=10)
         else:
             raise ValueError("Invalid request type. Use GET, POST, PUT, or DELETE.")
 

@@ -54,8 +54,10 @@ def save_swagger_paths_to_qdrant(swagger_doc: ResolvingParser, bot_id: str):
             )
             documents.append(document)
 
-    vector_store.add_documents(documents)
-    struct_log.info(event="api_ingestion_qdrant", documents=documents)
+    point_ids = vector_store.add_documents(documents)
+    struct_log.info(
+        event="api_ingestion_qdrant", documents=documents, point_ids=point_ids
+    )
 
 
 def add_swagger_file(request: Request, id: str) -> Dict[str, str]:

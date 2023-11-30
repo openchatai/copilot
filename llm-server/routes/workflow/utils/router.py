@@ -1,18 +1,17 @@
 import os
-import json
 from langchain.schema import HumanMessage, SystemMessage, BaseMessage
-from routes.workflow.utils.detect_multiple_intents import BotMessage
+from custom_types.api_operation import ApiOperation_vs
+from custom_types.bot_message import BotMessage
 from routes.workflow.extractors.extract_json import extract_json_payload
 
 # push it to the library
 from opencopilot_utils.get_vector_store import get_vector_store
 from opencopilot_utils import StoreOptions
-from custom_types.action_type import ActionType
 from integrations.custom_prompts.prompt_loader import load_prompts
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from utils.chat_models import CHAT_MODELS
 from utils import get_chat_model
-from typing import Optional, List, Union, cast
+from typing import Optional, List, cast, Any
 from langchain.vectorstores.base import VectorStore
 from utils.get_logger import struct_log
 
@@ -49,7 +48,7 @@ def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
         return None
 
 
-def get_relevant_apis_summaries(text: str, bot_id: str) -> Optional[str]:
+def get_relevant_apis_summaries(text: str, bot_id: str) -> List[Any]:
     try:
         score_threshold = float(os.getenv("SCORE_THRESHOLD_KB", "0.75"))
 
@@ -62,21 +61,23 @@ def get_relevant_apis_summaries(text: str, bot_id: str) -> Optional[str]:
         )
 
         results = apis_retriever.get_relevant_documents(text)
-        return results
-        # if results and len(results) > 0:
-        #     for result in results:
-        #         result.metadata[""]
-        #     return json.dumps(results)
-        # else:
-        #     return None
+
+        resp: List[ApiOperation_vs] = []
+        for result in results:
+            resp.append(result.metadata["operation"])
+
+        return resp
 
     except Exception as e:
         struct_log.exception(
             payload=text, error=str(e), event="get_relevant_apis_summaries"
         )
-        return None
+        return []
 
 
+# @Remaining tasks here
+# 1. Todo: add application initial state here as well
+# 2. Add api data from qdrant so that the llm understands what apis are available to it for use
 def process_conversation_step(
     session_id: str,
     app: Optional[str],
@@ -90,7 +91,7 @@ def process_conversation_step(
     prev_conversations = get_chat_message_as_llm_conversation(session_id)
     prompt_templates = load_prompts(app)
     system_message_classifier = SystemMessage(
-        content="You are a helpful assistant that classifies text input into one of predefined classes"
+        content="You are a helpful ai assistant. User will give you two things, a list of api's and some useful information, called context. "
     )
     if app and prompt_templates:
         system_message_classifier = prompt_templates.system_message_classifier
@@ -107,7 +108,7 @@ def process_conversation_step(
     if context and api_summaries:
         messages.append(
             HumanMessage(
-                content=f"Here is some relevant context I found that might be helpful. Here is the context I found - ```{context}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{api_summaries}```. "
+                content=f"Here is some relevant context I found that might be helpful - ```{context}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{api_summaries}```. "
             )
         )
     elif context:
