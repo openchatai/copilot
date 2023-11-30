@@ -58,13 +58,13 @@ def get_all_chat_history_by_session_id(
     chats = (
         session.query(ChatHistory)
         .filter_by(session_id=session_id)
-        .order_by(ChatHistory.created_at.desc())
+        .order_by(ChatHistory.id.desc())
         .limit(limit)
         .offset(offset)
         .all()
     )
 
-    return chats
+    return chats[::-1]
 
 
 def get_chat_message_as_llm_conversation(session_id: str) -> List[BaseMessage]:
