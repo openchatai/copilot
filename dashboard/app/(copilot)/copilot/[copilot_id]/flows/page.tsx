@@ -3,23 +3,22 @@ import React, { useState } from "react";
 import { HeaderShell } from "@/components/domain/HeaderShell";
 import { useCopilot } from "../../_context/CopilotProvider";
 import useSwr, { mutate } from "swr";
-import { getSwaggerByBotId } from "@/data/swagger";
 import { Button } from "@/components/ui/button";
 import {
   createWorkflowByBotId,
   deleteWorkflowById,
   getWorkflowById,
+  updateWorkflowById,
 } from "@/data/flow";
-import { useRouter } from "next/navigation";
 import { toast } from "@/components/ui/use-toast";
 import _ from "lodash";
 import { useIsEditing } from "./_parts/useIsEditing";
 import {
   Controller,
   FlowArena,
-  transformPaths,
   useController,
 } from "@/components/domain/flows-editor";
+import { useRouter } from "@/lib/router-events";
 
 function Header() {
   // editing => workflow_id // creating => undefined
@@ -27,37 +26,37 @@ function Header() {
   const { replace } = useRouter();
   const { id: copilotId, name: copilotName } = useCopilot();
   const {
-    loadPaths,
     reset: resetFlowEditor,
     getData,
-    loadFlows,
-    state,
+    loadData,
+    state
   } = useController();
+  console.log("state", state);
   useSwr(workflow_id, getWorkflowById, {
     onSuccess: (data) => {
-      const first = _.first(data.data.flows);
-      if (first) {
-        console.log(first);
-        // @ts-ignore
-        loadFlows([first]);
+      console.log("data", data.data);
+      // load first 
+      if (data.data) {
+        loadData(data.data)
       }
     },
   });
-  const { isLoading: isSwaggerLoading, mutate: mutateSwagger } = useSwr(
-    copilotId + "swagger_file",
-    async () => getSwaggerByBotId(copilotId),
-    {
-      onSuccess: (data) => {
-        if (!data) return;
-        loadPaths(transformPaths(data.data.paths));
-      },
-    },
-  );
-  console.log(state);
   const [loading, setLoading] = useState(false);
-  const isLoading = isSwaggerLoading || loading;
+  async function handleSave() {
+    if (!isEditing || !workflow_id) return;
+    setLoading(true);
+    const { data } = await updateWorkflowById(workflow_id, getData());
+    if (data) {
+      toast({
+        title: "Workflow updated",
+        description: "Your workflow has been updated.",
+        variant: "success",
+      });
+      mutate(copilotId + "/workflows");
+      setLoading(false);
+    }
+  }
 
-  async function handleSave() {}
   async function handleDelete() {
     if (!isEditing || !workflow_id) return;
     setLoading(true);
@@ -71,13 +70,18 @@ function Header() {
       replace(`/copilot/${copilotId}/flows`, {
         scroll: false,
       });
+
       mutate(copilotId + "/workflows");
+      resetFlowEditor()
       setLoading(false);
     }
   }
+
   async function handleCreate() {
     if (isEditing) return;
     const firstFlow = _.first(getData().flows);
+    console.log("data", getData());
+
     if (firstFlow) {
       setLoading(true);
       try {
@@ -120,12 +124,12 @@ function Header() {
       </h1>
       {isEditing ? (
         <div className="space-x-1">
-          <Button onClick={handleSave} disabled={isLoading}>
+          <Button onClick={handleSave}>
             Save
           </Button>
           <Button
             onClick={handleDelete}
-            disabled={isLoading}
+
             variant="destructive"
           >
             Delete
@@ -133,14 +137,13 @@ function Header() {
         </div>
       ) : (
         <div className="space-x-1">
-          <Button onClick={handleCreate} disabled={isLoading}>
+          <Button onClick={handleCreate}>
             Create
           </Button>
           <Button
             variant="destructive"
             onClick={() => {
               confirm("Are you sure??") && resetFlowEditor();
-              mutateSwagger();
             }}
           >
             Reset
