@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-import { ReactNode, createContext, useContext, useMemo } from "react";
+import { ReactNode, createContext, useContext } from "react";
 import { useConfigData } from "./ConfigData";
 import { useSessionId } from "@lib/hooks/useSessionId";
 
@@ -7,11 +7,12 @@ interface AxiosInstanceProps {
   axiosInstance: AxiosInstance;
 }
 
-function createAxiosInstance(apiUrl?: string, sessionId?: string) {
+function createAxiosInstance(apiUrl?: string, sessionId?: string | null, botToken?: string) {
   const instance = axios.create({
     baseURL: apiUrl,
     headers: {
       "X-Session-Id": sessionId,
+      "X-Bot-Token": botToken,
     },
   });
 
@@ -30,16 +31,7 @@ const AxiosContext = createContext<AxiosInstanceProps | undefined>(undefined);
 export function AxiosProvider({ children }: { children: ReactNode }) {
   const config = useConfigData();
   const { sessionId } = useSessionId();
-  const axiosInstance: AxiosInstance = useMemo(
-    () => createAxiosInstance(config?.apiUrl, sessionId),
-    [config, sessionId]
-  );
-
-  if (config?.token) {
-    axiosInstance.defaults.headers["X-Bot-Token"] = config?.token;
-  } else {
-    console.warn("No token!");
-  }
+  const axiosInstance: AxiosInstance = createAxiosInstance(config?.apiUrl, sessionId, config?.token);
 
   return (
     <AxiosContext.Provider value={{ axiosInstance }}>

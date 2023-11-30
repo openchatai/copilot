@@ -58,13 +58,13 @@ def get_all_chat_history_by_session_id(
     chats = (
         session.query(ChatHistory)
         .filter_by(session_id=session_id)
-        .order_by(ChatHistory.created_at.desc())
+        .order_by(ChatHistory.id.desc())
         .limit(limit)
         .offset(offset)
         .all()
     )
 
-    return chats
+    return chats[::-1]
 
 
 def get_chat_message_as_llm_conversation(session_id: str) -> List[BaseMessage]:
@@ -188,28 +188,14 @@ def get_chat_history_for_retrieval_chain(
 def get_unique_sessions_with_first_message_by_bot_id(
     bot_id: str, limit: int = 20, offset: int = 0
 ) -> list[Dict[str, object]]:
-    """
-    Retrieve unique session_ids for a given bot_id with pagination,
-    along with the first message in each session.
-
-    Args:
-        bot_id (str): The bot_id for which to retrieve session_ids.
-        limit (int, optional): The maximum number of results to return. Defaults to 20.
-        offset (int, optional): The number of results to skip from the beginning. Defaults to 0.
-        session (Session, optional): The SQLAlchemy session. Defaults to None.
-
-    Returns:
-        List[Dict[str, object]]: A list of dictionaries containing
-        unique session_ids and their first messages.
-    """
     # If a session is not provided, create a new one
     session = Session()
 
     # Use distinct to get unique session_ids
     unique_session_ids = (
-        session.query(distinct(ChatHistory.session_id))
+        session.query(distinct(ChatHistory.session_id),  ChatHistory.id)
         .filter_by(chatbot_id=bot_id)
-        .order_by(ChatHistory.created_at.desc())
+        .order_by(ChatHistory.id.desc())
         .limit(limit)
         .offset(offset)
         .all()
@@ -222,7 +208,7 @@ def get_unique_sessions_with_first_message_by_bot_id(
         first_message = (
             session.query(ChatHistory)
             .filter_by(chatbot_id=bot_id, session_id=session_id[0])
-            .order_by(ChatHistory.created_at.asc())
+            .order_by(ChatHistory.id.asc())
             .first()
         )
 
