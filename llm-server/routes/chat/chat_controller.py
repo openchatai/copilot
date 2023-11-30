@@ -57,7 +57,7 @@ def get_chat_sessions(bot_id: str) -> list[dict[str, object]]:
 @chat_workflow.route("/init", methods=["GET"])
 def init_chat():
     bot_token = request.headers.get("X-Bot-Token")
-    session_id = request.args.get("session_id")
+    session_id = request.headers.get("X-Session-Id")
 
     history = []
     if session_id:
