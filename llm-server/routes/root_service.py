@@ -59,6 +59,9 @@ def handle_request(
     try:
         context = get_relevant_docs(text, bot_id) or None
         apis = get_relevant_apis_summaries(text, bot_id)
+        
+        
+        # also provide a list of workflows here itself, the llm should be able to figure out if a workflow needs to be run
         step = process_conversation_step(
             user_requirement=text,
             context=context,
@@ -66,8 +69,11 @@ def handle_request(
             app=app,
             api_summaries=apis,
         )
-        
-        return {"error": None, "response": step.bot_message}
+
+        if len(step.ids) > 0:
+            # check if one of the existing workf
+        else:
+            return {"error": None, "response": step.bot_message}
     except Exception as e:
         return handle_exception(e, "handle_request")
 
