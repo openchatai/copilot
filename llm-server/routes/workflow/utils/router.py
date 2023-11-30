@@ -77,7 +77,7 @@ def get_relevant_apis_summaries(text: str, bot_id: str) -> Optional[str]:
         return None
 
 
-def classify_text(
+def process_conversation_step(
     session_id: str,
     app: Optional[str],
     user_requirement: str,
@@ -154,19 +154,3 @@ def classify_text(
 
     bot_message = BotMessage.from_dict(d)
     return bot_message
-
-
-def get_action_type(
-    user_requirement: str, bot_id: str, session_id: str, app: Optional[str]
-) -> BotMessage:
-    context = get_relevant_docs(user_requirement, bot_id) or None
-    apis = get_relevant_apis_summaries(user_requirement, bot_id)
-    route = classify_text(
-        user_requirement=user_requirement,
-        context=context,
-        session_id=session_id,
-        app=app,
-        api_summaries=apis,
-    )
-
-    return route

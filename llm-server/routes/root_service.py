@@ -14,7 +14,7 @@ from routes.workflow.utils import (
 )
 from opencopilot_utils import get_llm, StoreOptions
 from bson import ObjectId
-from routes.workflow.utils.router import get_action_type
+from routes.workflow.utils.router import get_action_type, get_relevant_apis_summaries, get_relevant_docs, process_conversation_step
 from utils.chat_models import CHAT_MODELS
 from utils.db import Database
 from models.repository.chat_history_repo import get_chat_history_for_retrieval_chain
@@ -56,91 +56,18 @@ def handle_request(
 ) -> ResponseDict:
     log_user_request(text)
     check_required_fields(base_prompt, text, swagger_url)
-    swagger_doc = None
     try:
-        action = get_action_type(text, bot_id, session_id, app)
-        return {"error": None, "response": action.bot_message}
-
-        if not isinstance(action, ActionType):
-            return {"response": action, "error": None}
-        logging.info(f"Triggered action: {action}")
-        if action == ActionType.ASSISTANT_ACTION:
-            current_state = process_state(app, headers)
-            # document = None
-            swagger_doc = get_swagger_doc(swagger_url)
-
-            document = check_workflow_in_store(text, bot_id)
-            struct_log.info(
-                event="handle_request",
-                function_call="handle_existing_workflow",
-                output=document,
-            )
-            if document:
-                return handle_existing_workflow(
-                    document,
-                    text,
-                    headers,
-                    server_base_url,
-                    swagger_url,
-                    app,
-                    swagger_doc,
-                    session_id,
-                    bot_id,
-                )
-
-            bot_response = hasSingleIntent(
-                swagger_doc, text, session_id, current_state, app
-            )
-
-            # short circuit if the bot did not return a json payload, can happen if api calls were not supposed to be made
-            if isinstance(bot_response, str):
-                return {"error": "", "response": ""}
-
-            if len(bot_response.ids) >= 1:
-                return handle_api_calls(
-                    bot_response.ids,
-                    swagger_doc,
-                    text,
-                    headers,
-                    server_base_url,
-                    swagger_url,
-                    app,
-                    session_id,
-                    bot_id,
-                )
-
-            elif len(bot_response.ids) == 0:
-                return handle_no_api_call(bot_response.bot_message)
-
-        elif (
-            action == ActionType.KNOWLEDGE_BASE_QUERY
-            or action == ActionType.GENERAL_QUERY
-        ):
-            sanitized_question = text.strip().replace("\n", " ")
-            vector_store = get_vector_store(StoreOptions(namespace="knowledgebase"))
-            mode = "assistant"
-            chain = getConversationRetrievalChain(
-                vector_store, mode, base_prompt, bot_id, app
-            )
-            chat_history = get_chat_history_for_retrieval_chain(session_id, limit=40)
-            response = chain(
-                {"question": sanitized_question, "chat_history": chat_history},
-                return_only_outputs=True,
-            )
-            return {"response": response["answer"], "error": ""}
-
-        # elif action == ActionType.GENERAL_QUERY:
-        #     messages = [
-        #         SystemMessage(
-        #             content="You are an ai assistant, that answers general queries in <= 3 sentences"
-        #         ),
-        #         HumanMessage(content=f"Answer the following: {text}"),
-        #     ]
-
-        #     content = chat(messages).content
-        #     return {"response": content}
-        raise BaseException(action)
-
+        context = get_relevant_docs(text, bot_id) or None
+        apis = get_relevant_apis_summaries(text, bot_id)
+        step = process_conversation_step(
+            user_requirement=text,
+            context=context,
+            session_id=session_id,
+            app=app,
+            api_summaries=apis,
+        )
+        
+        return {"error": None, "response": step.bot_message}
     except Exception as e:
         return handle_exception(e, "handle_request")
 
