@@ -49,8 +49,8 @@ export function BotTextMessage({
   id,
 }: {
   message: string;
-  timestamp?: number;
-  id?: string;
+  timestamp?: number | Date;
+  id?: string | number;
 }) {
   const { displayText } = useTypeWriter({
     text: message,
@@ -133,8 +133,8 @@ export function UserMessage({
   timestamp,
 }: {
   content: string;
-  timestamp?: number;
-  id?: string;
+  timestamp?: number | Date;
+  id?: string | number;
 }) {
   return (
     <div
