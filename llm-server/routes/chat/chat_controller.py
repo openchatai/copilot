@@ -59,10 +59,10 @@ def init_chat():
     bot_token = request.headers.get("X-Bot-Token")
     session_id = request.args.get("session_id")
     
-    initial_questions = []
+    history = []
     if session_id:
         chats = get_all_chat_history_by_session_id(session_id, 0, 200)
-        initial_questions = sqlalchemy_objs_to_json_array(chats) or []
+        history = sqlalchemy_objs_to_json_array(chats) or []
         
     if not bot_token:
         return (
@@ -82,7 +82,8 @@ def init_chat():
             "bot_name": bot.name,
             "logo": "logo",
             "faq": [],  # Replace with actual FAQ data
-            "initial_questions": initial_questions,  # Replace with actual initial questions
+            "initial_questions": [],  # Replace with actual initial questions
+            "history": history
         }
     )
 
