@@ -72,6 +72,7 @@ def handle_request(
 
         if len(step.ids) > 0:
             # check if one of the existing workf
+            pass
         else:
             return {"error": None, "response": step.bot_message}
     except Exception as e:
