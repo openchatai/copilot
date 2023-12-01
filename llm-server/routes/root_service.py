@@ -1,20 +1,22 @@
+import json
 import os
 from typing import Dict, Any, Optional, List
 
 import logging
-from custom_types.action_type import ActionType
 from integrations.custom_prompts.prompt_loader import load_prompts
 from routes.workflow.typings.response_dict import ResponseDict
 from routes.workflow.typings.run_workflow_input import WorkflowData
 from routes.workflow.utils import (
     run_workflow,
-    check_workflow_in_store,
-    hasSingleIntent,
     create_workflow_from_operation_ids,
 )
-from opencopilot_utils import get_llm, StoreOptions
+from opencopilot_utils import get_llm
 from bson import ObjectId
-from routes.workflow.utils.router import get_action_type
+from routes.workflow.utils.router import (
+    get_relevant_apis_summaries,
+    get_relevant_docs,
+    process_conversation_step,
+)
 from utils.chat_models import CHAT_MODELS
 from utils.db import Database
 from models.repository.chat_history_repo import get_chat_history_for_retrieval_chain
@@ -27,6 +29,7 @@ from langchain.vectorstores.base import VectorStore
 from langchain.prompts import PromptTemplate
 from langchain.chains import ConversationalRetrievalChain
 from utils import struct_log
+from werkzeug.datastructures import Headers
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -50,96 +53,41 @@ def handle_request(
     session_id: str,
     base_prompt: str,
     bot_id: str,
-    headers: Dict[str, str],
+    headers: Headers,
     server_base_url: str,
     app: Optional[str],
 ) -> ResponseDict:
     log_user_request(text)
     check_required_fields(base_prompt, text, swagger_url)
-    swagger_doc = None
     try:
-        action = get_action_type(text, bot_id, session_id, app)
+        context = get_relevant_docs(text, bot_id) or None
+        apis = get_relevant_apis_summaries(text, bot_id)
 
-        if not isinstance(action, ActionType):
-            return {"response": action, "error": None}
-        logging.info(f"Triggered action: {action}")
-        if action == ActionType.ASSISTANT_ACTION:
-            current_state = process_state(app, headers)
-            # document = None
-            swagger_doc = get_swagger_doc(swagger_url)
+        # also provide a list of workflows here itself, the llm should be able to figure out if a workflow needs to be run
+        step = process_conversation_step(
+            user_requirement=text,
+            context=context,
+            session_id=session_id,
+            app=app,
+            api_summaries=json.dumps(apis),
+        )
 
-            document = check_workflow_in_store(text, bot_id)
-            struct_log.info(
-                event="handle_request",
-                function_call="handle_existing_workflow",
-                output=document,
-            )
-            if document:
-                return handle_existing_workflow(
-                    document,
-                    text,
-                    headers,
-                    server_base_url,
-                    swagger_url,
-                    app,
-                    swagger_doc,
-                    session_id,
-                    bot_id,
-                )
-
-            bot_response = hasSingleIntent(
-                swagger_doc, text, session_id, current_state, app
+        if len(step.ids) > 0:
+            response = handle_api_calls(
+                ids=step.ids,
+                swagger_doc=get_swagger_doc(swagger_url),
+                app=app,
+                bot_id=bot_id,
+                headers=headers,
+                server_base_url=server_base_url,
+                session_id=session_id,
+                text=text,
+                swagger_url=swagger_url,
             )
 
-            # short circuit if the bot did not return a json payload, can happen if api calls were not supposed to be made
-            if isinstance(bot_response, str):
-                return {"error": "", "response": ""}
-
-            if len(bot_response.ids) >= 1:
-                return handle_api_calls(
-                    bot_response.ids,
-                    swagger_doc,
-                    text,
-                    headers,
-                    server_base_url,
-                    swagger_url,
-                    app,
-                    session_id,
-                    bot_id,
-                )
-
-            elif len(bot_response.ids) == 0:
-                return handle_no_api_call(bot_response.bot_message)
-
-        elif (
-            action == ActionType.KNOWLEDGE_BASE_QUERY
-            or action == ActionType.GENERAL_QUERY
-        ):
-            sanitized_question = text.strip().replace("\n", " ")
-            vector_store = get_vector_store(StoreOptions(namespace="knowledgebase"))
-            mode = "assistant"
-            chain = getConversationRetrievalChain(
-                vector_store, mode, base_prompt, bot_id, app
-            )
-            chat_history = get_chat_history_for_retrieval_chain(session_id, limit=40)
-            response = chain(
-                {"question": sanitized_question, "chat_history": chat_history},
-                return_only_outputs=True,
-            )
-            return {"response": response["answer"], "error": ""}
-
-        # elif action == ActionType.GENERAL_QUERY:
-        #     messages = [
-        #         SystemMessage(
-        #             content="You are an ai assistant, that answers general queries in <= 3 sentences"
-        #         ),
-        #         HumanMessage(content=f"Answer the following: {text}"),
-        #     ]
-
-        #     content = chat(messages).content
-        #     return {"response": content}
-        raise BaseException(action)
-
+            return response
+        else:
+            return {"error": None, "response": step.bot_message}
     except Exception as e:
         return handle_exception(e, "handle_request")
 
@@ -270,7 +218,7 @@ def get_swagger_doc(swagger_url: str) -> ResolvingParser:
 def handle_existing_workflow(
     document: Document,  # lagnchaing
     text: str,
-    headers: Dict[str, Any],
+    headers: Headers,
     server_base_url: str,
     swagger_url: Optional[str],
     app: Optional[str],
@@ -302,7 +250,7 @@ def handle_api_calls(
     ids: List[str],
     swagger_doc: ResolvingParser,
     text: str,
-    headers: Dict[str, Any],
+    headers: Headers,
     server_base_url: str,
     swagger_url: Optional[str],
     app: Optional[str],

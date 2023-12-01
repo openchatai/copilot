@@ -163,11 +163,13 @@ def get_chat_history_for_retrieval_chain(
         query = (
             session.query(ChatHistory)
             .filter(ChatHistory.session_id == session_id)
-            .order_by(ChatHistory.created_at)
+            .order_by(ChatHistory.created_at.desc())
         )
 
         if limit:
             query = query.limit(limit)
+
+        query = query.all()[::-1]
 
         chat_history: List[Tuple[str, str]] = []
 

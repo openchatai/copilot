@@ -28,8 +28,9 @@ def convert_json_to_text(
         content="You are a chatbot that can understand API responses"
     )
     prompt_templates = load_prompts(app)
-    if prompt_templates.api_summarizer:
-        api_summarizer_template = prompt_templates.api_summarizer
+    api_summarizer_template = (
+        prompt_templates.api_summarizer if prompt_templates else None
+    )
 
     if app is not None and api_summarizer_template is not None:
         system_message = SystemMessage(content=api_summarizer_template)

@@ -17,12 +17,17 @@ class PromptsClass:
         self.knowledge_base_system_prompt = getattr(
             prompts, "knowledge_base_system_prompt"
         )
-        self.classification_prompt = getattr(prompts, "classification_prompt")
+        self.system_message_classifier = getattr(prompts, "system_message_classifier")
         self.api_summarizer = getattr(prompts, "api_summarizer")
         self.api_generation_prompt = getattr(prompts, "api_generation_prompt")
 
 
 def load_prompts(app_name) -> Optional[PromptsClass]:
-    if not app_name:
+    try:
+        if not app_name:
+            return None
+        return PromptsClass(app_name)
+    except Exception as e:
+        # Handle the exception as per your requirements
+        print(f"An error occurred: {e}")
         return None
-    return PromptsClass(app_name)

@@ -12,13 +12,13 @@ from prance import ResolvingParser
 from integrations.load_json_config import load_json_config
 from integrations.transformers.transformer import transform_response
 from utils import struct_log
-
+from werkzeug.datastructures import Headers
 
 def run_openapi_operations(
     record: WorkflowDataType,
     swagger_json: ResolvingParser,
     text: str,
-    headers: Any,
+    headers: Headers,
     server_base_url: str,
     app: Optional[str],
 ) -> str:

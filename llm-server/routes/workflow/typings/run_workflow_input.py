@@ -1,4 +1,5 @@
-from typing import Dict, Optional
+from typing import Optional
+from werkzeug.datastructures import Headers
 
 
 # This is the api payload and doesnot represent workflow schema, use WorkflowDataType from opencopilot types for that
@@ -6,7 +7,7 @@ class WorkflowData:
     def __init__(
         self,
         text: str,
-        headers: Dict[str, str],
+        headers: Headers,
         server_base_url: str,
         swagger_url: Optional[str],
         app: Optional[str],
