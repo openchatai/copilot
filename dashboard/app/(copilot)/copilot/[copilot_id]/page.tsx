@@ -25,13 +25,14 @@ function InstallationSection() {
       <AccordionItem value="installation">
         <AccordionTrigger>
           <div className="flex flex-row items-center gap-3">
-            <span className="flex-center h-9 w-9 rounded-lg bg-secondary text-secondary-foreground">
+            <span className="flex-center h-9 w-9 rounded-lg bg-secondary text-primary">
               <Wand2 className="h-4 w-4" />
             </span>
             <div className="text-start">
-              <h1 className="text-base font-semibold">Installation</h1>
+              <h1 className="text-base font-semibold">Pre-Bundled</h1>
               <p className="text-sm font-normal">
-                Add the installation code to your website
+                You can use the pre-bundled widget by adding the script to your
+                website
               </p>
             </div>
           </div>
@@ -43,24 +44,26 @@ function InstallationSection() {
             appear. Remember to version to run your Assistant.
           </p>
           <CodeBlock
-            code={`<script>
-  // be aware to call this function when the document/window is ready.
-  const options = {
-     apiUrl: "http://localhost:8888/backend", // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:5000/api
-     initialMessages: ["How are the things"], // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
-     token: "${CopilotToken}", // you can get your token from the dashboard
-     triggerSelector: "#triggerSelector", // the selector of the element that will trigger the copilot when clicked
-     headers: {
-       // optional: you can pass your authentication tokens to the copilot or any other header you want to send with every request
-       Authorization: "Bearer your_auth_token_goes_here",
-       AnyKey: "AnyValue"
-     },
-     user:{
-      name:"Default User"
-     }
-   }
-   window.addEventListener("DOMContentLoaded", ()=>initAiCoPilot(options)); // window.onload
-</script>`}
+            code={`
+            <script src="http://localhost:8888/pilot.js"></script>
+            <script> // be aware to call this function when the document/window is ready.
+            const options = {
+              apiUrl: "http://localhost:8888/backend", // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:5000/api
+              initialMessages: ["How are the things"], // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
+              token: "${CopilotToken}", // you can get your token from the dashboard
+              triggerSelector: "#triggerSelector", // the selector of the element that will trigger the copilot when clicked
+              headers: { 
+                // optional: you can pass your authentication tokens to the copilot or any other header you want to send with every request
+                Authorization: "Bearer your_auth_token_goes_here",
+                AnyKey: "AnyValue"
+              },
+              user:{
+                name:"Default User"
+              }
+            }
+            window.addEventListener("DOMContentLoaded", ()=>initAiCoPilot(options)); // window.onload
+</script>
+`}
           />
         </AccordionContent>
       </AccordionItem>
@@ -68,34 +71,33 @@ function InstallationSection() {
   );
 }
 
-function TryItSection() {
-  const { token: CopilotToken } = useCopilot();
+function SelfHost() {
 
   return (
     <section className="rounded-lg border bg-white shadow-sm">
       <AccordionItem value="try-share">
         <AccordionTrigger>
           <div className="flex flex-row items-center gap-3">
-            <span className="flex-center h-9 w-9 rounded-lg bg-secondary text-secondary-foreground">
+            <span className="flex-center h-9 w-9 rounded-lg bg-secondary text-primary">
               <Inspect className="h-4 w-4" />
             </span>
             <div className="text-start">
-              <h1 className="text-base font-semibold">Try and Share</h1>
+              <h1 className="text-base font-semibold">Self host the widget</h1>
               <p className="text-sm font-normal">
-                You can alsoe try the widget and share it with your friends
+                You can self host the widget by installing it from npm
               </p>
             </div>
           </div>
         </AccordionTrigger>
         <AccordionContent className="px-8 py-6">
           <p className="mb-2">
-            Try your copilot on our {" "}
+            You can follow this guide to self host the React Component
             <Button asChild variant="link" className="p-0">
               <Link
                 target="_blank"
-                href={"http://localhost:8888/backend" + "/demo/" + CopilotToken}
+                href={"https://docs.opencopilot.so/widget/embed#as-a-react-component"}
               >
-                example dashboard
+                The Docs
               </Link>
             </Button>
             .
@@ -132,13 +134,14 @@ export default function CopilotPage() {
               the needed headers to enable OpenCopilot from accessing it
             </AlertDescription>
           </Alert>
+          <h2 className="text-xl font-semibold mb-5">Installation</h2>
           <Accordion
             type="single"
             className="max-w-full space-y-5"
             defaultValue="installation"
           >
             <InstallationSection />
-            <TryItSection />
+            <SelfHost />
           </Accordion>
         </div>
         <div className="h-full w-fit py-5 px-10">

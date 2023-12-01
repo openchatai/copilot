@@ -41,21 +41,14 @@ export function NodeEdge({
             className={cn(
               "rounded bg-accent p-0.5 text-sm transition-all duration-300 ease-in-out",
               activeEdge?.id === props.id &&
-                "bg-primary text-primary ring-4 ring-indigo-200 ring-offset-transparent",
+              "text-accent bg-primary",
             )}
           >
             <Plus />
           </button>
         </div>
       </EdgeLabelRenderer>
-      <BaseEdge
-        {...props}
-        path={edgePath}
-        style={{
-          strokeWidth: 2,
-          stroke: "var(--border)",
-        }}
-      />
+      <BaseEdge {...props} path={edgePath} />
     </>
   );
 }

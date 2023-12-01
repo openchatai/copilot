@@ -1,10 +1,12 @@
-import React, { ReactNode, createContext, useContext, useState } from "react";
+import React, { ReactNode, createContext, useContext, useLayoutEffect, useState } from "react";
 import now from "../utils/timenow";
 import { useAxiosInstance } from "./axiosInstance";
 import { useConfigData } from "./ConfigData";
 import { useSoundEffectes } from "../hooks/useSoundEffects";
 import { Message } from "@lib/types";
 import { getId } from "@lib/utils/utils";
+import { useInitialData } from "./InitialDataContext";
+import { historyToMessages } from "@lib/utils/historyToMessages";
 export type FailedMessage = {
   message: Message;
   reason?: string;
@@ -20,7 +22,15 @@ interface ChatContextProps {
 const ChatContext = createContext<ChatContextProps | undefined>(undefined);
 
 const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { data: idata } = useInitialData()
   const [messages, setMessages] = useState<Message[]>([]);
+
+  useLayoutEffect(() => {
+    if (idata?.history) {
+      setMessages(historyToMessages(idata?.history));
+    }
+  }, [idata?.history]);
+
   const sfx = useSoundEffectes();
   const [loading, setLoading] = useState(false);
   const [failedMessage, setError] = useState<FailedMessage | null>(null);

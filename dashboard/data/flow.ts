@@ -1,36 +1,14 @@
 import axios from "axios";
+import { getDef } from "@/components/domain/flows-editor/utils/getDef";
+
 const instance = axios.create({
   baseURL: "http://localhost:8888/backend/flows",
 });
-type Flow = {
-  name: string;
-  description: string;
-  requires_confirmation: boolean;
-  steps: {
-    stepId: string;
-    operation: string;
-    open_api_operation_id: string;
-    description: string;
-    parameters?: Record<string, unknown>;
-  };
-  on_success: {
-    handler: string;
-  };
-  on_failure: {
-    handler: string;
-  };
-};
 
 type Workflow = {
   _id: string;
-  opencopilot: string;
-  info: {
-    title: string;
-    version: string;
-  };
-  swagger_id: string;
-  flows: Flow[];
-};
+} & ReturnType<typeof getDef>
+
 
 interface PaginatedWorkflows {
   workflows: Workflow[];
@@ -38,6 +16,7 @@ interface PaginatedWorkflows {
   page_size: number;
   total_workflows: number;
 }
+
 // http://localhost:8888/backend/flows/get/b/:bot_id?page=1
 export const getWorkflowsByBotId = async (bot_id: string, page: number = 1) => {
   return await instance.get<PaginatedWorkflows>(

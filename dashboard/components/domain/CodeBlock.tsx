@@ -49,7 +49,7 @@ function CodeBlock({
         }}
         wrapLongLines
       >
-        {code}
+        {code.trim()}
       </SyntaxHighlighter>
     </div>
   );

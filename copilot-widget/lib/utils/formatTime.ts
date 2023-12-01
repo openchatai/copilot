@@ -1,4 +1,4 @@
-export default function formatTimeFromTimestamp(timestamp: number): string {
+export default function formatTimeFromTimestamp(timestamp: number | Date): string {
     const date = new Date(timestamp); // Multiply by 1000 to convert seconds to milliseconds
     const hours = date.getHours();
     const minutes = String(date.getMinutes()).padStart(2, '0');

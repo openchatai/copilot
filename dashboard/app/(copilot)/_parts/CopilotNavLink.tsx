@@ -31,7 +31,7 @@ export function CopilotLayoutNavLink({
               size: "icon",
               variant: "link",
             })}
-            activeClassName="text-primary"
+            activeClassName="text-primary bg-accent"
             inactiveClassName="hover:text-primary text-accent-foreground/50 hover:bg-accent"
           >
             <IconComponent className="h-5 w-5" />

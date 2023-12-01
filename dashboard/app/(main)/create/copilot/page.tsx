@@ -22,6 +22,7 @@ import {
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { SwaggerUi } from "./_parts/swagger-form";
 import { FormValuesWithId } from "./_parts/swagger-form/types";
+import { useConfetti } from "@/app/_store/atoms/confetti";
 
 function Header() {
   const { stepCount, activeStep, goToStep } = useWizard();
@@ -138,6 +139,7 @@ const generateSwaggerDefinition = (formData: FormValuesWithId[]) => {
   return swaggerDefinition;
 };
 function UploadSwaggerStep() {
+  const { pop: popConfetti } = useConfetti()
   const { nextStep, previousStep } = useWizard();
   const {
     state: { swaggerFiles, createdCopilot, swaggerEndpoints },
@@ -184,6 +186,7 @@ function UploadSwaggerStep() {
                 description: "You have created your copilot successfully",
                 variant: "success",
               });
+              popConfetti(5)
               _.delay(nextStep, 1000);
             }
           }
@@ -203,13 +206,13 @@ function UploadSwaggerStep() {
                 description: "You have created your copilot successfully",
                 variant: "success",
               });
+              popConfetti(5)
               _.delay(nextStep, 1000);
             }
           }
         }
       } catch (error) {
         setLoading(false);
-
       }
 
     }

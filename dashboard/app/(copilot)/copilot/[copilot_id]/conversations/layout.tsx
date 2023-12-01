@@ -13,7 +13,7 @@ export default function SettingsLayout({ children, params }: Props) {
   return (
     <div className="flex h-full flex-row overflow-hidden">
       <div className="flex h-full w-full max-w-xs shrink-0 flex-col items-start border-r bg-primary-foreground">
-        <div className="flex-center h-header shrink-0 justify-start border-b px-6">
+        <div className="flex-center h-header shrink-0 justify-start w-full border-b px-6">
           <h1 className="text-lg font-bold text-secondary-foreground">
             Conversations
           </h1>

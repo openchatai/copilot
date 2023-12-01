@@ -2,6 +2,7 @@ from typing import cast
 
 from flask import jsonify, Blueprint, request, Response, abort
 from werkzeug.datastructures import Headers
+from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
 from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id,
     get_unique_sessions_with_first_message_by_bot_id,
@@ -43,7 +44,7 @@ def get_session_chats(session_id: str) -> Response:
 
 
 @chat_workflow.route("/b/<bot_id>/chat_sessions", methods=["GET"])
-def get_chat_sessions(bot_id: str) -> Response:
+def get_chat_sessions(bot_id: str) -> list[dict[str, object]]:
     limit = cast(int, request.args.get("limit", 20))
     offset = cast(int, request.args.get("offset", 0))
     chat_history_sessions = get_unique_sessions_with_first_message_by_bot_id(
@@ -56,6 +57,12 @@ def get_chat_sessions(bot_id: str) -> Response:
 @chat_workflow.route("/init", methods=["GET"])
 def init_chat():
     bot_token = request.headers.get("X-Bot-Token")
+    session_id = request.headers.get("X-Session-Id")
+
+    history = []
+    if session_id:
+        chats = get_all_chat_history_by_session_id(session_id, 200, 0)
+        history = sqlalchemy_objs_to_json_array(chats) or []
 
     if not bot_token:
         return (
@@ -76,6 +83,7 @@ def init_chat():
             "logo": "logo",
             "faq": [],  # Replace with actual FAQ data
             "initial_questions": [],  # Replace with actual initial questions
+            "history": history,
         }
     )
 
