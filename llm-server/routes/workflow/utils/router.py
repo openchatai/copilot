@@ -84,17 +84,20 @@ def process_conversation_step(
     user_requirement: str,
     context: Optional[str],
     api_summaries: Optional[str],
+    bot_id: str,
 ):
     if not session_id:
         raise ValueError("Session id must be defined for chat conversations")
 
     prev_conversations = get_chat_message_as_llm_conversation(session_id)
-    prompt_templates = load_prompts(app)
+    prompt_templates = load_prompts(bot_id)
     system_message_classifier = SystemMessage(
         content="You are a helpful ai assistant. User will give you two things, a list of api's and some useful information, called context. "
     )
     if app and prompt_templates:
-        system_message_classifier = prompt_templates.system_message_classifier
+        system_message_classifier = SystemMessage(
+            content=prompt_templates.system_message
+        )
     struct_log.info(
         event="system_message_classifier",
         app=app,

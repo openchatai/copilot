@@ -1,6 +1,6 @@
 import os
 import json
-from flask import Blueprint, Response, request, jsonify
+from flask import Blueprint, Response, request
 from werkzeug.utils import secure_filename
 import secrets
 from routes.uploads.celery_service import celery
