@@ -1,4 +1,4 @@
-import { type Edge, type Node } from "reactflow";
+import { type Edge } from "reactflow";
 import React, { useCallback, useMemo } from "react";
 import { atom, useAtom } from "jotai";
 
