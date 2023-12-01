@@ -4,6 +4,7 @@ from typing import Dict, Any, Optional, List
 
 import logging
 from integrations.custom_prompts.prompt_loader import load_prompts
+from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from routes.workflow.typings.response_dict import ResponseDict
 from routes.workflow.typings.run_workflow_input import WorkflowData
 from routes.workflow.utils import (
@@ -12,24 +13,24 @@ from routes.workflow.utils import (
 )
 from opencopilot_utils import get_llm
 from bson import ObjectId
-from routes.workflow.utils.router import (
+from routes.workflow.utils.api_retrievers import (
     get_relevant_apis_summaries,
     get_relevant_docs,
-    process_conversation_step,
+    get_relevant_flows,
 )
+from routes.workflow.utils.process_conversation_step import process_conversation_step
+
 from utils.chat_models import CHAT_MODELS
 from utils.db import Database
-from models.repository.chat_history_repo import get_chat_history_for_retrieval_chain
 from utils.get_chat_model import get_chat_model
-from utils.process_app_state import process_state
 from prance import ResolvingParser
 from langchain.docstore.document import Document
-from opencopilot_utils.get_vector_store import get_vector_store
 from langchain.vectorstores.base import VectorStore
 from langchain.prompts import PromptTemplate
 from langchain.chains import ConversationalRetrievalChain
 from utils import struct_log
 from werkzeug.datastructures import Headers
+import asyncio
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -47,7 +48,7 @@ FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
 chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
 
-def handle_request(
+async def handle_request(
     text: str,
     swagger_url: str,
     session_id: str,
@@ -60,16 +61,24 @@ def handle_request(
     log_user_request(text)
     check_required_fields(base_prompt, text, swagger_url)
     try:
-        context = get_relevant_docs(text, bot_id) or None
-        apis = get_relevant_apis_summaries(text, bot_id)
+        tasks = [
+            get_relevant_docs(text, bot_id),
+            get_relevant_apis_summaries(text, bot_id),
+            get_relevant_flows(text, bot_id),
+            get_chat_message_as_llm_conversation(session_id),
+        ]
 
+        results = await asyncio.gather(*tasks)
+        context, apis, flows, prev_conversations = results
         # also provide a list of workflows here itself, the llm should be able to figure out if a workflow needs to be run
         step = process_conversation_step(
             user_requirement=text,
             context=context,
             session_id=session_id,
             app=app,
-            api_summaries=json.dumps(apis),
+            api_summaries=apis,
+            prev_conversations=prev_conversations,
+            flows=flows,
         )
 
         if len(step.ids) > 0:

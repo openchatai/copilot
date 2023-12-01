@@ -54,7 +54,7 @@ def handle_swagger_file():
                 prompt_message=request.form.get(
                     "prompt_message", ChatBotInitialPromptEnum.AI_COPILOT_INITIAL_PROMPT
                 ),
-                website=request.form.get("website", "https://example.com")
+                website=request.form.get("website", "https://example.com"),
             )
 
             swagger_doc = get_swagger_doc(filename)

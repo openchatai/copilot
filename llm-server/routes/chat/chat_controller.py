@@ -89,7 +89,7 @@ def init_chat():
 
 
 @chat_workflow.route("/send", methods=["POST"])
-def send_chat():
+async def send_chat():
     message = request.json.get("content")
     session_id = request.json.get("session_id")
     headers_from_json = request.json.get("headers", {})
@@ -127,7 +127,7 @@ def send_chat():
         )
 
     try:
-        response_data = root_service.handle_request(
+        response_data = await root_service.handle_request(
             text=message,
             swagger_url=swagger_url,
             session_id=session_id,
