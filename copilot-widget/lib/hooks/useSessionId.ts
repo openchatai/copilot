@@ -1,4 +1,5 @@
-import { useLayoutEffect, useState } from "react";
+import { getId } from "@lib/utils/utils";
+import { useEffect, useState } from "react";
 
 export const SESSION_ID_KEY = "@openchatai:session_id";
 function gtSessionId() {
@@ -6,12 +7,9 @@ function gtSessionId() {
 }
 export function useSessionId() {
   const [sessionId, setSessionId] = useState<string | undefined | null>(gtSessionId);
-  useLayoutEffect(() => {
-    const $sessionId = sessionStorage.getItem(SESSION_ID_KEY);
-    if ($sessionId) {
-      setSessionId(sessionId);
-    } else {
-      const newSessionId = Math.random().toString(36).substring(2, 15);
+  useEffect(() => {
+    if (!sessionId) {
+      const newSessionId = getId()
       sessionStorage.setItem(SESSION_ID_KEY, newSessionId);
       setSessionId(newSessionId);
     }
