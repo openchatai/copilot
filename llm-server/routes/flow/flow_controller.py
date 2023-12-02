@@ -171,7 +171,8 @@ def add_action_to_flow_api(flow_id: str):
         if not all([flow_block_id, name]):
             return jsonify({"error": "Missing required fields, make sure [flow_block_id, name] are exist"}), 400
 
-        action = add_action_to_flow_block(chatbot_id, flow_id, flow_block_id, name, action_type, swagger_endpoint, order)
+        action = add_action_to_flow_block(chatbot_id, flow_id, flow_block_id, name, action_type, swagger_endpoint,
+                                          order)
         return jsonify({"status": "success", "data": block_action_to_dict(action)}), 201
     except Exception as e:
         # Log the exception here
@@ -258,14 +259,11 @@ def create_flow_block_api(flow_id: str):
         if not name:
             return jsonify({"error": "Missing required field: 'name'"}), 400
 
-        flow_block = create_flow_block(chatbot_id, flow_id, name, status, next_on_success, next_on_fail, order_within_the_flow)
+        flow_block = create_flow_block(chatbot_id, flow_id, name, status, next_on_success, next_on_fail,
+                                       order_within_the_flow)
         return jsonify(flow_block_with_actions_to_dict(flow_block)), 201
     except Exception as e:
         # Log the exception here
         print(f"Error creating flow block: {e}")
         # Return an error response
         return jsonify({"error": "Failed to create flow block {}".format(str(e))}), 500
-
-@flow.route("/<flow_id>/actions", methods=["PATCH"])
-def update_action_in_flow(session_id: str) -> Response:
-    pass
