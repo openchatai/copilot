@@ -1,8 +1,8 @@
+import datetime
 import uuid
 
 from opencopilot_db.database_setup import Base, engine
-from sqlalchemy import Column, String, DateTime, Boolean, Text
-import datetime
+from sqlalchemy import Column, String, DateTime
 
 
 class Chatbot(Base):
