@@ -130,7 +130,7 @@ def add_variables_to_flow_api(flow_id: str):
         value = data.get('value')
         runtime_override_key = data.get('runtime_override_key', None)
         runtime_override_action_id = data.get('runtime_override_action_id', None)
-        copilot_id = data.get('copilot_id')
+        copilot_id = data.get('chatbot_id')
         bot = find_one_or_fail_by_id(copilot_id)
 
         if not name or value is None:
@@ -165,12 +165,13 @@ def add_action_to_flow_api(flow_id: str):
         action_type = data.get('type', 'api')  # Default to 'api' if not provided
         swagger_endpoint = data.get('swagger_endpoint', None)
         order = data.get('order', 0)  # Default to 0 if not provided
+        chatbot_id = data.get("chatbot_id")  # todo, i think this is a bad idea - let's remove it
 
         # Basic validation
         if not all([flow_block_id, name]):
             return jsonify({"error": "Missing required fields, make sure [flow_block_id, name] are exist"}), 400
 
-        action = add_action_to_flow_block(flow_id, flow_block_id, name, action_type, swagger_endpoint, order)
+        action = add_action_to_flow_block(chatbot_id, flow_id, flow_block_id, name, action_type, swagger_endpoint, order)
         return jsonify({"status": "success", "data": block_action_to_dict(action)}), 201
     except Exception as e:
         # Log the exception here
@@ -251,14 +252,14 @@ def create_flow_block_api(flow_id: str):
         next_on_success = data.get("next_on_success")
         next_on_fail = data.get("next_on_fail")
         order_within_the_flow = data.get("order_within_the_flow", 0)  # Default order
-        chatbot_id = data.get("chatbot_id", 0)  # todo, i think this is a bad idea - let's remove it
+        chatbot_id = data.get("chatbot_id")  # todo, i think this is a bad idea - let's remove it
 
         # Validate required fields
         if not name:
             return jsonify({"error": "Missing required field: 'name'"}), 400
 
         flow_block = create_flow_block(chatbot_id, flow_id, name, status, next_on_success, next_on_fail, order_within_the_flow)
-        return jsonify(flow_block_to_dict(flow_block)), 201
+        return jsonify(flow_block_with_actions_to_dict(flow_block)), 201
     except Exception as e:
         # Log the exception here
         print(f"Error creating flow block: {e}")

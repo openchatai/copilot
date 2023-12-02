@@ -102,7 +102,8 @@ def add_or_update_variable_in_flow(bot_id: str, flow_id: str, name: str, value: 
         return variable
 
 
-def add_action_to_flow_block(flow_id: str, flow_block_id: str, name: str, action_type: str, swagger_endpoint: dict,
+def add_action_to_flow_block(chatbot_id: str, flow_id: str, flow_block_id: str, name: str, action_type: str,
+                             swagger_endpoint: dict,
                              order: int) -> BlockAction:
     """
     Adds a new action to a flow in the database.
@@ -120,6 +121,7 @@ def add_action_to_flow_block(flow_id: str, flow_block_id: str, name: str, action
     """
     with Session() as session:
         action = BlockAction(
+            chatbot_id=chatbot_id,
             flow_id=flow_id,
             flow_block_id=flow_block_id,
             name=name,
