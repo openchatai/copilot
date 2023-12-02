@@ -50,6 +50,14 @@ def flow_to_dict(flow: Flow):
     }
 
 
+def flow_to_simplified_dict(flow: Flow):
+    """Convert a Flow object to a dictionary."""
+    return {
+        "id": flow.id.hex() if isinstance(flow.id, bytes) else flow.id,
+        "name": flow.name,
+    }
+
+
 def flow_block_to_dict(block: FlowBlock):
     """Convert a FlowBlock object to a dictionary."""
     return {
