@@ -1,8 +1,6 @@
 from typing import cast
 
 from flask import jsonify, Blueprint, request, Response, abort, Request
-from werkzeug.datastructures import Headers
-from utils.llm_consts import SUMMARIZATION_PROMPT, SYSTEM_MESSAGE_PROMPT
 from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
 from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id,
@@ -107,7 +105,13 @@ def init_chat():
 
 
 @chat_workflow.route("/send", methods=["POST"])
+<<<<<<< Updated upstream
 async def send_chat():
+=======
+def send_chat():
+    if not request.json:
+        raise ValueError("request.json is not defined!")
+>>>>>>> Stashed changes
     message = request.json.get("content")
     session_id = request.json.get("session_id")
     headers_from_json = request.json.get("headers", {})
@@ -147,18 +151,21 @@ async def send_chat():
     try:
         response_data = await root_service.handle_request(
             text=message,
-            swagger_url=swagger_url,
+            swagger_url=str(swagger_url),
             session_id=session_id,
-            base_prompt=base_prompt,
-            bot_id=bot.id,
+            base_prompt=str(base_prompt),
+            bot_id=str(bot.id),
             headers=headers_from_json,
             server_base_url=server_base_url,
             app=app_name,
         )
 
-        create_chat_history(bot.id, session_id, True, message)
+        if response_data["response"] is None or response_data["error"] is None:
+            raise ValueError("Please check logs")
+
+        create_chat_history(str(bot.id), session_id, True, message)
         create_chat_history(
-            bot.id,
+            str(bot.id),
             session_id,
             False,
             response_data["response"] or response_data["error"],
