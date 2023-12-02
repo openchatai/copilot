@@ -1,7 +1,7 @@
 from flask import Blueprint, Response, jsonify, request
 
-from models.repository.flow_repo import create_flow, get_all_flows_for_bot
-from presenters.flow_presenters import flow_to_dict
+from models.repository.flow_repo import create_flow, get_all_flows_for_bot, get_flow_by_id
+from presenters.flow_presenters import flow_to_dict, flow_to_dict_with_nested_entities
 from utils.db import Database
 
 db_instance = Database()
@@ -56,33 +56,27 @@ def create_flow_api(bot_id: str):
 
 
 @flow.route("/<flow_id>", methods=["GET"])
-def get_flow_by_id(flow_id: str) -> Response:
-    return jsonify({
-        'id': 'uuid4',
-        'name': 'Add to cart flow',
-        'blocks': [
-            {
-                'id': 'action_id',
-                'order': 1,
-                'type': 'block',
-                'next_on_success': 'some_action_id',
-                'next_on_fail': 'some_action_id',
-                'name': 'Create stuff',
-                'apis': [
-                    {
-                        # ... Swagger endpoint
-                        'parameters': {
-                            'x': '{env_x}',
-                            'y': 'magic_y'
-                        }
-                    },
+def get_flow_by_id_api(flow_id: str):
+    """
+    API endpoint to retrieve a specific flow by its ID.
 
-                ]
+    Args:
+        flow_id: The ID of the flow.
 
-            },
-            # ...
-        ]
-    })
+    Returns:
+        A Flask response object with the Flow object as a dictionary.
+    """
+    try:
+        flow = get_flow_by_id(flow_id)
+        if flow:
+            return jsonify(flow_to_dict_with_nested_entities(flow)), 200
+        else:
+            return jsonify({"error": "Flow not found"}), 404
+    except Exception as e:
+        # Log the exception here
+        print(f"Error retrieving flow with ID {flow_id}: {e}")
+        # Return an error response
+        return jsonify({"error": "Failed to retrieve flow"}), 500
 
 
 @flow.route("/<flow_id>/variables", methods=["GET"])

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from flask import jsonify, Response
 from opencopilot_db import engine
@@ -45,29 +45,18 @@ def get_all_flows_for_bot(bot_id: str) -> List[Flow]:
 
 
 
-def get_flow_by_id(flow_id: str):
+def get_flow_by_id(flow_id: str) -> Optional[Flow]:
     """
-    API method to fetch a specific flow by its ID and convert it to a dictionary format.
+    Retrieves a specific flow by its ID from the database.
 
     Args:
         flow_id: The ID of the flow.
 
     Returns:
-        A Flask response object with a dictionary representing the Flow object.
+        The Flow object if found, otherwise None.
     """
-    try:
-        with Session() as session:
-            flow = session.query(Flow).filter(Flow.id == flow_id).first()
-            if flow:
-                flow_dict = flow_to_dict_with_nested_entities(flow)
-                return jsonify(flow_dict), 200
-            else:
-                return jsonify({"status": "error", "message": "Flow not found"}), 404
-    except Exception as e:
-        # Log the exception
-        print(f"Error retrieving flow by ID: {e}")
-        # Return an error response
-        return jsonify({"error": "Failed to retrieve flow"}), 500
+    with Session() as session:
+        return session.query(Flow).filter(Flow.id == flow_id).first()
 
 
 def get_flow_variables(flow_id: str):
