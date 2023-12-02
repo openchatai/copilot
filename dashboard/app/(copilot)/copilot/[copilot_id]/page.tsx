@@ -14,6 +14,7 @@ import { Link } from "@/lib/router-events";
 import React from "react";
 import { useCopilot } from "../_context/CopilotProvider";
 import dynamic from "next/dynamic";
+import { baseUrl } from "@/data/base-url";
 
 const Widget = dynamic(() => import("./CopilotWidget"));
 
