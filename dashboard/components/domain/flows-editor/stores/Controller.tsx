@@ -1,3 +1,4 @@
+'use client';
 import {
   useReducer,
   type ReactNode,
@@ -12,7 +13,7 @@ import { FlowType } from "../types/Flow";
 import { Settings, SettingsProvider } from "./Config";
 import { getDef } from "../utils/getDef";
 import { createSafeContext } from "@/lib/createSafeContext";
-import genId from 'lodash/uniqueId'
+import { genId } from "../utils/genId";
 
 type StateShape = {
   paths: TransformedPath[];
@@ -33,6 +34,7 @@ type ControllerContextType = {
   appendNode: (node: NodeData) => void;
   addNodeBetween: (sourceId: string, targetId: string, node: NodeData) => void;
   deleteNode: (id: string) => void;
+  activeFlow?: FlowType;
 };
 
 type ActionType =
@@ -69,6 +71,9 @@ type ActionType =
       targetId: string,
       node: NodeData
     }
+  } | {
+    type: "set-server-id",
+    payload: string
   }
 
 type CreateFlowPayload = Extract<ActionType, { type: "create-flow" }>["pyload"];
@@ -245,6 +250,10 @@ function Controller({
       }),
     [],
   );
+  const activeFlow = useMemo(
+    () => state.flows.find((f) => f.id === state.activeFlowId),
+    [state],
+  );
   return (
     <ReactFlowProvider>
       <SettingsProvider value={settings}>
@@ -262,6 +271,7 @@ function Controller({
             deleteNode,
             getData,
             loadData,
+            activeFlow,
           }}
         >
           {children}

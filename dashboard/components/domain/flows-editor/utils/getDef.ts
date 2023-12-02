@@ -11,7 +11,7 @@ export function getDef(flows: FlowType[]) {
       return {
         name: flow.name,
         description: flow.description,
-        steps: flow.steps.map(({ parameters, ...step }) => ({
+        steps: flow.steps.map(({ parameters, responses, requestBody, methods, ...step }) => ({
           ...step,
           open_api_operation_id: step.operationId,
           operation: "REQUEST"
