@@ -1,12 +1,12 @@
+import datetime
 import uuid
 
 from opencopilot_db.database_setup import Base, engine
-from sqlalchemy import Column, String, DateTime, Boolean, Text
-import datetime
+from sqlalchemy import Column, String, DateTime
 
 
 class Chatbot(Base):
-    __tablename__ = 'flow_actions'
+    __tablename__ = 'flow_blocks'
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String(255))
