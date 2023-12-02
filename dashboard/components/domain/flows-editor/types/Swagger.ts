@@ -24,6 +24,7 @@ interface Operation {
   tags?: string[];
   summary?: string;
   description?: string;
+  methods?: any[]
   operationId?: string;
   parameters?: Array<{
     name: string;
@@ -75,10 +76,7 @@ export interface Swagger<
 
 // transformation types
 
-export type ExtendedOperation = Omit<
-  Operation,
-  "responses" | "requestBody"
-> & {
+export type ExtendedOperation = Partial<Operation> & {
   method: Method;
 };
 

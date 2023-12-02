@@ -41,7 +41,7 @@ export function NodeEdge({
             className={cn(
               "rounded bg-accent p-0.5 text-sm transition-all duration-300 ease-in-out",
               activeEdge?.id === props.id &&
-              "text-accent bg-primary",
+              "text-white bg-primary",
             )}
           >
             <Plus />

@@ -1,6 +1,5 @@
 import { PathButton } from "./PathButton";
 import { useMemo, useState } from "react";
-import { FlowsList } from "./FlowsList";
 import { useController } from "../stores/Controller";
 import { isEmpty } from "lodash";
 import { cn } from "@/lib/utils";
@@ -81,7 +80,6 @@ export function AsideMenu() {
           </div>
         </div>
       </div>
-      <FlowsList />
     </aside>
   );
 }

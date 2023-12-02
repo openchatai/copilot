@@ -1,3 +1,4 @@
+'use client';
 import ReactFlow, {
   Background,
   OnConnect,
