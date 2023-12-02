@@ -1,235 +1,80 @@
-from datetime import datetime
-from typing import Optional, List, Dict, Union, Tuple
-from opencopilot_db import ChatHistory, engine
+from typing import List, Optional
+
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import distinct
-from sqlalchemy.orm import class_mapper
-from langchain.schema import BaseMessage, AIMessage, HumanMessage
+from opencopilot_db import Flow, FlowBlock, BlockAction, FlowVariable, engine
 
 Session = sessionmaker(bind=engine)
 
 
-def create_chat_history(
-    chatbot_id: str,
-    session_id: str,
-    from_user: bool,
-    message: str,
-) -> ChatHistory:
-    """Creates a new chat history record.
+def create_flow(chatbot_id: str, name: str) -> Flow:
+    """Creates a new flow record.
 
     Args:
-      chatbot_id: The ID of the chatbot that sent the message.
-      session_id: The ID of the chat session.
-      from_user: The user who sent the message.
-      message: The message content.
+        chatbot_id: The ID of the chatbot associated with the flow.
+        name: The name of the flow.
 
     Returns:
-      The newly created ChatHistory object.
+        The newly created Flow object.
     """
-
     with Session() as session:
-        chat_history = ChatHistory(
-            chatbot_id=chatbot_id,
-            session_id=session_id,
-            from_user=from_user,
-            message=message,
-        )
-
-        session.add(chat_history)
+        flow = Flow(chatbot_id=chatbot_id, name=name)
+        session.add(flow)
         session.commit()
+        return flow
 
-    return chat_history
 
-
-def get_all_chat_history_by_session_id(
-    session_id: str, limit: int = 20, offset: int = 0
-) -> List[ChatHistory]:
-    """Retrieves all chat history records for a given session ID, sorted by created_at in descending order (most recent first).
+def get_all_flows_by_bot_id(bot_id: str) -> List[Flow]:
+    """Retrieves all flows for a given bot.
 
     Args:
-      session_id: The ID of the session to retrieve chat history for.
-      limit: The maximum number of chat history records to retrieve.
-      offset: The offset at which to start retrieving chat history records.
+        bot_id: The ID of the bot.
 
     Returns:
-      A list of ChatHistory objects, sorted by created_at in descending order.
-    """
-    session = Session()
-    chats = (
-        session.query(ChatHistory)
-        .filter_by(session_id=session_id)
-        .order_by(ChatHistory.id.desc())
-        .limit(limit)
-        .offset(offset)
-        .all()
-    )
-
-    return chats[::-1]
-
-
-def get_chat_message_as_llm_conversation(session_id: str) -> List[BaseMessage]:
-    chats = get_all_chat_history_by_session_id(session_id, 100)
-    conversations: List[BaseMessage] = []
-    for chat in chats:
-        if chat.from_user:
-            conversations.append(HumanMessage(content=str(chat.message)))
-        else:
-            conversations.append(AIMessage(content=str(chat.message)))
-
-    return conversations
-
-
-def get_all_chat_history(limit: int = 10, offset: int = 0) -> List[ChatHistory]:
-    """Retrieves all chat history records.
-
-    Args:
-      limit: The maximum number of chat history records to retrieve.
-      offset: The offset at which to start retrieving chat history records.
-
-    Returns:
-      A list of ChatHistory objects.
+        A list of Flow objects.
     """
     with Session() as session:
-        chats = session.query(ChatHistory).limit(limit).offset(offset).all()
-        return chats
+        return session.query(Flow).filter(Flow.chatbot_id == bot_id).all()
 
 
-def update_chat_history(
-    chat_history_id: str,
-    chatbot_id: Optional[str] = None,
-    session_id: Optional[str] = None,
-    from_user: Optional[str] = None,
-    message: Optional[str] = None,
-) -> ChatHistory:
-    """Updates a chat history record.
+def get_flow_by_id(flow_id: str) -> Optional[Flow]:
+    """Fetches a specific flow by its ID.
 
     Args:
-      chat_history_id: The ID of the chat history record to update.
-      chatbot_id: The new chatbot ID.
-      session_id: The new session ID.
-      from_user: The new user name.
-      message: The new message content.
+        flow_id: The ID of the flow.
 
     Returns:
-      The updated ChatHistory object.
+        A Flow object or None if not found.
     """
     with Session() as session:
-        chat_history: ChatHistory = session.query(ChatHistory).get(chat_history_id)
+        return session.query(Flow).filter(Flow.id == flow_id).first()
 
-        if not chatbot_id:
-            chat_history.chatbot_id = chatbot_id
-        if session_id:
-            chat_history.session_id = session_id
-        if from_user:
-            chat_history.from_user = from_user
-        if message:
-            chat_history.message = message
 
-        chat_history.updated_at = datetime.now()
+def get_flow_variables(flow_id: str) -> List[FlowVariable]:
+    """Fetches variables associated with a specific flow.
 
-        session.add(chat_history)
+    Args:
+        flow_id: The ID of the flow.
+
+    Returns:
+        A list of FlowVariable objects.
+    """
+    with Session() as session:
+        return session.query(FlowVariable).filter(FlowVariable.flow_id == flow_id).all()
+
+
+def add_variable_to_flow(flow_id: str, name: str, value: str) -> FlowVariable:
+    """Adds or updates a variable in a flow.
+
+    Args:
+        flow_id: The ID of the flow.
+        name: The name of the variable.
+        value: The value of the variable.
+
+    Returns:
+        The newly created or updated FlowVariable object.
+    """
+    with Session() as session:
+        variable = FlowVariable(flow_id=flow_id, name=name, value=value)
+        session.add(variable)
         session.commit()
-
-    return chat_history
-
-
-def delete_chat_history(chat_history_id: str) -> None:
-    """Deletes a chat history record.
-
-    Args:
-      chat_history_id: The ID of the chat history record to delete.
-    """
-    with Session() as session:
-        chat_history = session.query(ChatHistory).get(chat_history_id)
-        session.delete(chat_history)
-        session.commit()
-
-
-def get_chat_history_for_retrieval_chain(
-    session_id: str, limit: Optional[int] = None
-) -> List[Tuple[str, str]]:
-    """Fetches limited ChatHistory entries by session ID and converts to chat_history format.
-
-    Args:
-        session_id (str): The session ID to fetch chat history for
-        limit (Optional[int], optional): Maximum number of entries to retrieve
-
-    Returns:
-        List[Tuple[str, str]]: List of tuples of (user_query, bot_response)
-    """
-
-    with Session() as session:
-        # Query and limit results if a limit is provided
-        query = (
-            session.query(ChatHistory)
-            .filter(ChatHistory.session_id == session_id)
-            .order_by(ChatHistory.created_at.desc())
-        )
-
-        if limit:
-            query = query.limit(limit)
-
-        query = query.all()[::-1]
-
-        chat_history: List[Tuple[str, str]] = []
-
-        user_query: Optional[str] = None
-        for entry in query:
-            entry: ChatHistory
-
-            if entry.from_user is True:
-                user_query = str(entry.message)
-            else:
-                if user_query is not None:
-                    chat_history.append((user_query, str(entry.message)))
-                    user_query = None
-
-    return chat_history
-
-
-def get_unique_sessions_with_first_message_by_bot_id(
-    bot_id: str, limit: int = 20, offset: int = 0
-) -> list[Dict[str, object]]:
-    # If a session is not provided, create a new one
-    session = Session()
-
-    # Use distinct to get unique session_ids
-    unique_session_ids = (
-        session.query(distinct(ChatHistory.session_id),  ChatHistory.id)
-        .filter_by(chatbot_id=bot_id)
-        .order_by(ChatHistory.id.desc())
-        .limit(limit)
-        .offset(offset)
-        .all()
-    )
-
-    result_list = []
-
-    for session_id in unique_session_ids:
-        # Get the first message in each session
-        first_message = (
-            session.query(ChatHistory)
-            .filter_by(chatbot_id=bot_id, session_id=session_id[0])
-            .order_by(ChatHistory.id.asc())
-            .first()
-        )
-
-        # Convert ChatHistory object to a dictionary
-        if first_message:
-            first_message_dict = {
-                column.key: getattr(first_message, column.key)
-                for column in class_mapper(ChatHistory).mapped_table.columns
-            }
-        else:
-            first_message_dict = None
-
-        # Create a dictionary with session_id and first_message
-        result_dict: Dict[str, object] = {
-            "session_id": session_id[0],
-            "first_message": first_message_dict,
-        }
-
-        result_list: List[Dict[str, object]] = []
-        result_list.append(result_dict)
-
-    return result_list
+        return variable
