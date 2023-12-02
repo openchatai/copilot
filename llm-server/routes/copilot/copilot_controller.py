@@ -2,10 +2,11 @@ import json
 import os
 import uuid
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, Response
 from prance import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from routes.root_service import get_swagger_doc
+from routes._swagger import reindex_service
 from werkzeug.utils import secure_filename
 from utils.base import resolve_abs_local_file_path_from
 from utils.get_logger import struct_log
@@ -59,8 +60,7 @@ def handle_swagger_file():
 
             swagger_doc = get_swagger_doc(filename)
 
-            if EXPERIMENTAL_FEATURES_ENABLED == "YES":
-                swagger_service.save_swagger_paths_to_qdrant(swagger_doc, chatbot["id"])
+            swagger_service.save_swagger_paths_to_qdrant(swagger_doc, chatbot["id"])
 
             swagger_service.save_swaggerfile_to_mongo(
                 filename, str(chatbot["id"]), swagger_doc
@@ -186,3 +186,17 @@ def validator(copilot_id):
             "validations": validations,
         }
     )
+
+
+# This api will be used to reindex all swagger files into our qdrant vector store
+@copilot.route("/reindex/apis", methods=["POST"])
+def reindex_apis():
+    # Check if the provided key matches the expected key
+    SECRET_KEY = os.getenv("BASIC_AUTH_KEY")
+    if not SECRET_KEY:
+        raise ValidationError("This is a protected route! Contact admin")
+    if request.headers.get("Authorization") == f"Bearer {SECRET_KEY}":
+        response = reindex_service.reindex_apis()
+        return Response(response=response, status=200)
+    else:
+        return Response(response="Unauthorized", status=401)

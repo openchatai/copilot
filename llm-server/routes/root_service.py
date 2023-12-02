@@ -48,7 +48,7 @@ async def handle_request(
     session_id: str,
     base_prompt: str,
     bot_id: str,
-    headers: Headers,
+    headers: Dict[str, str],
     server_base_url: str,
     app: Optional[str],
 ) -> ResponseDict:
@@ -160,7 +160,7 @@ def handle_api_calls(
     ids: List[str],
     swagger_doc: ResolvingParser,
     text: str,
-    headers: Headers,
+    headers: Dict[str, str],
     server_base_url: str,
     swagger_url: Optional[str],
     app: Optional[str],

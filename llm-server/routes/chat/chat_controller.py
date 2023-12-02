@@ -1,6 +1,8 @@
 from typing import cast
 
 from flask import jsonify, Blueprint, request, Response, abort, Request
+from routes.chat.chat_dto import ChatInput
+from utils.llm_consts import X_App_Name
 from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
 from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id,
@@ -105,16 +107,15 @@ def init_chat():
 
 
 @chat_workflow.route("/send", methods=["POST"])
-<<<<<<< Updated upstream
 async def send_chat():
-=======
-def send_chat():
-    if not request.json:
-        raise ValueError("request.json is not defined!")
->>>>>>> Stashed changes
-    message = request.json.get("content")
-    session_id = request.json.get("session_id")
-    headers_from_json = request.json.get("headers", {})
+    json_data = request.get_json()
+    if not isinstance(json_data, dict):
+        raise ValueError("Invalid JSON format. Expected a dictionary.")
+
+    input_data = ChatInput(**json_data)
+    message = input_data.content
+    session_id = input_data.session_id
+    headers_from_json = input_data.headers
 
     bot_token = request.headers.get("X-Bot-Token")
 
@@ -125,10 +126,8 @@ def send_chat():
         raise ValueError("bot token must be defined! ")
     bot = find_one_or_fail_by_token(bot_token)
 
-    app_name = headers_from_json.get("X-App-Name") or None
-
-    if app_name in headers_from_json:
-        del headers_from_json["app_name"]
+    app_name = headers_from_json.get(X_App_Name) or None
+    headers_from_json.pop(X_App_Name)
 
     swagger_url = bot.swagger_url
 
