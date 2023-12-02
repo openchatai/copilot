@@ -9,28 +9,22 @@ from presenters.flow_presenters import flow_to_dict, flow_to_dict_with_nested_en
 Session = sessionmaker(bind=engine)
 
 
-def create_flow(chatbot_id: str, name: str):
+def create_flow(chatbot_id: str, name: str) -> Flow:
     """
-    API method to create a new flow record and return it in a JSON format.
+    Creates a new flow record in the database.
 
     Args:
         chatbot_id: The ID of the chatbot associated with the flow.
         name: The name of the flow.
 
     Returns:
-        A Flask response object with the newly created Flow object as a dictionary.
+        The newly created Flow object.
     """
-    try:
-        with Session() as session:
-            flow = Flow(chatbot_id=chatbot_id, name=name)
-            session.add(flow)
-            session.commit()
-            return jsonify({"status": "success", "data": flow_to_dict(flow)}), 201
-    except Exception as e:
-        # Log the exception here
-        print(f"Error creating flow: {e}")
-        # Return an error response
-        return jsonify({"error": "Failed to create flow"}), 500
+    with Session() as session:
+        flow = Flow(chatbot_id=chatbot_id, name=name)
+        session.add(flow)
+        session.commit()
+        return flow
 
 
 def get_all_flows_by_bot_id(bot_id: str):
