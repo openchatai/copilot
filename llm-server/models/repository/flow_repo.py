@@ -128,3 +128,23 @@ def add_action_to_flow_block(flow_id: str, flow_block_id: str, name: str, action
         session.add(action)
         session.commit()
         return action
+
+
+def remove_action_from_flow_block(flow_id: str, action_id: str) -> bool:
+    """
+    Removes an action from a flow in the database.
+
+    Args:
+        flow_id: The ID of the flow.
+        action_id: The ID of the action to be removed.
+
+    Returns:
+        True if the action was successfully removed, False otherwise.
+    """
+    with Session() as session:
+        action = session.query(BlockAction).filter_by(flow_id=flow_id, id=action_id).first()
+        if action:
+            session.delete(action)
+            session.commit()
+            return True
+        return False

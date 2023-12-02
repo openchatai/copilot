@@ -2,7 +2,7 @@ from flask import Blueprint, Response, jsonify, request
 
 from models.repository.copilot_repo import find_one_or_fail_by_id
 from models.repository.flow_repo import create_flow, get_all_flows_for_bot, get_flow_by_id, get_variables_for_flow, \
-    add_or_update_variable_in_flow, add_action_to_flow_block
+    add_or_update_variable_in_flow, add_action_to_flow_block, remove_action_from_flow_block
 from presenters.flow_presenters import flow_to_dict, flow_to_dict_with_nested_entities, flow_variable_to_dict, \
     block_action_to_dict
 from utils.db import Database
@@ -172,8 +172,34 @@ def add_action_to_flow_api(flow_id: str):
 
 
 @flow.route("/<flow_id>/actions", methods=["DELETE"])
-def remove_action_from_flow(flow_id: str) -> Response:
-    pass
+def remove_action_from_flow_api(flow_id: str):
+    """
+    API endpoint to remove an action from a specific flow.
+
+    Args:
+        flow_id: The ID of the flow.
+
+    Returns:
+        A Flask response object indicating the result of the operation.
+    """
+    try:
+        # Extracting action ID from the request
+        data = request.json
+        action_id = data.get('action_id')
+
+        if not action_id:
+            return jsonify({"error": "Missing required field: action_id"}), 400
+
+        success = remove_action_from_flow_block(flow_id, action_id)
+        if success:
+            return jsonify({"status": "success", "message": "Action removed successfully"}), 200
+        else:
+            return jsonify({"error": "Action not found or could not be removed"}), 404
+    except Exception as e:
+        # Log the exception here
+        print(f"Error removing action from flow: {e}")
+        # Return an error response
+        return jsonify({"error": "Failed to remove action from flow"}), 500
 
 
 @flow.route("/<flow_id>/actions", methods=["PATCH"])
