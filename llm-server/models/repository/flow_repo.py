@@ -26,7 +26,7 @@ def create_flow(chatbot_id: str, name: str) -> Flow:
         return flow
 
 
-def get_all_flows_for_bot(bot_id: str) -> List[Flow]:
+def get_all_flows_for_bot(bot_id: str) -> list[Type[Flow]]:
     """
     Retrieves all flows for a given bot from the database.
 

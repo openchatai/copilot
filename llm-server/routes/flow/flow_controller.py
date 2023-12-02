@@ -1,6 +1,7 @@
 from flask import Blueprint, Response, jsonify, request
 
-from models.repository.flow_repo import create_flow, get_all_flows_for_bot, get_flow_by_id, get_variables_for_flow
+from models.repository.flow_repo import create_flow, get_all_flows_for_bot, get_flow_by_id, get_variables_for_flow, \
+    add_or_update_variable_in_flow
 from presenters.flow_presenters import flow_to_dict, flow_to_dict_with_nested_entities, flow_variable_to_dict
 from utils.db import Database
 
