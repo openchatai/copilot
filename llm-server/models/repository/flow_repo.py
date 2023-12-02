@@ -1,7 +1,9 @@
-from typing import List, Optional
+from typing import List, Optional, Type
 
+from opencopilot_db import engine
+from opencopilot_db.flow import Flow
+from opencopilot_db.flow_variables import FlowVariable
 from sqlalchemy.orm import sessionmaker
-from opencopilot_db import Flow, FlowBlock, BlockAction, FlowVariable, engine
 
 Session = sessionmaker(bind=engine)
 
@@ -23,7 +25,7 @@ def create_flow(chatbot_id: str, name: str) -> Flow:
         return flow
 
 
-def get_all_flows_by_bot_id(bot_id: str) -> List[Flow]:
+def get_all_flows_by_bot_id(bot_id: str) -> list[Type[Flow]]:
     """Retrieves all flows for a given bot.
 
     Args:
@@ -49,7 +51,7 @@ def get_flow_by_id(flow_id: str) -> Optional[Flow]:
         return session.query(Flow).filter(Flow.id == flow_id).first()
 
 
-def get_flow_variables(flow_id: str) -> List[FlowVariable]:
+def get_flow_variables(flow_id: str) -> list[Type[FlowVariable]]:
     """Fetches variables associated with a specific flow.
 
     Args:
