@@ -6,7 +6,6 @@ from routes.workflow.extractors.extract_json import extract_json_payload
 
 # push it to the library
 from integrations.custom_prompts.prompt_loader import load_prompts
-from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from utils import get_chat_model
 from utils.chat_models import CHAT_MODELS
 from utils.get_logger import struct_log
@@ -27,14 +26,15 @@ def process_conversation_step(
     api_summaries: List[ApiOperation_vs],
     prev_conversations: List[BaseMessage],
     flows: List[WorkflowFlowType],
+    bot_id: str,
 ):
     if not session_id:
         raise ValueError("Session id must be defined for chat conversations")
-    prompt_templates = load_prompts(app)
+    prompt_templates = load_prompts(bot_id)
     system_message_classifier = SystemMessage(
-        content="You are a helpful ai assistant. User will give you two things, a list of api's and some useful information, called context. You will also have access to flows. Flows is a pre defined list of api's that can be used to answer the questions that follow."
+        content="You are a helpful ai assistant. User will give you two things, a list of api's and some useful information, called context."
     )
-    if app and prompt_templates:
+    if app and prompt_templates.system_message is not None:
         system_message_classifier = SystemMessage(
             content=prompt_templates.system_message
         )

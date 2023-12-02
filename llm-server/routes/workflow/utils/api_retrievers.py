@@ -18,7 +18,7 @@ flows: VectorStore = get_vector_store(StoreOptions("swagger"))
 apis: VectorStore = get_vector_store(StoreOptions("apis"))
 
 
-def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
+async def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
     try:
         score_threshold = float(os.getenv("SCORE_THRESHOLD_KB", "0.65"))
 
@@ -45,7 +45,7 @@ def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
         return None
 
 
-def get_relevant_flows(text: str, bot_id: str) -> List[WorkflowFlowType]:
+async def get_relevant_flows(text: str, bot_id: str) -> List[WorkflowFlowType]:
     try:
         score_threshold = float(os.getenv("SCORE_THRESHOLD_KB", "0.80"))
 
@@ -70,7 +70,7 @@ def get_relevant_flows(text: str, bot_id: str) -> List[WorkflowFlowType]:
         return []
 
 
-def get_relevant_apis_summaries(text: str, bot_id: str) -> List[ApiOperation_vs]:
+async def get_relevant_apis_summaries(text: str, bot_id: str) -> List[ApiOperation_vs]:
     try:
         score_threshold = float(os.getenv("SCORE_THRESHOLD_KB", "0.75"))
 

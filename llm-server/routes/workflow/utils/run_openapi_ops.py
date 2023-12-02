@@ -14,13 +14,15 @@ from integrations.transformers.transformer import transform_response
 from utils import struct_log
 from werkzeug.datastructures import Headers
 
-def run_openapi_operations(
+
+async def run_openapi_operations(
     record: WorkflowDataType,
     swagger_json: ResolvingParser,
     text: str,
     headers: Headers,
     server_base_url: str,
     app: Optional[str],
+    bot_id: str
 ) -> str:
     api_request_data = {}
     prev_api_response = ""
@@ -31,7 +33,7 @@ def run_openapi_operations(
             try:
                 # refresh state after every api call, we can look into optimizing this later as well
                 operation_id = step.get("open_api_operation_id")
-                api_payload = generate_openapi_payload(
+                api_payload = await generate_openapi_payload(
                     swagger_json,
                     text,
                     operation_id,
@@ -98,4 +100,4 @@ def run_openapi_operations(
                     event="/check_workflow_in_store",
                 )
 
-    return convert_json_to_text(text, record_info, app, api_request_data)
+    return convert_json_to_text(text, record_info, api_request_data, bot_id=bot_id)

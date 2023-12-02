@@ -14,7 +14,6 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 def convert_json_to_text(
     user_input: str,
     api_response: str,
-    app: Optional[str],
     api_request_data: Dict[str, Any],
     bot_id: str,
 ) -> str:
@@ -33,7 +32,7 @@ def convert_json_to_text(
         prompt_templates.api_summarizer if prompt_templates else None
     )
 
-    if app is not None and api_summarizer_template is not None:
+    if api_summarizer_template is not None:
         system_message = SystemMessage(content=api_summarizer_template)
 
     messages = [

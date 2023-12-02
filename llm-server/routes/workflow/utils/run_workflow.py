@@ -9,11 +9,12 @@ import json
 from utils import struct_log
 
 
-def run_workflow(
+async def run_workflow(
     workflow_doc: WorkflowDataType,
     swagger_json: Any,
     data: WorkflowData,
     app: Optional[str],
+    bot_id: str,
 ) -> ResponseDict:
     headers = data.headers or Headers()
     server_base_url = data.server_base_url
@@ -22,13 +23,14 @@ def run_workflow(
     error = None
 
     try:
-        result = run_openapi_operations(
+        result = await run_openapi_operations(
             workflow_doc,
             swagger_json,
             data.text,
             headers,
             server_base_url,
             app,
+            bot_id=bot_id,
         )
     except Exception as e:
         struct_log.exception(

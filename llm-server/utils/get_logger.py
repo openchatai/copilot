@@ -11,7 +11,7 @@ structlog.configure(
         structlog.dev.ConsoleRenderer(),
         # structlog.processors.JSONRenderer(), use for json logging
     ],
-    wrapper_class=structlog.make_filtering_bound_logger(logging.NOTSET),
+    wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
     context_class=dict,
     logger_factory=structlog.PrintLoggerFactory(),
     cache_logger_on_first_use=False,
