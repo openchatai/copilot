@@ -1,5 +1,6 @@
 from flask import Blueprint, Response, jsonify, request
 
+from models.repository.copilot_repo import find_one_or_fail_by_id
 from models.repository.flow_repo import create_flow, get_all_flows_for_bot, get_flow_by_id, get_variables_for_flow, \
     add_or_update_variable_in_flow
 from presenters.flow_presenters import flow_to_dict, flow_to_dict_with_nested_entities, flow_variable_to_dict
@@ -120,11 +121,13 @@ def add_variables_to_flow_api(flow_id: str):
         value = data.get('value')
         runtime_override_key = data.get('runtime_override_key', None)
         runtime_override_action_id = data.get('runtime_override_action_id', None)
+        copilot_id = data.get('copilot_id')
+        bot = find_one_or_fail_by_id(copilot_id)
 
         if not name or value is None:
             return jsonify({"error": "Missing required fields"}), 400
 
-        variable = add_or_update_variable_in_flow(flow_id, name, value, runtime_override_key, runtime_override_action_id)
+        variable = add_or_update_variable_in_flow(bot.id. flow_id, name, value, runtime_override_key, runtime_override_action_id)
         return jsonify({"status": "success", "data": flow_variable_to_dict(variable)}), 201
     except Exception as e:
         # Log the exception here

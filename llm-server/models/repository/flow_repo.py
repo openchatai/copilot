@@ -69,7 +69,7 @@ def get_variables_for_flow(flow_id: str) -> list[Type[FlowVariable]]:
         return session.query(FlowVariable).filter(FlowVariable.flow_id == flow_id).all()
 
 
-def add_or_update_variable_in_flow(flow_id: str, name: str, value: str, runtime_override_key: str = None,
+def add_or_update_variable_in_flow(bot_id: str, flow_id: str, name: str, value: str, runtime_override_key: str = None,
                                    runtime_override_action_id: str = None) -> FlowVariable:
     """
     Adds a new variable to a flow or updates it if it already exists.
@@ -85,13 +85,15 @@ def add_or_update_variable_in_flow(flow_id: str, name: str, value: str, runtime_
         The updated or newly created FlowVariable object.
     """
     with Session() as session:
-        variable = session.query(FlowVariable).filter_by(flow_id=flow_id, name=name,
+        variable = session.query(FlowVariable).filter_by(bot_id=bot_id, flow_id=flow_id, name=name,
                                                          runtime_override_action_id=runtime_override_action_id,
                                                          runtime_override_key=runtime_override_key).first()
         if variable:
             variable.value = value
         else:
-            variable = FlowVariable(flow_id=flow_id, name=name, value=value)
+            variable = FlowVariable(bot_id=bot_id, flow_id=flow_id, name=name,
+                                    runtime_override_action_id=runtime_override_action_id,
+                                    runtime_override_key=runtime_override_key)
             session.add(variable)
         session.commit()
         return variable
