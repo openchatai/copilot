@@ -28,7 +28,7 @@ app.register_blueprint(upload_controller, url_prefix="/backend/uploads")
 app.register_blueprint(datasource_workflow, url_prefix="/backend/data_sources")
 app.register_blueprint(prompt_template_workflow, url_prefix="/backend/prompt-templates")
 app.register_blueprint(prompt_workflow, url_prefix="/backend/prompts")
-app.register_blueprint(flow, url_prefix="/backend/flows-v2")  ## todo rename
+app.register_blueprint(flow, url_prefix="/backend/flows-v2")  # todo rename
 
 app.config.from_object(Config)
 
