@@ -1,7 +1,8 @@
 from typing import cast
 
-from flask import jsonify, Blueprint, request, Response, abort
+from flask import jsonify, Blueprint, request, Response, abort, Request
 from werkzeug.datastructures import Headers
+from utils.llm_consts import SUMMARIZATION_PROMPT, SYSTEM_MESSAGE_PROMPT
 from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
 from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id,
@@ -12,11 +13,28 @@ from models.repository.copilot_repo import find_one_or_fail_by_token
 from utils.db import Database
 from .. import root_service
 from utils import struct_log
+from typing import Optional
 
 db_instance = Database()
 mongo = db_instance.get_db()
 
 chat_workflow = Blueprint("chat", __name__)
+
+
+def get_validated_data(request: Request) -> Optional[dict]:
+    data = request.get_json()
+    if not data:
+        return None
+
+    required_keys = {"app", "system_prompt", "summarization_prompt"}
+
+    if not required_keys.issubset(data.keys()):
+        print(
+            f"Missing required keys in request: {required_keys.difference(data.keys())}"
+        )
+        return None
+
+    return data
 
 
 @chat_workflow.route("/sessions/<session_id>/chats", methods=["GET"])

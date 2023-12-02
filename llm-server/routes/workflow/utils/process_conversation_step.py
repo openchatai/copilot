@@ -35,7 +35,9 @@ def process_conversation_step(
         content="You are a helpful ai assistant. User will give you two things, a list of api's and some useful information, called context. You will also have access to flows. Flows is a pre defined list of api's that can be used to answer the questions that follow."
     )
     if app and prompt_templates:
-        system_message_classifier = prompt_templates.system_message_classifier
+        system_message_classifier = SystemMessage(
+            content=prompt_templates.system_message
+        )
     struct_log.info(
         event="system_message_classifier",
         app=app,
