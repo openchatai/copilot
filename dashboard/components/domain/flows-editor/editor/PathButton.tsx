@@ -1,7 +1,7 @@
 import { MethodBtn } from "./MethodRenderer";
 import { useMode } from "../stores/ModeProvider";
 import { useController } from "../stores/Controller";
-import { Method, TransformedPath } from "../types/Swagger";
+import { Method, NodeData, TransformedPath } from "../types/Swagger";
 import {
   Tooltip,
   TooltipProvider,
@@ -13,22 +13,21 @@ import { useCallback } from "react";
 export function PathButton({ path }: { path: TransformedPath }) {
   const { mode } = useMode();
   const {
-    state: { activeFlowId },
-    activeNodes,
+    state: { steps },
     appendNode,
     addNodeBetween,
   } = useController();
 
   const isPresentInNodes = useCallback(
     (method: Method) => {
-      return !!activeNodes?.find((node) => {
+      return !!steps?.find((node) => {
         return (
           node.path === path.path &&
           node.method.toLowerCase() === method.toLowerCase()
         );
       });
     },
-    [activeNodes, path],
+    [steps, path],
   );
 
   return (
@@ -51,13 +50,16 @@ export function PathButton({ path }: { path: TransformedPath }) {
                         if (isPresentInNodes(method.method)) {
                           return;
                         }
-                        if (!activeFlowId) {
-                          alert("Please select a flow first");
-                          return;
-                        }
-                        const node = {
+                        const node: NodeData = {
                           id: `${path.path}-${method.method}`,
-                          ...method, ...path
+                          path: path.path,
+                          method: method.method,
+                          description: method.description,
+                          parameters: method.parameters || [],
+                          tags: method.tags,
+                          summary: method.summary,
+                          operationId: method.operationId,
+
                         }
                         if (mode.type === "append-node") {
                           appendNode(node);
