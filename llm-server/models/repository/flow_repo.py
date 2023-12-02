@@ -24,6 +24,7 @@ def create_flow(chatbot_id: str, name: str) -> Flow:
         flow = Flow(chatbot_id=chatbot_id, name=name)
         session.add(flow)
         session.commit()
+        session.refresh(flow)  # Refresh the instance to load any unloaded attributes
         return flow
 
 

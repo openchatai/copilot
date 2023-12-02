@@ -56,9 +56,6 @@ def create_flow_api(bot_id: str):
         if not name:
             return jsonify({"error": "Missing required field: 'name'"}), 400
 
-        # Additional validations can be added here if needed
-        # For example, checking the length of the name, or if it contains invalid characters, etc.
-
         flow = create_flow(bot_id, name)
         return jsonify(flow_to_dict(flow)), 201
     except Exception as e:
