@@ -5,7 +5,7 @@ from opencopilot_db.database_setup import Base, engine
 from sqlalchemy import Column, String, DateTime
 
 
-class Chatbot(Base):
+class FlowVariable(Base):
     __tablename__ = 'flow_variables'
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))

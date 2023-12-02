@@ -5,7 +5,7 @@ from opencopilot_db.database_setup import Base, engine
 from sqlalchemy import Column, String, DateTime, Integer, JSON
 
 
-class Chatbot(Base):
+class BlockAction(Base):
     __tablename__ = 'block_actions'
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
