@@ -12,6 +12,7 @@ mongo = db_instance.get_db()
 
 flow = Blueprint("flow", __name__)
 
+
 @flow.route("/bot/<bot_id>", methods=["GET"])
 def get_all_flows_api(bot_id: str):
     """
