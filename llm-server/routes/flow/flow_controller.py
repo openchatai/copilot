@@ -5,7 +5,7 @@ from models.repository.flow_repo import create_flow, get_all_flows_for_bot, get_
     add_or_update_variable_in_flow, add_action_to_flow_block, remove_action_from_flow_block, get_flow_blocks_for_flow, \
     create_flow_block
 from presenters.flow_presenters import flow_to_dict, flow_to_dict_with_nested_entities, flow_variable_to_dict, \
-    block_action_to_dict, flow_block_to_dict, flow_block_with_actions_to_dict
+    block_action_to_dict, flow_block_with_actions_to_dict
 from utils.db import Database
 
 db_instance = Database()
@@ -265,7 +265,6 @@ def create_flow_block_api(flow_id: str):
         print(f"Error creating flow block: {e}")
         # Return an error response
         return jsonify({"error": "Failed to create flow block {}".format(str(e))}), 500
-
 
 @flow.route("/<flow_id>/actions", methods=["PATCH"])
 def update_action_in_flow(session_id: str) -> Response:
