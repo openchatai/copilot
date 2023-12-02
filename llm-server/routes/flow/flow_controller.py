@@ -86,7 +86,7 @@ def get_flow_by_id_api(flow_id: str):
         # Log the exception here
         print(f"Error retrieving flow with ID {flow_id}: {e}")
         # Return an error response
-        return jsonify({"error": "Failed to retrieve flow"}), 500
+        return jsonify({"error": "Failed to retrieve flow {}".format(str(e))}), 500
 
 
 @flow.route("/<flow_id>/variables", methods=["GET"])
@@ -104,12 +104,12 @@ def get_flow_variables_api(flow_id: str):
         flow_variables = get_variables_for_flow(flow_id)
         variables_dict = [flow_variable_to_dict(variable) for variable in
                           flow_variables]  # Assuming flow_variable_to_dict is defined
-        return jsonify({"status": "success", "data": variables_dict}), 200
+        return jsonify(variables_dict), 200
     except Exception as e:
         # Log the exception here
         print(f"Error retrieving flow variables for flow ID {flow_id}: {e}")
         # Return an error response
-        return jsonify({"error": "Failed to retrieve flow variables"}), 500
+        return jsonify({"error": "Failed to retrieve flow variables {}".format(str(e))}), 500
 
 
 @flow.route("/<flow_id>/variables", methods=["POST", "PUT"])

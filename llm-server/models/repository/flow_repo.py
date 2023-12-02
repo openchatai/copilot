@@ -54,7 +54,7 @@ def get_flow_by_id(flow_id: str) -> Optional[Flow]:
         The Flow object if found, otherwise None.
     """
     with Session() as session:
-        return session.query(Flow).filter(Flow.id == flow_id).first()
+        return session.query(Flow).filter(Flow.id == str(flow_id)).first()
 
 
 def get_variables_for_flow(flow_id: str) -> list[Type[FlowVariable]]:
