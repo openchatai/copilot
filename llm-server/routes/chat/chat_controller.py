@@ -37,29 +37,6 @@ def get_validated_data(request: Request) -> Optional[dict]:
     return data
 
 
-@chat_workflow.route("/b/<bot_id>", methods=["POST"])
-def add_prompts(bot_id: str) -> Response:
-    data = get_validated_data(request)
-
-    if data is None:
-        return Response(status=400)
-
-    try:
-        mongo.prompts.insert_one(
-            {
-                "bot_id": bot_id,
-                "app": data["app"],
-                "system_prompt": data[SYSTEM_MESSAGE_PROMPT],
-                "summarization_prompt": data[SUMMARIZATION_PROMPT],
-            }
-        )
-    except Exception as e:
-        print(f"Error inserting prompt: {e}")
-        return Response(status=500)
-
-    return Response(status=200)
-
-
 @chat_workflow.route("/sessions/<session_id>/chats", methods=["GET"])
 def get_session_chats(session_id: str) -> Response:
     limit = int(request.args.get("limit", 20))
