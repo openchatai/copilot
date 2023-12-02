@@ -12,6 +12,7 @@ class BlockAction(Base):
     name = Column(String(255))
     chatbot_id = Column(String(36), nullable=False)
     flow_id = Column(String(36), nullable=False)
+    flow_block_id = Column(String(36), nullable=False)
     type = Column(String(255), default='api')
     swagger_endpoint = Column(JSON(), default=None)
     order = Column(Integer, default=0)
