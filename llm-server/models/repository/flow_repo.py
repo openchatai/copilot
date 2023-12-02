@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Type
 
 from opencopilot_db import engine
 from opencopilot_db.flow import Flow
@@ -55,7 +55,7 @@ def get_flow_by_id(flow_id: str) -> Optional[Flow]:
         return session.query(Flow).filter(Flow.id == flow_id).first()
 
 
-def get_variables_for_flow(flow_id: str) -> List[FlowVariable]:
+def get_variables_for_flow(flow_id: str) -> list[Type[FlowVariable]]:
     """
     Retrieves all variables for a specific flow from the database.
 
