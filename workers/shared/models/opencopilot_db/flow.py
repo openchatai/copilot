@@ -10,7 +10,7 @@ class Chatbot(Base):
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String(255))
-    chatbot_id = Column(String(36), nullable=True)
+    chatbot_id = Column(String(36), nullable=False)
     status = Column(String(255), default='draft')
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)

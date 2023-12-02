@@ -10,8 +10,8 @@ class Chatbot(Base):
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String(255))
-    chatbot_id = Column(String(36), nullable=True)
-    flow_id = Column(String(36), nullable=True)
+    chatbot_id = Column(String(36), nullable=False)
+    flow_id = Column(String(36), nullable=False)
     status = Column(String(255), default='draft')
     type = Column(String(255), default='block')
     next_on_success = Column(String(255), default=None)
