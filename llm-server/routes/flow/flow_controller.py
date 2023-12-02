@@ -29,6 +29,9 @@ def get_all_flows_by_bot_id(bot_id: str) -> Response:
         }
     ])
 
+@flow.route("/bot/<bot_id>/flows", methods=["POST"])
+def create_flow(bot_id: str) -> Response:
+    pass
 
 @flow.route("/<flow_id>", methods=["GET"])
 def get_flow_by_id(flow_id: str) -> Response:
