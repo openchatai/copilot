@@ -20,7 +20,7 @@ create_database_schema()
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
-app.register_blueprint(workflow, url_prefix="/backend/flows")
+app.register_blueprint(workflow, url_prefix="/backend/flows-old")
 app.register_blueprint(_swagger, url_prefix="/backend/swagger_api")
 app.register_blueprint(chat_workflow, url_prefix="/backend/chat")
 app.register_blueprint(copilot, url_prefix="/backend/copilot")
@@ -28,7 +28,7 @@ app.register_blueprint(upload_controller, url_prefix="/backend/uploads")
 app.register_blueprint(datasource_workflow, url_prefix="/backend/data_sources")
 app.register_blueprint(prompt_template_workflow, url_prefix="/backend/prompt-templates")
 app.register_blueprint(prompt_workflow, url_prefix="/backend/prompts")
-app.register_blueprint(flow, url_prefix="/backend/flows-v2")  # todo rename
+app.register_blueprint(flow, url_prefix="/backend/flows")  # todo rename
 
 app.config.from_object(Config)
 
