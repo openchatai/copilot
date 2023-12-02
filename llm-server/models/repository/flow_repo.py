@@ -1,12 +1,9 @@
 from typing import List, Optional
 
-from flask import jsonify
 from opencopilot_db import engine
 from opencopilot_db.flow import Flow
 from opencopilot_db.flow_variables import FlowVariable
 from sqlalchemy.orm import sessionmaker
-
-from presenters.flow_presenters import flow_variable_to_dict
 
 Session = sessionmaker(bind=engine)
 
@@ -93,4 +90,3 @@ def add_or_update_variable_in_flow(flow_id: str, name: str, value: str) -> FlowV
             session.add(variable)
         session.commit()
         return variable
-

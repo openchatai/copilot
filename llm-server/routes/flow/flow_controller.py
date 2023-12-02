@@ -92,7 +92,8 @@ def get_flow_variables_api(flow_id: str):
     """
     try:
         flow_variables = get_variables_for_flow(flow_id)
-        variables_dict = [flow_variable_to_dict(variable) for variable in flow_variables]  # Assuming flow_variable_to_dict is defined
+        variables_dict = [flow_variable_to_dict(variable) for variable in
+                          flow_variables]  # Assuming flow_variable_to_dict is defined
         return jsonify({"status": "success", "data": variables_dict}), 200
     except Exception as e:
         # Log the exception here
@@ -100,9 +101,6 @@ def get_flow_variables_api(flow_id: str):
         # Return an error response
         return jsonify({"error": "Failed to retrieve flow variables"}), 500
 
-
-
-from flask import request, jsonify
 
 @flow.route("/<flow_id>/variables", methods=["POST", "PUT"])
 def add_variables_to_flow_api(flow_id: str):
@@ -131,7 +129,6 @@ def add_variables_to_flow_api(flow_id: str):
         print(f"Error adding/updating variable in flow: {e}")
         # Return an error response
         return jsonify({"error": "Failed to add/update variable in flow"}), 500
-
 
 
 @flow.route("/<flow_id>/actions", methods=["POST"])
