@@ -5,6 +5,7 @@ from uuid import uuid4
 from .get_declarative_base import Base
 from .database_setup import engine
 
+
 class ChatHistory(Base):
     __tablename__ = "chat_history"
 
@@ -17,5 +18,6 @@ class ChatHistory(Base):
     updated_at = Column(
         DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
     )
+
 
 Base.metadata.create_all(engine)

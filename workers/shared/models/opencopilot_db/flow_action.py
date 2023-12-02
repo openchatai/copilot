@@ -6,11 +6,12 @@ import datetime
 
 
 class Chatbot(Base):
-    __tablename__ = 'flows'
+    __tablename__ = 'flow_actions'
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String(255))
     chatbot_id = Column(String(36), nullable=True)
+    flow_id = Column(String(36), nullable=True)
     status = Column(String(255), default='draft')
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
