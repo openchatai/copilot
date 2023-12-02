@@ -73,10 +73,11 @@ async def handle_request(
             api_summaries=apis,
             prev_conversations=prev_conversations,
             flows=flows,
+            bot_id=bot_id,
         )
 
         if len(step.ids) > 0:
-            response = handle_api_calls(
+            response = await handle_api_calls(
                 ids=step.ids,
                 swagger_doc=get_swagger_doc(swagger_url),
                 app=app,
@@ -151,12 +152,13 @@ def handle_existing_workflow(
         swagger_doc,
         WorkflowData(text, headers, server_base_url, swagger_url, app),
         app,
+        bot_id=bot_id,
     )
 
     return output
 
 
-def handle_api_calls(
+async def handle_api_calls(
     ids: List[str],
     swagger_doc: ResolvingParser,
     text: str,
@@ -168,11 +170,12 @@ def handle_api_calls(
     bot_id: str,
 ) -> ResponseDict:
     _workflow = create_workflow_from_operation_ids(ids, swagger_doc, text)
-    output = run_workflow(
+    output = await run_workflow(
         _workflow,
         swagger_doc,
         WorkflowData(text, headers, server_base_url, swagger_url, app),
         app,
+        bot_id=bot_id,
     )
 
     _workflow["swagger_url"] = swagger_url

@@ -109,8 +109,8 @@ def init_chat():
 @chat_workflow.route("/send", methods=["POST"])
 async def send_chat():
     json_data = request.get_json()
-    if not isinstance(json_data, dict):
-        raise ValueError("Invalid JSON format. Expected a dictionary.")
+    # if not isinstance(json_data, dict):
+    #     raise ValueError("Invalid JSON format. Expected a dictionary.")
 
     input_data = ChatInput(**json_data)
     message = input_data.content
@@ -123,7 +123,7 @@ async def send_chat():
         abort(400, description="Invalid content, the size is larger than 255 char")
 
     if not bot_token:
-        raise ValueError("bot token must be defined! ")
+        return Response(response="bot token is required", status=500)
     bot = find_one_or_fail_by_token(bot_token)
 
     app_name = headers_from_json.get(X_App_Name) or None
@@ -158,9 +158,6 @@ async def send_chat():
             server_base_url=server_base_url,
             app=app_name,
         )
-
-        if response_data["response"] is None or response_data["error"] is None:
-            raise ValueError("Please check logs")
 
         create_chat_history(str(bot.id), session_id, True, message)
         create_chat_history(
