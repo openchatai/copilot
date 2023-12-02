@@ -12,8 +12,7 @@ mongo = db_instance.get_db()
 
 flow = Blueprint("flow", __name__)
 
-
-@flow.route("/bot/<bot_id>/flows", methods=["GET"])
+@flow.route("/bot/<bot_id>", methods=["GET"])
 def get_all_flows_api(bot_id: str):
     """
     API endpoint to retrieve all flows for a given bot.
@@ -36,7 +35,7 @@ def get_all_flows_api(bot_id: str):
         return jsonify({"error": "Failed to retrieve flows"}), 500
 
 
-@flow.route("/bot/<bot_id>/flows", methods=["POST"])
+@flow.route("/bot/<bot_id>", methods=["POST"])
 def create_flow_api(bot_id: str):
     """
     API endpoint to create a new flow record.
