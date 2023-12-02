@@ -2,8 +2,9 @@ from flask import Blueprint, Response, jsonify, request
 
 from models.repository.copilot_repo import find_one_or_fail_by_id
 from models.repository.flow_repo import create_flow, get_all_flows_for_bot, get_flow_by_id, get_variables_for_flow, \
-    add_or_update_variable_in_flow
-from presenters.flow_presenters import flow_to_dict, flow_to_dict_with_nested_entities, flow_variable_to_dict
+    add_or_update_variable_in_flow, add_action_to_flow_block
+from presenters.flow_presenters import flow_to_dict, flow_to_dict_with_nested_entities, flow_variable_to_dict, \
+    block_action_to_dict
 from utils.db import Database
 
 db_instance = Database()
@@ -127,7 +128,8 @@ def add_variables_to_flow_api(flow_id: str):
         if not name or value is None:
             return jsonify({"error": "Missing required fields"}), 400
 
-        variable = add_or_update_variable_in_flow(bot.id. flow_id, name, value, runtime_override_key, runtime_override_action_id)
+        variable = add_or_update_variable_in_flow(bot.id.flow_id, name, value, runtime_override_key,
+                                                  runtime_override_action_id)
         return jsonify({"status": "success", "data": flow_variable_to_dict(variable)}), 201
     except Exception as e:
         # Log the exception here
@@ -137,8 +139,36 @@ def add_variables_to_flow_api(flow_id: str):
 
 
 @flow.route("/<flow_id>/actions", methods=["POST"])
-def add_action_to_flow(flow_id: str) -> Response:
-    pass
+def add_action_to_flow_api(flow_id: str):
+    """
+    API endpoint to add a new action to a specific flow.
+
+    Args:
+        flow_id: The ID of the flow.
+
+    Returns:
+        A Flask response object with the newly created BlockAction object as a dictionary.
+    """
+    try:
+        # Extracting action data from the request
+        data = request.json
+        flow_block_id = data.get('flow_block_id')
+        name = data.get('name')
+        action_type = data.get('type', 'api')  # Default to 'api' if not provided
+        swagger_endpoint = data.get('swagger_endpoint', None)
+        order = data.get('order', 0)  # Default to 0 if not provided
+
+        # Basic validation
+        if not all([flow_block_id, name]):
+            return jsonify({"error": "Missing required fields, make sure [flow_block_id, name] are exist"}), 400
+
+        action = add_action_to_flow_block(flow_id, flow_block_id, name, action_type, swagger_endpoint, order)
+        return jsonify({"status": "success", "data": block_action_to_dict(action)}), 201
+    except Exception as e:
+        # Log the exception here
+        print(f"Error adding action to flow: {e}")
+        # Return an error response
+        return jsonify({"error": "Failed to add action to flow"}), 500
 
 
 @flow.route("/<flow_id>/actions", methods=["DELETE"])

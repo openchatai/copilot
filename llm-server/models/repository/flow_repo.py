@@ -1,6 +1,7 @@
 from typing import Optional, Type
 
 from opencopilot_db import engine
+from opencopilot_db.block_action import BlockAction
 from opencopilot_db.flow import Flow
 from opencopilot_db.flow_variables import FlowVariable
 from sqlalchemy.orm import sessionmaker
@@ -97,3 +98,33 @@ def add_or_update_variable_in_flow(bot_id: str, flow_id: str, name: str, value: 
             session.add(variable)
         session.commit()
         return variable
+
+
+def add_action_to_flow_block(flow_id: str, flow_block_id: str, name: str, action_type: str, swagger_endpoint: dict,
+                             order: int) -> BlockAction:
+    """
+    Adds a new action to a flow in the database.
+
+    Args:
+        flow_id: The ID of the flow.
+        flow_block_id: The ID of the flow block.
+        name: The name of the action.
+        action_type: The type of the action.
+        swagger_endpoint: The Swagger endpoint details.
+        order: The order of the action.
+
+    Returns:
+        The newly created BlockAction object.
+    """
+    with Session() as session:
+        action = BlockAction(
+            flow_id=flow_id,
+            flow_block_id=flow_block_id,
+            name=name,
+            type=action_type,
+            swagger_endpoint=swagger_endpoint,
+            order=order
+        )
+        session.add(action)
+        session.commit()
+        return action
