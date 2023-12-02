@@ -1,4 +1,4 @@
-from typing import List, Optional, Type
+from typing import Optional, Type
 
 from opencopilot_db import engine
 from opencopilot_db.flow import Flow
@@ -69,11 +69,14 @@ def get_variables_for_flow(flow_id: str) -> list[Type[FlowVariable]]:
         return session.query(FlowVariable).filter(FlowVariable.flow_id == flow_id).all()
 
 
-def add_or_update_variable_in_flow(flow_id: str, name: str, value: str) -> FlowVariable:
+def add_or_update_variable_in_flow(flow_id: str, name: str, value: str, runtime_override_key: str = None,
+                                   runtime_override_action_id: str = None) -> FlowVariable:
     """
     Adds a new variable to a flow or updates it if it already exists.
 
     Args:
+        runtime_override_key:
+        runtime_override_action_id:
         flow_id: The ID of the flow.
         name: The name of the variable.
         value: The value of the variable.
@@ -82,7 +85,9 @@ def add_or_update_variable_in_flow(flow_id: str, name: str, value: str) -> FlowV
         The updated or newly created FlowVariable object.
     """
     with Session() as session:
-        variable = session.query(FlowVariable).filter_by(flow_id=flow_id, name=name).first()
+        variable = session.query(FlowVariable).filter_by(flow_id=flow_id, name=name,
+                                                         runtime_override_action_id=runtime_override_action_id,
+                                                         runtime_override_key=runtime_override_key).first()
         if variable:
             variable.value = value
         else:

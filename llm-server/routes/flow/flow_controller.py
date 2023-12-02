@@ -115,15 +115,16 @@ def add_variables_to_flow_api(flow_id: str):
         A Flask response object with the updated or newly created FlowVariable object as a dictionary.
     """
     try:
-        # Extracting variable data from the request
         data = request.json
         name = data.get('name')
         value = data.get('value')
+        runtime_override_key = data.get('runtime_override_key', None)
+        runtime_override_action_id = data.get('runtime_override_action_id', None)
 
         if not name or value is None:
             return jsonify({"error": "Missing required fields"}), 400
 
-        variable = add_or_update_variable_in_flow(flow_id, name, value)
+        variable = add_or_update_variable_in_flow(flow_id, name, value, runtime_override_key, runtime_override_action_id)
         return jsonify({"status": "success", "data": flow_variable_to_dict(variable)}), 201
     except Exception as e:
         # Log the exception here
