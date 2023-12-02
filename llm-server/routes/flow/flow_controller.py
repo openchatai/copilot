@@ -2,9 +2,9 @@ from flask import Blueprint, Response, jsonify, request
 
 from models.repository.copilot_repo import find_one_or_fail_by_id
 from models.repository.flow_repo import create_flow, get_all_flows_for_bot, get_flow_by_id, get_variables_for_flow, \
-    add_or_update_variable_in_flow, add_action_to_flow_block, remove_action_from_flow_block
+    add_or_update_variable_in_flow, add_action_to_flow_block, remove_action_from_flow_block, get_flow_blocks_for_flow
 from presenters.flow_presenters import flow_to_dict, flow_to_dict_with_nested_entities, flow_variable_to_dict, \
-    block_action_to_dict
+    block_action_to_dict, flow_block_to_dict
 from utils.db import Database
 
 db_instance = Database()
@@ -142,7 +142,7 @@ def add_variables_to_flow_api(flow_id: str):
         # Log the exception here
         print(f"Error adding/updating variable in flow: {e}")
         # Return an error response
-        return jsonify({"error": "Failed to add/update variable in flow"}), 500
+        return jsonify({"error": "Failed to add/update variable in flow {}".format(str(e))}), 500
 
 
 @flow.route("/<flow_id>/actions", methods=["POST"])
@@ -175,7 +175,7 @@ def add_action_to_flow_api(flow_id: str):
         # Log the exception here
         print(f"Error adding action to flow: {e}")
         # Return an error response
-        return jsonify({"error": "Failed to add action to flow"}), 500
+        return jsonify({"error": "Failed to add action to flow {}".format(str(e))}), 500
 
 
 @flow.route("/<flow_id>/actions", methods=["DELETE"])
@@ -206,7 +206,29 @@ def remove_action_from_flow_api(flow_id: str):
         # Log the exception here
         print(f"Error removing action from flow: {e}")
         # Return an error response
-        return jsonify({"error": "Failed to remove action from flow"}), 500
+        return jsonify({"error": "Failed to remove action from flow {}".format(str(e))}), 500
+
+
+@flow.route("/<flow_id>/blocks", methods=["GET"])
+def get_flow_blocks_api(flow_id: str):
+    """
+    API endpoint to retrieve all flow blocks for a specific flow.
+
+    Args:
+        flow_id: The ID of the flow.
+
+    Returns:
+        A Flask response object with a list of FlowBlock objects as dictionaries.
+    """
+    try:
+        flow_blocks = get_flow_blocks_for_flow(flow_id)
+        blocks_dict = [flow_block_to_dict(block) for block in flow_blocks]
+        return jsonify({"status": "success", "data": blocks_dict}), 200
+    except Exception as e:
+        # Log the exception here
+        print(f"Error retrieving flow blocks for flow ID {flow_id}: {e}")
+        # Return an error response
+        return jsonify({"error": "Failed to retrieve flow blocks {}".format(str(e))}), 500
 
 
 @flow.route("/<flow_id>/actions", methods=["PATCH"])

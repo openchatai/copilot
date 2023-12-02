@@ -1,8 +1,9 @@
-from typing import Optional, Type
+from typing import Optional, Type, List
 
 from opencopilot_db import engine
 from opencopilot_db.block_action import BlockAction
 from opencopilot_db.flow import Flow
+from opencopilot_db.flow_block import FlowBlock
 from opencopilot_db.flow_variables import FlowVariable
 from sqlalchemy.orm import sessionmaker
 
@@ -149,3 +150,17 @@ def remove_action_from_flow_block(flow_id: str, action_id: str) -> bool:
             session.commit()
             return True
         return False
+
+
+def get_flow_blocks_for_flow(flow_id: str) -> List[FlowBlock]:
+    """
+    Retrieves all flow blocks for a specific flow from the database.
+
+    Args:
+        flow_id: The ID of the flow.
+
+    Returns:
+        A list of FlowBlock objects.
+    """
+    with Session() as session:
+        return session.query(FlowBlock).filter(FlowBlock.flow_id == flow_id).all()
