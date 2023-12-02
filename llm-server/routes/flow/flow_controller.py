@@ -1,6 +1,6 @@
 from flask import Blueprint, Response, jsonify, request
 
-from models.repository.flow_repo import create_flow
+from models.repository.flow_repo import create_flow, get_all_flows_for_bot
 from presenters.flow_presenters import flow_to_dict
 from utils.db import Database
 
@@ -11,25 +11,26 @@ flow = Blueprint("flow", __name__)
 
 
 @flow.route("/bot/<bot_id>/flows", methods=["GET"])
-def get_all_flows_by_bot_id(bot_id: str) -> Response:
-    return jsonify([
-        {
-            'id': 'uuid4',
-            'name': 'Add to cart flow',
-        },
-        {
-            'id': 'uuid4',
-            'name': 'Add to cart flow',
-        },
-        {
-            'id': 'uuid4',
-            'name': 'Add to cart flow',
-        },
-        {
-            'id': 'uuid4',
-            'name': 'Add to cart flow',
-        }
-    ])
+def get_all_flows_api(bot_id: str):
+    """
+    API endpoint to retrieve all flows for a given bot.
+
+    Args:
+        bot_id: The ID of the bot.
+
+    Returns:
+        A Flask response object with a list of Flow objects as dictionaries.
+    """
+    try:
+        flows = get_all_flows_for_bot(bot_id)
+        flows_dict = [flow_to_dict(flow) for flow in
+                      flows]  # Assuming flow_to_dict is a function to convert Flow objects to dictionaries
+        return jsonify(flows_dict), 200
+    except Exception as e:
+        # Log the exception here
+        print(f"Error retrieving flows for bot ID {bot_id}: {e}")
+        # Return an error response
+        return jsonify({"error": "Failed to retrieve flows"}), 500
 
 
 @flow.route("/bot/<bot_id>/flows", methods=["POST"])
@@ -46,7 +47,7 @@ def create_flow_api(bot_id: str):
     try:
         name = request.json.get("name")
         flow = create_flow(bot_id, name)
-        return jsonify({"status": "success", "data": flow_to_dict(flow)}), 201
+        return jsonify(flow_to_dict(flow)), 201
     except Exception as e:
         # Log the exception here
         print(f"Error creating flow: {e}")

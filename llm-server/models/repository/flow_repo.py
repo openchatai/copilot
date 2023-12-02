@@ -1,3 +1,5 @@
+from typing import List
+
 from flask import jsonify, Response
 from opencopilot_db import engine
 from opencopilot_db.flow import Flow
@@ -27,26 +29,20 @@ def create_flow(chatbot_id: str, name: str) -> Flow:
         return flow
 
 
-def get_all_flows_by_bot_id(bot_id: str):
+def get_all_flows_for_bot(bot_id: str) -> List[Flow]:
     """
-    API method to retrieve all flows for a given bot and convert them to a dictionary format.
+    Retrieves all flows for a given bot from the database.
 
     Args:
         bot_id: The ID of the bot.
 
     Returns:
-        A Flask response object with a list of dictionaries representing Flow objects.
+        A list of Flow objects.
     """
-    try:
-        with Session() as session:
-            flows = session.query(Flow).filter(Flow.chatbot_id == bot_id).all()
-            flows_dict = [flow_to_dict(flow) for flow in flows]
-            return jsonify(flows_dict), 200
-    except Exception as e:
-        # Log the exception
-        print(f"Error retrieving flows: {e}")
-        # Return an error response
-        return jsonify({"error": "Failed to retrieve flows"}), 500
+    with Session() as session:
+        flows = session.query(Flow).filter(Flow.chatbot_id == bot_id).all()
+        return flows
+
 
 
 def get_flow_by_id(flow_id: str):
