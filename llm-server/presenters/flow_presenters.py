@@ -84,7 +84,7 @@ def block_action_to_dict(action: BlockAction):
         "flow_id": action.flow_id,
         "type": action.type,
         "swagger_endpoint": action.swagger_endpoint,
-        "order": action.order,
+        "order_within_the_block": action.order,
         "created_at": action.created_at.isoformat() if action.created_at else None,
         "updated_at": action.updated_at.isoformat() if action.updated_at else None,
         "deleted_at": action.deleted_at.isoformat() if action.deleted_at else None,
