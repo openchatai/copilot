@@ -231,6 +231,7 @@ def get_flow_blocks_api(flow_id: str):
         # Return an error response
         return jsonify({"error": "Failed to retrieve flow blocks {}".format(str(e))}), 500
 
+
 @flow.route("/<flow_id>/blocks", methods=["POST"])
 def create_flow_block_api(flow_id: str):
     """
@@ -250,18 +251,20 @@ def create_flow_block_api(flow_id: str):
         next_on_success = data.get("next_on_success")
         next_on_fail = data.get("next_on_fail")
         order_within_the_flow = data.get("order_within_the_flow", 0)  # Default order
+        chatbot_id = data.get("chatbot_id", 0)  # todo, i think this is a bad idea - let's remove it
 
         # Validate required fields
         if not name:
             return jsonify({"error": "Missing required field: 'name'"}), 400
 
-        flow_block = create_flow_block(flow_id, name, status, next_on_success, next_on_fail, order_within_the_flow)
+        flow_block = create_flow_block(chatbot_id, flow_id, name, status, next_on_success, next_on_fail, order_within_the_flow)
         return jsonify(flow_block_to_dict(flow_block)), 201
     except Exception as e:
         # Log the exception here
         print(f"Error creating flow block: {e}")
         # Return an error response
-        return jsonify({"error": "Failed to create flow block"}), 500
+        return jsonify({"error": "Failed to create flow block {}".format(str(e))}), 500
+
 
 @flow.route("/<flow_id>/actions", methods=["PATCH"])
 def update_action_in_flow(session_id: str) -> Response:

@@ -166,7 +166,7 @@ def get_flow_blocks_for_flow(flow_id: str) -> List[FlowBlock]:
         return session.query(FlowBlock).filter(FlowBlock.flow_id == flow_id).all()
 
 
-def create_flow_block(flow_id: str, name: str, status: str, next_on_success: str, next_on_fail: str,
+def create_flow_block(chatbot_id: str, flow_id: str, name: str, status: str, next_on_success: str, next_on_fail: str,
                       order_within_the_flow: int) -> FlowBlock:
     """
     Creates a new flow block in the database.
@@ -184,6 +184,7 @@ def create_flow_block(flow_id: str, name: str, status: str, next_on_success: str
     """
     with Session() as session:
         flow_block = FlowBlock(
+            chatbot_id=chatbot_id,
             flow_id=flow_id,
             name=name,
             status=status,
@@ -193,4 +194,5 @@ def create_flow_block(flow_id: str, name: str, status: str, next_on_success: str
         )
         session.add(flow_block)
         session.commit()
+        session.refresh(flow_block)
         return flow_block
