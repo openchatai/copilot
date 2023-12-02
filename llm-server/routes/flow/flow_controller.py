@@ -4,7 +4,7 @@ from models.repository.copilot_repo import find_one_or_fail_by_id
 from models.repository.flow_repo import create_flow, get_all_flows_for_bot, get_flow_by_id, get_variables_for_flow, \
     add_or_update_variable_in_flow, add_action_to_flow_block, remove_action_from_flow_block, get_flow_blocks_for_flow
 from presenters.flow_presenters import flow_to_dict, flow_to_dict_with_nested_entities, flow_variable_to_dict, \
-    block_action_to_dict, flow_block_to_dict
+    block_action_to_dict, flow_block_to_dict, flow_block_with_actions_to_dict
 from utils.db import Database
 
 db_instance = Database()
@@ -222,8 +222,8 @@ def get_flow_blocks_api(flow_id: str):
     """
     try:
         flow_blocks = get_flow_blocks_for_flow(flow_id)
-        blocks_dict = [flow_block_to_dict(block) for block in flow_blocks]
-        return jsonify({"status": "success", "data": blocks_dict}), 200
+        blocks_dict = [flow_block_with_actions_to_dict(block) for block in flow_blocks]
+        return jsonify(blocks_dict), 200
     except Exception as e:
         # Log the exception here
         print(f"Error retrieving flow blocks for flow ID {flow_id}: {e}")

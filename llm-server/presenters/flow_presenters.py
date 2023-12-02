@@ -106,3 +106,34 @@ def flow_variable_to_dict(variable: FlowVariable):
         "updated_at": variable.updated_at.isoformat() if variable.updated_at else None,
         "deleted_at": variable.deleted_at.isoformat() if variable.deleted_at else None,
     }
+
+
+def flow_block_with_actions_to_dict(flow_block: FlowBlock):
+    """
+    Convert a FlowBlock object to a dictionary, including nested actions.
+
+    Args:
+        flow_block: The FlowBlock object.
+
+    Returns:
+        A dictionary representation of the FlowBlock, including its actions.
+    """
+    with Session() as session:
+        # Query for actions associated with the block
+        actions = session.query(BlockAction).filter(BlockAction.flow_block_id == flow_block.id).all()
+        actions_dict = [block_action_to_dict(action) for action in actions]  # Assuming block_action_to_dict is defined
+
+        return {
+            "id": flow_block.id,
+            "name": flow_block.name,
+            "chatbot_id": flow_block.chatbot_id,
+            "flow_id": flow_block.flow_id,
+            "status": flow_block.status,
+            "next_on_success": flow_block.next_on_success,
+            "next_on_fail": flow_block.next_on_fail,
+            "order_within_the_flow": flow_block.order_within_the_flow,
+            "created_at": flow_block.created_at.isoformat() if flow_block.created_at else None,
+            "updated_at": flow_block.updated_at.isoformat() if flow_block.updated_at else None,
+            "deleted_at": flow_block.deleted_at.isoformat() if flow_block.deleted_at else None,
+            "actions": actions_dict  # Including nested actions
+        }
