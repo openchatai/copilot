@@ -17,7 +17,7 @@ def flow_to_dict_with_nested_entities(flow: Flow):
 
         # For each block, include its associated BlockActions
         for block in blocks_dict:
-            block_actions = session.query(BlockAction).filter(BlockAction.flow_block_id == block.id).all()
+            block_actions = session.query(BlockAction).filter(BlockAction.flow_block_id == block.get('id')).all()
             block['actions'] = [block_action_to_dict(action) for action in block_actions]
 
         # Convert FlowVariables associated with the Flow
