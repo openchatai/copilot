@@ -14,7 +14,7 @@ cachetools==5.3.2
 celery==5.3.4
 certifi==2023.7.22
 chardet==5.2.0
-charset-normalizer==3.3.1
+charset-normalizer==3.3.2
 chroma-hnswlib==0.7.3
 click==8.1.7
 click-didyoumean==0.3.0
