@@ -164,3 +164,33 @@ def get_flow_blocks_for_flow(flow_id: str) -> List[FlowBlock]:
     """
     with Session() as session:
         return session.query(FlowBlock).filter(FlowBlock.flow_id == flow_id).all()
+
+
+def create_flow_block(flow_id: str, name: str, status: str, next_on_success: str, next_on_fail: str,
+                      order_within_the_flow: int) -> FlowBlock:
+    """
+    Creates a new flow block in the database.
+
+    Args:
+        flow_id: The ID of the flow to which the block belongs.
+        name: The name of the flow block.
+        status: The status of the flow block.
+        next_on_success: The ID of the next block on success.
+        next_on_fail: The ID of the next block on failure.
+        order_within_the_flow: The order of the block within the flow.
+
+    Returns:
+        The newly created FlowBlock object.
+    """
+    with Session() as session:
+        flow_block = FlowBlock(
+            flow_id=flow_id,
+            name=name,
+            status=status,
+            next_on_success=next_on_success,
+            next_on_fail=next_on_fail,
+            order_within_the_flow=order_within_the_flow
+        )
+        session.add(flow_block)
+        session.commit()
+        return flow_block
