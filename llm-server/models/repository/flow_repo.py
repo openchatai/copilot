@@ -1,12 +1,10 @@
-from typing import Optional, Type
-
 from flask import jsonify, Response
 from opencopilot_db import engine
 from opencopilot_db.flow import Flow
 from opencopilot_db.flow_variables import FlowVariable
 from sqlalchemy.orm import sessionmaker
 
-from presenters.flow_presenters import flow_to_dict, flow_to_dict_with_nested_entities
+from presenters.flow_presenters import flow_to_dict, flow_to_dict_with_nested_entities, flow_variable_to_dict
 
 Session = sessionmaker(bind=engine)
 
@@ -75,17 +73,26 @@ def get_flow_by_id(flow_id: str):
         return jsonify({"error": "Failed to retrieve flow"}), 500
 
 
-def get_flow_variables(flow_id: str) -> list[Type[FlowVariable]]:
-    """Fetches variables associated with a specific flow.
+def get_flow_variables(flow_id: str):
+    """
+    API method to fetch variables associated with a specific flow and convert them to a dictionary format.
 
     Args:
         flow_id: The ID of the flow.
 
     Returns:
-        A list of FlowVariable objects.
+        A Flask response object with a list of dictionaries representing FlowVariable objects.
     """
-    with Session() as session:
-        return session.query(FlowVariable).filter(FlowVariable.flow_id == flow_id).all()
+    try:
+        with Session() as session:
+            flow_variables = session.query(FlowVariable).filter(FlowVariable.flow_id == flow_id).all()
+            variables_dict = [flow_variable_to_dict(variable) for variable in flow_variables]
+            return jsonify(variables_dict), 200
+    except Exception as e:
+        # Log the exception here
+        print(f"Error retrieving flow variables: {e}")
+        # Return an error response
+        return jsonify({"error": "Failed to retrieve flow variables"}), 500
 
 
 def add_variable_to_flow(flow_id: str, name: str, value: str) -> FlowVariable:
