@@ -131,6 +131,7 @@ def add_action_to_flow_block(chatbot_id: str, flow_id: str, flow_block_id: str, 
         )
         session.add(action)
         session.commit()
+        session.refresh(action)
         return action
 
 
