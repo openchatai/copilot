@@ -1,8 +1,9 @@
 import axios from "axios";
 import { getDef } from "@/components/domain/flows-editor/utils/getDef";
+import { baseUrl } from "./base-url";
 
 const instance = axios.create({
-  baseURL: "http://localhost:8888/backend/flows",
+  baseURL: baseUrl + "/backend/flows",
 });
 
 type Workflow = {

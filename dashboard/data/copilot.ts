@@ -1,7 +1,8 @@
 import axios from "axios";
+import { baseUrl } from "./base-url";
 
 const instance = axios.create({
-  baseURL: "http://localhost:8888/backend/copilot",
+  baseURL: baseUrl + "/backend/copilot",
 });
 
 export type CopilotType = {
