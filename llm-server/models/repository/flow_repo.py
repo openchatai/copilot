@@ -1,12 +1,12 @@
 from typing import List, Optional
 
-from flask import jsonify, Response
+from flask import jsonify
 from opencopilot_db import engine
 from opencopilot_db.flow import Flow
 from opencopilot_db.flow_variables import FlowVariable
 from sqlalchemy.orm import sessionmaker
 
-from presenters.flow_presenters import flow_to_dict, flow_to_dict_with_nested_entities, flow_variable_to_dict
+from presenters.flow_presenters import flow_variable_to_dict
 
 Session = sessionmaker(bind=engine)
 
@@ -44,7 +44,6 @@ def get_all_flows_for_bot(bot_id: str) -> List[Flow]:
         return flows
 
 
-
 def get_flow_by_id(flow_id: str) -> Optional[Flow]:
     """
     Retrieves a specific flow by its ID from the database.
@@ -59,30 +58,23 @@ def get_flow_by_id(flow_id: str) -> Optional[Flow]:
         return session.query(Flow).filter(Flow.id == flow_id).first()
 
 
-def get_flow_variables(flow_id: str):
+def get_variables_for_flow(flow_id: str) -> List[FlowVariable]:
     """
-    API method to fetch variables associated with a specific flow and convert them to a dictionary format.
+    Retrieves all variables for a specific flow from the database.
 
     Args:
         flow_id: The ID of the flow.
 
     Returns:
-        A Flask response object with a list of dictionaries representing FlowVariable objects.
+        A list of FlowVariable objects.
     """
-    try:
-        with Session() as session:
-            flow_variables = session.query(FlowVariable).filter(FlowVariable.flow_id == flow_id).all()
-            variables_dict = [flow_variable_to_dict(variable) for variable in flow_variables]
-            return jsonify(variables_dict), 200
-    except Exception as e:
-        # Log the exception here
-        print(f"Error retrieving flow variables: {e}")
-        # Return an error response
-        return jsonify({"error": "Failed to retrieve flow variables"}), 500
+    with Session() as session:
+        return session.query(FlowVariable).filter(FlowVariable.flow_id == flow_id).all()
 
 
-def add_variable_to_flow(flow_id: str, name: str, value: str) -> FlowVariable:
-    """Adds or updates a variable in a flow.
+def add_or_update_variable_in_flow(flow_id: str, name: str, value: str) -> FlowVariable:
+    """
+    Adds a new variable to a flow or updates it if it already exists.
 
     Args:
         flow_id: The ID of the flow.
@@ -90,10 +82,15 @@ def add_variable_to_flow(flow_id: str, name: str, value: str) -> FlowVariable:
         value: The value of the variable.
 
     Returns:
-        The newly created or updated FlowVariable object.
+        The updated or newly created FlowVariable object.
     """
     with Session() as session:
-        variable = FlowVariable(flow_id=flow_id, name=name, value=value)
-        session.add(variable)
+        variable = session.query(FlowVariable).filter_by(flow_id=flow_id, name=name).first()
+        if variable:
+            variable.value = value
+        else:
+            variable = FlowVariable(flow_id=flow_id, name=name, value=value)
+            session.add(variable)
         session.commit()
         return variable
+
