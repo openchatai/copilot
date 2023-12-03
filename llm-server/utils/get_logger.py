@@ -1,6 +1,7 @@
 import logging
 import json
 from typing import Mapping, Any
+from pythonjsonlogger.jsonlogger import JsonFormatter
 
 
 class CustomJSONFormatter(logging.Formatter):
@@ -24,7 +25,7 @@ class CustomLogger:
         self.logger = logging.getLogger(module_name)
         self.logger.setLevel(level)
 
-        formatter = CustomJSONFormatter()
+        formatter = JsonFormatter()
         log_handler = logging.StreamHandler()
         log_handler.setFormatter(formatter)
         self.logger.addHandler(log_handler)
