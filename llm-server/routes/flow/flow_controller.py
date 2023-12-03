@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 
 from models.repository.copilot_repo import find_one_or_fail_by_id
 from models.repository.flow_repo import create_flow, get_all_flows_for_bot, get_flow_by_id, get_variables_for_flow, \
-    add_or_update_variable_in_flow
+    add_or_update_variable_in_flow, update_flow
 from presenters.flow_presenters import flow_to_dict, flow_variable_to_dict
 from utils.db import Database
 
@@ -64,6 +64,39 @@ def create_flow_api(bot_id: str):
         print(f"Error creating flow: {e}")
         # Return an error response
         return jsonify({"error": "Failed to create flow. {}".format(str(e))}), 500
+
+
+@flow.route("/<flow_id>", methods=["PUT"])
+def update_flow_api(flow_id: str):
+    """
+    API endpoint to update an existing flow record.
+
+    Args:
+        flow_id: The ID of the flow to be updated.
+
+    Returns:
+        A Flask response object with the updated Flow object as a dictionary.
+    """
+    try:
+        data = request.json
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+
+        name = data.get("name")
+        description = data.get("description", None)
+        payload = data.get("blocks", {})  # TODO: Add validation
+
+        if not name:
+            return jsonify({"error": "Missing required field: 'name'"}), 400
+
+        updated_flow = update_flow(flow_id, name, payload, description)
+        if updated_flow:
+            return jsonify(flow_to_dict(updated_flow)), 200
+        else:
+            return jsonify({"error": "Flow not found"}), 404
+    except Exception as e:
+        print(f"Error updating flow: {e}")
+        return jsonify({"error": "Failed to update flow. {}".format(str(e))}), 500
 
 
 @flow.route("/<flow_id>", methods=["GET"])

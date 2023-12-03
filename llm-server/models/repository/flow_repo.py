@@ -28,6 +28,30 @@ def create_flow(chatbot_id: str, name: str, payload: dict, description: str = No
         session.refresh(flow)  # Refresh the instance to load any unloaded attributes
         return flow
 
+def update_flow(flow_id: str, name: str, payload: dict, description: str) -> Optional[Flow]:
+    """
+    Updates an existing flow record in the database.
+
+    Args:
+        flow_id: The ID of the flow to update.
+        name: The new name of the flow.
+        payload: The new payload for the flow.
+        description: The new description of the flow.
+
+    Returns:
+        The updated Flow object, or None if not found.
+    """
+    with Session() as session:
+        flow = session.query(Flow).filter(Flow.id == flow_id).first()
+        if flow:
+            flow.name = name
+            flow.payload = payload
+            flow.description = description
+            session.commit()
+            session.refresh(flow)
+            return flow
+        return None
+
 
 def get_all_flows_for_bot(bot_id: str) -> list[Type[Flow]]:
     """
