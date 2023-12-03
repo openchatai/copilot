@@ -7,11 +7,25 @@ import { Controller, FlowArena, useController } from "@/components/domain/flows-
 import { Button } from "@/components/ui/button";
 import { useIsEditing } from "./_parts/useIsEditing";
 import { EmptyBlock } from "@/components/domain/EmptyBlock";
+import { mutateFlows } from "./_parts/WorkflowsList";
 
 function SaveBtn() {
   const { state } = useController();
   const [isEditing, workflowId] = useIsEditing();
   return isEditing ? <Button onClick={() => console.log(state)}>Save</Button> : null
+}
+function DeleteBtn() {
+  const [isEditing, workflowId] = useIsEditing();
+  const { id: copilotId } = useCopilot();
+  async function handleDelete() {
+    const confirm = window.confirm("Are you sure you want to delete this workflow?");
+    if (!confirm) return;
+    console.log("delete");
+    mutateFlows(copilotId);
+  }
+
+  return isEditing ? <Button variant='destructive' onClick={handleDelete}>Delete</Button> : null
+
 }
 
 function Header() {
@@ -21,8 +35,9 @@ function Header() {
       <h1 className="text-lg font-bold text-accent-foreground">
         {copilotName}'s flows
       </h1>
-      <div>
+      <div className="space-x-2">
         <SaveBtn />
+        <DeleteBtn />
       </div>
     </HeaderShell>
   );

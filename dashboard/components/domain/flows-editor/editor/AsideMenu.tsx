@@ -39,18 +39,16 @@ export function AsideMenu() {
   return (
     <aside
       className={cn(
-        "absolute z-20 h-full max-h-full w-full max-w-sm origin-right overflow-hidden border-r border-border bg-white shadow-lg ease-in-out",
+        "absolute z-20 h-full max-h-full w-full max-w-sm origin-right overflow-hidden border-r border-border bg-card shadow-lg ease-in-out",
       )}
     >
       <div className="h-full w-full py-2">
         <div className="flex h-full max-h-full w-full flex-col items-start gap-2 overflow-hidden [&>*]:w-full"
         >
-          <div className="flex items-center px-4 pt-4">
-            <h1 className="flex-1 text-base font-semibold text-accent-foreground">
+          <div className="flex flex-col gap-2 items-start px-4 backdrop-blur-sm bg-card/20 border-b py-4">
+            <h1 className="text-base font-semibold text-accent-foreground">
               Select a Step
             </h1>
-          </div>
-          <div className="w-full px-4">
             <Input
               type="text"
               value={search}
@@ -58,7 +56,7 @@ export function AsideMenu() {
               placeholder="Search..."
             />
           </div>
-          <div className="flex-1 overflow-auto px-4 pb-8">
+          <div className="flex-1 overflow-auto px-4">
             <ul className="h-fit select-none space-y-1">
               {isLoading ? <div className="flex-center w-full"><Loader /></div> : isEmpty(renderedPaths) ? <EmptyBlock /> : (
                 <>
