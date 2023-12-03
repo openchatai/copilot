@@ -1,9 +1,7 @@
-from typing import Optional, Type, List
+from typing import Optional, Type
 
 from opencopilot_db import engine
-from opencopilot_db.block_action import BlockAction
 from opencopilot_db.flow import Flow
-from opencopilot_db.flow_block import FlowBlock
 from opencopilot_db.flow_variables import FlowVariable
 from sqlalchemy.orm import sessionmaker
 
@@ -100,102 +98,3 @@ def add_or_update_variable_in_flow(bot_id: str, flow_id: str, name: str, value: 
             session.add(variable)
         session.commit()
         return variable
-
-
-def add_action_to_flow_block(chatbot_id: str, flow_id: str, flow_block_id: str, name: str, action_type: str,
-                             swagger_endpoint: dict,
-                             order: int) -> BlockAction:
-    """
-    Adds a new action to a flow in the database.
-
-    Args:
-        flow_id: The ID of the flow.
-        flow_block_id: The ID of the flow block.
-        name: The name of the action.
-        action_type: The type of the action.
-        swagger_endpoint: The Swagger endpoint details.
-        order: The order of the action.
-
-    Returns:
-        The newly created BlockAction object.
-    """
-    with Session() as session:
-        action = BlockAction(
-            chatbot_id=chatbot_id,
-            flow_id=flow_id,
-            flow_block_id=flow_block_id,
-            name=name,
-            type=action_type,
-            swagger_endpoint=swagger_endpoint,
-            order=order
-        )
-        session.add(action)
-        session.commit()
-        session.refresh(action)
-        return action
-
-
-def remove_action_from_flow_block(flow_id: str, action_id: str) -> bool:
-    """
-    Removes an action from a flow in the database.
-
-    Args:
-        flow_id: The ID of the flow.
-        action_id: The ID of the action to be removed.
-
-    Returns:
-        True if the action was successfully removed, False otherwise.
-    """
-    with Session() as session:
-        action = session.query(BlockAction).filter_by(flow_id=flow_id, id=action_id).first()
-        if action:
-            session.delete(action)
-            session.commit()
-            return True
-        return False
-
-
-def get_flow_blocks_for_flow(flow_id: str) -> List[FlowBlock]:
-    """
-    Retrieves all flow blocks for a specific flow from the database.
-
-    Args:
-        flow_id: The ID of the flow.
-
-    Returns:
-        A list of FlowBlock objects.
-    """
-    with Session() as session:
-        return session.query(FlowBlock).filter(FlowBlock.flow_id == flow_id).all()
-
-
-def create_flow_block(chatbot_id: str, flow_id: str, name: str, status: str, next_on_success: str, next_on_fail: str,
-                      order_within_the_flow: int) -> FlowBlock:
-    """
-    Creates a new flow block in the database.
-
-    Args:
-        flow_id: The ID of the flow to which the block belongs.
-        name: The name of the flow block.
-        status: The status of the flow block.
-        next_on_success: The ID of the next block on success.
-        next_on_fail: The ID of the next block on failure.
-        order_within_the_flow: The order of the block within the flow.
-
-    Returns:
-        The newly created FlowBlock object.
-    """
-    with Session() as session:
-        flow_block = FlowBlock(
-            chatbot_id=chatbot_id,
-            flow_id=flow_id,
-            name=name,
-            status=status,
-            next_on_success=next_on_success,
-            next_on_fail=next_on_fail,
-            order_within_the_flow=order_within_the_flow
-        )
-        session.add(flow_block)
-        session.commit()
-        session.refresh(flow_block)
-        return flow_block
