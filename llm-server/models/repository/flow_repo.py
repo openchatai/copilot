@@ -76,6 +76,7 @@ def add_or_update_variable_in_flow(bot_id: str, flow_id: str, name: str, value: 
     Adds a new variable to a flow or updates it if it already exists.
 
     Args:
+        bot_id:
         runtime_override_key:
         runtime_override_action_id:
         flow_id: The ID of the flow.
