@@ -64,14 +64,14 @@ const edgeTypes = {
 export function FlowArena() {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const { activeNodes, state } = useController();
+  const { state: { steps } } = useController();
   const { setMode } = useMode();
 
   useEffect(() => {
-    const { newNodes, edges } = autoLayout(activeNodes || []);
+    const { newNodes, edges } = autoLayout(steps || []);
     setNodes(newNodes);
     setEdges(edges);
-  }, [state.flows, activeNodes]);
+  }, [steps]);
 
   const onConnect: OnConnect = useCallback(
     (connection) => setEdges((eds) => addEdge(connection, eds)),
