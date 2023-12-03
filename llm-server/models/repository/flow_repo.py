@@ -28,6 +28,7 @@ def create_flow(chatbot_id: str, name: str, payload: dict, description: str = No
         session.refresh(flow)  # Refresh the instance to load any unloaded attributes
         return flow
 
+
 def update_flow(flow_id: str, name: str, payload: dict, description: str) -> Optional[Flow]:
     """
     Updates an existing flow record in the database.
