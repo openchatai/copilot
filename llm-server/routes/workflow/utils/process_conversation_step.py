@@ -39,15 +39,9 @@ def process_conversation_step(
         system_message_classifier = SystemMessage(
             content=prompt_templates.system_message
         )
-    logger.info(
+    logger.debug(
         message="System message classification",
-        extra={
-            "incident": "system_message_classifier",
-            "app": app,
-            "context": context,
-            "classification_prompt": system_message_classifier.content,
-            "prev_conversations": prev_conversations,
-        },
+        extra={"incident": "system_message_classifier", "app": app, "context": context},
     )
     messages: List[BaseMessage] = []
     messages.append(system_message_classifier)

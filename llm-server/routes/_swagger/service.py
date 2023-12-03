@@ -63,8 +63,7 @@ def save_swagger_paths_to_qdrant(swagger_doc: ResolvingParser, bot_id: str):
         message="API ingestion for Qdrant",
         extra={
             "incident": "api_ingestion_qdrant",
-            "documents": documents,
-            "point_ids": point_ids,
+            "point_ids": json.dumps(point_ids),
         },
     )
 

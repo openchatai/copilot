@@ -39,7 +39,7 @@ def check_workflow_in_store(text: str, bot_id: str) -> Optional[Document]:
         error_data = {
             "payload": payload_data,
             "error": str(e),
-            "incident": "/check_workflow_in_store",
+            "incident": "check_workflow_in_store",
         }
 
         logger.error("An exception occurred", extra=error_data)

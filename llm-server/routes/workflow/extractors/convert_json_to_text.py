@@ -24,7 +24,7 @@ def convert_json_to_text(
         "Information about converting JSON to text",
         extra={
             "incident": "convert_json_to_text",
-            "message": "api_request_data",
+            "msg1": "api_request_data",
             "data": api_request_data,
         },
     )

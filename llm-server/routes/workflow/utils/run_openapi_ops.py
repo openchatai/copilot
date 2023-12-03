@@ -51,7 +51,7 @@ async def run_openapi_operations(
                         message="Making API call",
                         extra={
                             "incident": "make_api_call",
-                            "payload": api_payload.body_schema,
+                            "payload": json.dumps(api_payload.body_schema),
                         },
                     )
 
@@ -81,7 +81,7 @@ async def run_openapi_operations(
                     message="Loading JSON configuration",
                     extra={
                         "incident": "load_json_config",
-                        # "json_config": partial_json,
+                        "json_config": json.dumps(partial_json),
                     },
                 )
                 if not partial_json:
@@ -102,7 +102,7 @@ async def run_openapi_operations(
                         extra={
                             "incident": "api_response",
                             "text": api_response.text,
-                            "message": "Truncate unnecessary info using json_config provided",
+                            "msg": "Truncate unnecessary info using json_config provided",
                         },
                     )
                     api_json = json.loads(api_response.text)
