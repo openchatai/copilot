@@ -4,8 +4,8 @@ import yaml
 from typing import Dict, List
 from flask import Request
 from prance import ResolvingParser
-from opencopilot_utils.get_vector_store import get_vector_store
-from opencopilot_utils import StoreOptions
+from shared.utils.opencopilot_utils.get_vector_store import get_vector_store
+from shared.utils.opencopilot_utils import StoreOptions
 from langchain.docstore.document import Document
 from utils.get_logger import CustomLogger
 import os
@@ -63,8 +63,7 @@ def save_swagger_paths_to_qdrant(swagger_doc: ResolvingParser, bot_id: str):
         message="API ingestion for Qdrant",
         extra={
             "incident": "api_ingestion_qdrant",
-            "documents": documents,
-            "point_ids": point_ids,
+            "point_ids": json.dumps(point_ids),
         },
     )
 

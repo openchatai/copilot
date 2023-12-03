@@ -3,7 +3,7 @@ from shared.models.opencopilot_db import create_database_schema
 from dotenv import load_dotenv
 
 import os
-load_dotenv("../llm-server/.env")
+load_dotenv()
 
 create_database_schema()
 app = Celery(
@@ -12,4 +12,4 @@ app = Celery(
     backend=os.getenv("CELERY_BACKEND",'redis://localhost:6379/1')
 )
 
-app.conf.imports = ('tasks',)
+app.conf.imports = ('workers.tasks',)

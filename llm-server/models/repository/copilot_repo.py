@@ -2,7 +2,7 @@ import datetime
 import uuid
 from typing import List, Optional, Any, Type
 
-from opencopilot_db.chatbot import Chatbot, engine
+from shared.models.opencopilot_db.chatbot import Chatbot, engine
 from sqlalchemy import exc
 from sqlalchemy.orm import sessionmaker, Session
 
@@ -111,7 +111,7 @@ def create_copilot(
             session.rollback()
             logger.error(
                 "An exception occurred",
-                extra={"app": "OPENCOPILOT", "error": str(e), "incident": "/swagger"},
+                extra={"app": "OPENCOPILOT", "error": str(e), "incident": "swagger"},
             )
             raise e
         finally:

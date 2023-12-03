@@ -101,7 +101,7 @@ async def handle_request(
 def log_user_request(text: str) -> None:
     logger.info(
         "[OpenCopilot] Got the following user request: {}".format(text),
-        extra={"event": "log_user_request"},
+        extra={"incident": "log_user_request"},
     )
 
 
@@ -195,7 +195,7 @@ def handle_no_api_call(bot_message: str) -> ResponseDict:
 
 
 def handle_exception(e: Exception, event: str) -> ResponseDict:
-    error_data = {"payload": {}, "error": str(e), "incident": "/handle_request"}
+    error_data = {"payload": {}, "error": str(e), "incident": "handle_request"}
     logger.error("An exception occurred", extra=error_data)
 
     return {"response": str(e), "error": "An error occured in handle request"}

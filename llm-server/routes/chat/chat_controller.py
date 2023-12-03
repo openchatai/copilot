@@ -127,8 +127,7 @@ async def send_chat():
         return Response(response="bot token is required", status=500)
     bot = find_one_or_fail_by_token(bot_token)
 
-    app_name = headers_from_json.get(X_App_Name) or None
-    headers_from_json.pop(X_App_Name)
+    app_name = headers_from_json.pop(X_App_Name, None)
 
     swagger_url = bot.swagger_url
 

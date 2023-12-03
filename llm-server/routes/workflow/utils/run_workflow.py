@@ -43,9 +43,9 @@ async def run_workflow(
         }
 
         error_data = {
-            "payload": payload_data,
+            "payload": json.dumps(payload_data),
             "error": str(e),
-            "incident": "/run_workflow",
+            "incident": "run_workflow",
         }
 
         logger.error("An exception occurred", extra=error_data)

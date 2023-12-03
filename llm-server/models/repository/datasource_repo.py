@@ -1,6 +1,6 @@
 from typing import List
-from opencopilot_db import engine
-from opencopilot_db import PdfDataSource, WebsiteDataSource
+from shared.models.opencopilot_db import engine
+from shared.models.opencopilot_db import PdfDataSource, WebsiteDataSource
 from sqlalchemy.orm import sessionmaker
 
 Session = sessionmaker(bind=engine)

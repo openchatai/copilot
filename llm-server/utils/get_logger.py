@@ -1,6 +1,6 @@
 import logging
 import json
-from typing import Optional, Any
+from typing import Mapping, Any
 
 
 class CustomJSONFormatter(logging.Formatter):
@@ -12,7 +12,7 @@ class CustomJSONFormatter(logging.Formatter):
             "loc": f"{record.name.replace('.', '/')}.py:{record.lineno}",
             "extra": record.__dict__.get("extra", {}),
         }
-        return json.dumps(log_record)
+        return json.dumps(log_record, ensure_ascii=False)
 
 
 class CustomLogger:
@@ -33,40 +33,35 @@ class CustomLogger:
         self,
         level: int,
         message: str,
-        extra: Optional[Any] = None,
+        extra: Mapping[str, object] = {},
+        exc_info: bool = False,
     ) -> None:
-        if extra is not None:
-            if not isinstance(extra, dict):
-                extra = {"non_dict_extra": extra}
-        else:
-            extra = {}
-
-        self.logger.log(level, message, extra=extra)
+        self.logger.log(level, msg=message, extra=extra, exc_info=exc_info)
 
     def info(
         self,
         message: str,
-        extra: Optional[Any] = None,
+        extra: Mapping[str, object] = {},
     ) -> None:
         self.log(logging.INFO, message, extra)
 
     def warn(
         self,
         message: str,
-        extra: Optional[Any] = None,
+        extra: Mapping[str, object] = {},
     ) -> None:
         self.log(logging.WARNING, message, extra)
 
     def error(
         self,
         message: str,
-        extra: Optional[Any] = None,
+        extra: Mapping[str, object] = {},
     ) -> None:
-        self.log(logging.ERROR, message, extra)
+        self.log(logging.ERROR, message, extra, exc_info=True)
 
     def debug(
         self,
         message: str,
-        extra: Optional[Any] = None,
+        extra: Mapping[str, object] = {},
     ) -> None:
         self.log(logging.DEBUG, message, extra)

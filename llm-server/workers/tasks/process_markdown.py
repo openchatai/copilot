@@ -1,15 +1,15 @@
 from celery import shared_task
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from repos.pdf_data_sources import insert_pdf_data_source, update_pdf_data_source_status
+from shared.models.opencopilot_db.pdf_data_sources import insert_pdf_data_source, update_pdf_data_source_status
 
-from langchain.document_loaders import PyPDFium2Loader
+from langchain.document_loaders import UnstructuredMarkdownLoader
 from shared.utils.opencopilot_utils import get_embeddings, init_vector_store, StoreOptions, get_file_path
 
 @shared_task
-def process_pdf(file_name: str, bot_id: str):
+def process_markdown(file_name: str, bot_id: str):
     try:
         insert_pdf_data_source(chatbot_id=bot_id, file_name=file_name, status="PENDING")
-        loader = PyPDFium2Loader(get_file_path(file_name))
+        loader = UnstructuredMarkdownLoader(get_file_path(file_name))
         raw_docs = loader.load()
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=1000, chunk_overlap=200, length_function=len
@@ -25,7 +25,7 @@ def process_pdf(file_name: str, bot_id: str):
 
 
 @shared_task
-def retry_failed_pdf_crawl(chatbot_id: str, file_name: str):
+def retry_failed_markdown_crawl(chatbot_id: str, file_name: str):
     """Re-runs a failed PDF crawl.
 
     Args:
@@ -35,7 +35,7 @@ def retry_failed_pdf_crawl(chatbot_id: str, file_name: str):
 
     update_pdf_data_source_status(chatbot_id=chatbot_id, file_name=file_name, status="PENDING")
     try:
-        process_pdf(filename=file_name, bot_id=chatbot_id)
+        process_markdown(filename=file_name, bot_id=chatbot_id)
     except Exception as e:
         update_pdf_data_source_status(chatbot_id=chatbot_id, file_name=file_name, status="FAILED")
         print(f"Error reprocessing {file_name}:", e)

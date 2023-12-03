@@ -10,7 +10,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 from shared.utils.opencopilot_utils import get_embeddings, init_vector_store
 from shared.utils.opencopilot_utils.interfaces import StoreOptions
-from repos.website_data_sources import (
+from shared.models.opencopilot_db.website_data_sources import (
     create_website_data_source,
     get_website_data_source_by_id,
     update_website_data_source_status_by_url,

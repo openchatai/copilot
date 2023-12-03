@@ -3,8 +3,8 @@ from custom_types.api_operation import ApiOperation_vs
 from opencopilot_types.workflow_type import WorkflowFlowType
 
 # push it to the library
-from opencopilot_utils.get_vector_store import get_vector_store
-from opencopilot_utils import StoreOptions
+from shared.utils.opencopilot_utils.get_vector_store import get_vector_store
+from shared.utils.opencopilot_utils import StoreOptions
 from utils.chat_models import CHAT_MODELS
 from utils import get_chat_model
 from typing import Optional, List
