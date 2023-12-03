@@ -9,7 +9,7 @@ from routes.root_service import get_swagger_doc
 from routes._swagger import reindex_service
 from werkzeug.utils import secure_filename
 from utils.base import resolve_abs_local_file_path_from
-from utils.get_logger import struct_log
+from utils.get_logger import CustomLogger
 
 import routes._swagger.service as swagger_service
 from enums.initial_prompt import ChatBotInitialPromptEnum
@@ -25,6 +25,7 @@ from models.repository.copilot_repo import (
 from utils.llm_consts import EXPERIMENTAL_FEATURES_ENABLED
 from utils.swagger_parser import SwaggerParser
 
+logger = CustomLogger(module_name=__name__)
 copilot = Blueprint("copilot", __name__)
 
 UPLOAD_FOLDER = "shared_data"
@@ -40,7 +41,13 @@ def index():
 def handle_swagger_file():
     if "swagger_file" not in request.files:
         return jsonify({"error": "You must upload a swagger file."}), 400
-    struct_log.info(event="handling swagger file", data=request.get_data)
+    logger.info(
+        message="Handling Swagger file",
+        extra={
+            "incident": "handling_swagger_file",
+            "data": request.get_data(),  # Assuming request is available in the scope
+        },
+    )
     file = request.files["swagger_file"]
     if file.filename == "":
         return jsonify({"error": "No selected file."}), 400
@@ -126,8 +133,14 @@ def general_settings_update(copilot_id):
 
         data = request.json
 
-        struct_log.info(event="update_copilot", data=data, bot_id=copilot_id)
-
+        logger.info(
+            message="Updating Copilot",
+            extra={
+                "incident": "update_copilot",
+                "data": data,
+                "bot_id": copilot_id,
+            },
+        )
         # Call update_copilot with the provided data
         updated_copilot = update_copilot(
             copilot_id=copilot_id,

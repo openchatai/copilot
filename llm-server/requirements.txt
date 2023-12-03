@@ -112,6 +112,7 @@ PyMySQL==1.1.0
 PyPika==0.48.9
 python-dateutil==2.8.2
 python-dotenv==1.0.0
+python-json-logger==2.0.7
 PyYAML==6.0.1
 qdrant-client==1.6.4
 redis==5.0.1

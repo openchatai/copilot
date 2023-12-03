@@ -8,10 +8,11 @@ from routes.workflow.extractors.extract_json import extract_json_payload
 from integrations.custom_prompts.prompt_loader import load_prompts
 from utils import get_chat_model
 from utils.chat_models import CHAT_MODELS
-from utils.get_logger import struct_log
+from utils.get_logger import CustomLogger
 from typing import Optional, List, cast
 from json import dumps
 
+logger = CustomLogger(module_name=__name__)
 chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
 
@@ -38,12 +39,15 @@ def process_conversation_step(
         system_message_classifier = SystemMessage(
             content=prompt_templates.system_message
         )
-    struct_log.info(
-        event="system_message_classifier",
-        app=app,
-        context=context,
-        classification_prompt=system_message_classifier,
-        prev_conversations=prev_conversations,
+    logger.info(
+        message="System message classification",
+        extra={
+            "incident": "system_message_classifier",
+            "app": app,
+            "context": context,
+            "classification_prompt": system_message_classifier.content,
+            "prev_conversations": prev_conversations,
+        },
     )
     messages: List[BaseMessage] = []
     messages.append(system_message_classifier)
@@ -101,7 +105,13 @@ def process_conversation_step(
     if isinstance(d, str):
         return BotMessage(ids=[], bot_message=d)
 
-    struct_log.info(event="extract_json_payload", data=d)
+    logger.info(
+        message="Extracting JSON payload",
+        extra={
+            "incident": "extract_json_payload",
+            "data": d,
+        },
+    )
 
     bot_message = BotMessage.from_dict(d)
     return bot_message
