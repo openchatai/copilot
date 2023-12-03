@@ -44,6 +44,8 @@ services:
       context: ./llm-server
       dockerfile: worker.Dockerfile
     image: codebanesr/workers:latest  # Add this line
+    deploy:
+      replicas: 2
     # logging:
     #   driver: awslogs
     #   options: 

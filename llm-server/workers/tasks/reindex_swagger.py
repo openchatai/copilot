@@ -1,14 +1,15 @@
 from urllib.parse import urlparse
 from celery import shared_task
 from jsonschema import RefResolutionError, ValidationError
-from shared.utils.opencopilot_utils.interfaces import StoreOptions
 from prance import ResolvingParser
 import os
 from qdrant_client import QdrantClient, models
 from routes._swagger.service import save_swagger_paths_to_qdrant
-from typing import Any, Iterable
+from typing import Iterable
 from utils.db import Database
 from utils.get_logger import CustomLogger
+from shared.models.opencopilot_db.chatbot import Chatbot
+from models.repository.copilot_repo import (get_total_chatbots, get_chatbots_batch)
 client = QdrantClient(url=os.getenv("QDRANT_URL", "http://qdrant:6333"))
 
 
@@ -21,24 +22,22 @@ shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
 
 
 
-
 @shared_task
 def reindex_apis(batch_size: int = 100):
-    total_files: int = mongo.swagger_files.count_documents({})
-
+    total_files: int = get_total_chatbots()
     for offset in range(0, total_files, batch_size):
-        batch: Iterable[Any] = mongo.swagger_files.find().skip(offset).limit(batch_size)
+        batch: Iterable[Chatbot] = get_chatbots_batch(offset, batch_size)
         process_swagger_files_batch(batch)
 
-def process_swagger_files_batch(swagger_files: Iterable[Any]):
-    for swagger_file in swagger_files:
-        process_swagger_file(swagger_file)
+def process_swagger_files_batch(chatbots: Iterable[Chatbot]):
+    for chatbot in chatbots:
+        process_swagger_file(chatbot)
         
 
-def process_swagger_file(swagger_file: Any):
-    bot_id: str = swagger_file["meta"]["bot_id"]
+def process_swagger_file(chatbot: Chatbot):
+    bot_id = str(chatbot.id)
     try:
-        swagger_url = swagger_file["meta"]["swagger_url"]
+        swagger_url = str(chatbot.swagger_url)
 
         # Check if swagger_url is a valid URL
         if not is_valid_url(swagger_url):
@@ -61,8 +60,8 @@ def process_swagger_file(swagger_file: Any):
             ),
         )
         
-        if points is not None:
-            logger.info("Points not found for bot", {bot_id: bot_id})
+        if points is None:
+            logger.info("Points not found for bot, we will reindex", {bot_id: bot_id})
             save_swagger_paths_to_qdrant(swagger_doc=swagger_doc, bot_id=bot_id)
             
         else:
