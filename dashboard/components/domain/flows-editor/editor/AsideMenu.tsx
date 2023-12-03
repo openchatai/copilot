@@ -43,9 +43,7 @@ export function AsideMenu() {
       )}
     >
       <div className="h-full w-full py-2">
-        <div
-          data-container="select-node"
-          className="flex h-full max-h-full w-full flex-col items-start gap-5 overflow-hidden animate-in data-[hidden=true]:hidden data-[hidden=true]:animate-out data-[hidden=true]:slide-out-to-left-full [&>*]:w-full"
+        <div className="flex h-full max-h-full w-full flex-col items-start gap-2 overflow-hidden [&>*]:w-full"
         >
           <div className="flex items-center px-4 pt-4">
             <h1 className="flex-1 text-base font-semibold text-accent-foreground">
@@ -53,24 +51,19 @@ export function AsideMenu() {
             </h1>
           </div>
           <div className="w-full px-4">
-            <div className="flex items-center">
-              <Input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search..."
-              />
-            </div>
+            <Input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search..."
+            />
           </div>
           <div className="flex-1 overflow-auto px-4 pb-8">
             <ul className="h-fit select-none space-y-1">
-              {
-                isLoading && <div className="flex-center w-full"><Loader /></div>
-              }
-              {isEmpty(renderedPaths) ? <EmptyBlock /> : (
+              {isLoading ? <div className="flex-center w-full"><Loader /></div> : isEmpty(renderedPaths) ? <EmptyBlock /> : (
                 <>
                   {renderedPaths.map((path) => (
-                    <li key={path.path} className="w-full">
+                    <li key={path.path}>
                       <PathButton path={path} />
                     </li>
                   ))}
