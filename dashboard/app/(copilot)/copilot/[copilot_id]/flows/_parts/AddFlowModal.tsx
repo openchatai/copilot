@@ -4,20 +4,23 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { AlertDialog, AlertDialogCancel, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogContent, AlertDialogTrigger, AlertDialogAction } from '@/components/ui/alert-dialog';
+import { mutateFlows } from './WorkflowsList';
+import { useCopilot } from '../../../_context/CopilotProvider';
 
 export function AddFlowModal() {
     const [modalOpen, setModalOpen] = useState(false);
+    const { id: copilotId } = useCopilot()
     // this should create new flow on the server and then update the state
     function onSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         const data = new FormData(e.currentTarget);
-        const [name, description, focus] = [
+        const [name, description] = [
             data.get("name"),
             data.get("description"),
-            data.get("focus"),
         ];
         if (name && description) {
             console.log({ name, description });
+            mutateFlows(copilotId);
             setModalOpen(false);
         }
     }
