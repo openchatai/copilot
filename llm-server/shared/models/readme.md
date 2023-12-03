@@ -27,7 +27,7 @@ create_database_schema()
 ### Importing the Models
 
 ```python
-from opencopilot_db.models import PdfDataSource, Chatbot
+from shared.models.opencopilot_db.models import PdfDataSource, Chatbot
 ```
 
 ### Creating and Managing Database Records

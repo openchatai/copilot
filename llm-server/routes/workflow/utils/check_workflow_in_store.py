@@ -2,8 +2,8 @@ from typing import Any, Dict, Optional
 
 from langchain.vectorstores.base import VectorStore
 from langchain.docstore.document import Document
-from opencopilot_utils import StoreOptions
-from opencopilot_utils.get_vector_store import get_vector_store
+from shared.utils.opencopilot_utils import StoreOptions
+from shared.utils.opencopilot_utils.get_vector_store import get_vector_store
 import os
 
 from utils.get_logger import CustomLogger

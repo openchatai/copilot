@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional, List, Dict, Union, Tuple
-from opencopilot_db import ChatHistory, engine
+from shared.models.opencopilot_db import ChatHistory, engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import distinct
 from sqlalchemy.orm import class_mapper

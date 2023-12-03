@@ -18,7 +18,7 @@ The OpenCopilot Utility Library contains a collection of common utility function
 To start using the utility library, you can initialize your vector store with the provided embeddings using the following code:
 
 ```python
-from opencopilot_utils import get_embeddings, init_vector_store, StoreOptions
+from shared.utils.opencopilot_utils import get_embeddings, init_vector_store, StoreOptions
 
 embeddings = get_embeddings()
 init_vector_store(docs, embeddings, StoreOptions(namespace=bot_id))
@@ -37,7 +37,7 @@ pip install opencopilot-utils
 To use the utility functions and types, simply import them in your Python code:
 
 ```python
-from opencopilot_utils import some_utility_function, SomeCommonType
+from shared.utils.opencopilot_utils import some_utility_function, SomeCommonType
 ```
 
 For more details and examples, please refer to the official documentation.

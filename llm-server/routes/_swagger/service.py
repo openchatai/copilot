@@ -4,8 +4,8 @@ import yaml
 from typing import Dict, List
 from flask import Request
 from prance import ResolvingParser
-from opencopilot_utils.get_vector_store import get_vector_store
-from opencopilot_utils import StoreOptions
+from shared.utils.opencopilot_utils.get_vector_store import get_vector_store
+from shared.utils.opencopilot_utils import StoreOptions
 from langchain.docstore.document import Document
 from utils.get_logger import CustomLogger
 import os

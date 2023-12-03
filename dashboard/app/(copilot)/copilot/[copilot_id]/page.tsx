@@ -19,6 +19,7 @@ const Widget = dynamic(() => import("./CopilotWidget"));
 
 function InstallationSection() {
   const { token: CopilotToken } = useCopilot();
+  const baseUrl = "https://cloud.opencopilot.so/backend"
   return (
     <section className="rounded-lg border bg-white shadow-sm">
       <AccordionItem value="installation">

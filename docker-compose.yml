@@ -41,8 +41,8 @@ services:
   workers:
     restart: unless-stopped
     build:
-      context: ./workers
-      dockerfile: Dockerfile
+      context: ./llm-server
+      dockerfile: worker.Dockerfile
     image: codebanesr/workers:latest  # Add this line
     # logging:
     #   driver: awslogs
@@ -154,7 +154,6 @@ services:
 networks:
   opencopilot-net:
     name: opencopilot-net
-    # external: true
 
 volumes:
   shared_data:
