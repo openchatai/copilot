@@ -7,7 +7,7 @@ from prance import ResolvingParser
 from opencopilot_utils.get_vector_store import get_vector_store
 from opencopilot_utils import StoreOptions
 from langchain.docstore.document import Document
-from utils.get_logger import struct_log
+from utils.get_logger import CustomLogger
 import os
 from utils.db import Database
 
@@ -15,6 +15,8 @@ client = QdrantClient(url=os.getenv("QDRANT_URL", "http://qdrant:6333"))
 
 db_instance = Database()
 mongo = db_instance.get_db()
+
+logger = CustomLogger(module_name=__name__)
 
 
 def save_swaggerfile_to_mongo(
@@ -47,16 +49,23 @@ def save_swagger_paths_to_qdrant(swagger_doc: ResolvingParser, bot_id: str):
             document.metadata["bot_id"] = bot_id
             document.metadata["operation"] = operation
 
-            struct_log.info(
-                event="ingestion_doc",
+            logger.info(
                 message="document before ingestion ---",
-                data=document,
+                extra={
+                    "incident": "ingestion_doc",
+                    "data": document.page_content,
+                },
             )
             documents.append(document)
 
     point_ids = vector_store.add_documents(documents)
-    struct_log.info(
-        event="api_ingestion_qdrant", documents=documents, point_ids=point_ids
+    logger.info(
+        message="API ingestion for Qdrant",
+        extra={
+            "incident": "api_ingestion_qdrant",
+            "documents": documents,
+            "point_ids": point_ids,
+        },
     )
 
 

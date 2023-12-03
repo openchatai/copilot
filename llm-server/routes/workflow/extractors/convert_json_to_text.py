@@ -1,14 +1,15 @@
 import os
 import logging
-from utils import struct_log
 from langchain.schema import HumanMessage, SystemMessage
 
 from integrations.custom_prompts.prompt_loader import load_prompts
 from typing import Optional, Dict, Any, cast
 from utils import get_chat_model
 from utils.chat_models import CHAT_MODELS
+from utils.get_logger import CustomLogger
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
+logger = CustomLogger(module_name=__name__)
 
 
 def convert_json_to_text(
@@ -19,8 +20,13 @@ def convert_json_to_text(
 ) -> str:
     chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
-    struct_log.info(
-        event="convert_json_to_text", message="api_request_data", data=api_request_data
+    logger.info(
+        "Information about converting JSON to text",
+        extra={
+            "incident": "convert_json_to_text",
+            "message": "api_request_data",
+            "data": api_request_data,
+        },
     )
 
     api_summarizer_template = None

@@ -6,7 +6,10 @@ from opencopilot_types.workflow_type import WorkflowDataType
 from werkzeug.datastructures import Headers
 import logging
 import json
-from utils import struct_log
+
+from utils.get_logger import CustomLogger
+
+logger = CustomLogger(module_name=__name__)
 
 
 async def run_workflow(
@@ -33,15 +36,19 @@ async def run_workflow(
             bot_id=bot_id,
         )
     except Exception as e:
-        struct_log.exception(
-            payload={
-                "headers": dict(headers),
-                "server_base_url": server_base_url,
-                "app": app,
-            },
-            error=str(e),
-            event="/run_workflow",
-        )
+        payload_data = {
+            "headers": dict(headers),
+            "server_base_url": server_base_url,
+            "app": app,
+        }
+
+        error_data = {
+            "payload": payload_data,
+            "error": str(e),
+            "incident": "/run_workflow",
+        }
+
+        logger.error("An exception occurred", extra=error_data)
         error = str(e)
 
     output: ResponseDict = {"response": result if not error else "", "error": error}

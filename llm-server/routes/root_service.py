@@ -1,7 +1,5 @@
 import os
 from typing import Dict, Any, Optional, List
-
-import logging
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from routes.workflow.typings.response_dict import ResponseDict
 from routes.workflow.typings.run_workflow_input import WorkflowData
@@ -22,9 +20,13 @@ from utils.db import Database
 from utils.get_chat_model import get_chat_model
 from prance import ResolvingParser
 from langchain.docstore.document import Document
-from utils import struct_log
 from werkzeug.datastructures import Headers
 import asyncio
+
+
+from utils.get_logger import CustomLogger
+
+logger = CustomLogger(module_name=__name__)
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -97,7 +99,10 @@ async def handle_request(
 
 
 def log_user_request(text: str) -> None:
-    logging.info("[OpenCopilot] Got the following user request: {}".format(text))
+    logger.info(
+        "[OpenCopilot] Got the following user request: {}".format(text),
+        extra={"event": "log_user_request"},
+    )
 
 
 def check_required_fields(
@@ -113,7 +118,7 @@ def check_required_fields(
 
 
 def get_swagger_doc(swagger_url: str) -> ResolvingParser:
-    logging.info(f"Swagger url: {swagger_url}")
+    logger.info(f"Swagger url: {swagger_url}")
     swagger_doc: Optional[Dict[str, Any]] = mongo.swagger_files.find_one(
         {"meta.swagger_url": swagger_url}, {"meta": 0, "_id": 0}
     )
@@ -190,5 +195,7 @@ def handle_no_api_call(bot_message: str) -> ResponseDict:
 
 
 def handle_exception(e: Exception, event: str) -> ResponseDict:
-    struct_log.exception(payload={}, error=str(e), event="/handle_request")
+    error_data = {"payload": {}, "error": str(e), "incident": "/handle_request"}
+    logger.error("An exception occurred", extra=error_data)
+
     return {"response": str(e), "error": "An error occured in handle request"}

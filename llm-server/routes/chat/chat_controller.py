@@ -2,6 +2,7 @@ from typing import cast
 
 from flask import jsonify, Blueprint, request, Response, abort, Request
 from routes.chat.chat_dto import ChatInput
+from utils.get_logger import CustomLogger
 from utils.llm_consts import X_App_Name
 from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
 from models.repository.chat_history_repo import (
@@ -12,11 +13,11 @@ from models.repository.chat_history_repo import (
 from models.repository.copilot_repo import find_one_or_fail_by_token
 from utils.db import Database
 from .. import root_service
-from utils import struct_log
 from typing import Optional
 
 db_instance = Database()
 mongo = db_instance.get_db()
+logger = CustomLogger(module_name=__name__)
 
 chat_workflow = Blueprint("chat", __name__)
 
@@ -171,7 +172,9 @@ async def send_chat():
             {"type": "text", "response": {"text": response_data["response"]}}
         )
     except Exception as e:
-        struct_log.exception(event="/chat/send", error=str(e))
+        logger.error(
+            "An exception occurred", extra={"incident": "chat/send", "error": str(e)}
+        )
         return (
             jsonify(
                 {

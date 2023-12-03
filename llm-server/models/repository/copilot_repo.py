@@ -6,11 +6,12 @@ from opencopilot_db.chatbot import Chatbot, engine
 from sqlalchemy import exc
 from sqlalchemy.orm import sessionmaker, Session
 
-from utils import struct_log
 from utils.base import generate_random_token
+from utils.get_logger import CustomLogger
 
 # Create a Session factory
 SessionLocal = sessionmaker(bind=engine)
+logger = CustomLogger(module_name=__name__)
 
 
 def list_all_with_filter(filter_criteria: Optional[Any] = None) -> List[Chatbot]:
@@ -99,7 +100,7 @@ def create_copilot(
             smart_sync=smart_sync,
             created_at=datetime.datetime.utcnow(),
             updated_at=datetime.datetime.utcnow(),
-            email='example@example.com',
+            email="example@example.com",
         )
 
         try:
@@ -108,7 +109,10 @@ def create_copilot(
             return chatbot_to_dict(new_chatbot)
         except Exception as e:
             session.rollback()
-            struct_log.exception(app="OPENCOPILOT", error=str(e), event="/swagger")
+            logger.error(
+                "An exception occurred",
+                extra={"app": "OPENCOPILOT", "error": str(e), "incident": "/swagger"},
+            )
             raise e
         finally:
             session.close()
@@ -249,6 +253,9 @@ def update_copilot(
         raise ValueError(f"No Chatbot found with id: {copilot_id}")
     except Exception as e:
         session.rollback()
-        struct_log.exception(app="OPENCOPILOT", error=str(e), event="update_copilot")
+        logger.error(
+            "An exception occurred",
+            extra={"app": "OPENCOPILOT", "error": str(e), "incident": "update_copilot"},
+        )
     finally:
         session.close()
