@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from typing import List, Optional, Any, Type
+from typing import Iterable, List, Optional, Any, Type
 
 from shared.models.opencopilot_db.chatbot import Chatbot, engine
 from sqlalchemy import exc
@@ -47,7 +47,27 @@ def list_all_with_filter(filter_criteria: Optional[Any] = None) -> List[Chatbot]
     finally:
         session.close()
 
-
+def get_total_chatbots() -> int:
+    session: Session = SessionLocal()
+    try:
+        total_chatbots = session.query(Chatbot).count()
+        return total_chatbots
+    except Exception as e:
+        raise e
+    finally:
+        session.close()
+        
+        
+def get_chatbots_batch(offset: int, batch_size: int) -> Iterable[Chatbot]:
+    session: Session = SessionLocal()
+    try:
+        chatbots_batch = session.query(Chatbot).offset(offset).limit(batch_size).all()
+        return chatbots_batch
+    except Exception as e:
+        raise e
+    finally:
+        session.close()
+        
 def find_or_fail_by_bot_id(bot_id: bytes) -> Optional[Chatbot]:
     session: Session = SessionLocal()
     try:
