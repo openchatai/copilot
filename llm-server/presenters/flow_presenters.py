@@ -42,15 +42,8 @@ def flow_to_simplified_dict(flow: Flow):
 def flow_variable_to_dict(variable: FlowVariable):
     """Convert a FlowVariable object to a dictionary."""
     return {
-        "id": variable.id.hex() if isinstance(variable.id, bytes) else variable.id,
-        "flow_id": variable.flow_id,
-        "chatbot_id": variable.chatbot_id,
         "name": variable.name,
         "value": variable.value,
         "runtime_override_key": variable.runtime_override_key,
         "runtime_override_action_id": variable.runtime_override_action_id,
-        "status": variable.status,
-        "created_at": variable.created_at.isoformat() if variable.created_at else None,
-        "updated_at": variable.updated_at.isoformat() if variable.updated_at else None,
-        "deleted_at": variable.deleted_at.isoformat() if variable.deleted_at else None,
     }
