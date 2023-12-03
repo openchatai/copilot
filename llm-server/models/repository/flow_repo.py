@@ -8,11 +8,13 @@ from sqlalchemy.orm import sessionmaker
 Session = sessionmaker(bind=engine)
 
 
-def create_flow(chatbot_id: str, name: str) -> Flow:
+def create_flow(chatbot_id: str, name: str, payload: dict, description: str = None) -> Flow:
     """
     Creates a new flow record in the database.
 
     Args:
+        description:
+        payload:
         chatbot_id: The ID of the chatbot associated with the flow.
         name: The name of the flow.
 
@@ -20,7 +22,7 @@ def create_flow(chatbot_id: str, name: str) -> Flow:
         The newly created Flow object.
     """
     with Session() as session:
-        flow = Flow(chatbot_id=chatbot_id, name=name)
+        flow = Flow(chatbot_id=chatbot_id, name=name, payload=payload, description=description)
         session.add(flow)
         session.commit()
         session.refresh(flow)  # Refresh the instance to load any unloaded attributes

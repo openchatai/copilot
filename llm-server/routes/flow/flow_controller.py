@@ -47,15 +47,17 @@ def create_flow_api(bot_id: str):
         A Flask response object with the newly created Flow object as a dictionary.
     """
     try:
-        data = request.form
+        data = request.json
         if not data:
             return jsonify({"error": "No data provided"}), 400
 
         name = data.get("name")
+        description = data.get("description", None)
+        payload = data.get("blocks", {})  # todo validation
         if not name:
             return jsonify({"error": "Missing required field: 'name'"}), 400
 
-        flow = create_flow(bot_id, name)
+        flow = create_flow(bot_id, name, payload, description)
         return jsonify(flow_to_dict(flow)), 201
     except Exception as e:
         # Log the exception here

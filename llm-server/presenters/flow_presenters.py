@@ -9,14 +9,11 @@ Session = sessionmaker(bind=engine)
 def flow_to_dict(flow: Flow):
     """Convert a Flow object to a dictionary."""
     return {
-        "id": flow.id.hex() if isinstance(flow.id, bytes) else flow.id,
+        "flow_id": flow.id.hex() if isinstance(flow.id, bytes) else flow.id,
         "name": flow.name,
-        "chatbot_id": flow.chatbot_id,
-        "status": flow.status,
         "payload": flow.payload,
-        "created_at": flow.created_at.isoformat() if flow.created_at else None,
-        "updated_at": flow.updated_at.isoformat() if flow.updated_at else None,
-        "deleted_at": flow.deleted_at.isoformat() if flow.deleted_at else None,
+        "description": flow.description,
+        "last_saved_at": flow.updated_at.isoformat() if flow.updated_at else None,
     }
 
 
