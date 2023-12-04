@@ -36,21 +36,19 @@ def save_swagger_paths_to_qdrant(swagger_doc: ResolvingParser, bot_id: str):
         # delete documents with metadata in api with the current bot id, before reingesting
         documents: List[Document] = []
         paths = swagger_doc.specification.get("paths", {})
-        
+
         for path, operations in paths.items():
             for method, operation in operations.items():
                 try:
                     operation["method"] = method
                     operation["path"] = path
                     del operation["responses"]
-                    
+
                     # Check if "summary" key is present before accessing it
-                    summary = operation.get('summary', '')
-                    description = operation.get('description', '')
-                    
-                    document = Document(
-                        page_content=f"{summary}; {description}"
-                    )
+                    summary = operation.get("summary", "")
+                    description = operation.get("description", "")
+
+                    document = Document(page_content=f"{summary}; {description}")
                     document.metadata["bot_id"] = bot_id
                     document.metadata["operation"] = operation
 
@@ -70,12 +68,15 @@ def save_swagger_paths_to_qdrant(swagger_doc: ResolvingParser, bot_id: str):
             incident="api_ingestion_qdrant",
             point_ids=point_ids,
         )
+
+        return point_ids
     except KeyError as e:
         # Handle the specific key error at a higher level if needed
         logger.error(f"KeyError in processing paths: {e}")
     except Exception as e:
         # Handle other exceptions
         logger.error(f"An error occurred: {e}")
+
 
 def add_swagger_file(request: Request, id: str) -> Dict[str, str]:
     if request.content_type == "application/json":

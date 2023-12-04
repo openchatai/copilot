@@ -71,6 +71,7 @@ def handle_swagger_file():
                 filename, str(chatbot["id"]), swagger_doc
             )
         except ValidationError as e:
+            logger.error("Failed to parse json", e=str(e), fn="handle_swagger_file")
             return (
                 jsonify(
                     {
