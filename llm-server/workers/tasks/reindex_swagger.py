@@ -68,8 +68,10 @@ def process_swagger_file(chatbot: Chatbot):
             save_swagger_paths_to_qdrant(swagger_doc=swagger_doc, bot_id=bot_id)
         else:
             records, point_id = scroll_result
-
-            if len(records)==0:
+            logger.info("Got some results from scroll", records=records)
+            
+            logger.info("Printing point id and record", point_id=point_id, records=records)
+            if len(records)==0 or not point_id:
                 logger.info("Points not found for bot, we will reindex", bot_id=bot_id)
                 save_swagger_paths_to_qdrant(swagger_doc=swagger_doc, bot_id=bot_id)
                 time.sleep(3)
