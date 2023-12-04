@@ -24,8 +24,7 @@ class CustomLogger:
         self.logger.log(
             level,
             event=event,
-            extra={k: v for k, v in kwargs.items() if k not in ("exc_info", "extra")},
-            exc_info=kwargs.get("exc_info"),
+            **{k: v for k, v in kwargs.items() if k not in ("exc_info", "extra")},
         )
 
     def info(self, event, **kwargs):
@@ -35,7 +34,7 @@ class CustomLogger:
         self.log(logging.WARNING, event, **kwargs)
 
     def error(self, event, **kwargs):
-        self.log(logging.ERROR, event, **kwargs)
+        self.log(logging.ERROR, event, exc_info=True, **kwargs)
 
     def debug(self, event, **kwargs):
         self.log(logging.DEBUG, event, **kwargs)

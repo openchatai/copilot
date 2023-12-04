@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from flask import Flask, g
+from flask import Flask
 
 from routes._swagger.controller import _swagger
 from routes.chat.chat_controller import chat_workflow
@@ -12,21 +12,7 @@ from routes.workflow.workflow_controller import workflow
 from utils.config import Config
 from utils.vector_store_setup import init_qdrant_collections
 from shared.models.opencopilot_db import create_database_schema
-import structlog
-
-structlog.configure(
-    processors=[
-        structlog.processors.add_log_level,
-        structlog.processors.TimeStamper(fmt="iso"),
-        structlog.processors.CallsiteParameterAdder(
-            [structlog.processors.CallsiteParameter.FUNC_NAME]
-        ),
-        structlog.processors.dict_tracebacks,
-        structlog.processors.JSONRenderer(),
-    ],
-    logger_factory=structlog.stdlib.LoggerFactory(),
-    cache_logger_on_first_use=True,
-)
+from utils.get_logger import structlog
 
 
 load_dotenv()
@@ -45,12 +31,6 @@ app.register_blueprint(prompt_template_workflow, url_prefix="/backend/prompt-tem
 app.register_blueprint(prompt_workflow, url_prefix="/backend/prompts")
 
 app.config.from_object(Config)
-
-
-@app.before_request
-def before_request():
-    g.logger = structlog.get_logger()
-
 
 init_qdrant_collections()
 

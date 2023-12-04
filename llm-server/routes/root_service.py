@@ -71,7 +71,7 @@ async def handle_request(
             get_relevant_flows(text, bot_id),
             get_chat_message_as_llm_conversation(session_id),
         ]
-        
+
         results = await asyncio.gather(*tasks)
         context, apis, flows, prev_conversations = results
         # also provide a list of workflows here itself, the llm should be able to figure out if a workflow needs to be run
@@ -99,15 +99,38 @@ async def handle_request(
                 swagger_url=swagger_url,
             )
 
+            logger.info(
+                "chatbot response",
+                response=response,
+                method="handle_request",
+                apis=apis,
+                prev_conversations=prev_conversations,
+                context=context,
+                flows=flows,
+            )
             return response
         else:
             return {"error": None, "response": step.bot_message}
     except Exception as e:
-        return handle_exception(e, "handle_request", {"input": text, "apis": json.dumps(apis)})
+        logger.error(
+            "chatbot response",
+            error=str(e),
+            method="handle_request",
+            apis=apis,
+            prev_conversations=prev_conversations,
+            context=context,
+            flows=flows,
+        )
+
+        return {"response": str(e), "error": "An error occured in handle request"}
 
 
 def log_user_request(text: str) -> None:
-    logger.info("[OpenCopilot] Got the following user request: {}".format(text), incident="log_user_request")
+    logger.info(
+        "[OpenCopilot] Got the following user request: {}".format(text),
+        incident="log_user_request",
+        method="log_user_request",
+    )
 
 
 def check_required_fields(
@@ -197,9 +220,3 @@ async def handle_api_calls(
 
 def handle_no_api_call(bot_message: str) -> ResponseDict:
     return {"response": bot_message, "error": ""}
-
-
-def handle_exception(e: Exception, event: str, context: Dict[str, str]) -> ResponseDict:
-    logger.error("An exception occurred", payload={}, error=str(e), incident=event, context=context)
-
-    return {"response": str(e), "error": "An error occured in handle request"}
