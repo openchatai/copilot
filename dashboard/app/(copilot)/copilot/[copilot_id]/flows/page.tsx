@@ -8,13 +8,40 @@ import { Button } from "@/components/ui/button";
 import { useIsEditing } from "./_parts/useIsEditing";
 import { EmptyBlock } from "@/components/domain/EmptyBlock";
 import { mutateFlows } from "./_parts/WorkflowsList";
-import useSWR from "swr";
-import { deleteWorkflowById, getWorkflowById } from "@/data/flow";
+import useSWR, { mutate } from "swr";
+import { deleteWorkflowById, getWorkflowById, updateWorkflowById } from "@/data/flow";
+import { toast } from "@/components/ui/use-toast";
 
 function SaveBtn() {
   const { state } = useController();
   const [isEditing, workflowId] = useIsEditing();
-  return isEditing ? <Button onClick={() => console.log(state)}>Save</Button> : null
+  const [loading, setLoading] = useState(false)
+  async function handleSave() {
+    if (!workflowId || !state.name || !state.description) return;
+    try {
+      setLoading(true)
+      const { data } = await updateWorkflowById(workflowId, {
+        ...state,
+        name: state.name,
+        description: state.description,
+        steps: state.steps,
+        info: {
+          version: "0.0.1"
+        },
+        requires_confirmation: true,
+      })
+      if (data) {
+        mutate(data._id)
+        toast({
+          title: "Saved successfully",
+          variant: "success"
+        })
+      }
+    } catch (error) {
+      setLoading(false)
+    }
+  }
+  return isEditing ? <Button loading={loading} onClick={handleSave}>Save</Button> : null
 }
 function DeleteBtn() {
   const [isEditing, workflowId, reset] = useIsEditing();
