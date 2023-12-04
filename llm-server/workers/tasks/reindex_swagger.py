@@ -62,7 +62,7 @@ def process_swagger_file(chatbot: Chatbot):
         )
         
         if points is None:
-            logger.info("Points not found for bot, we will reindex", {bot_id: bot_id})
+            logger.info("Points not found for bot, we will reindex", extra={"bot_id": bot_id})
             save_swagger_paths_to_qdrant(swagger_doc=swagger_doc, bot_id=bot_id)
             time.sleep(3)
             

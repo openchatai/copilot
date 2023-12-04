@@ -1,5 +1,8 @@
 import os
+import json
 from typing import Dict, Any, Optional, List
+from langchain.schema import BaseMessage
+from custom_types.api_operation import ApiOperation_vs
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from routes.workflow.typings.response_dict import ResponseDict
 from routes.workflow.typings.run_workflow_input import WorkflowData
@@ -22,6 +25,7 @@ from prance import ResolvingParser
 from langchain.docstore.document import Document
 from werkzeug.datastructures import Headers
 import asyncio
+from opencopilot_types.workflow_type import WorkflowFlowType
 
 
 from utils.get_logger import CustomLogger
@@ -56,6 +60,10 @@ async def handle_request(
 ) -> ResponseDict:
     log_user_request(text)
     check_required_fields(base_prompt, text, swagger_url)
+    context: str = ""
+    apis: List[ApiOperation_vs] = []
+    flows: List[WorkflowFlowType] = []
+    prev_conversations: List[BaseMessage] = []
     try:
         tasks = [
             get_relevant_docs(text, bot_id),
@@ -63,7 +71,7 @@ async def handle_request(
             get_relevant_flows(text, bot_id),
             get_chat_message_as_llm_conversation(session_id),
         ]
-
+        
         results = await asyncio.gather(*tasks)
         context, apis, flows, prev_conversations = results
         # also provide a list of workflows here itself, the llm should be able to figure out if a workflow needs to be run
@@ -95,14 +103,11 @@ async def handle_request(
         else:
             return {"error": None, "response": step.bot_message}
     except Exception as e:
-        return handle_exception(e, "handle_request")
+        return handle_exception(e, "handle_request", {"input": text, "apis": json.dumps(apis)})
 
 
 def log_user_request(text: str) -> None:
-    logger.info(
-        "[OpenCopilot] Got the following user request: {}".format(text),
-        extra={"incident": "log_user_request"},
-    )
+    logger.info("[OpenCopilot] Got the following user request: {}".format(text), incident="log_user_request")
 
 
 def check_required_fields(
@@ -194,8 +199,7 @@ def handle_no_api_call(bot_message: str) -> ResponseDict:
     return {"response": bot_message, "error": ""}
 
 
-def handle_exception(e: Exception, event: str) -> ResponseDict:
-    error_data = {"payload": {}, "error": str(e), "incident": "handle_request"}
-    logger.error("An exception occurred", extra=error_data)
+def handle_exception(e: Exception, event: str, context: Dict[str, str]) -> ResponseDict:
+    logger.error("An exception occurred", payload={}, error=str(e), incident=event, context=context)
 
     return {"response": str(e), "error": "An error occured in handle request"}

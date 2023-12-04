@@ -1,8 +1,5 @@
-import logging
-from typing import Any, Dict, Union, cast
+from typing import Dict, Union, cast
 from typing import List
-
-logging.basicConfig(level=logging.INFO)
 
 
 class BotMessage:

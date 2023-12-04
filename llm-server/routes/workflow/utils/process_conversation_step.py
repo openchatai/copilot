@@ -39,10 +39,7 @@ def process_conversation_step(
         system_message_classifier = SystemMessage(
             content=prompt_templates.system_message
         )
-    logger.debug(
-        message="System message classification",
-        extra={"incident": "system_message_classifier", "app": app, "context": context},
-    )
+    logger.debug("System message classification", incident="system_message_classifier", app=app, context=context)
     messages: List[BaseMessage] = []
     messages.append(system_message_classifier)
 
@@ -99,13 +96,7 @@ def process_conversation_step(
     if isinstance(d, str):
         return BotMessage(ids=[], bot_message=d)
 
-    logger.info(
-        message="Extracting JSON payload",
-        extra={
-            "incident": "extract_json_payload",
-            "data": d,
-        },
-    )
+    logger.info("Extracting JSON payload", incident="process_conversation_step", data=d)
 
     bot_message = BotMessage.from_dict(d)
     return bot_message

@@ -171,9 +171,7 @@ async def send_chat():
             {"type": "text", "response": {"text": response_data["response"]}}
         )
     except Exception as e:
-        logger.error(
-            "An exception occurred", extra={"incident": "chat/send", "error": str(e)}
-        )
+        logger.error("An exception occurred", incident="chat/send", error=str(e))
         return (
             jsonify(
                 {
