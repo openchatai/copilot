@@ -23,7 +23,12 @@ class Workflow(BaseModel):
     on_failure: List[dict]
     on_success: List[dict]
     steps: Optional[List[Step]]
+    vector_ids: Optional[List[str]] = []
 
 
 class WorkflowCreate(Workflow):
-    bot_id: Optional[str]
+    bot_id: str
+
+
+class WorkflowUpdate(Workflow):
+    bot_id: str

@@ -5,8 +5,9 @@ from typing import Any, cast
 from bson import ObjectId, json_util
 from fastapi.encoders import jsonable_encoder
 from pydantic import ValidationError
+from pymongo import ReturnDocument
 from copilot_exceptions.handle_exceptions_and_errors import handle_exceptions_and_errors
-from routes.workflow.dto.workflow_dto import Workflow, WorkflowCreate
+from routes.workflow.dto.workflow_dto import Workflow, WorkflowCreate, WorkflowUpdate
 from utils.vector_db.add_workflow import add_workflow_data_to_qdrant
 from flask import Blueprint, request, jsonify
 from opencopilot_types.workflow_type import WorkflowDataType
@@ -64,7 +65,11 @@ def create_workflow_by_bot_id(bot_id):
         jsonable_encoder(workflow_data)
     ).inserted_id
 
-    add_workflow_data_to_qdrant(workflow_id, workflow_data, bot_id)
+    vector_ids = add_workflow_data_to_qdrant(workflow_id, workflow_data, bot_id)
+
+    mongo.workflows.update_one(
+        {"_id": workflow_id}, {"$set": {"vector_ids": vector_ids}}
+    )
 
     return jsonify({"msg": "Workflow created", "id": str(workflow_id)}), 201
 
@@ -132,9 +137,9 @@ def get_workflows_by_bot_id(bot_id: str) -> Any:
 
 
 @workflow.route("/<workflow_id>", methods=["PUT"])
-def update_workflow(workflow_id):
+def update_workflow(workflow_id: str):
     try:
-        workflow_update = Workflow(**request.json)
+        workflow_update = WorkflowUpdate(**request.get_json())
     except ValidationError as e:
         return jsonify({"errors": e.errors()}), 400
 
@@ -146,10 +151,19 @@ def update_workflow(workflow_id):
         return jsonify({"error": "Workflow not found"}), 404
 
     vector_store = get_vector_store(StoreOptions("swagger"))
-    vector_store.delete(ids=[workflow_id])
+    if workflow_update.vector_ids and len(workflow_update.vector_ids) > 0:
+        # the vector might actually be updated
+        vector_store.delete(ids=workflow_update.vector_ids)
 
-    updated_doc = mongo.workflows.find_one({"_id": ObjectId(workflow_id)})
-    add_workflow_data_to_qdrant(workflow_id, workflow_update, updated_doc["bot_id"])
+    vector_ids = add_workflow_data_to_qdrant(
+        workflow_id, workflow_update, workflow_update.bot_id
+    )
+
+    mongo.workflows.find_one_and_update(
+        {"_id": ObjectId(workflow_id)},
+        {"$set": {"vector_ids": vector_ids}},
+        return_document=ReturnDocument.AFTER,
+    )
 
     return jsonify({"msg": "Workflow updated"}), 200
 
