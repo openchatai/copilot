@@ -1,50 +1,39 @@
 "use client";
-import Loading from "@/app/(main)/loading";
 import { EmptyBlock } from "@/components/domain/EmptyBlock";
+import Loader from "@/components/ui/Loader";
 import { NavLink } from "@/components/ui/NavLink";
-import { Button } from "@/components/ui/button";
 import { getWorkflowsByBotId } from "@/data/flow";
 import _ from "lodash";
-import { Link } from "@/lib/router-events";
-import React from "react";
-import useSwr from "swr";
+import useSWR, { mutate } from "swr";
+
+export function mutateFlows(copilot_id: string) {
+  mutate('flows/' + copilot_id)
+}
 
 export function WorkflowsList({ copilot_id }: { copilot_id: string }) {
+  const { data: flows, isLoading } = useSWR('flows/' + copilot_id, async () => (await getWorkflowsByBotId(copilot_id)).data);
   const flowsBase = `/copilot/${copilot_id}/flows`;
-  const { data: flows, isLoading } = useSwr(
-    copilot_id + "/workflows",
-    async () => await getWorkflowsByBotId(copilot_id),
-  );
-  return isLoading ? (
-    <Loading />
-  ) : flows?.data.workflows && !_.isEmpty(flows.data.workflows) ? (
-    <ul className="space-y-1 px-2">
-      {_.map(flows.data.workflows, (workflow, i) => {
-        const firstFlow = _.first(workflow.flows);
-        return (
-          <li key={i} className="h-fit w-full">
-            <NavLink
-              href={flowsBase + "/?workflow_id=" + workflow._id}
-              matchSearchParams
-              className="flex items-center rounded border px-4 py-2 text-sm font-medium text-accent-foreground transition duration-150 ease-in-out "
-              activeClassName="border-gray-300 bg-accent"
-            >
-              {firstFlow?.name}
-            </NavLink>
-          </li>
-        );
-      })}
+
+  return (
+    <ul className="px-2 space-y-2">
+      {
+        isLoading ? <Loader /> : _.isEmpty(flows?.workflows) ? <EmptyBlock>
+          <p className="text-sm text-gray-500">No flows yet</p>
+        </EmptyBlock> :
+          flows?.workflows.map((flow, i) => (
+            <li key={i}>
+              <NavLink
+                href={flowsBase + "/?workflow_id=" + flow._id}
+                matchSearchParams
+                className="flex items-center rounded border px-4 py-2 text-sm font-medium text-accent-foreground transition duration-150 ease-in-out "
+                activeClassName="border-gray-300 bg-accent"
+              >
+                {flow.name}
+              </NavLink>
+            </li>
+
+          ))
+      }
     </ul>
-  ) : (
-    <div className="px-2">
-      <EmptyBlock>
-        <p className="text-center">
-          <span>No workflows yet.</span>
-          <Button variant="link" size="sm" asChild>
-            <Link href={flowsBase}>create new one</Link>
-          </Button>
-        </p>
-      </EmptyBlock>
-    </div>
-  );
+  )
 }

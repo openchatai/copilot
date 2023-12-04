@@ -30,8 +30,8 @@ const HideHandleStyles = {
   border: "none",
 };
 function EndpointNode({ data, zIndex }: NodeProps<NodeData>) {
-  const { deleteNode, activeNodes } = useController();
-  const nodeObj = activeNodes?.find((n) => n.id === data.id);
+  const { deleteNode, state: { steps } } = useController();
+  const nodeObj = steps ?.find((n) => n.id === data.id);
   const { mode, setMode, reset: resetMode } = useMode();
   const isActive = useMemo(() => {
     if (mode.type === "edit-node") {
@@ -42,14 +42,14 @@ function EndpointNode({ data, zIndex }: NodeProps<NodeData>) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
-  const isFirstNode = activeNodes?.[0]?.id === data.id;
-  const isLastNode = activeNodes?.[activeNodes.length - 1]?.id === data.id;
+  const isFirstNode = steps ?.[0]?.id === data.id;
+  const isLastNode = steps ?.[steps .length - 1]?.id === data.id;
   return (
     <>
       <NodeToolbar align="center" isVisible={isActive} position={Position.Left}>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <button className="rounded-full bg-white p-2 text-rose-500">
+            <button className="rounded-full bg-destructive p-2 text-white">
               <TrashIcon className="w-4 h-4" />
             </button>
           </AlertDialogTrigger>
@@ -98,7 +98,7 @@ function EndpointNode({ data, zIndex }: NodeProps<NodeData>) {
             <code className="block text-xs text-accent-foreground">
               {data.path}
             </code>
-            <p className="ms-2 line-clamp-2 text-xs font-medium text-slate-600">
+            <p className="ms-2 line-clamp-2 text-xs font-medium">
               {data.description}
             </p>
             <MethodBtn
@@ -123,7 +123,7 @@ function EndpointNode({ data, zIndex }: NodeProps<NodeData>) {
               className={cn(
                 "rounded bg-[#ddd] p-0.5 text-sm transition-all duration-300 ease-in-out",
                 mode.type === "append-node" &&
-                "text-primbg-primary bg-primary ring-4 ring-primary/20 ring-offset-transparent",
+                "text-white bg-primary ring-4 ring-primary/20 ring-offset-transparent",
               )}
             >
               <PlusIcon />

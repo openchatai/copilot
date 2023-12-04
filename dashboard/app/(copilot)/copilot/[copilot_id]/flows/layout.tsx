@@ -1,7 +1,6 @@
 import React from "react";
 import { WorkflowsList } from "./_parts/WorkflowsList";
-import { Button } from "@/components/ui/button";
-import { Link } from "@/lib/router-events";
+import { AddFlowModal } from "./_parts/AddFlowModal";
 
 type Props = {
   children: React.ReactNode;
@@ -27,9 +26,7 @@ export default function FlowsLayout({
             <WorkflowsList copilot_id={copilot_id} />
           </div>
           <footer className="w-full px-4">
-            <Button size="fluid" asChild>
-              <Link href={flowsBase}>Create New Flow</Link>
-            </Button>
+            <AddFlowModal />
           </footer>
         </div>
       </aside>

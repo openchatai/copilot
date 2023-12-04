@@ -43,12 +43,10 @@ async def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
 
     except Exception as e:
         logger.error(
-            message="Error occurred while getting relevant docs",
-            extra={
-                "incident": "get_relevant_docs",
-                "payload": text,
-                "error": str(e),
-            },
+            "Error occurred while getting relevant docs",
+            incident="get_relevant_docs",
+            payload=text,
+            error=str(e),
         )
         return None
 
@@ -75,8 +73,10 @@ async def get_relevant_flows(text: str, bot_id: str) -> List[WorkflowFlowType]:
 
     except Exception as e:
         logger.error(
-            message="Error occurred while getting relevant docs",
-            extra={"incident": "get_relevant_docs", "payload": text, "error": str(e)},
+            "Error occurred while getting relevant docs",
+            incident="get_relevant_docs",
+            payload=text,
+            error=str(e),
         )
         return []
 
@@ -103,11 +103,9 @@ async def get_relevant_apis_summaries(text: str, bot_id: str) -> List[ApiOperati
 
     except Exception as e:
         logger.error(
-            message="Error occurred while getting relevant API summaries",
-            extra={
-                "incident": "get_relevant_apis_summaries",
-                "payload": text,
-                "error": str(e),
-            },
+            "Error occurred while getting relevant API summaries",
+            incident="get_relevant_apis_summaries",
+            payload=text,
+            error=str(e),
         )
         return []

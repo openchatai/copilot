@@ -26,8 +26,9 @@ def check_workflow_in_store(text: str, bot_id: str) -> Optional[Document]:
         result = retriever.get_relevant_documents(text)
         logger.info(
             "Information about the event",
-            extra={"incident": "check_workflow_in_store"},
+            incident="check_workflow_in_store",
         )
+
 
         if len(result) > 0:
             result[0]
@@ -35,12 +36,5 @@ def check_workflow_in_store(text: str, bot_id: str) -> Optional[Document]:
         return None
 
     except Exception as e:
-        payload_data = {"text": text, "bot_id": bot_id}
-        error_data = {
-            "payload": payload_data,
-            "error": str(e),
-            "incident": "check_workflow_in_store",
-        }
-
-        logger.error("An exception occurred", extra=error_data)
+        logger.error("An exception occurred", payload={"text": text, "bot_id": bot_id}, error=str(e), incident="check_workflow_in_store")
         return None

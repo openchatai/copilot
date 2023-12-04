@@ -7,6 +7,9 @@ from custom_types.t_json import JsonData
 from typing import Optional
 import logging
 from langchain.schema import HumanMessage, SystemMessage
+from utils.get_logger import CustomLogger
+
+logger= CustomLogger(module_name=__name__)
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
@@ -33,11 +36,7 @@ async def gen_params_from_schema(
         HumanMessage(content="Your output must be a valid json"),
     ]
     result = chat(messages)
-    logging.info("[OpenCopilot] LLM Body Response: {}".format(result.content))
+    logger.info("[OpenCopilot] LLM Body Response: {}".format(result.content))
     d: Optional[JsonData] = extract_json_payload(result.content)
-    logging.info(
-        "[OpenCopilot] Parsed the json payload: {}, context: {}".format(
-            d, "gen_body_from_schema"
-        )
-    )
+    logger.info("Parsed params from schema", text=text, params=d)
     return d
