@@ -267,6 +267,7 @@ def update_copilot(
         chatbot.updated_at = datetime.datetime.utcnow()
 
         session.commit()
+        session.refresh(chatbot)
         return chatbot_to_dict(chatbot)
     except exc.NoResultFound:
         session.rollback()
