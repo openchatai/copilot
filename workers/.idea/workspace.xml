@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3bd776a7-5db5-42c8-ae14-ba0a3adcaaee" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../llm-server/models/repository/copilot_repo.py" beforeDir="false" afterPath="$PROJECT_DIR$/../llm-server/models/repository/copilot_repo.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../llm-server/routes/copilot/copilot_controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/../llm-server/routes/copilot/copilot_controller.py" afterDir="false" />
-    </list>
+    <list default="true" id="3bd776a7-5db5-42c8-ae14-ba0a3adcaaee" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

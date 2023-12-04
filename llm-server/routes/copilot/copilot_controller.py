@@ -5,7 +5,6 @@ import uuid
 from flask import Blueprint, jsonify, request, Response
 from prance import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
 from werkzeug.utils import secure_filename
 
 import routes._swagger.service as swagger_service
@@ -71,7 +70,8 @@ def handle_swagger_file():
             swagger_service.save_swaggerfile_to_mongo(
                 filename, str(chatbot.id), swagger_doc
             )
-            update_copilot(copilot_id=chatbot.id, swagger_url=filename)
+            chatbot = update_copilot(copilot_id=chatbot.id, swagger_url=filename)
+            return jsonify({"copilot":  chatbot_to_dict(chatbot)})
         except ValidationError as e:
             return jsonify(
                 {
@@ -83,9 +83,7 @@ def handle_swagger_file():
             ), 400
 
     # Return the chatbot details, regardless of the file's presence
-    session: Session = SessionLocal()
-    session.refresh(chatbot)
-    return jsonify({"copilot": chatbot})
+    return jsonify({"copilot": chatbot_to_dict(chatbot)})
 
 
 @copilot.route("/<string:copilot_id>", methods=["GET"])
@@ -152,7 +150,7 @@ def general_settings_update(copilot_id):
         )
 
         # Return the updated chatbot information
-        return jsonify({"chatbot": updated_copilot})
+        return jsonify({"chatbot": chatbot_to_dict(updated_copilot)})
     except ValueError as e:
         # Handle not found error
         return jsonify({"error": str(e)}), 404

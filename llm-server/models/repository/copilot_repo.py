@@ -126,7 +126,8 @@ def create_copilot(
         try:
             session.add(new_chatbot)
             session.commit()
-            return chatbot_to_dict(new_chatbot)
+            session.refresh(new_chatbot)
+            return new_chatbot
         except Exception as e:
             session.rollback()
             logger.error(
@@ -224,7 +225,7 @@ def update_copilot(
     enhanced_privacy: Optional[bool] = None,
     smart_sync: Optional[bool] = None,
     website: Optional[str] = None,
-) -> dict[str, Any]:
+) -> Type[Chatbot]:
     """
     Updates an existing Chatbot instance in the database.
 
@@ -268,7 +269,7 @@ def update_copilot(
 
         session.commit()
         session.refresh(chatbot)
-        return chatbot_to_dict(chatbot)
+        return chatbot
     except exc.NoResultFound:
         session.rollback()
         raise ValueError(f"No Chatbot found with id: {copilot_id}")
