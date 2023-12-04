@@ -5,6 +5,7 @@ import uuid
 from flask import Blueprint, jsonify, request, Response
 from prance import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 from werkzeug.utils import secure_filename
 
 import routes._swagger.service as swagger_service
@@ -82,6 +83,8 @@ def handle_swagger_file():
             ), 400
 
     # Return the chatbot details, regardless of the file's presence
+    session: Session = SessionLocal()
+    session.refresh(chatbot)
     return jsonify({"copilot": chatbot})
 
 
