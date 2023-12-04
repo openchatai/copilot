@@ -1,15 +1,9 @@
-<<<<<<< Updated upstream
-from typing import Any
-from opencopilot_types.workflow_type import WorkflowDataType
-from opencopilot_utils import StoreOptions, get_embeddings, init_vector_store
-=======
 from routes.workflow.dto.workflow_dto import Workflow
 from shared.utils.opencopilot_utils import (
     StoreOptions,
     get_embeddings,
     init_vector_store,
 )
->>>>>>> Stashed changes
 from langchain.docstore.document import Document
 
 
