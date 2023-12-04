@@ -1,6 +1,11 @@
 from routes.workflow.dto.workflow_dto import Workflow
-from shared.utils.opencopilot_utils import StoreOptions, get_vector_store
-from typing import List
+from typing import Any , List
+from opencopilot_types.workflow_type import WorkflowDataType
+from shared.utils.opencopilot_utils import (
+    StoreOptions,
+    get_embeddings,
+    init_vector_store,
+)
 from langchain.docstore.document import Document
 
 

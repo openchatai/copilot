@@ -1,12 +1,12 @@
 from langchain.schema import HumanMessage, SystemMessage, BaseMessage
 from custom_types.api_operation import ApiOperation_vs
-from custom_types.bot_message import BotMessage
+from custom_types.bot_message import parse_bot_message, BotMessage
 from opencopilot_types.workflow_type import WorkflowFlowType
-from routes.workflow.extractors.extract_json import extract_json_payload
 
 # push it to the library
 from integrations.custom_prompts.prompt_loader import load_prompts
-from utils import get_chat_model
+from utils.get_chat_model import get_chat_model
+from langchain.schema import OutputParserException
 from utils.chat_models import CHAT_MODELS
 from utils.get_logger import CustomLogger
 from typing import Optional, List, cast
@@ -40,8 +40,10 @@ def process_conversation_step(
             content=prompt_templates.system_message
         )
     logger.debug(
-        message="System message classification",
-        extra={"incident": "system_message_classifier", "app": app, "context": context},
+        "System message classification",
+        incident="system_message_classifier",
+        app=app,
+        context=context,
     )
     messages: List[BaseMessage] = []
     messages.append(system_message_classifier)
@@ -81,7 +83,7 @@ def process_conversation_step(
         HumanMessage(
             content="""Based on the information provided to you I want you to answer the questions that follow. Your should respond with a json that looks like the following - 
     {{
-        "ids": ["list", "of", "apis", "to", "be", "called"],
+        "ids": ["list", "of", "operationIds", "for apis to be called"],
         "bot_message": "your response based on the instructions provided at the beginning"
     }}                
     """
@@ -93,19 +95,22 @@ def process_conversation_step(
 
     messages.append(HumanMessage(content=user_requirement))
 
-    content = chat(messages=messages).content
-    d = extract_json_payload(cast(str, content))
+    content = cast(str, chat(messages=messages).content)
 
-    if isinstance(d, str):
-        return BotMessage(ids=[], bot_message=d)
+    try:
+        d = parse_bot_message(content)
+        logger.info(
+            "Extracting JSON payload",
+            action="parse_bot_message",
+            data=d,
+            content=content,
+        )
+        return d
 
-    logger.info(
-        message="Extracting JSON payload",
-        extra={
-            "incident": "extract_json_payload",
-            "data": d,
-        },
-    )
-
-    bot_message = BotMessage.from_dict(d)
-    return bot_message
+    except OutputParserException as e:
+        logger.error("Failed to parse json", data=content)
+        logger.error("Failed to parse json", err=str(e))
+        return BotMessage(bot_message=content, ids=[])
+    except Exception as e:
+        logger.error("unexpected error occured", err=str(e))
+        return BotMessage(ids=[], bot_message=str(e))

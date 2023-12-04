@@ -1,68 +1,40 @@
+import structlog
 import logging
-import json
-from typing import Mapping, Any
-from pythonjsonlogger.jsonlogger import JsonFormatter
 
-
-class CustomJSONFormatter(logging.Formatter):
-    def format(self, record: logging.LogRecord) -> str:
-        log_record = {
-            "timestamp": self.formatTime(record, self.datefmt),
-            "level": record.levelname,
-            "message": record.getMessage(),
-            "loc": f"{record.name.replace('.', '/')}.py:{record.lineno}",
-            "extra": record.__dict__.get("extra", {}),
-        }
-        return json.dumps(log_record, ensure_ascii=False)
+structlog.configure(
+    processors=[
+        structlog.processors.add_log_level,
+        structlog.processors.StackInfoRenderer(),
+        structlog.dev.set_exc_info,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.dict_tracebacks,
+        structlog.processors.JSONRenderer(),
+    ],
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    cache_logger_on_first_use=True,
+)
 
 
 class CustomLogger:
-    def __init__(
-        self,
-        module_name: str = __name__,
-        level: int = logging.INFO,
-    ) -> None:
-        self.logger = logging.getLogger(module_name)
-        self.logger.setLevel(level)
+    def __init__(self, module_name: str = __name__, level: int = logging.INFO):
+        self.logger = structlog.get_logger(module_name)
+        logging.basicConfig(level=level, format="%(message)s")
 
-        formatter = JsonFormatter()
-        log_handler = logging.StreamHandler()
-        log_handler.setFormatter(formatter)
-        self.logger.addHandler(log_handler)
+    def log(self, level, event, **kwargs):
+        self.logger.log(
+            level,
+            event=event,
+            **{k: v for k, v in kwargs.items() if k not in ("exc_info", "extra")},
+        )
 
-    def log(
-        self,
-        level: int,
-        message: str,
-        extra: Mapping[str, object] = {},
-        exc_info: bool = False,
-    ) -> None:
-        self.logger.log(level, msg=message, extra=extra, exc_info=exc_info)
+    def info(self, event, **kwargs):
+        self.log(logging.INFO, event, **kwargs)
 
-    def info(
-        self,
-        message: str,
-        extra: Mapping[str, object] = {},
-    ) -> None:
-        self.log(logging.INFO, message, extra)
+    def warn(self, event, **kwargs):
+        self.log(logging.WARNING, event, **kwargs)
 
-    def warn(
-        self,
-        message: str,
-        extra: Mapping[str, object] = {},
-    ) -> None:
-        self.log(logging.WARNING, message, extra)
+    def error(self, event, **kwargs):
+        self.log(logging.ERROR, event, exc_info=True, **kwargs)
 
-    def error(
-        self,
-        message: str,
-        extra: Mapping[str, object] = {},
-    ) -> None:
-        self.log(logging.ERROR, message, extra, exc_info=True)
-
-    def debug(
-        self,
-        message: str,
-        extra: Mapping[str, object] = {},
-    ) -> None:
-        self.log(logging.DEBUG, message, extra)
+    def debug(self, event, **kwargs):
+        self.log(logging.DEBUG, event, **kwargs)

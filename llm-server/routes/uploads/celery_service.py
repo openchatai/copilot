@@ -1,8 +1,5 @@
 import os
 from celery import Celery
-import logging
-
-logger = logging.getLogger(__name__)
 
 SHARED_FOLDER = os.getenv("SHARED_FOLDER", "/app/shared_data")
 os.makedirs(SHARED_FOLDER, exist_ok=True)
