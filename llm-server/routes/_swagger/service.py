@@ -32,37 +32,50 @@ def save_swaggerfile_to_mongo(
 
 def save_swagger_paths_to_qdrant(swagger_doc: ResolvingParser, bot_id: str):
     vector_store = get_vector_store(StoreOptions("apis"))
+    try:
+        # delete documents with metadata in api with the current bot id, before reingesting
+        documents: List[Document] = []
+        paths = swagger_doc.specification.get("paths", {})
+        
+        for path, operations in paths.items():
+            for method, operation in operations.items():
+                try:
+                    operation["method"] = method
+                    operation["path"] = path
+                    del operation["responses"]
+                    
+                    # Check if "summary" key is present before accessing it
+                    summary = operation.get('summary', '')
+                    description = operation.get('description', '')
+                    
+                    document = Document(
+                        page_content=f"{summary}; {description}"
+                    )
+                    document.metadata["bot_id"] = bot_id
+                    document.metadata["operation"] = operation
 
-    # delete documents with metadata in api with the current bot id, before reingesting
-    documents: List[Document] = []
-    paths = swagger_doc.specification.get("paths")
-    for path in paths:
-        operations = paths[path]
-        for method in operations:
-            operation = operations[method]
-            operation["method"] = method
-            operation["path"] = path
-            del operation["responses"]
-            document = Document(
-                page_content=f"{operation['summary']}; {operation['description']}"
-            )
-            document.metadata["bot_id"] = bot_id
-            document.metadata["operation"] = operation
+                    logger.info(
+                        "document before ingestion ---",
+                        incident="ingestion_doc",
+                        data=document.page_content,
+                    )
+                    documents.append(document)
+                except KeyError as e:
+                    # Handle the specific key error, log, or take necessary action
+                    logger.error(f"KeyError in processing document: {e}")
 
-            logger.info(
-                "document before ingestion ---",
-                incident="ingestion_doc",
-                data=document.page_content,
-            )
-            documents.append(document)
-
-    point_ids = vector_store.add_documents(documents)
-    logger.info(
-        "API ingestion for Qdrant",
-        incident="api_ingestion_qdrant",
-        point_ids=point_ids,
-    )
-
+        point_ids = vector_store.add_documents(documents)
+        logger.info(
+            "API ingestion for Qdrant",
+            incident="api_ingestion_qdrant",
+            point_ids=point_ids,
+        )
+    except KeyError as e:
+        # Handle the specific key error at a higher level if needed
+        logger.error(f"KeyError in processing paths: {e}")
+    except Exception as e:
+        # Handle other exceptions
+        logger.error(f"An error occurred: {e}")
 
 def add_swagger_file(request: Request, id: str) -> Dict[str, str]:
     if request.content_type == "application/json":
