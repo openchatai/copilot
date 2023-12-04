@@ -9,7 +9,8 @@ from typing import Iterable
 from utils.db import Database
 from utils.get_logger import CustomLogger
 from shared.models.opencopilot_db.chatbot import Chatbot
-from models.repository.copilot_repo import (get_total_chatbots, get_chatbots_batch)
+from models.repository.copilot_repo import get_total_chatbots, get_chatbots_batch
+
 client = QdrantClient(url=os.getenv("QDRANT_URL", "http://qdrant:6333"))
 import time
 
@@ -22,7 +23,6 @@ client = QdrantClient(url=os.getenv("QDRANT_URL", "http://qdrant:6333"))
 shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
 
 
-
 @shared_task
 def reindex_apis(batch_size: int = 100):
     total_files: int = get_total_chatbots()
@@ -30,10 +30,11 @@ def reindex_apis(batch_size: int = 100):
         batch: Iterable[Chatbot] = get_chatbots_batch(offset, batch_size)
         process_swagger_files_batch(batch)
 
+
 def process_swagger_files_batch(chatbots: Iterable[Chatbot]):
     for chatbot in chatbots:
         process_swagger_file(chatbot)
-        
+
 
 def process_swagger_file(chatbot: Chatbot):
     bot_id = str(chatbot.id)
@@ -45,7 +46,7 @@ def process_swagger_file(chatbot: Chatbot):
             swagger_url = f"{shared_folder}{swagger_url}"
 
         swagger_doc = ResolvingParser(url=swagger_url)
-        
+
         points = client.scroll(
             collection_name="apis",
             scroll_filter=models.Filter(
@@ -53,19 +54,20 @@ def process_swagger_file(chatbot: Chatbot):
                     models.Filter(
                         must=[
                             models.FieldCondition(
-                                key="metadata.bot_id", match=models.MatchValue(value="bot_id")
+                                key="metadata.bot_id",
+                                match=models.MatchValue(value="bot_id"),
                             )
                         ],
                     ),
                 ],
             ),
         )
-        
+
         if points is None:
-            logger.info("Points not found for bot, we will reindex", {bot_id: bot_id})
+            logger.info("Points not found for bot, we will reindex", bot_id=bot_id)
             save_swagger_paths_to_qdrant(swagger_doc=swagger_doc, bot_id=bot_id)
             time.sleep(3)
-            
+
         else:
             logger.info(f"points already exist for bot : {bot_id}")
 

@@ -129,10 +129,7 @@ def create_copilot(
             return chatbot_to_dict(new_chatbot)
         except Exception as e:
             session.rollback()
-            logger.error(
-                "An exception occurred",
-                extra={"app": "OPENCOPILOT", "error": str(e), "incident": "swagger"},
-            )
+            logger.error("An exception occurred", app="OPENCOPILOT", error=str(e), incident="swagger")
             raise e
         finally:
             session.close()
@@ -273,9 +270,6 @@ def update_copilot(
         raise ValueError(f"No Chatbot found with id: {copilot_id}")
     except Exception as e:
         session.rollback()
-        logger.error(
-            "An exception occurred",
-            extra={"app": "OPENCOPILOT", "error": str(e), "incident": "update_copilot"},
-        )
+        logger.error("An exception occurred", app="OPENCOPILOT", error=str(e), incident="update_copilot")
     finally:
         session.close()

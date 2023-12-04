@@ -40,8 +40,10 @@ def process_conversation_step(
             content=prompt_templates.system_message
         )
     logger.debug(
-        message="System message classification",
-        extra={"incident": "system_message_classifier", "app": app, "context": context},
+        "System message classification",
+        incident="system_message_classifier",
+        app=app,
+        context=context,
     )
     messages: List[BaseMessage] = []
     messages.append(system_message_classifier)
@@ -81,7 +83,7 @@ def process_conversation_step(
         HumanMessage(
             content="""Based on the information provided to you I want you to answer the questions that follow. Your should respond with a json that looks like the following - 
     {{
-        "ids": ["list", "of", "apis", "to", "be", "called"],
+        "ids": ["list", "of", "operationIds", "for apis to be called"],
         "bot_message": "your response based on the instructions provided at the beginning"
     }}                
     """
@@ -99,13 +101,7 @@ def process_conversation_step(
     if isinstance(d, str):
         return BotMessage(ids=[], bot_message=d)
 
-    logger.info(
-        message="Extracting JSON payload",
-        extra={
-            "incident": "extract_json_payload",
-            "data": d,
-        },
-    )
+    logger.info("Extracting JSON payload", incident="process_conversation_step", data=d)
 
     bot_message = BotMessage.from_dict(d)
     return bot_message

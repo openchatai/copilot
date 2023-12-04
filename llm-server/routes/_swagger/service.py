@@ -50,21 +50,17 @@ def save_swagger_paths_to_qdrant(swagger_doc: ResolvingParser, bot_id: str):
             document.metadata["operation"] = operation
 
             logger.info(
-                message="document before ingestion ---",
-                extra={
-                    "incident": "ingestion_doc",
-                    "data": document.page_content,
-                },
+                "document before ingestion ---",
+                incident="ingestion_doc",
+                data=document.page_content,
             )
             documents.append(document)
 
     point_ids = vector_store.add_documents(documents)
     logger.info(
-        message="API ingestion for Qdrant",
-        extra={
-            "incident": "api_ingestion_qdrant",
-            "point_ids": json.dumps(point_ids),
-        },
+        "API ingestion for Qdrant",
+        incident="api_ingestion_qdrant",
+        point_ids=point_ids,
     )
 
 

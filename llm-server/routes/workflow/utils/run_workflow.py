@@ -48,13 +48,13 @@ async def run_workflow(
             "incident": "run_workflow",
         }
 
-        logger.error("An exception occurred", extra=error_data)
+        logger.error("An exception occurred", error=error_data)
         error = str(e)
 
     output: ResponseDict = {"response": result if not error else "", "error": error}
 
     logging.info(
-        "[OpenCopilot] Workflow output %s", json.dumps(output, separators=(",", ":"))
+        "Workflow output %s", json.dumps(output, separators=(",", ":"))
     )
 
     return output
