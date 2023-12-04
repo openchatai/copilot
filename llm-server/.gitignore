@@ -155,3 +155,4 @@ app.bin
 app.build/
 app.dist/
 app.onefile-build/
+.DS_Store
