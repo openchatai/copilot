@@ -1,15 +1,16 @@
-from typing import Dict, Union, cast
 from typing import List
+from langchain.pydantic_v1 import BaseModel, Field
+from langchain.output_parsers import PydanticOutputParser
+
+class BotMessage(BaseModel):
+    bot_message: str = Field(description="Message from the bot")
+    ids: List[str] = Field(description="List of IDs")
+    
+    
+# Set up a parser + inject instructions into the prompt template.
+bot_message_parser = PydanticOutputParser(pydantic_object=BotMessage)
 
 
-class BotMessage:
-    def __init__(self, ids: List[str], bot_message: str):
-        self.ids = ids
-        self.bot_message = bot_message
-
-    def to_dict(self) -> Dict[str, Union[str, List[str]]]:
-        return {"ids": self.ids, "bot_message": self.bot_message}
-
-    @classmethod
-    def from_dict(cls, data: Dict[str, Union[str, List[str]]]) -> "BotMessage":
-        return cls(cast(List[str], data["ids"]), cast(str, data["bot_message"]))
+# bot_message_parser.parse(input_string)
+def parse_bot_message(input: str) -> BotMessage:
+    return bot_message_parser.parse(input)

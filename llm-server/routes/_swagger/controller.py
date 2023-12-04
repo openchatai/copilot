@@ -47,7 +47,7 @@ def get_swagger_files(swagger_url: str) -> Response:
 
 @_swagger.route("/get/b/<bot_id>", methods=["GET"])
 def get_swagger_files_by_bot_id(bot_id: str) -> Response:
-    swagger_file = mongo.swagger_files.find_one({"meta.bot_id": bot_id})
+    swagger_file = mongo.swagger_files.find_one({"bot_id": bot_id})
     if not swagger_file:
         return jsonify({"message": "Swagger file not found"}), 404
     swagger_file["_id"] = str(swagger_file["_id"])
