@@ -1,33 +1,47 @@
-import importlib
+from cachetools import cached, TTLCache
 from typing import Optional
 
+from utils.db import Database
+from utils.llm_consts import SUMMARIZATION_PROMPT, SYSTEM_MESSAGE_PROMPT
 
+db_instance = Database()
+mongo = db_instance.get_db()
+
+
+# defining it for each bot instead of app, because even for the same app we might want to add different prompts for different users
 class PromptsClass:
-    _instances = {}
+    def __init__(self, bot_id: str):
+        self.bot_id = bot_id
 
-    def __new__(cls, app_name: str):
-        if app_name not in cls._instances:
-            instance = super().__new__(cls)
-            instance._init_instance(app_name)
-            cls._instances[app_name] = instance
-        return cls._instances[app_name]
+    @cached(cache=TTLCache(maxsize=128, ttl=60))  # TTL is set to 60 seconds (1 minute)
+    def _load_prompts(self) -> dict:
+        try:
+            prompt = mongo.prompts.find_one({"bot_id": self.bot_id})
+            if not prompt:
+                return {SUMMARIZATION_PROMPT: None, SYSTEM_MESSAGE_PROMPT: None}
+            return prompt
+        except Exception as e:
+            print(f"Error loading prompts: {e}")
+            raise
 
-    def _init_instance(self, app_name: str):
-        prompts = importlib.import_module(f"integrations.custom_prompts.{app_name}")
-        self.knowledge_base_system_prompt = getattr(
-            prompts, "knowledge_base_system_prompt"
-        )
-        self.system_message_classifier = getattr(prompts, "system_message_classifier")
-        self.api_summarizer = getattr(prompts, "api_summarizer")
-        self.api_generation_prompt = getattr(prompts, "api_generation_prompt")
+    @property
+    def prompts(self) -> dict:
+        return self._load_prompts()
+
+    @property
+    def system_message(self) -> Optional[str]:
+        return self.prompts[SYSTEM_MESSAGE_PROMPT]
+
+    @property
+    def api_summarizer(self) -> Optional[str]:
+        return self.prompts[SUMMARIZATION_PROMPT]
 
 
-def load_prompts(app_name) -> Optional[PromptsClass]:
+def load_prompts(bot_id: str) -> Optional[PromptsClass]:
     try:
-        if not app_name:
+        if not bot_id:
             return None
-        return PromptsClass(app_name)
+        return PromptsClass(bot_id)
     except Exception as e:
-        # Handle the exception as per your requirements
-        print(f"An error occurred: {e}")
+        print(f"Error loading prompts: {e}")
         return None

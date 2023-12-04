@@ -1,6 +1,6 @@
 import os
 import json
-from flask import Blueprint, Response, request, jsonify
+from flask import Blueprint, Response, request
 from werkzeug.utils import secure_filename
 import secrets
 from routes.uploads.celery_service import celery
@@ -98,14 +98,14 @@ def start_file_ingestion() -> Response:
             # Check if the file extension is PDF
             if filename.lower().endswith(".pdf"):
                 celery.send_task(
-                    "tasks.process_pdfs.process_pdf", args=[filename, bot_id]
+                    "workers.tasks.process_pdfs.process_pdf", args=[filename, bot_id]
                 )
             elif filename.lower().endswith(".md"):
                 celery.send_task(
-                    "tasks.process_markdown.process_markdown", args=[filename, bot_id]
+                    "workers.tasks.process_markdown.process_markdown", args=[filename, bot_id]
                 )
             elif validators.url(filename):
-                celery.send_task("tasks.web_crawl.web_crawl", args=[filename, bot_id])
+                celery.send_task("workers.tasks.web_crawl.web_crawl", args=[filename, bot_id])
             else:
                 print(f"Received: {filename}, is neither a pdf nor a url. ")
 
@@ -135,7 +135,7 @@ def retry_failed_web_crawl():
         if request.json:
             website_data_source_id = request.json["website_data_source_id"]
             celery.send_task(
-                "web_crawl.resume_failed_website_scrape", args=[website_data_source_id]
+                "workers.web_crawl.resume_failed_website_scrape", args=[website_data_source_id]
             )
 
         return Response(
@@ -177,7 +177,7 @@ def retry_failed_pdf_crawl():
             chatbot_id = request.json["chatbot_id"]
             file_name = request.json["file_name"]
             celery.send_task(
-                "pdf_crawl.retry_failed_pdf_crawl", args=[chatbot_id, file_name]
+                "workers.pdf_crawl.retry_failed_pdf_crawl", args=[chatbot_id, file_name]
             )
 
             return Response(

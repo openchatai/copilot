@@ -7,11 +7,18 @@ services:
       dockerfile: Dockerfile
       target: ${TARGET}
     image: codebanesr/llm-server:latest
+    # logging:
+    #   driver: awslogs
+    #   options: 
+    #     awslogs-group: opencopilot
+    #     awslogs-region: us-east-1
+    #     awslogs-stream: llm-server
+      
     volumes:
       - ./llm-server:/app  # Mount the host llm-server directory to /app in the container
       - shared_data:/app/shared_data
     networks:
-      - opencopilot_network
+      - opencopilot-net
     env_file:
       - llm-server/.env
     ports:
@@ -29,16 +36,25 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      - opencopilot_network
+      - opencopilot-net
 
   workers:
     restart: unless-stopped
     build:
-      context: ./workers
-      dockerfile: Dockerfile
+      context: ./llm-server
+      dockerfile: worker.Dockerfile
     image: codebanesr/workers:latest  # Add this line
+    deploy:
+      replicas: 2
+    # logging:
+    #   driver: awslogs
+    #   options: 
+    #     awslogs-group: opencopilot
+    #     awslogs-region: us-east-1
+    #     awslogs-stream: workers
+      
     networks:
-      - opencopilot_network
+      - opencopilot-net
     volumes:
       - shared_data:/app/shared_data
     env_file:
@@ -60,7 +76,7 @@ services:
     volumes:
       - shared_data:/app/shared_data
     networks:
-      - opencopilot_network
+      - opencopilot-net
     depends_on:
       - mysql
 
@@ -79,7 +95,7 @@ services:
     volumes:
       - database:/var/lib/mysql
     networks:
-      - opencopilot_network
+      - opencopilot-net
 
   mongodb:
     image: mongo:latest
@@ -92,7 +108,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: dbuser
       MONGO_INITDB_ROOT_PASSWORD: dbpass
     networks:
-      - opencopilot_network
+      - opencopilot-net
 
   adminer:
     image: adminer
@@ -101,7 +117,7 @@ services:
     depends_on:
       - mysql
     networks:
-      - opencopilot_network
+      - opencopilot-net
 
   qdrant:
     image: qdrant/qdrant
@@ -111,7 +127,7 @@ services:
     volumes:
       - qdrant_storage:/qdrant/storage
     networks:
-      - opencopilot_network
+      - opencopilot-net
 
   selenium:
     # image: selenium/standalone-firefox:4.14.1-20231025
@@ -121,7 +137,7 @@ services:
       - "7900:7900"
     shm_size: 2g
     networks:
-      - opencopilot_network
+      - opencopilot-net
 
   nginx:
     image: nginx
@@ -131,14 +147,15 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     networks:
-      - opencopilot_network
+      - opencopilot-net
     depends_on:
       - dashboard
       - llm-server
       - mysql
 
 networks:
-  opencopilot_network:
+  opencopilot-net:
+    name: opencopilot-net
 
 volumes:
   shared_data:
