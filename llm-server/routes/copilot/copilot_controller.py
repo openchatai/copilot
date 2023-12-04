@@ -38,50 +38,53 @@ def index():
 
 @copilot.route("/swagger", methods=["POST"])
 def handle_swagger_file():
+    if "swagger_file" not in request.files:
+        return jsonify({"error": "You must upload a swagger file."}), 400
     logger.info(
         "Handling Swagger file",
         incident="handling_swagger_file",
         data=request.get_data(),  # Assuming request is available in the scope
     )
-
-    # Create the Copilot with default values
-    chatbot = create_copilot(
-        name=request.form.get("name", "My First Copilot"),
-        swagger_url="",
-        prompt_message=request.form.get(
-            "prompt_message", ChatBotInitialPromptEnum.AI_COPILOT_INITIAL_PROMPT
-        ),
-        website=request.form.get("website", "https://example.com"),
-    )
-
-    file = request.files.get("swagger_file")
-    if file and file.filename:
+    file = request.files["swagger_file"]
+    if file.filename == "":
+        return jsonify({"error": "No selected file."}), 400
+    if file:
         try:
             filename = secure_filename(str(uuid.uuid4()) + ".json")
             file.save(os.path.join(UPLOAD_FOLDER, filename))
 
-            # Update swagger_url after successfully saving the file
+            chatbot = create_copilot(
+                name=request.form.get("name", "My First Copilot"),
+                swagger_url=filename,
+                prompt_message=request.form.get(
+                    "prompt_message", ChatBotInitialPromptEnum.AI_COPILOT_INITIAL_PROMPT
+                ),
+                website=request.form.get("website", "https://example.com"),
+            )
 
             swagger_doc = get_swagger_doc(filename)
 
             swagger_service.save_swagger_paths_to_qdrant(swagger_doc, chatbot.id)
+
             swagger_service.save_swaggerfile_to_mongo(
                 filename, str(chatbot.id), swagger_doc
             )
-            chatbot = update_copilot(copilot_id=chatbot.id, swagger_url=filename)
-            return jsonify({"copilot":  chatbot_to_dict(chatbot)})
         except ValidationError as e:
-            return jsonify(
-                {
-                    "failure": "The copilot was created, but we failed to handle the swagger file due to some"
-                               " validation issues. Your copilot will work fine but without the ability to"
-                               " talk with any APIs. Error: {}".format(str(e)),
-                    "copilot": chatbot_to_dict(chatbot=chatbot)
-                }
-            ), 400
+            return (
+                jsonify(
+                    {
+                        "failure": "The copilot was created, but we failed to handle the swagger file duo to some"
+                        " validation issues, your copilot will work fine but without the ability to"
+                        " talk with any APIs. error: {}".format(str(e)),
+                        "cp": chatbot_to_dict(copilot)
+                    }
+                ),
+                400,
+            )
 
-    # Return the chatbot details, regardless of the file's presence
-    return jsonify({"copilot": chatbot_to_dict(chatbot)})
+        return jsonify({"file_name": filename, "chatbot": chatbot_to_dict(chatbot)})
+
+    return jsonify({"failure": "could_not_handle_swagger_file"}), 400
 
 
 @copilot.route("/<string:copilot_id>", methods=["GET"])
