@@ -2,164 +2,116 @@
 import React, { useState } from "react";
 import { HeaderShell } from "@/components/domain/HeaderShell";
 import { useCopilot } from "../../_context/CopilotProvider";
-import useSwr, { mutate } from "swr";
-import { Button } from "@/components/ui/button";
-import {
-  createWorkflowByBotId,
-  deleteWorkflowById,
-  getWorkflowById,
-  updateWorkflowById,
-} from "@/data/flow";
-import { toast } from "@/components/ui/use-toast";
 import _ from "lodash";
+import { Controller, FlowArena, useController } from "@/components/domain/flows-editor";
+import { Button } from "@/components/ui/button";
 import { useIsEditing } from "./_parts/useIsEditing";
-import {
-  Controller,
-  FlowArena,
-  useController,
-} from "@/components/domain/flows-editor";
-import { useRouter } from "@/lib/router-events";
+import { EmptyBlock } from "@/components/domain/EmptyBlock";
+import { mutateFlows } from "./_parts/WorkflowsList";
+import useSWR, { mutate } from "swr";
+import { deleteWorkflowById, getWorkflowById, updateWorkflowById } from "@/data/flow";
+import { toast } from "@/components/ui/use-toast";
+
+function SaveBtn() {
+  const { state } = useController();
+  const [isEditing, workflowId] = useIsEditing();
+  const [loading, setLoading] = useState(false)
+  async function handleSave() {
+    if (!workflowId || !state.name || !state.description) return;
+    try {
+      setLoading(true)
+      const { data } = await updateWorkflowById(workflowId, {
+        ...state,
+        name: state.name,
+        description: state.description,
+        steps: state.steps,
+        info: {
+          version: "0.0.1"
+        },
+        requires_confirmation: true,
+      })
+      if (data) {
+        mutate(data._id)
+        toast({
+          title: "Saved successfully",
+          variant: "success"
+        })
+      }
+    } catch (error) {
+      setLoading(false)
+    }
+  }
+  return isEditing ? <Button loading={loading} onClick={handleSave}>Save</Button> : null
+}
+function DeleteBtn() {
+  const [isEditing, workflowId, reset] = useIsEditing();
+  const { id: copilotId } = useCopilot();
+  const [loading, setLoading] = useState(false)
+  async function handleDelete() {
+    const confirm = window.confirm("Are you sure you want to delete this workflow?");
+    if (!confirm || !workflowId) return;
+    try {
+      setLoading(true)
+      const resp = await deleteWorkflowById(workflowId);
+      if (resp.status === 200) {
+        mutateFlows(copilotId)
+        reset()
+      }
+    } catch (error) {
+      setLoading(false)
+    }
+    setLoading(false)
+  }
+
+  return isEditing ? <Button loading={loading} variant='destructive' onClick={handleDelete}>Delete</Button> : null
+
+}
 
 function Header() {
-  // editing => workflow_id // creating => undefined
-  const [isEditing, workflow_id] = useIsEditing();
-  const { replace } = useRouter();
-  const { id: copilotId, name: copilotName } = useCopilot();
-  const {
-    reset: resetFlowEditor,
-    getData,
-    loadData,
-    state
-  } = useController();
-  console.log("state", state);
-  useSwr(workflow_id, getWorkflowById, {
-    onSuccess: (data) => {
-      console.log("data", data.data);
-      // load first 
-      if (data.data) {
-        loadData(data.data)
-      }
-    },
-  });
-  const [loading, setLoading] = useState(false);
-  async function handleSave() {
-    if (!isEditing || !workflow_id) return;
-    setLoading(true);
-    const { data } = await updateWorkflowById(workflow_id, getData());
-    if (data) {
-      toast({
-        title: "Workflow updated",
-        description: "Your workflow has been updated.",
-        variant: "success",
-      });
-      mutate(copilotId + "/workflows");
-      setLoading(false);
-    }
-  }
-
-  async function handleDelete() {
-    if (!isEditing || !workflow_id) return;
-    setLoading(true);
-    const { data } = await deleteWorkflowById(workflow_id);
-    if (data) {
-      toast({
-        title: "Workflow deleted",
-        description: "Your workflow has been deleted.",
-        variant: "success",
-      });
-      replace(`/copilot/${copilotId}/flows`, {
-        scroll: false,
-      });
-
-      mutate(copilotId + "/workflows");
-      resetFlowEditor()
-      setLoading(false);
-    }
-  }
-
-  async function handleCreate() {
-    if (isEditing) return;
-    const firstFlow = _.first(getData().flows);
-    console.log("data", getData());
-
-    if (firstFlow) {
-      setLoading(true);
-      try {
-        const { data } = await createWorkflowByBotId(copilotId, getData());
-        if (data.workflow_id) {
-          toast({
-            title: "Workflow created",
-            description: "Your workflow has been created.",
-            variant: "success",
-          });
-          replace(
-            `/copilot/${copilotId}/flows/?workflow_id=${data.workflow_id}`,
-            {
-              scroll: false,
-            },
-          );
-          mutate(copilotId + "/workflows");
-        }
-      } catch (error) {
-        toast({
-          title: "Workflow not created",
-          description: "Something went wrong.",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      toast({
-        title: "Workflow not created",
-        description: "You need at least one flow to create a workflow.",
-        variant: "destructive",
+  const { name: copilotName } = useCopilot();
+  const [, workflowId] = useIsEditing();
+  const { setData } = useController();
+  useSWR(workflowId, getWorkflowById, {
+    onSuccess: ({ data }) => {
+      setData({
+        name: data.name,
+        description: data.description,
+        steps: data.steps,
       });
     }
-  }
+  })
   return (
     <HeaderShell className="justify-between gap-2">
       <h1 className="text-lg font-bold text-accent-foreground">
-        {copilotName}
+        {copilotName}'s flows
       </h1>
-      {isEditing ? (
-        <div className="space-x-1">
-          <Button onClick={handleSave}>
-            Save
-          </Button>
-          <Button
-            onClick={handleDelete}
-
-            variant="destructive"
-          >
-            Delete
-          </Button>
-        </div>
-      ) : (
-        <div className="space-x-1">
-          <Button onClick={handleCreate}>
-            Create
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={() => {
-              confirm("Are you sure??") && resetFlowEditor();
-            }}
-          >
-            Reset
-          </Button>
-        </div>
-      )}
+      <div className="space-x-2">
+        <SaveBtn />
+        <DeleteBtn />
+      </div>
     </HeaderShell>
   );
 }
-export default function FlowsPage() {
+export default function FlowsPage({
+  searchParams: { workflow_id },
+}: {
+  searchParams: {
+    workflow_id?: string;
+  };
+}) {
+  console.log("workflow_id", workflow_id);
   return (
-    <Controller maxFlows={1}>
+    <Controller>
       <div className="flex h-full w-full flex-col">
         <Header />
-        <div className="relative flex h-full w-full flex-1 items-start justify-between">
-          <FlowArena />
+        <div className="relative flex h-full w-full flex-1 justify-center">
+          {
+            workflow_id ? <FlowArena /> :
+              <EmptyBlock Imagesize={150}>
+                <h2>Select or create workflow to start editing</h2>
+              </EmptyBlock>
+          }
+
         </div>
       </div>
     </Controller>
