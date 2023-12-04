@@ -5,6 +5,7 @@ from shared.utils.opencopilot_utils import (
     StoreOptions,
     get_embeddings,
     init_vector_store,
+    get_vector_store
 )
 from langchain.docstore.document import Document
 
