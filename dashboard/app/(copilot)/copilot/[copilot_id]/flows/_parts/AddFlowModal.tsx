@@ -6,20 +6,38 @@ import { Label } from '@/components/ui/label';
 import { AlertDialog, AlertDialogCancel, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogContent, AlertDialogTrigger, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { mutateFlows } from './WorkflowsList';
 import { useCopilot } from '../../../_context/CopilotProvider';
+import { createWorkflowByBotId } from '@/data/flow';
+import { toast } from '@/components/ui/use-toast';
 
 export function AddFlowModal() {
     const [modalOpen, setModalOpen] = useState(false);
     const { id: copilotId } = useCopilot()
     // this should create new flow on the server and then update the state
-    function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         const data = new FormData(e.currentTarget);
         const [name, description] = [
-            data.get("name"),
-            data.get("description"),
+            data.get("name")?.toString(),
+            data.get("description")?.toString(),
         ];
         if (name && description) {
-            console.log({ name, description });
+            const { data } = await createWorkflowByBotId(copilotId, {
+                info: {},
+                name,
+                description,
+                on_failure: [],
+                steps: [], on_success: [],
+                requires_confirmation: true, opencopilot: {
+                    version: "0.0.1",
+                },
+            })
+            if (data.workflow_id) {
+                toast({
+                    title: 'Flow created',
+                    description: 'Your flow has been created',
+                    variant: 'success'
+                })
+            }
             mutateFlows(copilotId);
             setModalOpen(false);
         }

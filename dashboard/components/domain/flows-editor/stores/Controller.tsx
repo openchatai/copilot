@@ -20,6 +20,7 @@ type ControllerContextType = {
   appendNode: (node: NodeData) => void;
   addNodeBetween: (sourceId: string, targetId: string, node: NodeData) => void;
   deleteNode: (id: string) => void;
+  setData: (data: Omit<StateShape, 'paths'>) => void;
 };
 
 type ActionType =
@@ -40,6 +41,9 @@ type ActionType =
       targetId: string,
       node: NodeData
     }
+  } | {
+    type: "set-data",
+    payload: Omit<StateShape, 'paths'>
   };
 
 
@@ -74,6 +78,13 @@ function stateReducer(state: StateShape, action: ActionType) {
         const { targetId, node } = action.payload;
         const index = draft.steps.findIndex((s) => s.id === targetId);
         draft.steps.splice(index + 1, 0, node);
+        break;
+      }
+      case "set-data": {
+        const { name, description, steps } = action.payload;
+        draft.name = name;
+        draft.description = description;
+        draft.steps = steps;
         break;
       }
       default:
@@ -133,7 +144,12 @@ function Controller({
                 payload: id,
               });
             },
-
+            setData(data) {
+              dispatch({
+                type: "set-data",
+                payload: data,
+              });
+            },
           }}
         >
           {children}

@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { HeaderShell } from "@/components/domain/HeaderShell";
 import { useCopilot } from "../../_context/CopilotProvider";
 import _ from "lodash";
@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { useIsEditing } from "./_parts/useIsEditing";
 import { EmptyBlock } from "@/components/domain/EmptyBlock";
 import { mutateFlows } from "./_parts/WorkflowsList";
+import useSWR from "swr";
+import { deleteWorkflowById, getWorkflowById } from "@/data/flow";
 
 function SaveBtn() {
   const { state } = useController();
@@ -15,21 +17,42 @@ function SaveBtn() {
   return isEditing ? <Button onClick={() => console.log(state)}>Save</Button> : null
 }
 function DeleteBtn() {
-  const [isEditing, workflowId] = useIsEditing();
+  const [isEditing, workflowId, reset] = useIsEditing();
   const { id: copilotId } = useCopilot();
+  const [loading, setLoading] = useState(false)
   async function handleDelete() {
     const confirm = window.confirm("Are you sure you want to delete this workflow?");
-    if (!confirm) return;
-    console.log("delete");
-    mutateFlows(copilotId);
+    if (!confirm || !workflowId) return;
+    try {
+      setLoading(true)
+      const resp = await deleteWorkflowById(workflowId);
+      if (resp.status === 200) {
+        mutateFlows(copilotId)
+        reset()
+      }
+    } catch (error) {
+      setLoading(false)
+    }
+    setLoading(false)
   }
 
-  return isEditing ? <Button variant='destructive' onClick={handleDelete}>Delete</Button> : null
+  return isEditing ? <Button loading={loading} variant='destructive' onClick={handleDelete}>Delete</Button> : null
 
 }
 
 function Header() {
   const { name: copilotName } = useCopilot();
+  const [, workflowId] = useIsEditing();
+  const { setData } = useController();
+  useSWR(workflowId, getWorkflowById, {
+    onSuccess: ({ data }) => {
+      setData({
+        name: data.name,
+        description: data.description,
+        steps: data.steps,
+      });
+    }
+  })
   return (
     <HeaderShell className="justify-between gap-2">
       <h1 className="text-lg font-bold text-accent-foreground">
