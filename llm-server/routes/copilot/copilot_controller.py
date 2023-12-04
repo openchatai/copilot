@@ -66,9 +66,9 @@ def handle_swagger_file():
 
             swagger_doc = get_swagger_doc(filename)
 
-            swagger_service.save_swagger_paths_to_qdrant(swagger_doc, chatbot["id"])
+            swagger_service.save_swagger_paths_to_qdrant(swagger_doc, chatbot.id)
             swagger_service.save_swaggerfile_to_mongo(
-                filename, str(chatbot["id"]), swagger_doc
+                filename, str(chatbot.id), swagger_doc
             )
             update_copilot(copilot_id=chatbot.id, swagger_url=filename)
         except ValidationError as e:
