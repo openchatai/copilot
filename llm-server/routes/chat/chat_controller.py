@@ -2,6 +2,7 @@ from typing import cast
 
 from flask import jsonify, Blueprint, request, Response, abort, Request
 from routes.chat.chat_dto import ChatInput
+from utils.get_logger import CustomLogger
 from utils.llm_consts import X_App_Name
 from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
 from models.repository.chat_history_repo import (
@@ -12,11 +13,11 @@ from models.repository.chat_history_repo import (
 from models.repository.copilot_repo import find_one_or_fail_by_token
 from utils.db import Database
 from .. import root_service
-from utils import struct_log
 from typing import Optional
 
 db_instance = Database()
 mongo = db_instance.get_db()
+logger = CustomLogger(module_name=__name__)
 
 chat_workflow = Blueprint("chat", __name__)
 
@@ -109,8 +110,8 @@ def init_chat():
 @chat_workflow.route("/send", methods=["POST"])
 async def send_chat():
     json_data = request.get_json()
-    if not isinstance(json_data, dict):
-        raise ValueError("Invalid JSON format. Expected a dictionary.")
+    # if not isinstance(json_data, dict):
+    #     raise ValueError("Invalid JSON format. Expected a dictionary.")
 
     input_data = ChatInput(**json_data)
     message = input_data.content
@@ -123,11 +124,10 @@ async def send_chat():
         abort(400, description="Invalid content, the size is larger than 255 char")
 
     if not bot_token:
-        raise ValueError("bot token must be defined! ")
+        return Response(response="bot token is required", status=500)
     bot = find_one_or_fail_by_token(bot_token)
 
-    app_name = headers_from_json.get(X_App_Name) or None
-    headers_from_json.pop(X_App_Name)
+    app_name = headers_from_json.pop(X_App_Name, None)
 
     swagger_url = bot.swagger_url
 
@@ -159,9 +159,6 @@ async def send_chat():
             app=app_name,
         )
 
-        if response_data["response"] is None or response_data["error"] is None:
-            raise ValueError("Please check logs")
-
         create_chat_history(str(bot.id), session_id, True, message)
         create_chat_history(
             str(bot.id),
@@ -174,7 +171,9 @@ async def send_chat():
             {"type": "text", "response": {"text": response_data["response"]}}
         )
     except Exception as e:
-        struct_log.exception(event="/chat/send", error=str(e))
+        logger.error(
+            "An exception occurred", extra={"incident": "chat/send", "error": str(e)}
+        )
         return (
             jsonify(
                 {

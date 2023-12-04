@@ -1,7 +1,7 @@
 import re
 import os
 import json
-from opencopilot_utils import get_llm
+from shared.utils.opencopilot_utils import get_llm
 from routes.workflow.extractors.extract_param import gen_params_from_schema
 from routes.workflow.extractors.extract_body import gen_body_from_schema
 from typing import Any, Optional
@@ -15,7 +15,7 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
 
 
-def get_api_info_by_operation_id(data: Any, target_operation_id: str) -> ApiInfo:
+async def get_api_info_by_operation_id(data: Any, target_operation_id: str) -> ApiInfo:
     api_info = ApiInfo(
         endpoint=None,
         method=None,
@@ -71,7 +71,7 @@ def extract_json_payload(input_string: str) -> Optional[Any]:
     return json.loads(match[0]) if match else None
 
 
-def generate_openapi_payload(
+async def generate_openapi_payload(
     swagger_json: ResolvingParser,
     text: str,
     _operation_id: str,
@@ -79,41 +79,38 @@ def generate_openapi_payload(
     app: Optional[str],
     current_state: Optional[str],
 ) -> ApiInfo:
-    async def process_api_info():
-        a, b, c = swagger_json.version_parsed
-        print(a, b, c)
+    a, b, c = swagger_json.version_parsed
+    print(a, b, c)
 
-        api_info = get_api_info_by_operation_id(
-            swagger_json.specification, _operation_id
+    api_info = await get_api_info_by_operation_id(
+        swagger_json.specification, _operation_id
+    )
+
+    if api_info.path_params["properties"]:
+        api_info.path_params = await gen_params_from_schema(
+            json.dumps(api_info.path_params, separators=(",", ":")),
+            text,
+            prev_api_response,
+            current_state,
         )
 
-        if api_info.path_params["properties"]:
-            api_info.path_params = await gen_params_from_schema(
-                json.dumps(api_info.path_params, separators=(",", ":")),
-                text,
-                prev_api_response,
-                current_state,
-            )
+    if api_info.query_params["properties"]:
+        api_info.query_params = await gen_params_from_schema(
+            json.dumps(api_info.query_params, separators=(",", ":")),
+            text,
+            prev_api_response,
+            current_state,
+        )
 
-        if api_info.query_params["properties"]:
-            api_info.query_params = await gen_params_from_schema(
-                json.dumps(api_info.query_params, separators=(",", ":")),
-                text,
-                prev_api_response,
-                current_state,
-            )
+    if api_info.body_schema:
+        api_info.body_schema = await gen_body_from_schema(
+            json.dumps(api_info.body_schema, separators=(",", ":")),
+            text,
+            prev_api_response,
+            app,
+            current_state,
+        )
+    else:
+        api_info.body_schema = {}
 
-        if api_info.body_schema:
-            api_info.body_schema = await gen_body_from_schema(
-                json.dumps(api_info.body_schema, separators=(",", ":")),
-                text,
-                prev_api_response,
-                app,
-                current_state,
-            )
-        else:
-            api_info.body_schema = {}
-
-        return api_info
-
-    return asyncio.run(process_api_info())
+    return api_info

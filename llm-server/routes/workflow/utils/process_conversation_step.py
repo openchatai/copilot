@@ -6,13 +6,13 @@ from routes.workflow.extractors.extract_json import extract_json_payload
 
 # push it to the library
 from integrations.custom_prompts.prompt_loader import load_prompts
-from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from utils import get_chat_model
 from utils.chat_models import CHAT_MODELS
-from utils.get_logger import struct_log
+from utils.get_logger import CustomLogger
 from typing import Optional, List, cast
 from json import dumps
 
+logger = CustomLogger(module_name=__name__)
 chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
 
@@ -27,23 +27,21 @@ def process_conversation_step(
     api_summaries: List[ApiOperation_vs],
     prev_conversations: List[BaseMessage],
     flows: List[WorkflowFlowType],
+    bot_id: str,
 ):
     if not session_id:
         raise ValueError("Session id must be defined for chat conversations")
-    prompt_templates = load_prompts(app)
+    prompt_templates = load_prompts(bot_id)
     system_message_classifier = SystemMessage(
-        content="You are a helpful ai assistant. User will give you two things, a list of api's and some useful information, called context. You will also have access to flows. Flows is a pre defined list of api's that can be used to answer the questions that follow."
+        content="You are a helpful ai assistant. User will give you two things, a list of api's and some useful information, called context."
     )
-    if app and prompt_templates:
+    if app and prompt_templates.system_message is not None:
         system_message_classifier = SystemMessage(
             content=prompt_templates.system_message
         )
-    struct_log.info(
-        event="system_message_classifier",
-        app=app,
-        context=context,
-        classification_prompt=system_message_classifier,
-        prev_conversations=prev_conversations,
+    logger.debug(
+        message="System message classification",
+        extra={"incident": "system_message_classifier", "app": app, "context": context},
     )
     messages: List[BaseMessage] = []
     messages.append(system_message_classifier)
@@ -101,7 +99,13 @@ def process_conversation_step(
     if isinstance(d, str):
         return BotMessage(ids=[], bot_message=d)
 
-    struct_log.info(event="extract_json_payload", data=d)
+    logger.info(
+        message="Extracting JSON payload",
+        extra={
+            "incident": "extract_json_payload",
+            "data": d,
+        },
+    )
 
     bot_message = BotMessage.from_dict(d)
     return bot_message

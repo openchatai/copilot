@@ -3,7 +3,7 @@ import json
 import os
 
 
-def load_json_config(app: str, operation_id: str) -> Optional[Any]:
+def load_json_config(app: Optional[str], operation_id: str) -> Optional[Any]:
     """Load the configuration for the given app and operation ID.
 
     Args:
@@ -14,6 +14,8 @@ def load_json_config(app: str, operation_id: str) -> Optional[Any]:
         The loaded config dict if found, else None
     """
 
+    if not app:
+        return None
     current_dir = os.path.dirname(__file__)
     config_file = os.path.join(
         current_dir, f"transformers/{app}/operations/{operation_id}.json"
