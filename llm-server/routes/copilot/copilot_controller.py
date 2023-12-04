@@ -5,11 +5,7 @@ import uuid
 from flask import Blueprint, jsonify, request, Response
 from prance import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
-from routes.root_service import get_swagger_doc
-from routes._swagger import reindex_service
 from werkzeug.utils import secure_filename
-from utils.base import resolve_abs_local_file_path_from
-from utils.get_logger import CustomLogger
 
 import routes._swagger.service as swagger_service
 from enums.initial_prompt import ChatBotInitialPromptEnum
@@ -22,7 +18,10 @@ from models.repository.copilot_repo import (
     SessionLocal,
     update_copilot,
 )
-from utils.llm_consts import EXPERIMENTAL_FEATURES_ENABLED
+from routes._swagger import reindex_service
+from routes.root_service import get_swagger_doc
+from utils.base import resolve_abs_local_file_path_from
+from utils.get_logger import CustomLogger
 from utils.swagger_parser import SwaggerParser
 
 logger = CustomLogger(module_name=__name__)
@@ -77,8 +76,8 @@ def handle_swagger_file():
                 jsonify(
                     {
                         "failure": "The copilot was created, but we failed to handle the swagger file duo to some"
-                        " validation issues, your copilot will work fine but without the ability to"
-                        " talk with any APIs. error: {}".format(str(e))
+                                   " validation issues, your copilot will work fine but without the ability to"
+                                   " talk with any APIs. error: {}".format(str(e))
                     }
                 ),
                 400,
@@ -184,7 +183,7 @@ def validator(copilot_id):
             jsonify(
                 {
                     "error": "Failed to load the swagger file for validation. error: "
-                    + str(e)
+                             + str(e)
                 }
             ),
             400,
