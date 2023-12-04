@@ -1,12 +1,12 @@
 from langchain.schema import HumanMessage, SystemMessage, BaseMessage
 from custom_types.api_operation import ApiOperation_vs
-from custom_types.bot_message import BotMessage
+from custom_types.bot_message import parse_bot_message, BotMessage
 from opencopilot_types.workflow_type import WorkflowFlowType
-from routes.workflow.extractors.extract_json import extract_json_payload
 
 # push it to the library
 from integrations.custom_prompts.prompt_loader import load_prompts
-from utils import get_chat_model
+from utils.get_chat_model import get_chat_model
+from langchain.schema import OutputParserException
 from utils.chat_models import CHAT_MODELS
 from utils.get_logger import CustomLogger
 from typing import Optional, List, cast
@@ -95,13 +95,22 @@ def process_conversation_step(
 
     messages.append(HumanMessage(content=user_requirement))
 
-    content = chat(messages=messages).content
-    d = extract_json_payload(cast(str, content))
+    content = cast(str, chat(messages=messages).content)
 
-    if isinstance(d, str):
-        return BotMessage(ids=[], bot_message=d)
+    try:
+        d = parse_bot_message(content)
+        logger.info(
+            "Extracting JSON payload",
+            action="parse_bot_message",
+            data=d,
+            content=content,
+        )
+        return d
 
-    logger.info("Extracting JSON payload", incident="process_conversation_step", data=d)
-
-    bot_message = BotMessage.from_dict(d)
-    return bot_message
+    except OutputParserException as e:
+        logger.error("Failed to parse json", data=content)
+        logger.error("Failed to parse json", err=str(e))
+        return BotMessage(bot_message=content, ids=[])
+    except Exception as e:
+        logger.error("unexpected error occured", err=str(e))
+        return BotMessage(ids=[], bot_message=str(e))
