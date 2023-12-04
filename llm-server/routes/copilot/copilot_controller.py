@@ -42,11 +42,9 @@ def handle_swagger_file():
     if "swagger_file" not in request.files:
         return jsonify({"error": "You must upload a swagger file."}), 400
     logger.info(
-        message="Handling Swagger file",
-        extra={
-            "incident": "handling_swagger_file",
-            "data": request.get_data(),  # Assuming request is available in the scope
-        },
+        "Handling Swagger file",
+        incident="handling_swagger_file",
+        data=request.get_data(),  # Assuming request is available in the scope
     )
     file = request.files["swagger_file"]
     if file.filename == "":
@@ -134,12 +132,10 @@ def general_settings_update(copilot_id):
         data = request.json
 
         logger.info(
-            message="Updating Copilot",
-            extra={
-                "incident": "update_copilot",
-                "data": data,
-                "bot_id": copilot_id,
-            },
+            "Updating Copilot",
+            incident="update_copilot",
+            data=data,
+            bot_id=copilot_id,
         )
         # Call update_copilot with the provided data
         updated_copilot = update_copilot(

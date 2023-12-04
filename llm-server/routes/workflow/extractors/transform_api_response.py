@@ -1,12 +1,12 @@
 import os
 import logging
-import json
 from langchain.schema import HumanMessage, SystemMessage
-from routes.lossy_compressors.truncate_json import truncate_json
-from utils import get_chat_model
+from utils.get_chat_model import get_chat_model
 from utils.chat_models import CHAT_MODELS
 
+from utils.get_logger import CustomLogger
 
+logger = CustomLogger(module_name=__name__)
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
 
@@ -27,6 +27,6 @@ def transform_api_response_from_schema(server_url: str, responseText: str) -> st
     ]
 
     result = chat(messages)
-    logging.info("[OpenCopilot] Transformed Response: {}".format(result.content))
+    logger.info("extracting essential fields", content=result.content, server_url=server_url)
 
     return result.content

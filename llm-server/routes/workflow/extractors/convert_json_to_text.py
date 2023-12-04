@@ -4,7 +4,7 @@ from langchain.schema import HumanMessage, SystemMessage
 
 from integrations.custom_prompts.prompt_loader import load_prompts
 from typing import Optional, Dict, Any, cast
-from utils import get_chat_model
+from utils.get_chat_model import get_chat_model
 from utils.chat_models import CHAT_MODELS
 from utils.get_logger import CustomLogger
 
@@ -19,15 +19,6 @@ def convert_json_to_text(
     bot_id: str,
 ) -> str:
     chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
-
-    logger.info(
-        "Information about converting JSON to text",
-        extra={
-            "incident": "convert_json_to_text",
-            "msg1": "api_request_data",
-            "data": api_request_data,
-        },
-    )
 
     api_summarizer_template = None
     system_message = SystemMessage(
@@ -56,6 +47,6 @@ def convert_json_to_text(
     ]
 
     result = chat(messages)
-    logging.info("[OpenCopilot] Transformed Response: {}".format(result.content))
+    logger.info("Convert json to text", content=result.content, incident="convert_json_to_text", api_request_data=api_request_data)
 
     return cast(str, result.content)

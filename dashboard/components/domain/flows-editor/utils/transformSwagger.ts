@@ -14,7 +14,12 @@ export function transformPaths(paths: Paths): TransformedPath[] {
                 const operation = endpoint[method as Method];
                 operation && methods.add({
                     method: method as Method,
-                    ...operation
+                    description: operation.description,
+                    summary: operation.summary,
+                    parameters: operation.parameters,
+                    tags: operation.tags,
+                    operationId: operation.operationId,
+                    methods: []
                 });
             }
 
