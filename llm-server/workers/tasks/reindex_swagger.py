@@ -47,7 +47,7 @@ def process_swagger_file(chatbot: Chatbot):
 
         swagger_doc = ResolvingParser(url=swagger_url)
 
-        points = client.scroll(
+        scroll_result = client.scroll(
             collection_name="apis",
             scroll_filter=models.Filter(
                 must_not=[
@@ -55,7 +55,7 @@ def process_swagger_file(chatbot: Chatbot):
                         must=[
                             models.FieldCondition(
                                 key="metadata.bot_id",
-                                match=models.MatchValue(value="bot_id"),
+                                match=models.MatchValue(value=str(chatbot.id)),
                             )
                         ],
                     ),
@@ -63,13 +63,19 @@ def process_swagger_file(chatbot: Chatbot):
             ),
         )
 
-        if points is None:
-            logger.info("Points not found for bot, we will reindex", bot_id=bot_id)
+        if scroll_result is None:
+            logger.info("scroll_result is None. No records found, we will reindex")
             save_swagger_paths_to_qdrant(swagger_doc=swagger_doc, bot_id=bot_id)
-            time.sleep(3)
-
         else:
-            logger.info(f"points already exist for bot : {bot_id}")
+            records, point_id = scroll_result
+
+            if len(records)==0:
+                logger.info("Points not found for bot, we will reindex", bot_id=bot_id)
+                save_swagger_paths_to_qdrant(swagger_doc=swagger_doc, bot_id=bot_id)
+                time.sleep(3)
+
+            else:
+                logger.info(f"points already exist for bot : {bot_id}")
 
     except KeyError as e:
         print(f"Error: Missing key in swagger_file - {e}")
