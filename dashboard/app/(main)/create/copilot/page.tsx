@@ -153,71 +153,67 @@ function UploadSwaggerStep() {
   const bothSelected = swaggerFile && !_.isEmpty(swaggerEndpoints);
   // spagetti 🍝
   async function handleCreateCopilot() {
-    if (!swaggerFile && _.isEmpty(swaggerEndpoints)) {
+    const hasSwaggerFile = Boolean(swaggerFile);
+    const hasSwaggerEndpoints = !_.isEmpty(swaggerEndpoints);
+    const isBothSelected = bothSelected;
+
+    if (!hasSwaggerFile && !hasSwaggerEndpoints) {
       toast({
         title: "No swagger file uploaded or created!",
-        description:
-          "Please upload a swagger file to continue, or create one using the form",
+        description: "Please upload a swagger file or create one using the form",
         variant: "destructive",
       });
       return;
     }
-    if (bothSelected) {
+
+    if (isBothSelected) {
       toast({
         title: "Both swagger file and swagger definition created!",
-        description:
-          "Please reset one of them to continue, you can't use both at the same time",
+        description: "Please reset one of them to continue, you can't use both at the same time",
         variant: "destructive",
       });
       return;
     }
-    else {
-      setLoading(true);
-      try {
-        if (!createdCopilot) {
-          if (swaggerFile) {
-            const res = await createCopilot({
-              swagger_file: swaggerFile,
-            });
-            if (res.data) {
-              setCopilot(res.data.chatbot);
-              toast({
-                title: "Copilot Created Successfully",
-                description: "You have created your copilot successfully",
-                variant: "success",
-              });
-              popConfetti(5)
-              _.delay(nextStep, 1000);
-            }
-          }
-          if (!_.isEmpty(swaggerEndpoints)) {
-            const swaggerDefinition = generateSwaggerDefinition(swaggerEndpoints);
-            const swagger_file = new File([JSON.stringify(swaggerDefinition)], "swagger.json", {
-              type: "application/json",
-            })
-            console.log(swagger_file);
-            const res = await createCopilot({
-              swagger_file,
-            });
-            if (res.data) {
-              setCopilot(res.data.chatbot);
-              toast({
-                title: "Copilot Created Successfully",
-                description: "You have created your copilot successfully",
-                variant: "success",
-              });
-              popConfetti(5)
-              _.delay(nextStep, 1000);
-            }
-          }
-        }
-      } catch (error) {
-        setLoading(false);
-      }
 
+    setLoading(true);
+
+    try {
+      if (!createdCopilot) {
+        const swaggerContent = hasSwaggerFile
+          ? swaggerFile
+          : generateSwaggerDefinition(swaggerEndpoints);
+
+        const swaggerFileObject = new File([JSON.stringify(swaggerContent)], "swagger.json", {
+          type: "application/json",
+        });
+
+        const res = await createCopilot({ swagger_file: swaggerFileObject });
+        if (res.data) {
+          setCopilot(res.data.chatbot);
+          toast({
+            title: "Copilot Created Successfully",
+            description: "You have created your copilot successfully",
+            variant: "success",
+          });
+          popConfetti(5);
+          _.delay(nextStep, 1000);
+        }
+      }
+    } catch (error) {
+      // @ts-ignore
+      const failure = error?.response?.data?.failure;
+      toast({
+        title: "Error",
+        description: failure,
+        variant: "destructive",
+      });
+      // go to next step
+      nextStep();
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
+
   return (
     <div className="relative p-1">
       {loading && (

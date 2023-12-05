@@ -5,11 +5,7 @@ import uuid
 from flask import Blueprint, jsonify, request, Response
 from prance import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
-from routes.root_service import get_swagger_doc
-from routes._swagger import reindex_service
 from werkzeug.utils import secure_filename
-from utils.base import resolve_abs_local_file_path_from
-from utils.get_logger import CustomLogger
 
 import routes._swagger.service as swagger_service
 from enums.initial_prompt import ChatBotInitialPromptEnum
@@ -22,7 +18,10 @@ from models.repository.copilot_repo import (
     SessionLocal,
     update_copilot,
 )
-from utils.llm_consts import EXPERIMENTAL_FEATURES_ENABLED
+from routes._swagger import reindex_service
+from routes.root_service import get_swagger_doc
+from utils.base import resolve_abs_local_file_path_from
+from utils.get_logger import CustomLogger
 from utils.swagger_parser import SwaggerParser
 
 logger = CustomLogger(module_name=__name__)
@@ -65,24 +64,26 @@ def handle_swagger_file():
 
             swagger_doc = get_swagger_doc(filename)
 
-            swagger_service.save_swagger_paths_to_qdrant(swagger_doc, chatbot["id"])
+            swagger_service.save_swagger_paths_to_qdrant(swagger_doc, chatbot.id)
 
             swagger_service.save_swaggerfile_to_mongo(
-                filename, str(chatbot["id"]), swagger_doc
+                filename, str(chatbot.id), swagger_doc
             )
         except ValidationError as e:
+            logger.error("Failed to parse json", e=str(e), fn="handle_swagger_file")
             return (
                 jsonify(
                     {
                         "failure": "The copilot was created, but we failed to handle the swagger file duo to some"
                         " validation issues, your copilot will work fine but without the ability to"
-                        " talk with any APIs. error: {}".format(str(e))
+                        " talk with any APIs. error: {}".format(str(e)),
+                        "cp": chatbot_to_dict(copilot)
                     }
                 ),
                 400,
             )
 
-        return jsonify({"file_name": filename, "chatbot": chatbot})
+        return jsonify({"file_name": filename, "chatbot": chatbot_to_dict(chatbot)})
 
     return jsonify({"failure": "could_not_handle_swagger_file"}), 400
 
@@ -149,7 +150,7 @@ def general_settings_update(copilot_id):
         )
 
         # Return the updated chatbot information
-        return jsonify({"chatbot": updated_copilot})
+        return jsonify({"chatbot": chatbot_to_dict(updated_copilot)})
     except ValueError as e:
         # Handle not found error
         return jsonify({"error": str(e)}), 404
@@ -180,7 +181,7 @@ def validator(copilot_id):
             jsonify(
                 {
                     "error": "Failed to load the swagger file for validation. error: "
-                    + str(e)
+                             + str(e)
                 }
             ),
             400,

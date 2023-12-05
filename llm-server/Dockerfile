@@ -14,4 +14,4 @@ CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", "--wait-for-client",
 # Production stage
 FROM common AS production
 EXPOSE 8002
-CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--port=8002"]
+CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--port=8002", "--reload"]
