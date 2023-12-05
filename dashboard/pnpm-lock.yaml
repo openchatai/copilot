@@ -12,8 +12,8 @@ dependencies:
     specifier: ^1.5.2
     version: 1.6.0(@radix-ui/react-alert-dialog@1.0.5)(@radix-ui/react-dialog@1.0.5)(@radix-ui/react-tooltip@1.0.7)(react-dom@18.2.0)(react@18.2.0)
   '@openchatai/copilot-widget':
-    specifier: ^1.3.1
-    version: 1.3.1(react-dom@18.2.0)(react@18.2.0)
+    specifier: ^1.3.2
+    version: 1.3.2(react-dom@18.2.0)(react@18.2.0)
   '@radix-ui/react-accordion':
     specifier: ^1.1.2
     version: 1.1.2(@types/react-dom@18.2.13)(@types/react@18.2.28)(react-dom@18.2.0)(react@18.2.0)
@@ -463,8 +463,8 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
-  /@openchatai/copilot-widget@1.3.1(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-hWcBwlOk/Rxxg1E7AJfW79QlZxK0KFazdz9P7ZF7uo7GuEdN9uDz/LtDntdkkWXyCM0HtMf/lyCfsoWrnTCzoQ==}
+  /@openchatai/copilot-widget@1.3.2(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-+AIZV+yjMAwK+I8MBGHIr35r4eF1ee+uJl6yLiUAxR053UMTcD7P0SIPwl99QmJ1XJnh7pmiFIWa58kRo+t6Lw==}
     peerDependencies:
       react: ^18.x
       react-dom: ^18.x
