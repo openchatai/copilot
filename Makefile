@@ -41,7 +41,7 @@ install:
 
 	@echo "$(COLOR_BOLD)=== 🟢 Running Alembic migrations ===$(COLOR_RESET)"
 	docker ps
-	docker logs -f
+	docker compose logs -f
 
 
 	@echo "$(COLOR_BOLD)=== Installation completed ===$(COLOR_RESET)"
