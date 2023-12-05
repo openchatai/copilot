@@ -1,3 +1,5 @@
+import time
+
 from urllib.parse import urlparse
 from celery import shared_task
 from jsonschema import RefResolutionError, ValidationError
@@ -12,7 +14,6 @@ from shared.models.opencopilot_db.chatbot import Chatbot
 from models.repository.copilot_repo import get_total_chatbots, get_chatbots_batch
 
 client = QdrantClient(url=os.getenv("QDRANT_URL", "http://qdrant:6333"))
-import time
 
 
 logger = CustomLogger(module_name=__name__)
@@ -47,35 +48,27 @@ def process_swagger_file(chatbot: Chatbot):
 
         swagger_doc = ResolvingParser(url=swagger_url)
 
-        scroll_result = client.scroll(
+        count_result = client.count(
             collection_name="apis",
             scroll_filter=models.Filter(
-                must_not=[
-                    models.Filter(
-                        must=[
-                            models.FieldCondition(
-                                key="metadata.bot_id",
-                                match=models.MatchValue(value=str(chatbot.id)),
-                            )
-                        ],
-                    ),
+                must=[
+                    models.FieldCondition(
+                        key="metadata.bot_id",
+                        match=models.MatchValue(value=str(chatbot.id)),
+                    )
                 ],
             ),
+            exact=True,
         )
 
-        if scroll_result is None:
-            logger.info("scroll_result is None. No records found, we will reindex")
+        if count_result.count == 0:
+            logger.info("total count = 0", count_result=count_result)
             save_swagger_paths_to_qdrant(swagger_doc=swagger_doc, bot_id=bot_id)
+            time.sleep(3)
         else:
-            records, point_id = scroll_result
-
-            if len(records)==0:
-                logger.info("Points not found for bot, we will reindex", bot_id=bot_id)
-                save_swagger_paths_to_qdrant(swagger_doc=swagger_doc, bot_id=bot_id)
-                time.sleep(3)
-
-            else:
-                logger.info(f"points already exist for bot : {bot_id}")
+            logger.info(
+                "Found existing points, no action required", count_result=count_result
+            )
 
     except KeyError as e:
         print(f"Error: Missing key in swagger_file - {e}")
