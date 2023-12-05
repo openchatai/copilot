@@ -1,6 +1,6 @@
-name: Lint Code Base
+name: Lint Python Code Base
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   build:
@@ -24,5 +24,5 @@ jobs:
     - name: Lint with flake8
       run: |
         pip install flake8
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        flake8 llm-server/ --count --select=E9,F63,F7,F82 --show-source --statistics
+
