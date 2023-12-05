@@ -15,7 +15,7 @@ export type ChatMessageType = {
 // http://localhost:8888/backend/chat/sessions/:sessionId/chats
 export async function getConversationBySessionId(sessionId: string) {
   if (!sessionId) return;
-  return instance.get<ChatMessageType[]>(`/sessions/${sessionId}/chats`);
+  return (await instance.get<ChatMessageType[]>(`/sessions/${sessionId}/chats`)).data;
 }
 
 export type ConversationType = {
