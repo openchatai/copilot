@@ -36,7 +36,7 @@ install:
 	$(DOCKER_COMPOSE) up -d #--force-recreate
 
 	@echo "$(COLOR_BOLD)=== 🟢 Waiting for services to start (~30 seconds) ===$(COLOR_RESET)"
-	@sleep 30
+	@sleep 60
 
 
 	@echo "$(COLOR_BOLD)=== 🟢 Running Alembic migrations ===$(COLOR_RESET)"
