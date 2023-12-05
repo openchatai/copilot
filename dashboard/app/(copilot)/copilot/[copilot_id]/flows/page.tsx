@@ -16,12 +16,12 @@ function SaveBtn() {
   const { state } = useController();
   const [isEditing, workflowId] = useIsEditing();
   const [loading, setLoading] = useState(false)
+  const { id: copilotId } = useCopilot();
   async function handleSave() {
     if (!workflowId || !state.name || !state.description) return;
+    setLoading(true)
     try {
-      setLoading(true)
-      const { data } = await updateWorkflowById(workflowId, {
-        ...state,
+      const flow = {
         name: state.name,
         description: state.description,
         steps: state.steps,
@@ -29,7 +29,14 @@ function SaveBtn() {
           version: "0.0.1"
         },
         requires_confirmation: true,
-      })
+        on_failure: [],
+        on_success: [],
+        opencopilot: {
+          version: "0.0.1",
+        },
+        bot_id: copilotId
+      }
+      const { data } = await updateWorkflowById(workflowId, flow)
       if (data) {
         mutate(data._id)
         toast({
@@ -40,6 +47,7 @@ function SaveBtn() {
     } catch (error) {
       setLoading(false)
     }
+    setLoading(false)
   }
   return isEditing ? <Button loading={loading} onClick={handleSave}>Save</Button> : null
 }
@@ -55,6 +63,10 @@ function DeleteBtn() {
       const resp = await deleteWorkflowById(workflowId);
       if (resp.status === 200) {
         mutateFlows(copilotId)
+        toast({
+          title: "Deleted successfully",
+          variant: "success"
+        })
         reset()
       }
     } catch (error) {
