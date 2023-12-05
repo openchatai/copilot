@@ -27,6 +27,7 @@ services:
     depends_on:
       - mongodb
       - qdrant
+      - mysql
   
   redis:
     image: redis:latest
@@ -78,7 +79,7 @@ services:
     networks:
       - opencopilot-net
     depends_on:
-      - mysql
+      - llm-server
 
   mysql:
     restart: unless-stopped
