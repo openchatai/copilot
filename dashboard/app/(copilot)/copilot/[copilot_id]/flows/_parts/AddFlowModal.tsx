@@ -12,8 +12,10 @@ import { toast } from '@/components/ui/use-toast';
 export function AddFlowModal() {
     const [modalOpen, setModalOpen] = useState(false);
     const { id: copilotId } = useCopilot()
+    const [loading, setLoading] = useState(false)
     // this should create new flow on the server and then update the state
     async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+        setLoading(true)
         e.preventDefault();
         const data = new FormData(e.currentTarget);
         const [name, description] = [
@@ -21,25 +23,35 @@ export function AddFlowModal() {
             data.get("description")?.toString(),
         ];
         if (name && description) {
-            const { data } = await createWorkflowByBotId(copilotId, {
-                info: {},
-                name,
-                description,
-                on_failure: [],
-                steps: [], on_success: [],
-                requires_confirmation: true, opencopilot: {
-                    version: "0.0.1",
-                },
-            })
-            if (data.workflow_id) {
+            try {
+                const { data } = await createWorkflowByBotId(copilotId, {
+                    info: {},
+                    name,
+                    description,
+                    on_failure: [],
+                    steps: [], on_success: [],
+                    requires_confirmation: true, opencopilot: {
+                        version: "0.0.1",
+                    },
+                })
+                if (data.workflow_id) {
+                    toast({
+                        title: 'Flow created',
+                        description: 'Your flow has been created',
+                        variant: 'success'
+                    })
+                }
+                mutateFlows(copilotId);
+                setLoading(false)
+                setModalOpen(false);
+            } catch (error) {
+                setLoading(false);
                 toast({
-                    title: 'Flow created',
-                    description: 'Your flow has been created',
-                    variant: 'success'
+                    title: 'Error',
+                    description: 'Something went wrong',
+                    variant: 'destructive'
                 })
             }
-            mutateFlows(copilotId);
-            setModalOpen(false);
         }
     }
     return (
@@ -70,9 +82,9 @@ export function AddFlowModal() {
                         className="my-2"
                     />
                     <AlertDialogFooter className='space-x-4'>
-                        <AlertDialogAction type='submit'>
+                        <Button type='submit' loading={loading}>
                             Create
-                        </AlertDialogAction>
+                        </Button>
                         <AlertDialogCancel>
                             Cancel
                         </AlertDialogCancel>
