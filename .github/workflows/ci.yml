@@ -23,6 +23,9 @@ jobs:
         sudo service docker start
         docker --version
 
+    - name: Copy .env.example to .env
+      run: cp llm-server/.env.example llm-server/.env  # Adjust this line as needed
+
     - name: Build and Test
       run: |
         make install
