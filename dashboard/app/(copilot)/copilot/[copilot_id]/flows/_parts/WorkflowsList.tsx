@@ -17,7 +17,7 @@ export function WorkflowsList({ copilot_id }: { copilot_id: string }) {
   return (
     <ul className="px-2 space-y-2">
       {
-        isLoading ? <Loader /> : _.isEmpty(flows?.workflows) ? <EmptyBlock>
+        isLoading ? <Loader className="grow-0 mx-auto w-fit" /> : _.isEmpty(flows?.workflows) ? <EmptyBlock>
           <p className="text-sm text-gray-500">No flows yet</p>
         </EmptyBlock> :
           flows?.workflows.map((flow, i) => (

@@ -50,7 +50,7 @@ export function PathButton({ path }: { path: TransformedPath }) {
                         if (isPresentInNodes(method.method)) {
                           return;
                         }
-                        const node: NodeData = {
+                        const node: NodeData & { operation: string } = {
                           id: `${path.path}-${method.method}`,
                           path: path.path,
                           method: method.method,
@@ -59,6 +59,7 @@ export function PathButton({ path }: { path: TransformedPath }) {
                           tags: method.tags,
                           summary: method.summary,
                           operationId: method.operationId,
+                          operation: "REQUEST",
 
                         }
                         if (mode.type === "append-node") {
