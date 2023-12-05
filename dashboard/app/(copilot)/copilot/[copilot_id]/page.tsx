@@ -14,12 +14,13 @@ import { Link } from "@/lib/router-events";
 import React from "react";
 import { useCopilot } from "../_context/CopilotProvider";
 import dynamic from "next/dynamic";
+import { baseUrl } from "@/data/base-url";
 
 const Widget = dynamic(() => import("./CopilotWidget"));
 
 function InstallationSection() {
   const { token: CopilotToken } = useCopilot();
-
+  const baseUrl = "https://cloud.opencopilot.so/backend"
   return (
     <section className="rounded-lg border bg-white shadow-sm">
       <AccordionItem value="installation">
@@ -45,10 +46,10 @@ function InstallationSection() {
           </p>
           <CodeBlock
             code={`
-            <script src="http://localhost:8888/pilot.js"></script>
+            <script src="http://${baseUrl}/pilot.js"></script>
             <script> // be aware to call this function when the document/window is ready.
             const options = {
-              apiUrl: "http://localhost:8888/backend", // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:5000/api
+              apiUrl: "http://${baseUrl}/backend", // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:5000/api
               initialMessages: ["How are the things"], // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
               token: "${CopilotToken}", // you can get your token from the dashboard
               triggerSelector: "#triggerSelector", // the selector of the element that will trigger the copilot when clicked

@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { baseUrl } from '@/data/base-url';
 import {
     CopilotWidget,
     Root
@@ -20,7 +21,7 @@ export default function Widget({
 
         <Root
             options={{
-                apiUrl: "http://localhost:8888/backend",
+                apiUrl: baseUrl + "/backend",
                 defaultOpen: true,
                 token,
                 initialMessage: "Hey Pal!",

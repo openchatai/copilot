@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional, List, Dict, Union, Tuple
-from opencopilot_db import ChatHistory, engine
+from shared.models.opencopilot_db import ChatHistory, engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import distinct
 from sqlalchemy.orm import class_mapper
@@ -67,7 +67,7 @@ def get_all_chat_history_by_session_id(
     return chats[::-1]
 
 
-def get_chat_message_as_llm_conversation(session_id: str) -> List[BaseMessage]:
+async def get_chat_message_as_llm_conversation(session_id: str) -> List[BaseMessage]:
     chats = get_all_chat_history_by_session_id(session_id, 100)
     conversations: List[BaseMessage] = []
     for chat in chats:
@@ -195,7 +195,7 @@ def get_unique_sessions_with_first_message_by_bot_id(
 
     # Use distinct to get unique session_ids
     unique_session_ids = (
-        session.query(distinct(ChatHistory.session_id),  ChatHistory.id)
+        session.query(distinct(ChatHistory.session_id), ChatHistory.id)
         .filter_by(chatbot_id=bot_id)
         .order_by(ChatHistory.id.desc())
         .limit(limit)

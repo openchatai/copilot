@@ -1,14 +1,25 @@
 import axios from "axios";
-import { getDef } from "@/components/domain/flows-editor/utils/getDef";
+import { baseUrl } from "./base-url";
 
 const instance = axios.create({
-  baseURL: "http://localhost:8888/backend/flows",
+  baseURL: baseUrl + "/backend/flows",
 });
 
 type Workflow = {
   _id: string;
-} & ReturnType<typeof getDef>
-
+  bot_id: string;
+  description: string;
+  info: any;
+  name: string;
+  on_failure: any[];
+  on_success: any[];
+  opencopilot: {
+    version: string;
+  };
+  requires_confirmation: boolean;
+  steps: any[];
+  vector_ids: string[];
+}
 
 interface PaginatedWorkflows {
   workflows: Workflow[];
@@ -26,14 +37,8 @@ export const getWorkflowsByBotId = async (bot_id: string, page: number = 1) => {
 export const getWorkflowById = async (id: string) => {
   return await instance.get<Workflow>(`/${id}`);
 };
-
-export const createWorkflowFromSwagger = (
-  swaggerUrl: string,
-): Promise<Workflow> => {
-  return instance.post(`/u/${swaggerUrl}`);
-};
-// http://localhost:8888/backend/flows/b/:bot_id
-export const createWorkflowByBotId = async (bot_id: string, data: any) => {
+// http://localhost:8888/backend/flows/b/:bot_id/
+export const createWorkflowByBotId = async (bot_id: string, data: Partial<Workflow>) => {
   return await instance.post<{
     message: "Workflow created";
     workflow_id: string;

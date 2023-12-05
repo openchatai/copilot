@@ -2,12 +2,14 @@ import os
 from langchain.schema import HumanMessage, SystemMessage
 from utils.chat_models import CHAT_MODELS
 from utils.get_chat_model import get_chat_model
-from opencopilot_utils import get_llm
+from shared.utils.opencopilot_utils import get_llm
 
 from typing import Any, Optional
 from routes.workflow.extractors.extract_json import extract_json_payload
 import importlib
-import logging
+from utils.get_logger import CustomLogger
+
+logger = CustomLogger(module_name=__name__)
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
@@ -51,13 +53,9 @@ async def gen_body_from_schema(
 
     result = chat(messages)
 
-    logging.info("[OpenCopilot] LLM Body Response: {}".format(result.content))
+    logger.info("LLM Body Response", content=result.content, text=text, app=app)
 
     d: Any = extract_json_payload(result.content)
-    logging.info(
-        "[OpenCopilot] Parsed the json payload: {}, context: {}".format(
-            d, "gen_body_from_schema"
-        )
-    )
+    logger.info("Parsed the json payload", payload=d, app=app, api_generation_prompt=api_generation_prompt)
 
     return d

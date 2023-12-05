@@ -1,9 +1,10 @@
 import requests
 from typing import Any, Dict
 from requests import Response
-import logging
 
-logger = logging.getLogger(__name__)
+from utils.get_logger import CustomLogger
+
+logger = CustomLogger(module_name=__name__)
 
 
 def replace_url_placeholders(url: str, values_dict: Dict[str, Any]) -> str:
@@ -33,6 +34,7 @@ def make_api_request(
     headers,
     servers,
 ) -> Response:
+    url = ""
     try:
         endpoint = replace_url_placeholders(endpoint, path_params)
         url: str = servers[0] + endpoint
@@ -66,15 +68,5 @@ def make_api_request(
         return response
 
     except requests.exceptions.RequestException as e:
-        logger.error(
-            "API request failed",
-            exc_info=e,
-            extra={
-                "headers": headers,
-                "url": url,
-                "params": path_params,
-                "query_params": query_params,
-                "method": method,
-            },
-        )
+        logger.error("API request failed", e=str(e), headers=headers, url= url, params = path_params, query_params= query_params, method=method)
         raise (e)

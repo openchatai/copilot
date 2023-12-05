@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:19.03.12
+        options: --privileged
+        ports:
+          - 2375:2375
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Docker
+      run: |
+        sudo service docker start
+        docker --version
+
+    - name: Copy .env.example to .env
+      run: |
+        cp llm-server/.env.example llm-server/.env 
+
+    - name: Build and Test
+      run: make install

@@ -4,47 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a5b96282-820c-459e-94b5-28be0f17b86c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../llm-server/models/repository/flow_repo.py" beforeDir="false" afterPath="$PROJECT_DIR$/../llm-server/models/repository/flow_repo.py" afterDir="false" />
-    </list>
+    <list default="true" id="3bd776a7-5db5-42c8-ae14-ba0a3adcaaee" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
-  </component>
-  <component name="MarkdownSettingsMigration">
-    <option name="stateVersion" value="1" />
-  </component>
-  <component name="ProjectId" id="2YdavPqhMFs9G0fHLRkJaNDjnnH" />
-  <component name="ProjectViewState">
-    <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showLibraryContents" value="true" />
-  </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;flows-v2&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/gharbat/PhpstormProjects/chatbot-backend/OpenCopilot/workers/shared/models/opencopilot_db&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "git-widget-placeholder": "fix/create-bot-400-status"
   }
-}</component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/shared/models/opencopilot_db" />
-    </key>
-  </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+}]]></component>
   <component name="TaskManager">
-    <task active="true" id="Default" summary="Default task">
-      <changelist id="a5b96282-820c-459e-94b5-28be0f17b86c" name="Changes" comment="" />
-      <created>1700858139564</created>
-      <option name="number" value="Default" />
-      <option name="presentableId" value="Default" />
-      <updated>1700858139564</updated>
-    </task>
     <servers />
   </component>
 </project>

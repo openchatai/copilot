@@ -25,9 +25,13 @@ services:
       - 8002:8002
       - 5678:5678
     depends_on:
-      - mongodb
-      - qdrant
-  
+      mysql:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+      mongodb:
+        condition: service_started
+
   redis:
     image: redis:latest
     container_name: redis_cache
@@ -41,9 +45,11 @@ services:
   workers:
     restart: unless-stopped
     build:
-      context: ./workers
-      dockerfile: Dockerfile
+      context: ./llm-server
+      dockerfile: worker.Dockerfile
     image: codebanesr/workers:latest  # Add this line
+    deploy:
+      replicas: 2
     # logging:
     #   driver: awslogs
     #   options: 
@@ -60,8 +66,12 @@ services:
     # worker will also check for some database tables, this is a hacky solution
     command: sh -c "celery -A celery_app worker --loglevel=info"
     depends_on:
-      - mysql
-      - qdrant
+      mysql:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+      mongodb:
+        condition: service_started
 
   dashboard:
     restart: unless-stopped
@@ -76,7 +86,7 @@ services:
     networks:
       - opencopilot-net
     depends_on:
-      - mysql
+      - llm-server
 
   mysql:
     restart: unless-stopped
@@ -94,6 +104,11 @@ services:
       - database:/var/lib/mysql
     networks:
       - opencopilot-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   mongodb:
     image: mongo:latest
@@ -147,14 +162,16 @@ services:
     networks:
       - opencopilot-net
     depends_on:
-      - dashboard
-      - llm-server
-      - mysql
+      mysql:
+        condition: service_healthy
+      dashboard:
+        condition: service_started
+      llm-server:
+        condition: service_started
 
 networks:
   opencopilot-net:
     name: opencopilot-net
-    # external: true
 
 volumes:
   shared_data:

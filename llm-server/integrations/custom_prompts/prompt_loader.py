@@ -18,7 +18,7 @@ class PromptsClass:
         try:
             prompt = mongo.prompts.find_one({"bot_id": self.bot_id})
             if not prompt:
-                raise ValueError(f"No prompts found for bot {self.bot_id}")
+                return {SUMMARIZATION_PROMPT: None, SYSTEM_MESSAGE_PROMPT: None}
             return prompt
         except Exception as e:
             print(f"Error loading prompts: {e}")
@@ -29,11 +29,11 @@ class PromptsClass:
         return self._load_prompts()
 
     @property
-    def system_message(self) -> str:
+    def system_message(self) -> Optional[str]:
         return self.prompts[SYSTEM_MESSAGE_PROMPT]
 
     @property
-    def api_summarizer(self) -> str:
+    def api_summarizer(self) -> Optional[str]:
         return self.prompts[SUMMARIZATION_PROMPT]
 
 

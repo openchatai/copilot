@@ -1,16 +1,17 @@
 import datetime
 import uuid
-from typing import List, Optional, Any, Type
+from typing import Iterable, List, Optional, Any, Type
 
-from opencopilot_db.chatbot import Chatbot, engine
+from shared.models.opencopilot_db.chatbot import Chatbot, engine
 from sqlalchemy import exc
 from sqlalchemy.orm import sessionmaker, Session
 
-from utils import struct_log
 from utils.base import generate_random_token
+from utils.get_logger import CustomLogger
 
 # Create a Session factory
 SessionLocal = sessionmaker(bind=engine)
+logger = CustomLogger(module_name=__name__)
 
 
 def list_all_with_filter(filter_criteria: Optional[Any] = None) -> List[Chatbot]:
@@ -46,7 +47,27 @@ def list_all_with_filter(filter_criteria: Optional[Any] = None) -> List[Chatbot]
     finally:
         session.close()
 
-
+def get_total_chatbots() -> int:
+    session: Session = SessionLocal()
+    try:
+        total_chatbots = session.query(Chatbot).count()
+        return total_chatbots
+    except Exception as e:
+        raise e
+    finally:
+        session.close()
+        
+        
+def get_chatbots_batch(offset: int, batch_size: int) -> Iterable[Chatbot]:
+    session: Session = SessionLocal()
+    try:
+        chatbots_batch = session.query(Chatbot).offset(offset).limit(batch_size).all()
+        return chatbots_batch
+    except Exception as e:
+        raise e
+    finally:
+        session.close()
+        
 def find_or_fail_by_bot_id(bot_id: bytes) -> Optional[Chatbot]:
     session: Session = SessionLocal()
     try:
@@ -99,16 +120,17 @@ def create_copilot(
             smart_sync=smart_sync,
             created_at=datetime.datetime.utcnow(),
             updated_at=datetime.datetime.utcnow(),
-            email='example@example.com',
+            email="example@example.com",
         )
 
         try:
             session.add(new_chatbot)
             session.commit()
-            return chatbot_to_dict(new_chatbot)
+            session.refresh(new_chatbot)
+            return new_chatbot
         except Exception as e:
             session.rollback()
-            struct_log.exception(app="OPENCOPILOT", error=str(e), event="/swagger")
+            logger.error("An exception occurred", app="OPENCOPILOT", error=str(e), incident="swagger")
             raise e
         finally:
             session.close()
@@ -200,7 +222,7 @@ def update_copilot(
     enhanced_privacy: Optional[bool] = None,
     smart_sync: Optional[bool] = None,
     website: Optional[str] = None,
-) -> dict[str, Any]:
+) -> Type[Chatbot]:
     """
     Updates an existing Chatbot instance in the database.
 
@@ -243,12 +265,13 @@ def update_copilot(
         chatbot.updated_at = datetime.datetime.utcnow()
 
         session.commit()
-        return chatbot_to_dict(chatbot)
+        session.refresh(chatbot)
+        return chatbot
     except exc.NoResultFound:
         session.rollback()
         raise ValueError(f"No Chatbot found with id: {copilot_id}")
     except Exception as e:
         session.rollback()
-        struct_log.exception(app="OPENCOPILOT", error=str(e), event="update_copilot")
+        logger.error("An exception occurred", app="OPENCOPILOT", error=str(e), incident="update_copilot")
     finally:
         session.close()

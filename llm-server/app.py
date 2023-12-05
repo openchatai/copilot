@@ -13,6 +13,9 @@ from routes.uploads.upload_controller import upload_controller
 from routes.workflow.workflow_controller import workflow
 from utils.config import Config
 from utils.vector_store_setup import init_qdrant_collections
+from shared.models.opencopilot_db import create_database_schema
+from utils.get_logger import structlog
+
 
 load_dotenv()
 
