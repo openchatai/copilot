@@ -1,0 +1,30 @@
+name: Lint Code Base
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Change to project directory
+      run: cd llm-server
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f llm-server/requirements.txt ]; then pip install -r llm-server/requirements.txt; fi
+
+    - name: Lint with flake8
+      run: |
+        pip install flake8
+        flake8 llm-server/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 llm-server/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
