@@ -26,7 +26,8 @@ install:
 
     # Check if llm-server/.env exists
     ifeq ($(LLM_SERVER_ENV_EXISTS),false)
-	    $(error Please make sure to copy llm-server/.env.example to llm-server/.env and fill it with the needed keys.)
+        @echo "Copying llm-server/.env.example to llm-server/.env"
+        cp llm-server/.env.example llm-server/.env
     endif
 
 	@echo "$(COLOR_BOLD)=== 🟢 Copying .env files ===$(COLOR_RESET)"
