@@ -48,18 +48,19 @@ function ChatDivider({ content }: { content: string }) {
 }
 
 export function ChatScreen() {
-  const activeid = useAtomValue(activeSessionId);
+  const activeId = useAtomValue(activeSessionId);
   const {
     data: chat,
     isLoading
-  } = useSWR(activeid, getConversationBySessionId)
+  } = useSWR(activeId, getConversationBySessionId)
+  
   return (
     <div className="flex-1 space-y-3 overflow-auto p-4 font-medium">
       {
         isLoading && <Loader className="h-full flex-center" />
       }
       {
-        chat ? chat?.data.map((c, i) => {
+        chat ? chat?.map((c, i) => {
           if (c.from_user) {
             return <UserMessage key={i} {...c} />
           } else if (!c.from_user) {
