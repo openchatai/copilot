@@ -50,7 +50,7 @@ function ChatScreen() {
                       timestamp={message.timestamp}
                       id={message.id}
                       key={index}
-                      message={message.response.text}
+                      message={message?.response?.text || ''}
                     />
                   );
               } else if (message.from === "user") {
@@ -59,7 +59,7 @@ function ChatScreen() {
                     key={index}
                     id={message.id}
                     timestamp={message.timestamp}
-                    content={message.content}
+                    content={message?.content || ''}
                   />
                 );
               }

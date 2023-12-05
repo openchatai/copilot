@@ -3,7 +3,7 @@ export type HistoryMessage = {
     created_at: string;
     from_user: boolean;
     id: number;
-    message: string;
+    message: string | null;
     session_id: string;
     updated_at: string;
 };
