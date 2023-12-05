@@ -15,7 +15,7 @@ services:
     #     awslogs-stream: llm-server
       
     volumes:
-      - ./llm-server:/app  # Mount the host llm-server directory to /app in the container
+      - ./llm-server:/app
       - shared_data:/app/shared_data
     networks:
       - opencopilot-net
