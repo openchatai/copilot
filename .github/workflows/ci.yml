@@ -29,6 +29,3 @@ jobs:
 
     - name: Build and Test
       run: make install
-
-    - name: Show Docker Container Logs
-      run: make logs
