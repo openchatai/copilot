@@ -24,14 +24,7 @@ jobs:
         docker --version
 
     - name: Copy .env.example to .env
-      run: |
-        cp llm-server/.env.example llm-server/.env  # Adjust the path as needed
-
-    - name: Debug current directory and list files
-      run: |
-        pwd
-        ls -al
-        ls -al llm-server/  # Adjust this to verify the .env file
+      run: cp llm-server/.env.example llm-server/.env
 
     - name: Build and Test
       run: |
