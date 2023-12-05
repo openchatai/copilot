@@ -6,6 +6,9 @@ import useSWR from "swr";
 import { useCopilot } from "../../../_context/CopilotProvider";
 import { ConversationType, getSessionsByBotId } from "@/data/conversations";
 import { format } from 'timeago.js';
+import _ from "lodash";
+import { EmptyBlock } from "@/components/domain/EmptyBlock";
+import Loader from "@/components/ui/Loader";
 function Conversation(props: ConversationType) {
   const [activeid, setActiveId] = useAtom(activeSessionId);
   const isActive = activeid === props.session_id;
@@ -34,14 +37,21 @@ export function ListConversations() {
     id: copilotId,
   } = useCopilot();
   const {
-    data: conversations
-  } = useSWR(copilotId + "/conversations", async () => (await getSessionsByBotId(copilotId))?.data)
+    data: conversations,
+    isLoading
+  } = useSWR(copilotId + "/conversations", async () => (await getSessionsByBotId(copilotId))?.data, {
+    refreshInterval: 5000,
+  })
   return (
     <div className="w-full flex-1 overflow-hidden">
       <ul className="h-full overflow-auto">
-        {conversations?.map((c, i) => (
-          <Conversation {...c} key={i} />
-        ))}
+        {isLoading ? <Loader /> :
+          _.isEmpty(conversations) ? <EmptyBlock>
+            No conversations yet
+          </EmptyBlock> : conversations?.map((c, i) => (
+            <Conversation {...c} key={i} />
+          ))
+        }
       </ul>
     </div>
   );
