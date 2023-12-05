@@ -8,7 +8,7 @@ export function historyToMessages(history?: HistoryMessage[]): Message[] {
             if (m.from_user) {
                 $messages.push({
                     from: "user",
-                    content: m.message,
+                    content: m?.message || '',
                     id: m.id,
                     timestamp: new Date(m.created_at),
                 })
@@ -19,7 +19,7 @@ export function historyToMessages(history?: HistoryMessage[]): Message[] {
                     timestamp: new Date(m.created_at),
                     type: "text",
                     response: {
-                        text: m.message
+                        text: m?.message || ''
                     }
                 })
             }
