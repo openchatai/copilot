@@ -25,7 +25,7 @@ jobs:
 
     - name: Copy .env.example to .env
       run: |
-        cp llm-server/.env.example llm-server/.env  # Adjust the path as needed
+        cp llm-server/.env.example llm-server/.env 
 
     - name: Build and Test
       run: make install
