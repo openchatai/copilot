@@ -1,9 +1,9 @@
-from sqlalchemy import Column, String, DateTime, Boolean, Integer
 import datetime
-from uuid import uuid4
-# from shared.get_declarative_base import Base
-from .get_declarative_base import Base
+
+from sqlalchemy import Column, String, DateTime, Boolean, Integer
+
 from .database_setup import engine
+from .get_declarative_base import Base
 
 
 class ChatHistory(Base):

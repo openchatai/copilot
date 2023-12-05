@@ -1,7 +1,8 @@
 from opencopilot_db import engine
-from opencopilot_db.flow import Flow
-from opencopilot_db.flow_variables import FlowVariable
 from sqlalchemy.orm import sessionmaker
+
+from shared.models.opencopilot_db.flow import Flow
+from shared.models.opencopilot_db.flow_variables import FlowVariable
 
 Session = sessionmaker(bind=engine)
 
