@@ -1,10 +1,8 @@
 import os
-from langchain.vectorstores.pinecone import Pinecone
 
 from langchain.vectorstores.qdrant import Qdrant
 from langchain.vectorstores.base import VectorStore
 from .store_type import StoreType
-from .config import VECTOR_STORE_INDEX_NAME, PINECONE_TEXT_KEY
 from .interfaces import StoreOptions
 from .get_embeddings import get_embeddings
 import qdrant_client
