@@ -5,7 +5,7 @@ on:
     paths:
       - "copilot-widget/**"
 jobs:
-  build-and-publish:
+  build-and-upload-script:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,7 +18,7 @@ jobs:
         run: cd copilot-widget/ && npm install
 
       - name: Build copilot-widget
-        run: cd copilot-widget/ && npm run build
+        run: cd copilot-widget/ && npm run build:embed
 
       - name: Upload embed as artifact.
         uses: actions/upload-artifact@v3

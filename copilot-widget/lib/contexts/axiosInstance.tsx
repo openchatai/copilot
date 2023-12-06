@@ -30,7 +30,7 @@ const AxiosContext = createContext<AxiosInstanceProps | undefined>(undefined);
 // prefred it separated for the future.
 export function AxiosProvider({ children }: { children: ReactNode }) {
   const config = useConfigData();
-  const { sessionId } = useSessionId();
+  const { sessionId } = useSessionId(config?.token || 'defaultToken');
   const axiosInstance: AxiosInstance = createAxiosInstance(config?.apiUrl, sessionId, config?.token);
 
   return (
