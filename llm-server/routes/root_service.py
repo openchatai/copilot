@@ -157,10 +157,7 @@ async def handle_request(
             "chatbot response",
             error=str(e),
             method="handle_request",
-            apis=apis,
             prev_conversations=prev_conversations,
-            context=context,
-            flows=flows,
         )
 
         return {"response": str(e), "error": "An error occured in handle request"}

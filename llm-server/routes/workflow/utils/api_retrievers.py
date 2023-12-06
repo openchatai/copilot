@@ -87,7 +87,7 @@ async def get_relevant_apis_summaries(text: str, bot_id: str) -> List[ApiOperati
 
         apis_retriever = apis.as_retriever(
             search_kwargs={
-                "k": 5,
+                "k": 3,
                 "score_threshold": score_threshold,
                 "filter": {"bot_id": bot_id},
             },
