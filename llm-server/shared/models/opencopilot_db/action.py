@@ -12,7 +12,8 @@ class Action(Base):
     chatbot_id = Column(String(36), nullable=False)
     name = Column(String(255), nullable=True, default="")
     description = Column(Text, nullable=True, default="")
-    payload = Column(JSON, nullable=False, default={})
+    base_uri = Column(String(255), nullable=True, default="")
+    payload = Column(JSON, nullable=False, default={})  # Swagger path
     status = Column(String(255), default='live')  # live, draft
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)

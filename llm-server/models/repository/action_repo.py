@@ -1,12 +1,12 @@
 # action_repo.py
 import datetime
 import uuid
-from typing import Optional
+from typing import Optional, List
 
 from opencopilot_db.database_setup import engine
 from sqlalchemy.orm import sessionmaker
 
-from shared.models.opencopilot_db.actions import Action
+from shared.models.opencopilot_db.action import Action
 from utils.get_logger import CustomLogger
 
 # Create a Session factory
@@ -14,7 +14,8 @@ SessionLocal = sessionmaker(bind=engine)
 logger = CustomLogger(module_name=__name__)
 
 
-def create_action(chatbot_id: str, name: str, description: str, payload: dict, status: str) -> dict:
+def create_action(chatbot_id: str, name: str, description: str = None, base_uri: str = None, payload: dict = None,
+                  status: str = None) -> dict:
     """
     Creates a new Action instance and adds it to the database with validations.
     """
@@ -31,6 +32,7 @@ def create_action(chatbot_id: str, name: str, description: str, payload: dict, s
             chatbot_id=chatbot_id,
             name=name,
             description=description,
+            base_uri=base_uri,
             payload=payload,
             status=status,
             created_at=datetime.datetime.utcnow(),
@@ -74,6 +76,7 @@ def action_to_dict(action: Action) -> dict:
         "chatbot_id": action.chatbot_id,
         "name": action.name,
         "description": action.description,
+        "base_uri": action.base_uri,
         "payload": action.payload,
         "status": action.status,
         "created_at": action.created_at.isoformat(),
