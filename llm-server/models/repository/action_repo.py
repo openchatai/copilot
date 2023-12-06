@@ -1,11 +1,10 @@
 # action_repo.py
 import datetime
 import uuid
-from typing import Optional, List, Type
+from typing import Optional, Type
 
-from sqlalchemy import exc
-from sqlalchemy.orm import sessionmaker, Session
 from opencopilot_db.database_setup import engine
+from sqlalchemy.orm import sessionmaker
 
 from shared.models.opencopilot_db.actions import Action
 from utils.get_logger import CustomLogger
@@ -15,13 +14,14 @@ SessionLocal = sessionmaker(bind=engine)
 logger = CustomLogger(module_name=__name__)
 
 
-def create_action(name: str, description: str, payload: dict, status: str) -> dict:
+def create_action(chatbot_id: str, name: str, description: str, payload: dict, status: str) -> dict:
     """
     Creates a new Action instance and adds it to the database.
     """
     with SessionLocal() as session:
         new_action = Action(
             id=str(uuid.uuid4()),
+            chatbot_id=chatbot_id,
             name=name,
             description=description,
             payload=payload,
@@ -55,14 +55,13 @@ def find_action_by_id(action_id: str) -> Optional[Action]:
         return session.query(Action).filter(Action.id == action_id).first()
 
 
-# Additional functions like update_action, delete_action, etc., can be added as needed
-
 def action_to_dict(action: Action) -> dict:
     """
     Converts an Action object to a dictionary.
     """
     return {
         "id": action.id,
+        "chatbot_id": action.chatbot_id,
         "name": action.name,
         "description": action.description,
         "payload": action.payload,
