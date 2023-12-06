@@ -28,25 +28,15 @@ def process_conversation_step(
     prev_conversations: List[BaseMessage],
     flows: List[WorkflowFlowType],
     bot_id: str,
+    base_prompt: str
 ):
+    logger.info("planner data", context=context, api_summaries=api_summaries, prev_conversations=prev_conversations, flows=flows)
     if not session_id:
         raise ValueError("Session id must be defined for chat conversations")
-    prompt_templates = load_prompts(bot_id)
-    system_message_classifier = SystemMessage(
-        content="You are a helpful ai assistant. User will give you two things, a list of api's and some useful information, called context."
-    )
-    if app and prompt_templates.system_message is not None:
-        system_message_classifier = SystemMessage(
-            content=prompt_templates.system_message
-        )
-    logger.debug(
-        "System message classification",
-        incident="system_message_classifier",
-        app=app,
-        context=context,
-    )
     messages: List[BaseMessage] = []
-    messages.append(system_message_classifier)
+    messages.append(SystemMessage(content=base_prompt))
+    
+    messages.append(SystemMessage(content="You will have access to a list of api's and some useful information, called context."))
 
     if len(prev_conversations) > 0:
         messages.extend(prev_conversations)
@@ -81,10 +71,11 @@ def process_conversation_step(
 
     messages.append(
         HumanMessage(
-            content="""Based on the information provided to you I want you to answer the questions that follow. Your should respond with a json that looks like the following - 
+            content="""Based on the information provided to you I want you to answer the questions that follow. Your should respond with a json that looks like the following, you must always use the operationIds provided in api summaries. Do not make up an operation id - 
     {{
         "ids": ["list", "of", "operationIds", "for apis to be called"],
-        "bot_message": "your response based on the instructions provided at the beginning"
+        "bot_message": "your response based on the instructions provided at the beginning",
+        "missing_information": "Optional Field; Incase of ambiguity where user input is not sufficient to make the api call, ask follow up questions. Followup question should only be asked once per user input"
     }}                
     """
         )
@@ -94,6 +85,9 @@ def process_conversation_step(
     )
 
     messages.append(HumanMessage(content=user_requirement))
+    
+    
+    logger.info("messages array", messages=messages)
 
     content = cast(str, chat(messages=messages).content)
 
@@ -110,7 +104,7 @@ def process_conversation_step(
     except OutputParserException as e:
         logger.error("Failed to parse json", data=content)
         logger.error("Failed to parse json", err=str(e))
-        return BotMessage(bot_message=content, ids=[])
+        return BotMessage(bot_message=content, ids=[], missing_information=None)
     except Exception as e:
         logger.error("unexpected error occured", err=str(e))
-        return BotMessage(ids=[], bot_message=str(e))
+        return BotMessage(ids=[], bot_message=str(e), missing_information=None)

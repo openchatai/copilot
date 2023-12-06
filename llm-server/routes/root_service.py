@@ -47,6 +47,34 @@ FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
 
 chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
+def validate_steps(steps: List[str], swagger_doc: ResolvingParser):
+    try:
+        paths = swagger_doc.specification.get("paths", {})
+        operationIds: List[str] = []
+
+        for path in paths:
+            operations = paths[path]
+            for method in operations:
+                operation = operations[method]
+                operationId = operation.get("operationId")
+                if operationId:
+                    operationIds.append(operationId)
+
+        if not operationIds:
+            logger.warn("No operationIds found in the Swagger document.")
+            return False
+
+        if all(x in operationIds for x in steps):
+            return True
+        else:
+            logger.warn("Model has hallucinated, made up operation id", steps=steps, operationIds=operationIds)
+            return False
+
+    except Exception as e:
+        logger.error(f"An error occurred: {str(e)}")
+        return False
+
+
 
 async def handle_request(
     text: str,
@@ -84,12 +112,25 @@ async def handle_request(
             prev_conversations=prev_conversations,
             flows=flows,
             bot_id=bot_id,
+            base_prompt=base_prompt
         )
+        
+        if step.missing_information is not None and len(step.missing_information) >= 10:
+            return {
+                "error": None,
+                "response": step.missing_information
+            }
 
         if len(step.ids) > 0:
+            swagger_doc = get_swagger_doc(swagger_url)
+            fl = validate_steps(step.ids, swagger_doc)
+            
+            if fl is False:
+                return {"error": None, "response": step.bot_message}
+            
             response = await handle_api_calls(
                 ids=step.ids,
-                swagger_doc=get_swagger_doc(swagger_url),
+                swagger_doc=swagger_doc,
                 app=app,
                 bot_id=bot_id,
                 headers=headers,

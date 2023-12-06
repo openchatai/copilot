@@ -4,20 +4,31 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.document_loaders import PyPDFium2Loader
 from shared.models.opencopilot_db.pdf_data_sources import insert_pdf_data_source, update_pdf_data_source_status
 from shared.utils.opencopilot_utils import get_embeddings, init_vector_store, StoreOptions, get_file_path
+from shared.utils.opencopilot_utils import get_vector_store
+from utils.get_logger import CustomLogger
 
+logger = CustomLogger(module_name=__name__)
+
+embeddings = get_embeddings()
+kb_vector_store = get_vector_store(StoreOptions("knowledgebase"))
 @shared_task
 def process_pdf(file_name: str, bot_id: str):
     try:
+        logger.info("Pdf task picked up", file_name=file_name, bot_id=bot_id)
         insert_pdf_data_source(chatbot_id=bot_id, file_name=file_name, status="PENDING")
         loader = PyPDFium2Loader(get_file_path(file_name))
         raw_docs = loader.load()
+        
+        # clean the data received from pdf document before passing it 
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=1000, chunk_overlap=200, length_function=len
         )
         docs = text_splitter.split_documents(raw_docs)
-        embeddings = get_embeddings()
-        init_vector_store(docs, embeddings, StoreOptions(namespace="knowledgebase", metadata={"bot_id": bot_id}))
-
+        
+        for doc in docs:
+            doc.metadata["bot_id"] = bot_id
+        
+        kb_vector_store.add_documents(docs)
         update_pdf_data_source_status(chatbot_id=bot_id, file_name=file_name, status="COMPLETED")
     except Exception as e:
         update_pdf_data_source_status(chatbot_id=bot_id, file_name=file_name, status="FAILED")
