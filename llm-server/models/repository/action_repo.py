@@ -1,7 +1,7 @@
 # action_repo.py
 import datetime
 import uuid
-from typing import Optional, Type
+from typing import Optional
 
 from opencopilot_db.database_setup import engine
 from sqlalchemy.orm import sessionmaker
@@ -16,8 +16,15 @@ logger = CustomLogger(module_name=__name__)
 
 def create_action(chatbot_id: str, name: str, description: str, payload: dict, status: str) -> dict:
     """
-    Creates a new Action instance and adds it to the database.
+    Creates a new Action instance and adds it to the database with validations.
     """
+    # Explicit Validations
+    if not chatbot_id or not isinstance(chatbot_id, str):
+        raise ValueError("Invalid chatbot_id provided")
+    if not name or not isinstance(name, str):
+        raise ValueError("Invalid name provided")
+    # Add other necessary validations as needed
+
     with SessionLocal() as session:
         new_action = Action(
             id=str(uuid.uuid4()),
@@ -39,12 +46,15 @@ def create_action(chatbot_id: str, name: str, description: str, payload: dict, s
             raise
 
 
-def list_all_actions() -> list[Type[Action]]:
+def list_all_actions(chatbot_id: Optional[str] = None) -> List[Action]:
     """
-    Retrieves all actions from the database.
+    Retrieves actions from the database, optionally filtered by chatbot_id.
     """
     with SessionLocal() as session:
-        return session.query(Action).all()
+        query = session.query(Action)
+        if chatbot_id is not None:
+            query = query.filter(Action.chatbot_id == chatbot_id)
+        return query.all()
 
 
 def find_action_by_id(action_id: str) -> Optional[Action]:
