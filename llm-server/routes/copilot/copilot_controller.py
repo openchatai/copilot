@@ -46,7 +46,7 @@ def handle_swagger_file():
         data=request.get_data(),  # Assuming request is available in the scope
     )
     file = request.files["swagger_file"]
-    if file.filename == "":
+    if file.filename == "":  # Nothing was uploaded
         return jsonify({"error": "No selected file."}), 400
     if file:
         try:
