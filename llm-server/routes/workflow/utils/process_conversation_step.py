@@ -75,7 +75,7 @@ def process_conversation_step(
     {{
         "ids": ["list", "of", "operationIds", "for apis to be called"],
         "bot_message": "your response based on the instructions provided at the beginning",
-        "missing_information": "Optional Field; Incase of ambiguity where user input is not sufficient to make the api call, ask follow up questions. Followup question should only be asked once per user input"
+        "missing_information": "Optional Field; Incase of ambiguity where user input is not sufficient to make the api call, ask follow up questions."
     }}                
     """
         )
