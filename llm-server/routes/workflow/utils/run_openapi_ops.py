@@ -47,7 +47,7 @@ async def run_openapi_operations(
                 api_request_data[operation_id] = api_payload.__dict__
                 api_response = None
                 try:
-                    logger.info("Making API call", incident="make_api_call", payload=json.dumps(api_payload.body_schema))
+                    logger.info("Making API call", incident="make_api_call", body=json.dumps(api_payload.body_schema), params=api_payload.query_params)
 
                     api_response = make_api_request(
                         headers=headers, **api_payload.__dict__

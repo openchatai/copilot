@@ -28,17 +28,12 @@ def process_conversation_step(
     prev_conversations: List[BaseMessage],
     flows: List[WorkflowFlowType],
     bot_id: str,
+    base_prompt: str
 ):
     if not session_id:
         raise ValueError("Session id must be defined for chat conversations")
-    prompt_templates = load_prompts(bot_id)
-    system_message_classifier = SystemMessage(
-        content="You are a helpful ai assistant. User will give you two things, a list of api's and some useful information, called context."
-    )
-    if app and prompt_templates.system_message is not None:
-        system_message_classifier = SystemMessage(
-            content=prompt_templates.system_message
-        )
+    # prompt_templates = load_prompts(bot_id)
+    
     logger.debug(
         "System message classification",
         incident="system_message_classifier",
@@ -46,7 +41,9 @@ def process_conversation_step(
         context=context,
     )
     messages: List[BaseMessage] = []
-    messages.append(system_message_classifier)
+    messages.append(SystemMessage(content=base_prompt))
+    
+    messages.append(SystemMessage(content="You will have access to a list of api's and some useful information, called context."))
 
     if len(prev_conversations) > 0:
         messages.extend(prev_conversations)

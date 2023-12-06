@@ -159,13 +159,14 @@ async def send_chat():
             app=app_name,
         )
 
-        create_chat_history(str(bot.id), session_id, True, message)
-        create_chat_history(
-            str(bot.id),
-            session_id,
-            False,
-            response_data["response"] or response_data["error"],
-        )
+        if response_data["response"]:
+            create_chat_history(str(bot.id), session_id, True, message)
+            create_chat_history(
+                str(bot.id),
+                session_id,
+                False,
+                response_data["response"] or response_data["error"],
+            )
 
         return jsonify(
             {"type": "text", "response": {"text": response_data["response"]}}

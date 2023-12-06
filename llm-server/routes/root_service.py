@@ -84,6 +84,7 @@ async def handle_request(
             prev_conversations=prev_conversations,
             flows=flows,
             bot_id=bot_id,
+            base_prompt=base_prompt
         )
 
         if len(step.ids) > 0:
