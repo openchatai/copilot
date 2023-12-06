@@ -24,7 +24,7 @@ class CustomLogger:
         self.logger.log(
             level,
             event=event,
-            **{k: v for k, v in kwargs.items() if k not in ("exc_info", "extra")},
+            **kwargs
         )
 
     def info(self, event, **kwargs):

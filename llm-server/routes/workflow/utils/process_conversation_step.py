@@ -102,9 +102,8 @@ def process_conversation_step(
         return d
 
     except OutputParserException as e:
-        logger.error("Failed to parse json", data=content)
-        logger.error("Failed to parse json", err=str(e))
+        logger.warn("Failed to parse json", data=content, err=str(e))
         return BotMessage(bot_message=content, ids=[], missing_information=None)
     except Exception as e:
-        logger.error("unexpected error occured", err=str(e))
+        logger.warn("unexpected error occured", err=str(e))
         return BotMessage(ids=[], bot_message=str(e), missing_information=None)

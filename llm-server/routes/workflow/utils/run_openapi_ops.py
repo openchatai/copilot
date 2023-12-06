@@ -106,4 +106,6 @@ async def run_openapi_operations(
                     app= app,
                     error=str(e),
                 )
+                
+                return str(e)
     return convert_json_to_text(text, record_info, api_request_data, bot_id=bot_id)
