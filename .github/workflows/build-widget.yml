@@ -13,9 +13,14 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        with:
+          version: 8
+          run_install: false
+        
       - name: Install dependencies
-        run: cd copilot-widget/ && npm install
+        run: cd copilot-widget/ && pnpm install
 
       - name: Build copilot-widget
         run: cd copilot-widget/ && npm run build:embed
