@@ -22,7 +22,6 @@ from models.repository.copilot_repo import (
     SessionLocal,
     update_copilot,
 )
-from utils.llm_consts import EXPERIMENTAL_FEATURES_ENABLED
 from utils.swagger_parser import SwaggerParser
 
 logger = CustomLogger(module_name=__name__)
