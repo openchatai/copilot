@@ -18,6 +18,8 @@ def process_pdf(file_name: str, bot_id: str):
         insert_pdf_data_source(chatbot_id=bot_id, file_name=file_name, status="PENDING")
         loader = PyPDFium2Loader(get_file_path(file_name))
         raw_docs = loader.load()
+        
+        # clean the data received from pdf document before passing it 
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=1000, chunk_overlap=200, length_function=len
         )
