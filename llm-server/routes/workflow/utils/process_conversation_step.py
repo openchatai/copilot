@@ -30,16 +30,9 @@ def process_conversation_step(
     bot_id: str,
     base_prompt: str
 ):
+    logger.info("planner data", context=context, api_summaries=api_summaries, prev_conversations=prev_conversations, flows=flows)
     if not session_id:
         raise ValueError("Session id must be defined for chat conversations")
-    # prompt_templates = load_prompts(bot_id)
-    
-    logger.debug(
-        "System message classification",
-        incident="system_message_classifier",
-        app=app,
-        context=context,
-    )
     messages: List[BaseMessage] = []
     messages.append(SystemMessage(content=base_prompt))
     
@@ -78,7 +71,7 @@ def process_conversation_step(
 
     messages.append(
         HumanMessage(
-            content="""Based on the information provided to you I want you to answer the questions that follow. Your should respond with a json that looks like the following - 
+            content="""Based on the information provided to you I want you to answer the questions that follow. Your should respond with a json that looks like the following, you must always use the operationIds provided in api summaries. Do not make up an operation id - 
     {{
         "ids": ["list", "of", "operationIds", "for apis to be called"],
         "bot_message": "your response based on the instructions provided at the beginning",
@@ -92,6 +85,9 @@ def process_conversation_step(
     )
 
     messages.append(HumanMessage(content=user_requirement))
+    
+    
+    logger.info("messages array", messages=messages)
 
     content = cast(str, chat(messages=messages).content)
 

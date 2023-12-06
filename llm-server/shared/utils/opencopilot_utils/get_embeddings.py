@@ -1,10 +1,16 @@
+from functools import lru_cache
 from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.embeddings.ollama import OllamaEmbeddings
 from .embedding_type import EmbeddingProvider
 import os
 from langchain.embeddings.base import Embeddings
-
+from utils.get_logger import CustomLogger
 import os, warnings
 
+
+logger = CustomLogger(module_name=__name__)
+
+LOCAL_IP = os.getenv("LOCAL_IP", "host.docker.internal")
 
 def get_embedding_provider():
     """Gets the chosen embedding provider from environment variables."""
@@ -31,7 +37,7 @@ def get_openai_embedding():
     """Gets embeddings using the OpenAI embedding provider."""
     openai_api_key = os.environ.get("OPENAI_API_KEY")
 
-    return OpenAIEmbeddings(openai_api_key=openai_api_key, chunk_size=1)
+    return OpenAIEmbeddings(openai_api_key=openai_api_key)
 
 def choose_embedding_provider():
     """Chooses and returns the appropriate embedding provider instance."""
@@ -39,6 +45,10 @@ def choose_embedding_provider():
 
     if embedding_provider == EmbeddingProvider.azure.value:
         return get_azure_embedding()
+    
+    elif embedding_provider == EmbeddingProvider.openchat.value:
+        logger.info("Got ollama embedding provider", provider=embedding_provider)
+        return OllamaEmbeddings(base_url=f"{LOCAL_IP}:11434", model="openchat")
     
     elif embedding_provider == EmbeddingProvider.OPENAI.value or embedding_provider is None:
         if embedding_provider is None:
@@ -53,6 +63,7 @@ def choose_embedding_provider():
         )
 
 # Main function to get embeddings
+@lru_cache(maxsize=1)
 def get_embeddings() -> Embeddings:
     """Gets embeddings using the chosen embedding provider."""
     return choose_embedding_provider()

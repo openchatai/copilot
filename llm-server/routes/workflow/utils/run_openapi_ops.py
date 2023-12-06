@@ -67,7 +67,7 @@ async def run_openapi_operations(
                 # so we don't necessarily have to defined mappers for all api endpoints
                 partial_json = load_json_config(app, operation_id)
                 if not partial_json:
-                    logger.error(
+                    logger.warn(
                         "Config map is not defined for this operationId",
                         incident="config_map_undefined",
                         operation_id=operation_id,
