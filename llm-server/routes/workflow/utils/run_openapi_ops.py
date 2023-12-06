@@ -68,14 +68,19 @@ async def run_openapi_operations(
                 partial_json = load_json_config(app, operation_id)
                 if not partial_json:
                     logger.error(
-                        "Failed to find a config map. Consider adding a config map for this operation id",
+                        "Config map is not defined for this operationId",
                         incident="config_map_undefined",
                         operation_id=operation_id,
                         app=app
                     )
-                    record_info[operation_id] = transform_api_response_from_schema(
-                        api_payload.endpoint or "", api_response.text
-                    )
+                    record_info[operation_id] = api_response.text
+                    
+                    # Removed this because this slows down the bot response instead of speeding it
+                    # record_info[operation_id] = transform_api_response_from_schema(
+                    #     api_payload.endpoint or "", api_response.text
+                    # )
+                    
+                    pass
                 else:
                     logger.info(
                         "API Response",

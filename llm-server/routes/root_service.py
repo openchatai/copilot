@@ -86,6 +86,12 @@ async def handle_request(
             bot_id=bot_id,
             base_prompt=base_prompt
         )
+        
+        if step.missing_information is not None and len(step.missing_information) >= 10:
+            return {
+                "error": None,
+                "response": step.missing_information
+            }
 
         if len(step.ids) > 0:
             response = await handle_api_calls(

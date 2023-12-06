@@ -81,7 +81,8 @@ def process_conversation_step(
             content="""Based on the information provided to you I want you to answer the questions that follow. Your should respond with a json that looks like the following - 
     {{
         "ids": ["list", "of", "operationIds", "for apis to be called"],
-        "bot_message": "your response based on the instructions provided at the beginning"
+        "bot_message": "your response based on the instructions provided at the beginning",
+        "missing_information": "Optional Field; Incase of ambiguity where user input is not sufficient to make the api call, ask follow up questions. Followup question should only be asked once per user input"
     }}                
     """
         )
@@ -107,7 +108,7 @@ def process_conversation_step(
     except OutputParserException as e:
         logger.error("Failed to parse json", data=content)
         logger.error("Failed to parse json", err=str(e))
-        return BotMessage(bot_message=content, ids=[])
+        return BotMessage(bot_message=content, ids=[], missing_information=None)
     except Exception as e:
         logger.error("unexpected error occured", err=str(e))
-        return BotMessage(ids=[], bot_message=str(e))
+        return BotMessage(ids=[], bot_message=str(e), missing_information=None)

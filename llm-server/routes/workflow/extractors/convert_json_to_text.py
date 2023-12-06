@@ -22,7 +22,7 @@ def convert_json_to_text(
 
     api_summarizer_template = None
     system_message = SystemMessage(
-        content="You are a chatbot that can understand API responses"
+        content="You are an ai assistant that can summarize api responses"
     )
     prompt_templates = load_prompts(bot_id)
     api_summarizer_template = (
@@ -35,15 +35,15 @@ def convert_json_to_text(
     messages = [
         system_message,
         HumanMessage(
-            content="You'll receive user input and server responses obtained by making calls to various APIs. You will also recieve a dictionary that specifies, the body, param and query param used to make those api calls. Your task is to transform the JSON response into a response that is an answer to the user input. You should inform the user about the filters that were used to make these api calls. Try to respond in 3 sentences or less, unless there is too much to summarize."
+            content="You'll receive user input and server responses obtained by making calls to various APIs. Your task is to summarize the api response that is an answer to the user input. Try to be concise and accurate, and also include references if present."
         ),
-        HumanMessage(content="Here is the user input: {}.".format(user_input)),
+        HumanMessage(content=user_input),
         HumanMessage(
             content="Here is the response from the apis: {}".format(api_response)
         ),
-        HumanMessage(
-            content="Here is the api_request_data: {}".format(api_request_data)
-        ),
+        # HumanMessage(
+        #     content="Here is the api_request_data: {}".format(api_request_data)
+        # ),
     ]
 
     result = chat(messages)
