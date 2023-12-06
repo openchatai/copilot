@@ -85,7 +85,7 @@ def get_workflows_by_bot_id(bot_id: str) -> Any:
 
     # Query MongoDB to get a paginated list of workflows
     workflows = list(
-        mongo.workflows.find({"bot_id": bot_id}).skip(skip).limit(page_size)
+        mongo.workflows.find({"meta.bot_id": bot_id}).skip(skip).limit(page_size)
     )
 
     for workflow in workflows:
