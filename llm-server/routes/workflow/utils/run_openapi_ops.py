@@ -60,18 +60,18 @@ async def run_openapi_operations(
 
                 except Exception as e:
                     logger.error("Error occurred while making API call", incident="make_api_call_failed", error=str(e))
-                    return {}
+                    raise e
 
+                logger.info("Got the following api response", text = api_response.text)
                 # if a custom transformer function is defined for this operationId use that, otherwise forward it to the llm
                 # so we don't necessarily have to defined mappers for all api endpoints
                 partial_json = load_json_config(app, operation_id)
-                logger.info("Loading JSON configuration", incident="load_json_config", json_config=json.dumps(partial_json))
                 if not partial_json:
                     logger.error(
                         "Failed to find a config map. Consider adding a config map for this operation id",
-                        incident="load_json_config",
-                        error="Failed to find a config map, consider adding a config map for this operation id",
+                        incident="config_map_undefined",
                         operation_id=operation_id,
+                        app=app
                     )
                     record_info[operation_id] = transform_api_response_from_schema(
                         api_payload.endpoint or "", api_response.text
@@ -79,9 +79,10 @@ async def run_openapi_operations(
                 else:
                     logger.info(
                         "API Response",
-                        incident="api_response",
-                        text=api_response.text,
-                        action="Truncate unnecessary info using json_config provided",
+                        incident="log_api_response",
+                        api_response=api_response.text,
+                        json_config_used=partial_json,
+                        next_action="summarize_with_partial_json",
                     )
                     api_json = json.loads(api_response.text)
                     record_info[operation_id] = json.dumps(
@@ -91,19 +92,13 @@ async def run_openapi_operations(
                     )
 
             except Exception as e:
-                payload = json.dumps(
-                    {
-                        "text": text,
-                        "headers": headers,
-                        "server_base_url": server_base_url,
-                        "app": app,
-                    }
-                )
-
                 logger.error(
                     "Error occurred during workflow check in store",
-                    incident="check_workflow_in_store",
-                    payload=payload,
+                    incident="check_workflow_in_store",                    
+                    text= text,
+                    headers= headers,
+                    server_base_url= server_base_url,
+                    app= app,
                     error=str(e),
                 )
     return convert_json_to_text(text, record_info, api_request_data, bot_id=bot_id)

@@ -14,7 +14,7 @@ logger = CustomLogger(module_name=__name__)
 
 def convert_json_to_text(
     user_input: str,
-    api_response: str,
+    api_response: Dict[str, Any],
     api_request_data: Dict[str, Any],
     bot_id: str,
 ) -> str:
@@ -35,7 +35,7 @@ def convert_json_to_text(
     messages = [
         system_message,
         HumanMessage(
-            content="You'll receive user input and server responses obtained by making calls to various APIs. You will also recieve a dictionary that specifies, the body, param and query param used to make those api calls. Your task is to transform the JSON response into a response that in an answer to the user input. You should inform the user about the filters that were used to make these api calls"
+            content="You'll receive user input and server responses obtained by making calls to various APIs. You will also recieve a dictionary that specifies, the body, param and query param used to make those api calls. Your task is to transform the JSON response into a response that is an answer to the user input. You should inform the user about the filters that were used to make these api calls. Try to respond in 3 sentences or less, unless there is too much to summarize."
         ),
         HumanMessage(content="Here is the user input: {}.".format(user_input)),
         HumanMessage(

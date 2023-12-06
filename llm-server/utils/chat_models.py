@@ -9,6 +9,7 @@ class ChatModels(NamedTuple):
     nous_hermes = "nous-hermes"
     llama2: str = "llama2"
     xwinlm = "xwinlm"
+    openchat = "openchat"
 
 
 CHAT_MODELS: ChatModels = ChatModels()
