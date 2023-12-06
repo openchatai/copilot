@@ -1,8 +1,6 @@
-import json
-
-
 class Endpoint:
-    def __init__(self, operation_id, endpoint_type, name, description, request_body, request_parameters, response, path):
+    def __init__(self, operation_id, endpoint_type, name, description, request_body, request_parameters, response,
+                 path):
         self.operation_id = operation_id
         self.type = endpoint_type
         self.name = name
@@ -95,9 +93,43 @@ class SwaggerParser:
     def get_validations(self):
         endpoints = self.get_endpoints()
         validations = {
-            'endpoints_without_operation_id': [endpoint.to_dict() for endpoint in get_endpoints_without_operation_id(endpoints)],
-            'endpoints_without_description': [endpoint.to_dict() for endpoint in get_endpoints_without_description(endpoints)],
+            'endpoints_without_operation_id': [endpoint.to_dict() for endpoint in
+                                               get_endpoints_without_operation_id(endpoints)],
+            'endpoints_without_description': [endpoint.to_dict() for endpoint in
+                                              get_endpoints_without_description(endpoints)],
             'endpoints_without_name': [endpoint.to_dict() for endpoint in get_endpoints_without_name(endpoints)],
             'auth_type': self.get_authorization_type()
         }
         return validations
+
+    def get_base_uri(self):
+        """
+        Retrieves the base URI from the Swagger file's "servers" object, specific to OpenAPI 3.0.0.
+        """
+        servers = self.swagger_data.get('servers', [])
+        if servers:
+            # Use the first server's URL as the base URI
+            return servers[0].get('url', '')
+        return ''
+
+    def get_all_actions(self):
+        """
+        Retrieves all actions defined in the Swagger file.
+        Each action represents a path and includes details like base_uri, path, name, summary, and operation_id.
+        """
+        actions = []
+        base_uri = self.get_base_uri()
+        paths = self.swagger_data.get('paths', {})
+
+        for path, path_data in paths.items():
+            for method, method_data in path_data.items():
+                action = {
+                    "base_uri": base_uri,
+                    "path": path,
+                    "name": method_data.get('summary'),
+                    "summary": method_data.get('description'),
+                    "operation_id": method_data.get('operationId')
+                }
+                actions.append(action)
+
+        return actions
