@@ -6,12 +6,12 @@ import { Tv2 } from "lucide-react";
 import { IS_DEV } from "@/lib/consts";
 import { SearchModal } from "./(main)/_parts/SearchModal";
 import React from "react";
-import { JotaiProvider } from "./_store/JotaiProvider";
 import { SWRProvider } from "./swr-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { HandleOnComplete } from "@/lib/router-events";
 import { TopLoader } from "@/lib/Toploader";
 import dynamic from "next/dynamic";
+import { JotaiProvider } from "./jotai-provider";
 
 const Confetti = dynamic(() => import("@/components/domain/confetti-canvas"), {
   ssr: false,
@@ -39,7 +39,7 @@ export default function RootLayout({
           <body
             className={cn(
               opensans.className,
-              "h-screen min-h-screen w-screen overflow-hidden scroll-smooth bg-background text-accent-foreground antialiased",
+              "h-screen min-h-[100dvh] max-h-[100dvh] w-screen overflow-hidden scroll-smooth bg-background text-accent-foreground antialiased",
               IS_DEV && "debug-screens",
             )}
           >

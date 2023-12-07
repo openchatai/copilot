@@ -1,6 +1,5 @@
 import { Pen, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import _ from "lodash";
 import { Label } from "@/components/ui/label";
 import { SwaggerForm } from "./form";
 import { methodVariants } from "./MethodRenderer";
