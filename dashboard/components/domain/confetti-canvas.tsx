@@ -2,7 +2,7 @@
 import React from 'react'
 import { useWindowSize } from 'react-use'
 import { default as ReactConfetti } from 'react-confetti'
-import { useConfetti } from '@/app/_store/atoms/confetti';
+import { useConfetti } from '@/app/_store/confetti';
 
 export default function Confetti() {
     const { width, height } = useWindowSize()
