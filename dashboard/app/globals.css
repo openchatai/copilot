@@ -126,3 +126,10 @@
   border-width: 3px;
   @apply h-5 w-5 animate-spin rounded-full border-primary border-t-transparent;
 }
+
+/* select labels beside required inputs */
+.required-label::after {
+  content: "*";
+  color: hsl(var(--destructive));
+  margin-left: 0.25rem;
+}
