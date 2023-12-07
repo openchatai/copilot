@@ -15,7 +15,6 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-import { searchModalAtom } from "@/app/_store/atoms/searchModal";
 import { useAtom } from "jotai";
 import { useHotkeys } from "react-hotkeys-hook";
 import { EmptyBlock } from "@/components/domain/EmptyBlock";
@@ -23,6 +22,8 @@ import useSwr from "swr";
 import { listCopilots } from "@/data/copilot";
 import { useRouter } from "next/navigation";
 import { Link } from "@/lib/router-events";
+import { searchModalAtom } from "@/app/_store/searchModal";
+
 export function SearchModal() {
   const [open, setOpen] = useAtom(searchModalAtom);
   useHotkeys("ctrl+/", (e) => {
