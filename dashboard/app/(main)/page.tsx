@@ -23,7 +23,7 @@ export default async function HomePage() {
           </div>
           <div className="space-x-2">
             <Button asChild>
-              <Link href="create/copilot">Create Copilot</Link>
+              <Link href="/create/copilot">Create Copilot</Link>
             </Button>
           </div>
         </div>
