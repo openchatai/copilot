@@ -4,29 +4,38 @@ export type SessionIdType = `${string}:${string}`;
 const SESSION_ID_HEADER = "X-Session-Id";
 const COPILOT_TOKEN_HEADER = "X-Bot-Token";
 
-let instance: AxiosInstance;
+type InstanceOptions = {
+    copilotToken: string;
+    sessionId: SessionIdType;
+    baseUrl: string;
+}
 
-export function createInstance(copilotToken: string, sessionId: SessionIdType, baseUrl: string) {
+// only one instance per copilotToken
+let instances = new Map<string, AxiosInstance>();
+
+export function getInstance(
+    {
+        copilotToken,
+        sessionId,
+        baseUrl,
+    }: InstanceOptions,
+) {
     // make sure we only have one instance
-    if (instance) {
-        return instance;
+    if (!instances.has(copilotToken)) {
+        const instance = axios.create({
+            baseURL: baseUrl,
+            headers: {
+                [SESSION_ID_HEADER]: sessionId,
+                [COPILOT_TOKEN_HEADER]: copilotToken,
+            },
+        });
+        instances.set(copilotToken, instance);
     }
-    instance = axios.create({
-        baseURL: baseUrl,
-        headers: {
-            [SESSION_ID_HEADER]: sessionId,
-            [COPILOT_TOKEN_HEADER]: copilotToken,
-        },
-    });
-    return instance;
+    return instances.get(copilotToken)!;
 }
 
 export function getInitialData(instance: AxiosInstance) {
     return instance.get<InitialDataType>("/chat/init");
-}
-
-export function sendMessage(instance: AxiosInstance, message: string) {
-    return instance.post<HistoryMessage>("/chat/send", { message });
 }
 
 export type HistoryMessage = {
