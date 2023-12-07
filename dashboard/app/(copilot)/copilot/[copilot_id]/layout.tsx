@@ -124,7 +124,7 @@ export default function CopilotLayout({ children, params }: Props) {
         </div>
       </aside>
       <main className="flex flex-1 flex-col overflow-hidden">
-        <div className="h-full max-w-full flex-1 bg-primary-foreground">
+        <div className="h-full min-h-full max-w-full flex-1 bg-primary-foreground">
           <CopilotProvider>{children}</CopilotProvider>
         </div>
       </main>
