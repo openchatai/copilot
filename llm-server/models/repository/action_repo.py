@@ -2,6 +2,7 @@
 import datetime
 import uuid
 from typing import Optional, List
+from routes.action.dtos.action_dto import ActionCreate
 
 from opencopilot_db.database_setup import engine
 from sqlalchemy.orm import sessionmaker
@@ -14,27 +15,19 @@ SessionLocal = sessionmaker(bind=engine)
 logger = CustomLogger(module_name=__name__)
 
 
-def create_action(chatbot_id: str, name: str, description: str = None, base_uri: str = None, payload: dict = None,
-                  status: str = None) -> dict:
+def create_action(data: ActionCreate) -> dict:
     """
     Creates a new Action instance and adds it to the database with validations.
     """
-    # Explicit Validations
-    if not chatbot_id or not isinstance(chatbot_id, str):
-        raise ValueError("Invalid chatbot_id provided")
-    if not name or not isinstance(name, str):
-        raise ValueError("Invalid name provided")
-    # Add other necessary validations as needed
-
     with SessionLocal() as session:
         new_action = Action(
             id=str(uuid.uuid4()),
-            chatbot_id=chatbot_id,
-            name=name,
-            description=description,
-            base_uri=base_uri,
-            payload=payload,
-            status=status,
+            chatbot_id=data.chatbot_id,
+            name=data.name,
+            description=data.description,
+            base_uri=data.base_uri,
+            payload=data.payload,
+            status=data.status,
             created_at=datetime.datetime.utcnow(),
             updated_at=datetime.datetime.utcnow(),
         )
