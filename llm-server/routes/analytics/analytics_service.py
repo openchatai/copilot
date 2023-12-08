@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from shared.models.opencopilot_db import engine
 from sqlalchemy.dialects.mysql import insert
 
-def upsert_analytics_record(chatbot_id: str, successful_operations: int, total_operations: int, user_id: str):
+def upsert_analytics_record(chatbot_id: str, successful_operations: int, total_operations: int):
     Session = sessionmaker(bind=engine)
     session = Session()
 
@@ -11,7 +11,6 @@ def upsert_analytics_record(chatbot_id: str, successful_operations: int, total_o
         chatbot_id=chatbot_id,
         successful_operations=successful_operations,
         total_operations=total_operations,
-        user_id=user_id
     )
 
     session.execute(insert_stmt)

@@ -9,7 +9,6 @@ class Analytics(Base):
     chatbot_id = Column(String, primary_key=True)
     successful_operations = Column(Integer)
     total_operations = Column(Integer)
-    user_id = Column(String)
 
     def __init__(self, chatbot_id, user_id):
         self.chatbot_id = chatbot_id
