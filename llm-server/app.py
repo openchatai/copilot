@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from dotenv import load_dotenv
 from flask import Flask
 
@@ -13,6 +14,11 @@ from routes.workflow.workflow_controller import workflow
 from utils.config import Config
 from utils.vector_store_setup import init_qdrant_collections
 from shared.models.opencopilot_db import create_database_schema
+from flask import jsonify
+from utils.db import Database
+# from routes.uploads.celery_service import celery
+db_instance = Database()
+mongo = db_instance.get_db()
 
 load_dotenv()
 
@@ -31,6 +37,15 @@ app.register_blueprint(prompt_template_workflow, url_prefix="/backend/prompt-tem
 app.register_blueprint(prompt_workflow, url_prefix="/backend/prompts")
 
 app.config.from_object(Config)
+
+@app.route('/healthcheck')
+def health_check():
+    info = mongo.client
+    # c_info = celery.connection()
+    
+    # print(c_info)
+    return jsonify(status='OK', servers={"mongo": info.options.pool_options.max_pool_size})
+
 
 init_qdrant_collections()
 

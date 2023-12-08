@@ -7,13 +7,12 @@ services:
       dockerfile: Dockerfile
       target: ${TARGET}
     image: codebanesr/llm-server:latest
-    # logging:
-    #   driver: awslogs
-    #   options: 
-    #     awslogs-group: opencopilot
-    #     awslogs-region: us-east-1
-    #     awslogs-stream: llm-server
-      
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; assert requests.get('http://llm-server:8002/healthcheck').status_code == 200"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     volumes:
       - ./llm-server:/app
       - shared_data:/app/shared_data
@@ -31,6 +30,12 @@ services:
         condition: service_started
       mongodb:
         condition: service_started
+    # logging:
+    #   driver: awslogs
+    #   options: 
+    #     awslogs-group: opencopilot
+    #     awslogs-region: us-east-1
+    #     awslogs-stream: llm-server
 
   redis:
     image: redis:latest
