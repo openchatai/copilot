@@ -6,7 +6,6 @@ class Analytics(Base):
     __tablename__ = 'analytics'
 
     chatbot_id = Column(String(36), primary_key=True)
-    chatbot_id_fk = Column(String(36), ForeignKey(Chatbot.id), nullable=True)
     successful_operations = Column(Integer)
     total_operations = Column(Integer)
     logs= Column(String(4096), nullable=True)
