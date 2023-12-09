@@ -15,7 +15,7 @@ SessionLocal = sessionmaker(bind=engine)
 logger = CustomLogger(module_name=__name__)
 
 
-def create_action(chatbot_id:str, data: ActionDTO) -> dict:
+def create_action(chatbot_id: str, data: ActionDTO) -> dict:
     """
     Creates a new Action instance and adds it to the database with validations.
     """
@@ -37,6 +37,34 @@ def create_action(chatbot_id:str, data: ActionDTO) -> dict:
             session.commit()
             session.refresh(new_action)
             return new_action
+        except Exception as e:
+            session.rollback()
+            logger.error("An exception occurred", error=str(e))
+            raise
+
+
+def update_action(action_id: str, data: ActionDTO) -> Action:
+    """
+    Updates an existing Action instance in the database with new data.
+    """
+    with SessionLocal() as session:
+        action = session.query(Action).filter(Action.id == action_id).first()
+        if action is None:
+            raise ValueError("Action not found")
+
+        # Update fields
+        action.name = data.name
+        action.description = data.description
+        action.operation_id = data.operation_id
+        action.base_uri = data.base_uri
+        action.request_type = data.request_type
+        action.payload = data.payload
+        action.updated_at = datetime.datetime.utcnow()
+
+        try:
+            session.commit()
+            session.refresh(action)
+            return action
         except Exception as e:
             session.rollback()
             logger.error("An exception occurred", error=str(e))
