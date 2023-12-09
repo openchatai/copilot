@@ -25,3 +25,4 @@ def init_qdrant_collections():
     try_create_collection("knowledgebase", vector_params)
     try_create_collection("swagger", vector_params)  # workflow
     try_create_collection("apis", vector_params)
+    try_create_collection("actions", vector_params)

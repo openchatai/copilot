@@ -10,6 +10,7 @@ from routes.prompt.prompt_controller import prompt_workflow
 from routes.prompt.prompt_template_controller import prompt_template_workflow
 from routes.uploads.upload_controller import upload_controller
 from routes.workflow.workflow_controller import workflow
+from routes.action.action_controller import action as action_controller
 from utils.config import Config
 from utils.vector_store_setup import init_qdrant_collections
 from shared.models.opencopilot_db import create_database_schema
@@ -29,6 +30,7 @@ app.register_blueprint(upload_controller, url_prefix="/backend/uploads")
 app.register_blueprint(datasource_workflow, url_prefix="/backend/data_sources")
 app.register_blueprint(prompt_template_workflow, url_prefix="/backend/prompt-templates")
 app.register_blueprint(prompt_workflow, url_prefix="/backend/prompts")
+app.register_blueprint(action_controller, url_prefix="/backend/actions")
 
 app.config.from_object(Config)
 

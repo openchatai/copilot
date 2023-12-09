@@ -6,7 +6,8 @@ from opencopilot_types.workflow_type import WorkflowFlowType
 from shared.utils.opencopilot_utils.get_vector_store import get_vector_store
 from shared.utils.opencopilot_utils import StoreOptions
 from utils.chat_models import CHAT_MODELS
-from utils import get_chat_model
+from routes.action.dtos.action_dto import ActionCreate
+from utils.get_chat_model import get_chat_model
 from typing import Optional, List
 from langchain.vectorstores.base import VectorStore
 from utils.get_logger import CustomLogger
@@ -98,6 +99,36 @@ async def get_relevant_apis_summaries(text: str, bot_id: str) -> List[ApiOperati
         resp: List[ApiOperation_vs] = []
         for result in results:
             resp.append(result.metadata["operation"])
+
+        return resp
+
+    except Exception as e:
+        logger.error(
+            "Error occurred while getting relevant API summaries",
+            incident="get_relevant_apis_summaries",
+            payload=text,
+            error=str(e),
+        )
+        return []
+    
+    
+async def get_actions(text: str, bot_id: str) -> List[ActionCreate]:
+    try:
+        score_threshold = float(os.getenv("SCORE_THRESHOLD_KB", "0.75"))
+
+        actions_retriever = apis.as_retriever(
+            search_kwargs={
+                "k": 3,
+                "score_threshold": score_threshold,
+                "filter": {"bot_id": bot_id},
+            },
+        )
+
+        results = actions_retriever.get_relevant_documents(text)
+
+        resp: List[ApiOperation_vs] = []
+        for result in results:
+            resp.append(result.metadata["action"])
 
         return resp
 

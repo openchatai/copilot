@@ -13,9 +13,6 @@ from utils.get_logger import CustomLogger
 from shared.models.opencopilot_db.chatbot import Chatbot
 from models.repository.copilot_repo import get_total_chatbots, get_chatbots_batch
 
-client = QdrantClient(url=os.getenv("QDRANT_URL", "http://qdrant:6333"))
-
-
 logger = CustomLogger(module_name=__name__)
 
 db_instance = Database()

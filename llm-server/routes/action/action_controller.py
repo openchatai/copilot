@@ -1,30 +1,39 @@
+from http import HTTPStatus
 from flask import Blueprint, jsonify, request
 from routes.action.dtos.action_dto import ActionCreate
-from models.repository.action_repo import list_all_actions, action_to_dict, create_action, find_action_by_id
-
-
+from models.repository.action_repo import action_to_dict, create_action, find_action_by_id
+from werkzeug import Response
+from . import action_service
 action = Blueprint('action', __name__)
 
-
-@action.route('/bot/<string:chatbot_id>', methods=['GET'])
-def get_actions(chatbot_id):
-    actions = list_all_actions(chatbot_id)
-    return jsonify([action_to_dict(action) for action in actions])
-
-
+@action.route("/<chatbot_id>", methods=["GET"])
+def get_actions(chatbot_id: str):
+    limit = int(request.args.get("limit", 20))
+    offset = int(request.args.get("offset", 0))
+    actions = action_service.get_all_actions(chatbot_id, limit, offset)
+    return jsonify(actions)
 
 @action.route('/bot/<string:chatbot_id>', methods=['POST'])
 def add_action(chatbot_id):
     data = ActionCreate(chatbot_id=chatbot_id, **request.get_json()) 
-    
-    action = create_action(data)
-
+    action = action_service.create_action(data)
     return jsonify(action), 201
 
 
-@action.route('/<string:action_id>', methods=['GET'])
-def get_action(action_id):
-    action = find_action_by_id(action_id)
-    if action is None:
-        return jsonify({'error': 'Action not found'}), 404
-    return jsonify(action_to_dict(action))
+@action.route('/p/<string:point_id>', methods=['GET'])
+def get_action(point_id):
+    action = action_service.get_action(point_id)
+    return jsonify(action.model_dump())
+
+
+@action.route('/<string:point_id>', methods=["PUT"])
+def update_action(point_id: str):    
+    action = ActionCreate(**request.get_json())
+    action_service.update_action(action=action, point_id=point_id)
+    return Response(status=HTTPStatus.ACCEPTED)
+
+
+@action.route('/<string:point_id>', methods=["DELETE"])
+def delete_action(point_id: str):    
+    action_service.delete_action(point_id)
+    return Response(status=HTTPStatus.ACCEPTED)
