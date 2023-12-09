@@ -192,6 +192,7 @@ def validator(copilot_id):
             "chatbot_id": bot.id,
             "all_endpoints": [endpoint.to_dict() for endpoint in endpoints],
             "validations": validations,
+            "actions": parser.get_all_actions()
         }
     )
 

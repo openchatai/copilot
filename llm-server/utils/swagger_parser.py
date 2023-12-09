@@ -101,7 +101,7 @@ class SwaggerParser:
             'endpoints_without_description': [endpoint.to_dict() for endpoint in
                                               get_endpoints_without_description(endpoints)],
             'endpoints_without_name': [endpoint.to_dict() for endpoint in get_endpoints_without_name(endpoints)],
-            'auth_type': self.get_authorization_type()
+            'auth_type': self.get_authorization_type(),
         }
         return validations
 
@@ -143,7 +143,7 @@ class SwaggerParser:
                     param['schema'] = self.resolve_schema_references(param['schema'])
         return payload
 
-    def get_all_actions(self):
+    def get_all_actions(self, as_dict= True):
         """
         Retrieves all actions defined in the Swagger file as ActionDTO instances.
         Each action represents an operation on a path and includes details like base_uri,
@@ -173,6 +173,9 @@ class SwaggerParser:
                     payload=processed_payload,
                 )
 
-                actions.append(action_dto)
+                if as_dict:
+                    actions.append(action_dto.to_dict())
+                else:
+                    actions.append(action_dto)
 
         return actions
