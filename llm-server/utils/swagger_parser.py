@@ -143,7 +143,7 @@ class SwaggerParser:
                     param['schema'] = self.resolve_schema_references(param['schema'])
         return payload
 
-    def get_all_actions(self, as_dict= True):
+    def get_all_actions(self, as_dict=True):
         """
         Retrieves all actions defined in the Swagger file as ActionDTO instances.
         Each action represents an operation on a path and includes details like base_uri,

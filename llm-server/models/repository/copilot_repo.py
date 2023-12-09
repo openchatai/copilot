@@ -126,6 +126,7 @@ def create_copilot(
         try:
             session.add(new_chatbot)
             session.commit()
+            session.refresh(new_chatbot)
             return chatbot_to_dict(new_chatbot)
         except Exception as e:
             session.rollback()
