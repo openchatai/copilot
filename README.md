@@ -1,17 +1,10 @@
 <p>
-
-<img alt="GitHub Contributors" src="https://img.shields.io/github/contributors/openchatai/opencopilot" />
-<img alt="GitHub Last Commit" src="https://img.shields.io/github/last-commit/openchatai/opencopilot" />
-<img alt="" src="https://img.shields.io/github/repo-size/openchatai/opencopilot" />
-<img alt="GitHub Issues" src="https://img.shields.io/github/issues/openchatai/opencopilot" />
-<img alt="GitHub Pull Requests" src="https://img.shields.io/github/issues-pr/openchatai/opencopilot" />
-<img alt="Github License" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
 <a href="https://discord.gg/yjEgCgvefr"><img alt="Discord" src="https://img.shields.io/discord/1111357170504699954"></a>
-
-
 </p>
 
-![image](https://github.com/openchatai/OpenCopilot/assets/32633162/a0cdc888-d2de-46b7-8c0b-96e876050b6e)
+
+<img width="1445" alt="image" style="border-radius:20px" src="https://github.com/openchatai/OpenCopilot/assets/32633162/340d174b-6ddd-452f-a66d-6c5567cc4583">
+
 
 **Documentation [available here](https://docs.opencopilot.so)**
 
@@ -28,8 +21,6 @@ OpenCopilot allows you to have your own product's AI copilot. It integrates with
 - Finally, you can integrate our user-friendly chat bubble into your SaaS app.
 
 
-
-https://github.com/openchatai/OpenCopilot/assets/32633162/0d9cfe4d-87f3-437e-b038-cf53c122d1d2
 
 (In this example, the user was able to add a new fish to the store just by text commands)
 
@@ -52,7 +43,6 @@ OPENAI_API_KEY=YOUR_TOKEN_HERE
 MYSQL_URI=mysql+pymysql://dbuser:dbpass@mysql:3306/opencopilot
 ```
 
----
 ```
 make install
 ```
@@ -78,14 +68,10 @@ make help
 **You can try it out on [opencopilot.so](http://opencopilot.so/)**
 
 
-https://github.com/openchatai/OpenCopilot/assets/32633162/3bf5c24d-572c-4a42-9e45-40f05e5a16b2
-
-
-
-
-[Watch this video from Shopify:](http://www.youtube.com/watch?v=HVvbY7A7lIQ)
 
 [![IMAGE ALT TEXT](https://github.com/openchatai/OpenCopilot/assets/32633162/edebbaa6-eba5-4f72-b88d-cf0d690fffa8)](http://www.youtube.com/watch?v=HVvbY7A7lIQ "Video Title")
+
+
 (OpenCopilot is not affiliated with Shopify, and they do not use OpenCopilot, it's just a demo of what copilots are capable of)
 
 
@@ -109,21 +95,20 @@ Our goal is to empower every SaaS product with the ability to have their own AI 
 
 
 
-## 🛣️ Roadmap:
+## 🛣️ Teach the copilot via flows:
+Most of the time, the copilot can figure out what actions to execute when the user requests something, but in case there is a complex flow, you can define it to help the copilot:
 
-- [x] Create unlimited copilots.
-- [x] Embed the copilot on your SaaS product using standard JS calls.
-- [x] TypeScript chat bubble.
-- [x] Provide Swagger definitions for your APIs.
-- [x] Swagger definition validator + recommender.
-- [x] UI endpoints editor.
-- [x] Chat memory.
-- [x] Vector DB support for large Swagger files.
-- [ ] Plugins system to support different types of authentications.
-- [x] Offline LLMs.
-- [ ] Ability to ingest text data, PDF files, websites, and extra data sources.
+<img width="1453" alt="image 2" src="https://github.com/openchatai/OpenCopilot/assets/32633162/81cb899c-0200-40c6-bc2f-4fe49e112085">
 
-We love hearing from you! Got any cool ideas or requests? We're all ears! So, if you have something in mind, give us a shout! 
+
+
+## 🛣️ Embed on your app in a few lines of code
+Less than <10 lines of codes to implement on your web app or desktop app
+
+<img width="1445" alt="image" src="https://github.com/openchatai/OpenCopilot/assets/32633162/d2ad2597-9de2-4177-b894-7ce92dfd1fcd">
+
+
+
 
 
 ### Important links
@@ -141,3 +126,6 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind are welcome!
+
+We love hearing from you! Got any cool ideas or requests? We're all ears! So, if you have something in mind, give us a shout! 
+

@@ -22,7 +22,7 @@ import {
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { SwaggerUi } from "./_parts/swagger-form";
 import { FormValuesWithId } from "./_parts/swagger-form/types";
-import { useConfetti } from "@/app/_store/atoms/confetti";
+import { useConfetti } from "@/app/_store/confetti";
 
 function Header() {
   const { stepCount, activeStep, goToStep } = useWizard();

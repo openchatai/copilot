@@ -1,4 +1,3 @@
-import os
 from custom_types.api_operation import ApiOperation_vs
 from opencopilot_types.workflow_type import WorkflowFlowType
 
@@ -6,10 +5,11 @@ from opencopilot_types.workflow_type import WorkflowFlowType
 from shared.utils.opencopilot_utils.get_vector_store import get_vector_store
 from shared.utils.opencopilot_utils import StoreOptions
 from utils.chat_models import CHAT_MODELS
-from utils import get_chat_model
+from utils.get_chat_model import get_chat_model
 from typing import Optional, List
 from langchain.vectorstores.base import VectorStore
 from utils.get_logger import CustomLogger
+from utils.llm_consts import vs_thresholds
 
 logger = CustomLogger(module_name=__name__)
 chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
@@ -21,12 +21,10 @@ apis: VectorStore = get_vector_store(StoreOptions("apis"))
 
 async def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
     try:
-        score_threshold = float(os.getenv("SCORE_THRESHOLD_KB", "0.65"))
-
         kb_retriever = knowledgebase.as_retriever(
             search_kwargs={
                 "k": 3,
-                "score_threshold": score_threshold,
+                "score_threshold": vs_thresholds.get("kb_score_threshold"),
                 "filter": {"bot_id": bot_id},
             },
         )
@@ -53,12 +51,11 @@ async def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
 
 async def get_relevant_flows(text: str, bot_id: str) -> List[WorkflowFlowType]:
     try:
-        score_threshold = float(os.getenv("SCORE_THRESHOLD_KB", "0.80"))
 
         flow_retriever = flows.as_retriever(
             search_kwargs={
                 "k": 3,
-                "score_threshold": score_threshold,
+                "score_threshold": vs_thresholds.get("flows_score_threshold"),
                 "filter": {"bot_id": bot_id},
             },
         )
@@ -83,12 +80,10 @@ async def get_relevant_flows(text: str, bot_id: str) -> List[WorkflowFlowType]:
 
 async def get_relevant_apis_summaries(text: str, bot_id: str) -> List[ApiOperation_vs]:
     try:
-        score_threshold = float(os.getenv("SCORE_THRESHOLD_KB", "0.75"))
-
         apis_retriever = apis.as_retriever(
             search_kwargs={
                 "k": 3,
-                "score_threshold": score_threshold,
+                "score_threshold": vs_thresholds.get("api_score_threshold"),
                 "filter": {"bot_id": bot_id},
             },
         )

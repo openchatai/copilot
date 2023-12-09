@@ -196,39 +196,6 @@ def get_swagger_doc(swagger_url: str) -> ResolvingParser:
     else:
         return ResolvingParser(spec_string=swagger_doc)
 
-
-def handle_existing_workflow(
-    document: Document,  # lagnchaing
-    text: str,
-    headers: Headers,
-    server_base_url: str,
-    swagger_url: Optional[str],
-    app: Optional[str],
-    swagger_doc: ResolvingParser,
-    session_id: str,
-    bot_id: str,
-) -> ResponseDict:
-    # use user defined workflows if exists, if not use auto_gen_workflow
-    _workflow = mongo.workflows.find_one(
-        {"_id": ObjectId(document.metadata["workflow_id"])}
-    )
-
-    if _workflow is None:
-        _workflow = mongo.auto_gen_workflows.find_one(
-            {"_id": ObjectId(document.metadata["workflow_id"])}
-        )
-
-    output = run_workflow(
-        _workflow,
-        swagger_doc,
-        WorkflowData(text, headers, server_base_url, swagger_url, app),
-        app,
-        bot_id=bot_id,
-    )
-
-    return output
-
-
 async def handle_api_calls(
     ids: List[str],
     swagger_doc: ResolvingParser,
@@ -250,8 +217,6 @@ async def handle_api_calls(
     )
 
     _workflow["swagger_url"] = swagger_url
-    # m_workflow = mongo.auto_gen_workflows.insert_one(_workflow)
-    # add_workflow_data_to_qdrant(m_workflow.inserted_id, _workflow, swagger_url)
 
     return output
 

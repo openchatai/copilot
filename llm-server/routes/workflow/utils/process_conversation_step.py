@@ -72,11 +72,11 @@ def process_conversation_step(
     messages.append(
         HumanMessage(
             content="""Based on the information provided to you I want you to answer the questions that follow. Your should respond with a json that looks like the following, you must always use the operationIds provided in api summaries. Do not make up an operation id - 
-    {{
+    {
         "ids": ["list", "of", "operationIds", "for apis to be called"],
         "bot_message": "your response based on the instructions provided at the beginning",
         "missing_information": "Optional Field; Incase of ambiguity where user input is not sufficient to make the api call, ask follow up questions."
-    }}                
+    }                
     """
         )
     )

@@ -1,6 +1,7 @@
 from typing import cast
 
 from flask import jsonify, Blueprint, request, Response, abort, Request
+from routes.analytics.analytics_service import upsert_analytics_record
 from routes.chat.chat_dto import ChatInput
 from utils.get_logger import CustomLogger
 from utils.llm_consts import X_App_Name
@@ -160,13 +161,16 @@ async def send_chat():
         )
 
         if response_data["response"]:
+            upsert_analytics_record(chatbot_id=str(bot.id), successful_operations=1, total_operations=1)
             create_chat_history(str(bot.id), session_id, True, message)
             create_chat_history(
                 str(bot.id),
                 session_id,
                 False,
-                response_data["response"] or response_data["error"],
+                response_data["response"] or response_data["error"] or "",
             )
+        elif response_data["error"]:
+            upsert_analytics_record(chatbot_id=str(bot.id), successful_operations=0, total_operations=1, logs=response_data["error"])
 
         return jsonify(
             {"type": "text", "response": {"text": response_data["response"]}}
