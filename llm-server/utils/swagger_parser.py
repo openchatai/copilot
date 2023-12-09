@@ -115,10 +115,38 @@ class SwaggerParser:
             return servers[0].get('url', '')
         return ''
 
+    def resolve_schema_references(self, schema):
+        """
+        Resolves $ref references in the schema to their corresponding definitions.
+        """
+        if "$ref" in schema:
+            ref_path = schema["$ref"]
+            parts = ref_path.split("/")
+            # Navigate through the swagger data to find the referenced schema
+            ref_schema = self.swagger_data
+            for part in parts[1:]:  # Skip the first element as it's just a '#'
+                ref_schema = ref_schema.get(part, {})
+            return ref_schema
+        return schema
+
+    def process_payload(self, payload):
+        """
+        Processes the payload to include full schema definitions for any $ref references.
+        """
+        if 'request_body' in payload and 'content' in payload['request_body']:
+            for content_type, content_data in payload['request_body']['content'].items():
+                if 'schema' in content_data:
+                    content_data['schema'] = self.resolve_schema_references(content_data['schema'])
+        if 'request_parameters' in payload:
+            for param in payload['request_parameters']:
+                if 'schema' in param:
+                    param['schema'] = self.resolve_schema_references(param['schema'])
+        return payload
+
     def get_all_actions(self):
         """
         Retrieves all actions defined in the Swagger file as ActionDTO instances.
-        Each action represents an operation (GET, POST, PUT, etc.) on a path and includes details like base_uri,
+        Each action represents an operation on a path and includes details like base_uri,
         path, name, summary, operation_id, and other relevant information.
         """
         actions = []
@@ -128,10 +156,12 @@ class SwaggerParser:
         for path, path_data in paths.items():
             for method, method_data in path_data.items():
                 payload = {
-                    "request_body": method_data.get('requestBody'),
-                    "request_parameters": method_data.get('parameters'),
-                    "response": method_data.get('responses')
+                    "request_body": method_data.get('requestBody', {}),
+                    "request_parameters": method_data.get('parameters', [])
                 }
+
+                # Process the payload to resolve any $ref references
+                processed_payload = self.process_payload(payload)
 
                 action_dto = ActionDTO(
                     base_uri=base_uri,
@@ -140,8 +170,9 @@ class SwaggerParser:
                     description=method_data.get('description'),
                     operation_id=method_data.get('operationId'),
                     request_type=method.upper(),
-                    payload=payload,
+                    payload=processed_payload,
                 )
+
                 actions.append(action_dto)
 
         return actions
