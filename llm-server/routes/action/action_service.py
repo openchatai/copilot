@@ -28,7 +28,7 @@ def create_actions(actions: List[ActionCreate], bot_id: str):
     documents: List[Document] = []
     for action in actions:
         document = Document(page_content=action.description)
-        document.metadata["action"] = action.model_dump()
+        document.metadata.update(action.model_dump())
         
         documents.append(document)
         
@@ -39,7 +39,7 @@ def create_action(action: ActionCreate):
     documents: List[Document] = []
 
     document = Document(page_content=action.description)
-    document.metadata["action"] = action.model_dump()
+    document.metadata.update(action.model_dump())
     
     documents.append(document)
         
@@ -54,7 +54,7 @@ def get_all_actions(chatbot_id: str, limit: int= 20, offset: int = 0) -> List[Pa
         scroll_filter=models.Filter(
             must=[
                 models.FieldCondition(
-                    key="metadata.action.chatbot_id",
+                    key="metadata.chatbot_id",
                     match=models.MatchValue(value=str(chatbot_id)),
                 )
             ],
@@ -79,7 +79,7 @@ def update_action(action: ActionCreate, point_id: str):
     client.set_payload(
         collection_name="actions",
         payload={
-            "action": action
+            "metadata": action
         },
         points=[point_id],
     )

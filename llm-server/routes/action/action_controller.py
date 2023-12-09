@@ -18,9 +18,9 @@ def get_actions(chatbot_id: str):
     logger.info("Found records", records=records)
     return jsonify(records)
 
-@action.route('/bot/<string:chatbot_id>', methods=['POST'])
-def add_action(chatbot_id):
-    data = ActionCreate(chatbot_id=chatbot_id, **request.get_json()) 
+@action.route('/bot/<string:bot_id>', methods=['POST'])
+def add_action(bot_id: str):
+    data = ActionCreate(bot_id=bot_id, **request.get_json()) 
     action = action_service.create_action(data)
     return jsonify(action), 201
 

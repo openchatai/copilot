@@ -1,7 +1,7 @@
 from pydantic import Field, BaseModel
 
 class ActionCreate(BaseModel):
-    chatbot_id: str 
+    bot_id: str 
     name: str = Field(..., min_length=3, max_length=50)
     description: str = Field(min_length=20, max_length=500)
     base_uri: str = Field(None, max_length=200)
