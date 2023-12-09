@@ -1,24 +1,25 @@
+name: Build & Upload the Embededable Script
+
 on:
   push:
     branches:
       - main
     paths:
       - "copilot-widget/**"
+
 jobs:
   build-and-upload-script:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
-      - uses: pnpm/action-setup@v2
-        name: Install pnpm
-        with:
-          version: 8
-          run_install: false
-        
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+
       - name: Install dependencies
         run: cd copilot-widget/ && pnpm install
 
