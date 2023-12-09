@@ -13,7 +13,9 @@ class Action(Base):
     name = Column(String(255), nullable=True, default="")
     description = Column(Text, nullable=True, default="")
     base_uri = Column(String(255), nullable=True, default="")
-    payload = Column(JSON, nullable=False, default={})  # Swagger path
+    request_type = Column(String(255), nullable=True, default="")  # GET, POST, etc...
+    operation_id = Column(String(255), nullable=True, default="")  # auto generated
+    payload = Column(JSON, nullable=False, default={})  # The request stuff
     status = Column(String(255), default='live')  # live, draft
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
