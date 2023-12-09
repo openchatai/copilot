@@ -12,6 +12,8 @@ import { HiOutlineClipboard, HiOutlineClipboardCheck } from "react-icons/hi";
 import { FailedMessage, useChat } from "@lib/contexts/Controller";
 import { getLast } from "@lib/utils/utils";
 import { useConfigData } from "@lib/contexts/ConfigData";
+import { useTextRotator } from "@lib/hooks/useTextRotator";
+
 function BotIcon({ error }: { error?: boolean }) {
   return (
     <img
@@ -105,8 +107,18 @@ export function BotTextMessage({
   );
 }
 
+// this hook swaps the texts aarray in order every n seconds to display the next text
+// when the last text is reached, it stops 
+const waitingText = [
+  "The copilot is thinking...",
+  "Checking if we need to proceed with external call...",
+  "Crunching some numbers...",
+  "Almost there...",
+]
+
 export function BotMessageLoading() {
-  const { displayText } = useTypeWriter({ text: "Bot is Thinking..." });
+  const displayText = useTextRotator({ texts: waitingText, intervalInSeconds: 2 })
+
   return (
     <div className="opencopilot-p-2 opencopilot-flex opencopilot-items-center opencopilot-shrink-0 opencopilot-gap-3 opencopilot-w-full">
       <div className="loading opencopilot-flex-col opencopilot-w-7 opencopilot-flex opencopilot-h-7 opencopilot-bg-accent opencopilot-text-primary opencopilot-rounded-lg opencopilot-shrink-0 opencopilot-mt-auto flex-center">
@@ -118,10 +130,19 @@ export function BotMessageLoading() {
         />
       </div>
       <div className="opencopilot-space-y-2 opencopilot-flex-1">
-        <div className="mesg_body opencopilot-w-fit opencopilot-whitespace-nowrap opencopilot-max-w-full">
-          <p className="opencopilot-text-sm opencopilot-lowercase">
-            {displayText}
-          </p>
+        <div className="mesg_body opencopilot-w-fit opencopilot-max-w-full">
+          {
+            displayText.map(({ isVisible, order, text }) => (
+              <p data-visible={isVisible} key={order} className="opencopilot-text-sm 
+              opencopilot-lowercase 
+              data-[visible=false]:!opencopilot-hidden 
+              opencopilot-fade-in data-[visible=false]:opencopilot-fade-out 
+              data-[visible=false]:opencopilot-animate-out 
+              opencopilot-animate-in">
+                {text}
+              </p>
+            ))
+          }
         </div>
       </div>
     </div>
