@@ -1,3 +1,6 @@
+from entities.action_entity import ActionDTO
+
+
 class Endpoint:
     def __init__(self, operation_id, endpoint_type, name, description, request_body, request_parameters, response,
                  path):
@@ -114,8 +117,9 @@ class SwaggerParser:
 
     def get_all_actions(self):
         """
-        Retrieves all actions defined in the Swagger file.
-        Each action represents a path and includes details like base_uri, path, name, summary, and operation_id.
+        Retrieves all actions defined in the Swagger file as ActionDTO instances.
+        Each action represents an operation (GET, POST, PUT, etc.) on a path and includes details like base_uri,
+        path, name, summary, operation_id, and other relevant information.
         """
         actions = []
         base_uri = self.get_base_uri()
@@ -123,13 +127,21 @@ class SwaggerParser:
 
         for path, path_data in paths.items():
             for method, method_data in path_data.items():
-                action = {
-                    "base_uri": base_uri,
-                    "path": path,
-                    "name": method_data.get('summary'),
-                    "summary": method_data.get('description'),
-                    "operation_id": method_data.get('operationId')
+                payload = {
+                    "request_body": method_data.get('requestBody'),
+                    "request_parameters": method_data.get('parameters'),
+                    "response": method_data.get('responses')
                 }
-                actions.append(action)
+
+                action_dto = ActionDTO(
+                    base_uri=base_uri,
+                    path=path,
+                    name=method_data.get('summary'),
+                    description=method_data.get('description'),
+                    operation_id=method_data.get('operationId'),
+                    request_type=method.upper(),
+                    payload=payload,
+                )
+                actions.append(action_dto)
 
         return actions

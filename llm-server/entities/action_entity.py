@@ -7,7 +7,6 @@ from pydantic import BaseModel
 
 class ActionDTO(BaseModel):
     id: str = str(uuid.uuid4())
-    chatbot_id: str
     name: Optional[str] = ""
     description: Optional[str] = ""
     base_uri: Optional[str] = ""
@@ -49,10 +48,6 @@ class ActionDTO(BaseModel):
     #   }
     # }
     payload: Dict = {}
-    status: Optional[str] = "live"
-    created_at: datetime.datetime = datetime.datetime.utcnow()
-    updated_at: datetime.datetime = datetime.datetime.utcnow()
-    deleted_at: Optional[datetime.datetime] = None
 
     def to_dict(self):
         return self.dict()
