@@ -13,7 +13,7 @@ from typing import Optional, List, cast
 from json import dumps
 
 logger = CustomLogger(module_name=__name__)
-chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
+chat = get_chat_model()
 
 
 # @Remaining tasks here

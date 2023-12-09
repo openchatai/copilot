@@ -18,7 +18,7 @@ def convert_json_to_text(
     api_request_data: Dict[str, Any],
     bot_id: str,
 ) -> str:
-    chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
+    chat = get_chat_model()
 
     api_summarizer_template = None
     system_message = SystemMessage(

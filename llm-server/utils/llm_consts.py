@@ -16,3 +16,6 @@ vs_thresholds: VsThresholds = {
     "flows_score_threshold": float(os.getenv("FLOWS_SCORE_THRESHOLD", "0.75")),
     "kb_score_threshold": float(os.getenv("KB_SCORE_THRESHOLD", "0.75"))    
 }
+
+
+model_env_var = "CHAT_MODEL"

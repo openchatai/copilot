@@ -45,7 +45,7 @@ FAILED_TO_FETCH_SWAGGER_CONTENT = "Failed to fetch Swagger content"
 FILE_NOT_FOUND = "File not found"
 FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
 
-chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
+chat = get_chat_model()
 
 def validate_steps(steps: List[str], swagger_doc: ResolvingParser):
     try:

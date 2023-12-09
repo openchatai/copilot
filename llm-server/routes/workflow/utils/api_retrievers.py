@@ -12,7 +12,7 @@ from utils.get_logger import CustomLogger
 from utils.llm_consts import vs_thresholds
 
 logger = CustomLogger(module_name=__name__)
-chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
+chat = get_chat_model()
 
 knowledgebase: VectorStore = get_vector_store(StoreOptions("knowledgebase"))
 flows: VectorStore = get_vector_store(StoreOptions("swagger"))
