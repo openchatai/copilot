@@ -89,7 +89,7 @@ def add_action(chatbot_id):
 
     # Convert the saved action DTO to a dictionary for JSON response
 
-    return jsonify(action_to_dict(action)), 201
+    return jsonify(action_to_dict(saved_action)), 201
 
 
 @action.route('/<string:action_id>', methods=['PUT'])
