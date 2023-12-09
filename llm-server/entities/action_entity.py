@@ -6,7 +6,6 @@ from pydantic import BaseModel
 
 
 class ActionDTO(BaseModel):
-    id: str = str(uuid.uuid4())
     name: Optional[str] = ""
     description: Optional[str] = ""
     base_uri: Optional[str] = ""

@@ -1,13 +1,10 @@
 import json
 import os
-import uuid
 
 from flask import Blueprint, jsonify, request, Response
 from prance import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
-from werkzeug.utils import secure_filename
 
-import routes._swagger.service as swagger_service
 from enums.initial_prompt import ChatBotInitialPromptEnum
 from models.repository.copilot_repo import (
     list_all_with_filter,
@@ -19,7 +16,6 @@ from models.repository.copilot_repo import (
     update_copilot,
 )
 from routes._swagger import reindex_service
-from routes.root_service import get_swagger_doc
 from utils.base import resolve_abs_local_file_path_from
 from utils.get_logger import CustomLogger
 from utils.swagger_parser import SwaggerParser

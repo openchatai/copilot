@@ -2,11 +2,11 @@
 import datetime
 import uuid
 from typing import Optional, List
-from routes.action.dtos.action_dto import ActionCreate
 
 from opencopilot_db.database_setup import engine
 from sqlalchemy.orm import sessionmaker
 
+from entities.action_entity import ActionDTO
 from shared.models.opencopilot_db.action import Action
 from utils.get_logger import CustomLogger
 
@@ -15,26 +15,28 @@ SessionLocal = sessionmaker(bind=engine)
 logger = CustomLogger(module_name=__name__)
 
 
-def create_action(data: ActionCreate) -> dict:
+def create_action(chatbot_id:str, data: ActionDTO) -> dict:
     """
     Creates a new Action instance and adds it to the database with validations.
     """
     with SessionLocal() as session:
         new_action = Action(
             id=str(uuid.uuid4()),
-            chatbot_id=data.chatbot_id,
+            chatbot_id=chatbot_id,
             name=data.name,
             description=data.description,
+            operation_id=data.operation_id,
             base_uri=data.base_uri,
+            request_type=data.request_type,
             payload=data.payload,
-            status=data.status,
             created_at=datetime.datetime.utcnow(),
             updated_at=datetime.datetime.utcnow(),
         )
         try:
             session.add(new_action)
             session.commit()
-            return action_to_dict(new_action)
+            session.refresh(new_action)
+            return new_action
         except Exception as e:
             session.rollback()
             logger.error("An exception occurred", error=str(e))
