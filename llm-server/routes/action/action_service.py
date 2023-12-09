@@ -70,7 +70,7 @@ def get_all_actions(chatbot_id: str, limit: int= 20, offset: int = 0) -> List[Pa
         payload = record.payload
         
         if payload is not None:
-            actions.append(payload)
+            actions.append({"payload": payload, "id": record.id})
 
     return actions
 
