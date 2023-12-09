@@ -13,15 +13,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: "pnpm"
-
       - name: Install dependencies
-        run: cd copilot-widget/ && pnpm install
+        run: cd copilot-widget/ && npm install
 
       - name: Build copilot-widget
         run: cd copilot-widget/ && npm run build:embed
