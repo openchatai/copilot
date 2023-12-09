@@ -1,0 +1,14 @@
+# templates/mongodb/mongodb-data-persistentvolumeclaim.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-mongodb-data
+  labels:
+    app: {{ .Release.Name }}-mongodb-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.mongodb.dataStorageSize | default "100Mi" }}
+status: {}

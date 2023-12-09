@@ -1,0 +1,19 @@
+# templates/qdrant/qdrant-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-qdrant
+  labels:
+    app: {{ .Release.Name }}-qdrant
+spec:
+  ports:
+    - name: "6333"
+      port: 6333
+      targetPort: 6333
+    - name: "6334"
+      port: 6334
+      targetPort: 6334
+  selector:
+    app: {{ .Release.Name }}-qdrant
+status:
+  loadBalancer: {}

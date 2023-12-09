@@ -1,0 +1,36 @@
+# templates/hpa/selenium-hpa.yaml
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Release.Name }}-selenium-hpa
+  labels:
+    app: {{ .Release.Name }}-selenium
+{{- if .Values.selenium.hpa.enabled }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Release.Name }}-selenium
+  minReplicas: {{ .Values.selenium.hpa.minReplicas }}
+  maxReplicas: {{ .Values.selenium.hpa.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageValue: {{ .Values.selenium.hpa.cpuTargetUtilization }}m
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageValue: {{ .Values.selenium.hpa.memoryTargetUtilization }}Mi
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: {{ .Values.selenium.hpa.stabilizationWindowSeconds }}
+      policies:
+        - type: Pods
+          value: {{ .Values.selenium.hpa.policies[0].value }}
+          periodSeconds: {{ .Values.selenium.hpa.policies[0].periodSeconds }}
+{{- end }}

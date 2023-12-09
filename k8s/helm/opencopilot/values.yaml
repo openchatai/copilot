@@ -1,0 +1,43 @@
+# values.yaml
+llmServer:
+  image:
+    repository: 551408198746.dkr.ecr.us-east-1.amazonaws.com/llm-server
+    tag: latest
+
+workers:
+  image:
+    repository: 551408198746.dkr.ecr.us-east-1.amazonaws.com/llm-server
+    tag: latest
+
+dashboard:
+  image:
+    repository: 551408198746.dkr.ecr.us-east-1.amazonaws.com/dashboard
+    tag: latest
+
+mongodb:
+  dataStorageSize: 100Mi
+
+mysql:
+  dataStorageSize: 100Mi
+
+qdrant:
+  storageSize: 100Mi
+
+
+redis:
+  dataStorageSize: 100Mi
+
+
+selenium:
+  replicas: 1
+  hpa:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5
+    cpuTargetUtilization: 70
+    memoryTargetUtilization: 70
+    stabilizationWindowSeconds: 300
+    policies:
+      - type: Pods
+        value: 1
+        periodSeconds: 60

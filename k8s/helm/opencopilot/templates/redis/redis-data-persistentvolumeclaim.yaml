@@ -1,0 +1,14 @@
+# templates/redis/redis-data-persistentvolumeclaim.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-redis-data
+  labels:
+    app: {{ .Release.Name }}-redis-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.redis.dataStorageSize | default "100Mi" }}
+status: {}
