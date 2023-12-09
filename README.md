@@ -1,14 +1,5 @@
 <p>
-
-<img alt="GitHub Contributors" src="https://img.shields.io/github/contributors/openchatai/opencopilot" />
-<img alt="GitHub Last Commit" src="https://img.shields.io/github/last-commit/openchatai/opencopilot" />
-<img alt="" src="https://img.shields.io/github/repo-size/openchatai/opencopilot" />
-<img alt="GitHub Issues" src="https://img.shields.io/github/issues/openchatai/opencopilot" />
-<img alt="GitHub Pull Requests" src="https://img.shields.io/github/issues-pr/openchatai/opencopilot" />
-<img alt="Github License" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
 <a href="https://discord.gg/yjEgCgvefr"><img alt="Discord" src="https://img.shields.io/discord/1111357170504699954"></a>
-
-
 </p>
 
 
