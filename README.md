@@ -11,7 +11,9 @@
 
 </p>
 
-![image](https://github.com/openchatai/OpenCopilot/assets/32633162/a0cdc888-d2de-46b7-8c0b-96e876050b6e)
+
+<img width="1445" alt="image" style="border-radius:20px" src="https://github.com/openchatai/OpenCopilot/assets/32633162/340d174b-6ddd-452f-a66d-6c5567cc4583">
+
 
 **Documentation [available here](https://docs.opencopilot.so)**
 
@@ -78,14 +80,10 @@ make help
 **You can try it out on [opencopilot.so](http://opencopilot.so/)**
 
 
-https://github.com/openchatai/OpenCopilot/assets/32633162/3bf5c24d-572c-4a42-9e45-40f05e5a16b2
-
-
-
-
-[Watch this video from Shopify:](http://www.youtube.com/watch?v=HVvbY7A7lIQ)
 
 [![IMAGE ALT TEXT](https://github.com/openchatai/OpenCopilot/assets/32633162/edebbaa6-eba5-4f72-b88d-cf0d690fffa8)](http://www.youtube.com/watch?v=HVvbY7A7lIQ "Video Title")
+
+
 (OpenCopilot is not affiliated with Shopify, and they do not use OpenCopilot, it's just a demo of what copilots are capable of)
 
 
