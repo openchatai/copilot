@@ -25,11 +25,9 @@ def create_flow(flow_dto: FlowDTO) -> Flow:
         new_flow = Flow(
             chatbot_id=flow_dto.chatbot_id,
             name=flow_dto.name,
-            payload=flow_dto.blocks,  # Assuming payload is equivalent to blocks in DTO
-            description=flow_dto.description,  # Assuming description is part of the DTO
+            payload=flow_dto.blocks,
+            description=flow_dto.description,
             status=flow_dto.status,
-            created_at=flow_dto.created_at,
-            updated_at=flow_dto.updated_at,
             id=flow_dto.id
         )
 

@@ -24,9 +24,7 @@ class Variable(BaseModel):
 class FlowDTO(BaseModel):
     blocks: List[Block]
     chatbot_id: uuid.UUID
-    created_at: datetime
     id: uuid.UUID
     name: str
     status: str
-    updated_at: datetime
     variables: List[Variable]

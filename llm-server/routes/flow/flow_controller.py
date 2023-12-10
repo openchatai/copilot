@@ -1,3 +1,5 @@
+import uuid
+
 from flask import Blueprint, jsonify, request
 
 from entities.flow_entity import FlowDTO
@@ -67,9 +69,7 @@ def create_flow_api(bot_id: str):
                 status=status,
                 variables=variables,
                 blocks=blocks,
-                created_at=data.get('created_at'),  # Assuming this is provided, or use datetime.datetime.utcnow()
-                updated_at=data.get('updated_at'),  # Similarly, either provided or use datetime.datetime.utcnow()
-                id=data.get('id')  # Assuming this is provided, or use uuid.uuid4()
+                id=uuid.uuid4()
             )
         except Exception as e:
             return jsonify({"error": str(e)}), 400
