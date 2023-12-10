@@ -1,89 +1,45 @@
-import re
-import os
 import json
-from shared.utils.opencopilot_utils import get_llm
-from routes.workflow.extractors.extract_param import gen_params_from_schema
-from routes.workflow.extractors.extract_body import gen_body_from_schema
-from typing import Any, Optional
+import os
+from typing import Optional
+
+from models.repository.action_repo import find_action_by_operation_id
 from routes.workflow.api_info import ApiInfo
-
-from prance import ResolvingParser
-import asyncio
-
+from routes.workflow.extractors.extract_body import gen_body_from_schema
+from routes.workflow.extractors.extract_param import gen_params_from_schema
+from shared.utils.opencopilot_utils import get_llm
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
 
 
-async def get_api_info_by_operation_id(data: Any, target_operation_id: str) -> ApiInfo:
-    api_info = ApiInfo(
-        endpoint=None,
-        method=None,
-        path_params={},
-        query_params={},
-        body_schema=None,
-        servers=[],
-    )
-
-    for path, methods in data["paths"].items():
-        for method, details in methods.items():
-            if (
-                "operationId" in details
-                and details["operationId"] == target_operation_id
-            ):
-                # Extract endpoint and method
-                api_info.endpoint = path
-                api_info.method = method.upper()
-
-                all_params = details.get("parameters", [])
-                api_info.path_params = {
-                    "properties": [obj for obj in all_params if obj["in"] == "path"]
-                }
-
-                api_info.query_params = {
-                    "properties": [obj for obj in all_params if obj["in"] == "query"]
-                }
-
-                # Extract request body schema
-                if "requestBody" in details:
-                    request_body = details["requestBody"]
-                    if (
-                        "content" in request_body
-                        and "application/json" in request_body["content"]
-                    ):
-                        api_info.body_schema = request_body["content"][
-                            "application/json"
-                        ]["schema"]
-
-                # Extract server URLs
-                servers = data.get("servers", [])
-                server_urls = [server["url"] for server in servers]
-                api_info.servers = server_urls
-
-    return api_info
-
-
-def extract_json_payload(input_string: str) -> Optional[Any]:
-    # Remove all whitespace characters
-    input_string = re.sub(r"\s", "", input_string)
-
-    match = re.findall(r"{.+[:,].+}|\[.+[,:].+\]", input_string)
-    return json.loads(match[0]) if match else None
-
-
 async def generate_openapi_payload(
-    swagger_json: ResolvingParser,
-    text: str,
-    _operation_id: str,
-    prev_api_response: str,
-    app: Optional[str],
-    current_state: Optional[str],
+        text: str,
+        _operation_id: str,
+        prev_api_response: str,
+        app: Optional[str],
+        current_state: Optional[str],
 ) -> ApiInfo:
-    a, b, c = swagger_json.version_parsed
-    print(a, b, c)
+    action = find_action_by_operation_id(_operation_id)
+    payload = action.payload
 
-    api_info = await get_api_info_by_operation_id(
-        swagger_json.specification, _operation_id
+    parameters = payload.get('parameters', [])
+
+    # Extract path and query parameters, ensure they have 'name' and 'in' keys
+    path_params = {param['name']: param for param in parameters if param.get('in') == 'path' and 'name' in param}
+    query_params = {param['name']: param for param in parameters if param.get('in') == 'query' and 'name' in param}
+
+    # Extract body schema, handle different content types
+    request_body = payload.get("requestBody", {}).get("content", {})
+    # Default to empty schema if specific content type not found
+    body_schema = request_body.get("application/octet-stream", {}).get("schema", {})
+
+    # Assuming action.api_endpoint and action.request_type are provided
+    api_info = ApiInfo(
+        endpoint=action.api_endpoint,
+        method=action.request_type,
+        path_params=path_params,
+        query_params=query_params,
+        body_schema=body_schema,
     )
 
     if api_info.path_params["properties"]:
