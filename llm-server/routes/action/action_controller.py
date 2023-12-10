@@ -10,6 +10,7 @@ from models.repository.action_repo import (
     find_action_by_id,
     update_action,
 )
+from routes.action import action_vector_service
 from utils.swagger_parser import SwaggerParser
 
 action = Blueprint("action", __name__)
@@ -64,12 +65,10 @@ def import_actions_from_swagger_file(chatbot_id):
 @action.route("/bot/<string:chatbot_id>", methods=["POST"])
 def add_action(chatbot_id):
     action_dto = ActionDTO(bot_id=chatbot_id, **request.get_json())
-    # Save the action using the repository
+
+    # Todo make sure either both or non go in
     saved_action = create_action(chatbot_id, action_dto)
-
-    # Todo: sync with vector db
-
-    # Convert the saved action DTO to a dictionary for JSON response
+    action_vector_service.create_action(action_dto)
 
     return jsonify(action_to_dict(saved_action)), 201
 
