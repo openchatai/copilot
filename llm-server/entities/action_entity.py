@@ -4,11 +4,18 @@ from pydantic import BaseModel
 
 
 class ActionDTO(BaseModel):
+    bot_id: str
     name: Optional[str] = ""
     description: Optional[str] = ""
     api_endpoint: Optional[str] = ""
     request_type: Optional[str] = ""
     operation_id: Optional[str] = ""  # todo let's remove this
+
+    # todo
+    class Config:
+        # Configuring to allow arbitrary JSON keys
+        extra = "allow"
+
     # Payload contains Swagger endpoint parameters and request body as JSON.
     # Example structure:
     # {

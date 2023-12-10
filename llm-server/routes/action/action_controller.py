@@ -1,31 +1,38 @@
 from flask import Blueprint, jsonify, request, abort
+from pydantic import BaseModel
 from werkzeug.utils import secure_filename
-
+from typing import Any
 from entities.action_entity import ActionDTO
-from models.repository.action_repo import list_all_actions, action_to_dict, create_action, find_action_by_id, update_action
+from models.repository.action_repo import (
+    list_all_actions,
+    action_to_dict,
+    create_action,
+    find_action_by_id,
+    update_action,
+)
 from utils.swagger_parser import SwaggerParser
 
-action = Blueprint('action', __name__)
+action = Blueprint("action", __name__)
 
 
-@action.route('/bot/<string:chatbot_id>', methods=['GET'])
+@action.route("/bot/<string:chatbot_id>", methods=["GET"])
 def get_actions(chatbot_id):
     actions = list_all_actions(chatbot_id)
     return jsonify([action_to_dict(action) for action in actions])
 
 
-@action.route('/bot/<string:chatbot_id>/import-from-swagger', methods=['PUT'])
+@action.route("/bot/<string:chatbot_id>/import-from-swagger", methods=["PUT"])
 def import_actions_from_swagger_file(chatbot_id):
     # Check if the request has the file part
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file part in the request'}), 400
+    if "file" not in request.files:
+        return jsonify({"error": "No file part in the request"}), 400
 
-    file = request.files['file']
+    file = request.files["file"]
 
     # If the user does not select a file, the browser submits an
     # empty file without a filename.
-    if file.filename == '':
-        return jsonify({'error': 'No file part in the request'}), 400
+    if file.filename == "":
+        return jsonify({"error": "No file part in the request"}), 400
 
     if file:
         filename = secure_filename(file.filename)
@@ -36,7 +43,7 @@ def import_actions_from_swagger_file(chatbot_id):
             swagger_parser = SwaggerParser(swagger_content)
             actions = swagger_parser.get_all_actions()
         except Exception as e:
-            return jsonify({'error': f'Failed to parse Swagger file: {str(e)}'}), 400
+            return jsonify({"error": f"Failed to parse Swagger file: {str(e)}"}), 400
 
         # Store actions in the database
         for action_data in actions:
@@ -44,46 +51,19 @@ def import_actions_from_swagger_file(chatbot_id):
                 create_action(chatbot_id, action_data)
                 # todo sync with the vector db
             except Exception as e:
-                return jsonify({'error': f'Failed to store action: {str(e)}'}), 500
+                return jsonify({"error": f"Failed to store action: {str(e)}"}), 500
 
-        return jsonify({'message': f'Successfully imported actions from {filename}'}), 201
-
-    return jsonify({'error': 'Invalid swagger file'}), 400
-
-
-@action.route('/bot/<string:chatbot_id>', methods=['POST'])
-def add_action(chatbot_id):
-    # Ensure request JSON is available
-    if not request.json:
-        abort(400, description="No JSON data provided")
-
-    # Extract data from the request
-    request_data = request.get_json()
-
-    # Extract individual fields from request_data
-    name = request_data.get('name', '')
-    description = request_data.get('description', '')
-    api_endpoint = request_data.get('api_endpoint', '')
-    request_type = request_data.get('request_type', '')
-    operation_id = request_data.get('operation_id', '')
-    payload = request_data.get('payload', {})
-
-    # todo add better validation
-
-    try:
-        # Create ActionDTO explicitly with each field
-        action_dto = ActionDTO(
-            name=name,
-            description=description,
-            api_endpoint=api_endpoint,
-            request_type=request_type,
-            operation_id=operation_id,
-            payload=payload,
+        return (
+            jsonify({"message": f"Successfully imported actions from {filename}"}),
+            201,
         )
-    except Exception as e:
-        # Handle validation errors
-        return jsonify({"error": str(e)}), 201
 
+    return jsonify({"error": "Invalid swagger file"}), 400
+
+
+@action.route("/bot/<string:chatbot_id>", methods=["POST"])
+def add_action(chatbot_id):
+    action_dto = ActionDTO(bot_id=chatbot_id, **request.get_json())
     # Save the action using the repository
     saved_action = create_action(chatbot_id, action_dto)
 
@@ -94,12 +74,12 @@ def add_action(chatbot_id):
     return jsonify(action_to_dict(saved_action)), 201
 
 
-@action.route('/<string:action_id>', methods=['PUT'])
+@action.route("/<string:action_id>", methods=["PUT"])
 def update_action_api(action_id):
     # Find the existing action
     existing_action = find_action_by_id(action_id)
     if existing_action is None:
-        return jsonify({'error': 'Action not found'}), 404
+        return jsonify({"error": "Action not found"}), 404
 
     # Ensure request JSON is available
     if not request.json:
@@ -109,12 +89,12 @@ def update_action_api(action_id):
     request_data = request.get_json()
 
     # Extract individual fields from request_data, using existing values as defaults
-    name = request_data.get('name', existing_action.name)
-    description = request_data.get('description', existing_action.description)
-    base_uri = request_data.get('base_uri', existing_action.base_uri)
-    request_type = request_data.get('request_type', existing_action.request_type)
-    operation_id = request_data.get('operation_id', existing_action.operation_id)
-    payload = request_data.get('payload', existing_action.payload)
+    name = request_data.get("name", existing_action.name)
+    description = request_data.get("description", existing_action.description)
+    base_uri = request_data.get("base_uri", existing_action.base_uri)
+    request_type = request_data.get("request_type", existing_action.request_type)
+    operation_id = request_data.get("operation_id", existing_action.operation_id)
+    payload = request_data.get("payload", existing_action.payload)
 
     try:
         # Update ActionDTO explicitly with each field
@@ -139,9 +119,9 @@ def update_action_api(action_id):
     return jsonify(action_to_dict(updated_action)), 200
 
 
-@action.route('/<string:action_id>', methods=['GET'])
+@action.route("/<string:action_id>", methods=["GET"])
 def get_action(action_id):
     action = find_action_by_id(action_id)
     if action is None:
-        return jsonify({'error': 'Action not found'}), 404
+        return jsonify({"error": "Action not found"}), 404
     return jsonify(action_to_dict(action))
