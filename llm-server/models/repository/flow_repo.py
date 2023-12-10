@@ -1,3 +1,4 @@
+import json
 from typing import Optional, Type
 
 from opencopilot_db import engine
@@ -20,12 +21,14 @@ def create_flow(flow_dto: FlowDTO) -> Flow:
     Returns:
         The newly created Flow object.
     """
+    blocks_json = [block.to_dict() for block in flow_dto.blocks]
+
     with Session() as session:
         # Create a new Flow instance using data from the DTO
         new_flow = Flow(
             chatbot_id=flow_dto.chatbot_id,
             name=flow_dto.name,
-            payload=flow_dto.blocks,
+            payload=blocks_json,
             description=flow_dto.description,
             id=flow_dto.id
         )
