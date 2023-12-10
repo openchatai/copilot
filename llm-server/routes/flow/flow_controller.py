@@ -57,7 +57,7 @@ def create_flow_api(bot_id: str):
 
         # Extract individual fields from data
         name = data.get('name')
-        status = data.get('status')
+        description = data.get('description')
         variables = data.get('variables', [])
         blocks = data.get('blocks', [])
 
@@ -66,9 +66,9 @@ def create_flow_api(bot_id: str):
             flow_dto = FlowDTO(
                 chatbot_id=bot_id,
                 name=name,
-                status=status,
                 variables=variables,
                 blocks=blocks,
+                description=description,
                 id=uuid.uuid4()
             )
         except Exception as e:

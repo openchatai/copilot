@@ -1,5 +1,4 @@
 import uuid
-from datetime import datetime
 from typing import List, Optional
 
 from pydantic import BaseModel
@@ -13,12 +12,21 @@ class Block(BaseModel):
     next_on_fail: Optional[str] = None
     next_on_success: Optional[str] = None
     order: int
-    status: str
+
+    def to_dict(self):
+        # Convert the entire FlowDTO to a dictionary,
+        # including nested ActionDTO objects within each Block
+        return self.dict()
 
 
 class Variable(BaseModel):
     name: str
     value: str
+
+    def to_dict(self):
+        # Convert the entire FlowDTO to a dictionary,
+        # including nested ActionDTO objects within each Block
+        return self.dict()
 
 
 class FlowDTO(BaseModel):
@@ -26,5 +34,10 @@ class FlowDTO(BaseModel):
     chatbot_id: uuid.UUID
     id: uuid.UUID
     name: str
-    status: str
+    description: str
     variables: List[Variable]
+
+    def to_dict(self):
+        # Convert the entire FlowDTO to a dictionary,
+        # including nested ActionDTO objects within each Block
+        return self.dict()

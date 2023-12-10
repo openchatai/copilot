@@ -27,7 +27,6 @@ def create_flow(flow_dto: FlowDTO) -> Flow:
             name=flow_dto.name,
             payload=flow_dto.blocks,
             description=flow_dto.description,
-            status=flow_dto.status,
             id=flow_dto.id
         )
 
