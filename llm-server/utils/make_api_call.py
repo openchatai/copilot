@@ -32,12 +32,11 @@ def make_api_request(
     path_params,
     query_params,
     headers,
-    servers,
 ) -> Response:
     url = ""
     try:
         endpoint = replace_url_placeholders(endpoint, path_params)
-        url: str = servers[0] + endpoint
+        url: str = endpoint
         # Create a session and configure it with headers
         session = requests.Session()
 
