@@ -43,21 +43,29 @@ def import_actions_from_swagger_file(chatbot_id):
         # Parse Swagger file
         try:
             swagger_parser = SwaggerParser(swagger_content)
-            actions = swagger_parser.get_all_actions()
+            actions = swagger_parser.get_all_actions(chatbot_id)
         except Exception as e:
             logger.error("Failed to parse Swagger file", error=e)
             return jsonify({"error": f"Failed to parse Swagger file: {str(e)}"}), 400
 
+        is_error = False
         # Store actions in the database
         for action_data in actions:
             try:
                 create_action(chatbot_id, action_data)
                 action_vector_service.create_action(action_data)
             except Exception as e:
-                return jsonify({"error": f"Failed to store action: {str(e)}"}), 500
+                logger.error(str(e), failed_action=action_data)
+                isError = True
+                continue
 
         return (
-            jsonify({"message": f"Successfully imported actions from {filename}"}),
+            jsonify(
+                {
+                    "message": f"Successfully imported actions from {filename}",
+                    "is_error": is_error,
+                }
+            ),
             201,
         )
 
