@@ -1,5 +1,6 @@
-import requests
 from typing import Any, Dict
+
+import requests
 from requests import Response
 
 from utils.get_logger import CustomLogger
@@ -26,14 +27,24 @@ def replace_url_placeholders(url: str, values_dict: Dict[str, Any]) -> str:
 
 
 def make_api_request(
-    method,
-    endpoint,
-    body_schema,
-    path_params,
-    query_params,
-    headers,
+        method,
+        endpoint,
+        body_schema,
+        path_params,
+        query_params,
+        headers,
 ) -> Response:
     url = ""
+
+    logger.info(
+        "cool",
+        m=method,
+        e=endpoint,
+        b=body_schema,
+        p=path_params,
+        q=query_params,
+        h=headers,
+    )
     try:
         endpoint = replace_url_placeholders(endpoint, path_params)
         url: str = endpoint
