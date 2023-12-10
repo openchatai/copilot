@@ -11,7 +11,7 @@ class Endpoint:
         name,
         description,
         request_body,
-        request_parameters,
+        parameters,
         response,
         path,
     ):
@@ -20,7 +20,7 @@ class Endpoint:
         self.name = name
         self.description = description
         self.request_body = request_body
-        self.request_parameters = request_parameters
+        self.parameters = parameters
         self.response = response
         self.path = path
 
@@ -31,7 +31,7 @@ class Endpoint:
             "name": self.name,
             "description": self.description,
             "request_body": self.request_body,
-            "request_parameters": self.request_parameters,
+            "parameters": self.parameters,
             "response": self.response,
             "path": self.path,
         }
@@ -92,7 +92,7 @@ class SwaggerParser:
                     name=method_data.get("summary"),
                     description=method_data.get("description"),
                     request_body=method_data.get("requestBody"),
-                    request_parameters=method_data.get("parameters"),
+                    parameters=method_data.get("parameters"),
                     response=method_data.get("responses"),
                     path=path,
                 )
@@ -164,8 +164,8 @@ class SwaggerParser:
                     content_data["schema"] = self.resolve_schema_references(
                         content_data["schema"]
                     )
-        if "request_parameters" in payload:
-            for param in payload["request_parameters"]:
+        if "parameters" in payload:
+            for param in payload["parameters"]:
                 if "schema" in param:
                     param["schema"] = self.resolve_schema_references(param["schema"])
         return payload
@@ -184,14 +184,14 @@ class SwaggerParser:
             for method, method_data in path_data.items():
                 payload = {
                     "request_body": method_data.get("requestBody", {}),
-                    "request_parameters": method_data.get("parameters", []),
+                    "parameters": method_data.get("parameters", []),
                 }
 
                 # Process the payload to resolve any $ref references
                 processed_payload = self.process_payload(payload)
 
                 action_dto = ActionDTO(
-                    base_uri=base_uri + path,
+                    api_endpoint=base_uri + path,
                     name=method_data.get("name", method_data.get("summary", "")),
                     description=method_data.get("description"),
                     request_type=method.upper(),
