@@ -24,7 +24,9 @@ async def run_actions(
 ) -> str:
     api_request_data = {}
     prev_api_response = ""
-    record_info = {"Workflow Name": record.get("name")}
+    apis_calls_history = {
+        "Workflow Name": record.get("name")
+    }  # It will contain the operation id and the response for each request
     current_state = process_state(app, headers)
     for flow in record.get("flows", []):
         for step in flow.get("steps"):
@@ -59,7 +61,7 @@ async def run_actions(
                     raise e
 
                 logger.info("Got the following api response", text=api_response.text)
-                # if a custom transformer function is defined for this operationId use that, otherwise forward it to the llm
+                # if a custom transformer function is defined for this operationId use that, otherwise forward it to the llm,
                 # so we don't necessarily have to defined mappers for all api endpoints
                 partial_json = load_json_config(app, operation_id)
                 if not partial_json:
@@ -69,12 +71,7 @@ async def run_actions(
                         operation_id=operation_id,
                         app=app
                     )
-                    record_info[operation_id] = api_response.text
-
-                    # Removed this because this slows down the bot response instead of speeding it
-                    # record_info[operation_id] = transform_api_response_from_schema(
-                    #     api_payload.endpoint or "", api_response.text
-                    # )
+                    apis_calls_history[operation_id] = api_response.text
 
                     pass
                 else:
@@ -86,7 +83,7 @@ async def run_actions(
                         next_action="summarize_with_partial_json",
                     )
                     api_json = json.loads(api_response.text)
-                    record_info[operation_id] = json.dumps(
+                    apis_calls_history[operation_id] = json.dumps(
                         transform_response(
                             full_json=api_json, partial_json=partial_json
                         )
@@ -103,4 +100,4 @@ async def run_actions(
                 )
 
                 return str(e)
-    return convert_json_to_text(text, record_info, api_request_data, bot_id=bot_id)
+    return convert_json_to_text(text, apis_calls_history, api_request_data, bot_id=bot_id)

@@ -22,8 +22,8 @@ def create_workflow_from_operation_ids(
             "parameters": {},
         }
         flow: WorkflowFlowType = {
-            "name": operation["name"],
-            "description": operation["description"],
+            "name": operation.name,
+            "description": operation.description,
             "requires_confirmation": False,
             "steps": [step],
             "on_success": [{"handler": "plotOutcomeJsFunction"}],
