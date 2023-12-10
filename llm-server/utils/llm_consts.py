@@ -12,7 +12,10 @@ class VsThresholds(TypedDict):
     kb_score_threshold: float
 
 vs_thresholds: VsThresholds = {
-    "api_score_threshold": float(os.getenv("API_SCORE_THRESHOLD", "0.75")),
+    "api_score_threshold": float(os.getenv("API_SCORE_THRESHOLD", "0.25")),
     "flows_score_threshold": float(os.getenv("FLOWS_SCORE_THRESHOLD", "0.75")),
     "kb_score_threshold": float(os.getenv("KB_SCORE_THRESHOLD", "0.75"))    
 }
+
+
+model_env_var = "CHAT_MODEL"

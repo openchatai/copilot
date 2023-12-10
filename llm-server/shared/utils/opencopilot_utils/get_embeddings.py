@@ -1,50 +1,37 @@
+import os
+import warnings
 from functools import lru_cache
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.embeddings.ollama import OllamaEmbeddings
 from .embedding_type import EmbeddingProvider
-import os
 from langchain.embeddings.base import Embeddings
 from utils.get_logger import CustomLogger
-import os, warnings
 
 
 logger = CustomLogger(module_name=__name__)
 
 LOCAL_IP = os.getenv("LOCAL_IP", "host.docker.internal")
 
-def get_embedding_provider():
-    """Gets the chosen embedding provider from environment variables."""
-    return os.environ.get("EMBEDDING_PROVIDER")
-
-def get_azure_embedding():
-    """Gets embeddings using the Azure embedding provider."""
-    deployment = os.environ.get("AZURE_OPENAI_EMBEDDING_MODEL_NAME")
-    openai_api_key = os.environ.get("AZURE_OPENAI_API_KEY")
-    client = os.environ.get("AZURE_OPENAI_API_TYPE")
-    openai_api_base = os.environ['AZURE_OPENAI_API_BASE']
-    openai_api_version = os.environ['AZURE_OPENAI_API_VERSION']
-
-    return OpenAIEmbeddings(
-        openai_api_key=openai_api_key,
-        deployment=deployment,
-        client=client,
-        chunk_size=8,
-        openai_api_base=openai_api_base,
-        openai_api_version=openai_api_version
-    )
-
-def get_openai_embedding():
-    """Gets embeddings using the OpenAI embedding provider."""
-    openai_api_key = os.environ.get("OPENAI_API_KEY")
-
-    return OpenAIEmbeddings(openai_api_key=openai_api_key)
-
-def choose_embedding_provider():
-    """Chooses and returns the appropriate embedding provider instance."""
-    embedding_provider = get_embedding_provider()
+@lru_cache(maxsize=1)
+def get_embeddings():
+    embedding_provider = os.environ.get("EMBEDDING_PROVIDER", EmbeddingProvider.OPENAI.value)
 
     if embedding_provider == EmbeddingProvider.azure.value:
-        return get_azure_embedding()
+        deployment = os.environ.get("AZURE_OPENAI_EMBEDDING_MODEL_NAME")
+        client = os.environ.get("AZURE_OPENAI_API_TYPE")
+        
+        # These keys should be set
+        # os.environ["OPENAI_API_TYPE"] = "azure"
+        # os.environ["OPENAI_API_BASE"] = "https://<your-endpoint.openai.azure.com/"
+        # os.environ["OPENAI_API_KEY"] = "your AzureOpenAI key"
+        # os.environ["OPENAI_API_VERSION"] = "2023-05-15"
+        # os.environ["OPENAI_PROXY"] = "http://your-corporate-proxy:8080"
+
+        return OpenAIEmbeddings(
+            deployment=deployment,
+            client=client,
+            chunk_size=8,
+        )
     
     elif embedding_provider == EmbeddingProvider.openchat.value:
         logger.info("Got ollama embedding provider", provider=embedding_provider)
@@ -53,7 +40,7 @@ def choose_embedding_provider():
     elif embedding_provider == EmbeddingProvider.OPENAI.value or embedding_provider is None:
         if embedding_provider is None:
             warnings.warn("No embedding provider specified. Defaulting to OpenAI.")
-        return get_openai_embedding()
+        return OpenAIEmbeddings()
 
     else:
         available_providers = ", ".join([service.value for service in EmbeddingProvider])
@@ -61,9 +48,3 @@ def choose_embedding_provider():
             f"Embedding service '{embedding_provider}' is not currently available. "
             f"Available services: {available_providers}"
         )
-
-# Main function to get embeddings
-@lru_cache(maxsize=1)
-def get_embeddings() -> Embeddings:
-    """Gets embeddings using the chosen embedding provider."""
-    return choose_embedding_provider()
