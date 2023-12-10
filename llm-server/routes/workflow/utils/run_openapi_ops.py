@@ -1,28 +1,26 @@
 import json
-from opencopilot_types.workflow_type import WorkflowDataType
-from routes.workflow.generate_openapi_payload import generate_openapi_payload
-from utils.make_api_call import make_api_request
-from typing import Any, Optional
-from routes.workflow.extractors.transform_api_response import (
-    transform_api_response_from_schema,
-)
-from routes.workflow.extractors.convert_json_to_text import convert_json_to_text
-from utils.process_app_state import process_state
-from prance import ResolvingParser
+from typing import Optional
+
+from werkzeug.datastructures import Headers
+
 from integrations.load_json_config import load_json_config
 from integrations.transformers.transformer import transform_response
-from werkzeug.datastructures import Headers
+from opencopilot_types.workflow_type import WorkflowDataType
+from routes.workflow.extractors.convert_json_to_text import convert_json_to_text
+from routes.workflow.generate_openapi_payload import generate_api_payload
 from utils.get_logger import CustomLogger
+from utils.make_api_call import make_api_request
+from utils.process_app_state import process_state
 
 logger = CustomLogger(module_name=__name__)
 
 
-async def run_openapi_operations(
-    record: WorkflowDataType,
-    text: str,
-    headers: Headers,
-    app: Optional[str],
-    bot_id: str,
+async def run_actions(
+        record: WorkflowDataType,
+        text: str,
+        headers: Headers,
+        app: Optional[str],
+        bot_id: str,
 ) -> str:
     api_request_data = {}
     prev_api_response = ""
@@ -33,7 +31,7 @@ async def run_openapi_operations(
             try:
                 # refresh state after every api call, we can look into optimizing this later as well
                 operation_id = step.get("open_api_operation_id")
-                api_payload = await generate_openapi_payload(
+                api_payload = await generate_api_payload(
                     text,
                     operation_id,
                     prev_api_response,
@@ -44,7 +42,8 @@ async def run_openapi_operations(
                 api_request_data[operation_id] = api_payload.__dict__
                 api_response = None
                 try:
-                    logger.info("Making API call", incident="make_api_call", body=json.dumps(api_payload.body_schema), params=api_payload.query_params)
+                    logger.info("Making API call", incident="make_api_call", body=json.dumps(api_payload.body_schema),
+                                params=api_payload.query_params)
 
                     api_response = make_api_request(
                         headers=headers, **api_payload.__dict__
@@ -59,7 +58,7 @@ async def run_openapi_operations(
                     logger.error("Error occurred while making API call", incident="make_api_call_failed", error=str(e))
                     raise e
 
-                logger.info("Got the following api response", text = api_response.text)
+                logger.info("Got the following api response", text=api_response.text)
                 # if a custom transformer function is defined for this operationId use that, otherwise forward it to the llm
                 # so we don't necessarily have to defined mappers for all api endpoints
                 partial_json = load_json_config(app, operation_id)
@@ -71,12 +70,12 @@ async def run_openapi_operations(
                         app=app
                     )
                     record_info[operation_id] = api_response.text
-                    
+
                     # Removed this because this slows down the bot response instead of speeding it
                     # record_info[operation_id] = transform_api_response_from_schema(
                     #     api_payload.endpoint or "", api_response.text
                     # )
-                    
+
                     pass
                 else:
                     logger.info(
@@ -96,13 +95,12 @@ async def run_openapi_operations(
             except Exception as e:
                 logger.error(
                     "Error occurred during workflow check in store",
-                    incident="check_workflow_in_store",                    
-                    text= text,
-                    headers= headers,
-                    server_base_url= server_base_url,
-                    app= app,
+                    incident="check_workflow_in_store",
+                    text=text,
+                    headers=headers,
+                    app=app,
                     error=str(e),
                 )
-                
+
                 return str(e)
     return convert_json_to_text(text, record_info, api_request_data, bot_id=bot_id)

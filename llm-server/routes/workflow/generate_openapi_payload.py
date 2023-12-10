@@ -12,7 +12,7 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
 
 
-async def generate_openapi_payload(
+async def generate_api_payload(
         text: str,
         _operation_id: str,
         prev_api_response: str,

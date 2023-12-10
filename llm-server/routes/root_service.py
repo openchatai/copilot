@@ -1,33 +1,28 @@
+import asyncio
 import os
-import json
-from typing import Dict, Any, Optional, List
+from typing import Dict, Optional, List
+
 from langchain.schema import BaseMessage
+
 from custom_types.api_operation import ActionOperation_vs
 from models.repository.action_repo import list_all_operation_ids_by_bot_id
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
+from opencopilot_types.workflow_type import WorkflowFlowType
 from routes.workflow.typings.response_dict import ResponseDict
 from routes.workflow.typings.run_workflow_input import WorkflowData
 from routes.workflow.utils import (
     run_workflow,
     create_workflow_from_operation_ids,
 )
-from bson import ObjectId
 from routes.workflow.utils.api_retrievers import (
     get_relevant_apis_summaries,
     get_relevant_docs,
     get_relevant_flows,
 )
 from routes.workflow.utils.process_conversation_step import process_conversation_step
-
 from utils.chat_models import CHAT_MODELS
 from utils.db import Database
 from utils.get_chat_model import get_chat_model
-from prance import ResolvingParser
-from langchain.docstore.document import Document
-from werkzeug.datastructures import Headers
-import asyncio
-from opencopilot_types.workflow_type import WorkflowFlowType
-
 from utils.get_logger import CustomLogger
 
 logger = CustomLogger(module_name=__name__)
@@ -170,20 +165,6 @@ def check_required_fields(
             raise Exception(error_msg)
 
 
-def get_swagger_doc(swagger_url: str) -> ResolvingParser:
-    logger.info(f"Swagger url: {swagger_url}")
-    swagger_doc: Optional[Dict[str, Any]] = mongo.swagger_files.find_one(
-        {"meta.swagger_url": swagger_url}, {"meta": 0, "_id": 0}
-    )
-
-    if swagger_url.startswith("http:") or swagger_url.startswith("https:"):
-        return ResolvingParser(url=swagger_url)
-    elif swagger_url.endswith(".json") or swagger_url.endswith(".yaml"):
-        return ResolvingParser(url=shared_folder + swagger_url)
-    else:
-        return ResolvingParser(spec_string=swagger_doc)
-
-
 async def handle_api_calls(
         ids: List[str],
         text: str,
@@ -199,8 +180,6 @@ async def handle_api_calls(
         app,
         bot_id=bot_id,
     )
-
-    _workflow["swagger_url"] = swagger_url
 
     return output
 

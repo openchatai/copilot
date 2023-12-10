@@ -1,7 +1,7 @@
 from typing import Any, Optional
 from routes.workflow.typings.response_dict import ResponseDict
 from routes.workflow.typings.run_workflow_input import WorkflowData
-from routes.workflow.utils.run_openapi_ops import run_openapi_operations
+from routes.workflow.utils.run_openapi_ops import run_actions
 from opencopilot_types.workflow_type import WorkflowDataType
 from werkzeug.datastructures import Headers
 import logging
@@ -24,7 +24,7 @@ async def run_workflow(
     error = None
 
     try:
-        result = await run_openapi_operations(
+        result = await run_actions(
             workflow_doc,
             data.text,
             headers,
@@ -34,7 +34,6 @@ async def run_workflow(
     except Exception as e:
         payload_data = {
             "headers": dict(headers),
-            "server_base_url": server_base_url,
             "app": app,
         }
 

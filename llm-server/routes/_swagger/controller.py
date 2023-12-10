@@ -1,6 +1,5 @@
 from bson import ObjectId
 from flask import jsonify, Blueprint, request, Response
-from routes.root_service import get_swagger_doc
 
 import routes._swagger.service as swagger_service
 from utils.db import Database
@@ -58,17 +57,6 @@ def get_swagger_files_by_bot_id(bot_id: str) -> Response:
 @_swagger.route("/b/<id>", methods=["GET", "POST"])
 def add_swagger_file(id) -> Response:
     result = swagger_service.add_swagger_file(request, id)
-    return jsonify(result)
-
-
-@_swagger.route("/init/b/<bot_id>", methods=["GET", "POST"])
-def add_init_swagger_file(bot_id: str) -> Response:
-    body = request.get_json()
-    swagger_url = body["swagger_url"]
-
-    swagger_doc = get_swagger_doc(swagger_url=swagger_url)
-
-    result = swagger_service.save_swaggerfile_to_mongo(swagger_url, bot_id, swagger_doc)
     return jsonify(result)
 
 
