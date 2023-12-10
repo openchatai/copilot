@@ -44,26 +44,26 @@ def process_conversation_step(
     if context and len(api_summaries) > 0 and len(flows) > 0:
         messages.append(
             HumanMessage(
-                content=f"Here is some relevant context I found that might be helpful - ```{dumps(context)}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{dumps(api_summaries)}```. I also found some api flows, that maybe able to answer the following question ```{dumps(flows)}```. If one of the flows can accurately answer the question, then set `id` in the response should be the ids defined in the flows. Flows should take precedence over the api_summaries"
+                content=f"Here is some relevant context I found that might be helpful - ```{dumps(context, ensure_ascii=False, separators=(',', ':'))}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{dumps(api_summaries)}```. I also found some api flows, that maybe able to answer the following question ```{dumps(flows, ensure_ascii=False, separators=(',', ':'))}```. If one of the flows can accurately answer the question, then set `id` in the response should be the ids defined in the flows. Flows should take precedence over the api_summaries"
             )
         )
 
     elif context and len(api_summaries) > 0:
         messages.append(
             HumanMessage(
-                content=f"Here is some relevant context I found that might be helpful - ```{dumps(context)}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{dumps(api_summaries)}```. "
+                content=f"Here is some relevant context I found that might be helpful - ```{dumps(context, ensure_ascii=False, separators=(',', ':'))}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{dumps(api_summaries, ensure_ascii=False, separators=(',', ':'))}```. "
             )
         )
     elif context:
         messages.append(
             HumanMessage(
-                content=f"I found some relevant context that might be helpful. Here is the context: ```{dumps(context)}```. "
+                content=f"I found some relevant context that might be helpful. Here is the context: ```{dumps(context, ensure_ascii=False, separators=(',', ':'))}```. "
             )
         )
     elif len(api_summaries) > 0:
         messages.append(
             HumanMessage(
-                content=f"I found API summaries that might be helpful in answering the question. Here are the api summaries: ```{dumps(api_summaries)}```. "
+                content=f"I found API summaries that might be helpful in answering the question. Here are the api summaries: ```{dumps(api_summaries, ensure_ascii=False, separators=(',', ':'))}```. "
             )
         )
     else:
@@ -71,12 +71,14 @@ def process_conversation_step(
 
     messages.append(
         HumanMessage(
-            content="""Based on the information provided to you I want you to answer the questions that follow. Your should respond with a json that looks like the following, you must always use the operationIds provided in api summaries. Do not make up an operation id - 
+            content="""Based on the information provided to you and the conversation history of this conversation, I want you to answer the questions that follow. Your should respond with a json that looks like the following, you must always use the operationIds provided in api summaries. Do not make up an operation id - 
     {
         "ids": ["list", "of", "operationIds", "for apis to be called"],
         "bot_message": "your response based on the instructions provided at the beginning",
-        "missing_information": "Optional Field; Incase of ambiguity where user input is not sufficient to make the api call, ask follow up questions."
+        "missing_information": "Optional Field; Incase of ambiguity ask clarifying questions. You should not worry about the api filters or query, that should be decided by a different agent."
     }                
+    
+    Don't add operation ids if you can reply by merely looking in the conversation history.
     """
         )
     )

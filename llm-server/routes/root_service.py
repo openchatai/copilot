@@ -118,7 +118,7 @@ async def handle_request(
         if step.missing_information is not None and len(step.missing_information) >= 10:
             return {
                 "error": None,
-                "response": step.missing_information
+                "response": step.bot_message + "\n" + step.missing_information
             }
 
         if len(step.ids) > 0:
