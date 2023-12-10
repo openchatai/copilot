@@ -1,4 +1,3 @@
-import json
 import os
 
 from flask import Blueprint, jsonify, request, Response
@@ -16,9 +15,7 @@ from models.repository.copilot_repo import (
     update_copilot,
 )
 from routes._swagger import reindex_service
-from utils.base import resolve_abs_local_file_path_from
 from utils.get_logger import CustomLogger
-from utils.swagger_parser import SwaggerParser
 
 logger = CustomLogger(module_name=__name__)
 copilot = Blueprint("copilot", __name__)
@@ -116,55 +113,15 @@ def general_settings_update(copilot_id):
         return jsonify({"error": "An error occurred", "details": str(e)}), 500
 
 
-@copilot.route("/<string:copilot_id>/validator", methods=["GET"])
-def validator(copilot_id):
-    bot = find_one_or_fail_by_id(copilot_id)
-
-    try:
-        swagger_url = bot.swagger_url  # Adjust attribute name as necessary
-        swagger_content = ""
-
-        if not swagger_url.startswith("https"):
-            swagger_url = resolve_abs_local_file_path_from(swagger_url)
-            # Read the file content from the local system or shared storage
-            with open(swagger_url, "r") as file:
-                swagger_content = file.read()
-
-        swagger_data = json.loads(swagger_content)
-        parser = SwaggerParser(swagger_data)
-
-    except Exception as e:
-        return (
-            jsonify(
-                {
-                    "error": "Failed to load the swagger file for validation. error: "
-                    + str(e)
-                }
-            ),
-            400,
-        )
-
-    endpoints = parser.get_endpoints()
-    validations = parser.get_validations()
-    return jsonify(
-        {
-            "chatbot_id": bot.id,
-            "all_endpoints": [endpoint.to_dict() for endpoint in endpoints],
-            "validations": validations,
-            "actions": parser.get_all_actions(bot_id=copilot_id),
-        }
-    )
-
-
 # This api will be used to reindex all swagger files into our qdrant vector store
-@copilot.route("/reindex/apis", methods=["POST"])
-def reindex_apis():
-    # Check if the provided key matches the expected key
-    SECRET_KEY = os.getenv("BASIC_AUTH_KEY")
-    if not SECRET_KEY:
-        raise ValidationError("This is a protected route! Contact admin")
-    if request.headers.get("Authorization") == f"Bearer {SECRET_KEY}":
-        response = reindex_service.reindex_apis()
-        return Response(response=response, status=200)
-    else:
-        return Response(response="Unauthorized", status=401)
+# @copilot.route("/reindex/apis", methods=["POST"])
+# def reindex_apis():
+#     # Check if the provided key matches the expected key
+#     SECRET_KEY = os.getenv("BASIC_AUTH_KEY")
+#     if not SECRET_KEY:
+#         raise ValidationError("This is a protected route! Contact admin")
+#     if request.headers.get("Authorization") == f"Bearer {SECRET_KEY}":
+#         response = reindex_service.reindex_apis()
+#         return Response(response=response, status=200)
+#     else:
+#         return Response(response="Unauthorized", status=401)
