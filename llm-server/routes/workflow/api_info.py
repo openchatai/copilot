@@ -12,6 +12,6 @@ class ApiInfo:
     ) -> None:
         self.endpoint = endpoint
         self.method = method
-        self.path_params = path_params
-        self.query_params = query_params
+        self.path_params: Any = {"properties": path_params}
+        self.query_params: Any = {"properties": query_params}
         self.body_schema = body_schema

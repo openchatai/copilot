@@ -13,20 +13,28 @@ llm = get_llm()
 
 
 async def generate_api_payload(
-        text: str,
-        _operation_id: str,
-        prev_api_response: str,
-        app: Optional[str],
-        current_state: Optional[str],
+    text: str,
+    _operation_id: str,
+    prev_api_response: str,
+    app: Optional[str],
+    current_state: Optional[str],
 ) -> ApiInfo:
     action = find_action_by_operation_id(_operation_id)
     payload = action.payload
 
-    parameters = payload.get('parameters', [])
+    parameters = payload.get("parameters", [])
 
     # Extract path and query parameters, ensure they have 'name' and 'in' keys
-    path_params = {param['name']: param for param in parameters if param.get('in') == 'path' and 'name' in param}
-    query_params = {param['name']: param for param in parameters if param.get('in') == 'query' and 'name' in param}
+    path_params = {
+        param["name"]: param
+        for param in parameters
+        if param.get("in") == "path" and "name" in param
+    }
+    query_params = {
+        param["name"]: param
+        for param in parameters
+        if param.get("in") == "query" and "name" in param
+    }
 
     # Extract body schema, handle different content types
     request_body = payload.get("requestBody", {}).get("content", {})

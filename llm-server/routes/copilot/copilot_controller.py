@@ -32,7 +32,7 @@ def index():
     return jsonify([chatbot_to_dict(chatbot) for chatbot in chatbots])
 
 
-@copilot.route("/", methods=["POST"])
+@copilot.route("/swagger", methods=["POST"])
 def create_new_copilot():
     chatbot = create_copilot(
         name=request.form.get("name", "My First Copilot"),
@@ -138,7 +138,7 @@ def validator(copilot_id):
             jsonify(
                 {
                     "error": "Failed to load the swagger file for validation. error: "
-                             + str(e)
+                    + str(e)
                 }
             ),
             400,
@@ -151,7 +151,7 @@ def validator(copilot_id):
             "chatbot_id": bot.id,
             "all_endpoints": [endpoint.to_dict() for endpoint in endpoints],
             "validations": validations,
-            "actions": parser.get_all_actions()
+            "actions": parser.get_all_actions(),
         }
     )
 

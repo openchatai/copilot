@@ -67,5 +67,13 @@ def make_api_request(
         return response
 
     except requests.exceptions.RequestException as e:
-        logger.error("API request failed", e=str(e), headers=headers, url= url, params = path_params, query_params= query_params, method=method)
+        logger.error(
+            "API request failed",
+            e=str(e),
+            headers=headers,
+            url=url,
+            params=path_params,
+            query_params=query_params,
+            method=method,
+        )
         raise (e)
