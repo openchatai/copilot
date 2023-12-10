@@ -1,4 +1,4 @@
-from custom_types.api_operation import ApiOperation_vs
+from custom_types.api_operation import ActionOperation_vs
 from opencopilot_types.workflow_type import WorkflowFlowType
 
 # push it to the library
@@ -16,7 +16,7 @@ chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
 knowledgebase: VectorStore = get_vector_store(StoreOptions("knowledgebase"))
 flows: VectorStore = get_vector_store(StoreOptions("swagger"))
-apis: VectorStore = get_vector_store(StoreOptions("apis"))
+apis: VectorStore = get_vector_store(StoreOptions("actions"))
 
 
 async def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
@@ -78,7 +78,7 @@ async def get_relevant_flows(text: str, bot_id: str) -> List[WorkflowFlowType]:
         return []
 
 
-async def get_relevant_apis_summaries(text: str, bot_id: str) -> List[ApiOperation_vs]:
+async def get_relevant_apis_summaries(text: str, bot_id: str) -> List[ActionOperation_vs]:
     try:
         apis_retriever = apis.as_retriever(
             search_kwargs={
@@ -90,9 +90,11 @@ async def get_relevant_apis_summaries(text: str, bot_id: str) -> List[ApiOperati
 
         results = apis_retriever.get_relevant_documents(text)
 
-        resp: List[ApiOperation_vs] = []
+        resp: List[ActionOperation_vs] = []
         for result in results:
-            resp.append(result.metadata["operation"])
+            resp.append(
+                ActionOperation_vs(**result.metadata)
+            )
 
         return resp
 

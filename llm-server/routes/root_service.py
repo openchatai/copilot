@@ -2,7 +2,7 @@ import os
 import json
 from typing import Dict, Any, Optional, List
 from langchain.schema import BaseMessage
-from custom_types.api_operation import ApiOperation_vs
+from custom_types.api_operation import ActionOperation_vs
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from routes.workflow.typings.response_dict import ResponseDict
 from routes.workflow.typings.run_workflow_input import WorkflowData
@@ -27,7 +27,6 @@ from werkzeug.datastructures import Headers
 import asyncio
 from opencopilot_types.workflow_type import WorkflowFlowType
 
-
 from utils.get_logger import CustomLogger
 
 logger = CustomLogger(module_name=__name__)
@@ -46,6 +45,7 @@ FILE_NOT_FOUND = "File not found"
 FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
 
 chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
+
 
 def validate_steps(steps: List[str], swagger_doc: ResolvingParser):
     try:
@@ -75,21 +75,20 @@ def validate_steps(steps: List[str], swagger_doc: ResolvingParser):
         return False
 
 
-
 async def handle_request(
-    text: str,
-    swagger_url: str,
-    session_id: str,
-    base_prompt: str,
-    bot_id: str,
-    headers: Dict[str, str],
-    server_base_url: str,
-    app: Optional[str],
+        text: str,
+        swagger_url: str,
+        session_id: str,
+        base_prompt: str,
+        bot_id: str,
+        headers: Dict[str, str],
+        server_base_url: str,
+        app: Optional[str],
 ) -> ResponseDict:
     log_user_request(text)
     check_required_fields(base_prompt, text, swagger_url)
     context: str = ""
-    apis: List[ApiOperation_vs] = []
+    apis: List[ActionOperation_vs] = []
     flows: List[WorkflowFlowType] = []
     prev_conversations: List[BaseMessage] = []
     try:
@@ -114,7 +113,7 @@ async def handle_request(
             bot_id=bot_id,
             base_prompt=base_prompt
         )
-        
+
         if step.missing_information is not None and len(step.missing_information) >= 10:
             return {
                 "error": None,
@@ -124,10 +123,10 @@ async def handle_request(
         if len(step.ids) > 0:
             swagger_doc = get_swagger_doc(swagger_url)
             fl = validate_steps(step.ids, swagger_doc)
-            
+
             if fl is False:
                 return {"error": None, "response": step.bot_message}
-            
+
             response = await handle_api_calls(
                 ids=step.ids,
                 swagger_doc=swagger_doc,
@@ -172,7 +171,7 @@ def log_user_request(text: str) -> None:
 
 
 def check_required_fields(
-    base_prompt: str, text: str, swagger_url: Optional[str]
+        base_prompt: str, text: str, swagger_url: Optional[str]
 ) -> None:
     for required_field, error_msg in [
         ("base_prompt", BASE_PROMPT_REQUIRED),
@@ -196,16 +195,17 @@ def get_swagger_doc(swagger_url: str) -> ResolvingParser:
     else:
         return ResolvingParser(spec_string=swagger_doc)
 
+
 async def handle_api_calls(
-    ids: List[str],
-    swagger_doc: ResolvingParser,
-    text: str,
-    headers: Dict[str, str],
-    server_base_url: str,
-    swagger_url: Optional[str],
-    app: Optional[str],
-    session_id: str,
-    bot_id: str,
+        ids: List[str],
+        swagger_doc: ResolvingParser,
+        text: str,
+        headers: Dict[str, str],
+        server_base_url: str,
+        swagger_url: Optional[str],
+        app: Optional[str],
+        session_id: str,
+        bot_id: str,
 ) -> ResponseDict:
     _workflow = create_workflow_from_operation_ids(ids, swagger_doc, text)
     output = await run_workflow(
