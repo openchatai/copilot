@@ -164,8 +164,7 @@ class SwaggerParser:
                 processed_payload = self.process_payload(payload)
 
                 action_dto = ActionDTO(
-                    base_uri=base_uri,
-                    path=path,
+                    base_uri=base_uri . path,
                     name=method_data.get('summary'),
                     description=method_data.get('description'),
                     operation_id=method_data.get('operationId'),

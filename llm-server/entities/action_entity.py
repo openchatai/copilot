@@ -6,9 +6,9 @@ from pydantic import BaseModel
 class ActionDTO(BaseModel):
     name: Optional[str] = ""
     description: Optional[str] = ""
-    base_uri: Optional[str] = ""
+    api_endpoint: Optional[str] = ""
     request_type: Optional[str] = ""
-    operation_id: Optional[str] = ""
+    operation_id: Optional[str] = ""  # todo let's remove this
     # Payload contains Swagger endpoint parameters and request body as JSON.
     # Example structure:
     # {

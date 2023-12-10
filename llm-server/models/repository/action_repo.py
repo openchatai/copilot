@@ -22,11 +22,11 @@ def create_action(chatbot_id: str, data: ActionDTO) -> dict:
     with SessionLocal() as session:
         new_action = Action(
             id=str(uuid.uuid4()),
-            chatbot_id=chatbot_id,
+            bot_id=chatbot_id,
             name=data.name,
             description=data.description,
             operation_id=data.operation_id,
-            base_uri=data.base_uri,
+            api_endpoint=data.api_endpoint,
             request_type=data.request_type,
             payload=data.payload,
             created_at=datetime.datetime.utcnow(),
@@ -56,7 +56,7 @@ def update_action(action_id: str, data: ActionDTO) -> Action:
         action.name = data.name
         action.description = data.description
         action.operation_id = data.operation_id
-        action.base_uri = data.base_uri
+        action.base_uri = data.api_endpoint
         action.request_type = data.request_type
         action.payload = data.payload
         action.updated_at = datetime.datetime.utcnow()
@@ -78,7 +78,7 @@ def list_all_actions(chatbot_id: Optional[str] = None) -> List[Action]:
     with SessionLocal() as session:
         query = session.query(Action)
         if chatbot_id is not None:
-            query = query.filter(Action.chatbot_id == chatbot_id)
+            query = query.filter(Action.bot_id == chatbot_id)
         return query.all()
 
 
@@ -96,10 +96,10 @@ def action_to_dict(action: Action) -> dict:
     """
     return {
         "id": action.id,
-        "chatbot_id": action.chatbot_id,
+        "bot_id": action.bot_id,
         "name": action.name,
         "description": action.description,
-        "base_uri": action.base_uri,
+        "api_endpoint": action.api_endpoint,
         "payload": action.payload,
         "status": action.status,
         "created_at": action.created_at.isoformat(),

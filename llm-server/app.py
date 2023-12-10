@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from flask import Flask
 
 from routes._swagger.controller import _swagger
+from routes.action.action_controller import action
 from routes.chat.chat_controller import chat_workflow
 from routes.copilot.copilot_controller import copilot
 from routes.data_source.data_source_controller import datasource_workflow
@@ -36,6 +37,7 @@ app.register_blueprint(upload_controller, url_prefix="/backend/uploads")
 app.register_blueprint(datasource_workflow, url_prefix="/backend/data_sources")
 app.register_blueprint(prompt_template_workflow, url_prefix="/backend/prompt-templates")
 app.register_blueprint(prompt_workflow, url_prefix="/backend/prompts")
+app.register_blueprint(action, url_prefix="/backend/actions")
 
 app.config.from_object(Config)
 

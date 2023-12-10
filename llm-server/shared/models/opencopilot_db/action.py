@@ -9,10 +9,10 @@ class Action(Base):
     __tablename__ = 'actions'
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    chatbot_id = Column(String(36), nullable=False)
+    bot_id = Column(String(36), nullable=False)
     name = Column(String(255), nullable=True, default="")
     description = Column(Text, nullable=True, default="")
-    base_uri = Column(String(255), nullable=True, default="")
+    api_endpoint = Column(String(255), nullable=True, default="")
     request_type = Column(String(255), nullable=True, default="")  # GET, POST, etc...
     operation_id = Column(String(255), nullable=True, default="")  # auto generated
     payload = Column(JSON, nullable=False, default={})  # The request stuff

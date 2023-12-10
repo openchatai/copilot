@@ -63,17 +63,19 @@ def add_action(chatbot_id):
     # Extract individual fields from request_data
     name = request_data.get('name', '')
     description = request_data.get('description', '')
-    base_uri = request_data.get('base_uri', '')
+    api_endpoint = request_data.get('api_endpoint', '')
     request_type = request_data.get('request_type', '')
     operation_id = request_data.get('operation_id', '')
     payload = request_data.get('payload', {})
+
+    # todo add better validation
 
     try:
         # Create ActionDTO explicitly with each field
         action_dto = ActionDTO(
             name=name,
             description=description,
-            base_uri=base_uri,
+            api_endpoint=api_endpoint,
             request_type=request_type,
             operation_id=operation_id,
             payload=payload,
