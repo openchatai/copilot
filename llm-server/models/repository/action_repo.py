@@ -82,6 +82,35 @@ def list_all_actions(chatbot_id: Optional[str] = None) -> List[Action]:
         return query.all()
 
 
+def find_action_by_operation_id(operation_id: str) -> Optional[Action]:
+    """
+    Retrieves an action from the database filtered by the given operation_id.
+    Returns a single Action object if found, otherwise None.
+    """
+    with SessionLocal() as session:
+        action = session.query(Action).filter(Action.operation_id == operation_id).first()
+        return action
+
+
+def list_all_operation_ids_by_bot_id(chatbot_id: Optional[str] = None) -> List[str]:
+    """
+    Retrieves a list of operation IDs for actions associated with a specific chatbot,
+    filtered by the given chatbot_id. This function excludes null and empty strings
+    from the list of operation IDs.
+    """
+    operation_ids = []
+    with SessionLocal() as session:
+        query = session.query(Action.operation_id)  # Query only the operation_id column
+        if chatbot_id is not None:
+            query = query.filter(Action.bot_id == chatbot_id)
+        results = query.all()  # This will be a list of tuples
+
+        # Extract operation_id from each tuple, filter out None and empty strings
+        operation_ids = [op_id for (op_id,) in results if op_id]
+
+    return operation_ids
+
+
 def find_action_by_id(action_id: str) -> Optional[Action]:
     """
     Finds an Action instance by its ID.
@@ -100,6 +129,7 @@ def action_to_dict(action: Action) -> dict:
         "name": action.name,
         "description": action.description,
         "api_endpoint": action.api_endpoint,
+        "operation_id": action.operation_id,
         "payload": action.payload,
         "status": action.status,
         "created_at": action.created_at.isoformat(),

@@ -19,10 +19,8 @@ logger = CustomLogger(module_name=__name__)
 
 async def run_openapi_operations(
     record: WorkflowDataType,
-    swagger_json: ResolvingParser,
     text: str,
     headers: Headers,
-    server_base_url: str,
     app: Optional[str],
     bot_id: str,
 ) -> str:

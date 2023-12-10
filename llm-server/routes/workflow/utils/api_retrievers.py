@@ -93,7 +93,7 @@ async def get_relevant_apis_summaries(text: str, bot_id: str) -> List[ActionOper
         resp: List[ActionOperation_vs] = []
         for result in results:
             resp.append(
-                ActionOperation_vs(**result.metadata)
+                result.metadata
             )
 
         return resp

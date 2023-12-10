@@ -1,6 +1,6 @@
 from typing import List
-from routes.workflow.utils.get_swagger_op_by_id import get_operation_by_id
-from prance import ResolvingParser
+
+from models.repository.action_repo import find_action_by_operation_id
 from opencopilot_types.workflow_type import (
     WorkflowDataType,
     WorkflowFlowType,
@@ -9,12 +9,12 @@ from opencopilot_types.workflow_type import (
 
 
 def create_workflow_from_operation_ids(
-    op_ids: List[str], swagger_doc: ResolvingParser, user_input: str
+        op_ids: List[str], user_input: str
 ) -> WorkflowDataType:
     flows: List[WorkflowFlowType] = []
 
     for op_id in op_ids:
-        operation = get_operation_by_id(swagger_doc, op_id)
+        operation = find_action_by_operation_id(op_id)
         step: WorkflowStepType = {
             "stepId": str(op_ids.index(op_id)),
             "operation": "call",

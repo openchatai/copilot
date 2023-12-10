@@ -14,13 +14,11 @@ logger = CustomLogger(module_name=__name__)
 
 async def run_workflow(
     workflow_doc: WorkflowDataType,
-    swagger_json: Any,
     data: WorkflowData,
     app: Optional[str],
     bot_id: str,
 ) -> ResponseDict:
     headers = data.headers or Headers()
-    server_base_url = data.server_base_url
 
     result = ""
     error = None
@@ -28,10 +26,8 @@ async def run_workflow(
     try:
         result = await run_openapi_operations(
             workflow_doc,
-            swagger_json,
             data.text,
             headers,
-            server_base_url,
             app,
             bot_id=bot_id,
         )
