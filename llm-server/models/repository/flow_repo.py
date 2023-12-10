@@ -3,31 +3,40 @@ from typing import Optional, Type
 from opencopilot_db import engine
 from sqlalchemy.orm import sessionmaker
 
+from entities.flow_entity import FlowDTO
 from shared.models.opencopilot_db.flow import Flow
 from shared.models.opencopilot_db.flow_variables import FlowVariable
 
 Session = sessionmaker(bind=engine)
 
 
-def create_flow(chatbot_id: str, name: str, payload: dict, description: str = None) -> Flow:
+def create_flow(flow_dto: FlowDTO) -> Flow:
     """
     Creates a new flow record in the database.
 
     Args:
-        description:
-        payload:
-        chatbot_id: The ID of the chatbot associated with the flow.
-        name: The name of the flow.
+        flow_dto: An instance of FlowDTO containing all necessary data.
 
     Returns:
         The newly created Flow object.
     """
     with Session() as session:
-        flow = Flow(chatbot_id=chatbot_id, name=name, payload=payload, description=description)
-        session.add(flow)
+        # Create a new Flow instance using data from the DTO
+        new_flow = Flow(
+            chatbot_id=flow_dto.chatbot_id,
+            name=flow_dto.name,
+            payload=flow_dto.blocks,  # Assuming payload is equivalent to blocks in DTO
+            description=flow_dto.description,  # Assuming description is part of the DTO
+            status=flow_dto.status,
+            created_at=flow_dto.created_at,
+            updated_at=flow_dto.updated_at,
+            id=flow_dto.id
+        )
+
+        session.add(new_flow)
         session.commit()
-        session.refresh(flow)  # Refresh the instance to load any unloaded attributes
-        return flow
+        session.refresh(new_flow)  # Refresh the instance to load any unloaded attributes
+        return new_flow
 
 
 def update_flow(flow_id: str, name: str, payload: dict, description: str) -> Optional[Flow]:

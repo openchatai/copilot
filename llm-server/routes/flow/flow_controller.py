@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 
+from entities.flow_entity import FlowDTO
 from models.repository.copilot_repo import find_one_or_fail_by_id
 from models.repository.flow_repo import create_flow, get_all_flows_for_bot, get_flow_by_id, get_variables_for_flow, \
     add_or_update_variable_in_flow, update_flow
@@ -47,23 +48,40 @@ def create_flow_api(bot_id: str):
         A Flask response object with the newly created Flow object as a dictionary.
     """
     try:
-        data = request.json
+        # Extract and validate incoming data
+        data = request.get_json()
         if not data:
             return jsonify({"error": "No data provided"}), 400
 
-        name = data.get("name")
-        description = data.get("description", None)
-        payload = data.get("blocks", {})  # todo validation
-        if not name:
-            return jsonify({"error": "Missing required field: 'name'"}), 400
+        # Extract individual fields from data
+        name = data.get('name')
+        status = data.get('status')
+        variables = data.get('variables', [])
+        blocks = data.get('blocks', [])
 
-        flow = create_flow(bot_id, name, payload, description)
+        # Validate data using FlowDTO
+        try:
+            flow_dto = FlowDTO(
+                chatbot_id=bot_id,
+                name=name,
+                status=status,
+                variables=variables,
+                blocks=blocks,
+                created_at=data.get('created_at'),  # Assuming this is provided, or use datetime.datetime.utcnow()
+                updated_at=data.get('updated_at'),  # Similarly, either provided or use datetime.datetime.utcnow()
+                id=data.get('id')  # Assuming this is provided, or use uuid.uuid4()
+            )
+        except Exception as e:
+            return jsonify({"error": str(e)}), 400
+
+        # Assuming create_flow is a function to save the flow to DB
+        flow = create_flow(flow_dto)
         return jsonify(flow_to_dict(flow)), 201
+
     except Exception as e:
-        # Log the exception here
         print(f"Error creating flow: {e}")
-        # Return an error response
         return jsonify({"error": "Failed to create flow. {}".format(str(e))}), 500
+
 
 
 @flow.route("/<flow_id>", methods=["PUT"])
