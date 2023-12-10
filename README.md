@@ -9,7 +9,7 @@
 **Documentation [available here](https://docs.opencopilot.so)**
 
 ------
-# 🔥 OpenCopilot [early beta]
+# 🔥 OpenCopilot
 
 ---- 
 OpenCopilot allows you to have your own product's AI copilot. It integrates with your underlying APIs and can execute API calls whenever needed. It uses LLMs to determine if the user's request requires calling an API endpoint. Then, it decides which endpoint to call and passes the appropriate payload based on the given API definition.
