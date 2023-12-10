@@ -83,7 +83,6 @@ def create_flow_api(bot_id: str):
         return jsonify({"error": "Failed to create flow. {}".format(str(e))}), 500
 
 
-
 @flow.route("/<flow_id>", methods=["PUT"])
 def update_flow_api(flow_id: str):
     """
@@ -96,18 +95,32 @@ def update_flow_api(flow_id: str):
         A Flask response object with the updated Flow object as a dictionary.
     """
     try:
-        data = request.json
+        # Extract and validate incoming data
+        data = request.get_json()
         if not data:
             return jsonify({"error": "No data provided"}), 400
 
-        name = data.get("name")
-        description = data.get("description", None)
-        payload = data.get("blocks", {})  # TODO: Add validation
+        # Extract individual fields from data
+        name = data.get('name')
+        status = data.get('status')
+        variables = data.get('variables', [])
+        blocks = data.get('blocks', [])
 
-        if not name:
-            return jsonify({"error": "Missing required field: 'name'"}), 400
+        # Validate data using FlowDTO
+        try:
+            flow_dto = FlowDTO(
+                id=uuid.UUID(flow_id),  # Convert string to UUID
+                chatbot_id=data.get('chatbot_id'),  # Extract chatbot_id if it's provided or necessary
+                name=name,
+                status=status,
+                variables=variables,
+                blocks=blocks,
+            )
+        except Exception as e:
+            return jsonify({"error": str(e)}), 400
 
-        updated_flow = update_flow(flow_id, name, payload, description)
+        # Assuming update_flow is a function to update the flow in the DB
+        updated_flow = update_flow(flow_dto)
         if updated_flow:
             return jsonify(flow_to_dict(updated_flow)), 200
         else:
