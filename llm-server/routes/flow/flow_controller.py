@@ -8,6 +8,7 @@ from models.repository.flow_repo import create_flow, get_all_flows_for_bot, get_
     add_or_update_variable_in_flow, update_flow
 from presenters.flow_presenters import flow_to_dict, flow_variable_to_dict
 from utils.db import Database
+import flow_vector_service
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -74,6 +75,7 @@ def create_flow_api(bot_id: str):
 
         # Assuming create_flow is a function to save the flow to DB
         flow = create_flow(flow_dto)
+        flow_vector_service.create_flow(flow_dto)
         return jsonify(flow_to_dict(flow)), 201
 
     except Exception as e:
