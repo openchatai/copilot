@@ -1,11 +1,10 @@
+from flask import jsonify, Blueprint, request, Response
+
 from models.repository.datasource_repo import (
     get_all_pdf_datasource_by_bot_id,
     get_all_website_datasource_by_bot_id,
 )
-from flask import Blueprint, request, jsonify
 from utils.db import Database
-from flask import Flask, request, jsonify, Blueprint, request, Response
-from operator import itemgetter
 
 db_instance = Database()
 mongo = db_instance.get_db()

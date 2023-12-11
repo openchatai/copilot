@@ -1,7 +1,4 @@
-import os
-
-from flask import Blueprint, jsonify, request, Response
-from prance import ValidationError
+from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import SQLAlchemyError
 
 from enums.initial_prompt import ChatBotInitialPromptEnum
@@ -14,7 +11,6 @@ from models.repository.copilot_repo import (
     SessionLocal,
     update_copilot,
 )
-from routes._swagger import reindex_service
 from utils.get_logger import CustomLogger
 
 logger = CustomLogger(module_name=__name__)
@@ -111,7 +107,6 @@ def general_settings_update(copilot_id):
     except Exception as e:
         # Handle other exceptions
         return jsonify({"error": "An error occurred", "details": str(e)}), 500
-
 
 # This api will be used to reindex all swagger files into our qdrant vector store
 # @copilot.route("/reindex/apis", methods=["POST"])

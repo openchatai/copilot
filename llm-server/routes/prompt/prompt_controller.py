@@ -1,12 +1,10 @@
-from flask import Blueprint, Response, request
 from typing import Optional
-from bson.objectid import ObjectId
 
+from bson.objectid import ObjectId
+from flask import Blueprint, Response, request
 from pydantic import BaseModel, Field, ValidationError
 
-
 from utils.db import Database
-
 
 db_instance = Database()
 mongo = db_instance.get_db()

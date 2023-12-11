@@ -1,4 +1,5 @@
 import os
+
 from celery import Celery
 
 SHARED_FOLDER = os.getenv("SHARED_FOLDER", "/app/shared_data")

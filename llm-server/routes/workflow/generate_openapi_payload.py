@@ -13,11 +13,11 @@ llm = get_llm()
 
 
 async def generate_api_payload(
-    text: str,
-    _operation_id: str,
-    prev_api_response: str,
-    app: Optional[str],
-    current_state: Optional[str],
+        text: str,
+        _operation_id: str,
+        prev_api_response: str,
+        app: Optional[str],
+        current_state: Optional[str],
 ) -> ApiInfo:
     action = find_action_by_operation_id(_operation_id)
     payload = action.payload
