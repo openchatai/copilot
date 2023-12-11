@@ -5,9 +5,9 @@ from typing import Dict, Optional, List
 from langchain.schema import BaseMessage
 
 from custom_types.api_operation import ActionOperation_vs
+from entities.flow_entity import FlowDTO
 from models.repository.action_repo import list_all_operation_ids_by_bot_id
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
-from opencopilot_types.workflow_type import WorkflowFlowType
 from routes.workflow.typings.response_dict import ResponseDict
 from routes.workflow.typings.run_workflow_input import FlowData
 from routes.workflow.utils import (
@@ -76,7 +76,7 @@ async def handle_request(
     check_required_fields(base_prompt, text, swagger_url)
     context: str = ""
     apis: List[ActionOperation_vs] = []
-    flows: List[WorkflowFlowType] = []
+    flows: List[FlowDTO] = []
     prev_conversations: List[BaseMessage] = []
     try:
         tasks = [
@@ -113,6 +113,9 @@ async def handle_request(
             if fl is False:
                 return {"error": None, "response": step.bot_message}
 
+            # ops_ids (all of them)
+            ## -> dynmic flows (on this)
+            ## -> vector search flow
             response = await handle_api_calls(
                 ids=step.ids,
                 app=app,
@@ -173,7 +176,7 @@ async def handle_api_calls(
         session_id: str,
         bot_id: str,
 ) -> ResponseDict:
-    _flow = create_dynamic_flow_from_operation_ids(ids, text)
+    _flow = create_dynamic_flow_from_operation_ids(ids, text, bot_id,)
     output = await run_flow(
         _flow,
         FlowData(text, headers, app),

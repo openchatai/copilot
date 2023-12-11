@@ -11,7 +11,7 @@ class Block(BaseModel):
     name: str
     next_on_fail: Optional[str] = None
     next_on_success: Optional[str] = None
-    order: int
+    order: int = 0
 
     def to_dict(self):
         # Convert the entire Block to a dictionary,

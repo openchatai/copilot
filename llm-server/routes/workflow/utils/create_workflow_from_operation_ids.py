@@ -1,38 +1,36 @@
 from typing import List
 
+from entities.action_entity import ActionDTO
+from entities.flow_entity import FlowDTO, Block
 from models.repository.action_repo import find_action_by_operation_id
-from opencopilot_types.workflow_type import (
-    WorkflowDataType,
-    WorkflowFlowType,
-    WorkflowStepType,
-)
 
 
 def create_dynamic_flow_from_operation_ids(
-        operation_ids: List[str], user_input: str
-) -> WorkflowDataType:
-    flows: List[WorkflowFlowType] = []
+        operation_ids: List[str], bot_id: str
+) -> FlowDTO:
+    flow = FlowDTO()
+    flow.name = "Dynamic Flow"
+    flow.description = "Dynamic Flow"
+    flow.bot_id = bot_id
+    flow.variables = []
+    flow.blocks = []
 
     for operation_id in operation_ids:
+        block = Block()
+        action = ActionDTO()
         operation = find_action_by_operation_id(operation_id)
-        step: WorkflowStepType = {
-            "stepId": str(operation_ids.index(operation_id)),
-            "open_api_operation_id": operation_id,
-            "parameters": {},
-        }
-        flow: WorkflowFlowType = {
-            "name": operation.name,
-            "description": operation.description,
-            "requires_confirmation": False,
-            "steps": [step],
-        }
-        flows.append(flow)
 
-    workflow: WorkflowDataType = {
-        "opencopilot": "0.1",
-        "info": {"title": user_input, "version": "1.0.0"},
-        "flows": flows,
-        "swagger_url": None,
-    }
+        action.bot_id = bot_id
+        action.name = "Dynamic action"
+        action.api_endpoint = operation.api_endpoint
+        action.request_type = operation.request_type
+        action.description = operation.description
+        action.operation_id = operation_id
 
-    return workflow
+        block.name = "Dynamic Block"
+        block.actions.append(action)
+
+        flow.blocks.append(block)
+
+
+    return flow

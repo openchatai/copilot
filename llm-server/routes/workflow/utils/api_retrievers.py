@@ -1,4 +1,5 @@
 from custom_types.api_operation import ActionOperation_vs
+from entities.flow_entity import FlowDTO
 from opencopilot_types.workflow_type import WorkflowFlowType
 
 # push it to the library
@@ -15,7 +16,7 @@ logger = CustomLogger(module_name=__name__)
 chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
 knowledgebase: VectorStore = get_vector_store(StoreOptions("knowledgebase"))
-flows: VectorStore = get_vector_store(StoreOptions("swagger"))
+flows: VectorStore = get_vector_store(StoreOptions("flows"))
 apis: VectorStore = get_vector_store(StoreOptions("actions"))
 
 
@@ -49,7 +50,7 @@ async def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
         return None
 
 
-async def get_relevant_flows(text: str, bot_id: str) -> List[WorkflowFlowType]:
+async def get_relevant_flows(text: str, bot_id: str) -> List[FlowDTO]:
     try:
 
         flow_retriever = flows.as_retriever(
@@ -62,7 +63,7 @@ async def get_relevant_flows(text: str, bot_id: str) -> List[WorkflowFlowType]:
 
         results = flow_retriever.get_relevant_documents(text)
 
-        resp: List[WorkflowFlowType] = []
+        resp: List[FlowDTO] = []
         for result in results:
             resp.append(result.metadata["operation"])
 
