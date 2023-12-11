@@ -17,7 +17,6 @@ def create_dynamic_flow_from_operation_ids(
         operation = find_action_by_operation_id(operation_id)
         step: WorkflowStepType = {
             "stepId": str(operation_ids.index(operation_id)),
-            "operation": "call",
             "open_api_operation_id": operation_id,
             "parameters": {},
         }
@@ -26,8 +25,6 @@ def create_dynamic_flow_from_operation_ids(
             "description": operation.description,
             "requires_confirmation": False,
             "steps": [step],
-            "on_success": [{"handler": "plotOutcomeJsFunction"}],
-            "on_failure": [{"handler": "plotOutcomeJsFunction"}],
         }
         flows.append(flow)
 
