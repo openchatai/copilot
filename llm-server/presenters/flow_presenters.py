@@ -25,7 +25,7 @@ def flow_to_dict(flow: Flow):
         return {
             "flow_id": flow.id.hex() if isinstance(flow.id, bytes) else flow.id,
             "name": flow.name,
-            "payload": flow.payload,
+            "blocks": flow.payload,
             "description": flow.description,
             "last_saved_at": flow.updated_at.isoformat() if flow.updated_at else None,
             # "variables": variables_dict  # Including nested variables
