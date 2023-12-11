@@ -1,4 +1,3 @@
-import uuid
 from typing import List, Optional
 
 from pydantic import BaseModel
@@ -39,3 +38,8 @@ class FlowDTO(BaseModel):
         # Convert the entire FlowDTO to a dictionary,
         # including nested ActionDTO objects within each Block
         return self.dict()
+
+
+class PartialFlowDTO(BaseModel):
+    bot_id: str
+    id: str

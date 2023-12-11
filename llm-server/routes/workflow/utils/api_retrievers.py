@@ -1,13 +1,14 @@
-from custom_types.api_operation import ActionOperation_vs
-from entities.flow_entity import FlowDTO
+from typing import Optional, List
 
+from langchain.vectorstores.base import VectorStore
+
+from custom_types.api_operation import ActionOperation_vs
+from entities.flow_entity import PartialFlowDTO
+from shared.utils.opencopilot_utils import StoreOptions
 # push it to the library
 from shared.utils.opencopilot_utils.get_vector_store import get_vector_store
-from shared.utils.opencopilot_utils import StoreOptions
 from utils.chat_models import CHAT_MODELS
 from utils.get_chat_model import get_chat_model
-from typing import Optional, List
-from langchain.vectorstores.base import VectorStore
 from utils.get_logger import CustomLogger
 from utils.llm_consts import vs_thresholds
 
@@ -49,7 +50,7 @@ async def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
         return None
 
 
-async def get_relevant_flows(text: str, bot_id: str) -> List[FlowDTO]:
+async def get_relevant_flows(text: str, bot_id: str) -> List[PartialFlowDTO]:
     try:
 
         flow_retriever = flows.as_retriever(
@@ -62,9 +63,9 @@ async def get_relevant_flows(text: str, bot_id: str) -> List[FlowDTO]:
 
         results = flow_retriever.get_relevant_documents(text)
 
-        resp: List[FlowDTO] = []
+        resp: List[PartialFlowDTO] = []
         for result in results:
-            resp.append(result.metadata["operation"])
+            resp.append(PartialFlowDTO(bot_id=result.metadata.get('bot_id'), id=result.metadata.get('flow_id')))
 
         return resp
 
@@ -78,7 +79,7 @@ async def get_relevant_flows(text: str, bot_id: str) -> List[FlowDTO]:
         return []
 
 
-async def get_relevant_apis_summaries(text: str, bot_id: str) -> List[ActionOperation_vs]:
+async def get_relevant_actions(text: str, bot_id: str) -> List[ActionOperation_vs]:
     try:
         apis_retriever = apis.as_retriever(
             search_kwargs={

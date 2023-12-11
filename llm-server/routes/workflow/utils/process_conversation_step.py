@@ -31,16 +31,16 @@ def process_conversation_step(
         flows: List[FlowDTO],
         base_prompt: str
 ):
+    # max (flows, actions, knowledge)
+
+
     logger.info("planner data", context=context, api_summaries=api_summaries, prev_conversations=prev_conversations,
                 flows=flows)
     if not session_id:
         raise ValueError("Session id must be defined for chat conversations")
 
-    messages: List[BaseMessage] = []
-    messages.append(SystemMessage(content=base_prompt))
-
-    messages.append(
-        SystemMessage(content="You will have access to a list of api's and some useful information, called context."))
+    messages: List[BaseMessage] = [SystemMessage(content=base_prompt), SystemMessage(
+        content="You will have access to a list of api's and some useful information, called context.")]
 
     if len(prev_conversations) > 0:
         messages.extend(prev_conversations)

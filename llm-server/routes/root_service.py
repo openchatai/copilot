@@ -15,7 +15,7 @@ from routes.workflow.utils import (
     create_dynamic_flow_from_operation_ids,
 )
 from routes.workflow.utils.api_retrievers import (
-    get_relevant_apis_summaries,
+    get_relevant_actions,
     get_relevant_docs,
     get_relevant_flows,
 )
@@ -79,7 +79,7 @@ async def handle_request(
     try:
         tasks = [
             get_relevant_docs(text, bot_id),
-            get_relevant_apis_summaries(text, bot_id),
+            get_relevant_actions(text, bot_id),
             get_relevant_flows(text, bot_id),
             get_chat_message_as_llm_conversation(session_id),
         ]
