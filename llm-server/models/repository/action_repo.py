@@ -130,6 +130,7 @@ def action_to_dict(action: Action) -> dict:
         "description": action.description,
         "api_endpoint": action.api_endpoint,
         "operation_id": action.operation_id,
+        "request_type": action.request_type,
         "payload": action.payload,
         "status": action.status,
         "created_at": action.created_at.isoformat(),

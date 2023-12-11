@@ -32,6 +32,11 @@ def process_conversation_step(
         base_prompt: str
 ):
     # max (flows, actions, knowledge)
+    # if max == flows -> execute static flow
+    # if max == actions -> then execute action
+    # if max == knowledge -> fetch
+    # if max < 70 -> normal LLM reply or dynamic flow?
+
 
 
     logger.info("planner data", context=context, api_summaries=api_summaries, prev_conversations=prev_conversations,

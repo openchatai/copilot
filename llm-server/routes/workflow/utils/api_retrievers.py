@@ -5,7 +5,6 @@ from langchain.vectorstores.base import VectorStore
 from custom_types.api_operation import ActionOperation_vs
 from entities.flow_entity import PartialFlowDTO
 from shared.utils.opencopilot_utils import StoreOptions
-# push it to the library
 from shared.utils.opencopilot_utils.get_vector_store import get_vector_store
 from utils.chat_models import CHAT_MODELS
 from utils.get_chat_model import get_chat_model
