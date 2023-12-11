@@ -1,16 +1,16 @@
+from json import dumps
+from typing import Optional, List, cast
+
 from langchain.schema import HumanMessage, SystemMessage, BaseMessage
+from langchain.schema import OutputParserException
+
 from custom_types.api_operation import ActionOperation_vs
 from custom_types.bot_message import parse_bot_message, BotMessage
-from opencopilot_types.workflow_type import WorkflowFlowType
-
-# push it to the library
-from integrations.custom_prompts.prompt_loader import load_prompts
-from utils.get_chat_model import get_chat_model
-from langchain.schema import OutputParserException
+from entities.flow_entity import FlowDTO
 from utils.chat_models import CHAT_MODELS
+# push it to the library
+from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
-from typing import Optional, List, cast
-from json import dumps
 
 logger = CustomLogger(module_name=__name__)
 chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
@@ -20,30 +20,32 @@ chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 # 1. Todo: add application initial state here as well
 # 2. Add api data from qdrant so that the llm understands what apis are available to it for use
 def process_conversation_step(
-    session_id: str,
-    app: Optional[str],
-    user_requirement: str,
-    context: Optional[str],
-    api_summaries: List[ActionOperation_vs],
-    prev_conversations: List[BaseMessage],
-    flows: List[WorkflowFlowType],
-    bot_id: str,
-    base_prompt: str
+        session_id: str,
+        app: Optional[str],
+        user_requirement: str,
+        context: Optional[str],
+        api_summaries: List[ActionOperation_vs],
+        prev_conversations: List[BaseMessage],
+        flows: List[FlowDTO],
+        bot_id: str,
+        base_prompt: str
 ):
-    logger.info("planner data", context=context, api_summaries=api_summaries, prev_conversations=prev_conversations, flows=flows)
+    logger.info("planner data", context=context, api_summaries=api_summaries, prev_conversations=prev_conversations,
+                flows=flows)
     if not session_id:
         raise ValueError("Session id must be defined for chat conversations")
     messages: List[BaseMessage] = []
     messages.append(SystemMessage(content=base_prompt))
-    
-    messages.append(SystemMessage(content="You will have access to a list of api's and some useful information, called context."))
+
+    messages.append(
+        SystemMessage(content="You will have access to a list of api's and some useful information, called context."))
 
     if len(prev_conversations) > 0:
         messages.extend(prev_conversations)
 
     if context and len(api_summaries) > 0 and len(flows) > 0:
         messages.append(
-            HumanMessage(
+            HumanMessage( # todo revisit this area
                 content=f"Here is some relevant context I found that might be helpful - ```{dumps(context)}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{dumps(api_summaries)}```. I also found some api flows, that maybe able to answer the following question ```{dumps(flows)}```. If one of the flows can accurately answer the question, then set `id` in the response should be the ids defined in the flows. Flows should take precedence over the api_summaries"
             )
         )
@@ -85,8 +87,7 @@ def process_conversation_step(
     )
 
     messages.append(HumanMessage(content=user_requirement))
-    
-    
+
     logger.info("messages array", messages=messages)
 
     content = cast(str, chat(messages=messages).content)

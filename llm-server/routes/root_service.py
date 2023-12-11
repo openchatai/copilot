@@ -9,7 +9,7 @@ from entities.flow_entity import FlowDTO
 from models.repository.action_repo import list_all_operation_ids_by_bot_id
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from routes.workflow.typings.response_dict import ResponseDict
-from routes.workflow.typings.run_workflow_input import FlowData
+from routes.workflow.typings.run_workflow_input import ChatContext
 from routes.workflow.utils import (
     run_flow,
     create_dynamic_flow_from_operation_ids,
@@ -113,9 +113,6 @@ async def handle_request(
             if fl is False:
                 return {"error": None, "response": step.bot_message}
 
-            # ops_ids (all of them)
-            ## -> dynmic flows (on this)
-            ## -> vector search flow
             response = await handle_api_calls(
                 ids=step.ids,
                 app=app,
@@ -176,11 +173,11 @@ async def handle_api_calls(
         session_id: str,
         bot_id: str,
 ) -> ResponseDict:
-    _flow = create_dynamic_flow_from_operation_ids(ids, text, bot_id,)
+    _flow = create_dynamic_flow_from_operation_ids(operation_ids=ids, bot_id=bot_id)
     output = await run_flow(
-        _flow,
-        FlowData(text, headers, app),
-        app,
+        flow=_flow,
+        chat_context=ChatContext(text, headers, app),
+        app=app,
         bot_id=bot_id,
     )
 

@@ -32,5 +32,4 @@ def create_dynamic_flow_from_operation_ids(
 
         flow.blocks.append(block)
 
-
     return flow

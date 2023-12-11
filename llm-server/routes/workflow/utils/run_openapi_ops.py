@@ -3,9 +3,10 @@ from typing import Optional
 
 from werkzeug.datastructures import Headers
 
+from entities.action_entity import ActionDTO
+from entities.flow_entity import FlowDTO
 from integrations.load_json_config import load_json_config
 from integrations.transformers.transformer import transform_response
-from opencopilot_types.workflow_type import WorkflowDataType
 from routes.workflow.extractors.convert_json_to_text import convert_json_to_text
 from routes.workflow.generate_openapi_payload import generate_api_payload
 from utils.get_logger import CustomLogger
@@ -16,7 +17,7 @@ logger = CustomLogger(module_name=__name__)
 
 
 async def run_actions(
-        record: WorkflowDataType,
+        flow: FlowDTO,
         text: str,
         headers: Headers,
         app: Optional[str],
@@ -25,10 +26,10 @@ async def run_actions(
     api_request_data = {}
     prev_api_response = ""
     apis_calls_history = {
-        "Workflow Name": record.get("name")
+        "Workflow Name": flow.get("name")
     }  # It will contain the operation id and the response for each request
     current_state = process_state(app, headers)
-    for flow in record.get("flows", []):
+    for flow in flow.get("flows", []):
         for step in flow.get("steps"):
             try:
                 # refresh state after every api call, we can look into optimizing this later as well

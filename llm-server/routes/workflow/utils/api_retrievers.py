@@ -1,6 +1,5 @@
 from custom_types.api_operation import ActionOperation_vs
 from entities.flow_entity import FlowDTO
-from opencopilot_types.workflow_type import WorkflowFlowType
 
 # push it to the library
 from shared.utils.opencopilot_utils.get_vector_store import get_vector_store

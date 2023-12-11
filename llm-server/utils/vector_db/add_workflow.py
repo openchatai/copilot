@@ -1,12 +1,13 @@
-from routes.workflow.dto.workflow_dto import Workflow
-from typing import Any , List
-from opencopilot_types.workflow_type import WorkflowDataType
-from shared.utils.opencopilot_utils import (StoreOptions,get_vector_store)
+from typing import List
+
 from langchain.docstore.document import Document
+
+from routes.workflow.dto.workflow_dto import Workflow
+from shared.utils.opencopilot_utils import (StoreOptions, get_vector_store)
 
 
 def add_workflow_data_to_qdrant(
-    workflow_id: str, workflow_data: Workflow, bot_id: str
+        workflow_id: str, workflow_data: Workflow, bot_id: str
 ) -> List[str]:
     docs = [
         Document(
@@ -22,4 +23,3 @@ def add_workflow_data_to_qdrant(
 
     vector_ids = vector_store.add_documents(docs)
     return vector_ids
-
