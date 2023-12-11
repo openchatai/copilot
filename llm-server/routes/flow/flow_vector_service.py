@@ -5,7 +5,7 @@ from typing import List
 from langchain.docstore.document import Document
 from qdrant_client import QdrantClient, models
 
-from entities.action_entity import ActionDTO
+from entities.flow_entity import FlowDTO
 from shared.utils.opencopilot_utils import get_vector_store
 from shared.utils.opencopilot_utils.interfaces import StoreOptions
 
@@ -23,9 +23,9 @@ def get_action(point_id: str):
     return points[0]
 
 
-def create_actions(actions: List[ActionDTO], bot_id: str):
+def create_flows(flows: List[FlowDTO], bot_id: str):
     documents: List[Document] = []
-    for action in actions:
+    for action in flows:
         document = Document(page_content=action.description + action.name)
         document.metadata.update(action.model_dump())
 
@@ -35,11 +35,11 @@ def create_actions(actions: List[ActionDTO], bot_id: str):
     return vector_ids
 
 
-def create_action(action: ActionDTO):
+def create_flow(flow: FlowDTO):
     documents: List[Document] = []
 
-    document = Document(page_content=action.description + action.name)
-    document.metadata.update(action.model_dump())
+    document = Document(page_content=flow.description + flow.name)
+    document.metadata.update(flow.model_dump())
 
     documents.append(document)
 
@@ -50,7 +50,7 @@ def create_action(action: ActionDTO):
 Payload = Dict[str, Any]
 
 
-def get_all_actions(chatbot_id: str, limit: int = 20, offset: int = 0) -> List[Payload]:
+def get_all_flows(chatbot_id: str, limit: int = 20, offset: int = 0) -> List[Payload]:
     [records, pointId] = client.scroll(
         collection_name="flows",
         scroll_filter=models.Filter(
@@ -77,7 +77,7 @@ def get_all_actions(chatbot_id: str, limit: int = 20, offset: int = 0) -> List[P
     return actions
 
 
-def update_action(action: ActionDTO, point_id: str):
+def update_flow(action: FlowDTO, point_id: str):
     client.set_payload(
         collection_name="flows",
         payload={
@@ -87,7 +87,7 @@ def update_action(action: ActionDTO, point_id: str):
     )
 
 
-def delete_action(point_id: str):
+def delete_flow(point_id: str):
     client.clear_payload(
         collection_name="flows",
         points_selector=models.PointIdsList(
