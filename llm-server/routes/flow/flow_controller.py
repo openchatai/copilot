@@ -9,10 +9,12 @@ from models.repository.flow_repo import create_flow, get_all_flows_for_bot, get_
 from presenters.flow_presenters import flow_to_dict, flow_variable_to_dict
 from utils.db import Database
 from routes.flow import flow_vector_service
+from utils.get_logger import CustomLogger
 
 db_instance = Database()
 mongo = db_instance.get_db()
 
+logger = CustomLogger("flow")
 flow = Blueprint("flow", __name__)
 
 
@@ -80,6 +82,7 @@ def create_flow_api(bot_id: str):
 
     except Exception as e:
         print(f"Error creating flow: {e}")
+        logger.error("Failed to create flow", payload=e)
         return jsonify({"error": "Failed to create flow. {}".format(str(e))}), 500
 
 
