@@ -1,20 +1,21 @@
+from typing import Optional
 from typing import cast
 
 from flask import jsonify, Blueprint, request, Response, abort, Request
-from routes.analytics.analytics_service import upsert_analytics_record
-from routes.chat.chat_dto import ChatInput
-from utils.get_logger import CustomLogger
-from utils.llm_consts import X_App_Name
-from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
+
 from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id,
     get_unique_sessions_with_first_message_by_bot_id,
     create_chat_history,
 )
 from models.repository.copilot_repo import find_one_or_fail_by_token
+from routes.analytics.analytics_service import upsert_analytics_record
+from routes.chat.chat_dto import ChatInput
 from utils.db import Database
+from utils.get_logger import CustomLogger
+from utils.llm_consts import X_App_Name
+from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
 from .. import root_service
-from typing import Optional
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -170,7 +171,8 @@ async def send_chat():
                 response_data["response"] or response_data["error"] or "",
             )
         elif response_data["error"]:
-            upsert_analytics_record(chatbot_id=str(bot.id), successful_operations=0, total_operations=1, logs=response_data["error"])
+            upsert_analytics_record(chatbot_id=str(bot.id), successful_operations=0, total_operations=1,
+                                    logs=response_data["error"])
 
         return jsonify(
             {"type": "text", "response": {"text": response_data["response"]}}

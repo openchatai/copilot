@@ -41,6 +41,10 @@ export function SwaggerUi() {
                     swaggerUrls.length === 0 ?
                         <div className="mx-auto">
                             <EmptyBlock>
+                                <button onClick={addNewEndpoint}>
+                                    <Plus className="w-5 h-5" />
+                                </button>
+
                                 No endpoints added yet.
                             </EmptyBlock>
                         </div>

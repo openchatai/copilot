@@ -1,5 +1,5 @@
 from langchain.schema import HumanMessage, SystemMessage, BaseMessage
-from custom_types.api_operation import ApiOperation_vs
+from custom_types.api_operation import ActionOperation_vs
 from custom_types.bot_message import parse_bot_message, BotMessage
 from opencopilot_types.workflow_type import WorkflowFlowType
 
@@ -24,7 +24,7 @@ def process_conversation_step(
     app: Optional[str],
     user_requirement: str,
     context: Optional[str],
-    api_summaries: List[ApiOperation_vs],
+    api_summaries: List[ActionOperation_vs],
     prev_conversations: List[BaseMessage],
     flows: List[WorkflowFlowType],
     bot_id: str,

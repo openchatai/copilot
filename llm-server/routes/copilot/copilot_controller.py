@@ -1,17 +1,6 @@
-import json
-import os
-import uuid
-
-from flask import Blueprint, jsonify, request, Response
-from prance import ValidationError
+from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import SQLAlchemyError
-from routes.root_service import get_swagger_doc
-from routes._swagger import reindex_service
-from werkzeug.utils import secure_filename
-from utils.base import resolve_abs_local_file_path_from
-from utils.get_logger import CustomLogger
 
-import routes._swagger.service as swagger_service
 from enums.initial_prompt import ChatBotInitialPromptEnum
 from models.repository.copilot_repo import (
     list_all_with_filter,
@@ -22,8 +11,7 @@ from models.repository.copilot_repo import (
     SessionLocal,
     update_copilot,
 )
-from utils.llm_consts import EXPERIMENTAL_FEATURES_ENABLED
-from utils.swagger_parser import SwaggerParser
+from utils.get_logger import CustomLogger
 
 logger = CustomLogger(module_name=__name__)
 copilot = Blueprint("copilot", __name__)
@@ -38,53 +26,16 @@ def index():
 
 
 @copilot.route("/swagger", methods=["POST"])
-def handle_swagger_file():
-    if "swagger_file" not in request.files:
-        return jsonify({"error": "You must upload a swagger file."}), 400
-    logger.info(
-        "Handling Swagger file",
-        incident="handling_swagger_file",
-        data=request.get_data(),  # Assuming request is available in the scope
+def create_new_copilot():
+    chatbot = create_copilot(
+        name=request.form.get("name", "My First Copilot"),
+        swagger_url="remove.this.filed.after.migration",
+        prompt_message=request.form.get(
+            "prompt_message", ChatBotInitialPromptEnum.AI_COPILOT_INITIAL_PROMPT
+        ),
+        website=request.form.get("website", "https://example.com"),
     )
-    file = request.files["swagger_file"]
-    if file.filename == "":
-        return jsonify({"error": "No selected file."}), 400
-    if file:
-        try:
-            filename = secure_filename(str(uuid.uuid4()) + ".json")
-            file.save(os.path.join(UPLOAD_FOLDER, filename))
-
-            chatbot = create_copilot(
-                name=request.form.get("name", "My First Copilot"),
-                swagger_url=filename,
-                prompt_message=request.form.get(
-                    "prompt_message", ChatBotInitialPromptEnum.AI_COPILOT_INITIAL_PROMPT
-                ),
-                website=request.form.get("website", "https://example.com"),
-            )
-
-            swagger_doc = get_swagger_doc(filename)
-
-            swagger_service.save_swagger_paths_to_qdrant(swagger_doc, chatbot["id"])
-
-            swagger_service.save_swaggerfile_to_mongo(
-                filename, str(chatbot["id"]), swagger_doc
-            )
-        except ValidationError as e:
-            return (
-                jsonify(
-                    {
-                        "failure": "The copilot was created, but we failed to handle the swagger file duo to some"
-                        " validation issues, your copilot will work fine but without the ability to"
-                        " talk with any APIs. error: {}".format(str(e))
-                    }
-                ),
-                400,
-            )
-
-        return jsonify({"file_name": filename, "chatbot": chatbot})
-
-    return jsonify({"failure": "could_not_handle_swagger_file"}), 400
+    return jsonify(chatbot)
 
 
 @copilot.route("/<string:copilot_id>", methods=["GET"])
@@ -157,55 +108,15 @@ def general_settings_update(copilot_id):
         # Handle other exceptions
         return jsonify({"error": "An error occurred", "details": str(e)}), 500
 
-
-@copilot.route("/<string:copilot_id>/validator", methods=["GET"])
-def validator(copilot_id):
-    bot = find_one_or_fail_by_id(copilot_id)
-
-    try:
-        swagger_url = bot.swagger_url  # Adjust attribute name as necessary
-        swagger_content = ""
-
-        if not swagger_url.startswith("https"):
-            swagger_url = resolve_abs_local_file_path_from(swagger_url)
-            # Read the file content from the local system or shared storage
-            with open(swagger_url, "r") as file:
-                swagger_content = file.read()
-
-        swagger_data = json.loads(swagger_content)
-        parser = SwaggerParser(swagger_data)
-
-    except Exception as e:
-        return (
-            jsonify(
-                {
-                    "error": "Failed to load the swagger file for validation. error: "
-                    + str(e)
-                }
-            ),
-            400,
-        )
-
-    endpoints = parser.get_endpoints()
-    validations = parser.get_validations()
-    return jsonify(
-        {
-            "chatbot_id": bot.id,
-            "all_endpoints": [endpoint.to_dict() for endpoint in endpoints],
-            "validations": validations,
-        }
-    )
-
-
 # This api will be used to reindex all swagger files into our qdrant vector store
-@copilot.route("/reindex/apis", methods=["POST"])
-def reindex_apis():
-    # Check if the provided key matches the expected key
-    SECRET_KEY = os.getenv("BASIC_AUTH_KEY")
-    if not SECRET_KEY:
-        raise ValidationError("This is a protected route! Contact admin")
-    if request.headers.get("Authorization") == f"Bearer {SECRET_KEY}":
-        response = reindex_service.reindex_apis()
-        return Response(response=response, status=200)
-    else:
-        return Response(response="Unauthorized", status=401)
+# @copilot.route("/reindex/apis", methods=["POST"])
+# def reindex_apis():
+#     # Check if the provided key matches the expected key
+#     SECRET_KEY = os.getenv("BASIC_AUTH_KEY")
+#     if not SECRET_KEY:
+#         raise ValidationError("This is a protected route! Contact admin")
+#     if request.headers.get("Authorization") == f"Bearer {SECRET_KEY}":
+#         response = reindex_service.reindex_apis()
+#         return Response(response=response, status=200)
+#     else:
+#         return Response(response="Unauthorized", status=401)

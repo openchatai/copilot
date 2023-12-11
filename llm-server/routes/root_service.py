@@ -1,33 +1,28 @@
+import asyncio
 import os
-import json
-from typing import Dict, Any, Optional, List
+from typing import Dict, Optional, List
+
 from langchain.schema import BaseMessage
-from custom_types.api_operation import ApiOperation_vs
+
+from custom_types.api_operation import ActionOperation_vs
+from models.repository.action_repo import list_all_operation_ids_by_bot_id
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
+from opencopilot_types.workflow_type import WorkflowFlowType
 from routes.workflow.typings.response_dict import ResponseDict
-from routes.workflow.typings.run_workflow_input import WorkflowData
+from routes.workflow.typings.run_workflow_input import FlowData
 from routes.workflow.utils import (
-    run_workflow,
-    create_workflow_from_operation_ids,
+    run_flow,
+    create_dynamic_flow_from_operation_ids,
 )
-from bson import ObjectId
 from routes.workflow.utils.api_retrievers import (
     get_relevant_apis_summaries,
     get_relevant_docs,
     get_relevant_flows,
 )
 from routes.workflow.utils.process_conversation_step import process_conversation_step
-
 from utils.chat_models import CHAT_MODELS
 from utils.db import Database
 from utils.get_chat_model import get_chat_model
-from prance import ResolvingParser
-from langchain.docstore.document import Document
-from werkzeug.datastructures import Headers
-import asyncio
-from opencopilot_types.workflow_type import WorkflowFlowType
-
-
 from utils.get_logger import CustomLogger
 
 logger = CustomLogger(module_name=__name__)
@@ -47,27 +42,19 @@ FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
 
 chat = get_chat_model()
 
-def validate_steps(steps: List[str], swagger_doc: ResolvingParser):
+
+def validate_steps(steps: List[str], bot_id: str):
     try:
-        paths = swagger_doc.specification.get("paths", {})
-        operationIds: List[str] = []
+        operation_ids = list_all_operation_ids_by_bot_id(bot_id)
 
-        for path in paths:
-            operations = paths[path]
-            for method in operations:
-                operation = operations[method]
-                operationId = operation.get("operationId")
-                if operationId:
-                    operationIds.append(operationId)
-
-        if not operationIds:
-            logger.warn("No operationIds found in the Swagger document.")
+        if not operation_ids:
+            logger.warn("No operation_ids found in the Swagger document.")
             return False
 
-        if all(x in operationIds for x in steps):
+        if all(x in operation_ids for x in steps):
             return True
         else:
-            logger.warn("Model has hallucinated, made up operation id", steps=steps, operationIds=operationIds)
+            logger.warn("Model has hallucinated, made up operation id", steps=steps, operationIds=operation_ids)
             return False
 
     except Exception as e:
@@ -75,21 +62,20 @@ def validate_steps(steps: List[str], swagger_doc: ResolvingParser):
         return False
 
 
-
 async def handle_request(
-    text: str,
-    swagger_url: str,
-    session_id: str,
-    base_prompt: str,
-    bot_id: str,
-    headers: Dict[str, str],
-    server_base_url: str,
-    app: Optional[str],
+        text: str,
+        swagger_url: str,
+        session_id: str,
+        base_prompt: str,
+        bot_id: str,
+        headers: Dict[str, str],
+        server_base_url: str,
+        app: Optional[str],
 ) -> ResponseDict:
     log_user_request(text)
     check_required_fields(base_prompt, text, swagger_url)
     context: str = ""
-    apis: List[ApiOperation_vs] = []
+    apis: List[ActionOperation_vs] = []
     flows: List[WorkflowFlowType] = []
     prev_conversations: List[BaseMessage] = []
     try:
@@ -114,7 +100,7 @@ async def handle_request(
             bot_id=bot_id,
             base_prompt=base_prompt
         )
-        
+
         if step.missing_information is not None and len(step.missing_information) >= 10:
             return {
                 "error": None,
@@ -122,22 +108,18 @@ async def handle_request(
             }
 
         if len(step.ids) > 0:
-            swagger_doc = get_swagger_doc(swagger_url)
-            fl = validate_steps(step.ids, swagger_doc)
-            
+            fl = validate_steps(step.ids, bot_id)
+
             if fl is False:
                 return {"error": None, "response": step.bot_message}
-            
+
             response = await handle_api_calls(
                 ids=step.ids,
-                swagger_doc=swagger_doc,
                 app=app,
                 bot_id=bot_id,
                 headers=headers,
-                server_base_url=server_base_url,
                 session_id=session_id,
                 text=text,
-                swagger_url=swagger_url,
             )
 
             logger.info(
@@ -172,7 +154,7 @@ def log_user_request(text: str) -> None:
 
 
 def check_required_fields(
-    base_prompt: str, text: str, swagger_url: Optional[str]
+        base_prompt: str, text: str, swagger_url: Optional[str]
 ) -> None:
     for required_field, error_msg in [
         ("base_prompt", BASE_PROMPT_REQUIRED),
@@ -183,40 +165,21 @@ def check_required_fields(
             raise Exception(error_msg)
 
 
-def get_swagger_doc(swagger_url: str) -> ResolvingParser:
-    logger.info(f"Swagger url: {swagger_url}")
-    swagger_doc: Optional[Dict[str, Any]] = mongo.swagger_files.find_one(
-        {"meta.swagger_url": swagger_url}, {"meta": 0, "_id": 0}
-    )
-
-    if swagger_url.startswith("http:") or swagger_url.startswith("https:"):
-        return ResolvingParser(url=swagger_url)
-    elif swagger_url.endswith(".json") or swagger_url.endswith(".yaml"):
-        return ResolvingParser(url=shared_folder + swagger_url)
-    else:
-        return ResolvingParser(spec_string=swagger_doc)
-
 async def handle_api_calls(
-    ids: List[str],
-    swagger_doc: ResolvingParser,
-    text: str,
-    headers: Dict[str, str],
-    server_base_url: str,
-    swagger_url: Optional[str],
-    app: Optional[str],
-    session_id: str,
-    bot_id: str,
+        ids: List[str],
+        text: str,
+        headers: Dict[str, str],
+        app: Optional[str],
+        session_id: str,
+        bot_id: str,
 ) -> ResponseDict:
-    _workflow = create_workflow_from_operation_ids(ids, swagger_doc, text)
-    output = await run_workflow(
-        _workflow,
-        swagger_doc,
-        WorkflowData(text, headers, server_base_url, swagger_url, app),
+    _flow = create_dynamic_flow_from_operation_ids(ids, text)
+    output = await run_flow(
+        _flow,
+        FlowData(text, headers, app),
         app,
         bot_id=bot_id,
     )
-
-    _workflow["swagger_url"] = swagger_url
 
     return output
 

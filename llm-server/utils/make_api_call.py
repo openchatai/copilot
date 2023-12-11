@@ -1,5 +1,6 @@
-import requests
 from typing import Any, Dict
+
+import requests
 from requests import Response
 
 from utils.get_logger import CustomLogger
@@ -32,12 +33,12 @@ def make_api_request(
     path_params,
     query_params,
     headers,
-    servers,
 ) -> Response:
     url = ""
+
     try:
         endpoint = replace_url_placeholders(endpoint, path_params)
-        url: str = servers[0] + endpoint
+        url: str = endpoint
         # Create a session and configure it with headers
         session = requests.Session()
 
@@ -68,5 +69,13 @@ def make_api_request(
         return response
 
     except requests.exceptions.RequestException as e:
-        logger.error("API request failed", e=str(e), headers=headers, url= url, params = path_params, query_params= query_params, method=method)
+        logger.error(
+            "API request failed",
+            e=str(e),
+            headers=headers,
+            url=url,
+            params=path_params,
+            query_params=query_params,
+            method=method,
+        )
         raise (e)
