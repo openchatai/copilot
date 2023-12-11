@@ -64,16 +64,14 @@ def validate_steps(steps: List[str], bot_id: str):
 
 async def handle_request(
         text: str,
-        swagger_url: str,
         session_id: str,
         base_prompt: str,
         bot_id: str,
         headers: Dict[str, str],
-        server_base_url: str,
         app: Optional[str],
 ) -> ResponseDict:
     log_user_request(text)
-    check_required_fields(base_prompt, text, swagger_url)
+    check_required_fields(base_prompt, text)
     context: str = ""
     apis: List[ActionOperation_vs] = []
     flows: List[FlowDTO] = []
@@ -88,16 +86,16 @@ async def handle_request(
 
         results = await asyncio.gather(*tasks)
         context, apis, flows, prev_conversations = results
-        # also provide a list of workflows here itself, the llm should be able to figure out if a workflow needs to be run
+        """
+        also provide a list of flows here itself, the llm should be able to figure out if a flow needs to be run
+        """
         step = process_conversation_step(
-            user_requirement=text,
+            user_message=text,
             context=context,
             session_id=session_id,
-            app=app,
             api_summaries=apis,
             prev_conversations=prev_conversations,
             flows=flows,
-            bot_id=bot_id,
             base_prompt=base_prompt
         )
 
@@ -108,17 +106,15 @@ async def handle_request(
             }
 
         if len(step.ids) > 0:
-            fl = validate_steps(step.ids, bot_id)
 
-            if fl is False:
+            if validate_steps(step.ids, bot_id) is False:
                 return {"error": None, "response": step.bot_message}
 
-            response = await handle_api_calls(
+            response = await create_and_run_dynamic_flow(
                 ids=step.ids,
                 app=app,
                 bot_id=bot_id,
                 headers=headers,
-                session_id=session_id,
                 text=text,
             )
 
@@ -154,23 +150,21 @@ def log_user_request(text: str) -> None:
 
 
 def check_required_fields(
-        base_prompt: str, text: str, swagger_url: Optional[str]
+        base_prompt: str, text: str
 ) -> None:
     for required_field, error_msg in [
         ("base_prompt", BASE_PROMPT_REQUIRED),
         ("text", TEXT_REQUIRED),
-        ("swagger_url", SWAGGER_URL_REQUIRED),
     ]:
         if not locals()[required_field]:
             raise Exception(error_msg)
 
 
-async def handle_api_calls(
+async def create_and_run_dynamic_flow(
         ids: List[str],
         text: str,
         headers: Dict[str, str],
         app: Optional[str],
-        session_id: str,
         bot_id: str,
 ) -> ResponseDict:
     _flow = create_dynamic_flow_from_operation_ids(operation_ids=ids, bot_id=bot_id)

@@ -112,8 +112,6 @@ def init_chat():
 @chat_workflow.route("/send", methods=["POST"])
 async def send_chat():
     json_data = request.get_json()
-    # if not isinstance(json_data, dict):
-    #     raise ValueError("Invalid JSON format. Expected a dictionary.")
 
     input_data = ChatInput(**json_data)
     message = input_data.content
@@ -152,7 +150,6 @@ async def send_chat():
     try:
         response_data = await root_service.handle_request(
             text=message,
-            swagger_url=str(swagger_url),
             session_id=session_id,
             base_prompt=str(base_prompt),
             bot_id=str(bot.id),
