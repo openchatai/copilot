@@ -1,6 +1,6 @@
 from typing import Any, Optional
 from routes.workflow.typings.response_dict import ResponseDict
-from routes.workflow.typings.run_workflow_input import WorkflowData
+from routes.workflow.typings.run_workflow_input import FlowData
 from routes.workflow.utils.run_openapi_ops import run_actions
 from opencopilot_types.workflow_type import WorkflowDataType
 from werkzeug.datastructures import Headers
@@ -12,9 +12,9 @@ from utils.get_logger import CustomLogger
 logger = CustomLogger(module_name=__name__)
 
 
-async def run_workflow(
+async def run_flow(
     workflow_doc: WorkflowDataType,
-    data: WorkflowData,
+    data: FlowData,
     app: Optional[str],
     bot_id: str,
 ) -> ResponseDict:

@@ -8,17 +8,17 @@ from opencopilot_types.workflow_type import (
 )
 
 
-def create_workflow_from_operation_ids(
-        op_ids: List[str], user_input: str
+def create_dynamic_flow_from_operation_ids(
+        operation_ids: List[str], user_input: str
 ) -> WorkflowDataType:
     flows: List[WorkflowFlowType] = []
 
-    for op_id in op_ids:
-        operation = find_action_by_operation_id(op_id)
+    for operation_id in operation_ids:
+        operation = find_action_by_operation_id(operation_id)
         step: WorkflowStepType = {
-            "stepId": str(op_ids.index(op_id)),
+            "stepId": str(operation_ids.index(operation_id)),
             "operation": "call",
-            "open_api_operation_id": op_id,
+            "open_api_operation_id": operation_id,
             "parameters": {},
         }
         flow: WorkflowFlowType = {

@@ -9,10 +9,10 @@ from models.repository.action_repo import list_all_operation_ids_by_bot_id
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from opencopilot_types.workflow_type import WorkflowFlowType
 from routes.workflow.typings.response_dict import ResponseDict
-from routes.workflow.typings.run_workflow_input import WorkflowData
+from routes.workflow.typings.run_workflow_input import FlowData
 from routes.workflow.utils import (
-    run_workflow,
-    create_workflow_from_operation_ids,
+    run_flow,
+    create_dynamic_flow_from_operation_ids,
 )
 from routes.workflow.utils.api_retrievers import (
     get_relevant_apis_summaries,
@@ -173,10 +173,10 @@ async def handle_api_calls(
         session_id: str,
         bot_id: str,
 ) -> ResponseDict:
-    _workflow = create_workflow_from_operation_ids(ids, text)
-    output = await run_workflow(
-        _workflow,
-        WorkflowData(text, headers, app),
+    _flow = create_dynamic_flow_from_operation_ids(ids, text)
+    output = await run_flow(
+        _flow,
+        FlowData(text, headers, app),
         app,
         bot_id=bot_id,
     )

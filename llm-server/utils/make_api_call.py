@@ -36,15 +36,6 @@ def make_api_request(
 ) -> Response:
     url = ""
 
-    logger.info(
-        "cool",
-        m=method,
-        e=endpoint,
-        b=body_schema,
-        p=path_params,
-        q=query_params,
-        h=headers,
-    )
     try:
         endpoint = replace_url_placeholders(endpoint, path_params)
         url: str = endpoint
