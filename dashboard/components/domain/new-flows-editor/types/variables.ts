@@ -1,4 +1,4 @@
-import { Union } from "./utils"
+import { Union } from "@/types/utils"
 
 type StaticType = {
     type: "STATIC",
