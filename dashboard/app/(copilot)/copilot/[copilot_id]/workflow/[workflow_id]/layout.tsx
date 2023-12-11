@@ -1,4 +1,5 @@
 import { HeaderShell } from '@/components/domain/HeaderShell'
+import { FlowsControllerV2 } from '@/components/domain/new-flows-editor/Controller'
 import { Button } from '@/components/ui/button'
 import React from 'react'
 
@@ -10,17 +11,25 @@ function WorkflowLayout({
     children
 }: Props) {
     return (
-        <div className='h-full flex flex-col'>
-            <HeaderShell className='justify-between'>
-                <h2>Workflow</h2>
-                <Button>
-                    Save
-                </Button>
-            </HeaderShell>
-            <div className='flex-1'>
-                {children}
+        <FlowsControllerV2>
+            <div className='h-full flex flex-col'>
+                <HeaderShell className='justify-between'>
+                    <h2 className='text-lg font-semibold'>Edit Workflow</h2>
+                    <div className='space-x-2'>
+                        <Button>
+                            Save
+                        </Button>
+                        <Button variant='destructive'>
+                            Delete
+                        </Button>
+                    </div>
+                </HeaderShell>
+                <div className='flex-1'>
+                    {children}
+                </div>
             </div>
-        </div>
+        </FlowsControllerV2>
+
     )
 }
 
