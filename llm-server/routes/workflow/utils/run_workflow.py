@@ -38,7 +38,7 @@ async def run_flow(
             "app": app,
         }
 
-        logger.error("An exception occurred", payload= json.dumps(payload_data), error= str(e))
+        logger.error("An exception occurred", payload=json.dumps(payload_data), error=str(e))
 
     output = {"response": result if not error else "", "error": error}
 
