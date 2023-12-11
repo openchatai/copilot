@@ -119,8 +119,9 @@ const FormControl = React.forwardRef<
           : `${formDescriptionId} ${formMessageId}`
       }
       aria-invalid={!!error}
-      data-invalid={!!error}
+      data-valid={!error}
       {...props}
+
     />
   );
 });
