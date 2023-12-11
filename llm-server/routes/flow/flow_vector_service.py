@@ -28,8 +28,8 @@ def create_flows(flows: List[FlowDTO], bot_id: str):
     for action in flows:
         document = Document(page_content=action.description + action.name)
         document.metadata.update({
-        "bot_id": flow.bot_id,
-        "flow_id": flow.id
+        "bot_id": str(flow.bot_id),
+        "flow_id": str(flow.id)
     })
 
         documents.append(document)
@@ -41,10 +41,10 @@ def create_flows(flows: List[FlowDTO], bot_id: str):
 def create_flow(flow: FlowDTO):
     documents: List[Document] = []
 
-    document = Document(page_content=flow.description + flow.name)
+    document = Document(page_content=flow.description + " " + flow.name)
     document.metadata.update({
-        "bot_id": flow.bot_id,
-        "flow_id": flow.id
+        "bot_id": str(flow.bot_id),
+        "flow_id": str(flow.id)
     })
 
     documents.append(document)
