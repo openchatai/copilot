@@ -154,7 +154,6 @@ async def send_chat():
             base_prompt=str(base_prompt),
             bot_id=str(bot.id),
             headers=headers_from_json,
-            server_base_url=server_base_url,
             app=app_name,
         )
 
