@@ -7,6 +7,7 @@ from langchain.schema import OutputParserException
 from custom_types.api_operation import ActionOperation_vs
 from custom_types.bot_message import parse_bot_message, BotMessage
 from entities.flow_entity import FlowDTO
+from routes.workflow.utils.document_similarity_dto import DocumentSimilarityDTO
 from utils.chat_models import CHAT_MODELS
 # push it to the library
 from utils.get_chat_model import get_chat_model
@@ -25,10 +26,10 @@ chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 def process_conversation_step(
         session_id: str,
         user_message: str,
-        context: Optional[str],
-        api_summaries: List[ActionOperation_vs],
+        knowledgebase: List[DocumentSimilarityDTO],
+        actions: List[DocumentSimilarityDTO],
         prev_conversations: List[BaseMessage],
-        flows: List[FlowDTO],
+        flows: List[DocumentSimilarityDTO],
         base_prompt: str
 ):
     # max (flows, actions, knowledge)
@@ -39,7 +40,7 @@ def process_conversation_step(
 
 
 
-    logger.info("planner data", context=context, api_summaries=api_summaries, prev_conversations=prev_conversations,
+    logger.info("planner data", context=knowledgebase, api_summaries=actions, prev_conversations=prev_conversations,
                 flows=flows)
     if not session_id:
         raise ValueError("Session id must be defined for chat conversations")
@@ -50,29 +51,29 @@ def process_conversation_step(
     if len(prev_conversations) > 0:
         messages.extend(prev_conversations)
 
-    if context and len(api_summaries) > 0 and len(flows) > 0:
+    if knowledgebase and len(actions) > 0 and len(flows) > 0:
         messages.append(
             HumanMessage(  # todo revisit this area
-                content=f"Here is some relevant context I found that might be helpful - ```{dumps(context)}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{dumps(api_summaries)}```. I also found some api flows, that maybe able to answer the following question ```{dumps(flows)}```. If one of the flows can accurately answer the question, then set `id` in the response should be the ids defined in the flows. Flows should take precedence over the api_summaries"
+                content=f"Here is some relevant context I found that might be helpful - ```{dumps(knowledgebase)}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{dumps(actions)}```. I also found some api flows, that maybe able to answer the following question ```{dumps(flows)}```. If one of the flows can accurately answer the question, then set `id` in the response should be the ids defined in the flows. Flows should take precedence over the api_summaries"
             )
         )
 
-    elif context and len(api_summaries) > 0:
+    elif knowledgebase and len(actions) > 0:
         messages.append(
             HumanMessage(
-                content=f"Here is some relevant context I found that might be helpful - ```{dumps(context)}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{dumps(api_summaries)}```. "
+                content=f"Here is some relevant context I found that might be helpful - ```{dumps(knowledgebase)}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{dumps(actions)}```. "
             )
         )
-    elif context:
+    elif knowledgebase:
         messages.append(
             HumanMessage(
-                content=f"I found some relevant context that might be helpful. Here is the context: ```{dumps(context)}```. "
+                content=f"I found some relevant context that might be helpful. Here is the context: ```{dumps(knowledgebase)}```. "
             )
         )
-    elif len(api_summaries) > 0:
+    elif len(actions) > 0:
         messages.append(
             HumanMessage(
-                content=f"I found API summaries that might be helpful in answering the question. Here are the api summaries: ```{dumps(api_summaries)}```. "
+                content=f"I found API summaries that might be helpful in answering the question. Here are the api summaries: ```{dumps(actions)}```. "
             )
         )
     else:

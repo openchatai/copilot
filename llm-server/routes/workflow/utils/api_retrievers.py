@@ -1,9 +1,8 @@
-from typing import Optional, List
+from typing import List
 
 from langchain.vectorstores.base import VectorStore
 
-from custom_types.api_operation import ActionOperation_vs
-from entities.flow_entity import PartialFlowDTO
+from routes.workflow.utils.document_similarity_dto import DocumentSimilarityDTO
 from shared.utils.opencopilot_utils import StoreOptions
 from shared.utils.opencopilot_utils.get_vector_store import get_vector_store
 from utils.chat_models import CHAT_MODELS
@@ -16,92 +15,81 @@ chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
 knowledgebase: VectorStore = get_vector_store(StoreOptions("knowledgebase"))
 flows: VectorStore = get_vector_store(StoreOptions("flows"))
-apis: VectorStore = get_vector_store(StoreOptions("actions"))
+actions: VectorStore = get_vector_store(StoreOptions("actions"))
 
 
-async def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
+async def get_relevant_actions(text: str, bot_id: str) -> List[DocumentSimilarityDTO]:
     try:
-        kb_retriever = knowledgebase.as_retriever(
-            search_kwargs={
-                "k": 3,
-                "score_threshold": vs_thresholds.get("kb_score_threshold"),
-                "filter": {"bot_id": bot_id},
-            },
-        )
 
-        result = kb_retriever.get_relevant_documents(text)
+        documents = actions.similarity_search_with_relevance_scores(text, 4, search_kwargs={
+            "k": 3,
+            "score_threshold": vs_thresholds.get("flows_score_threshold"),
+            "filter": {"bot_id": bot_id},
+        })
 
-        if result and len(result) > 0:
-            # Assuming result is a list of objects and each object has a page_content attribute
-            all_page_content = "\n\n".join([item.page_content for item in result])
+        documents_with_similarity = []
+        for document in documents:
+            (doc, score) = document  # Return the document and the score of this document
+            documents_with_similarity.append(DocumentSimilarityDTO(document=doc, score=score, type="actions"))
 
-            return all_page_content
-
-        return None
+        return documents_with_similarity
 
     except Exception as e:
         logger.error(
-            "Error occurred while getting relevant docs",
-            incident="get_relevant_docs",
-            payload=text,
-            error=str(e),
-        )
-        return None
-
-
-async def get_relevant_flows(text: str, bot_id: str) -> List[PartialFlowDTO]:
-    try:
-
-        flow_retriever = flows.as_retriever(
-            search_kwargs={
-                "k": 3,
-                "score_threshold": vs_thresholds.get("flows_score_threshold"),
-                "filter": {"bot_id": bot_id},
-            },
-        )
-
-        results = flow_retriever.get_relevant_documents(text)
-
-        resp: List[PartialFlowDTO] = []
-        for result in results:
-            resp.append(PartialFlowDTO(bot_id=result.metadata.get('bot_id'), id=result.metadata.get('flow_id')))
-
-        return resp
-
-    except Exception as e:
-        logger.error(
-            "Error occurred while getting relevant docs",
-            incident="get_relevant_docs",
+            "Error occurred while getting relevant API summaries",
+            incident="get_relevant_actions",
             payload=text,
             error=str(e),
         )
         return []
 
 
-async def get_relevant_actions(text: str, bot_id: str) -> List[ActionOperation_vs]:
+async def get_relevant_flows(text: str, bot_id: str) -> List[DocumentSimilarityDTO]:
     try:
-        apis_retriever = apis.as_retriever(
-            search_kwargs={
-                "k": 3,
-                "score_threshold": vs_thresholds.get("api_score_threshold"),
-                "filter": {"bot_id": bot_id},
-            },
-        )
 
-        results = apis_retriever.get_relevant_documents(text)
+        documents = flows.similarity_search_with_relevance_scores(text, 4, search_kwargs={
+            "k": 3,
+            "score_threshold": vs_thresholds.get("flows_score_threshold"),
+            "filter": {"bot_id": bot_id},
+        })
 
-        resp: List[ActionOperation_vs] = []
-        for result in results:
-            resp.append(
-                result.metadata
-            )
+        documents_with_similarity = []
+        for document in documents:
+            (doc, score) = document  # Return the document and the score of this document
+            documents_with_similarity.append(DocumentSimilarityDTO(document=doc, score=score, type="flows"))
 
-        return resp
+        return documents_with_similarity
 
     except Exception as e:
         logger.error(
             "Error occurred while getting relevant API summaries",
-            incident="get_relevant_apis_summaries",
+            incident="get_relevant_actions",
+            payload=text,
+            error=str(e),
+        )
+        return []
+
+
+async def get_relevant_knowledgebase(text: str, bot_id: str) -> List[DocumentSimilarityDTO]:
+    try:
+
+        documents = actions.similarity_search_with_relevance_scores(text, 4, search_kwargs={
+            "k": 3,
+            "score_threshold": vs_thresholds.get("flows_score_threshold"),
+            "filter": {"bot_id": bot_id},
+        })
+
+        documents_with_similarity = []
+        for document in documents:
+            (doc, score) = document  # Return the document and the score of this document
+            documents_with_similarity.append(DocumentSimilarityDTO(document=doc, score=score, type="knowledgebase"))
+
+        return documents_with_similarity
+
+    except Exception as e:
+        logger.error(
+            "Error occurred while getting relevant API summaries",
+            incident="get_relevant_actions",
             payload=text,
             error=str(e),
         )

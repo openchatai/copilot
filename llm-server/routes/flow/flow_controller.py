@@ -70,7 +70,7 @@ def create_flow_api(bot_id: str):
                 description=data.get('description'),
                 variables=data.get('variables', []),
                 blocks=data.get('blocks', []),
-                id=uuid.uuid4()
+                id=str(uuid.uuid4())
             )
         except Exception as e:
             return jsonify({"error": str(e)}), 400
