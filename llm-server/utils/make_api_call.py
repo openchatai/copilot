@@ -27,12 +27,12 @@ def replace_url_placeholders(url: str, values_dict: Dict[str, Any]) -> str:
 
 
 def make_api_request(
-    method,
-    endpoint,
-    body_schema,
-    path_params,
-    query_params,
-    headers,
+    method: str,
+    endpoint: str,
+    body_schema: Any,
+    path_params: Dict[str, str],
+    query_params: Dict[str, str],
+    headers: Any,
 ) -> Response:
     url = ""
 

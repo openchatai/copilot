@@ -8,6 +8,7 @@ from integrations.load_json_config import load_json_config
 from integrations.transformers.transformer import transform_response
 from routes.workflow.extractors.convert_json_to_text import convert_json_to_text
 from routes.workflow.generate_openapi_payload import generate_api_payload
+from utils import get_chat_model
 from utils.get_logger import CustomLogger
 from utils.make_api_call import make_api_request
 from utils.process_app_state import process_state
@@ -15,18 +16,17 @@ from utils.process_app_state import process_state
 logger = CustomLogger(module_name=__name__)
 
 
+
 async def run_actions(
-        flow: FlowDTO,
-        text: str,
-        headers: Headers,
-        app: Optional[str],
-        bot_id: str,
+    flow: FlowDTO,
+    text: str,
+    headers: Headers,
+    app: Optional[str],
+    bot_id: str,
 ) -> str:
     api_request_data = {}
     prev_api_response = ""
-    apis_calls_history = {
-        "Workflow Name": flow.name
-    }
+    apis_calls_history = {"Workflow Name": flow.name}
     current_state = process_state(app, headers)
 
     blocks = flow.blocks
@@ -44,16 +44,7 @@ async def run_actions(
                 )
                 api_request_data[operation_id] = api_payload.__dict__
 
-                api_response = make_api_request(
-                    headers=headers, **api_payload.__dict__
-                )
-
-                try:
-                    api_response.json()
-                except ValueError:
-                    raise ValueError("API response is not JSON")
-
-                logger.info("Got the following api response", text=api_response.text)
+                api_response = make_api_request(headers=headers, **api_payload.__dict__)
 
                 """ 
                 if a custom transformer function is defined for this operationId use that, otherwise forward it to the llm,
@@ -66,7 +57,7 @@ async def run_actions(
                         "Config map is not defined for this operationId",
                         incident="config_map_undefined",
                         operation_id=operation_id,
-                        app=app
+                        app=app,
                     )
                     apis_calls_history[operation_id] = api_response.text
 
@@ -97,4 +88,8 @@ async def run_actions(
                 )
 
                 return str(e)
-        return convert_json_to_text(text, apis_calls_history, api_request_data, bot_id=bot_id)
+
+        # @todo : replace this with a lighter and faster model
+        return convert_json_to_text(
+            text, apis_calls_history, api_request_data, bot_id=bot_id
+        )

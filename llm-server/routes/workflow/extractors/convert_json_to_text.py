@@ -11,6 +11,7 @@ from utils.get_logger import CustomLogger
 openai_api_key = os.getenv("OPENAI_API_KEY")
 logger = CustomLogger(module_name=__name__)
 
+chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
 def convert_json_to_text(
     user_input: str,
@@ -18,8 +19,6 @@ def convert_json_to_text(
     api_request_data: Dict[str, Any],
     bot_id: str,
 ) -> str:
-    chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
-
     api_summarizer_template = None
     system_message = SystemMessage(
         content="You are an ai assistant that can summarize api responses"
@@ -47,6 +46,11 @@ def convert_json_to_text(
     ]
 
     result = chat(messages)
-    logger.info("Convert json to text", content=result.content, incident="convert_json_to_text", api_request_data=api_request_data)
+    logger.info(
+        "Convert json to text",
+        content=result.content,
+        incident="convert_json_to_text",
+        api_request_data=api_request_data,
+    )
 
     return cast(str, result.content)

@@ -19,7 +19,7 @@ class ActionDTO(BaseModel):
     def __init__(self, **data):
         super().__init__(**data)
         # Generate and assign operation_id if name is provided
-        if self.name:
+        if self.name and not self.operation_id:
             self.operation_id = self.generate_operation_id_from_name(self.name)
 
     @staticmethod
