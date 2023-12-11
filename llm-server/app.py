@@ -1,6 +1,6 @@
-from http import HTTPStatus
 from dotenv import load_dotenv
 from flask import Flask
+from flask import jsonify
 
 from routes._swagger.controller import _swagger
 from routes.action.action_controller import action
@@ -11,12 +11,10 @@ from routes.flow.flow_controller import flow
 from routes.prompt.prompt_controller import prompt_workflow
 from routes.prompt.prompt_template_controller import prompt_template_workflow
 from routes.uploads.upload_controller import upload_controller
-from routes.workflow.workflow_controller import workflow
-from utils.config import Config
-from utils.vector_store_setup import init_qdrant_collections
 from shared.models.opencopilot_db import create_database_schema
-from flask import jsonify
+from utils.config import Config
 from utils.db import Database
+from utils.vector_store_setup import init_qdrant_collections
 
 # from routes.uploads.celery_service import celery
 db_instance = Database()
@@ -45,9 +43,6 @@ app.config.from_object(Config)
 @app.route('/healthcheck')
 def health_check():
     info = mongo.client
-    # c_info = celery.connection()
-
-    # print(c_info)
     return jsonify(status='OK', servers={"mongo": info.options.pool_options.max_pool_size})
 
 
