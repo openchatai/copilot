@@ -29,7 +29,7 @@ class Variable(BaseModel):
 
 class FlowDTO(BaseModel):
     blocks: List[Block]
-    chatbot_id: uuid.UUID
+    bot_id: uuid.UUID
     id: uuid.UUID
     name: str
     description: str

@@ -26,7 +26,7 @@ def create_flow(flow_dto: FlowDTO) -> Flow:
     with Session() as session:
         # Create a new Flow instance using data from the DTO
         new_flow = Flow(
-            chatbot_id=flow_dto.chatbot_id,
+            chatbot_id=flow_dto.bot_id,
             name=flow_dto.name,
             payload=blocks_json,
             description=flow_dto.description,

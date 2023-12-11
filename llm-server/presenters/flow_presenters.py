@@ -19,8 +19,8 @@ def flow_to_dict(flow: Flow):
     """
     with Session() as session:
         # Query for variables associated with the flow
-        variables = session.query(FlowVariable).filter(FlowVariable.flow_id == flow.id).all()
-        variables_dict = [flow_variable_to_dict(variable) for variable in variables]
+        # variables = session.query(FlowVariable).filter(FlowVariable.flow_id == flow.id).all()
+        # variables_dict = [flow_variable_to_dict(variable) for variable in variables]
 
         return {
             "flow_id": flow.id.hex() if isinstance(flow.id, bytes) else flow.id,
@@ -28,7 +28,7 @@ def flow_to_dict(flow: Flow):
             "payload": flow.payload,
             "description": flow.description,
             "last_saved_at": flow.updated_at.isoformat() if flow.updated_at else None,
-            "variables": variables_dict  # Including nested variables
+            # "variables": variables_dict  # Including nested variables
         }
 
 

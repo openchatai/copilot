@@ -50,25 +50,23 @@ def create_flow_api(bot_id: str):
         A Flask response object with the newly created Flow object as a dictionary.
     """
     try:
-        # Extract and validate incoming data
         data = request.get_json()
         if not data:
             return jsonify({"error": "No data provided"}), 400
 
-        # Extract individual fields from data
-        name = data.get('name')
-        description = data.get('description')
-        variables = data.get('variables', [])
-        blocks = data.get('blocks', [])
+        # Inject bot_id into each ActionDTO within the blocks (because the DTO expect it)
+        for block in data.get('blocks', []):
+            for action in block.get('actions', []):
+                action['bot_id'] = bot_id
 
-        # Validate data using FlowDTO
+        # Validate data using FlowDTO with Pydantic
         try:
             flow_dto = FlowDTO(
-                chatbot_id=bot_id,
-                name=name,
-                variables=variables,
-                blocks=blocks,
-                description=description,
+                bot_id=bot_id,
+                name=data.get('name'),
+                description=data.get('description'),
+                variables=data.get('variables', []),
+                blocks=data.get('blocks', []),
                 id=uuid.uuid4()
             )
         except Exception as e:
