@@ -16,7 +16,6 @@ from utils.config import Config
 from utils.db import Database
 from utils.vector_store_setup import init_qdrant_collections
 
-# from routes.uploads.celery_service import celery
 db_instance = Database()
 mongo = db_instance.get_db()
 

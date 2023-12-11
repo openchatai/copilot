@@ -8,7 +8,7 @@ from models.repository.flow_repo import create_flow, get_all_flows_for_bot, get_
     add_or_update_variable_in_flow, update_flow
 from presenters.flow_presenters import flow_to_dict, flow_variable_to_dict
 from utils.db import Database
-import flow_vector_service
+from routes.flow import flow_vector_service
 
 db_instance = Database()
 mongo = db_instance.get_db()
