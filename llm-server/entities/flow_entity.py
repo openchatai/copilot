@@ -14,8 +14,7 @@ class Block(BaseModel):
     order: int
 
     def to_dict(self):
-        # Convert the entire FlowDTO to a dictionary,
-        # including nested ActionDTO objects within each Block
+        # Convert the entire Block to a dictionary,
         return self.dict()
 
 
@@ -24,8 +23,7 @@ class Variable(BaseModel):
     value: str
 
     def to_dict(self):
-        # Convert the entire FlowDTO to a dictionary,
-        # including nested ActionDTO objects within each Block
+        # Convert the entire Variable to a dictionary,
         return self.dict()
 
 
