@@ -18,3 +18,9 @@ vs_thresholds: VsThresholds = {
     "flows_score_threshold": float(os.getenv("FLOWS_SCORE_THRESHOLD", "0.75")),
     "kb_score_threshold": float(os.getenv("KB_SCORE_THRESHOLD", "0.55")),
 }
+
+
+class VectorCollections:
+    flows = "flows"
+    actions = "actions"
+    knowledgebase = "knowledgebase"

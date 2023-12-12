@@ -7,7 +7,7 @@ from shared.utils.opencopilot_utils.get_vector_store import get_vector_store
 from utils.chat_models import CHAT_MODELS
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
-from utils.llm_consts import vs_thresholds
+from utils.llm_consts import vs_thresholds, VectorCollections
 from qdrant_client import QdrantClient, models
 from langchain.docstore.document import Document
 from shared.utils.opencopilot_utils.get_embeddings import get_embeddings
@@ -85,14 +85,14 @@ async def get_relevant_documents(
 
 
 async def get_relevant_actions(text: str, bot_id: str) -> List[DocumentSimilarityDTO]:
-    return await get_relevant_documents(text, bot_id, "actions")
+    return await get_relevant_documents(text, bot_id, VectorCollections.actions)
 
 
 async def get_relevant_flows(text: str, bot_id: str) -> List[DocumentSimilarityDTO]:
-    return await get_relevant_documents(text, bot_id, "flows")
+    return await get_relevant_documents(text, bot_id, VectorCollections.flows)
 
 
 async def get_relevant_knowledgebase(
     text: str, bot_id: str
 ) -> List[DocumentSimilarityDTO]:
-    return await get_relevant_documents(text, bot_id, "knowledgebase")
+    return await get_relevant_documents(text, bot_id, VectorCollections.knowledgebase)

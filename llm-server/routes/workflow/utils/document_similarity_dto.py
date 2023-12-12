@@ -3,6 +3,8 @@ from typing import List, Dict
 from langchain.docstore.document import Document
 from langchain_core.load.serializable import Serializable
 
+from utils.llm_consts import VectorCollections
+
 
 class DocumentSimilarityDTO(Serializable):
     document: Document
@@ -12,7 +14,7 @@ class DocumentSimilarityDTO(Serializable):
 
 def select_top_documents(
     documents: List[DocumentSimilarityDTO],
-) -> List[DocumentSimilarityDTO]:
+) -> Dict[str, List[DocumentSimilarityDTO]]:
     # Sort the documents by score in descending order
     documents.sort(key=lambda dto: dto.score, reverse=True)
 
@@ -31,4 +33,19 @@ def select_top_documents(
 
         previous_diff = current_diff
 
-    return selected_documents
+    # Categorize documents based on the 'type' field
+    categorized_documents = {
+        VectorCollections.knowledgebase: [],
+        VectorCollections.actions: [],
+        VectorCollections.flows: [],
+    }
+
+    for document in selected_documents:
+        if document.type == VectorCollections.knowledgebase:
+            categorized_documents[VectorCollections.knowledgebase].append(document)
+        elif document.type == VectorCollections.actions:
+            categorized_documents[VectorCollections.actions].append(document)
+        elif document.type == VectorCollections.flows:
+            categorized_documents[VectorCollections.flows].append(document)
+
+    return categorized_documents

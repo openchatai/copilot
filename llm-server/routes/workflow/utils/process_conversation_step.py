@@ -1,12 +1,8 @@
-from json import dumps
-from typing import Optional, List, cast
+from typing import List, cast
 
 from langchain.schema import HumanMessage, SystemMessage, BaseMessage
 from langchain.schema import OutputParserException
-
-from custom_types.api_operation import ActionOperation_vs
 from custom_types.bot_message import parse_bot_message, BotMessage
-from entities.flow_entity import FlowDTO
 from routes.workflow.utils.document_similarity_dto import DocumentSimilarityDTO
 from utils.chat_models import CHAT_MODELS
 
@@ -78,8 +74,12 @@ def process_conversation_step(
                 content=f"I found API summaries that might be helpful in answering the question. Here are the api summaries: ```{actions}```. "
             )
         )
-    else:
-        pass
+    elif len(flows) > 0:
+        messages.append(
+            HumanMessage(
+                content=f"I found some flows definitions that might be helpful in replying to the user. You must select one flow that can answer the user. Here are the flow definitions ```{flows}```."
+            )
+        )
 
     messages.append(
         HumanMessage(
