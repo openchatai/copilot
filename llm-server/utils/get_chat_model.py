@@ -10,7 +10,7 @@ from .chat_models import CHAT_MODELS
 
 localip = os.getenv("LOCAL_IP", "localhost")
 
-model_name = os.getenv(llm_consts.model_env_var, CHAT_MODELS.gpt_4_32k)
+model_name = os.getenv(llm_consts.model_env_var, CHAT_MODELS.gpt_3_5_turbo_16k)
 
 
 @lru_cache(maxsize=1)

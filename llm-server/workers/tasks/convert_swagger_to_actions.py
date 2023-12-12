@@ -5,6 +5,7 @@ from urllib.parse import urlparse
 from celery import shared_task
 from qdrant_client import QdrantClient
 
+from models.repository.action_repo import create_action
 from models.repository.copilot_repo import get_total_chatbots, get_chatbots_batch
 from routes.action import action_vector_service
 from shared.models.opencopilot_db.chatbot import Chatbot
@@ -65,6 +66,7 @@ def process_swagger_file(chatbot: Chatbot):
 
         for action in actions:
             action_vector_service.create_action(action)
+            create_action(chatbot_id=bot_id, data=action)
         logger.info(f"Successfully processed Swagger file for bot {bot_id} with {num_actions} actions")
 
     except Exception as e:
