@@ -12,17 +12,19 @@ logger = CustomLogger(module_name=__name__)
 
 LOCAL_IP = os.getenv("LOCAL_IP", "host.docker.internal")
 
+
 def get_embedding_provider():
     """Gets the chosen embedding provider from environment variables."""
     return os.environ.get("EMBEDDING_PROVIDER")
+
 
 def get_azure_embedding():
     """Gets embeddings using the Azure embedding provider."""
     deployment = os.environ.get("AZURE_OPENAI_EMBEDDING_MODEL_NAME")
     openai_api_key = os.environ.get("AZURE_OPENAI_API_KEY")
     client = os.environ.get("AZURE_OPENAI_API_TYPE")
-    openai_api_base = os.environ['AZURE_OPENAI_API_BASE']
-    openai_api_version = os.environ['AZURE_OPENAI_API_VERSION']
+    openai_api_base = os.environ["AZURE_OPENAI_API_BASE"]
+    openai_api_version = os.environ["AZURE_OPENAI_API_VERSION"]
 
     return OpenAIEmbeddings(
         openai_api_key=openai_api_key,
@@ -30,8 +32,9 @@ def get_azure_embedding():
         client=client,
         chunk_size=8,
         openai_api_base=openai_api_base,
-        openai_api_version=openai_api_version
+        openai_api_version=openai_api_version,
     )
+
 
 def get_openai_embedding():
     """Gets embeddings using the OpenAI embedding provider."""
@@ -39,28 +42,35 @@ def get_openai_embedding():
 
     return OpenAIEmbeddings(openai_api_key=openai_api_key)
 
+
 def choose_embedding_provider():
     """Chooses and returns the appropriate embedding provider instance."""
     embedding_provider = get_embedding_provider()
 
     if embedding_provider == EmbeddingProvider.azure.value:
         return get_azure_embedding()
-    
+
     elif embedding_provider == EmbeddingProvider.openchat.value:
         logger.info("Got ollama embedding provider", provider=embedding_provider)
         return OllamaEmbeddings(base_url=f"{LOCAL_IP}:11434", model="openchat")
-    
-    elif embedding_provider == EmbeddingProvider.OPENAI.value or embedding_provider is None:
+
+    elif (
+        embedding_provider == EmbeddingProvider.OPENAI.value
+        or embedding_provider is None
+    ):
         if embedding_provider is None:
             warnings.warn("No embedding provider specified. Defaulting to OpenAI.")
         return get_openai_embedding()
 
     else:
-        available_providers = ", ".join([service.value for service in EmbeddingProvider])
+        available_providers = ", ".join(
+            [service.value for service in EmbeddingProvider]
+        )
         raise ValueError(
             f"Embedding service '{embedding_provider}' is not currently available. "
             f"Available services: {available_providers}"
         )
+
 
 # Main function to get embeddings
 @lru_cache(maxsize=1)

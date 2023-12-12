@@ -8,13 +8,11 @@ from integrations.load_json_config import load_json_config
 from integrations.transformers.transformer import transform_response
 from routes.workflow.extractors.convert_json_to_text import convert_json_to_text
 from routes.workflow.generate_openapi_payload import generate_api_payload
-from utils import get_chat_model
 from utils.get_logger import CustomLogger
 from utils.make_api_call import make_api_request
 from utils.process_app_state import process_state
 
 logger = CustomLogger(module_name=__name__)
-
 
 
 async def run_actions(
@@ -35,6 +33,10 @@ async def run_actions(
         for action in block.actions:
             try:
                 operation_id = action.operation_id
+
+                if not operation_id:
+                    continue
+
                 api_payload = await generate_api_payload(
                     text,
                     operation_id,
