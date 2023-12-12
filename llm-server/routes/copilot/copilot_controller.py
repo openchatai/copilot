@@ -107,16 +107,3 @@ def general_settings_update(copilot_id):
     except Exception as e:
         # Handle other exceptions
         return jsonify({"error": "An error occurred", "details": str(e)}), 500
-
-# This api will be used to reindex all swagger files into our qdrant vector store
-# @copilot.route("/reindex/apis", methods=["POST"])
-# def reindex_apis():
-#     # Check if the provided key matches the expected key
-#     SECRET_KEY = os.getenv("BASIC_AUTH_KEY")
-#     if not SECRET_KEY:
-#         raise ValidationError("This is a protected route! Contact admin")
-#     if request.headers.get("Authorization") == f"Bearer {SECRET_KEY}":
-#         response = reindex_service.reindex_apis()
-#         return Response(response=response, status=200)
-#     else:
-#         return Response(response="Unauthorized", status=401)

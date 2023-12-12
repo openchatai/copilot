@@ -23,7 +23,7 @@ def get_action(point_id: str):
     return points[0]
 
 
-def create_actions(actions: List[ActionDTO], bot_id: str):
+def create_actions(actions: List[ActionDTO]):
     documents: List[Document] = []
     for action in actions:
         document = Document(page_content=action.description + action.name)
