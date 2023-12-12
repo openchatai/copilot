@@ -1,11 +1,11 @@
-from typing import List, Any
+from typing import List, Dict
 
 from langchain.docstore.document import Document
-from pydantic import BaseModel
+from langchain_core.load.serializable import Serializable
 
 
-class DocumentSimilarityDTO(BaseModel):
-    document: Any
+class DocumentSimilarityDTO(Serializable):
+    document: Document
     score: float
     type: str
 

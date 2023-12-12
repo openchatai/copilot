@@ -61,16 +61,16 @@ async def get_relevant_documents(
             if not payload:
                 continue
 
-            x = DocumentSimilarityDTO(
-                score=response.score,
-                type=collection_name,
-                document={
-                    "page_content": payload.get("page_content", ""),
-                    "metadata": payload.get("metadata", {}),
-                },
+            documents_with_similarity.append(
+                DocumentSimilarityDTO(
+                    score=response.score,
+                    type=collection_name,
+                    document=Document(
+                        page_content=payload.get("page_content", ""),
+                        metadata=payload.get("metadata", {}),
+                    ),
+                )
             )
-
-            documents_with_similarity.append(x)
 
         return documents_with_similarity
 

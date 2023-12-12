@@ -9,6 +9,7 @@ from custom_types.bot_message import parse_bot_message, BotMessage
 from entities.flow_entity import FlowDTO
 from routes.workflow.utils.document_similarity_dto import DocumentSimilarityDTO
 from utils.chat_models import CHAT_MODELS
+
 # push it to the library
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
@@ -24,13 +25,13 @@ chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
 
 def process_conversation_step(
-        session_id: str,
-        user_message: str,
-        knowledgebase: List[DocumentSimilarityDTO],
-        actions: List[DocumentSimilarityDTO],
-        prev_conversations: List[BaseMessage],
-        flows: List[DocumentSimilarityDTO],
-        base_prompt: str
+    session_id: str,
+    user_message: str,
+    knowledgebase: List[DocumentSimilarityDTO],
+    actions: List[DocumentSimilarityDTO],
+    prev_conversations: List[BaseMessage],
+    flows: List[DocumentSimilarityDTO],
+    base_prompt: str,
 ):
     # max (flows, actions, knowledge)
     # if max == flows -> execute static flow
@@ -38,36 +39,43 @@ def process_conversation_step(
     # if max == knowledge -> fetch
     # if max < 70 -> normal LLM reply or dynamic flow?
 
-
-
-    logger.info("planner data", context=knowledgebase, api_summaries=actions, prev_conversations=prev_conversations,
-                flows=flows)
+    logger.info(
+        "planner data",
+        context=knowledgebase,
+        api_summaries=actions,
+        prev_conversations=prev_conversations,
+        flows=flows,
+    )
     if not session_id:
         raise ValueError("Session id must be defined for chat conversations")
 
-    messages: List[BaseMessage] = [SystemMessage(content=base_prompt), SystemMessage(
-        content="You will have access to a list of api's and some useful information, called context.")]
+    messages: List[BaseMessage] = [
+        SystemMessage(content=base_prompt),
+        SystemMessage(
+            content="You will have access to a list of api's and some useful information, called context."
+        ),
+    ]
 
     if len(prev_conversations) > 0:
         messages.extend(prev_conversations)
 
-    if knowledgebase and len(actions) > 0 and len(flows) > 0:
+    if len(knowledgebase) > 0 and len(actions) > 0 and len(flows) > 0:
         messages.append(
             HumanMessage(  # todo revisit this area
-                content=f"Here is some relevant context I found that might be helpful - ```{dumps(knowledgebase)}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{dumps(actions)}```. I also found some api flows, that maybe able to answer the following question ```{dumps(flows)}```. If one of the flows can accurately answer the question, then set `id` in the response should be the ids defined in the flows. Flows should take precedence over the api_summaries"
+                content=f"Here is some relevant context I found that might be helpful - ```{knowledgebase}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{dumps(actions)}```. I also found some api flows, that maybe able to answer the following question ```{dumps(flows)}```. If one of the flows can accurately answer the question, then set `id` in the response should be the ids defined in the flows. Flows should take precedence over the api_summaries"
             )
         )
 
-    elif knowledgebase and len(actions) > 0:
+    elif len(knowledgebase) > 0 and len(actions) > 0:
         messages.append(
             HumanMessage(
-                content=f"Here is some relevant context I found that might be helpful - ```{dumps(knowledgebase)}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{dumps(actions)}```. "
+                content=f"Here is some relevant context I found that might be helpful - ```{knowledgebase}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{dumps(actions)}```. "
             )
         )
-    elif knowledgebase:
+    elif len(knowledgebase) > 0:
         messages.append(
             HumanMessage(
-                content=f"I found some relevant context that might be helpful. Here is the context: ```{dumps(knowledgebase)}```. "
+                content=f"I found some relevant context that might be helpful. Here is the context: ```{knowledgebase}```. "
             )
         )
     elif len(actions) > 0:
