@@ -7,6 +7,7 @@ from routes.workflow.utils.document_similarity_dto import DocumentSimilarityDTO
 
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
+from utils.llm_consts import VectorCollections
 
 logger = CustomLogger(module_name=__name__)
 chat = get_chat_model()
@@ -18,12 +19,68 @@ chat = get_chat_model()
 """
 
 
+def is_it_informative_or_actionable(chat_history, current_message,
+                                    available_document_types: List[DocumentSimilarityDTO]):
+    """
+    This function will take the user message and some context around it, and then will see if the user is requesting
+    something that can be answered in informative way or can be actionable (api action or a flow).
+
+    if it was actionable, then it will summarize what the user want
+    Args:
+        available_document_types:
+        chat_history:
+        current_message:
+
+    Returns:
+
+    """
+
+    if len(available_document_types) == 1 and VectorCollections.knowledgebase == available_document_types[0].type:
+        """
+        That means it is informative, and the LLM should be able to answer the question based on the given context or
+        by itself (based on the base prompt).
+        """
+        return False
+
+    prompt = '''
+    You are an AI tool that classifies user input as actionable or not. Actionable input refers to requests that can be fulfilled by calling an external tool. You will be provided with the user's input and descriptions of available tools. If the user's request can be fulfilled using one of these tools, it is considered actionable.
+
+    Example
+
+    **User Input:** create a b-1 visa application
+
+    **Available Tools:**
+    - Tool 1: This tool creates a b-1 visa application.
+    - Tool 2: This tool queries b-1 status.
+
+    **Verdict:** Actionable
+
+    **Justification:** The user's request can be fulfilled by using Tool 1.
+
+    **Another Example:**
+
+    **User Input:** how to create a b-1 visa application
+
+    **Available Tools:**
+    - Tool 1: This tool creates a b-1 visa application.
+    - Tool 2: This tool queries b-1 status.
+
+    **Verdict:** Not Actionable
+
+    **Justification:** The user is asking about how to create a visa application, which can be answered through text without the need to call a tool.
+
+    **Response Format:** Always respond with JSON, for example: {'actionable': false}
+    
+    Now I will send you the user input
+    '''
+
+
 def process_conversation_step(
         session_id: str,
         user_message: str,
         knowledgebase: List[DocumentSimilarityDTO],
         actions: List[DocumentSimilarityDTO],
-        prev_conversations: List[BaseMessage],
+        chat_history: List[BaseMessage],
         flows: List[DocumentSimilarityDTO],
         base_prompt: str,
 ) -> Union[Dict[str, Any], BotMessage]:
@@ -35,7 +92,7 @@ def process_conversation_step(
         user_message (str): The message from the user.
         knowledgebase (List[DocumentSimilarityDTO]): A list of DocumentSimilarityDTO objects representing the knowledgebase documents.
         actions (List[DocumentSimilarityDTO]): A list of DocumentSimilarityDTO objects representing the API actions.
-        prev_conversations (List[BaseMessage]): A list of previous conversation messages.
+        chat_history (List[BaseMessage]): A list of previous conversation messages.
         flows (List[DocumentSimilarityDTO]): A list of DocumentSimilarityDTO objects representing the API flows.
         base_prompt (str): The base prompt for the conversation.
 
@@ -56,13 +113,13 @@ def process_conversation_step(
         ),
     ]
 
-    if len(prev_conversations) > 0:
-        messages.extend(prev_conversations)
+    if len(chat_history) > 0:
+        messages.extend(chat_history[-5:])
 
     if len(knowledgebase) > 0 and len(actions) > 0 and len(flows) > 0:
         messages.append(
             HumanMessage(
-                content=f"Here is some relevant context I found that might be helpful - ```{knowledgebase}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{actions}```. I also found some api flows, that maybe able to answer the following question ```{flows}```. If one of the flows can accurately answer the question, then set `id` in the response should be the ids defined in the flows. Flows should take precedence over the api_summaries"
+                content=f"Here is some relevant context I found that might be helpful - ```{knowledgebase}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{actions}```. I also found some api flows, that maybe able to answer the following question ```{flows}```. If one of the flows can accurately answer the question, then set `id` in the response should be the ids defined in the flows. Flows should take precedence over the normal swagger apis"
             )
         )
 
@@ -105,7 +162,7 @@ def process_conversation_step(
         )
     )
     messages.append(
-        HumanMessage(content="If you are unsure / confused, ask claryfying questions")
+        HumanMessage(content="If you are unsure / confused, ask clarifying questions")
     )
 
     messages.append(HumanMessage(content=user_message))

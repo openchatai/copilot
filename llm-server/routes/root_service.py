@@ -99,7 +99,7 @@ async def handle_request(
             knowledgebase=top_documents[VectorCollections.knowledgebase],
             session_id=session_id,
             actions=top_documents[VectorCollections.knowledgebase],
-            prev_conversations=conversations_history,
+            chat_history=conversations_history,
             flows=top_documents[VectorCollections.flows],
             base_prompt=base_prompt,
         )
