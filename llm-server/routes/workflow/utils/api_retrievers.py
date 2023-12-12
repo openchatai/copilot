@@ -15,7 +15,7 @@ from utils.llm_consts import vs_thresholds, VectorCollections
 
 client = QdrantClient(url=os.getenv("QDRANT_URL", "http://qdrant:6333"))
 logger = CustomLogger(module_name=__name__)
-chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
+chat = get_chat_model()
 
 stores = {
     "knowledgebase": get_vector_store(StoreOptions("knowledgebase")),

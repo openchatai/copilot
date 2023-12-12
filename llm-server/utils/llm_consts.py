@@ -14,10 +14,12 @@ class VsThresholds(TypedDict):
 
 
 vs_thresholds: VsThresholds = {
-    "actions_score_threshold": float(os.getenv("ACTIONS_SCORE_THRESHOLD", "0.75")),
+    "actions_score_threshold": float(os.getenv("ACTIONS_SCORE_THRESHOLD", "0.25")),
     "flows_score_threshold": float(os.getenv("FLOWS_SCORE_THRESHOLD", "0.75")),
     "kb_score_threshold": float(os.getenv("KB_SCORE_THRESHOLD", "0.55")),
 }
+
+model_env_var = "CHAT_MODEL"
 
 
 class VectorCollections:

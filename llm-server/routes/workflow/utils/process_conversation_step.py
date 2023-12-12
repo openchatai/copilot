@@ -11,7 +11,7 @@ from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
 
 logger = CustomLogger(module_name=__name__)
-chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
+chat = get_chat_model()
 
 """
 @todo
@@ -83,12 +83,14 @@ def process_conversation_step(
 
     messages.append(
         HumanMessage(
-            content="""Based on the information provided to you I want you to answer the questions that follow. Your should respond with a json that looks like the following, you must always use the operationIds provided in api summaries. Do not make up an operation id - 
+            content="""Based on the information provided to you and the conversation history of this conversation, I want you to answer the questions that follow. Your should respond with a json that looks like the following, you must always use the operationIds provided in api summaries. Do not make up an operation id - 
     {
         "ids": ["list", "of", "operationIds", "for apis to be called"],
         "bot_message": "your response based on the instructions provided at the beginning",
-        "missing_information": "Optional Field; Incase of ambiguity where user input is not sufficient to make the api call, ask follow up questions."
+        "missing_information": "Optional Field; Incase of ambiguity ask clarifying questions. You should not worry about the api filters or query, that should be decided by a different agent."
     }                
+    
+    Don't add operation ids if you can reply by merely looking in the conversation history.
     """
         )
     )

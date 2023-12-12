@@ -19,6 +19,8 @@ def convert_json_to_text(
     api_request_data: Dict[str, Any],
     bot_id: str,
 ) -> str:
+    chat = get_chat_model()
+
     api_summarizer_template = None
     system_message = SystemMessage(
         content="You are an ai assistant that can summarize api responses"

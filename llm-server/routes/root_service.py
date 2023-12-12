@@ -43,7 +43,7 @@ FAILED_TO_FETCH_SWAGGER_CONTENT = "Failed to fetch Swagger content"
 FILE_NOT_FOUND = "File not found"
 FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
 
-chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
+chat = get_chat_model()
 
 
 def validate_steps(steps: List[str], bot_id: str):
@@ -109,7 +109,7 @@ async def handle_request(
         )
 
         if step.missing_information is not None and len(step.missing_information) >= 10:
-            return {"error": None, "response": step.missing_information}
+            return {"error": None, "response": step.bot_message + "\n" + step.missing_information}
 
         if len(step.ids) > 0:
             if validate_steps(step.ids, bot_id) is False:

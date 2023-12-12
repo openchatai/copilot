@@ -2,62 +2,47 @@ from typing import Dict
 from langchain.chat_models import ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
 from langchain.chat_models import ChatOllama, ChatAnthropic
+from utils import llm_consts
 from .chat_models import CHAT_MODELS
-
+from functools import lru_cache
 import os
 
 localip = os.getenv("LOCAL_IP", "localhost")
 
+model_name = os.getenv(llm_consts.model_env_var, CHAT_MODELS.gpt_4_32k)
 
-# Create a dictionary to store cached instances
-model_cache: Dict[str, BaseChatModel] = {}
-
-
-def get_chat_model(prop: str) -> BaseChatModel:
-    # Check if the model is already cached
-    if prop in model_cache:
-        return model_cache[prop]
-
-    if prop == CHAT_MODELS.gpt_3_5_turbo:
+@lru_cache(maxsize=1)
+def get_chat_model() -> BaseChatModel:
+    if model_name == CHAT_MODELS.gpt_3_5_turbo:
         model = ChatOpenAI(
-            openai_api_key=os.getenv("OPENAI_API_KEY"),
-            model=CHAT_MODELS.gpt_3_5_turbo,
-            temperature=0,
+            model=CHAT_MODELS.gpt_3_5_turbo, 
+            temperature=0
         )
-    elif prop == CHAT_MODELS.gpt_3_5_turbo_16k:
+    elif model_name == CHAT_MODELS.gpt_4_32k:
         model = ChatOpenAI(
-            openai_api_key=os.getenv("OPENAI_API_KEY"),
-            model=CHAT_MODELS.gpt_3_5_turbo_16k,
             temperature=0,
+            model=CHAT_MODELS.gpt_4_32k
         )
-    elif prop == CHAT_MODELS.claude_2_0:
+    elif model_name == CHAT_MODELS.gpt_4_1106_preview:
+        model = ChatOpenAI(
+            temperature=0,
+            model=CHAT_MODELS.gpt_4_1106_preview
+        )
+    elif model_name == CHAT_MODELS.gpt_3_5_turbo_16k:
+        model = ChatOpenAI(
+            model=CHAT_MODELS.gpt_3_5_turbo_16k, 
+            temperature=0
+        )
+    elif model_name == "claude":
         model = ChatAnthropic(
-            anthropic_api_key=os.getenv("CLAUDE_API_KEY", "CLAUDE_API_KEY")
+           anthropic_api_key=os.getenv("CLAUDE_API_KEY"),
         )
-    elif prop == CHAT_MODELS.mistral_openorca:
+    elif model_name == "openchat":
         model = ChatOllama(
             base_url=f"{localip}:11434",
-            model=CHAT_MODELS.mistral_openorca,
-            temperature=0,
+            model="openchat",
+            temperature=0
         )
-    elif prop == CHAT_MODELS.nous_hermes:
-        model = ChatOllama(
-            base_url=f"{localip}:11434",
-            model=CHAT_MODELS.nous_hermes,
-            temperature=0,
-        )
-    elif prop == CHAT_MODELS.xwinlm:
-        model = ChatOllama(
-            base_url=f"{localip}:11434",
-            model=CHAT_MODELS.xwinlm,
-            temperature=0,
-        )
-    elif prop == "llama2":
-        model = ChatOpenAI(model="llama2", temperature=0)
     else:
-        raise ValueError("Couldn't match one of the supported models.")
-
-    # Cache the initialized model
-    model_cache[prop] = model
-
+        raise ValueError(f"Unsupported model: {model_name}")
     return model
