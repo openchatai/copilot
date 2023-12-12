@@ -17,7 +17,6 @@ client = QdrantClient(url=os.getenv("QDRANT_URL", "http://qdrant:6333"))
 logger = CustomLogger(module_name=__name__)
 
 db_instance = Database()
-mongo = db_instance.get_db()
 client = QdrantClient(url=os.getenv("QDRANT_URL", "http://qdrant:6333"))
 shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
 
@@ -56,7 +55,6 @@ def process_swagger_file(chatbot: Chatbot):
 
     except Exception as e:
         print(f"An unexpected error occurred - {e}")
-        # Handle other unexpected errors here
 
 
 def is_valid_url(url):
