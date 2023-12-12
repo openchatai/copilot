@@ -18,6 +18,7 @@ logger = CustomLogger(module_name=__name__)
 db_instance = Database()
 shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
 
+
 @shared_task
 def index_action(batch_size: int = 100):
     """
@@ -32,6 +33,7 @@ def index_action(batch_size: int = 100):
         process_swagger_files_batch(batch)
         logger.info(f"Processed a batch of chatbots from offset {offset}")
 
+
 def process_swagger_files_batch(chatbots: Iterable[Chatbot]):
     """
     Process a batch of chatbots.
@@ -40,6 +42,7 @@ def process_swagger_files_batch(chatbots: Iterable[Chatbot]):
     """
     for chatbot in chatbots:
         process_swagger_file(chatbot)
+
 
 def process_swagger_file(chatbot: Chatbot):
     """
@@ -66,6 +69,7 @@ def process_swagger_file(chatbot: Chatbot):
 
     except Exception as e:
         logger.error(f"Error processing Swagger file for bot {bot_id}: {e}")
+
 
 def is_valid_url(url: str) -> bool:
     """
