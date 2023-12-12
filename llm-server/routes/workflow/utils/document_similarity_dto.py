@@ -13,7 +13,7 @@ class DocumentSimilarityDTO(Serializable):
 
 
 def select_top_documents(
-    documents: List[DocumentSimilarityDTO],
+        documents: List[DocumentSimilarityDTO],
 ) -> Dict[str, List[DocumentSimilarityDTO]]:
     # Sort the documents by score in descending order
     documents.sort(key=lambda dto: dto.score, reverse=True)
@@ -27,7 +27,7 @@ def select_top_documents(
 
         # Check if the difference is too large or exceeds 0.3
         if current_diff > 0.3 or (
-            previous_diff > 0 and current_diff / previous_diff > 1
+                previous_diff > 0 and current_diff / previous_diff > 1
         ):
             break
 

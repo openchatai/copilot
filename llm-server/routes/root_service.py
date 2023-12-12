@@ -70,12 +70,12 @@ def validate_steps(steps: List[str], bot_id: str):
 
 
 async def handle_request(
-    text: str,
-    session_id: str,
-    base_prompt: str,
-    bot_id: str,
-    headers: Dict[str, str],
-    app: Optional[str],
+        text: str,
+        session_id: str,
+        base_prompt: str,
+        bot_id: str,
+        headers: Dict[str, str],
+        app: Optional[str],
 ) -> ResponseDict:
     log_user_request(text)
     check_required_fields(base_prompt, text)
@@ -94,8 +94,6 @@ async def handle_request(
         results = await asyncio.gather(*tasks)
         knowledgebase, actions, flows, prev_conversations = results
         top_documents = select_top_documents(actions + flows + knowledgebase)
-
-        logger.info("Got top documents by score", top_documents=top_documents)
 
         """
         also provide a list of flows here itself, the llm should be able to figure out if a flow needs to be run
@@ -166,11 +164,11 @@ def check_required_fields(base_prompt: str, text: str) -> None:
 
 
 async def create_and_run_dynamic_flow(
-    ids: List[str],
-    text: str,
-    headers: Dict[str, str],
-    app: Optional[str],
-    bot_id: str,
+        ids: List[str],
+        text: str,
+        headers: Dict[str, str],
+        app: Optional[str],
+        bot_id: str,
 ) -> ResponseDict:
     _flow = create_dynamic_flow_from_operation_ids(operation_ids=ids, bot_id=bot_id)
     output = await run_flow(

@@ -1,16 +1,17 @@
 import os
 from typing import List, Dict
-from langchain.vectorstores.base import VectorStore
+
+from langchain.docstore.document import Document
+from qdrant_client import QdrantClient, models
+
 from routes.workflow.utils.document_similarity_dto import DocumentSimilarityDTO
 from shared.utils.opencopilot_utils import StoreOptions
+from shared.utils.opencopilot_utils.get_embeddings import get_embeddings
 from shared.utils.opencopilot_utils.get_vector_store import get_vector_store
 from utils.chat_models import CHAT_MODELS
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
 from utils.llm_consts import vs_thresholds, VectorCollections
-from qdrant_client import QdrantClient, models
-from langchain.docstore.document import Document
-from shared.utils.opencopilot_utils.get_embeddings import get_embeddings
 
 client = QdrantClient(url=os.getenv("QDRANT_URL", "http://qdrant:6333"))
 logger = CustomLogger(module_name=__name__)
@@ -31,7 +32,7 @@ score_thresholds: Dict[str, float] = {
 
 
 async def get_relevant_documents(
-    text: str, bot_id: str, collection_name: str
+        text: str, bot_id: str, collection_name: str
 ) -> List[DocumentSimilarityDTO]:
     try:
         embedding = get_embeddings()
@@ -93,6 +94,6 @@ async def get_relevant_flows(text: str, bot_id: str) -> List[DocumentSimilarityD
 
 
 async def get_relevant_knowledgebase(
-    text: str, bot_id: str
+        text: str, bot_id: str
 ) -> List[DocumentSimilarityDTO]:
     return await get_relevant_documents(text, bot_id, VectorCollections.knowledgebase)
