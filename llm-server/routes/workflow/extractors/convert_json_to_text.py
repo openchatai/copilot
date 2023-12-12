@@ -20,18 +20,7 @@ def convert_json_to_text(
     summary_prompt: str,
 ) -> str:
     chat = get_chat_model()
-
-    api_summarizer_template = None
-    system_message = SystemMessage(
-        content="You are an ai assistant that can summarize api responses"
-    )
-    prompt_templates = load_prompts(bot_id)
-    api_summarizer_template = (
-        prompt_templates.api_summarizer if prompt_templates else None
-    )
-
-    if api_summarizer_template is not None:
-        system_message = SystemMessage(content=api_summarizer_template)
+    system_message = SystemMessage(content=summary_prompt)
 
     messages = [
         system_message,
