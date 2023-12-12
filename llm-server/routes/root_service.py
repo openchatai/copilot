@@ -55,10 +55,6 @@ async def handle_request(
         app: Optional[str],
 ) -> ResponseDict:
     check_required_fields(base_prompt, text)
-    knowledgebase: List[DocumentSimilarityDTO] = []
-    actions: List[DocumentSimilarityDTO] = []
-    flows: List[DocumentSimilarityDTO] = []
-    conversations_history: List[BaseMessage] = []
 
     tasks = [
         get_relevant_knowledgebase(text, bot_id),
@@ -78,12 +74,10 @@ async def handle_request(
         top_documents=top_documents
     )
 
-    logger.info("cool", payload=next_step)
     if next_step.get('type') is UserMessageResponseType.actionable:
         # get the single highest actionable item (could be an action or a flow) - hope we are lucky, and we can get the right one XD
         actionable_item = select_top_documents(actions + flows,
                                                [VectorCollections.actions, VectorCollections.actions])
-
         # now run it
         response = await run_actionable_item(
             bot_id=bot_id,
@@ -96,7 +90,7 @@ async def handle_request(
         return response
         pass
     else:
-        # get the highest similarly knowledgeable item
+        # @todo get the highest similarly knowledgeable item
         # put it into the context
         # ask the llm
         pass
@@ -119,7 +113,6 @@ async def run_actionable_item(
         app: Optional[str],
         bot_id: str,
 ) -> ResponseDict:
-    logger.info("cool", payload=actionable_item.get(VectorCollections.actions))
     if actionable_item.get(VectorCollections.actions):
         document_similarity_dto = actionable_item.get(VectorCollections.actions)[0]
         vector_action = document_similarity_dto.document  # this variable now holds Qdrant vector document, which is the Action metadata
