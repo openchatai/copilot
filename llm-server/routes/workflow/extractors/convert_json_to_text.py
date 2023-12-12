@@ -11,7 +11,7 @@ from utils.get_logger import CustomLogger
 openai_api_key = os.getenv("OPENAI_API_KEY")
 logger = CustomLogger(module_name=__name__)
 
-chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
+chat = get_chat_model()
 
 
 def convert_json_to_text(
