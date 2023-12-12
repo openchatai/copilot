@@ -4,7 +4,7 @@ from typing import Dict, Optional, List
 
 from langchain.schema import BaseMessage
 
-from models.repository.action_repo import list_all_operation_ids_by_bot_id
+from entities.flow_entity import FlowDTO
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from routes.workflow.typings.response_dict import ResponseDict
 from routes.workflow.typings.run_workflow_input import ChatContext
@@ -21,11 +21,11 @@ from routes.workflow.utils.document_similarity_dto import (
     select_top_documents,
     DocumentSimilarityDTO,
 )
-from routes.workflow.utils.process_conversation_step import process_conversation_step
+from routes.workflow.utils.process_conversation_step import get_next_response_type
 from utils.db import Database
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
-from utils.llm_consts import VectorCollections
+from utils.llm_consts import VectorCollections, UserMessageResponseType
 
 logger = CustomLogger(module_name=__name__)
 
@@ -45,29 +45,6 @@ FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
 chat = get_chat_model()
 
 
-def validate_steps(steps: List[str], bot_id: str):
-    try:
-        operation_ids = list_all_operation_ids_by_bot_id(bot_id)
-
-        if not operation_ids:
-            logger.warn("No operation_ids found in the Swagger document.")
-            return False
-
-        if all(x in operation_ids for x in steps):
-            return True
-        else:
-            logger.warn(
-                "Model has hallucinated, made up operation id",
-                steps=steps,
-                operationIds=operation_ids,
-            )
-            return False
-
-    except Exception as e:
-        logger.error(f"An error occurred: {str(e)}")
-        return False
-
-
 async def handle_request(
         text: str,
         session_id: str,
@@ -76,7 +53,6 @@ async def handle_request(
         headers: Dict[str, str],
         app: Optional[str],
 ) -> ResponseDict:
-    log_user_request(text)
     check_required_fields(base_prompt, text)
     knowledgebase: List[DocumentSimilarityDTO] = []
     actions: List[DocumentSimilarityDTO] = []
@@ -94,60 +70,36 @@ async def handle_request(
         knowledgebase, actions, flows, conversations_history = results
         top_documents = select_top_documents(actions + flows + knowledgebase)
 
-        step = process_conversation_step(
+        next_step = get_next_response_type(
             user_message=text,
-            knowledgebase=top_documents[VectorCollections.knowledgebase],
             session_id=session_id,
-            actions=top_documents[VectorCollections.knowledgebase],
             chat_history=conversations_history,
-            flows=top_documents[VectorCollections.flows],
-            base_prompt=base_prompt,
+            top_documents=top_documents
         )
 
-        if step.missing_information is not None and len(step.missing_information) >= 10:
-            return {"error": None, "response": step.bot_message + "\n" + step.missing_information}
+        if next_step.get('type') is UserMessageResponseType.actionable:
+            # get the single highest actionable item (could be an action or a flow) - hope we are lucky, and we can get the right one XD
+            actionable_item = select_top_documents(actions + flows,
+                                                   [VectorCollections.actions, VectorCollections.actions])
 
-        if len(step.ids) > 0:
-            if validate_steps(step.ids, bot_id) is False:
-                return {"error": None, "response": step.bot_message}
-
-            response = await create_and_run_dynamic_flow(
-                ids=step.ids,
-                app=app,
+            # now run it
+            response = await run_actionable_item(
                 bot_id=bot_id,
+                actionable_item=actionable_item,
+                base_prompt=base_prompt,
+                app=app,
                 headers=headers,
                 text=text,
             )
-
-            logger.info(
-                "chatbot response",
-                response=response,
-                method="handle_request",
-                apis=actions,
-                prev_conversations=conversations_history,
-                context=knowledgebase,
-                flows=flows,
-            )
             return response
+            pass
         else:
-            return {"error": None, "response": step.bot_message}
-    except Exception as e:
-        logger.error(
-            "chatbot response",
-            error=str(e),
-            method="handle_request",
-            prev_conversations=conversations_history,
-        )
+            # get the highest similarly knowledgeable item
+            # put it into the context
+            # ask the llm
+            pass
 
-        return {"response": str(e), "error": "An error occured in handle request"}
-
-
-def log_user_request(text: str) -> None:
-    logger.info(
-        "[OpenCopilot] Got the following user request: {}".format(text),
-        incident="log_user_request",
-        method="log_user_request",
-    )
+        return None
 
 
 def check_required_fields(base_prompt: str, text: str) -> None:
@@ -159,13 +111,26 @@ def check_required_fields(base_prompt: str, text: str) -> None:
             raise Exception(error_msg)
 
 
-async def create_and_run_dynamic_flow(
+async def run_actionable_item(
+        actionable_item: DocumentSimilarityDTO,
+        base_prompt: str,
         ids: List[str],
         text: str,
         headers: Dict[str, str],
         app: Optional[str],
         bot_id: str,
 ) -> ResponseDict:
+
+    if actionable_item.type is VectorCollections.actions:
+        # we can't run stand-alone actions, so build a flow with single action and run it
+        action = None
+        flow = None
+        pass
+    else:
+        # then it's a flow already, so just fetch the DTO and run it.
+        flow = None
+        pass
+
     _flow = create_dynamic_flow_from_operation_ids(operation_ids=ids, bot_id=bot_id)
     output = await run_flow(
         flow=_flow,
@@ -174,8 +139,7 @@ async def create_and_run_dynamic_flow(
         bot_id=bot_id,
     )
 
+
+    # now take the output, put it into a chat message with the base prompt and ask the llm to present it
     return output
 
-
-def handle_no_api_call(bot_message: str) -> ResponseDict:
-    return {"response": bot_message, "error": ""}
