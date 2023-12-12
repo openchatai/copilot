@@ -1,11 +1,11 @@
 import datetime
 import uuid
-from typing import Iterable, List, Optional, Any, Type
+from typing import Iterable, List, Optional, Any
 
-from shared.models.opencopilot_db.chatbot import Chatbot, engine
 from sqlalchemy import exc
 from sqlalchemy.orm import sessionmaker, Session
 
+from shared.models.opencopilot_db.chatbot import Chatbot, engine
 from utils.base import generate_random_token
 from utils.get_logger import CustomLogger
 
@@ -47,6 +47,7 @@ def list_all_with_filter(filter_criteria: Optional[Any] = None) -> List[Chatbot]
     finally:
         session.close()
 
+
 def get_total_chatbots() -> int:
     session: Session = SessionLocal()
     try:
@@ -56,8 +57,8 @@ def get_total_chatbots() -> int:
         raise e
     finally:
         session.close()
-        
-        
+
+
 def get_chatbots_batch(offset: int, batch_size: int) -> Iterable[Chatbot]:
     session: Session = SessionLocal()
     try:
@@ -67,7 +68,8 @@ def get_chatbots_batch(offset: int, batch_size: int) -> Iterable[Chatbot]:
         raise e
     finally:
         session.close()
-        
+
+
 def find_or_fail_by_bot_id(bot_id: bytes) -> Optional[Chatbot]:
     session: Session = SessionLocal()
     try:
@@ -82,12 +84,12 @@ def find_or_fail_by_bot_id(bot_id: bytes) -> Optional[Chatbot]:
 
 
 def create_copilot(
-    name: str,
-    prompt_message: str,
-    swagger_url: str,
-    enhanced_privacy: bool = False,
-    smart_sync: bool = False,
-    website: Optional[str] = None,
+        name: str,
+        prompt_message: str,
+        swagger_url: str,
+        enhanced_privacy: bool = False,
+        smart_sync: bool = False,
+        website: Optional[str] = None,
 ):
     """
     Creates a new Chatbot instance and adds it to the database.
@@ -215,13 +217,13 @@ def chatbot_to_dict(chatbot: Chatbot):
 
 
 def update_copilot(
-    copilot_id: str,
-    name: Optional[str] = None,
-    prompt_message: Optional[str] = None,
-    swagger_url: Optional[str] = None,
-    enhanced_privacy: Optional[bool] = None,
-    smart_sync: Optional[bool] = None,
-    website: Optional[str] = None,
+        copilot_id: str,
+        name: Optional[str] = None,
+        prompt_message: Optional[str] = None,
+        swagger_url: Optional[str] = None,
+        enhanced_privacy: Optional[bool] = None,
+        smart_sync: Optional[bool] = None,
+        website: Optional[str] = None,
 ) -> dict[str, Any]:
     """
     Updates an existing Chatbot instance in the database.

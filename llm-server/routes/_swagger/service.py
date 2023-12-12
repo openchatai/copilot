@@ -20,7 +20,7 @@ logger = CustomLogger(module_name=__name__)
 
 
 def save_swaggerfile_to_mongo(
-    filename: str, bot_id: str, swagger_doc: ResolvingParser
+        filename: str, bot_id: str, swagger_doc: ResolvingParser
 ) -> bool:
     spec = swagger_doc.specification
     spec["meta"] = {"bot_id": bot_id, "swagger_url": filename}
@@ -36,18 +36,18 @@ def save_swagger_paths_to_qdrant(swagger_doc: ResolvingParser, bot_id: str):
         # delete documents with metadata in api with the current bot id, before reingesting
         documents: List[Document] = []
         paths = swagger_doc.specification.get("paths", {})
-        
+
         for path, operations in paths.items():
             for method, operation in operations.items():
                 try:
                     operation["method"] = method
                     operation["path"] = path
                     del operation["responses"]
-                    
+
                     # Check if "summary" key is present before accessing it
                     summary = operation.get('summary', '')
                     description = operation.get('description', '')
-                    
+
                     document = Document(
                         page_content=f"{summary}; {description}"
                     )
@@ -77,6 +77,7 @@ def save_swagger_paths_to_qdrant(swagger_doc: ResolvingParser, bot_id: str):
         # Handle other exceptions
         logger.error(f"An error occurred: {e}")
 
+
 def add_swagger_file(request: Request, id: str) -> Dict[str, str]:
     if request.content_type == "application/json":
         # JSON file
@@ -95,7 +96,7 @@ def add_swagger_file(request: Request, id: str) -> Dict[str, str]:
                 return {"error": "Invalid JSON format in uploaded file"}
 
         elif file.filename and (
-            file.filename.endswith(".yaml") or file.filename.endswith(".yml")
+                file.filename.endswith(".yaml") or file.filename.endswith(".yml")
         ):
             try:
                 file_content = yaml.safe_load(file)
