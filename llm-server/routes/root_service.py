@@ -81,7 +81,7 @@ async def handle_request(
     knowledgebase: List[DocumentSimilarityDTO] = []
     actions: List[DocumentSimilarityDTO] = []
     flows: List[DocumentSimilarityDTO] = []
-    prev_conversations: List[BaseMessage] = []
+    conversations_history: List[BaseMessage] = []
     try:
         tasks = [
             get_relevant_knowledgebase(text, bot_id),
@@ -91,7 +91,7 @@ async def handle_request(
         ]
 
         results = await asyncio.gather(*tasks)
-        knowledgebase, actions, flows, prev_conversations = results
+        knowledgebase, actions, flows, conversations_history = results
         top_documents = select_top_documents(actions + flows + knowledgebase)
 
         """
@@ -102,7 +102,7 @@ async def handle_request(
             knowledgebase=top_documents[VectorCollections.knowledgebase],
             session_id=session_id,
             actions=top_documents[VectorCollections.knowledgebase],
-            prev_conversations=prev_conversations,
+            prev_conversations=conversations_history,
             flows=top_documents[VectorCollections.flows],
             base_prompt=base_prompt,
         )
@@ -127,7 +127,7 @@ async def handle_request(
                 response=response,
                 method="handle_request",
                 apis=actions,
-                prev_conversations=prev_conversations,
+                prev_conversations=conversations_history,
                 context=knowledgebase,
                 flows=flows,
             )
@@ -139,7 +139,7 @@ async def handle_request(
             "chatbot response",
             error=str(e),
             method="handle_request",
-            prev_conversations=prev_conversations,
+            prev_conversations=conversations_history,
         )
 
         return {"response": str(e), "error": "An error occured in handle request"}

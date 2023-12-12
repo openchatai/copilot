@@ -4,9 +4,7 @@ from langchain.schema import HumanMessage, SystemMessage, BaseMessage
 from langchain.schema import OutputParserException
 from custom_types.bot_message import parse_bot_message, BotMessage
 from routes.workflow.utils.document_similarity_dto import DocumentSimilarityDTO
-from utils.chat_models import CHAT_MODELS
 
-# push it to the library
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
 
@@ -118,5 +116,5 @@ def process_conversation_step(
         logger.warn("Failed to parse json", data=content, err=str(e))
         return BotMessage(bot_message=content, ids=[], missing_information=None)
     except Exception as e:
-        logger.warn("unexpected error occured", err=str(e))
+        logger.warn("unexpected error occurred", err=str(e))
         return BotMessage(ids=[], bot_message=str(e), missing_information=None)

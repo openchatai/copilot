@@ -1,11 +1,11 @@
 import os
-import logging
+from typing import Dict, Any, cast
+
 from langchain.schema import HumanMessage, SystemMessage
 
 from integrations.custom_prompts.prompt_loader import load_prompts
-from typing import Optional, Dict, Any, cast
-from utils.get_chat_model import get_chat_model
 from utils.chat_models import CHAT_MODELS
+from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -13,11 +13,12 @@ logger = CustomLogger(module_name=__name__)
 
 chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
+
 def convert_json_to_text(
-    user_input: str,
-    api_response: Dict[str, Any],
-    api_request_data: Dict[str, Any],
-    bot_id: str,
+        user_input: str,
+        api_response: Dict[str, Any],
+        api_request_data: Dict[str, Any],
+        bot_id: str,
 ) -> str:
     chat = get_chat_model()
 
@@ -41,10 +42,7 @@ def convert_json_to_text(
         HumanMessage(content=user_input),
         HumanMessage(
             content="Here is the response from the apis: {}".format(api_response)
-        ),
-        # HumanMessage(
-        #     content="Here is the api_request_data: {}".format(api_request_data)
-        # ),
+        )
     ]
 
     result = chat(messages)
