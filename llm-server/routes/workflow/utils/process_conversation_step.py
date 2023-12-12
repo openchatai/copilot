@@ -33,12 +33,6 @@ def process_conversation_step(
     flows: List[DocumentSimilarityDTO],
     base_prompt: str,
 ):
-    # max (flows, actions, knowledge)
-    # if max == flows -> execute static flow
-    # if max == actions -> then execute action
-    # if max == knowledge -> fetch
-    # if max < 70 -> normal LLM reply or dynamic flow?
-
     logger.info(
         "planner data",
         context=knowledgebase,
@@ -62,14 +56,14 @@ def process_conversation_step(
     if len(knowledgebase) > 0 and len(actions) > 0 and len(flows) > 0:
         messages.append(
             HumanMessage(  # todo revisit this area
-                content=f"Here is some relevant context I found that might be helpful - ```{knowledgebase}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{dumps(actions)}```. I also found some api flows, that maybe able to answer the following question ```{dumps(flows)}```. If one of the flows can accurately answer the question, then set `id` in the response should be the ids defined in the flows. Flows should take precedence over the api_summaries"
+                content=f"Here is some relevant context I found that might be helpful - ```{knowledgebase}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{actions}```. I also found some api flows, that maybe able to answer the following question ```{flows}```. If one of the flows can accurately answer the question, then set `id` in the response should be the ids defined in the flows. Flows should take precedence over the api_summaries"
             )
         )
 
     elif len(knowledgebase) > 0 and len(actions) > 0:
         messages.append(
             HumanMessage(
-                content=f"Here is some relevant context I found that might be helpful - ```{knowledgebase}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{dumps(actions)}```. "
+                content=f"Here is some relevant context I found that might be helpful - ```{knowledgebase}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{actions}```. "
             )
         )
     elif len(knowledgebase) > 0:
@@ -81,7 +75,7 @@ def process_conversation_step(
     elif len(actions) > 0:
         messages.append(
             HumanMessage(
-                content=f"I found API summaries that might be helpful in answering the question. Here are the api summaries: ```{dumps(actions)}```. "
+                content=f"I found API summaries that might be helpful in answering the question. Here are the api summaries: ```{actions}```. "
             )
         )
     else:
