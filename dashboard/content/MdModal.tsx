@@ -1,20 +1,47 @@
 'use client';
+import { Button } from "@/components/ui/button";
 import { MdContentType } from "./getContent";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import ReactMarkdown from "react-markdown";
-import { usePathname } from "next/navigation";
+import { Wizard, useWizard } from "react-use-wizard";
+
+function Footer() {
+    const { activeStep, isFirstStep, isLastStep, nextStep, previousStep } = useWizard();
+    function handleCloseDialog() { }
+
+    return <DialogFooter className="p-4 space-x-4">
+        {
+            !isFirstStep && <Button onClick={previousStep} variant='outline'>Back</Button>
+        }
+        {
+            !isLastStep && <Button onClick={nextStep}>Next</Button>
+        }
+        {
+            isLastStep && <Button onClick={handleCloseDialog} className='max-w-[50%] w-full mx-auto'>Finish</Button>
+        }
+    </DialogFooter>
+}
 
 export default function MdModal({ content }: { content: MdContentType[] }) {
-    const pathname = usePathname();
-    const page = content.find((page) => page.attributes.pathname === pathname);
-    if (!page) return null;
+    const pages = content.reverse()
+    if (!pages) return null
 
     return <Dialog defaultOpen>
-        <DialogContent className="outline-none">
-            <DialogHeader>
-                <DialogTitle className="text-center text-xl">{page.attributes.name}</DialogTitle>
-            </DialogHeader>
-            <ReactMarkdown className="prose prose-base">{page.body}</ReactMarkdown>
+        <DialogContent className="outline-none p-0 bg-accent overflow-hidden">
+            <Wizard footer={<Footer />}>
+                {
+                    pages.map((page, i) => {
+                        return <div key={i} className="animate-in fade-in slide-in-from-right-5">
+                            <DialogHeader className="p-6 border-b">
+                                <DialogTitle className="text-center">{page.attributes.title}</DialogTitle>
+                            </DialogHeader>
+                            <div className="flex-grow overflow-auto p-4">
+                                <ReactMarkdown className='prose prose-sm prose-slate text-accent-foreground'>{page.body}</ReactMarkdown>
+                            </div>
+                        </div>
+                    })
+                }
+            </Wizard>
         </DialogContent>
     </Dialog>
 }
