@@ -24,7 +24,7 @@ def convert_json_to_text(
 
     api_summarizer_template = None
     system_message = SystemMessage(
-        content="You are an ai assistant that can summarize api responses"
+        content="You are an ai assistant that can summarize api responses, include references and links if available"
     )
     prompt_templates = load_prompts(bot_id)
     api_summarizer_template = (
