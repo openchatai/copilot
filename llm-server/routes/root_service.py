@@ -22,7 +22,6 @@ from routes.workflow.utils.document_similarity_dto import (
     DocumentSimilarityDTO,
 )
 from routes.workflow.utils.process_conversation_step import process_conversation_step
-from utils.chat_models import CHAT_MODELS
 from utils.db import Database
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
