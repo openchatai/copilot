@@ -23,19 +23,18 @@ def upgrade():
         .execute(sa.text("SHOW COLUMNS FROM chatbots LIKE 'summary_prompt'"))
         .fetchone()
     ):
-        op.add_column(
-            "chatbots",
-            sa.Column(
-                "summary_prompt",
-                sa.Text(),
-                nullable=False,
-                server_default=(
-                    "Given a JSON response, summarize the key information in a concise manner. "
-                    "Include relevant details, references, and links if present. "
-                    "Format the summary in Markdown for clarity and readability."
-                ),
-            ),
-        )
+        op.add_column("chatbots", sa.Column("summary_prompt", sa.Text(), nullable=True))
+
+    op.execute(
+        """
+        UPDATE chatbots
+        SET summary_prompt = "Given a JSON response, summarize the key information in a concise manner. Include relevant details, references, and links if present. Format the summary in Markdown for clarity and readability."
+        """
+    )
+
+    op.alter_column(
+        "chatbots", "summary_prompt", existing_type=sa.TEXT(), nullable=False
+    )
 
 
 def downgrade():
