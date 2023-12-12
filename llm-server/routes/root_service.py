@@ -4,8 +4,6 @@ from typing import Dict, Optional, List
 
 from langchain.schema import BaseMessage
 
-from custom_types.api_operation import ActionOperation_vs
-from entities.flow_entity import FlowDTO
 from models.repository.action_repo import list_all_operation_ids_by_bot_id
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from routes.workflow.typings.response_dict import ResponseDict
@@ -16,14 +14,19 @@ from routes.workflow.utils import (
 )
 from routes.workflow.utils.api_retrievers import (
     get_relevant_actions,
-    get_relevant_docs,
+    get_relevant_knowledgebase,
     get_relevant_flows,
+)
+from routes.workflow.utils.document_similarity_dto import (
+    select_top_documents,
+    DocumentSimilarityDTO,
 )
 from routes.workflow.utils.process_conversation_step import process_conversation_step
 from utils.chat_models import CHAT_MODELS
 from utils.db import Database
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
+from utils.llm_consts import VectorCollections
 
 logger = CustomLogger(module_name=__name__)
 
@@ -54,7 +57,11 @@ def validate_steps(steps: List[str], bot_id: str):
         if all(x in operation_ids for x in steps):
             return True
         else:
-            logger.warn("Model has hallucinated, made up operation id", steps=steps, operationIds=operation_ids)
+            logger.warn(
+                "Model has hallucinated, made up operation id",
+                steps=steps,
+                operationIds=operation_ids,
+            )
             return False
 
     except Exception as e:
@@ -72,41 +79,39 @@ async def handle_request(
 ) -> ResponseDict:
     log_user_request(text)
     check_required_fields(base_prompt, text)
-    context: str = ""
-    apis: List[ActionOperation_vs] = []
-    flows: List[FlowDTO] = []
+    knowledgebase: List[DocumentSimilarityDTO] = []
+    actions: List[DocumentSimilarityDTO] = []
+    flows: List[DocumentSimilarityDTO] = []
     prev_conversations: List[BaseMessage] = []
     try:
         tasks = [
-            get_relevant_docs(text, bot_id),
+            get_relevant_knowledgebase(text, bot_id),
             get_relevant_actions(text, bot_id),
             get_relevant_flows(text, bot_id),
             get_chat_message_as_llm_conversation(session_id),
         ]
 
         results = await asyncio.gather(*tasks)
-        context, apis, flows, prev_conversations = results
+        knowledgebase, actions, flows, prev_conversations = results
+        top_documents = select_top_documents(actions + flows + knowledgebase)
+
         """
         also provide a list of flows here itself, the llm should be able to figure out if a flow needs to be run
         """
         step = process_conversation_step(
             user_message=text,
-            context=context,
+            knowledgebase=top_documents[VectorCollections.knowledgebase],
             session_id=session_id,
-            api_summaries=apis,
+            actions=top_documents[VectorCollections.knowledgebase],
             prev_conversations=prev_conversations,
-            flows=flows,
-            base_prompt=base_prompt
+            flows=top_documents[VectorCollections.flows],
+            base_prompt=base_prompt,
         )
 
         if step.missing_information is not None and len(step.missing_information) >= 10:
-            return {
-                "error": None,
-                "response": step.missing_information
-            }
+            return {"error": None, "response": step.missing_information}
 
         if len(step.ids) > 0:
-
             if validate_steps(step.ids, bot_id) is False:
                 return {"error": None, "response": step.bot_message}
 
@@ -122,9 +127,9 @@ async def handle_request(
                 "chatbot response",
                 response=response,
                 method="handle_request",
-                apis=apis,
+                apis=actions,
                 prev_conversations=prev_conversations,
-                context=context,
+                context=knowledgebase,
                 flows=flows,
             )
             return response
@@ -149,9 +154,7 @@ def log_user_request(text: str) -> None:
     )
 
 
-def check_required_fields(
-        base_prompt: str, text: str
-) -> None:
+def check_required_fields(base_prompt: str, text: str) -> None:
     for required_field, error_msg in [
         ("base_prompt", BASE_PROMPT_REQUIRED),
         ("text", TEXT_REQUIRED),

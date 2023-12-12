@@ -8,13 +8,19 @@ X_App_Name = "X-App-Name"
 
 
 class VsThresholds(TypedDict):
-    api_score_threshold: float
+    actions_score_threshold: float
     flows_score_threshold: float
     kb_score_threshold: float
 
 
 vs_thresholds: VsThresholds = {
-    "api_score_threshold": float(os.getenv("API_SCORE_THRESHOLD", "0.75")),
+    "actions_score_threshold": float(os.getenv("ACTIONS_SCORE_THRESHOLD", "0.75")),
     "flows_score_threshold": float(os.getenv("FLOWS_SCORE_THRESHOLD", "0.75")),
-    "kb_score_threshold": float(os.getenv("KB_SCORE_THRESHOLD", "0.75"))
+    "kb_score_threshold": float(os.getenv("KB_SCORE_THRESHOLD", "0.55")),
 }
+
+
+class VectorCollections:
+    flows = "flows"
+    actions = "actions"
+    knowledgebase = "knowledgebase"

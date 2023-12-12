@@ -1,108 +1,99 @@
-from typing import Optional, List
+import os
+from typing import List, Dict
 
-from langchain.vectorstores.base import VectorStore
+from langchain.docstore.document import Document
+from qdrant_client import QdrantClient, models
 
-from custom_types.api_operation import ActionOperation_vs
-from entities.flow_entity import PartialFlowDTO
+from routes.workflow.utils.document_similarity_dto import DocumentSimilarityDTO
 from shared.utils.opencopilot_utils import StoreOptions
+from shared.utils.opencopilot_utils.get_embeddings import get_embeddings
 from shared.utils.opencopilot_utils.get_vector_store import get_vector_store
 from utils.chat_models import CHAT_MODELS
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
-from utils.llm_consts import vs_thresholds
+from utils.llm_consts import vs_thresholds, VectorCollections
 
+client = QdrantClient(url=os.getenv("QDRANT_URL", "http://qdrant:6333"))
 logger = CustomLogger(module_name=__name__)
 chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
 
-knowledgebase: VectorStore = get_vector_store(StoreOptions("knowledgebase"))
-flows: VectorStore = get_vector_store(StoreOptions("flows"))
-apis: VectorStore = get_vector_store(StoreOptions("actions"))
+stores = {
+    "knowledgebase": get_vector_store(StoreOptions("knowledgebase")),
+    "flows": get_vector_store(StoreOptions("flows")),
+    "actions": get_vector_store(StoreOptions("actions")),
+}
+
+# Define score thresholds for each collection
+score_thresholds: Dict[str, float] = {
+    "knowledgebase": vs_thresholds.get("kb_score_threshold"),
+    "flows": vs_thresholds.get("flows_score_threshold"),
+    "actions": vs_thresholds.get("actions_score_threshold"),
+}
 
 
-async def get_relevant_docs(text: str, bot_id: str) -> Optional[str]:
+async def get_relevant_documents(
+        text: str, bot_id: str, collection_name: str
+) -> List[DocumentSimilarityDTO]:
     try:
-        kb_retriever = knowledgebase.as_retriever(
-            search_kwargs={
-                "k": 3,
-                "score_threshold": vs_thresholds.get("kb_score_threshold"),
-                "filter": {"bot_id": bot_id},
-            },
+        embedding = get_embeddings()
+        query_vector = embedding.embed_query(text)
+
+        query_response = client.search(
+            collection_name=collection_name,
+            query_filter=models.Filter(
+                must=[
+                    models.FieldCondition(
+                        key="metadata.bot_id",
+                        match=models.MatchValue(value=bot_id),
+                    )
+                ]
+            ),
+            query_vector=query_vector,
+            with_payload=True,
+            limit=4,
+            search_params=models.SearchParams(hnsw_ef=128, exact=False),
+            score_threshold=score_thresholds.get(collection_name, 0.0),
         )
 
-        result = kb_retriever.get_relevant_documents(text)
+        documents_with_similarity: List[DocumentSimilarityDTO] = []
+        for response in query_response:
+            payload = response.payload
 
-        if result and len(result) > 0:
-            # Assuming result is a list of objects and each object has a page_content attribute
-            all_page_content = "\n\n".join([item.page_content for item in result])
+            if not payload:
+                continue
 
-            return all_page_content
-
-        return None
-
-    except Exception as e:
-        logger.error(
-            "Error occurred while getting relevant docs",
-            incident="get_relevant_docs",
-            payload=text,
-            error=str(e),
-        )
-        return None
-
-
-async def get_relevant_flows(text: str, bot_id: str) -> List[PartialFlowDTO]:
-    try:
-
-        flow_retriever = flows.as_retriever(
-            search_kwargs={
-                "k": 3,
-                "score_threshold": vs_thresholds.get("flows_score_threshold"),
-                "filter": {"bot_id": bot_id},
-            },
-        )
-
-        results = flow_retriever.get_relevant_documents(text)
-
-        resp: List[PartialFlowDTO] = []
-        for result in results:
-            resp.append(PartialFlowDTO(bot_id=result.metadata.get('bot_id'), id=result.metadata.get('flow_id')))
-
-        return resp
-
-    except Exception as e:
-        logger.error(
-            "Error occurred while getting relevant docs",
-            incident="get_relevant_docs",
-            payload=text,
-            error=str(e),
-        )
-        return []
-
-
-async def get_relevant_actions(text: str, bot_id: str) -> List[ActionOperation_vs]:
-    try:
-        apis_retriever = apis.as_retriever(
-            search_kwargs={
-                "k": 3,
-                "score_threshold": vs_thresholds.get("api_score_threshold"),
-                "filter": {"bot_id": bot_id},
-            },
-        )
-
-        results = apis_retriever.get_relevant_documents(text)
-
-        resp: List[ActionOperation_vs] = []
-        for result in results:
-            resp.append(
-                result.metadata
+            documents_with_similarity.append(
+                DocumentSimilarityDTO(
+                    score=response.score,
+                    type=collection_name,
+                    document=Document(
+                        page_content=payload.get("page_content", ""),
+                        metadata=payload.get("metadata", {}),
+                    ),
+                )
             )
 
-        return resp
+        return documents_with_similarity
 
     except Exception as e:
         logger.error(
-            "Error occurred while getting relevant API summaries",
-            incident="get_relevant_apis_summaries",
+            f"Error occurred while getting relevant {collection_name} summaries",
+            incident=f"get_relevant_{collection_name}",
             payload=text,
             error=str(e),
         )
         return []
+
+
+async def get_relevant_actions(text: str, bot_id: str) -> List[DocumentSimilarityDTO]:
+    return await get_relevant_documents(text, bot_id, VectorCollections.actions)
+
+
+async def get_relevant_flows(text: str, bot_id: str) -> List[DocumentSimilarityDTO]:
+    return await get_relevant_documents(text, bot_id, VectorCollections.flows)
+
+
+async def get_relevant_knowledgebase(
+        text: str, bot_id: str
+) -> List[DocumentSimilarityDTO]:
+    return await get_relevant_documents(text, bot_id, VectorCollections.knowledgebase)
