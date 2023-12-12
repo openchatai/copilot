@@ -6,6 +6,7 @@ from langchain.schema import BaseMessage
 
 from entities.flow_entity import FlowDTO
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
+from models.repository.flow_repo import get_flow_by_id
 from routes.workflow.typings.response_dict import ResponseDict
 from routes.workflow.typings.run_workflow_input import ChatContext
 from routes.workflow.utils import (
@@ -53,7 +54,6 @@ async def handle_request(
         headers: Dict[str, str],
         app: Optional[str],
 ) -> ResponseDict:
-
     check_required_fields(base_prompt, text)
     knowledgebase: List[DocumentSimilarityDTO] = []
     actions: List[DocumentSimilarityDTO] = []
@@ -112,25 +112,29 @@ def check_required_fields(base_prompt: str, text: str) -> None:
 
 
 async def run_actionable_item(
-        actionable_item: DocumentSimilarityDTO,
+        actionable_item: dict[str, List[DocumentSimilarityDTO]],
         base_prompt: str,
-        ids: List[str],
         text: str,
         headers: Dict[str, str],
         app: Optional[str],
         bot_id: str,
 ) -> ResponseDict:
-    if actionable_item.type is VectorCollections.actions:
-        # we can't run stand-alone actions, so build a flow with single action and run it
-        action = None
-        flow = None
-        pass
-    else:
-        # then it's a flow already, so just fetch the DTO and run it.
-        flow = None
-        pass
+    logger.info("cool", payload=actionable_item.get(VectorCollections.actions))
+    if actionable_item.get(VectorCollections.actions):
+        document_similarity_dto = actionable_item.get(VectorCollections.actions)[0]
+        vector_action = document_similarity_dto.document  # this variable now holds Qdrant vector document, which is the Action metadata
 
-    _flow = create_dynamic_flow_from_operation_ids(operation_ids=ids, bot_id=bot_id)
+        # @todo operation_id is not unique, that is not quite right - use action ID instead
+        _flow = create_dynamic_flow_from_operation_ids(operation_ids=[vector_action.metadata.get('operation_id')],
+                                                       bot_id=bot_id)
+    else:
+        document_similarity_dto = actionable_item.get(VectorCollections.flows)[0]
+        flow_action = document_similarity_dto.document  # this variable now holds Qdrant vector document, which is the Action metadata
+        flow_id = flow_action.metadata.get('flow_id')
+        flow_model = get_flow_by_id(flow_id)
+        _flow = FlowDTO()
+        # todo convert the flow model to flowDTO
+
     output = await run_flow(
         flow=_flow,
         chat_context=ChatContext(text, headers, app),
@@ -138,5 +142,5 @@ async def run_actionable_item(
         bot_id=bot_id,
     )
 
-    # now take the output, put it into a chat message with the base prompt and ask the llm to present it
+    # @todo now take the output, put it into a chat message with the base prompt and ask the llm to present it
     return output
