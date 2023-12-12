@@ -15,6 +15,20 @@ class DocumentSimilarityDTO(Serializable):
 def select_top_documents(
         documents: List[DocumentSimilarityDTO],
 ) -> Dict[str, List[DocumentSimilarityDTO]]:
+    """
+    Selects the top documents based on their similarity score and categorizes them. the goal is to minimize the noise
+    and come up with the most relevant documents (action, texts, flows)
+
+    Args:
+        documents (List[DocumentSimilarityDTO]): A list of DocumentSimilarityDTO objects representing the documents.
+
+    Returns:
+        Dict[str, List[DocumentSimilarityDTO]]: A dictionary containing the categorized documents.
+
+    Raises:
+        None
+    """
+
     # Sort the documents by score in descending order
     documents.sort(key=lambda dto: dto.score, reverse=True)
 

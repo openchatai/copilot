@@ -94,9 +94,6 @@ async def handle_request(
         knowledgebase, actions, flows, conversations_history = results
         top_documents = select_top_documents(actions + flows + knowledgebase)
 
-        """
-        also provide a list of flows here itself, the llm should be able to figure out if a flow needs to be run
-        """
         step = process_conversation_step(
             user_message=text,
             knowledgebase=top_documents[VectorCollections.knowledgebase],

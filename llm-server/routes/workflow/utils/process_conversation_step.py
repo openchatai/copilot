@@ -27,20 +27,13 @@ def process_conversation_step(
     flows: List[DocumentSimilarityDTO],
     base_prompt: str,
 ):
-    logger.info(
-        "planner data",
-        context=knowledgebase,
-        api_summaries=actions,
-        prev_conversations=prev_conversations,
-        flows=flows,
-    )
     if not session_id:
         raise ValueError("Session id must be defined for chat conversations")
 
     messages: List[BaseMessage] = [
         SystemMessage(content=base_prompt),
         SystemMessage(
-            content="You will have access to a list of api's and some useful information, called context."
+            content="You will have access to a list of APIs and some useful information, called context."
         ),
     ]
 

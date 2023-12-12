@@ -129,10 +129,7 @@ async def send_chat():
 
     app_name = headers_from_json.pop(X_App_Name, None)
 
-    swagger_url = bot.swagger_url
-
     base_prompt = bot.prompt_message
-    server_base_url = request.form.get("server_base_url", "")
 
     if not bot:
         return (
