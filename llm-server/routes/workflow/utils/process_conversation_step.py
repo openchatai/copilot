@@ -1,4 +1,4 @@
-from typing import List, cast
+from typing import List, cast, Union, Dict, Any
 
 from langchain.schema import HumanMessage, SystemMessage, BaseMessage
 from langchain.schema import OutputParserException
@@ -19,14 +19,33 @@ chat = get_chat_model()
 
 
 def process_conversation_step(
-    session_id: str,
-    user_message: str,
-    knowledgebase: List[DocumentSimilarityDTO],
-    actions: List[DocumentSimilarityDTO],
-    prev_conversations: List[BaseMessage],
-    flows: List[DocumentSimilarityDTO],
-    base_prompt: str,
-):
+        session_id: str,
+        user_message: str,
+        knowledgebase: List[DocumentSimilarityDTO],
+        actions: List[DocumentSimilarityDTO],
+        prev_conversations: List[BaseMessage],
+        flows: List[DocumentSimilarityDTO],
+        base_prompt: str,
+) -> Union[Dict[str, Any], BotMessage]:
+    """
+    Processes a conversation step by generating a response based on the provided inputs.
+
+    Args:
+        session_id (str): The ID of the session for the chat conversation.
+        user_message (str): The message from the user.
+        knowledgebase (List[DocumentSimilarityDTO]): A list of DocumentSimilarityDTO objects representing the knowledgebase documents.
+        actions (List[DocumentSimilarityDTO]): A list of DocumentSimilarityDTO objects representing the API actions.
+        prev_conversations (List[BaseMessage]): A list of previous conversation messages.
+        flows (List[DocumentSimilarityDTO]): A list of DocumentSimilarityDTO objects representing the API flows.
+        base_prompt (str): The base prompt for the conversation.
+
+    Returns:
+        Union[Dict[str, Any], BotMessage]: If the response can be parsed as JSON, returns a dictionary containing the response. Otherwise, returns a BotMessage object.
+
+    Raises:
+        ValueError: If the session ID is not defined.
+    """
+
     if not session_id:
         raise ValueError("Session id must be defined for chat conversations")
 
@@ -42,7 +61,7 @@ def process_conversation_step(
 
     if len(knowledgebase) > 0 and len(actions) > 0 and len(flows) > 0:
         messages.append(
-            HumanMessage(  # todo revisit this area
+            HumanMessage(
                 content=f"Here is some relevant context I found that might be helpful - ```{knowledgebase}```. Also, here is the excerpt from API swagger for the APIs I think might be helpful in answering the question ```{actions}```. I also found some api flows, that maybe able to answer the following question ```{flows}```. If one of the flows can accurately answer the question, then set `id` in the response should be the ids defined in the flows. Flows should take precedence over the api_summaries"
             )
         )
@@ -80,7 +99,7 @@ def process_conversation_step(
         "bot_message": "your response based on the instructions provided at the beginning",
         "missing_information": "Optional Field; Incase of ambiguity ask clarifying questions. You should not worry about the api filters or query, that should be decided by a different agent."
     }                
-    
+
     Don't add operation ids if you can reply by merely looking in the conversation history.
     """
         )
