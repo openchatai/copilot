@@ -31,9 +31,6 @@ def convert_json_to_text(
         HumanMessage(
             content="Here is the response from the apis: {}".format(api_response)
         ),
-        # HumanMessage(
-        #     content="Here is the api_request_data: {}".format(api_request_data)
-        # ),
     ]
 
     result = chat(messages)

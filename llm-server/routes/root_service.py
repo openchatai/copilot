@@ -120,12 +120,6 @@ async def handle_request(
             base_prompt=base_prompt,
         )
 
-        if step.missing_information is not None and len(step.missing_information) >= 10:
-            return {
-                "error": None,
-                "response": step.bot_message + "\n" + step.missing_information,
-            }
-
         if len(step.ids) > 0:
             swagger_doc = get_swagger_doc(swagger_url)
             fl = validate_steps(step.ids, swagger_doc)
