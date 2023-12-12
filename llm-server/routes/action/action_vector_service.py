@@ -38,7 +38,7 @@ def create_actions(actions: List[ActionDTO], bot_id: str):
 def create_action(action: ActionDTO):
     documents: List[Document] = []
 
-    document = Document(page_content=action.description + action.name)
+    document = Document(page_content=action.description + " " + action.name)
     document.metadata.update(action.model_dump())
 
     documents.append(document)
