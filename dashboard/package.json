@@ -37,6 +37,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "cmdk": "^0.2.0",
+    "front-matter": "^4.0.2",
     "immer": "^10.0.3",
     "jotai": "^2.4.3",
     "lodash": "^4.17.21",
@@ -50,6 +51,7 @@
     "react-error-boundary": "^4.0.11",
     "react-hook-form": "^7.47.0",
     "react-hotkeys-hook": "^4.4.1",
+    "react-markdown": "^9.0.1",
     "react-syntax-highlighter": "^15.5.0",
     "react-textarea-autosize": "^8.5.3",
     "react-use": "^17.4.0",
@@ -62,6 +64,7 @@
     "zod": "^3.22.3"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.10",
     "@types/lodash": "^4.14.199",
     "@types/node": "^20",
     "@types/react": "^18",

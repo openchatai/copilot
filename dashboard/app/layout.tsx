@@ -12,8 +12,13 @@ import { HandleOnComplete } from "@/lib/router-events";
 import { TopLoader } from "@/lib/Toploader";
 import dynamic from "next/dynamic";
 import { JotaiProvider } from "./jotai-provider";
+import { getContent } from "@/content/getContent";
 
 const Confetti = dynamic(() => import("@/components/domain/confetti-canvas"), {
+  ssr: false,
+});
+
+const MdModal = dynamic(() => import("@/content/MdModal"), {
   ssr: false,
 });
 
@@ -27,11 +32,18 @@ export const metadata: Metadata = {
   title: "OpenCopilot",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  let content = null
+  try {
+    content = await getContent();
+  } catch (error) {
+    console.error(error);
+  }
+
   return (
     <SWRProvider>
       <JotaiProvider>
@@ -66,6 +78,7 @@ export default function RootLayout({
             />
             <Confetti />
             <HandleOnComplete />
+            {content && <MdModal content={content} />}
           </body>
         </html>
       </JotaiProvider>
