@@ -42,8 +42,8 @@ def is_it_informative_or_actionable(chat_history: List[BaseMessage], current_mes
         for dto in available_documents[document]:
             if dto.type is VectorCollections.knowledgebase:
                 continue
-        actionable_tools = actionable_tools + "\n (Tool {}): ".format(counter) + dto.document.page_content
-        counter = counter + 1
+            actionable_tools = actionable_tools + "\n (Tool {}): ".format(counter) + dto.document.page_content
+            counter = counter + 1
 
     prompt = '''
     You are an AI tool that classifies user input as actionable or not. Actionable input refers to requests that can be fulfilled by calling an external tool. You will be provided with the user's input and descriptions of available tools. If the user's request can be fulfilled using one of these tools, it is considered actionable.
@@ -72,7 +72,7 @@ def is_it_informative_or_actionable(chat_history: List[BaseMessage], current_mes
 
     **Justification:** The user is asking about how to create a visa application, which can be answered through text without the need to call a tool.
 
-    **Response Format:** Always respond with JSON, for example: {'actionable': false}
+    **Response Format:** Always respond with JSON, for example: {"actionable": False} or {"actionable": True} (always with double quotation and without escaping)
     
     ===END EXAMPLES===
     The available tools :
@@ -81,6 +81,7 @@ def is_it_informative_or_actionable(chat_history: List[BaseMessage], current_mes
     Based on the above, here is the user input/questions:
     '''
 
+    logger.info("cool", payload=actionable_tools)
     messages: List[BaseMessage] = [
         SystemMessage(content=prompt),
     ]
@@ -107,7 +108,7 @@ def get_next_response_type(
         chat_history: List[BaseMessage],
         top_documents: Dict[str, List[DocumentSimilarityDTO]]
 
-) -> Dict[str]:
+) -> Dict:
     """
     Processes a conversation step by generating a response based on the provided inputs.
 
@@ -116,7 +117,6 @@ def get_next_response_type(
         session_id (str): The ID of the session for the chat conversation.
         user_message (str): The message from the user.
         chat_history (List[BaseMessage]): A list of previous conversation messages.
-        base_prompt (str): The base prompt for the conversation.
 
     Returns:
         Union[Dict[str, Any], BotMessage]: If the response can be parsed as JSON, returns a dictionary containing the response. Otherwise, returns a BotMessage object.

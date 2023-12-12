@@ -53,53 +53,53 @@ async def handle_request(
         headers: Dict[str, str],
         app: Optional[str],
 ) -> ResponseDict:
+
     check_required_fields(base_prompt, text)
     knowledgebase: List[DocumentSimilarityDTO] = []
     actions: List[DocumentSimilarityDTO] = []
     flows: List[DocumentSimilarityDTO] = []
     conversations_history: List[BaseMessage] = []
-    try:
-        tasks = [
-            get_relevant_knowledgebase(text, bot_id),
-            get_relevant_actions(text, bot_id),
-            get_relevant_flows(text, bot_id),
-            get_chat_message_as_llm_conversation(session_id),
-        ]
 
-        results = await asyncio.gather(*tasks)
-        knowledgebase, actions, flows, conversations_history = results
-        top_documents = select_top_documents(actions + flows + knowledgebase)
+    tasks = [
+        get_relevant_knowledgebase(text, bot_id),
+        get_relevant_actions(text, bot_id),
+        get_relevant_flows(text, bot_id),
+        get_chat_message_as_llm_conversation(session_id),
+    ]
 
-        next_step = get_next_response_type(
-            user_message=text,
-            session_id=session_id,
-            chat_history=conversations_history,
-            top_documents=top_documents
+    results = await asyncio.gather(*tasks)
+    knowledgebase, actions, flows, conversations_history = results
+    top_documents = select_top_documents(actions + flows + knowledgebase)
+
+    next_step = get_next_response_type(
+        user_message=text,
+        session_id=session_id,
+        chat_history=conversations_history,
+        top_documents=top_documents
+    )
+
+    logger.info("cool", payload=next_step)
+    if next_step.get('type') is UserMessageResponseType.actionable:
+        # get the single highest actionable item (could be an action or a flow) - hope we are lucky, and we can get the right one XD
+        actionable_item = select_top_documents(actions + flows,
+                                               [VectorCollections.actions, VectorCollections.actions])
+
+        # now run it
+        response = await run_actionable_item(
+            bot_id=bot_id,
+            actionable_item=actionable_item,
+            base_prompt=base_prompt,
+            app=app,
+            headers=headers,
+            text=text,
         )
-
-        if next_step.get('type') is UserMessageResponseType.actionable:
-            # get the single highest actionable item (could be an action or a flow) - hope we are lucky, and we can get the right one XD
-            actionable_item = select_top_documents(actions + flows,
-                                                   [VectorCollections.actions, VectorCollections.actions])
-
-            # now run it
-            response = await run_actionable_item(
-                bot_id=bot_id,
-                actionable_item=actionable_item,
-                base_prompt=base_prompt,
-                app=app,
-                headers=headers,
-                text=text,
-            )
-            return response
-            pass
-        else:
-            # get the highest similarly knowledgeable item
-            # put it into the context
-            # ask the llm
-            pass
-
-        return None
+        return response
+        pass
+    else:
+        # get the highest similarly knowledgeable item
+        # put it into the context
+        # ask the llm
+        pass
 
 
 def check_required_fields(base_prompt: str, text: str) -> None:
@@ -120,7 +120,6 @@ async def run_actionable_item(
         app: Optional[str],
         bot_id: str,
 ) -> ResponseDict:
-
     if actionable_item.type is VectorCollections.actions:
         # we can't run stand-alone actions, so build a flow with single action and run it
         action = None
@@ -139,7 +138,5 @@ async def run_actionable_item(
         bot_id=bot_id,
     )
 
-
     # now take the output, put it into a chat message with the base prompt and ask the llm to present it
     return output
-
