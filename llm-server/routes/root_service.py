@@ -11,7 +11,7 @@ from routes.workflow.typings.response_dict import ResponseDict
 from routes.workflow.typings.run_workflow_input import ChatContext
 from routes.workflow.utils import (
     run_flow,
-    create_dynamic_flow_from_operation_ids,
+    create_flow_from_operation_ids,
 )
 from routes.workflow.utils.api_retrievers import (
     get_relevant_actions,
@@ -125,12 +125,12 @@ async def run_actionable_item(
         vector_action = document_similarity_dto.document  # this variable now holds Qdrant vector document, which is the Action metadata
 
         # @todo operation_id is not unique, that is not quite right - use action ID instead
-        _flow = create_dynamic_flow_from_operation_ids(operation_ids=[vector_action.metadata.get('operation_id')],
-                                                       bot_id=bot_id)
+        _flow = create_flow_from_operation_ids(operation_ids=[vector_action.metadata.get('operation_id')],
+                                               bot_id=bot_id)
     else:
         document_similarity_dto = actionable_item.get(VectorCollections.flows)[0]
-        flow_action = document_similarity_dto.document  # this variable now holds Qdrant vector document, which is the Action metadata
-        flow_id = flow_action.metadata.get('flow_id')
+        vector_flow = document_similarity_dto.document  # this variable now holds Qdrant vector document, which is the Action metadata
+        flow_id = vector_flow.metaata.get('flow_id')
         flow_model = get_flow_by_id(flow_id)
         _flow = FlowDTO()
         # todo convert the flow model to flowDTO
