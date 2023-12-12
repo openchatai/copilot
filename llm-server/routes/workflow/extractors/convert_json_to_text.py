@@ -17,6 +17,7 @@ def convert_json_to_text(
     api_response: Dict[str, Any],
     api_request_data: Dict[str, Any],
     bot_id: str,
+    summary_prompt: str,
 ) -> str:
     chat = get_chat_model()
 
@@ -47,6 +48,11 @@ def convert_json_to_text(
     ]
 
     result = chat(messages)
-    logger.info("Convert json to text", content=result.content, incident="convert_json_to_text", api_request_data=api_request_data)
+    logger.info(
+        "Convert json to text",
+        content=result.content,
+        incident="convert_json_to_text",
+        api_request_data=api_request_data,
+    )
 
     return cast(str, result.content)
