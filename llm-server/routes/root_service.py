@@ -47,6 +47,7 @@ FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
 
 chat = get_chat_model()
 
+
 def validate_steps(steps: List[str], swagger_doc: ResolvingParser):
     try:
         paths = swagger_doc.specification.get("paths", {})
@@ -67,13 +68,16 @@ def validate_steps(steps: List[str], swagger_doc: ResolvingParser):
         if all(x in operationIds for x in steps):
             return True
         else:
-            logger.warn("Model has hallucinated, made up operation id", steps=steps, operationIds=operationIds)
+            logger.warn(
+                "Model has hallucinated, made up operation id",
+                steps=steps,
+                operationIds=operationIds,
+            )
             return False
 
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}")
         return False
-
 
 
 async def handle_request(
@@ -85,6 +89,7 @@ async def handle_request(
     headers: Dict[str, str],
     server_base_url: str,
     app: Optional[str],
+    summary_prompt: str,
 ) -> ResponseDict:
     log_user_request(text)
     check_required_fields(base_prompt, text, swagger_url)
@@ -112,22 +117,16 @@ async def handle_request(
             prev_conversations=prev_conversations,
             flows=flows,
             bot_id=bot_id,
-            base_prompt=base_prompt
+            base_prompt=base_prompt,
         )
-        
-        if step.missing_information is not None and len(step.missing_information) >= 10:
-            return {
-                "error": None,
-                "response": step.bot_message + "\n" + step.missing_information
-            }
 
         if len(step.ids) > 0:
             swagger_doc = get_swagger_doc(swagger_url)
             fl = validate_steps(step.ids, swagger_doc)
-            
+
             if fl is False:
                 return {"error": None, "response": step.bot_message}
-            
+
             response = await handle_api_calls(
                 ids=step.ids,
                 swagger_doc=swagger_doc,
@@ -135,9 +134,9 @@ async def handle_request(
                 bot_id=bot_id,
                 headers=headers,
                 server_base_url=server_base_url,
-                session_id=session_id,
                 text=text,
                 swagger_url=swagger_url,
+                summary_prompt=summary_prompt,
             )
 
             logger.info(
@@ -196,6 +195,7 @@ def get_swagger_doc(swagger_url: str) -> ResolvingParser:
     else:
         return ResolvingParser(spec_string=swagger_doc)
 
+
 async def handle_api_calls(
     ids: List[str],
     swagger_doc: ResolvingParser,
@@ -204,8 +204,8 @@ async def handle_api_calls(
     server_base_url: str,
     swagger_url: Optional[str],
     app: Optional[str],
-    session_id: str,
     bot_id: str,
+    summary_prompt: str,
 ) -> ResponseDict:
     _workflow = create_workflow_from_operation_ids(ids, swagger_doc, text)
     output = await run_workflow(
@@ -214,6 +214,7 @@ async def handle_api_calls(
         WorkflowData(text, headers, server_base_url, swagger_url, app),
         app,
         bot_id=bot_id,
+        summary_prompt=summary_prompt,
     )
 
     _workflow["swagger_url"] = swagger_url

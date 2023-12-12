@@ -28,15 +28,25 @@ def process_conversation_step(
     prev_conversations: List[BaseMessage],
     flows: List[WorkflowFlowType],
     bot_id: str,
-    base_prompt: str
+    base_prompt: str,
 ):
-    logger.info("planner data", context=context, api_summaries=api_summaries, prev_conversations=prev_conversations, flows=flows)
+    logger.info(
+        "planner data",
+        context=context,
+        api_summaries=api_summaries,
+        prev_conversations=prev_conversations,
+        flows=flows,
+    )
     if not session_id:
         raise ValueError("Session id must be defined for chat conversations")
     messages: List[BaseMessage] = []
     messages.append(SystemMessage(content=base_prompt))
-    
-    messages.append(SystemMessage(content="You will have access to a list of api's and some useful information, called context."))
+
+    messages.append(
+        SystemMessage(
+            content="You will have access to a list of api's and some useful information, called context."
+        )
+    )
 
     if len(prev_conversations) > 0:
         messages.extend(prev_conversations)
@@ -71,15 +81,14 @@ def process_conversation_step(
 
     messages.append(
         HumanMessage(
-            content="""Based on the information provided to you and the conversation history of this conversation, I want you to answer the questions that follow. Your should respond with a json that looks like the following, you must always use the operationIds provided in api summaries. Do not make up an operation id - 
-    {
-        "ids": ["list", "of", "operationIds", "for apis to be called"],
-        "bot_message": "your response based on the instructions provided at the beginning",
-        "missing_information": "Optional Field; Incase of ambiguity ask clarifying questions. You should not worry about the api filters or query, that should be decided by a different agent."
-    }                
-    
-    Don't add operation ids if you can reply by merely looking in the conversation history.
-    """
+            content="""Based on the information provided to you and the conversation history of this conversation, I want you to answer the questions that follow. You should respond with a json that looks like the following, you must always use the operationIds provided in api summaries. Do not make up an operation id -
+{
+    "ids": ["list", "of", "operationIds", "for", "apis", "to", "be", "called"],
+    "bot_message": "your response based on the instructions provided at the beginning, this could also be clarification if the information provided by the user is not complete / accurate",  
+}
+
+Don't add operation ids if you can reply by merely looking in the conversation history.
+"""
         )
     )
     messages.append(
@@ -87,8 +96,7 @@ def process_conversation_step(
     )
 
     messages.append(HumanMessage(content=user_requirement))
-    
-    
+
     logger.info("messages array", messages=messages)
 
     content = cast(str, chat(messages=messages).content)
@@ -105,7 +113,7 @@ def process_conversation_step(
 
     except OutputParserException as e:
         logger.warn("Failed to parse json", data=content, err=str(e))
-        return BotMessage(bot_message=content, ids=[], missing_information=None)
+        return BotMessage(bot_message=content, ids=[])
     except Exception as e:
         logger.warn("unexpected error occured", err=str(e))
-        return BotMessage(ids=[], bot_message=str(e), missing_information=None)
+        return BotMessage(ids=[], bot_message=str(e))
