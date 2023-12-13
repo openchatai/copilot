@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, render_template
 from flask_socketio import SocketIO
 from routes._swagger.controller import _swagger
 from routes.chat.chat_controller import chat_workflow, send_chat
@@ -16,9 +16,7 @@ from shared.models.opencopilot_db import create_database_schema
 from flask import jsonify
 from utils.db import Database
 from utils.get_logger import CustomLogger
-from flask_socketio import emit
 import asyncio
-
 logger = CustomLogger(module_name=__name__)
 
 
@@ -58,8 +56,9 @@ def health_check():
         status="OK", servers={"mongo": info.options.pool_options.max_pool_size}
     )
 
-
-init_qdrant_collections()
+@app.route('/backend')
+def index():
+    return render_template('index.html')
 
 
 @socketio.on("send_chat")
@@ -68,6 +67,7 @@ def handle_message(data):
     asyncio.run(send_chat(data))
 
 
+init_qdrant_collections()
 if __name__ == "__main__":
     socketio.run(
         app, host="0.0.0.0", port=8002, debug=True, use_reloader=True, log_output=True

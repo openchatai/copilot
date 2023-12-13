@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot with Socket.io</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .chat {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+        }
+
+        .message {
+            margin-bottom: 10px;
+        }
+
+        .user-message {
+            background-color: #eee;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .bot-message {
+            background-color: #f7f7f7;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        #input-container {
+            display: flex;
+            margin-top: 10px;
+        }
+
+        #input {
+            flex-grow: 1;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        #send-button {
+            background-color: #0080ff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Chatbot</h1>
+    <div class="chat" id="chat-box"></div>
+    <div id="input-container">
+        <input type="text" id="input" placeholder="Type your message here">
+        <button id="send-button">Send</button>
+    </div>
+
+    <script>
+        const socket = io("http://localhost:8888");
+        const sessionId = Math.random().toString(36).substring(2, 15);
+        const token = 'PMyJMFjmoKNFkus2';
+
+        // Generate unique ID for each message
+        function generateMessageId() {
+            return Math.random().toString(36).substring(2, 15);
+        }
+
+        // Send message to the server
+        const sendMessage = (message) => {
+            const payload = {
+                from: 'user',
+                content: message,
+                id: generateMessageId(),
+                headers: {
+                    'X-Copilot': 'copilot',
+                },
+                token: token,
+                session_id: sessionId,
+            };
+
+            socket.emit('send_chat', payload);
+        };
+
+        // Listen for server response and update chat box
+        let currentMessage;
+        const chatBox = document.getElementById('chat-box');
+        socket.on(sessionId, (word) => {
+            console.log(word)
+            if (!currentMessage) {
+              // Start a new message
+              currentMessage = document.createElement('div');
+              currentMessage.classList.add('message', 'bot-message');
+              chatBox.appendChild(currentMessage);
+            }
+          
+            // Append word to current message
+            currentMessage.innerHTML += ' ' + word;
+            
+            if (word.endsWith('.')) {
+              // Response complete, reset
+              currentMessage = null; 
+            }
+          
+            chatBox.scrollTop = chatBox.scrollHeight;
+          });
+        // Send message on button click
+        document.getElementById('send-button').addEventListener('click', () => {
+            const message = document.getElementById('input').value;
+            sendMessage(message);
+            document.getElementById('input').value = '';
+        });
+
+        // Send message on Enter key press
+        document.getElementById('input').addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                const message = document.getElementById('input').value;
+                sendMessage(message);
+                document.getElementById('input').value = '';
+            }
+        });
+    </script>
+</body>
+
+</html>

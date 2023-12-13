@@ -114,15 +114,14 @@ async def send_chat(json_data):
     input_data = ChatInput(**json_data)
     message = input_data.content
     session_id = input_data.session_id
+    bot_token = input_data.token
+    
     headers_from_json = input_data.headers
 
-    bot_token = request.headers.get("X-Bot-Token")
 
     if not message or len(message) > 255:
-        abort(400, description="Invalid content, the size is larger than 255 char")
+        emit(session_id, "Content length must be smaller than 255")
 
-    if not bot_token:
-        return emit(session_id, "bot token is required")
     bot = find_one_or_fail_by_token(bot_token)
 
     app_name = headers_from_json.pop(X_App_Name, None)
