@@ -96,9 +96,12 @@ def is_it_informative_or_actionable(chat_history: List[BaseMessage], current_mes
 
     content = cast(str, chat(messages=messages).content)
 
-    logger.info("cool", payload=content)
-
-    response = parse_actionable_or_not_response(content)
+    if "true" in content.lower():
+        response = parse_actionable_or_not_response({"actionable": True})
+        logger.info("cool", payload="actionable=True", original=content)
+    else:
+        response = parse_actionable_or_not_response({"actionable": False})
+        logger.info("cool", payload="actionable=False", original=content)
 
     return response.actionable
 
@@ -130,4 +133,3 @@ def get_next_response_type(
         return {"type": UserMessageResponseType.actionable}
 
     return {"type": UserMessageResponseType.informative}
-
