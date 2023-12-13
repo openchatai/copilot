@@ -4,8 +4,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ReactNode, forwardRef } from "react";
-import { useForm, useFieldArray, UseFormRegisterReturn } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import {
     Select,
     SelectValue,
@@ -13,47 +12,21 @@ import {
     SelectContent,
     SelectItem,
 } from "@/components/ui/select";
-import { Play, Plus, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import _ from "lodash";
-import { FormValues, FormValuesWithId, methods, swaggerFormSchema } from "./types";
 import { useCreateCopilot } from "../CreateCopilotProvider";
 import { toast } from "@/components/ui/use-toast";
-import { atom, useAtom } from "jotai";
-import axios, { AxiosResponse } from "axios";
-
-interface FormSelectProps extends UseFormRegisterReturn {
-    children?: ReactNode;
-    triggerContent?: ReactNode;
-    value?: string;
-}
-
-const FormSelect = forwardRef<HTMLButtonElement, FormSelectProps>(({ name, onChange, required, disabled, children, value }, ref) => {
-    return <Select
-        name={name}
-        onValueChange={(value) => onChange({ target: { name, value } })}
-        required={required}
-        disabled={disabled}
-        value={value}
-    >
-        {children}
-    </Select>
-})
-
-FormSelect.displayName = "FormSelect";
-
-const testAtom = atom<{
-    endpointId: string;
-    response: AxiosResponse<any>;
-    isOk: boolean;
-}[]>([])
-
-const isTestingAtom = atom(false);
+import { actionSchema } from "@/components/domain/action-form/schema";
+import { FormValues, FormValuesWithId } from "./types";
+import { apiMethods } from "@/types/utils";
+import { createActionByBotId } from "@/data/actions";
+import { mutate } from "swr";
+export const revalidateActions = (copilot_id: string) => mutate(copilot_id + '/actions')
 
 export function SwaggerForm({ defaultValues }: { defaultValues?: FormValuesWithId }) {
     const { state, dispatch } = useCreateCopilot();
-    const currentlyEditingEndpointId = state.currentlyEditingEndpointId;
-    const { register, handleSubmit, ...form } = useForm<FormValues>({
-        resolver: zodResolver(swaggerFormSchema),
+    const form = useForm<FormValues>({
+        resolver: zodResolver(actionSchema),
         defaultValues: defaultValues,
         mode: "onChange"
     });
@@ -66,30 +39,23 @@ export function SwaggerForm({ defaultValues }: { defaultValues?: FormValuesWithI
         name: "parameters",
         control: form.control,
     })
-    const [testResults, setTestResults] = useAtom(testAtom);
-    const [testing, setTesting] = useAtom(isTestingAtom);
-    
+    console.log(form.formState.errors)
+    console.log(form.getValues())
     async function onsubmitHandler(values: FormValues) {
         const mode = state.mode;
         if (mode === 'CREATE_NEW_ENDPOINT') {
-            console.log("Creaet new endpoint", values)
-            dispatch({
-                type: "ADD_NEW_ENDPOINT",
-                payload: { ...values, id: _.uniqueId() }
-            })
-            toast({
-                title: "Endpoint added",
-                description: "Endpoint has been added to the list.",
-                variant: "success"
-            })
-            form.reset()
-            dispatch({
-                type: "CHANGE_MODE",
-                payload: {
-                    mode: undefined,
-                    endpointId: undefined
+            if (state.createdCopilot) {
+                const response = await createActionByBotId(state.createdCopilot.id, values);
+                if (response.status === 200) {
+                    toast({
+                        title: "Action created",
+                        description: "New action has been created.",
+                        variant: "success"
+                    })
+                    revalidateActions(state.createdCopilot.id)
                 }
-            })
+            }
+            form.reset()
         } else if (mode === 'EDIT_EXISTING_ENDPOINT' && defaultValues) {
             console.log("Edit existing endpoint", defaultValues.id)
             const index = state.swaggerEndpoints.findIndex((endpoint) => endpoint.id === defaultValues.id);
@@ -101,91 +67,58 @@ export function SwaggerForm({ defaultValues }: { defaultValues?: FormValuesWithI
             })
             toast({
                 title: "Endpoint updated",
-                description: `Endpoint ${values.title} has been updated.`,
+                description: `Endpoint ${values.name} has been updated.`,
                 variant: "success"
             })
         }
 
     }
-    
-    async function testEndpoint() {
-        try {
-            if (!form.formState.isValid) {
-                toast({
-                    title: "Invalid form",
-                    description: "Please fix the errors in the form.",
-                    variant: "destructive"
-                })
-                return;
-            } else if (!currentlyEditingEndpointId) {
-                toast({
-                    title: "You should save the endpoint first",
-                    description: "You should save the endpoint first",
-                    variant: "destructive"
-                })
-            } else {
-                setTesting(true);
-                const request = await axios.request({
-                    method: form.watch('method'),
-                    url: form.watch('url'),
-                    data: form.watch('body'),
-                    headers: _.fromPairs(headerFields.map((field) => [field.key, field.value])),
-                    params: _.fromPairs(parameterFields.map((field) => [field.key, field.value])),
-                })
-                setTestResults((prev) => [...prev, {
-                    endpointId: currentlyEditingEndpointId,
-                    response: request,
-                    isOk: request.status >= 200 && request.status < 300
-                }])
-                setTesting(false);
-            }
-        } catch (error) {
-            setTesting(true);
-        }
 
-    }
-    
     return (
-        <AlertDialog open={!!state.mode}>
+        <AlertDialog open={true}>
             <AlertDialogContent asChild className="overflow-auto">
-                <form onSubmit={handleSubmit(onsubmitHandler)}>
+                <form onSubmit={form.handleSubmit(onsubmitHandler)}>
                     <AlertDialogHeader className="flex items-center justify-between w-full flex-row">
                         <AlertDialogTitle className="flex-1">
                             Define API action
                         </AlertDialogTitle>
-                        <Button variant="success" size="sm" type="button" onClick={testEndpoint} loading={testing} disabled={testing}>
-                            <Play className="w-5 h-5" />
-                            Test
-                        </Button>
                     </AlertDialogHeader>
                     <div className="w-full space-y-4 flex-1">
-                        <Input placeholder="Title, for example (Create a new post)" data-invalid={form.getFieldState('title').invalid}  {...register('title')} />
+                        <Input placeholder="Title, for example (Create a new post)" {...form.register('name')} />
                         <div className="w-full">
-                            <div data-invalid={form.getFieldState('url').invalid || form.getFieldState('method').invalid} className="flex items-center data-[invalid='true']:!border-destructive h-12 gap-0.5 p-1 overflow-hidden border border-border w-full m-0 bg-white shadow-sm rounded-md focus:outline-none text-sm focus-visible:outline-none transition-colors">
-                                <FormSelect value={form.watch('method')} {...register('method')}>
-                                    <SelectTrigger className="ring-0 w-fit h-full p-1.5 border-0 text-xs font-semibold">
+                            <div data-invalid={form.getFieldState('api_endpoint').invalid || form.getFieldState('request_type').invalid} className="flex items-center data-[invalid='true']:!border-destructive h-12 gap-0.5 p-1 overflow-hidden border border-border w-full m-0 bg-white shadow-sm rounded-md focus:outline-none text-sm focus-visible:outline-none transition-colors">
+                                <Select {..._.omit(form.register("request_type"), ['ref', "onChange"])} onValueChange={(v) => {
+                                    form.register("request_type").onChange({
+                                        type: "change",
+                                        target: {
+                                            value: v,
+                                            name: "request_type"
+                                        }
+                                    });
+                                }}>
+                                    <SelectTrigger {..._.pick(form.register("request_type"), ['ref'])} className="ring-0 w-fit h-full p-1.5 border-0 text-xs font-semibold">
                                         <SelectValue placeholder="Method" />
                                     </SelectTrigger>
                                     <SelectContent className="max-w-fit">
                                         {
-                                            methods.map((method) => (
+                                            apiMethods.map((method) => (
                                                 <SelectItem key={method} value={method} className="py-1.5">
                                                     {method}
                                                 </SelectItem>
                                             ))
                                         }
                                     </SelectContent>
-                                </FormSelect>
-                                <Input className="flex-1 border-0 h-full py-1.5 shadow-none" {...register('url')} placeholder="API endpoint" />
+                                </Select>
+                                <Input className="flex-1 border-0 h-full py-1.5 shadow-none" {...form.register('api_endpoint')} placeholder="API endpoint" />
                             </div>
-                            <p className="text-xs text-destructive mt-1">{form.getFieldState('url').error?.message}</p>
+                            <p className="text-xs text-destructive mt-1">{form.getFieldState('api_endpoint').error?.message}</p>
                         </div>
 
                         <div>
                             <div className="w-full relative">
-                                <Textarea {...register('summary')} maxRows={5} data-invalid={form.getFieldState('summary').invalid} placeholder="Summary, make sure it's celar and easy to understand" minRows={2} />
+                                <Textarea {...form.register('description')} maxRows={5} placeholder="Summary, make sure it's celar and easy to understand" minRows={2} />
                                 <span className="absolute -top-2 -right-2 bg-white px-1.5 py-0.5 text-xs rounded-md text-muted-foreground">
-                                    {form.watch('summary')?.length || 0}/50
+                                    {form.watch('description')?.length || 0}/50
                                 </span>
                             </div>
                             <p className="text-xs text-muted-foreground mt-0.5">
@@ -212,12 +145,12 @@ export function SwaggerForm({ defaultValues }: { defaultValues?: FormValuesWithI
                                         const isValid = errorMessage === undefined;
                                         return (<div className="flex items-center gap-2 animate-in fade-in slide-in-from-top-1" key={field.id}>
                                             <Input placeholder="Key"
-                                                {...register(`headers.${index}.key`)}
+                                                {...form.register(`headers.${index}.key`)}
                                                 data-valid={isValid}
                                             />
                                             <Input placeholder="Value"
                                                 data-valid={isValid}
-                                                {...register(`headers.${index}.value`)}
+                                                {...form.register(`headers.${index}.value`)}
                                             />
                                             <button className="shrink-0 p-2 text-destructive" type="button"
                                                 onClick={() => removeHeaderField(index)}>
@@ -247,12 +180,12 @@ export function SwaggerForm({ defaultValues }: { defaultValues?: FormValuesWithI
                                         const isValid = errorMessage === undefined;
                                         return (<div className="flex items-center gap-2 animate-in fade-in slide-in-from-top-1" key={field.id}>
                                             <Input placeholder="Key"
-                                                {...register(`parameters.${index}.key`)}
+                                                {...form.register(`parameters.${index}.key`)}
                                                 data-valid={isValid}
                                             />
                                             <Input placeholder="Value"
                                                 data-valid={isValid}
-                                                {...register(`parameters.${index}.value`)}
+                                                {...form.register(`parameters.${index}.value`)}
                                             />
                                             <button className="shrink-0 p-2 text-destructive" type="button"
                                                 onClick={() => removeParameterField(index)}>
@@ -267,7 +200,7 @@ export function SwaggerForm({ defaultValues }: { defaultValues?: FormValuesWithI
                             <Label htmlFor="request-body" >
                                 Body (JSON Schema only)
                             </Label>
-                            <Textarea id="request-body" {...register('body')} placeholder="Request Body" minRows={4} />
+                            <Textarea id="request-body" {...form.register('body')} placeholder="Request Body" minRows={4} />
                         </div>
                         <AlertDialogFooter className="gap-2 sticky bottom-0 left-0 bg-white w-full">
                             <AlertDialogCancel onClick={() => dispatch({

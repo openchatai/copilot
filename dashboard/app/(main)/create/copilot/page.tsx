@@ -7,22 +7,29 @@ import { cn } from "@/lib/utils";
 import { Link } from "@/lib/router-events";
 import React, { useState } from "react";
 import { Wizard, useWizard } from "react-use-wizard";
-import { ValidateSwaggerStep } from "./_parts/ValidateSwaggerStep";
-import { Check, CheckCheck, FileVideo } from "lucide-react";
+import { Check, CheckCheck, FileVideo, Pen, Plus, Trash2, Upload } from "lucide-react";
 import { CopilotType, createCopilot } from "@/data/copilot";
 import _ from "lodash";
 import { toast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Loader from "@/components/ui/Loader";
 import {
   CreateCopilotProvider,
   useCreateCopilot,
 } from "./_parts/CreateCopilotProvider";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { SwaggerUi } from "./_parts/swagger-form";
-import { FormValuesWithId } from "./_parts/swagger-form/types";
 import { useConfetti } from "@/app/_store/confetti";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAsyncFn } from "react-use";
+import { createActionByBotId, getActionsByBotId, importActionsFromSwagger } from "@/data/actions";
+import useSWR from "swr";
+import { EmptyBlock } from "@/components/domain/EmptyBlock";
+import { ActionForm } from "@/components/domain/action-form/ActionForm";
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
+import { revalidateActions } from "@/components/domain/new-flows-editor/Controller";
+import { methodVariants } from "@/components/domain/MethodRenderer";
 
 function Header() {
   const { stepCount, activeStep, goToStep } = useWizard();
@@ -101,235 +108,53 @@ function IntroStep() {
     </div>
   );
 }
-// lodash is the best 
-const generateSwaggerDefinition = (formData: FormValuesWithId[]) => {
-  const swaggerDefinition = {
-    openapi: '3.0.0',
-    info: {
-      title: 'Your API',
-      version: '1.0.0',
-      description: 'API description',
-    },
-    paths: {},
-  };
+function SetCopilotName() {
+  const { state: { copilot_name, createdCopilot }, dispatch } = useCreateCopilot();
+  const { nextStep } = useWizard();
+  const { pop: popConfetti } = useConfetti();
+  const [value, $createCopilot] = useAsyncFn(createCopilot);
 
-  _.forEach(formData, (api) => {
-    const { title, url, parameters, headers, summary } = api;
-    const pathId = title.replace(/\s/g, '');
-    _.set(swaggerDefinition.paths, [url, pathId], {
-      summary,
-      description: summary,
-      operationId: _.camelCase(title),
-      parameters: _.map(parameters, (value, key) => ({
-        name: key,
-        in: 'query',
-        description: `Description for ${key}`,
-        required: true,
-        schema: { type: 'string' },
-      })),
-      headers: _.map(headers, (value, key) => ({
-        name: key,
-        description: `Description for ${key}`,
-        required: true,
-        schema: { type: 'string' },
-      })),
-    });
-  });
-
-  return swaggerDefinition;
-};
-function UploadSwaggerStep() {
-  const { pop: popConfetti } = useConfetti()
-  const { nextStep, previousStep } = useWizard();
-  const {
-    state: { swaggerFiles, createdCopilot, swaggerEndpoints },
-    dispatch,
-  } = useCreateCopilot();
   const setCopilot = (copilot: CopilotType) => {
     dispatch({ type: "SET_COPILOT", payload: copilot });
+    popConfetti();
   };
-  const [loading, setLoading] = useState(false);
-  const swaggerFile = _.first(swaggerFiles);
-  const bothSelected = swaggerFile && !_.isEmpty(swaggerEndpoints);
-  // spagetti 🍝
+
   async function handleCreateCopilot() {
-    if (!swaggerFile && _.isEmpty(swaggerEndpoints)) {
-      toast({
-        title: "No swagger file uploaded or created!",
-        description:
-          "Please upload a swagger file to continue, or create one using the form",
-        variant: "destructive",
-      });
+    if (!copilot_name) return;
+    if (createdCopilot) {
+      nextStep();
       return;
     }
-    if (bothSelected) {
+    const response = await $createCopilot(copilot_name);
+    if (response.data.id) {
+      setCopilot(response.data);
+      nextStep();
+    } else {
       toast({
-        title: "Both swagger file and swagger definition created!",
-        description:
-          "Please reset one of them to continue, you can't use both at the same time",
+        title: "Something went wrong",
+        description: "Please try again later",
         variant: "destructive",
       });
-      return;
     }
-    else {
-      setLoading(true);
-      try {
-        if (!createdCopilot) {
-          if (swaggerFile) {
-            const res = await createCopilot({
-              swagger_file: swaggerFile,
-            });
-            if (res.data) {
-              setCopilot(res.data.chatbot);
-              toast({
-                title: "Copilot Created Successfully",
-                description: "You have created your copilot successfully",
-                variant: "success",
-              });
-              popConfetti(5)
-              _.delay(nextStep, 1000);
-            }
-          }
-          if (!_.isEmpty(swaggerEndpoints)) {
-            const swaggerDefinition = generateSwaggerDefinition(swaggerEndpoints);
-            const swagger_file = new File([JSON.stringify(swaggerDefinition)], "swagger.json", {
-              type: "application/json",
-            })
-            console.log(swagger_file);
-            const res = await createCopilot({
-              swagger_file,
-            });
-            if (res.data) {
-              setCopilot(res.data.chatbot);
-              toast({
-                title: "Copilot Created Successfully",
-                description: "You have created your copilot successfully",
-                variant: "success",
-              });
-              popConfetti(5)
-              _.delay(nextStep, 1000);
-            }
-          }
-        }
-      } catch (error) {
-        setLoading(false);
-      }
-
-    }
-    setLoading(false);
   }
-  return (
-    <div className="relative p-1">
-      {loading && (
-        <div className="flex-center absolute inset-0 z-40 bg-white/20 backdrop-blur-sm">
-          <Loader />
-        </div>
-      )}
-      <h2 className="mb-6 text-3xl font-bold text-accent-foreground">
-        Define your actions ✨
-      </h2>
-
-      {createdCopilot && (
-        <Alert variant="info" className="my-2">
-          <AlertTitle>Copilot Created Successfully</AlertTitle>
-          <AlertDescription>
-            You have created <strong>{createdCopilot?.name}</strong>
-          </AlertDescription>
-        </Alert>
-      )}
-      <p className="mb-4">
-        You copilot will use these APIs to communicate with your product and
-        execute actions
-      </p>
-      <Tabs defaultValue="swagger-form">
-        <TabsList className="relative">
-          <TabsTrigger value="swagger-form" className="flex-1">
-            Add actions via UI
-          </TabsTrigger>
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none rounded-full bg-muted p-1.5 text-sm font-semibold uppercase text-accent-foreground">
-            OR
-          </div>
-          <TabsTrigger value="upload" className="flex-1">
-            Upload Swagger
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="upload" className="min-h-[10rem]">
-          <div className="my-5">
-            <DropZone
-              multiple={false}
-              maxFiles={1}
-              accept={{ json: ["application/json"] }}
-              value={swaggerFiles || []}
-              onChange={(files) => {
-                dispatch({ type: "ADD_SWAGGER", payload: files });
-              }}
-            />
-          </div>
-          <div className="mb-8 mt-4 flex items-center justify-between space-x-6">
-            <div>
-              <div className="mb-1 text-sm font-medium text-slate-800">
-                Important Instructions
-              </div>
-              <div className="text-xs">
-                <ul>
-                  <li>
-                    ✅ Make sure each{" "}
-                    <strong>endpoint have description and operation id</strong>,
-                    results will be significantly better with a good description
-                  </li>
-                  <li>
-                    ✅ Make sure that the swagger file is valid, the system
-                    might not be able to parse invalid files,{" "}
-                    <Link href="https://editor.swagger.io/" target="_blank">
-                      use this tool validate your schema
-                    </Link>
-                  </li>
-                  <li>
-                    ✅ Do not add any Authorization layers, we will show you how
-                    to authorize your own requests by yourself
-                  </li>
-                  <li>
-                    ✅ This *very* new product, so many things does not make
-                    sense/work at this stage{" "}
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </TabsContent>
-        <TabsContent value="swagger-form" className="min-h-[10rem]">
-          <SwaggerUi />
-        </TabsContent>
-      </Tabs>
-      <footer className="flex w-full items-center justify-between gap-5 pt-5">
-        <Button
-          variant="ghost"
-          onClick={previousStep}
-          className="flex items-center justify-center gap-1 underline"
-        >
-          Back
-        </Button>
-        {createdCopilot ? (
-          <>
-            <Button
-              onClick={nextStep}
-              className="flex items-center justify-center gap-1"
-            >
-              Next
-            </Button>
-          </>
-        ) : (
-          // handle if user uploaded swagger file and created swagger definition at the same time.
-          // so user have to choose which one to use.
-          <>
-            <Button onClick={handleCreateCopilot}>
-              Create Copilot
-            </Button>
-          </>
-        )}
-      </footer>
+  return <div>
+    <h2 className="mb-6 text-3xl font-bold text-accent-foreground">
+      Let's give your copilot a name 🤖
+    </h2>
+    <div className="px-2 my-4">
+      <Label htmlFor="copilotName" className="font-semibold">
+        Copilot Name
+      </Label>
+      <Input id="copilotName"
+        disabled={!!createdCopilot}
+        className="mt-1" value={copilot_name ?? ''} onChange={(ev) => dispatch({ type: "CHANGE_NAME", payload: ev.target.value })} />
     </div>
-  );
+    <div className="flex items-center justify-end">
+      <Button onClick={handleCreateCopilot}
+        disabled={!copilot_name}
+        loading={value.loading}>Let's do it!</Button>
+    </div>
+  </div>
 }
 function FinishStep() {
   const {
@@ -352,7 +177,236 @@ function FinishStep() {
     </div>
   );
 }
-// create/copilot/
+// underconstruction
+function DefineActionsStep() {
+  const { nextStep, previousStep } = useWizard();
+  const [state, $importActionsFromSwagger] = useAsyncFn(importActionsFromSwagger)
+  const [addActionState, $addAction] = useAsyncFn(createActionByBotId)
+  const {
+    state: { swaggerFiles, createdCopilot },
+    dispatch,
+  } = useCreateCopilot();
+  const { data: actions } = useSWR(createdCopilot?.id + '/actions', async () => createdCopilot?.id ? await getActionsByBotId(createdCopilot?.id) : null)
+
+  const swaggerFile = _.first(swaggerFiles);
+  async function addActionFromSwagger() {
+    if (swaggerFile && createdCopilot) {
+      const response = await $importActionsFromSwagger(createdCopilot.id, swaggerFile)
+      if (response.data) {
+        toast({
+          title: "Actions imported successfully",
+          description: "We have imported your actions successfully",
+          variant: "success",
+        });
+      }
+      // reset swagger files
+      dispatch({
+        type: "ADD_SWAGGER",
+        payload: null,
+      });
+    }
+  }
+
+  return (
+    <div className="relative p-1">
+      <div className="mb-5 flex items-center justify-between">
+        <h2 className="text-3xl font-bold text-accent-foreground">
+          Define your actions ✨
+        </h2>
+      </div>
+      {createdCopilot && (
+        <Alert variant="info" className="my-2">
+          <AlertTitle>Copilot Created Successfully</AlertTitle>
+          <AlertDescription>
+            You have created <strong>{createdCopilot?.name}</strong>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      <p className="mb-2">
+        You copilot will use these APIs to communicate with your product and
+        execute actions
+      </p>
+      <div className="flex items-center mb-2 space-x-2 justify-end">
+        <AlertDialog>
+          <AlertDialogContent>
+            <AlertDialogHeader className="flex items-center justify-between w-full flex-row">
+              <AlertDialogTitle className="flex-1 text-lg font-bold">
+                Define API action
+              </AlertDialogTitle>
+            </AlertDialogHeader>
+            <ActionForm
+              onSubmit={async (values) => {
+                if (createdCopilot) {
+                  const { data } = await $addAction(createdCopilot.id, values);
+                  if (data) {
+                    toast({
+                      title: "Action created successfully",
+                      description: "We have created your action successfully",
+                      variant: "success",
+                    });
+                    revalidateActions(createdCopilot.id)
+                  }
+                }
+              }}
+              footer={
+                () => <AlertDialogFooter>
+                  <AlertDialogCancel asChild>
+                    <Button variant='outline'>Cancel</Button>
+                  </AlertDialogCancel>
+                  <Button type="submit" loading={addActionState.loading}>Import</Button>
+                </AlertDialogFooter>
+              } />
+          </AlertDialogContent>
+          <AlertDialogTrigger asChild>
+            <Button className="space-x-1" size='xs' variant='secondary'>
+              <span>
+                Add Action
+              </span>
+              <Plus className="w-4 h-4" />
+            </Button>
+          </AlertDialogTrigger>
+        </AlertDialog>
+        <AlertDialog>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex-1 text-lg font-bold">
+                Import from Swagger
+              </AlertDialogTitle>
+            </AlertDialogHeader>
+            <GetActionsFromSwagger />
+            <AlertDialogFooter>
+              <AlertDialogCancel asChild>
+                <Button variant='outline'>Cancel</Button>
+              </AlertDialogCancel>
+              <Button onClick={addActionFromSwagger} loading={state.loading}>Import</Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+          <AlertDialogTrigger asChild >
+            <Button className="space-x-1" size='xs' variant='secondary'>
+              <span>
+                Import from Swagger
+              </span>
+              <Upload className="w-4 h-4" />
+            </Button>
+          </AlertDialogTrigger>
+        </AlertDialog>
+      </div>
+      <div className="flex items-start flex-col gap-2 overflow-auto max-h-60 px-2 py-1">
+        {
+          _.isEmpty(actions?.data) ?
+            <div className="mx-auto">
+              <EmptyBlock>
+                <span className="text-center">
+                  No endpoints added yet.
+                  You can add new acions via swagger files or manually
+                </span>
+              </EmptyBlock>
+            </div>
+            :
+            _.map(actions?.data, (endpoint, index) => {
+              return <div key={index} className="w-full p-2 shrink-0 flex overflow-hidden max-w-full gap-4 items-center justify-between border border-border transition-colors rounded-lg">
+                <div className="flex-1 flex items-center justify-start overflow-hidden shrink-0">
+                  <div className="flex items-center gap-5 overflow-hidden shrink-0">
+                    <span className={cn(methodVariants({
+                      method: endpoint.request_type
+                    }))}>
+                      {endpoint.request_type}
+                    </span>
+                    <p className="flex-1 line-clamp-1 overflow-ellipsis font-medium text-xs">
+                      {endpoint.api_endpoint || endpoint.name}
+                    </p>
+                  </div>
+                </div>
+                <div className="space-x-2">
+                  <button className="text-primary" onClick={() => {
+                    dispatch({
+                      type: "CHANGE_MODE",
+                      payload: {
+                        mode: "EDIT_EXISTING_ENDPOINT",
+                        endpointId: endpoint.id
+                      }
+                    })
+                  }}>
+                    <Pen className="w-4 h-4" />
+                  </button>
+                  <button className="text-destructive">
+                    <Trash2 className="w-4 h-4" onClick={() => confirm("are you sure")} />
+                  </button>
+                </div>
+              </div>
+            })
+        }
+      </div>
+
+      <footer className="flex w-full items-center justify-between gap-5 pt-5">
+        <Button
+          variant="ghost"
+          onClick={previousStep}
+          className="flex items-center justify-center gap-1 underline"
+        >
+          Back
+        </Button>
+        {createdCopilot && (
+          <Button onClick={nextStep}>
+            {
+              _.isEmpty(actions?.data) ? "Skip" : "Next"
+            }
+          </Button>
+        )}
+      </footer>
+    </div >
+  );
+}
+
+function GetActionsFromSwagger() {
+  const { state: { swaggerFiles }, dispatch } = useCreateCopilot();
+  return <div>
+    <div className="my-5">
+      <DropZone
+        multiple={false}
+        maxFiles={1}
+        accept={{ json: ["application/json"] }}
+        value={swaggerFiles || []}
+        onChange={(files) => {
+          dispatch({ type: "ADD_SWAGGER", payload: files });
+        }}
+      />
+    </div>
+    <div className="mb-8 mt-4 flex items-center justify-between space-x-6">
+      <div>
+        <div className="mb-1 text-sm font-medium text-slate-800">
+          Important Instructions
+        </div>
+        <div className="text-xs">
+          <ul>
+            <li>
+              ✅ Make sure each{" "}
+              <strong>endpoint have description and operation id</strong>,
+              results will be significantly better with a good description
+            </li>
+            <li>
+              ✅ Make sure that the swagger file is valid, the system
+              might not be able to parse invalid files,{" "}
+              <Link href="https://editor.swagger.io/" target="_blank">
+                use this tool validate your schema
+              </Link>
+            </li>
+            <li>
+              ✅ Do not add any Authorization layers, we will show you how
+              to authorize your own requests by yourself
+            </li>
+            <li>
+              ✅ This *very* new product, so many things does not make
+              sense/work at this stage{" "}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
 export default function CreateCopilotPage() {
   const [loaded, setLoaded] = useState(false);
   return (
@@ -397,8 +451,8 @@ export default function CreateCopilotPage() {
           <CreateCopilotProvider>
             <Wizard header={<Header />}>
               <IntroStep />
-              <UploadSwaggerStep />
-              <ValidateSwaggerStep />
+              <SetCopilotName />
+              <DefineActionsStep />
               <FinishStep />
             </Wizard>
           </CreateCopilotProvider>
