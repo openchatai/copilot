@@ -31,8 +31,8 @@ export default function GeneralSettingsPage() {
   const [updateCopilotState, $updateCopilot] = useAsyncFn(updateCopilot);
 
   async function handleDelete() {
-    await $deleteCopilot(copilotId);
-    if (deleteCopilotstate.value?.data.success) {
+    const { data } = await $deleteCopilot(copilotId);
+    if (data.success) {
       toast({
         variant: "success",
         title: "Copilot deleted",
@@ -41,11 +41,11 @@ export default function GeneralSettingsPage() {
       _.delay(() => replace("/"), 1000);
     }
   }
-  
+
   async function handleSave() {
     if (Name === copilotName || Name.trim().length < 1) return;
-    await $updateCopilot(copilotId, { name: Name });
-    if (updateCopilotState.value?.data) {
+    const { data } = await $updateCopilot(copilotId, { name: Name });
+    if (data.chatbot) {
       toast({
         variant: "success",
         title: "Copilot updated",
