@@ -3,7 +3,6 @@ from typing import List, cast, Union, Dict, Any
 from langchain.schema import HumanMessage, SystemMessage, BaseMessage
 
 from custom_types.actionable_or_not_type import parse_actionable_or_not_response
-from custom_types.bot_message import BotMessage
 from routes.workflow.utils.document_similarity_dto import DocumentSimilarityDTO
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
@@ -116,9 +115,6 @@ def get_next_response_type(
         session_id (str): The ID of the session for the chat conversation.
         user_message (str): The message from the user.
         chat_history (List[BaseMessage]): A list of previous conversation messages.
-
-    Returns:
-        Union[Dict[str, Any], BotMessage]: If the response can be parsed as JSON, returns a dictionary containing the response. Otherwise, returns a BotMessage object.
 
     Raises:
         ValueError: If the session ID is not defined.

@@ -1,7 +1,10 @@
 import asyncio
 import os
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, cast
 
+from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
+
+from custom_types.bot_message import parse_informative_bot_response, InformativeBotResponse
 from entities.flow_entity import FlowDTO
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from models.repository.flow_repo import get_flow_by_id
@@ -86,7 +89,6 @@ async def handle_request(
             text=text,
         )
         return response
-        pass
     else:
         # it means that the user query is "informative" and can be answered using text only
         # get the top knowledgeable documents (if any)
@@ -95,9 +97,7 @@ async def handle_request(
             informative_item=documents,
             base_prompt=base_prompt,
             text=text,
-            headers=headers,
-            app=app,
-            bot_id=bot_id
+            conversations_history=conversations_history
         )
         return response
 
@@ -149,8 +149,38 @@ def run_informative_item(
         informative_item: dict[str, List[DocumentSimilarityDTO]],
         base_prompt: str,
         text: str,
-        headers: Dict[str, str],
-        app: Optional[str],
-        bot_id: str,
+        conversations_history: List[BaseMessage]
 ) -> ResponseDict:
-    pass
+    # so we got all context, let's ask:
+
+    context = []
+    for vector_result in informative_item.get(VectorCollections.knowledgebase):
+        context.append(vector_result.document.metadata)
+
+    messages: List[BaseMessage] = [SystemMessage(content=base_prompt)]
+
+    if len(conversations_history) > 0:
+        messages.extend(conversations_history)
+
+    messages.append(
+        HumanMessage(
+            content=f"I found some relevant context that might be helpful. Here is the context: ```{','.join(str(context))}```. "
+        )
+    )
+
+    messages.append(
+        HumanMessage(
+            content="""Based on the information provided to you and the conversation history of this conversation, I want you to answer the questions that follow, make sure your answer is helpful
+            and clear and use advisable tune (at the end you advise based on the given context)"""
+        )
+    )
+    messages.append(
+        HumanMessage(
+            content="If you are unsure, or you think you can do a better job by asking clarification questions, then ask.")
+    )
+
+    messages.append(HumanMessage(content=text))
+
+    content = cast(str, chat(messages=messages).content)
+
+    return {"response": content, "error": None}
