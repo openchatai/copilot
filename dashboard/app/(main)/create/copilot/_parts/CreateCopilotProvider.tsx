@@ -1,4 +1,4 @@
-import { CopilotType, ValidatorResponseType } from "@/data/copilot";
+import type { CopilotType } from "@/data/copilot";
 import { createSafeContext } from "@/lib/createSafeContext";
 import React from "react";
 import { produce } from "immer";
@@ -9,11 +9,12 @@ type ModeType = typeof Modes[number];
 type State = {
   createdCopilot?: CopilotType;
   isLoading?: boolean;
-  swaggerFiles?: File[];
-  validatorResponse?: ValidatorResponseType;
+  swaggerFiles?: File[] | null;
+  validatorResponse?: [];
   currentlyEditingEndpointId?: string | null;
   swaggerEndpoints: FormValuesWithId[];
   mode?: typeof Modes[number];
+  copilot_name: string | null
 };
 
 const actionTypes = {
@@ -27,6 +28,7 @@ const actionTypes = {
   ADD_NEW_ENDPOINT: "ADD_NEW_ENDPOINT",
   SET_EDIT_MODE: "SET_EDIT_MODE",
   RESET_MODE: "RESET_MODE",
+  CHANGE_NAME: "CHANGE_NAME",
 } as const;
 
 type ActionType = typeof actionTypes;
@@ -42,12 +44,9 @@ type Action =
   }
   | {
     type: ActionType["ADD_SWAGGER"];
-    payload: File[];
+    payload: File[] | null;
   }
   | {
-    type: ActionType["SET_VALIDATIONS"];
-    payload: ValidatorResponseType;
-  } | {
     type: ActionType["SET_SWAGGER_ENDPOINTS"];
     payload: FormValuesWithId[];
   } | {
@@ -63,8 +62,10 @@ type Action =
       endpointId?: string
     }
 
+  } | {
+    type: "CHANGE_NAME",
+    payload: string
   }
-
 
 const [CreateCopilotSafeProvider, useCreateCopilot] = createSafeContext<{
   state: State;
@@ -83,9 +84,6 @@ function reducer(state: State, action: Action) {
       case actionTypes.ADD_SWAGGER:
         draft.swaggerFiles = action.payload;
         break;
-      case actionTypes.SET_VALIDATIONS:
-        draft.validatorResponse = action.payload;
-        break;
       case actionTypes.SET_SWAGGER_ENDPOINTS:
         draft.swaggerEndpoints = action.payload;
         break;
@@ -94,6 +92,9 @@ function reducer(state: State, action: Action) {
         break;
       case actionTypes.ADD_NEW_ENDPOINT:
         draft.swaggerEndpoints.push(action.payload);
+        break;
+      case "CHANGE_NAME":
+        draft.copilot_name = action.payload;
         break;
       case "CHANGE_MODE":
         draft.mode = action.payload.mode;
@@ -110,7 +111,9 @@ function CreateCopilotProvider({ children }: { children: React.ReactNode }) {
     createdCopilot: undefined,
     validatorResponse: undefined,
     currentlyEditingEndpointId: null,
-    swaggerEndpoints: []
+    swaggerEndpoints: [],
+    copilot_name: null
+
   });
   return (
     <CreateCopilotSafeProvider value={{ state, dispatch }}>
