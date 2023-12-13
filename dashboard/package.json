@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "dev:debug": "cross-env NODE_OPTIONS='--inspect' next dev",
     "clean": "rm -rf .next"
   },
   "dependencies": {
@@ -68,6 +69,7 @@
     "@types/react-dom": "^18",
     "@types/react-syntax-highlighter": "^15.5.8",
     "autoprefixer": "^10",
+    "cross-env": "^7.0.3",
     "eslint": "^8",
     "eslint-config-next": "13.5.4",
     "postcss": "^8",
