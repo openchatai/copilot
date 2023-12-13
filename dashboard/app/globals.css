@@ -129,3 +129,9 @@
 * {
   min-width: 0;
 }
+/* select labels beside required inputs */
+.required-label::after {
+  content: "*";
+  color: hsl(var(--destructive));
+  margin-left: 0.25rem;
+}

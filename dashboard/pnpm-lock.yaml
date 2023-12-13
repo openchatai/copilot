@@ -41,6 +41,9 @@ dependencies:
   '@radix-ui/react-popover':
     specifier: ^1.0.7
     version: 1.0.7(@types/react-dom@18.2.13)(@types/react@18.2.28)(react-dom@18.2.0)(react@18.2.0)
+  '@radix-ui/react-portal':
+    specifier: ^1.0.4
+    version: 1.0.4(@types/react-dom@18.2.13)(@types/react@18.2.28)(react-dom@18.2.0)(react@18.2.0)
   '@radix-ui/react-radio-group':
     specifier: ^1.1.3
     version: 1.1.3(@types/react-dom@18.2.13)(@types/react@18.2.28)(react-dom@18.2.0)(react@18.2.0)
@@ -96,8 +99,8 @@ dependencies:
     specifier: ^4.17.21
     version: 4.17.21
   lucide-react:
-    specifier: ^0.284.0
-    version: 0.284.0(react@18.2.0)
+    specifier: ^0.294.0
+    version: 0.294.0(react@18.2.0)
   next:
     specifier: 14.0.0
     version: 14.0.0(react-dom@18.2.0)(react@18.2.0)
@@ -107,6 +110,9 @@ dependencies:
   react:
     specifier: ^18
     version: 18.2.0
+  react-beautiful-dnd:
+    specifier: ^13.1.1
+    version: 13.1.1(react-dom@18.2.0)(react@18.2.0)
   react-confetti:
     specifier: ^6.1.0
     version: 6.1.0(react@18.2.0)
@@ -138,8 +144,8 @@ dependencies:
     specifier: ^2.2.3
     version: 2.2.3(react-dom@18.2.0)(react@18.2.0)
   reactflow:
-    specifier: ^11.9.4
-    version: 11.9.4(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
+    specifier: ^11.10.1
+    version: 11.10.1(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
   swr:
     specifier: ^2.2.4
     version: 2.2.4(react@18.2.0)
@@ -166,6 +172,9 @@ devDependencies:
   '@types/react':
     specifier: ^18
     version: 18.2.28
+  '@types/react-beautiful-dnd':
+    specifier: ^13.1.7
+    version: 13.1.7
   '@types/react-dom':
     specifier: ^18
     version: 18.2.13
@@ -1672,13 +1681,13 @@ packages:
       '@babel/runtime': 7.23.2
     dev: false
 
-  /@reactflow/background@11.3.4(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-bgwvqWxF09chwmdkyClpYEMaewBspdwjgLbbFlLf4SpWPFMYyuvCBQrcISsvy/EDEWO9i3Uj9ktgGAhvtSQsmA==}
+  /@reactflow/background@11.3.6(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-06FPlSUOOMALEEs+2PqPAbpqmL7WDjrkbG2UsDr2d6mbcDDhHiV4tu9FYoz44SQvXo7ma9VRotlsaR4OiRcYsg==}
     peerDependencies:
       react: '>=17'
       react-dom: '>=17'
     dependencies:
-      '@reactflow/core': 11.9.4(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
+      '@reactflow/core': 11.10.1(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
       classcat: 5.0.4
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
@@ -1688,13 +1697,13 @@ packages:
       - immer
     dev: false
 
-  /@reactflow/controls@11.2.4(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-x6e5p9iHjC6gd+4SoZ3DOOp0F1MefGKQ8hT6yPVdqxfo1+rV2WhrWvrX/MCoEu12Dp7457LdLfa0giy3aho8tQ==}
+  /@reactflow/controls@11.2.6(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-4QHT92/ACVlZkvV+Hq44bAPV8WbMhkJl+/J0EbXcqQ1+an7cWJsF84eeelJw7R5J76RoaSSpKdsWsL2v7HAVlw==}
     peerDependencies:
       react: '>=17'
       react-dom: '>=17'
     dependencies:
-      '@reactflow/core': 11.9.4(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
+      '@reactflow/core': 11.10.1(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
       classcat: 5.0.4
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
@@ -1704,8 +1713,8 @@ packages:
       - immer
     dev: false
 
-  /@reactflow/core@11.9.4(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-Ko7nKPOYalwDTTbRHi2+QXDiidSAcpUzGN3G+0B+QysLZkcaPCkpkMjjHiDC4c/Z1BJBzs1FRJg/T6BXaBnYkg==}
+  /@reactflow/core@11.10.1(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-GIh3usY1W3eVobx//OO9+Cwm+5evQBBdPGxDaeXwm25UqPMWRI240nXQA5F/5gL5Mwpf0DUC7DR2EmrKNQy+Rw==}
     peerDependencies:
       react: '>=17'
       react-dom: '>=17'
@@ -1726,13 +1735,13 @@ packages:
       - immer
     dev: false
 
-  /@reactflow/minimap@11.7.4(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-Jo1R+uDey9IV7O2s3m0gK2+cZpg9M8hq2EZJb3NGfOSzMAPhj3mby0fNJIgTzycreuht0TpA51c2YfjGI3YIOw==}
+  /@reactflow/minimap@11.7.6(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-kJEtyeQkTZYViLGebVWHVUJROMAGcvejvT+iX4DqKnFb5yK8E8LWlXQpRx2FrL9gDy80mJJaciy7IxnnQKE1bg==}
     peerDependencies:
       react: '>=17'
       react-dom: '>=17'
     dependencies:
-      '@reactflow/core': 11.9.4(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
+      '@reactflow/core': 11.10.1(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
       '@types/d3-selection': 3.0.8
       '@types/d3-zoom': 3.0.6
       classcat: 5.0.4
@@ -1746,13 +1755,13 @@ packages:
       - immer
     dev: false
 
-  /@reactflow/node-resizer@2.2.4(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-+p271/hAsM5M1+RQTWW/02pbNkCHeGXwxGimIlL1tMIagyuko0NX2vOz2B8jxJnPKlF09Wj18BcXBNUm3nDcSg==}
+  /@reactflow/node-resizer@2.2.6(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-1Xb6q97uP7hRBLpog9sRCNfnsHdDgFRGEiU+lQqGgPEAeYwl4nRjWa/sXwH6ajniKxBhGEvrdzOgEFn6CRMcpQ==}
     peerDependencies:
       react: '>=17'
       react-dom: '>=17'
     dependencies:
-      '@reactflow/core': 11.9.4(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
+      '@reactflow/core': 11.10.1(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
       classcat: 5.0.4
       d3-drag: 3.0.0
       d3-selection: 3.0.0
@@ -1764,13 +1773,13 @@ packages:
       - immer
     dev: false
 
-  /@reactflow/node-toolbar@1.3.4(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-TfcmpXHRBb2mUfzKGjburiU6FWqRME9pPFs1OwIC1z5e9BjupQhNDEKEk8XHi7PKL/mAiDfwuGXaM1BVVFuPqw==}
+  /@reactflow/node-toolbar@1.3.6(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-JXDEuZ0wKjZ8z7qK2bIst0eZPzNyVEsiHL0e93EyuqT4fA9icoyE0fLq2ryNOOp7MXgId1h7LusnH6ta45F0yQ==}
     peerDependencies:
       react: '>=17'
       react-dom: '>=17'
     dependencies:
-      '@reactflow/core': 11.9.4(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
+      '@reactflow/core': 11.10.1(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
       classcat: 5.0.4
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
@@ -1996,6 +2005,13 @@ packages:
       '@types/unist': 2.0.8
     dev: false
 
+  /@types/hoist-non-react-statics@3.3.5:
+    resolution: {integrity: sha512-SbcrWzkKBw2cdwRTwQAswfpB9g9LJWfjtUeW/jvNwbhC8cpmmNYVePa+ncbUe0rGTQ7G3Ff6mYUN2VMfLVr+Sg==}
+    dependencies:
+      '@types/react': 18.2.28
+      hoist-non-react-statics: 3.3.2
+    dev: false
+
   /@types/js-cookie@2.2.7:
     resolution: {integrity: sha512-aLkWa0C0vO5b4Sr798E26QgOkss68Un0bLjs7u9qxzPT5CG+8DuNTffWES58YzJs3hrVAOs1wonycqEBqNJubA==}
     dev: false
@@ -2021,10 +2037,25 @@ packages:
   /@types/prop-types@15.7.8:
     resolution: {integrity: sha512-kMpQpfZKSCBqltAJwskgePRaYRFukDkm1oItcAbC3gNELR20XIBcN9VRgg4+m8DKsTfkWeA4m4Imp4DDuWy7FQ==}
 
+  /@types/react-beautiful-dnd@13.1.7:
+    resolution: {integrity: sha512-jQZLov9OkD0xRQkqz8/lx66bHYAYv+g4+POBqnH5Jtt/xo4MygzM879Q9sxAiosPBdNj1JYTdbPxDn3dNRYgow==}
+    dependencies:
+      '@types/react': 18.2.28
+    dev: true
+
   /@types/react-dom@18.2.13:
     resolution: {integrity: sha512-eJIUv7rPP+EC45uNYp/ThhSpE16k22VJUknt5OLoH9tbXoi8bMhwLf5xRuWMywamNbWzhrSmU7IBJfPup1+3fw==}
     dependencies:
       '@types/react': 18.2.28
+
+  /@types/react-redux@7.1.32:
+    resolution: {integrity: sha512-YJYV0M27cyHHJIacaRsZRx5OETzK8KWjEGnix7UH3ngItYo4It0MUBzU6WNwqnwhbrPw5wx9KXluuoTZ85Gg7A==}
+    dependencies:
+      '@types/hoist-non-react-statics': 3.3.5
+      '@types/react': 18.2.28
+      hoist-non-react-statics: 3.3.2
+      redux: 4.2.1
+    dev: false
 
   /@types/react-syntax-highlighter@15.5.8:
     resolution: {integrity: sha512-GT1PLGzhF3ilGaQiCHFDShxDBb014s01MQi0nWfXJ23efjWfUrZ2i0g4tH1JGdfnIGBtQDge/k3ON3fLoAuU/w==}
@@ -2499,6 +2530,12 @@ packages:
       shebang-command: 2.0.0
       which: 2.0.2
     dev: true
+
+  /css-box-model@1.2.1:
+    resolution: {integrity: sha512-a7Vr4Q/kd/aw96bnJG332W9V9LkJO69JRcaCYDUqjp6/z0w6VcZjgAcTbgFxEPfBgdnAwlh3iwu+hLopa+flJw==}
+    dependencies:
+      tiny-invariant: 1.3.1
+    dev: false
 
   /css-in-js-utils@3.1.0:
     resolution: {integrity: sha512-fJAcud6B3rRu+KHYk+Bwf+WFL2MDCJJ1XG9x137tJQ0xYxor7XziQtuGFbWNdqrvF4Tk26O3H73nfVqXt/fW1A==}
@@ -3387,6 +3424,12 @@ packages:
     resolution: {integrity: sha512-tzcUFauisWKNHaRkN4Wjl/ZA07gENAjFl3J/c480dprkGTg5EQstgaNFqBfUqCq54kZRIEcreTsAgF/m2quD7A==}
     dev: false
 
+  /hoist-non-react-statics@3.3.2:
+    resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
+    dependencies:
+      react-is: 16.13.1
+    dev: false
+
   /hyphenate-style-name@1.0.4:
     resolution: {integrity: sha512-ygGZLjmXfPHj+ZWh6LwbC37l43MhfztxetbFCoYTM2VjkIUpeHgSNn7QIyVFj7YQ1Wl9Cbw5sholVJPzWvC2MQ==}
     dev: false
@@ -3766,8 +3809,8 @@ packages:
       yallist: 4.0.0
     dev: true
 
-  /lucide-react@0.284.0(react@18.2.0):
-    resolution: {integrity: sha512-dVSMHYAya/TeY3+vsk+VQJEKNQN2AhIo0+Dp09B2qpzvcBuu93H98YZykFcjIAfmanFiDd8nqfXFR38L757cyQ==}
+  /lucide-react@0.294.0(react@18.2.0):
+    resolution: {integrity: sha512-V7o0/VECSGbLHn3/1O67FUgBwWB+hmzshrgDVRJQhMh8uj5D3HBuIvhuAmQTtlupILSplwIZg5FTc4tTKMA2SA==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
     dependencies:
@@ -3776,6 +3819,10 @@ packages:
 
   /mdn-data@2.0.14:
     resolution: {integrity: sha512-dn6wd0uw5GsdswPFfsgMp5NSB0/aDe6fK94YJV/AJDYXL6HVLWBsxeq7js7Ad+mU2K9LAlwpk6kN2D5mwCPVow==}
+    dev: false
+
+  /memoize-one@5.2.1:
+    resolution: {integrity: sha512-zYiwtZUcYyXKo/np96AGZAckk+FWWsUdJ3cHGGmld7+AhvcWmQyGCYUh1hc4Q/pkOhb65dQR/pqCyK0cOaHz4Q==}
     dev: false
 
   /merge2@1.4.1:
@@ -4228,6 +4275,29 @@ packages:
   /queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
 
+  /raf-schd@4.0.3:
+    resolution: {integrity: sha512-tQkJl2GRWh83ui2DiPTJz9wEiMN20syf+5oKfB03yYP7ioZcJwsIK8FjrtLwH1m7C7e+Tt2yYBlrOpdT+dyeIQ==}
+    dev: false
+
+  /react-beautiful-dnd@13.1.1(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-0Lvs4tq2VcrEjEgDXHjT98r+63drkKEgqyxdA7qD3mvKwga6a5SscbdLPO2IExotU1jW8L0Ksdl0Cj2AF67nPQ==}
+    peerDependencies:
+      react: ^16.8.5 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.5 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@babel/runtime': 7.23.2
+      css-box-model: 1.2.1
+      memoize-one: 5.2.1
+      raf-schd: 4.0.3
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      react-redux: 7.2.9(react-dom@18.2.0)(react@18.2.0)
+      redux: 4.2.1
+      use-memo-one: 1.1.3(react@18.2.0)
+    transitivePeerDependencies:
+      - react-native
+    dev: false
+
   /react-confetti@6.1.0(react@18.2.0):
     resolution: {integrity: sha512-7Ypx4vz0+g8ECVxr88W9zhcQpbeujJAVqL14ZnXJ3I23mOI9/oBVTQ3dkJhUmB0D6XOtCZEM6N0Gm9PMngkORw==}
     engines: {node: '>=10.18'}
@@ -4290,6 +4360,32 @@ packages:
 
   /react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
+
+  /react-is@17.0.2:
+    resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
+    dev: false
+
+  /react-redux@7.2.9(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-Gx4L3uM182jEEayZfRbI/G11ZpYdNAnBs70lFVMNdHJI76XYtR+7m0MN+eAs7UHBPhWXcnFPaS+9owSCJQHNpQ==}
+    peerDependencies:
+      react: ^16.8.3 || ^17 || ^18
+      react-dom: '*'
+      react-native: '*'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+    dependencies:
+      '@babel/runtime': 7.23.2
+      '@types/react-redux': 7.1.32
+      hoist-non-react-statics: 3.3.2
+      loose-envify: 1.4.0
+      prop-types: 15.8.1
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      react-is: 17.0.2
+    dev: false
 
   /react-remove-scroll-bar@2.3.4(@types/react@18.2.28)(react@18.2.0):
     resolution: {integrity: sha512-63C4YQBUt0m6ALadE9XV56hV8BgJWDmmTPY758iIJjfQKt2nYwoUrPk0LXRXcB/yIj82T1/Ixfdpdk68LwIB0A==}
@@ -4441,18 +4537,18 @@ packages:
       loose-envify: 1.4.0
     dev: false
 
-  /reactflow@11.9.4(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-IHAKBkJngNvU9y1vZ5Nw9rvA3Z+zc9geTgQQIi9qq9Y9knGLlDDr9KfsjbFMew9AycAAgVg8TvBEakF4IT5lqg==}
+  /reactflow@11.10.1(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-Q616fElAc5/N37tMwjuRkkgm/VgmnLLTNNCj61z5mvJxae+/VXZQMfot1K6a5LLz9G3SVKqU97PMb9Ga1PRXew==}
     peerDependencies:
       react: '>=17'
       react-dom: '>=17'
     dependencies:
-      '@reactflow/background': 11.3.4(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
-      '@reactflow/controls': 11.2.4(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
-      '@reactflow/core': 11.9.4(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
-      '@reactflow/minimap': 11.7.4(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
-      '@reactflow/node-resizer': 2.2.4(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
-      '@reactflow/node-toolbar': 1.3.4(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
+      '@reactflow/background': 11.3.6(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
+      '@reactflow/controls': 11.2.6(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
+      '@reactflow/core': 11.10.1(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
+      '@reactflow/minimap': 11.7.6(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
+      '@reactflow/node-resizer': 2.2.6(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
+      '@reactflow/node-toolbar': 1.3.6(@types/react@18.2.28)(immer@10.0.3)(react-dom@18.2.0)(react@18.2.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     transitivePeerDependencies:
@@ -4470,6 +4566,12 @@ packages:
     engines: {node: '>=8.10.0'}
     dependencies:
       picomatch: 2.3.1
+
+  /redux@4.2.1:
+    resolution: {integrity: sha512-LAUYz4lc+Do8/g7aeRa8JkyDErK6ekstQaqWQrNRW//MY1TvCEpMtpTWvlQ+FPbWCx+Xixu/6SHt5N0HR+SB4w==}
+    dependencies:
+      '@babel/runtime': 7.23.2
+    dev: false
 
   /reflect.getprototypeof@1.0.4:
     resolution: {integrity: sha512-ECkTw8TmJwW60lOTR+ZkODISW6RQ8+2CL3COqtiJKLd6MmB45hN51HprHFziKLGkAuTGQhBb91V8cy+KHlaCjw==}
@@ -4874,6 +4976,10 @@ packages:
     resolution: {integrity: sha512-a7wPxPdVlQL7lqvitHGGRsofhdwtkoSXPGATFuSOA2i1ZNQEPLrGnj68vOp2sOJTCFAQVXPeNMX/GctBaO9L2w==}
     dev: false
 
+  /tiny-invariant@1.3.1:
+    resolution: {integrity: sha512-AD5ih2NlSssTCwsMznbvwMZpJ1cbhkGd2uueNxzv2jDlEeZdU04JQfRnggJQ8DrcVBGjAsCKwFBbDlVNtEMlzw==}
+    dev: false
+
   /to-regex-range@5.0.1:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}
     engines: {node: '>=8.0'}
@@ -5051,6 +5157,14 @@ packages:
       '@types/react': 18.2.28
       react: 18.2.0
       use-isomorphic-layout-effect: 1.1.2(@types/react@18.2.28)(react@18.2.0)
+    dev: false
+
+  /use-memo-one@1.1.3(react@18.2.0):
+    resolution: {integrity: sha512-g66/K7ZQGYrI6dy8GLpVcMsBp4s17xNkYJVSMvTEevGy3nDxHOfE6z8BVE22+5G5x7t3+bhzrlTDB7ObrEE0cQ==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
     dev: false
 
   /use-sidecar@1.1.2(@types/react@18.2.28)(react@18.2.0):
