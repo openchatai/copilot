@@ -21,7 +21,7 @@ async def run_openapi_operations(
     headers: Headers,
     server_base_url: str,
     app: Optional[str],
-    bot_id: str,
+    session_id: str,
     summary_prompt: str,
 ) -> str:
     api_request_data = {}
@@ -119,6 +119,6 @@ async def run_openapi_operations(
         text,
         record_info,
         api_request_data,
-        bot_id=bot_id,
+        session_id=session_id,
         summary_prompt=summary_prompt,
     )

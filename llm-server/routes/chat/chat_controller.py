@@ -15,6 +15,7 @@ from models.repository.copilot_repo import find_one_or_fail_by_token
 from utils.db import Database
 from .. import root_service
 from typing import Optional
+from flask_socketio import emit
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -108,12 +109,8 @@ def init_chat():
     )
 
 
-@chat_workflow.route("/send", methods=["POST"])
-async def send_chat():
-    json_data = request.get_json()
-    # if not isinstance(json_data, dict):
-    #     raise ValueError("Invalid JSON format. Expected a dictionary.")
-
+async def send_chat(json_data):
+    logger.info("Received calls from socketio")
     input_data = ChatInput(**json_data)
     message = input_data.content
     session_id = input_data.session_id
@@ -125,7 +122,7 @@ async def send_chat():
         abort(400, description="Invalid content, the size is larger than 255 char")
 
     if not bot_token:
-        return Response(response="bot token is required", status=500)
+        return emit(session_id, "bot token is required")
     bot = find_one_or_fail_by_token(bot_token)
 
     app_name = headers_from_json.pop(X_App_Name, None)
@@ -136,16 +133,14 @@ async def send_chat():
     server_base_url = request.form.get("server_base_url", "")
 
     if not bot:
-        return (
-            jsonify(
-                {
-                    "type": "text",
-                    "response": {
-                        "text": "I'm unable to help you at the moment, please try again later. **code: b404**"
-                    },
-                }
-            ),
-            404,
+        emit(
+            session_id,
+            {
+                "type": "text",
+                "response": {
+                    "text": "I'm unable to help you at the moment, please try again later. **code: b404**"
+                },
+            },
         )
 
     try:
@@ -180,19 +175,17 @@ async def send_chat():
                 logs=response_data["error"],
             )
 
-        return jsonify(
-            {"type": "text", "response": {"text": response_data["response"]}}
-        )
+        return {"type": "text", "response": {"text": response_data["response"]}}
+
     except Exception as e:
         logger.error("An exception occurred", incident="chat/send", error=str(e))
-        return (
-            jsonify(
-                {
-                    "type": "text",
-                    "response": {
-                        "text": f"I'm unable to help you at the moment, please try again later. **code: b500**\n```{e}```"
-                    },
-                }
-            ),
-            500,
-        )
+
+        emit(
+            session_id,
+            {
+                "type": "text",
+                "response": {
+                    "text": f"I'm unable to help you at the moment, please try again later. **code: b500**\n```{e}```"
+                },
+            },
+        ),

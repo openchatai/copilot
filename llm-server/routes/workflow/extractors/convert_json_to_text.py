@@ -7,6 +7,7 @@ from typing import Optional, Dict, Any, cast
 from utils.get_chat_model import get_chat_model
 from utils.chat_models import CHAT_MODELS
 from utils.get_logger import CustomLogger
+from flask_socketio import emit
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 logger = CustomLogger(module_name=__name__)
@@ -16,7 +17,7 @@ def convert_json_to_text(
     user_input: str,
     api_response: Dict[str, Any],
     api_request_data: Dict[str, Any],
-    bot_id: str,
+    session_id: str,
     summary_prompt: str,
 ) -> str:
     chat = get_chat_model()
@@ -33,12 +34,18 @@ def convert_json_to_text(
         ),
     ]
 
-    result = chat(messages)
+    stream = chat.stream(messages)
+
+    output = ""
+    for chunk in stream:
+        emit(session_id, chunk)
+        output = output + str(chunk.content)
+
     logger.info(
         "Convert json to text",
-        content=result.content,
+        content=output,
         incident="convert_json_to_text",
         api_request_data=api_request_data,
     )
 
-    return cast(str, result.content)
+    return cast(str, output)

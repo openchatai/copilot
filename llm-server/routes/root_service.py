@@ -26,7 +26,7 @@ from langchain.docstore.document import Document
 from werkzeug.datastructures import Headers
 import asyncio
 from opencopilot_types.workflow_type import WorkflowFlowType
-
+from flask_socketio import emit
 
 from utils.get_logger import CustomLogger
 
@@ -108,7 +108,7 @@ async def handle_request(
         results = await asyncio.gather(*tasks)
         context, apis, flows, prev_conversations = results
         # also provide a list of workflows here itself, the llm should be able to figure out if a workflow needs to be run
-        step = process_conversation_step(
+        step = await process_conversation_step(
             user_requirement=text,
             context=context,
             session_id=session_id,
@@ -131,7 +131,7 @@ async def handle_request(
                 ids=step.ids,
                 swagger_doc=swagger_doc,
                 app=app,
-                bot_id=bot_id,
+                session_id=session_id,
                 headers=headers,
                 server_base_url=server_base_url,
                 text=text,
@@ -148,6 +148,8 @@ async def handle_request(
                 context=context,
                 flows=flows,
             )
+
+            emit(session_id, response)
             return response
         else:
             return {"error": None, "response": step.bot_message}
@@ -159,6 +161,10 @@ async def handle_request(
             prev_conversations=prev_conversations,
         )
 
+        emit(
+            session_id,
+            {"response": str(e), "error": "An error occured in handle request"},
+        )
         return {"response": str(e), "error": "An error occured in handle request"}
 
 
@@ -204,7 +210,7 @@ async def handle_api_calls(
     server_base_url: str,
     swagger_url: Optional[str],
     app: Optional[str],
-    bot_id: str,
+    session_id: str,
     summary_prompt: str,
 ) -> ResponseDict:
     _workflow = create_workflow_from_operation_ids(ids, swagger_doc, text)
@@ -213,7 +219,7 @@ async def handle_api_calls(
         swagger_doc,
         WorkflowData(text, headers, server_base_url, swagger_url, app),
         app,
-        bot_id=bot_id,
+        session_id=session_id,
         summary_prompt=summary_prompt,
     )
 

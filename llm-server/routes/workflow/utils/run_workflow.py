@@ -17,7 +17,7 @@ async def run_workflow(
     swagger_json: Any,
     data: WorkflowData,
     app: Optional[str],
-    bot_id: str,
+    session_id: str,
     summary_prompt: str,
 ) -> ResponseDict:
     headers = data.headers or Headers()
@@ -34,7 +34,7 @@ async def run_workflow(
             headers,
             server_base_url,
             app,
-            bot_id=bot_id,
+            session_id=session_id,
             summary_prompt=summary_prompt,
         )
     except Exception as e:

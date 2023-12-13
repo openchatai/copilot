@@ -5,12 +5,14 @@ from opencopilot_types.workflow_type import WorkflowFlowType
 
 # push it to the library
 from integrations.custom_prompts.prompt_loader import load_prompts
+from routes.workflow.utils.stream_text import stream_word
 from utils.get_chat_model import get_chat_model
 from langchain.schema import OutputParserException
 from utils.chat_models import CHAT_MODELS
 from utils.get_logger import CustomLogger
 from typing import Optional, List, cast
 from json import dumps
+from flask_socketio import emit
 
 logger = CustomLogger(module_name=__name__)
 chat = get_chat_model()
@@ -19,7 +21,7 @@ chat = get_chat_model()
 # @Remaining tasks here
 # 1. Todo: add application initial state here as well
 # 2. Add api data from qdrant so that the llm understands what apis are available to it for use
-def process_conversation_step(
+async def process_conversation_step(
     session_id: str,
     app: Optional[str],
     user_requirement: str,
@@ -30,13 +32,14 @@ def process_conversation_step(
     bot_id: str,
     base_prompt: str,
 ):
-    logger.info(
-        "planner data",
-        context=context,
-        api_summaries=api_summaries,
-        prev_conversations=prev_conversations,
-        flows=flows,
-    )
+    output = ""
+    # logger.info(
+    #     "planner data",
+    #     context=context,
+    #     api_summaries=api_summaries,
+    #     prev_conversations=prev_conversations,
+    #     flows=flows,
+    # )
     if not session_id:
         raise ValueError("Session id must be defined for chat conversations")
     messages: List[BaseMessage] = []
@@ -97,23 +100,23 @@ Don't add operation ids if you can reply by merely looking in the conversation h
 
     messages.append(HumanMessage(content=user_requirement))
 
-    logger.info("messages array", messages=messages)
-
-    content = cast(str, chat(messages=messages).content)
+    async for chunk in chat.astream(messages):
+        output += str(chunk.content)
+        emit(session_id, chunk.content)
 
     try:
-        d = parse_bot_message(content)
+        d = parse_bot_message(output)
         logger.info(
             "Extracting JSON payload",
             action="parse_bot_message",
             data=d,
-            content=content,
+            content=output,
         )
         return d
 
     except OutputParserException as e:
-        logger.warn("Failed to parse json", data=content, err=str(e))
-        return BotMessage(bot_message=content, ids=[])
+        logger.warn("Failed to parse json", data=output, err=str(e))
+        return BotMessage(bot_message=output, ids=[])
     except Exception as e:
         logger.warn("unexpected error occured", err=str(e))
         return BotMessage(ids=[], bot_message=str(e))
