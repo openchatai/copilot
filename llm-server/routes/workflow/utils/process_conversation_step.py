@@ -46,7 +46,7 @@ def is_it_informative_or_actionable(chat_history: List[BaseMessage], current_mes
 
     prompt = '''
     You are an AI tool that classifies user input as actionable or not. Actionable input refers to requests that can be fulfilled by calling an external tool. You will be provided with the user's input and descriptions of available tools. If the user's request can be fulfilled using one of these tools, it is considered actionable.
-
+    if the user question can be answered if we used one of the tools, then it's better to consider the request Actionable
     Example
 
     **User Input:** create a b-1 visa application
