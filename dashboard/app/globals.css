@@ -128,6 +128,7 @@
 }
 * {
   min-width: 0;
+  min-height: 0;
 }
 /* select labels beside required inputs */
 .required-label::after {
