@@ -6,39 +6,18 @@ const instance = axios.create({
 });
 
 export type CopilotType = {
+  created_at: string;
+  deleted_at: null | string;
+  enhanced_privacy: boolean;
   id: string;
   name: string;
-  token: string;
-  website: string;
-  status: "draft" | "published" | "archived";
   prompt_message: string;
-  enhanced_privacy: boolean;
   smart_sync: boolean;
-  created_at: string;
-  updated_at: string;
-  deleted_at?: Date;
+  status: "draft" | "live"
   swagger_url: string;
-  is_premade_demo_template: boolean;
-};
-export type EndpointType = {
-  operationId: string;
-  type: string;
-  name: string;
-  description: string;
-  requestBody: any;
-  requestParameters: any;
-  responseBody: any;
-  path: string;
-};
-export type ValidatorResponseType = {
-  chatbot_id: string;
-  all_endpoints: EndpointType[];
-  validations: {
-    endpoints_without_operation_id: EndpointType[];
-    endpoints_without_description: EndpointType[];
-    endpoints_without_name: EndpointType[];
-    auth_type: any;
-  };
+  token: string;
+  updated_at: string;
+  website: string;
 };
 
 export async function listCopilots() {
@@ -49,6 +28,7 @@ export async function getCopilot(id: string) {
   if (!id) throw new Error("Copilot id is required");
   return await instance.get<{ chatbot: CopilotType }>(`/${id}`);
 }
+
 // http://localhost:8888/backend/api/copilot/:id
 export async function deleteCopilot(id: string) {
   if (!id) throw new Error("Copilot id is required");
@@ -62,31 +42,10 @@ export async function updateCopilot(id: string, copilot: Partial<CopilotType>) {
     chatbot: CopilotType;
   }>(`/${id}`, copilot);
 }
-export async function validateSwagger(bot_id: string) {
-  if (!bot_id) throw new Error("Bot id is required");
-  return instance.get<ValidatorResponseType>(`/${bot_id}/validator`);
-}
 
-export async function createCopilot({ swagger_file }: { swagger_file: File }) {
-  const data = new FormData();
-  data.append("swagger_file", swagger_file);
-  return instance.post<{
-    chatbot: CopilotType;
-  }>("/swagger", data, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
-}
-
-// premade Templates
-
-// http://localhost:8888/backend/api/copilot/swagger/pre-made
-export type PetStoreCopilotType = {
-  swagger_url: string;
-  chatbot: CopilotType;
-};
-
-export async function createPetstoreTemplate() {
-  return await instance.get<PetStoreCopilotType>(`/swagger/pre-made`);
+// {{backend_base}}/copilot
+export async function createCopilot(copilot_name: string) {
+  const form = new FormData()
+  form.append('name', copilot_name)
+  return await instance.post<CopilotType>('/', form)
 }

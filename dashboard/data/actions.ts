@@ -38,6 +38,9 @@ export function createActionByBotId(bot_id: string, data: ActionType) {
 // {{backend_base}}/actions/bot/:bot_id/import-from-swagger
 export function importActionsFromSwagger(bot_id: string, swagger: File) {
     const formData = new FormData();
-    formData.append('swagger', swagger);
-    return instance.post<ActionResponseType[]>(`/bot/${bot_id}/import-from-swagger`, formData);
+    formData.append('file', swagger);
+    return instance.put<{
+        is_error: boolean;
+        message: string;
+    }>(`/bot/${bot_id}/import-from-swagger`, formData);
 }
