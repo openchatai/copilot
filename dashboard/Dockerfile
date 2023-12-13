@@ -1,10 +1,9 @@
 # Start with a base node image
 FROM node:18-alpine AS base
-
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
 # Install corepack and pnpm
-RUN corepack enable && \
-    corepack prepare pnpm@8.7.0 --activate
-
+RUN corepack enable
 # Dependencies image
 FROM base AS deps
 
@@ -52,7 +51,8 @@ RUN addgroup --system --gid 1001 nodejs && \
 # Copy the build output and necessary files from builder stage
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
+# copy public folder
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 USER nextjs
 
 EXPOSE 8000
