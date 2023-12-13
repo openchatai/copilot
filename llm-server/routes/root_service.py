@@ -2,8 +2,6 @@ import asyncio
 import os
 from typing import Dict, Optional, List
 
-from langchain.schema import BaseMessage
-
 from entities.flow_entity import FlowDTO
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from models.repository.flow_repo import get_flow_by_id
@@ -90,9 +88,14 @@ async def handle_request(
         return response
         pass
     else:
-        # @todo get the highest similarly knowledgeable item
-        # put it into the context
+        # it means that the user query is "informative" and can be answered using text only
+
+        # get the top knowledgeable documents (if any)
+        # append the base prompt as the first message
+        # provide the knowledgeable documents as context
+        # put the user question
         # ask the llm
+        # return the response
         pass
 
 
@@ -137,3 +140,14 @@ async def run_actionable_item(
 
     # @todo now take the output, put it into a chat message with the base prompt and ask the llm to present it
     return output
+
+
+def run_informative_item(
+        informative_item: dict[str, List[DocumentSimilarityDTO]],
+        base_prompt: str,
+        text: str,
+        headers: Dict[str, str],
+        app: Optional[str],
+        bot_id: str,
+) -> ResponseDict:
+    pass
