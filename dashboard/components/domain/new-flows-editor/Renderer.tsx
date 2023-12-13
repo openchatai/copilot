@@ -93,7 +93,7 @@ export function FlowRenderer() {
         <ReactFlowProvider>
             <DragDropContext onDragEnd={handleDragEnd}>
                 <div className='flex items-center justify-between w-full h-full overflow-hidden'>
-                    <aside className='w-full max-w-sm flex flex-col items-start h-full py-4 border-r bg-white'>
+                    <aside className='w-full max-w-sm flex flex-col items-start h-full py-4 border-r bg-white overflow-hidden'>
                         <div className='flex flex-row justify-between w-full border-b pb-4 px-4 items-center'>
                             <div>
                                 <h2 className='text-base font-semibold'>Actions</h2>
@@ -105,7 +105,7 @@ export function FlowRenderer() {
                                 <Plus size={16} />
                             </Button>
                         </div>
-                        <div className='flex-1 w-full'>
+                        <div className='flex-1 w-full overflow-auto'>
                             <ActionsList />
                         </div>
                     </aside>
