@@ -75,7 +75,6 @@ async def handle_request(
     )
 
     if next_step.get('type') is UserMessageResponseType.actionable:
-    # if False:
         # get the single highest actionable item (could be an action or a flow) - hope we are lucky, and we can get the right one XD
         actionable_item = select_top_documents(actions + flows,
                                                [VectorCollections.actions, VectorCollections.actions])
