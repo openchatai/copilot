@@ -81,6 +81,6 @@ function FlowsControllerV2({ children }: { children: React.ReactNode }) {
     </ControllerProvider>
 }
 
-export const revalidateActions = (copilotId: string) => mutate("actions/" + copilotId);
+export const revalidateActions = (copilotId: string) => mutate(copilotId + '/actions');
 
 export { useController, FlowsControllerV2 }

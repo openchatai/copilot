@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { Link } from "@/lib/router-events";
 import React, { useState } from "react";
 import { Wizard, useWizard } from "react-use-wizard";
-import { Check, CheckCheck, FileVideo, Pen, Plus, Trash2, Upload } from "lucide-react";
+import { Check, CheckCheck, FileVideo, Plus, Trash2, Upload } from "lucide-react";
 import { CopilotType, createCopilot } from "@/data/copilot";
 import _ from "lodash";
 import { toast } from "@/components/ui/use-toast";
@@ -30,6 +30,7 @@ import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, 
 import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
 import { revalidateActions } from "@/components/domain/new-flows-editor/Controller";
 import { methodVariants } from "@/components/domain/MethodRenderer";
+import { atom, useAtom } from "jotai";
 
 function Header() {
   const { stepCount, activeStep, goToStep } = useWizard();
@@ -177,7 +178,10 @@ function FinishStep() {
     </div>
   );
 }
-// underconstruction
+const formDialog = atom({
+  swagger: false,
+  manually: false
+})
 function DefineActionsStep() {
   const { nextStep, previousStep } = useWizard();
   const [state, $importActionsFromSwagger] = useAsyncFn(importActionsFromSwagger)
@@ -186,10 +190,10 @@ function DefineActionsStep() {
     state: { swaggerFiles, createdCopilot },
     dispatch,
   } = useCreateCopilot();
-  const { data: actions } = useSWR(createdCopilot?.id + '/actions', async () => createdCopilot?.id ? await getActionsByBotId(createdCopilot?.id) : null)
-
-  const swaggerFile = _.first(swaggerFiles);
+  const [dialogs, setDialogs] = useAtom(formDialog)
+  const { data: actions } = useSWR(createdCopilot ? (createdCopilot?.id + '/actions') : null, async () => createdCopilot?.id ? await getActionsByBotId(createdCopilot?.id) : null)
   async function addActionFromSwagger() {
+    const swaggerFile = _.first(swaggerFiles);
     if (swaggerFile && createdCopilot) {
       const response = await $importActionsFromSwagger(createdCopilot.id, swaggerFile)
       if (response.data) {
@@ -204,9 +208,12 @@ function DefineActionsStep() {
         type: "ADD_SWAGGER",
         payload: null,
       });
+      setDialogs({
+        ...dialogs,
+        swagger: false
+      })
     }
   }
-
   return (
     <div className="relative p-1">
       <div className="mb-5 flex items-center justify-between">
@@ -228,7 +235,10 @@ function DefineActionsStep() {
         execute actions
       </p>
       <div className="flex items-center mb-2 space-x-2 justify-end">
-        <AlertDialog>
+        <AlertDialog open={dialogs.manually} onOpenChange={(open) => setDialogs({
+          ...dialogs,
+          manually: open,
+        })}>
           <AlertDialogContent>
             <AlertDialogHeader className="flex items-center justify-between w-full flex-row">
               <AlertDialogTitle className="flex-1 text-lg font-bold">
@@ -245,6 +255,10 @@ function DefineActionsStep() {
                       description: "We have created your action successfully",
                       variant: "success",
                     });
+                    setDialogs({
+                      ...dialogs,
+                      manually: false
+                    })
                     revalidateActions(createdCopilot.id)
                   }
                 }
@@ -267,7 +281,10 @@ function DefineActionsStep() {
             </Button>
           </AlertDialogTrigger>
         </AlertDialog>
-        <AlertDialog>
+        <AlertDialog open={dialogs.swagger} onOpenChange={(open) => setDialogs({
+          ...dialogs,
+          swagger: open,
+        })}>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle className="flex-1 text-lg font-bold">
@@ -297,10 +314,14 @@ function DefineActionsStep() {
           _.isEmpty(actions?.data) ?
             <div className="mx-auto">
               <EmptyBlock>
-                <span className="text-center">
-                  No endpoints added yet.
-                  You can add new acions via swagger files or manually
-                </span>
+                <div className="text-center text-sm">
+                  <span className="block">
+                    No endpoints added yet.
+                  </span>
+                  <span className="block">
+                    You can add new acions via swagger files or manually
+                  </span>
+                </div>
               </EmptyBlock>
             </div>
             :
@@ -319,17 +340,6 @@ function DefineActionsStep() {
                   </div>
                 </div>
                 <div className="space-x-2">
-                  <button className="text-primary" onClick={() => {
-                    dispatch({
-                      type: "CHANGE_MODE",
-                      payload: {
-                        mode: "EDIT_EXISTING_ENDPOINT",
-                        endpointId: endpoint.id
-                      }
-                    })
-                  }}>
-                    <Pen className="w-4 h-4" />
-                  </button>
                   <button className="text-destructive">
                     <Trash2 className="w-4 h-4" onClick={() => confirm("are you sure")} />
                   </button>
