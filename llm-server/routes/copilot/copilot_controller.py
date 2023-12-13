@@ -25,7 +25,7 @@ def index():
     return jsonify([chatbot_to_dict(chatbot) for chatbot in chatbots])
 
 
-@copilot.route("/swagger", methods=["POST"])
+@copilot.route("/", methods=["POST"])
 def create_new_copilot():
     chatbot = create_copilot(
         name=request.form.get("name", "My First Copilot"),
