@@ -4,7 +4,6 @@ from typing import Dict, Optional, List, cast
 
 from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
 
-from custom_types.bot_message import parse_informative_bot_response, InformativeBotResponse
 from entities.flow_entity import FlowDTO
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from models.repository.flow_repo import get_flow_by_id
@@ -76,6 +75,7 @@ async def handle_request(
     )
 
     if next_step.get('type') is UserMessageResponseType.actionable:
+    # if False:
         # get the single highest actionable item (could be an action or a flow) - hope we are lucky, and we can get the right one XD
         actionable_item = select_top_documents(actions + flows,
                                                [VectorCollections.actions, VectorCollections.actions])
@@ -162,11 +162,12 @@ def run_informative_item(
     if len(conversations_history) > 0:
         messages.extend(conversations_history)
 
-    messages.append(
-        HumanMessage(
-            content=f"I found some relevant context that might be helpful. Here is the context: ```{','.join(str(context))}```. "
+    if len(context):
+        messages.append(
+            HumanMessage(
+                content=f"I found some relevant context that might be helpful. Here is the context: ```{','.join(str(context))}```. "
+            )
         )
-    )
 
     messages.append(
         HumanMessage(

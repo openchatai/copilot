@@ -37,7 +37,9 @@ def convert_json_to_text(
     messages = [
         system_message,
         HumanMessage(
-            content="You'll receive user input and server responses obtained by making calls to various APIs. Your task is to summarize the api response that is an answer to the user input. Try to be concise and accurate, and also include references if present."
+            content="You'll receive user input and server responses obtained by making calls to various APIs. Your "
+                    "task is to summarize the api response that is an answer to the user input. Try to be concise and "
+                    "accurate, and also include references if present."
         ),
         HumanMessage(content=user_input),
         HumanMessage(

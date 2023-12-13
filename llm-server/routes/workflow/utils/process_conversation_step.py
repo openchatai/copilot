@@ -24,7 +24,7 @@ def is_it_informative_or_actionable(chat_history: List[BaseMessage], current_mes
         chat_history:
         current_message:
 
-    Returns:
+    Returnsc:
 
     """
 
@@ -95,6 +95,8 @@ def is_it_informative_or_actionable(chat_history: List[BaseMessage], current_mes
     )
 
     content = cast(str, chat(messages=messages).content)
+
+    logger.info("cool", payload=content)
 
     response = parse_actionable_or_not_response(content)
 

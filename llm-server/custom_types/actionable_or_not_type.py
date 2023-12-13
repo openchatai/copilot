@@ -1,4 +1,5 @@
-from langchain.output_parsers import PydanticOutputParser
+import json
+
 from langchain.pydantic_v1 import BaseModel, Field
 
 
@@ -6,8 +7,10 @@ class ActionableOrNotType(BaseModel):
     actionable: bool = Field(description="is the message actionable or not")
 
 
-actionable_or_not_parser = PydanticOutputParser(pydantic_object=ActionableOrNotType)
+def parse_actionable_or_not_response(json_string: str) -> ActionableOrNotType:
+    # Parse the JSON string into a Python dictionary
+    data = json.loads(json_string)
 
+    # Create an instance of ActionableOrNotType
+    return ActionableOrNotType(**data)
 
-def parse_actionable_or_not_response(response: str) -> ActionableOrNotType:
-    return actionable_or_not_parser.parse(response)
