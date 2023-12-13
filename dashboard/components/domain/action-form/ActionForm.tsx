@@ -193,6 +193,22 @@ export function ActionForm({
                             }
                         </div>
                     </div>
+                    <FormField
+                        control={form.control}
+                        name="body"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="required-label">
+                                    Body (JSON)
+                                </FormLabel>
+                                <FormControl>
+                                    <Textarea minRows={3} {...field} />
+                                </FormControl>
+                                <FormDescription />
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                 </div>
                 {footer?.(form)}
             </form>

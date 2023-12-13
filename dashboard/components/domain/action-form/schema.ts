@@ -16,6 +16,7 @@ export const actionSchema = z.object({
         key: z.string().min(1),
         value: z.string()
     })).optional(),
+    body: z.string().optional(),
 });
 
 export type ActionType = z.infer<typeof actionSchema>;

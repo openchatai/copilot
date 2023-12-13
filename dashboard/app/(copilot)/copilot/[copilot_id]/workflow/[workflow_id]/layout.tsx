@@ -24,7 +24,7 @@ function WorkflowLayout({
                         </Button>
                     </div>
                 </HeaderShell>
-                <div className='flex-1'>
+                <div className='flex-1 min-h-0'>
                     {children}
                 </div>
             </div>

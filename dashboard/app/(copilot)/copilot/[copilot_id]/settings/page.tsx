@@ -21,12 +21,18 @@ import { useRouter } from "next/navigation";
 import { toast } from "@/components/ui/use-toast";
 import { CopyButton } from "@/components/headless/CopyButton";
 import { mutate } from "swr";
+import { useAsyncFn } from "react-use";
+
 export default function GeneralSettingsPage() {
   const { token, id: copilotId, name: copilotName } = useCopilot();
+  const [Name, setName] = React.useState(copilotName);
   const { replace } = useRouter();
+  const [deleteCopilotstate, $deleteCopilot] = useAsyncFn(deleteCopilot);
+  const [updateCopilotState, $updateCopilot] = useAsyncFn(updateCopilot);
+
   async function handleDelete() {
-    const response = await deleteCopilot(copilotId);
-    if (response.data.success) {
+    await $deleteCopilot(copilotId);
+    if (deleteCopilotstate.value?.data.success) {
       toast({
         variant: "success",
         title: "Copilot deleted",
@@ -35,11 +41,11 @@ export default function GeneralSettingsPage() {
       _.delay(() => replace("/"), 1000);
     }
   }
-  const [Name, setName] = React.useState(copilotName);
+  
   async function handleSave() {
     if (Name === copilotName || Name.trim().length < 1) return;
-    const { data: respData } = await updateCopilot(copilotId, { name: Name });
-    if (respData.chatbot) {
+    await $updateCopilot(copilotId, { name: Name });
+    if (updateCopilotState.value?.data) {
       toast({
         variant: "success",
         title: "Copilot updated",
@@ -55,7 +61,7 @@ export default function GeneralSettingsPage() {
           General settings
         </h1>
         <div className="space-x-2">
-          <Button size="sm" onClick={handleSave}>
+          <Button size="sm" loading={updateCopilotState.loading} onClick={handleSave}>
             Save
           </Button>
         </div>
@@ -148,7 +154,7 @@ export default function GeneralSettingsPage() {
                       <AlertDialogCancel asChild>
                         <Button variant="outline">Cancel</Button>
                       </AlertDialogCancel>
-                      <Button variant="destructive" onClick={handleDelete}>
+                      <Button variant="destructive" loading={deleteCopilotstate.loading} onClick={handleDelete}>
                         Delete
                       </Button>
                     </AlertDialogFooter>
