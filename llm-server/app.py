@@ -17,6 +17,7 @@ from flask import jsonify
 from utils.db import Database
 from utils.get_logger import CustomLogger
 import asyncio
+from aiohttp import web
 logger = CustomLogger(module_name=__name__)
 
 
@@ -28,7 +29,8 @@ load_dotenv()
 create_database_schema()
 
 app = Flask(__name__)
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
+
 app.url_map.strict_slashes = False
 app.register_blueprint(
     workflow, url_prefix="/backend/flows"
