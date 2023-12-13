@@ -86,7 +86,7 @@ def is_it_informative_or_actionable(chat_history: List[BaseMessage], current_mes
         SystemMessage(content=prompt),
     ]
     messages.extend(
-        chat_history[-5:]
+        chat_history[-6:]
     )
     messages.append(
         HumanMessage(content=current_message)
@@ -107,7 +107,6 @@ def get_next_response_type(
         user_message: str,
         chat_history: List[BaseMessage],
         top_documents: Dict[str, List[DocumentSimilarityDTO]]
-
 ) -> Dict:
     """
     Processes a conversation step by generating a response based on the provided inputs.

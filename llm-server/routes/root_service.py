@@ -89,14 +89,17 @@ async def handle_request(
         pass
     else:
         # it means that the user query is "informative" and can be answered using text only
-
         # get the top knowledgeable documents (if any)
-        # append the base prompt as the first message
-        # provide the knowledgeable documents as context
-        # put the user question
-        # ask the llm
-        # return the response
-        pass
+        documents = select_top_documents(knowledgebase)
+        response = run_informative_item(
+            informative_item=documents,
+            base_prompt=base_prompt,
+            text=text,
+            headers=headers,
+            app=app,
+            bot_id=bot_id
+        )
+        return response
 
 
 def check_required_fields(base_prompt: str, text: str) -> None:
@@ -128,8 +131,8 @@ async def run_actionable_item(
         vector_flow = document_similarity_dto.document  # this variable now holds Qdrant vector document, which is the Action metadata
         flow_id = vector_flow.metaata.get('flow_id')
         flow_model = get_flow_by_id(flow_id)
-        _flow = FlowDTO()
-        # todo convert the flow model to flowDTO
+        _flow = FlowDTO(bot_id=bot_id, flow_id=flow_model.id, name=flow_model.name, description=flow_model.description,
+                        blocks=flow_model.payload, variables=[])
 
     output = await run_flow(
         flow=_flow,
