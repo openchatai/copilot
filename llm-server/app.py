@@ -72,5 +72,5 @@ def handle_message(data):
 init_qdrant_collections()
 if __name__ == "__main__":
     socketio.run(
-        app, host="0.0.0.0", port=8002, debug=True, use_reloader=True, log_output=True
+        app, host="0.0.0.0", port=8002, debug=True, use_reloader=True, log_output=False
     )
