@@ -125,7 +125,9 @@ async def handle_request(
             fl = validate_steps(step.ids, swagger_doc)
 
             if fl is False:
-                return {"error": None, "response": step.bot_message}
+                response: ResponseDict = {"error": None, "response": step.bot_message}
+                emit(session_id, response)
+                return response
 
             response = await handle_api_calls(
                 ids=step.ids,
