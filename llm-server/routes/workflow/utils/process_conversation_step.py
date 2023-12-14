@@ -113,6 +113,9 @@ Don't add operation ids if you can reply by merely looking in the conversation h
             data=d,
             content=output,
         )
+        emit(session_id, d.bot_message)
+        emit(session_id, "|im_end|")
+
         return d
 
     except OutputParserException as e:

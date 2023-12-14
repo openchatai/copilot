@@ -37,11 +37,12 @@
     
     let socket = io("http://localhost:8888");
 
+    // this is for intermediate steps
     socket.on(`${sessionId}_info`, (msg) => {
       $('#chat-log').append(msg);
     });
 
-
+    // bot message
     socket.on(`${sessionId}`, (msg) => {
         $('#chat-real').append(msg);
       });
@@ -67,6 +68,8 @@
         </div>
         `);
 
+
+      // on click of submit button
       socket.emit('send_chat', payload);
 
       $('#message').val('');

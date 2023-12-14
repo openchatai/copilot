@@ -47,7 +47,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   useEffect(() => {
     socket.on(`${sessionId}_info`, (msg: string) => {
-      
+      console.log({log_msg: msg})
     })
   
     return () => {
@@ -57,7 +57,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   useEffect(() => {
     socket.on(sessionId, (msg: string) => {
-      
+      console.log({bot_message: msg})
     });
   
     return () => {
