@@ -1,16 +1,17 @@
 import asyncio
 import os
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, cast
 
-from langchain.schema import BaseMessage
+from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
 
-from models.repository.action_repo import list_all_operation_ids_by_bot_id
+from entities.flow_entity import FlowDTO
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
+from models.repository.flow_repo import get_flow_by_id
 from routes.workflow.typings.response_dict import ResponseDict
 from routes.workflow.typings.run_workflow_input import ChatContext
 from routes.workflow.utils import (
     run_flow,
-    create_dynamic_flow_from_operation_ids,
+    create_flow_from_operation_ids,
 )
 from routes.workflow.utils.api_retrievers import (
     get_relevant_actions,
@@ -21,11 +22,11 @@ from routes.workflow.utils.document_similarity_dto import (
     select_top_documents,
     DocumentSimilarityDTO,
 )
-from routes.workflow.utils.process_conversation_step import process_conversation_step
+from routes.workflow.utils.process_conversation_step import get_next_response_type
 from utils.db import Database
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
-from utils.llm_consts import VectorCollections
+from utils.llm_consts import VectorCollections, UserMessageResponseType
 
 logger = CustomLogger(module_name=__name__)
 
@@ -45,29 +46,6 @@ FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
 chat = get_chat_model()
 
 
-def validate_steps(steps: List[str], bot_id: str):
-    try:
-        operation_ids = list_all_operation_ids_by_bot_id(bot_id)
-
-        if not operation_ids:
-            logger.warn("No operation_ids found in the Swagger document.")
-            return False
-
-        if all(x in operation_ids for x in steps):
-            return True
-        else:
-            logger.warn(
-                "Model has hallucinated, made up operation id",
-                steps=steps,
-                operationIds=operation_ids,
-            )
-            return False
-
-    except Exception as e:
-        logger.error(f"An error occurred: {str(e)}")
-        return False
-
-
 async def handle_request(
         text: str,
         session_id: str,
@@ -76,78 +54,51 @@ async def handle_request(
         headers: Dict[str, str],
         app: Optional[str],
 ) -> ResponseDict:
-    log_user_request(text)
     check_required_fields(base_prompt, text)
-    knowledgebase: List[DocumentSimilarityDTO] = []
-    actions: List[DocumentSimilarityDTO] = []
-    flows: List[DocumentSimilarityDTO] = []
-    conversations_history: List[BaseMessage] = []
-    try:
-        tasks = [
-            get_relevant_knowledgebase(text, bot_id),
-            get_relevant_actions(text, bot_id),
-            get_relevant_flows(text, bot_id),
-            get_chat_message_as_llm_conversation(session_id),
-        ]
 
-        results = await asyncio.gather(*tasks)
-        knowledgebase, actions, flows, conversations_history = results
-        top_documents = select_top_documents(actions + flows + knowledgebase)
+    tasks = [
+        get_relevant_knowledgebase(text, bot_id),
+        get_relevant_actions(text, bot_id),
+        get_relevant_flows(text, bot_id),
+        get_chat_message_as_llm_conversation(session_id),
+    ]
 
-        step = process_conversation_step(
-            user_message=text,
-            knowledgebase=top_documents[VectorCollections.knowledgebase],
-            session_id=session_id,
-            actions=top_documents[VectorCollections.knowledgebase],
-            chat_history=conversations_history,
-            flows=top_documents[VectorCollections.flows],
-            base_prompt=base_prompt,
-        )
+    results = await asyncio.gather(*tasks)
+    knowledgebase, actions, flows, conversations_history = results
+    top_documents = select_top_documents(actions + flows + knowledgebase)
 
-        if step.missing_information is not None and len(step.missing_information) >= 10:
-            return {"error": None, "response": step.bot_message + "\n" + step.missing_information}
-
-        if len(step.ids) > 0:
-            if validate_steps(step.ids, bot_id) is False:
-                return {"error": None, "response": step.bot_message}
-
-            response = await create_and_run_dynamic_flow(
-                ids=step.ids,
-                app=app,
-                bot_id=bot_id,
-                headers=headers,
-                text=text,
-            )
-
-            logger.info(
-                "chatbot response",
-                response=response,
-                method="handle_request",
-                apis=actions,
-                prev_conversations=conversations_history,
-                context=knowledgebase,
-                flows=flows,
-            )
-            return response
-        else:
-            return {"error": None, "response": step.bot_message}
-    except Exception as e:
-        logger.error(
-            "chatbot response",
-            error=str(e),
-            method="handle_request",
-            prev_conversations=conversations_history,
-        )
-
-        return {"response": str(e), "error": "An error occured in handle request"}
-
-
-def log_user_request(text: str) -> None:
-    logger.info(
-        "[OpenCopilot] Got the following user request: {}".format(text),
-        incident="log_user_request",
-        method="log_user_request",
+    next_step = get_next_response_type(
+        user_message=text,
+        session_id=session_id,
+        chat_history=conversations_history,
+        top_documents=top_documents
     )
+
+    if next_step.get('type') is UserMessageResponseType.actionable:
+        # get the single highest actionable item (could be an action or a flow) - hope we are lucky, and we can get the right one XD
+        actionable_item = select_top_documents(actions + flows,
+                                               [VectorCollections.actions, VectorCollections.actions])
+        # now run it
+        response = await run_actionable_item(
+            bot_id=bot_id,
+            actionable_item=actionable_item,
+            base_prompt=base_prompt,
+            app=app,
+            headers=headers,
+            text=text,
+        )
+        return response
+    else:
+        # it means that the user query is "informative" and can be answered using text only
+        # get the top knowledgeable documents (if any)
+        documents = select_top_documents(knowledgebase)
+        response = run_informative_item(
+            informative_item=documents,
+            base_prompt=base_prompt,
+            text=text,
+            conversations_history=conversations_history
+        )
+        return response
 
 
 def check_required_fields(base_prompt: str, text: str) -> None:
@@ -159,14 +110,29 @@ def check_required_fields(base_prompt: str, text: str) -> None:
             raise Exception(error_msg)
 
 
-async def create_and_run_dynamic_flow(
-        ids: List[str],
+async def run_actionable_item(
+        actionable_item: dict[str, List[DocumentSimilarityDTO]],
+        base_prompt: str,
         text: str,
         headers: Dict[str, str],
         app: Optional[str],
         bot_id: str,
 ) -> ResponseDict:
-    _flow = create_dynamic_flow_from_operation_ids(operation_ids=ids, bot_id=bot_id)
+    if actionable_item.get(VectorCollections.actions):
+        document_similarity_dto = actionable_item.get(VectorCollections.actions)[0]
+        vector_action = document_similarity_dto.document  # this variable now holds Qdrant vector document, which is the Action metadata
+
+        # @todo operation_id is not unique, that is not quite right - use action ID instead
+        _flow = create_flow_from_operation_ids(operation_ids=[vector_action.metadata.get('operation_id')],
+                                               bot_id=bot_id)
+    else:
+        document_similarity_dto = actionable_item.get(VectorCollections.flows)[0]
+        vector_flow = document_similarity_dto.document  # this variable now holds Qdrant vector document, which is the flow metadata
+        flow_id = vector_flow.metaata.get('flow_id')
+        flow_model = get_flow_by_id(flow_id)
+        _flow = FlowDTO(bot_id=bot_id, flow_id=flow_model.id, name=flow_model.name, description=flow_model.description,
+                        blocks=flow_model.payload, variables=[])
+
     output = await run_flow(
         flow=_flow,
         chat_context=ChatContext(text, headers, app),
@@ -174,8 +140,47 @@ async def create_and_run_dynamic_flow(
         bot_id=bot_id,
     )
 
+    # @todo now take the output, put it into a chat message with the base prompt and ask the llm to present it
     return output
 
 
-def handle_no_api_call(bot_message: str) -> ResponseDict:
-    return {"response": bot_message, "error": ""}
+def run_informative_item(
+        informative_item: dict[str, List[DocumentSimilarityDTO]],
+        base_prompt: str,
+        text: str,
+        conversations_history: List[BaseMessage]
+) -> ResponseDict:
+    # so we got all context, let's ask:
+
+    context = []
+    for vector_result in informative_item.get(VectorCollections.knowledgebase):
+        context.append(vector_result.document.metadata)
+
+    messages: List[BaseMessage] = [SystemMessage(content=base_prompt)]
+
+    if len(conversations_history) > 0:
+        messages.extend(conversations_history)
+
+    if len(context):
+        messages.append(
+            HumanMessage(
+                content=f"I found some relevant context that might be helpful. Here is the context: ```{','.join(str(context))}```. "
+            )
+        )
+
+    messages.append(
+        HumanMessage(
+            content="""Based on the information provided to you and the conversation history of this conversation, I want you to answer the questions that follow, make sure your answer is helpful
+            and clear and use advisable tune (at the end you advise based on the given context)"""
+        )
+    )
+    messages.append(
+        HumanMessage(
+            content="If you are unsure, or you think you can do a better job by asking clarification questions, then ask.")
+    )
+
+    messages.append(HumanMessage(content=text))
+
+    content = cast(str, chat(messages=messages).content)
+
+    return {"response": content, "error": None}

@@ -124,7 +124,7 @@ async def send_chat():
         abort(400, description="Invalid content, the size is larger than 255 char")
 
     if not bot_token:
-        return Response(response="bot token is required", status=500)
+        return Response(response="bot token is required", status=400)
     bot = find_one_or_fail_by_token(bot_token)
 
     app_name = headers_from_json.pop(X_App_Name, None)
@@ -158,10 +158,10 @@ async def send_chat():
             upsert_analytics_record(chatbot_id=str(bot.id), successful_operations=1, total_operations=1)
             create_chat_history(str(bot.id), session_id, True, message)
             create_chat_history(
-                str(bot.id),
-                session_id,
-                False,
-                response_data["response"] or response_data["error"] or "",
+                chatbot_id=str(bot.id),
+                session_id=session_id,
+                from_user=False,
+                message=response_data["response"] or response_data["error"] or "",
             )
         elif response_data["error"]:
             upsert_analytics_record(chatbot_id=str(bot.id), successful_operations=0, total_operations=1,

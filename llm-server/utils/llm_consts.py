@@ -26,3 +26,8 @@ class VectorCollections:
     flows = "flows"
     actions = "actions"
     knowledgebase = "knowledgebase"
+
+
+class UserMessageResponseType:
+    actionable = "actionable"  # The user message should be answered with an action (flow or api action)
+    informative = "informative"  # The user message should be answered a normal text response

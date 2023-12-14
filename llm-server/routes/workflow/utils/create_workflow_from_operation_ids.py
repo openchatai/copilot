@@ -6,7 +6,7 @@ from entities.flow_entity import FlowDTO, Block
 from models.repository.action_repo import find_action_by_operation_id
 
 
-def create_dynamic_flow_from_operation_ids(
+def create_flow_from_operation_ids(
         operation_ids: List[str], bot_id: str
 ) -> FlowDTO:
     flow = FlowDTO(blocks=[], bot_id=bot_id, description="", id="", name="", variables=[])
