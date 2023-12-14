@@ -6,11 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { AddActionDrawer, useActionFormState } from './AddFlowSheet';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import { useActions } from './actionsAtom';
-import { ASIDE_DROPABLE_ID } from './consts';
-import { useController } from './Controller';
+import { reorderList, useController } from './Controller';
+import { ASIDE_DROPABLE_ID, ActionsList } from './ActionsList';
+import _ from 'lodash';
 import { useEffect } from 'react';
-import { ActionsList } from './ActionsList';
 
 const nodeTypes = {
     actionBlock
@@ -24,7 +23,7 @@ function autoLayout(blocks: any[]) {
                 y: index * 150,
             },
             draggable: false,
-            type: "endpointNode",
+            type: "actionBlock",
             id: node.id,
             data: node,
         };
@@ -51,15 +50,20 @@ function autoLayout(blocks: any[]) {
 }
 
 export function FlowRenderer() {
-    const [actions] = useActions();
     const [nodes, setNodes, onNodeChange] = useNodesState([]);
     const { state: {
+        actions,
         blocks
-    } } = useController();
+    }, reorderActions, addActionToBlock, reorderActionsInBlock } = useController();
+
     useEffect(() => {
-        const { newNodes, edges } = autoLayout(blocks || []);
+        const { newNodes, edges } = autoLayout(blocks);
+        console.log('newNodes', newNodes);
         setNodes(newNodes);
-    }, [blocks, setNodes])
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [blocks, setNodes]);
+
     function getNodeBlockById(id: string) {
         return nodes.find(node => node.id === id);
     }
@@ -67,7 +71,7 @@ export function FlowRenderer() {
     function getActionById(id: string) {
         return actions.find(action => action.id === id);
     }
-    // use lodash
+
     function handleDragEnd(result: DropResult) {
         if (!result.destination) return;
         const { source, destination, draggableId, mode, type } = result;
@@ -77,16 +81,31 @@ export function FlowRenderer() {
         console.log('destination', destination);
         console.log('draggableId', draggableId);
         if (source.droppableId === ASIDE_DROPABLE_ID) {
-            if (destination.droppableId === ASIDE_DROPABLE_ID) return;
+            if (destination.droppableId === ASIDE_DROPABLE_ID) {
+                // reorder the actions inside the aside list
+                reorderActions(source.index, destination.index);
+            }
             // copy the action to the flow's block
-            const actionId = draggableId.split('-')[1];
-            if (actionId) {
+            const actionId = draggableId.split('|')[1];
+            const blockId = destination.droppableId.split('|')[1];
+            if (actionId && blockId) {
+                const block = getNodeBlockById(blockId);
                 const action = getActionById(actionId);
-                console.log('action', action);
-                const block = getNodeBlockById(destination.droppableId);
+                if (action && block) {
+                    addActionToBlock(blockId, action, destination.index);
+                }
             }
         }
+        if (source.droppableId.startsWith('BLOCK_DROPABLE') && destination.droppableId.startsWith('BLOCK_DROPABLE')) {
+            // reorder the actions inside the block
+            const sourceBlockId = source.droppableId.split('|')[1];
+            const destinationBlockId = destination.droppableId.split('|')[1];
+            if (sourceBlockId && destinationBlockId && (sourceBlockId === destinationBlockId)) {
+                // reorder the actions inside the block
+                reorderActionsInBlock(sourceBlockId, source.index, destination.index);
+            }
 
+        }
     }
     const [, setDrawer] = useActionFormState();
     return (
@@ -101,7 +120,7 @@ export function FlowRenderer() {
                                     Drag and drop actions to the Blocks inside the flow
                                 </p>
                             </div>
-                            <Button size='fit' onClick={() => setDrawer(true)}>
+                            <Button size='fit' variant='secondary' onClick={() => setDrawer(true)}>
                                 <Plus size={16} />
                             </Button>
                         </div>
