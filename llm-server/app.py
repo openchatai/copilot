@@ -2,7 +2,6 @@ from dotenv import load_dotenv
 from flask import Flask
 from flask import jsonify
 
-from routes._swagger.controller import _swagger
 from routes.action.action_controller import action
 from routes.chat.chat_controller import chat_workflow
 from routes.copilot.copilot_controller import copilot
