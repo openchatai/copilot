@@ -3,7 +3,7 @@ from typing import List, cast, Dict
 
 from langchain.schema import HumanMessage, SystemMessage, BaseMessage
 
-from custom_types.actionable_or_not_type import parse_actionable_or_not_response
+from custom_types.actionable_or_not_type import parse_actionable_or_not_response, ActionableOrNotType
 from routes.workflow.utils.document_similarity_dto import DocumentSimilarityDTO
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
@@ -14,7 +14,7 @@ chat = get_chat_model()
 
 
 def is_it_informative_or_actionable(chat_history: List[BaseMessage], current_message: str,
-                                    available_documents: Dict[str, List[DocumentSimilarityDTO]]):
+                                    available_documents: Dict[str, List[DocumentSimilarityDTO]]) -> ActionableOrNotType:
     """
     This function will take the user message and some context around it, and then will see if the user is requesting
     something that can be answered in informative way or can be actionable (api action or a flow).
@@ -108,7 +108,7 @@ def is_it_informative_or_actionable(chat_history: List[BaseMessage], current_mes
         response = parse_actionable_or_not_response({"actionable": False})
 
     logger.info("Actionable or not response", payload=content_parsed_as_dict, final_result=response.actionable)
-    return response.actionable
+    return response
 
 
 def get_next_response_type(
@@ -116,7 +116,7 @@ def get_next_response_type(
         user_message: str,
         chat_history: List[BaseMessage],
         top_documents: Dict[str, List[DocumentSimilarityDTO]]
-) -> Dict:
+) -> ActionableOrNotType:
     """
     Processes a conversation step by generating a response based on the provided inputs.
 
@@ -133,8 +133,5 @@ def get_next_response_type(
     if not session_id:
         raise ValueError("Session id must be defined for chat conversations")
 
-    if is_it_informative_or_actionable(chat_history=chat_history, current_message=user_message,
-                                       available_documents=top_documents):
-        return {"type": UserMessageResponseType.actionable}
-
-    return {"type": UserMessageResponseType.informative}
+    return is_it_informative_or_actionable(chat_history=chat_history, current_message=user_message,
+                                           available_documents=top_documents)

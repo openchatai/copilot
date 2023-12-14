@@ -11,7 +11,7 @@ from routes.workflow.typings.response_dict import ResponseDict
 from routes.workflow.typings.run_workflow_input import ChatContext
 from routes.workflow.utils import (
     run_flow,
-    create_flow_from_operation_ids,
+    create_flow_from_operation_ids, document_similarity_dto,
 )
 from routes.workflow.utils.api_retrievers import (
     get_relevant_actions,
@@ -46,6 +46,13 @@ FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
 chat = get_chat_model()
 
 
+def is_the_llm_predicted_operation_id_actually_true(predicted_operation_id:str, actionable_items: dict[str, list[DocumentSimilarityDTO]]):
+    for action in actionable_items.get(VectorCollections.actions):
+        if predicted_operation_id == action.document.metadata.get('operation_id'):
+            return {VectorCollections.actions: [DocumentSimilarityDTO(**action)]}
+    return None
+
+
 async def handle_request(
         text: str,
         session_id: str,
@@ -74,10 +81,15 @@ async def handle_request(
         top_documents=top_documents
     )
 
-    if next_step.get('type') is UserMessageResponseType.actionable:
-        # get the single highest actionable item (could be an action or a flow) - hope we are lucky, and we can get the right one XD
-        actionable_item = select_top_documents(actions + flows,
-                                               [VectorCollections.actions, VectorCollections.actions])
+    if next_step.actionable:
+
+        # if the LLM given operationID is actually exist, then use it, otherwise fallback to the highest vector space document
+        llm_predicted_operation_id = is_the_llm_predicted_operation_id_actually_true(next_step.operation_id, select_top_documents(actions))
+        if llm_predicted_operation_id:
+            actionable_item = llm_predicted_operation_id
+        else:
+            actionable_item = select_top_documents(actions + flows,
+                                                   [VectorCollections.actions, VectorCollections.flows])
         # now run it
         response = await run_actionable_item(
             bot_id=bot_id,
@@ -119,15 +131,14 @@ async def run_actionable_item(
         bot_id: str,
 ) -> ResponseDict:
     if actionable_item.get(VectorCollections.actions):
-        document_similarity_dto = actionable_item.get(VectorCollections.actions)[0]
-        vector_action = document_similarity_dto.document  # this variable now holds Qdrant vector document, which is the Action metadata
+        document_similarity = actionable_item.get(VectorCollections.actions)[0]
+        vector_action = document_similarity.document  # this variable now holds Qdrant vector document, which is the Action metadata
 
-        # @todo operation_id is not unique, that is not quite right - use action ID instead
         _flow = create_flow_from_operation_ids(operation_ids=[vector_action.metadata.get('operation_id')],
                                                bot_id=bot_id)
     else:
-        document_similarity_dto = actionable_item.get(VectorCollections.flows)[0]
-        vector_flow = document_similarity_dto.document  # this variable now holds Qdrant vector document, which is the flow metadata
+        document_similarity = actionable_item.get(VectorCollections.flows)[0]
+        vector_flow = document_similarity.document  # this variable now holds Qdrant vector document, which is the flow metadata
         flow_id = vector_flow.metaata.get('flow_id')
         flow_model = get_flow_by_id(flow_id)
         _flow = FlowDTO(bot_id=bot_id, flow_id=flow_model.id, name=flow_model.name, description=flow_model.description,
