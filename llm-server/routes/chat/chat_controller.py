@@ -115,12 +115,11 @@ async def send_chat(json_data):
     message = input_data.content
     session_id = input_data.session_id
     bot_token = input_data.token
-    
+
     headers_from_json = input_data.headers
 
-
     if not message or len(message) > 255:
-        emit(session_id, "Content length must be smaller than 255")
+        emit(session_id, "Content length must be smaller than 255\n")
 
     bot = find_one_or_fail_by_token(bot_token)
 

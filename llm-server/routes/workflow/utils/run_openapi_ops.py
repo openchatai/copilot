@@ -10,6 +10,7 @@ from integrations.load_json_config import load_json_config
 from integrations.transformers.transformer import transform_response
 from werkzeug.datastructures import Headers
 from utils.get_logger import CustomLogger
+from flask_socketio import emit
 
 logger = CustomLogger(module_name=__name__)
 
@@ -28,11 +29,18 @@ async def run_openapi_operations(
     prev_api_response = ""
     record_info = {"Workflow Name": record.get("name")}
     current_state = process_state(app, headers)
+
+    emit(f"{session_id}_info", "\nGathering data from the apis...")
     for flow in record.get("flows", []):
         for step in flow.get("steps"):
             try:
                 # refresh state after every api call, we can look into optimizing this later as well
                 operation_id = step.get("open_api_operation_id")
+
+                emit(
+                    f"{session_id}_info",
+                    f"\nGenerating the necessary payload to call the api endpoint {operation_id}",
+                )
                 api_payload = await generate_openapi_payload(
                     swagger_json,
                     text,
@@ -53,9 +61,8 @@ async def run_openapi_operations(
                     )
 
                     api_response = make_api_request(
-                        headers=headers, **api_payload.__dict__
+                        headers=headers, session_id=session_id, **api_payload.__dict__
                     )
-
                     try:
                         api_response.json()
                     except ValueError:
@@ -69,7 +76,7 @@ async def run_openapi_operations(
                     )
                     raise e
 
-                logger.info("Got the following api response", text=api_response.text)
+                logger.info("\nGot the following api response", text=api_response.text)
                 # if a custom transformer function is defined for this operationId use that, otherwise forward it to the llm
                 # so we don't necessarily have to defined mappers for all api endpoints
                 partial_json = load_json_config(app, operation_id)
@@ -115,6 +122,8 @@ async def run_openapi_operations(
                 )
 
                 return str(e)
+
+    emit(f"{session_id}_info", "Organizing data for you...")
     return convert_json_to_text(
         text,
         record_info,

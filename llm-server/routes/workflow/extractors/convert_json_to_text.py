@@ -35,12 +35,12 @@ def convert_json_to_text(
     ]
 
     stream = chat.stream(messages)
-
     output = ""
     for chunk in stream:
-        emit(session_id, chunk)
+        emit(session_id, chunk.content)
         output = output + str(chunk.content)
 
+    emit(session_id, "|im_end|")
     logger.info(
         "Convert json to text",
         content=output,

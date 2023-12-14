@@ -102,7 +102,7 @@ Don't add operation ids if you can reply by merely looking in the conversation h
 
     async for chunk in chat.astream(messages):
         output += str(chunk.content)
-        emit(session_id, chunk.content)
+        emit(f"{session_id}_info", chunk.content)
 
     try:
         d = parse_bot_message(output)

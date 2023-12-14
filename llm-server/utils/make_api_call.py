@@ -3,6 +3,7 @@ from typing import Any, Dict
 from requests import Response
 
 from utils.get_logger import CustomLogger
+from flask_socketio import emit
 
 logger = CustomLogger(module_name=__name__)
 
@@ -33,6 +34,7 @@ def make_api_request(
     query_params,
     headers,
     servers,
+    session_id: str,
 ) -> Response:
     url = ""
     try:
@@ -63,10 +65,22 @@ def make_api_request(
             raise ValueError("Invalid request type. Use GET, POST, PUT, or DELETE.")
 
         # Raise an exception for HTTP errors (4xx and 5xx)
+        emit(
+            f"{session_id}_info", f"\nGot the following api response \n{response.text}"
+        )
         response.raise_for_status()
 
         return response
 
     except requests.exceptions.RequestException as e:
-        logger.error("API request failed", e=str(e), headers=headers, url= url, params = path_params, query_params= query_params, method=method)
+        emit(f"{session_id}_info", str(e))
+        logger.error(
+            "API request failed",
+            e=str(e),
+            headers=headers,
+            url=url,
+            params=path_params,
+            query_params=query_params,
+            method=method,
+        )
         raise (e)
