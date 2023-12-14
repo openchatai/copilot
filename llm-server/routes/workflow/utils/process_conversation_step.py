@@ -24,7 +24,7 @@ def is_it_informative_or_actionable(chat_history: List[BaseMessage], current_mes
         chat_history:
         current_message:
 
-    Returnsc:
+    Returns:
 
     """
 
@@ -41,37 +41,38 @@ def is_it_informative_or_actionable(chat_history: List[BaseMessage], current_mes
         for dto in available_documents[document]:
             if dto.type is VectorCollections.knowledgebase:
                 continue
-            actionable_tools = actionable_tools + "\n (Tool {}): ".format(counter) + dto.document.page_content
+            actionable_tools = actionable_tools + "\n (API {}): ".format(counter) + dto.document.page_content
             counter = counter + 1
 
     prompt = '''
-    You are an AI tool that classifies user input as actionable or not. Actionable input refers to requests that can be fulfilled by calling an external tool. You will be provided with the user's input and descriptions of available tools. If the user's request can be fulfilled using one of these tools, it is considered actionable.
-    if the user question can be answered if we used one of the tools, then it's better to consider the request Actionable
-    Example
+    You are an AI tool that classifies user input needs an API call or not. You should only recommend using API if the user request match one of the APIs description below, the user requests that can be fulfilled by calling an external API to either execute something or fetch more data
+    to help in answering the question.
+    
+    Examples:
 
     **User Input:** create a b-1 visa application
 
-    **Available Tools:**
-    - Tool 1: This tool creates a b-1 visa application.
-    - Tool 2: This tool queries b-1 status.
+    **Available APIs:**
+    - API 1: This tool creates a b-1 visa application.
+    - API 2: This tool queries b-1 status.
 
-    **Verdict:** Actionable
+    **Verdict:** Needs API call so the response should be {"needs_api": True, "justification": "the reason behind your verdict"}
 
-    **Justification:** The user's request can be fulfilled by using Tool 1.
+    **Justification:** The user's request can be fulfilled by calling API 1
 
     **Another Example:**
 
     **User Input:** how to create a b-1 visa application
 
-    **Available Tools:**
+    **Available APIs:**
     - Tool 1: This tool creates a b-1 visa application.
     - Tool 2: This tool queries b-1 status.
 
-    **Verdict:** Not Actionable
+    **Verdict:** Does not need API call so the response should be {"needs_api": False, "justification": "the reason behind your verdict"}
 
-    **Justification:** The user is asking about how to create a visa application, which can be answered through text without the need to call a tool.
+    **Justification:** The user is asking about how to create a visa application, which can be answered through text without the need to call an API + the APIs in the lite are for create or query b1 applications
 
-    **Response Format:** Always respond with JSON, for example: {"actionable": False} or {"actionable": True} (always with double quotation and without escaping)
+    **Response Format:** Always respond with JSON, for example: {"needs_api": False, "justification": "the reason behind your verdict"} or {"needs_api": True, "justification": "the reason behind your verdict"} (always with double quotation and without escaping)
     
     ===END EXAMPLES===
     The available tools :
