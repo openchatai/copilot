@@ -198,7 +198,7 @@ export function ActionForm({
                         name="body"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel className="required-label">
+                                <FormLabel>
                                     Body (JSON)
                                 </FormLabel>
                                 <FormControl>
