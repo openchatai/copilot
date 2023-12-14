@@ -1,4 +1,5 @@
-from typing import List, cast, Union, Dict, Any
+import json
+from typing import List, cast, Dict
 
 from langchain.schema import HumanMessage, SystemMessage, BaseMessage
 
@@ -36,17 +37,16 @@ def is_it_informative_or_actionable(chat_history: List[BaseMessage], current_mes
         return False  # not actionable => informative
 
     actionable_tools = ""
-    counter = 1
     for document in available_documents:
         for dto in available_documents[document]:
             if dto.type is VectorCollections.knowledgebase:
                 continue
-            actionable_tools = actionable_tools + "\n (API {}): ".format(counter) + dto.document.page_content
-            counter = counter + 1
+            actionable_tools = actionable_tools + " \n API ({}): ".format(
+                dto.document.metadata.get('operation_id')) + dto.document.page_content
 
     prompt = '''
     You are an AI tool that classifies user input needs an API call or not. You should only recommend using API if the user request match one of the APIs description below, the user requests that can be fulfilled by calling an external API to either execute something or fetch more data
-    to help in answering the question.
+    to help in answering the question, also, if the user questions are CRUD (create, update, delete) then probably you will need to use an API (LLMs can't store data)
     
     Examples:
 
@@ -56,7 +56,7 @@ def is_it_informative_or_actionable(chat_history: List[BaseMessage], current_mes
     - API 1: This tool creates a b-1 visa application.
     - API 2: This tool queries b-1 status.
 
-    **Verdict:** Needs API call so the response should be {"needs_api": True, "justification": "the reason behind your verdict"}
+    **Verdict:** Needs API call so the response should be {"needs_api": "yes", "justification": "the reason behind your verdict", "api": "name of the API to use" }
 
     **Justification:** The user's request can be fulfilled by calling API 1
 
@@ -68,15 +68,14 @@ def is_it_informative_or_actionable(chat_history: List[BaseMessage], current_mes
     - Tool 1: This tool creates a b-1 visa application.
     - Tool 2: This tool queries b-1 status.
 
-    **Verdict:** Does not need API call so the response should be {"needs_api": False, "justification": "the reason behind your verdict"}
+    **Verdict:** Does not need API call so the response should be {"needs_api": "no', "justification": "the reason behind your verdict",  "api": "name of the API to use" }
 
-    **Justification:** The user is asking about how to create a visa application, which can be answered through text without the need to call an API + the APIs in the lite are for create or query b1 applications
+    **Justification:** The user is asking about how to create a visa application, which can be answered through text without the need to call an API + the APIs in are for create or query b1 applications
 
-    **Response Format:** Always respond with JSON, for example: {"needs_api": False, "justification": "the reason behind your verdict"} or {"needs_api": True, "justification": "the reason behind your verdict"} (always with double quotation and without escaping)
+    **Response Format:** Always respond with JSON, for example: {"needs_api": "no", "justification": "the reason behind your verdict", "api": "name of the API to use" } or {"needs_api": 'yes', "justification": "the reason behind your verdict"} (always with double quotation and without escaping)
     
     ===END EXAMPLES===
     The available tools :
-    
     ''' + actionable_tools + '''
     Based on the above, here is the user input/questions:
     '''
@@ -97,13 +96,18 @@ def is_it_informative_or_actionable(chat_history: List[BaseMessage], current_mes
 
     content = cast(str, chat(messages=messages).content)
 
-    if "true" in content.lower():
-        response = parse_actionable_or_not_response({"actionable": True})
-        logger.info("cool", payload="actionable=True", original=content)
+    try:
+        content_parsed_as_dict = json.loads(content)
+    except Exception as e:
+        content_parsed_as_dict = {"needs_api": "no"}
+
+    if content_parsed_as_dict.get("needs_api") is "yes":
+        response = parse_actionable_or_not_response(
+            {"actionable": True, "operation_id": content_parsed_as_dict.get("api")})
     else:
         response = parse_actionable_or_not_response({"actionable": False})
-        logger.info("cool", payload="actionable=False", original=content)
 
+    logger.info("Actionable or not response", payload=content_parsed_as_dict, final_result=response.actionable)
     return response.actionable
 
 
