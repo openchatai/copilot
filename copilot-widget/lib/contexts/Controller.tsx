@@ -1,4 +1,4 @@
-import React, { ReactNode, createContext, useContext, useLayoutEffect, useState } from "react";
+import React, { ReactNode, createContext, useContext, useEffect, useLayoutEffect, useState } from "react";
 import now from "../utils/timenow";
 import { useAxiosInstance } from "./axiosInstance";
 import { useConfigData } from "./ConfigData";
@@ -6,7 +6,9 @@ import { useSoundEffectes } from "../hooks/useSoundEffects";
 import { Message } from "@lib/types";
 import { getId } from "@lib/utils/utils";
 import { useInitialData } from "./InitialDataContext";
+import io from 'socket.io-client';
 import { historyToMessages } from "@lib/utils/historyToMessages";
+import { useSessionId } from "@lib/hooks/useSessionId";
 export type FailedMessage = {
   message: Message;
   reason?: string;
@@ -20,28 +22,57 @@ interface ChatContextProps {
 }
 
 const ChatContext = createContext<ChatContextProps | undefined>(undefined);
+const socket = io('http://localhost:8888');
 
 const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { data: idata } = useInitialData()
+  const { data: idata } = useInitialData();
   const [messages, setMessages] = useState<Message[]>([]);
+  const sfx = useSoundEffectes();
+  const [loading, setLoading] = useState(false);
+  const [failedMessage, setError] = useState<FailedMessage | null>(null);
+  const config = useConfigData();
+
+  const {sessionId} = useSessionId(config?.token!)
+
+  socket.connect().on("error", (err) => {
+    console.log("Error", err)
+  })
 
   useLayoutEffect(() => {
     if (idata?.history) {
       setMessages(historyToMessages(idata?.history));
     }
   }, [idata?.history]);
+  
 
-  const sfx = useSoundEffectes();
-  const [loading, setLoading] = useState(false);
-  const [failedMessage, setError] = useState<FailedMessage | null>(null);
-  const { axiosInstance } = useAxiosInstance();
-  const config = useConfigData();
+  useEffect(() => {
+    socket.on(`${sessionId}_info`, (msg: string) => {
+      
+    })
+  
+    return () => {
+      socket.off(`${sessionId}_info`);
+    };
+  }, [sessionId, setMessages]);
+
+  useEffect(() => {
+    socket.on(sessionId, (msg: string) => {
+      
+    });
+  
+    return () => {
+      socket.off(sessionId);
+    };
+  }, [sessionId]);
+  
+
   const addMessage = (message: Message) => {
-    if (message.from === "user") {
+    if (message.from === 'user') {
       sfx?.submit.play();
     } else {
       sfx?.notify?.play();
     }
+
     const messageWithTimestamp: Message = {
       ...message,
       timestamp: message.timestamp ? message.timestamp : now(),
@@ -49,46 +80,35 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     setMessages((prevMessages) => [...prevMessages, messageWithTimestamp]);
   };
-  // will be called from BotInputMessage component
-  // NOTE:need some adjustments in production
 
-  const sendMessage = async (message: Message) => {
+  const sendMessage = (message: Message) => {
     // send user message
-    if (message.from === "user") {
+    if (message.from === 'user') {
       addMessage(message);
     }
+
     setError(null);
     setLoading(true);
-    try {
-      const { data, status, statusText } = await axiosInstance.post(
-        "/chat/send",
-        {
-          ...message,
-          headers: config?.headers,
-          user: config?.user,
-        }
-      );
-      if (status === 200) {
-        addMessage({ ...data, id: getId(), from: "bot" });
-      } else {
-        setError({
-          message,
-          reason: statusText,
-        });
-      }
-    } catch (error: any) {
-      setError({
-        message,
-        reason: error?.message,
-      });
-    } finally {
-      setLoading(false);
-    }
+
+    // Emit the message to the "send_chat" event
+    socket.emit('send_chat', {
+      "from": "user",
+      "content": (message as any).content,
+      "id": getId(),
+      "headers": {
+        "X-Copilot": "copilot"
+      },
+      "token": "PMyJMFjmoKNFkus2", // auth token etc...
+      "session_id": sessionId
+    });
+
+    setLoading(false);
   };
 
   function reset() {
     setMessages([]);
   }
+
   const chatContextValue: ChatContextProps = {
     messages,
     sendMessage,
@@ -97,11 +117,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     reset,
   };
 
-  return (
-    <ChatContext.Provider value={chatContextValue}>
-      {children}
-    </ChatContext.Provider>
-  );
+  return <ChatContext.Provider value={chatContextValue}>{children}</ChatContext.Provider>;
 };
 
 // custom react hook to access the context from child components

@@ -100,6 +100,7 @@ Don't add operation ids if you can reply by merely looking in the conversation h
 
     messages.append(HumanMessage(content=user_requirement))
 
+    logger.info("session_id_info", session_id=f"{session_id}_info")
     async for chunk in chat.astream(messages):
         output += str(chunk.content)
         emit(f"{session_id}_info", chunk.content)

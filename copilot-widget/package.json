@@ -75,5 +75,8 @@
       "types": "./dist/index.d.ts"
     },
     "./index.css": "./dist/index.css"
+  },
+  "dependencies": {
+    "socket.io-client": "^4.7.2"
   }
 }
