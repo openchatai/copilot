@@ -1,4 +1,3 @@
-export const ASIDE_DROPABLE_ID = 'aside-dropable';
 export const BLOCK_DROPABLE_ID_PREFIX = 'block-dropable-';
 export const ASIDE_ACTION_DRAGGABLE_ID_PREFIX = 'aside-action-draggable-';
 export const BLOCK_ACTION_DRAGGABLE_ID_PREFIX = 'block-action-draggable-';
