@@ -4,6 +4,7 @@ from typing import Dict, Any, Optional, List
 from langchain.schema import BaseMessage
 from custom_types.api_operation import ApiOperation_vs
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
+from prompts.consolidated_prompt import get_consolidate_question
 from routes.workflow.typings.response_dict import ResponseDict
 from routes.workflow.typings.run_workflow_input import WorkflowData
 from routes.workflow.utils import (
@@ -97,16 +98,24 @@ async def handle_request(
     apis: List[ApiOperation_vs] = []
     flows: List[WorkflowFlowType] = []
     prev_conversations: List[BaseMessage] = []
+    prev_conversations = await get_chat_message_as_llm_conversation(session_id)
+    consolidated_question = await get_consolidate_question(
+        conversation_history=prev_conversations, user_input=text
+    )
+    logger.info(
+        "Comparing consolidated prompt with user input",
+        consolidated_question=consolidated_question,
+        text=text,
+    )
     try:
         tasks = [
-            get_relevant_docs(text, bot_id),
-            get_relevant_apis_summaries(text, bot_id),
-            get_relevant_flows(text, bot_id),
-            get_chat_message_as_llm_conversation(session_id),
+            get_relevant_docs(consolidated_question, bot_id),
+            get_relevant_apis_summaries(consolidated_question, bot_id),
+            get_relevant_flows(consolidated_question, bot_id),
         ]
 
         results = await asyncio.gather(*tasks)
-        context, apis, flows, prev_conversations = results
+        context, apis, flows = results
         # also provide a list of workflows here itself, the llm should be able to figure out if a workflow needs to be run
         step = process_conversation_step(
             user_requirement=text,
