@@ -87,7 +87,7 @@ def process_conversation_step(
     "bot_message": "your response based on the instructions provided at the beginning, this could also be clarification if the information provided by the user is not complete / accurate",  
 }
 
-Don't add operation ids if you can reply by merely looking in the conversation history.
+Don't add operation ids if you can reply by merely looking in the conversation history, also don't add any commentary.
 """
         )
     )

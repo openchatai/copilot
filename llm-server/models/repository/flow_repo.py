@@ -1,6 +1,6 @@
 from typing import Optional, Type
 
-from opencopilot_db import engine
+from shared.models.opencopilot_db import engine
 from sqlalchemy.orm import sessionmaker
 
 from shared.models.opencopilot_db.flow import Flow
