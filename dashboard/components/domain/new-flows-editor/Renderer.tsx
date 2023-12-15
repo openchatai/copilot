@@ -1,5 +1,5 @@
 'use client';
-import ReactFlow, { Background, Controls, Edge, Node, ReactFlowProvider, useEdgesState, useNodesState } from 'reactflow';
+import ReactFlow, { Background, Controls, ReactFlowProvider, useEdgesState, useNodesState } from 'reactflow';
 import actionBlock from './ActionBlock';
 import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button';
@@ -10,8 +10,7 @@ import { useController } from './Controller';
 import { ASIDE_DROPABLE_ID, ActionsList } from './ActionsList';
 import { useEffect } from 'react';
 import BlockEdge from './BlockEdge';
-import { BlockType } from './types/block';
-import _ from 'lodash';
+import { autoLayout } from './autoLayout';
 
 const nodeTypes = {
     actionBlock
@@ -21,47 +20,6 @@ const edgeTypes = {
     BlockEdge
 }
 
-function autoLayout(blocks: BlockType[]) {
-    const orderedBlocks = _.cloneDeep(blocks).sort((a, b) => {
-        if (a.next_on_success === b.id) {
-            return -1;
-        }
-        if (b.next_on_success === a.id) {
-            return 1;
-        }
-        return 0;
-    });
-    const newNodes: Node<BlockType>[] = orderedBlocks.map((block, index) => {
-        // order blocks based on next_on_success
-        return {
-            position: {
-                x: 500 * index,
-                y: 0,
-            },
-            draggable: false,
-            type: "actionBlock",
-            id: block.id,
-            data: block,
-        };
-    });
-    const edges: Edge[] = newNodes.map((node) => {
-        const nextId = node.data.next_on_success;
-        const next = newNodes.find((n) => n.id === nextId);
-
-        if (next) {
-            return {
-                id: node.id + "|" + next.id,
-                target: node.id,
-                source: next.id,
-                type: "BlockEdge",
-            };
-        }
-    }).filter((v) => typeof v !== "undefined") as Edge[];
-    return {
-        newNodes,
-        edges,
-    };
-}
 
 export function FlowRenderer() {
     const [nodes, setNodes, onNodeChange] = useNodesState([]);
