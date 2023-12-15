@@ -8,7 +8,6 @@ from routes.workflow.utils.document_similarity_dto import DocumentSimilarityDTO
 from shared.utils.opencopilot_utils import StoreOptions
 from shared.utils.opencopilot_utils.get_embeddings import get_embeddings
 from shared.utils.opencopilot_utils.get_vector_store import get_vector_store
-from utils.chat_models import CHAT_MODELS
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
 from utils.llm_consts import vs_thresholds, VectorCollections
