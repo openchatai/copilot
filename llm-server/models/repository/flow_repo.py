@@ -1,5 +1,5 @@
 import json
-from typing import Optional, Type
+from typing import Optional, Type, Any
 
 from opencopilot_db import engine
 from sqlalchemy.orm import sessionmaker
@@ -39,15 +39,13 @@ def create_flow(flow_dto: FlowDTO) -> Flow:
         return new_flow
 
 
-def update_flow(flow_id: str, name: str, payload: dict, description: str) -> Optional[Flow]:
+def update_flow(flow_id: str, flow_dto: FlowDTO) -> Type[Flow] | None:
     """
     Updates an existing flow record in the database.
 
     Args:
+        flow_dto:
         flow_id: The ID of the flow to update.
-        name: The new name of the flow.
-        payload: The new payload for the flow.
-        description: The new description of the flow.
 
     Returns:
         The updated Flow object, or None if not found.
@@ -55,9 +53,9 @@ def update_flow(flow_id: str, name: str, payload: dict, description: str) -> Opt
     with Session() as session:
         flow = session.query(Flow).filter(Flow.id == flow_id).first()
         if flow:
-            flow.name = name
-            flow.payload = payload
-            flow.description = description
+            flow.name = flow_dto.name
+            flow.payload = flow_dto.blocks
+            flow.description = flow_dto.description
             session.commit()
             session.refresh(flow)
             return flow

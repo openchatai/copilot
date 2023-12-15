@@ -123,8 +123,9 @@ def update_flow_api(flow_id: str):
             return jsonify({"error": str(e)}), 400
 
         # Assuming update_flow is a function to update the flow in the DB
-        updated_flow = update_flow(flow_dto)
+        updated_flow = update_flow(flow_id, flow_dto)
         if updated_flow:
+            # todo update thee flow in the vector db
             return jsonify(flow_to_dict(updated_flow)), 200
         else:
             return jsonify({"error": "Flow not found"}), 404
