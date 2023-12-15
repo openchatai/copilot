@@ -7,8 +7,8 @@ from models.repository.copilot_repo import find_one_or_fail_by_id
 from models.repository.flow_repo import create_flow, get_all_flows_for_bot, get_flow_by_id, get_variables_for_flow, \
     add_or_update_variable_in_flow, update_flow
 from presenters.flow_presenters import flow_to_dict, flow_variable_to_dict
-from utils.db import Database
 from routes.flow import flow_vector_service
+from utils.db import Database
 from utils.get_logger import CustomLogger
 
 db_instance = Database()
@@ -105,19 +105,26 @@ def update_flow_api(flow_id: str):
 
         # Extract individual fields from data
         name = data.get('name')
+        description = data.get('description')
         status = data.get('status')
         variables = data.get('variables', [])
         blocks = data.get('blocks', [])
 
+        flow = get_flow_by_id(flow_id)
+        for block in data.get('blocks', []):
+            for action in block.get('actions', []):
+                action['bot_id'] = flow.chatbot_id
+
         # Validate data using FlowDTO
         try:
             flow_dto = FlowDTO(
-                id=uuid.UUID(flow_id),  # Convert string to UUID
-                chatbot_id=data.get('chatbot_id'),  # Extract chatbot_id if it's provided or necessary
+                id=flow_id,  # Convert string to UUID
+                bot_id=flow.chatbot_id,  # Extract chatbot_id if it's provided or necessary
                 name=name,
                 status=status,
                 variables=variables,
                 blocks=blocks,
+                description=description
             )
         except Exception as e:
             return jsonify({"error": str(e)}), 400
