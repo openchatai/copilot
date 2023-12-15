@@ -39,7 +39,7 @@ def create_flow(flow_dto: FlowDTO) -> Flow:
         return new_flow
 
 
-def update_flow(flow_id: str, flow_dto: FlowDTO) -> Type[Flow] | None:
+def update_flow(flow_id: str, flow_dto: FlowDTO) -> Type[Flow]:
     """
     Updates an existing flow record in the database.
 
@@ -50,11 +50,13 @@ def update_flow(flow_id: str, flow_dto: FlowDTO) -> Type[Flow] | None:
     Returns:
         The updated Flow object, or None if not found.
     """
+    blocks_json = [block.to_dict() for block in flow_dto.blocks]
+
     with Session() as session:
         flow = session.query(Flow).filter(Flow.id == flow_id).first()
         if flow:
             flow.name = flow_dto.name
-            flow.payload = flow_dto.blocks
+            flow.payload = blocks_json
             flow.description = flow_dto.description
             session.commit()
             session.refresh(flow)
