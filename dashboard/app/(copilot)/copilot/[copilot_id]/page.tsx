@@ -9,12 +9,13 @@ import {
 } from "@/components/ui/accordion";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { ShieldAlert, Wand2, Inspect } from "lucide-react";
+import { ShieldAlert, Wand2, Inspect, Home } from "lucide-react";
 import { Link } from "@/lib/router-events";
 import React from "react";
 import { useCopilot } from "../_context/CopilotProvider";
 import dynamic from "next/dynamic";
 import { baseUrl } from "@/data/base-url";
+import { BreadCrumbs } from "@/components/domain/BreadCrumbs";
 
 const Widget = dynamic(() => import("./CopilotWidget"));
 
@@ -110,13 +111,11 @@ function SelfHost() {
 }
 
 export default function CopilotPage() {
-  const { name: CopilotName, token: CopilotToken } = useCopilot();
+  const { name: copilotName, token: copilotToken, id: copilotId } = useCopilot();
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
       <HeaderShell className="justify-between bg-white">
-        <h1 className="text-lg font-bold text-accent-foreground">
-          {CopilotName}
-        </h1>
+        <BreadCrumbs items={[{ type: "link", href: "/", render: <Home className="w-4 h-4" /> }, { type: "base", render: "Copilot" }, { type: "link", href: "/copilot/" + copilotId, render: copilotName }]} />
         <div className="space-x-2">
           <Button
             id="triggerSelector"
@@ -146,7 +145,7 @@ export default function CopilotPage() {
           </Accordion>
         </div>
         <div className="h-full w-fit py-5 px-10">
-          <Widget token={CopilotToken} />
+          <Widget token={copilotToken} />
         </div>
       </div>
     </div>
