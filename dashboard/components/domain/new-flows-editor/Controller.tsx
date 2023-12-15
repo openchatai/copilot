@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 'use client';
 import { createSafeContext } from '@/lib/createSafeContext'
 import React, { useCallback, useReducer } from 'react'
@@ -7,22 +8,27 @@ import { ActionResponseType, getActionsByBotId } from '@/data/actions';
 import { useCopilot } from '@/app/(copilot)/copilot/_context/CopilotProvider';
 import useSWR, { mutate } from 'swr';
 import { BlockType } from './types/block';
-import _ from 'lodash';
+import _, { uniqueId } from 'lodash';
+import { atom, useAtom } from 'jotai';
 
+const selectedNodeIds = atom<string[]>([]);
+
+export const useSelectedNodes = () => useAtom(selectedNodeIds);
 
 type ControllerType = {
     state: StateType,
-    // eslint-disable-next-line no-unused-vars
     loadActions: (actions: ActionResponseType[]) => void,
     reset: () => void,
-    // eslint-disable-next-line no-unused-vars
     updateBlock: (blockId: string, block: Partial<BlockType>) => void,
-    // eslint-disable-next-line no-unused-vars
     reorderActions: (sourceIndex: number, destinationIndex: number) => void,
-    // eslint-disable-next-line no-unused-vars
     addActionToBlock: (blockId: string, action: ActionResponseType, index: number) => void,
-    // eslint-disable-next-line no-unused-vars
     reorderActionsInBlock: (blockId: string, sourceIndex: number, destinationIndex: number) => void,
+    deleteBlock: (blockId: string) => void,
+    deleteActionFromBlock: (blockId: string, actionId: string) => void,
+    addNextOnSuccess: (sourceId: string, destinationId: string) => void,
+    deleteBlockById: (blockId: string) => void,
+    insertEmptyBlock: (sourceId: string) => void,
+
 }
 const [ControllerProvider, useController] = createSafeContext<ControllerType>('Controller');
 
@@ -68,6 +74,33 @@ type ActionsType = Union<[{
         sourceIndex: number,
         destinationIndex: number,
     }
+}, {
+    type: "DELETE_BLOCK",
+    payload: {
+        blockId: string,
+    }
+}, {
+    type: "DELETE_ACTION_FROM_BLOCK",
+    payload: {
+        actionId: string,
+        blockId: string,
+    }
+}, {
+    type: "ADD_EMPTY_NEXT_ON_SUCCESS_BETWEEN",
+    payload: {
+        sourceId: string,
+        destinationId: string,
+    }
+}, {
+    type: "DELETE_BLOCK_BY_ID",
+    payload: {
+        blockId: string
+    }
+}, {
+    type: "INSERT_EMPTY_BLOCK_AFTER",
+    payload: {
+        sourceId: string,
+    }
 }]>;
 
 type StateType = {
@@ -85,7 +118,7 @@ const initialState: StateType = {
         id: "block-1",
         name: "Start",
         created_at: new Date().toISOString(),
-        next_on_success: null,
+        next_on_success: "block-2",
         updated_at: new Date().toISOString(),
         actions: [{
             id: "action-1",
@@ -96,6 +129,24 @@ const initialState: StateType = {
             request_type: "POST",
             api_endpoint: "https://api.example.com/users",
             operation_id: "create_user",
+            deleted_at: null,
+        }],
+    },
+    {
+        id: "block-2",
+        name: "Start",
+        created_at: new Date().toISOString(),
+        next_on_success: null,
+        updated_at: new Date().toISOString(),
+        actions: [{
+            id: "action-2",
+            name: "Delete a User",
+            description: "Deletes user",
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            request_type: "POST",
+            api_endpoint: "https://api.example.com/users",
+            operation_id: "delete_user",
             deleted_at: null,
         }],
     }],
@@ -146,6 +197,68 @@ function stateReducer(state: StateType, action: ActionsType) {
                 }
                 return;
             }
+            case "DELETE_BLOCK": {
+                const { blockId } = action.payload;
+                draft.blocks = draft.blocks.filter(block => block.id !== blockId);
+                return;
+            }
+            case "DELETE_ACTION_FROM_BLOCK": {
+                const { blockId, actionId } = action.payload;
+                const block = draft.blocks.find(block => block.id === blockId);
+                if (block) {
+                    block.actions = block.actions.filter(action => action.id !== actionId);
+                }
+                return;
+            }
+            case "ADD_EMPTY_NEXT_ON_SUCCESS_BETWEEN": {
+                // add empty block between two blocks
+                const { sourceId, destinationId } = action.payload;
+                const sourceBlock = draft.blocks.find(block => block.id === sourceId);
+                const destinationBlock = draft.blocks.find(block => block.id === destinationId);
+                if (sourceBlock && destinationBlock) {
+                    const newBlock: BlockType = {
+                        id: "block-" + uniqueId(),
+                        name: "New Block",
+                        created_at: new Date().toISOString(),
+                        next_on_success: destinationId,
+                        updated_at: new Date().toISOString(),
+                        actions: [],
+                    }
+                    draft.blocks.push(newBlock);
+                    sourceBlock.next_on_success = newBlock.id;
+                }
+                return;
+            }
+            case "DELETE_BLOCK_BY_ID": {
+                const { blockId } = action.payload;
+                // delete the block and update the next_on_success of the previous block
+                const block = draft.blocks.find(block => block.id === blockId);
+                if (!block) return;
+                const previousBlock = draft.blocks.find(block => block.next_on_success === blockId);
+                if (previousBlock) {
+                    previousBlock.next_on_success = block.next_on_success;
+                }
+                draft.blocks = draft.blocks.filter(block => block.id !== blockId);
+                return;
+            }
+            case "INSERT_EMPTY_BLOCK_AFTER": {
+                const { sourceId } = action.payload;
+                const sourceBlock = draft.blocks.find(block => block.id === sourceId);
+                if (!sourceBlock) return;
+                const newBlock: BlockType = {
+                    id: "block-" + uniqueId(),
+                    name: "New Block",
+                    created_at: new Date().toISOString(),
+                    next_on_success: sourceBlock.next_on_success,
+                    updated_at: new Date().toISOString(),
+                    actions: [],
+                }
+                draft.blocks.push(newBlock);
+                sourceBlock.next_on_success = newBlock.id;
+                return;
+            }
+            default:
+                return;
         }
     })
 }
@@ -159,7 +272,7 @@ function FlowsControllerV2({ children }: { children: React.ReactNode }) {
             dispatch({ type: "LOAD_ACTIONS", payload: data })
         }
     });
-
+    // useCallback Hell :( 
     const loadActions = useCallback((actions: ActionResponseType[]) => {
         dispatch({ type: "LOAD_ACTIONS", payload: actions })
     }, [])
@@ -184,7 +297,28 @@ function FlowsControllerV2({ children }: { children: React.ReactNode }) {
         dispatch({ type: "REORDER_ACTIONS_IN_BLOCK", payload: { blockId, sourceIndex, destinationIndex } })
     }
         , [])
-    return <ControllerProvider value={{ state, loadActions, reset, updateBlock, reorderActions, addActionToBlock, reorderActionsInBlock }}>
+    const deleteBlock = useCallback((blockId: string) => {
+        dispatch({ type: "DELETE_BLOCK", payload: { blockId } })
+    }
+        , [])
+    const deleteActionFromBlock = useCallback((blockId: string, actionId: string) => {
+        dispatch({ type: "DELETE_ACTION_FROM_BLOCK", payload: { blockId, actionId } })
+    }
+        , [])
+    const addNextOnSuccess = useCallback((sourceId: string, destinationId: string) => {
+        dispatch({ type: "ADD_EMPTY_NEXT_ON_SUCCESS_BETWEEN", payload: { sourceId, destinationId } })
+    }
+        , [])
+    const deleteBlockById = useCallback((blockId: string) => {
+        dispatch({ type: "DELETE_BLOCK_BY_ID", payload: { blockId } })
+    }
+        , [])
+    const insertEmptyBlock = useCallback((sourceId: string) => {
+        dispatch({ type: "INSERT_EMPTY_BLOCK_AFTER", payload: { sourceId } })
+    }
+        , [])
+
+    return <ControllerProvider value={{ insertEmptyBlock, state, deleteBlockById, addNextOnSuccess, deleteActionFromBlock, loadActions, reset, updateBlock, reorderActions, addActionToBlock, reorderActionsInBlock, deleteBlock }}>
         {children}
     </ControllerProvider>
 }

@@ -1,45 +1,59 @@
 'use client';
-import ReactFlow, { Background, Controls, Edge, MarkerType, Node, ReactFlowProvider, useNodesState } from 'reactflow';
+import ReactFlow, { Background, Controls, Edge, Node, ReactFlowProvider, useEdgesState, useNodesState } from 'reactflow';
 import actionBlock from './ActionBlock';
 import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { AddActionDrawer, useActionFormState } from './AddFlowSheet';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import { reorderList, useController } from './Controller';
+import { useController } from './Controller';
 import { ASIDE_DROPABLE_ID, ActionsList } from './ActionsList';
-import _ from 'lodash';
 import { useEffect } from 'react';
+import BlockEdge from './BlockEdge';
+import { BlockType } from './types/block';
+import _ from 'lodash';
 
 const nodeTypes = {
     actionBlock
 }
 
-function autoLayout(blocks: any[]) {
-    const newNodes: Node<any>[] = blocks.map((node, index) => {
+const edgeTypes = {
+    BlockEdge
+}
+
+function autoLayout(blocks: BlockType[]) {
+    const orderedBlocks = _.cloneDeep(blocks).sort((a, b) => {
+        if (a.next_on_success === b.id) {
+            return -1;
+        }
+        if (b.next_on_success === a.id) {
+            return 1;
+        }
+        return 0;
+    });
+    const newNodes: Node<BlockType>[] = orderedBlocks.map((block, index) => {
+        // order blocks based on next_on_success
         return {
             position: {
-                x: 0,
-                y: index * 150,
+                x: 500 * index,
+                y: 0,
             },
             draggable: false,
             type: "actionBlock",
-            id: node.id,
-            data: node,
+            id: block.id,
+            data: block,
         };
     });
-    const edges: Edge[] = newNodes.map((node, index) => {
-        const next = newNodes[index + 1];
+    const edges: Edge[] = newNodes.map((node) => {
+        const nextId = node.data.next_on_success;
+        const next = newNodes.find((n) => n.id === nextId);
+
         if (next) {
             return {
-                id: node.id + "-" + next.id,
+                id: node.id + "|" + next.id,
                 target: node.id,
                 source: next.id,
-                sourceHandleId: "out",
-                targetHandleId: "in",
-                markerStart: {
-                    type: MarkerType.ArrowClosed,
-                },
+                type: "BlockEdge",
             };
         }
     }).filter((v) => typeof v !== "undefined") as Edge[];
@@ -51,18 +65,19 @@ function autoLayout(blocks: any[]) {
 
 export function FlowRenderer() {
     const [nodes, setNodes, onNodeChange] = useNodesState([]);
+    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+
     const { state: {
         actions,
         blocks
-    }, reorderActions, addActionToBlock, reorderActionsInBlock } = useController();
+    }, reorderActions, addActionToBlock, reorderActionsInBlock, deleteBlock, deleteActionFromBlock } = useController();
 
     useEffect(() => {
         const { newNodes, edges } = autoLayout(blocks);
-        console.log('newNodes', newNodes);
         setNodes(newNodes);
-
+        setEdges(edges);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [blocks, setNodes]);
+    }, [blocks, setNodes, setEdges, autoLayout]);
 
     function getNodeBlockById(id: string) {
         return nodes.find(node => node.id === id);
@@ -75,11 +90,9 @@ export function FlowRenderer() {
     function handleDragEnd(result: DropResult) {
         if (!result.destination) return;
         const { source, destination, draggableId, mode, type } = result;
+        console.log(result);
         if (!draggableId) return;
         // perform copy of the action to the flow's block;
-        console.log('source', source);
-        console.log('destination', destination);
-        console.log('draggableId', draggableId);
         if (source.droppableId === ASIDE_DROPABLE_ID) {
             if (destination.droppableId === ASIDE_DROPABLE_ID) {
                 // reorder the actions inside the aside list
@@ -106,6 +119,15 @@ export function FlowRenderer() {
             }
 
         }
+        // delete action form block 
+        if (source.droppableId.startsWith('BLOCK_DROPABLE') && destination.droppableId === ASIDE_DROPABLE_ID) {
+            const sourceBlockId = source.droppableId.split('|')[1];
+            const actionId = draggableId.split('|')[1];
+            console.log(sourceBlockId, actionId);
+            if (sourceBlockId && actionId) {
+                deleteActionFromBlock(sourceBlockId, actionId);
+            }
+        }
     }
     const [, setDrawer] = useActionFormState();
     return (
@@ -113,7 +135,7 @@ export function FlowRenderer() {
             <DragDropContext onDragEnd={handleDragEnd}>
                 <div className='flex items-center justify-between w-full h-full overflow-hidden'>
                     <aside className='w-full max-w-sm flex flex-col items-start h-full py-4 border-r bg-white overflow-hidden'>
-                        <div className='flex flex-row justify-between w-full border-b pb-4 px-4 items-center'>
+                        <div className='flex flex-row justify-between w-full border-b pb-3 px-4 items-center'>
                             <div>
                                 <h2 className='text-base font-semibold'>Actions</h2>
                                 <p className='text-xs'>
@@ -129,7 +151,24 @@ export function FlowRenderer() {
                         </div>
                     </aside>
                     <AddActionDrawer />
-                    <ReactFlow maxZoom={1} minZoom={1} nodeTypes={nodeTypes} nodes={nodes} onNodesChange={onNodeChange} className='flex-1'>
+                    <ReactFlow
+                        fitView
+                        fitViewOptions={{
+                            padding: 20,
+                            duration: 0.5,
+                        }}
+                        onNodesDelete={(nodes) => {
+                            nodes.forEach(node => {
+                                const blockId = node.id;
+                                if (blockId) {
+                                    deleteBlock(blockId);
+                                }
+                            })
+                        }}
+                        edges={edges}
+                        edgeTypes={edgeTypes}
+                        onEdgesChange={onEdgesChange}
+                        maxZoom={1} minZoom={1} nodeTypes={nodeTypes} nodes={nodes} onNodesChange={onNodeChange} className='flex-1'>
                         <Controls position='bottom-right' />
                         <Background color="var(--accent-foreground)" />
                     </ReactFlow>

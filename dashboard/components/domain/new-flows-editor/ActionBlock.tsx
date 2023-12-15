@@ -12,6 +12,8 @@ import _, { uniqueId } from 'lodash';
 import { useController } from './Controller';
 import { DebounceInput } from 'react-debounce-input';
 import { BlockType } from './types/block';
+import { Settings2, Trash2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 // @patch for the transform issue;
 export const useDraggableInPortal = () => {
@@ -24,7 +26,12 @@ export const useDraggableInPortal = () => {
             element.style.inset = '0 0 0 0'
             element.style.zIndex = '9999'
             document.body.appendChild(element)
-            return () => { document.body.removeChild(element) }
+            return () => {
+                // check if the element was removed by something else
+                if (element.parentElement) {
+                    element.parentElement.removeChild(element)
+                }
+            }
         }
     }, [element])
 
@@ -44,14 +51,13 @@ type Props = NodeProps<BlockType>
 function DraggableActionInsideActionBlock({ action, index, id }: { action: ActionResponseType, index: number, id: string }) {
     const draggableInPortal = useDraggableInPortal();
     return <Draggable key={id} draggableId={BLOCK_ACTION_DRAGGABLE_ID_PREFIX + id} index={index}>
-        {draggableInPortal((provided) => <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className='w-full bg-white border shrink-0 border-gray-100 rounded-lg shadow-md'>
+        {draggableInPortal((provided) => <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className='w-full bg-white shrink-0 border-2 border-accent-foreground border-dotted rounded-md'>
             <Action action={action} />
         </div>)}
     </Draggable>
-
 }
 
-function ActionBlock({ data: { actions, name }, id }: Props) {
+function UpdateBlock({ id, name }: { id: string, name: string }) {
     const { state, updateBlock } = useController();
 
     function updateBlockName(name: string) {
@@ -59,22 +65,43 @@ function ActionBlock({ data: { actions, name }, id }: Props) {
             updateBlock(id, { name });
         }, 1000)
     }
+    return <DebounceInput required element='input' value={name} onChange={(ev) => {
+        updateBlockName(ev.target.value);
+    }} type="text" className='outline-none flex-1 w-full text-white font-medium p-0.5 rounded text-sm bg-transparent placeholder:text-white' placeholder='Name' />
+}
+function DeleteBlockBtn({ id }: { id: string }) {
+    const { deleteBlockById } = useController();
+    return <button onClick={() => {
+        deleteBlockById(id);
+    }} className='p-1 rounded bg-destructive text-white transition-colors'>
+        <Trash2 size={18} />
+    </button>
+}
+function BlockHandle({ type, position, className }: { type: 'source' | 'target', position: Position, className?: string }) {
+    return <Handle type={type} position={position} className={cn("!bg-white", className)} style={{ width: '10px', height: "10px" }} />
+}
+
+function ActionBlock({ data: { actions, name }, id, selected }: Props) {
 
     return (
         <>
-            <Handle type="target" position={Position.Top} />
-            <div className='min-w-[15rem] bg-white border transition-all nodrag overflow-hidden nopan p-2 rounded-lg h-auto flex flex-col'>
-                <div className='mb-2 border-b p-2 shrink-0'>
-                    <DebounceInput element='input' value={name} onChange={(ev) => {
-                        updateBlockName(ev.target.value);
-                    }} type="text" className='outline-none focus-within:bg-accent p-0.5 rounded text-sm' placeholder='Name' />
+            <BlockHandle type="target" position={Position.Right} />
+            <div className={cn('w-[20rem] bg-white border transition-all nodrag overflow-hidden nopan rounded-lg h-auto flex flex-col')}>
+                <div className={cn('mb-2 p-2 flex items-center justify-between shrink-0 transition-colors', selected ? "bg-sky-600" : "bg-sky-800")}>
+                    <UpdateBlock id={id} name={name} />
+                    <div className='space-x-2'>
+                        <button className='text-white p-1 rounded hover:bg-white hover:text-sky-600 transition-colors'>
+                            <Settings2 size={18} />
+                        </button>
+                        <DeleteBlockBtn id={id} />
+                    </div>
                 </div>
                 <Droppable droppableId={'BLOCK_DROPABLE|' + id}>
                     {(provided) => (
-                        <div ref={provided.innerRef} {...provided.droppableProps} className='flex-1 min-h-0 nodrag nopan flex shrink-0 flex-col space-y-1 items-start justify-center'>
+                        <div ref={provided.innerRef} {...provided.droppableProps} className='flex-1 p-2 min-h-0 w-full transition-all nodrag nopan flex shrink-0 flex-col space-y-1 items-start justify-center'>
                             {
                                 _.isEmpty(actions) ? <div className='text-sm text-gray-400 text-center p-4 w-full'>Drag and drop actions here</div> : actions.map((action, index) => {
-                                    return <DraggableActionInsideActionBlock id={index.toString()} key={uniqueId('block_action_key')} action={action} index={index} />
+                                    return <DraggableActionInsideActionBlock id={action.id} key={uniqueId('block_action_key')} action={action} index={index} />
                                 })
                             }
                             {provided.placeholder}
@@ -82,7 +109,7 @@ function ActionBlock({ data: { actions, name }, id }: Props) {
                     )}
                 </Droppable>
             </div>
-            <Handle type="source" position={Position.Bottom} />
+            <BlockHandle type="source" position={Position.Left} />
         </>
 
     )
