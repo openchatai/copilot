@@ -28,7 +28,7 @@ export function FlowRenderer() {
     const { state: {
         actions,
         blocks
-    }, reorderActions, addActionToBlock, reorderActionsInBlock, deleteBlock, deleteActionFromBlock } = useController();
+    }, reorderActions, addActionToBlock, reorderActionsInBlock, deleteBlock, deleteActionFromBlock, moveActionFromBlockToBlock } = useController();
 
     useEffect(() => {
         const { newNodes, edges } = autoLayout(blocks);
@@ -74,6 +74,13 @@ export function FlowRenderer() {
             if (sourceBlockId && destinationBlockId && (sourceBlockId === destinationBlockId)) {
                 // reorder the actions inside the block
                 reorderActionsInBlock(sourceBlockId, source.index, destination.index);
+            }
+            // move action from one block to another
+            if (sourceBlockId && destinationBlockId && (sourceBlockId !== destinationBlockId)) {
+                const actionId = draggableId.split('|')[1];
+                if (actionId) {
+                    moveActionFromBlockToBlock(sourceBlockId, destinationBlockId, destination.index, actionId);
+                }
             }
 
         }

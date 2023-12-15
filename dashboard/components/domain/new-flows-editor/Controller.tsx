@@ -28,6 +28,7 @@ type ControllerType = {
     addNextOnSuccess: (sourceId: string, destinationId: string) => void,
     deleteBlockById: (blockId: string) => void,
     insertEmptyBlock: (sourceId: string) => void,
+    moveActionFromBlockToBlock: (sourceBlockId: string, destinationBlockId: string, index: number, action_id: string) => void,
 
 }
 const [ControllerProvider, useController] = createSafeContext<ControllerType>('Controller');
@@ -100,6 +101,14 @@ type ActionsType = Union<[{
     type: "INSERT_EMPTY_BLOCK_AFTER",
     payload: {
         sourceId: string,
+    }
+}, {
+    type: "MOVE_ACTION_FROM_BLOCK_TO_BLOCK",
+    payload: {
+        sourceBlockId: string,
+        destinationBlockId: string,
+        index: number,
+        action_id: string,
     }
 }]>;
 
@@ -257,6 +266,19 @@ function stateReducer(state: StateType, action: ActionsType) {
                 sourceBlock.next_on_success = newBlock.id;
                 return;
             }
+            case "MOVE_ACTION_FROM_BLOCK_TO_BLOCK": {
+                const { sourceBlockId, destinationBlockId, index, action_id } = action.payload;
+                const sourceBlock = draft.blocks.find(block => block.id === sourceBlockId);
+                const destinationBlock = draft.blocks.find(block => block.id === destinationBlockId);
+                if (sourceBlock && destinationBlock) {
+                    const action = sourceBlock.actions.find(action => action.id === action_id);
+                    if (action) {
+                        destinationBlock.actions.splice(index, 0, action);
+                        sourceBlock.actions = sourceBlock.actions.filter(action => action.id !== action_id);
+                    }
+                }
+                return;
+            }
             default:
                 return;
         }
@@ -317,8 +339,12 @@ function FlowsControllerV2({ children }: { children: React.ReactNode }) {
         dispatch({ type: "INSERT_EMPTY_BLOCK_AFTER", payload: { sourceId } })
     }
         , [])
+    const moveActionFromBlockToBlock = useCallback((sourceBlockId: string, destinationBlockId: string, index: number, action_id: string) => {
+        dispatch({ type: "MOVE_ACTION_FROM_BLOCK_TO_BLOCK", payload: { sourceBlockId, destinationBlockId, index, action_id } })
+    }
+        , [])
 
-    return <ControllerProvider value={{ insertEmptyBlock, state, deleteBlockById, addNextOnSuccess, deleteActionFromBlock, loadActions, reset, updateBlock, reorderActions, addActionToBlock, reorderActionsInBlock, deleteBlock }}>
+    return <ControllerProvider value={{ insertEmptyBlock, moveActionFromBlockToBlock, state, deleteBlockById, addNextOnSuccess, deleteActionFromBlock, loadActions, reset, updateBlock, reorderActions, addActionToBlock, reorderActionsInBlock, deleteBlock }}>
         {children}
     </ControllerProvider>
 }
