@@ -47,7 +47,7 @@ export function FlowRenderer() {
 
     function handleDragEnd(result: DropResult) {
         if (!result.destination) return;
-        const { source, destination, draggableId, mode, type } = result;
+        const { source, destination, draggableId } = result;
         console.log(result);
         if (!draggableId) return;
         // perform copy of the action to the flow's block;
