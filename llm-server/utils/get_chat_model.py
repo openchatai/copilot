@@ -38,6 +38,7 @@ def get_chat_model() -> BaseChatModel:
     elif model_name == "claude":
         model = ChatAnthropic(
             anthropic_api_key=os.getenv("CLAUDE_API_KEY"),
+            model_name="claude-instant-1.2"
         )
     elif model_name == "openchat":
         model = ChatOllama(base_url=f"{localip}:11434", model="openchat", temperature=0)

@@ -3,6 +3,13 @@ from langchain.schema import BaseMessage, AIMessage, HumanMessage, SystemMessage
 from utils.get_chat_model import get_chat_model
 
 
+def get_last_4(arr):
+    if arr is None or len(arr) == 0:
+        return []
+    if len(arr) <= 4:
+        return arr[-len(arr):]
+    return arr[-4:]
+
 async def get_consolidate_question(
     conversation_history: List[BaseMessage], user_input: str
 ) -> str:
@@ -10,21 +17,33 @@ async def get_consolidate_question(
         return user_input
 
     conversation_str = ""
-    for message in conversation_history:
+    for message in get_last_4(conversation_history):
         if message.type == "ai":
             conversation_str += f"Assistant: {message.content} \n"
         if message.type == "Human":
             conversation_str += f"Human: {message.content} \n"
 
     messages: List[BaseMessage] = []
+    messages.append(SystemMessage(content="You are a chat inspector, everytime you look at a new line of chat, you are able to piece references in the chat with information you looked at earlier, and output them."))
     messages.append(
         HumanMessage(
-            content=f"""Given the conversation history and the user's latest input which may be vague, construct a clear, standalone query that captures the user's intended meaning, without ambiguity. Replace any reference to objects / entities etc... with their real names / values. If reference is not found return the latest user input. I will use the output given by you to do a similarity search to find relevant conversations. 
-            Conversation history: ```{conversation_str}```, 
-            latest_user_input: ```{user_input}```
-        """
+            content="""Given a conversation history, replace occurrences of references like "it," "they," etc. in the latest input with their actual values. Remember, you are not supposed to answer the user question, merely enhance the latest user input
+
+Conversation history:
+---
+User: Can you recommend a good restaurant nearby?
+Assistant: Sure, how about trying that Italian place on Main Street? It has great pasta.
+
+User input: What do they serve?
+---
+
+Output: "What does the Italian place on Main Street serve?"
+"""
         )
     )
+    
+    messages.append(HumanMessage(content=f"Here's the conversation history: ```{conversation_history}```"))
+    messages.append(HumanMessage(content=f"{user_input}"))
 
     chat = get_chat_model()
     result = await chat.ainvoke(messages)
