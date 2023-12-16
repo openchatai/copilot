@@ -47,6 +47,38 @@ install:
 	@echo "$(COLOR_BOLD)=== 🔥🔥 You can now access the dashboard at -> http://localhost:8888 ===$(COLOR_RESET)"
 	@echo "$(COLOR_BOLD)=== Enjoy! ===$(COLOR_RESET)"
 
+arm:
+    ifndef DOCKER_INSTALLED
+	    $(error Docker is not installed. Please visit https://www.docker.com/get-started to download and install Docker.)
+    endif
+
+	@echo "$(COLOR_BOLD)=== 🟢 Putting the services down (if already running) ===$(COLOR_RESET)"
+	$(DOCKER_COMPOSE) down #--remove-orphans
+
+	@echo "$(COLOR_BOLD)=== 🟢 Setting up Docker environment ===$(COLOR_RESET)"
+
+    # Check if llm-server/.env exists
+    ifeq ($(LLM_SERVER_ENV_EXISTS),false)
+		@echo "Copying llm-server/.env.example to llm-server/.env"
+		cp llm-server/.env.example llm-server/.env
+    endif
+
+	@echo "$(COLOR_BOLD)=== 🟢 Copying .env files ===$(COLOR_RESET)"
+	cp -n dashboard/.env.example dashboard/.env 2>/dev/null || true
+	$(DOCKER_COMPOSE) -f docker-compose.arm.yml up -d --build
+
+	@echo "$(COLOR_BOLD)=== 🟢 Waiting for services to start (~30 seconds) ===$(COLOR_RESET)"
+	@sleep 30
+
+
+	@echo "$(COLOR_BOLD)=== 🟢 Running Alembic migrations ===$(COLOR_RESET)"
+	$(DOCKER_COMPOSE) exec -T llm-server sh -c "cd models && python setup_alembic.py && alembic upgrade head"
+
+
+	@echo "$(COLOR_BOLD)=== Installation completed ===$(COLOR_RESET)"
+	@echo "$(COLOR_BOLD)=== 🔥🔥 You can now access the dashboard at -> http://localhost:8888 ===$(COLOR_RESET)"
+	@echo "$(COLOR_BOLD)=== Enjoy! ===$(COLOR_RESET)"
+
 
 migrate:
 	@echo "$(COLOR_BOLD)=== 🟢 Running Alembic migrations ===$(COLOR_RESET)"
