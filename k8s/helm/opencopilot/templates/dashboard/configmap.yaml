@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ .Release.Name }}-dashboard-configmap
-data:
-  .env.dashboard: |
-{{ .Files.Get "files/.env.dashboard" | indent 4 }}

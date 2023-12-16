@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out=k8s
+    kompose.version: 1.31.2 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: selenium
+  name: selenium
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: selenium
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --out=k8s
+        kompose.version: 1.31.2 (HEAD)
+        linkerd.io/inject: enabled
+      creationTimestamp: null
+      labels:
+        io.kompose.network/opencopilot-opencopilot-network: "true"
+        io.kompose.service: selenium
+    spec:
+      containers:
+        - image: seleniarm/standalone-firefox:4.1.2-20220222
+          name: selenium
+          ports:
+            - containerPort: 4444
+              hostPort: 4444
+              protocol: TCP
+            - containerPort: 7900
+              hostPort: 7900
+              protocol: TCP
+          resources: {}
+      restartPolicy: Always
+status: {}
