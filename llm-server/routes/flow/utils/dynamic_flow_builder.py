@@ -1,5 +1,4 @@
-from entities.flow_entity import FlowDTO
-from routes.workflow.utils.api_retrievers import get_relevant_actions
+from routes.flow.utils.api_retrievers import get_relevant_actions
 from utils.get_chat_model import get_chat_model
 from langchain.schema import BaseMessage, HumanMessage, SystemMessage
 from typing import List

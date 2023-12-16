@@ -4,10 +4,10 @@ from typing import Optional
 from werkzeug.datastructures import Headers
 
 from entities.flow_entity import FlowDTO
+from extractors.convert_json_to_text import convert_json_to_text
 from integrations.load_json_config import load_json_config
 from integrations.transformers.transformer import transform_response
-from routes.workflow.extractors.convert_json_to_text import convert_json_to_text
-from routes.workflow.generate_openapi_payload import generate_api_payload
+from routes.flow.generate_openapi_payload import generate_api_payload
 from utils.get_logger import CustomLogger
 from utils.make_api_call import make_api_request
 from utils.process_app_state import process_state

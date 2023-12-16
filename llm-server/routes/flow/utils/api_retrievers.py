@@ -4,7 +4,7 @@ from typing import List, Dict
 from langchain.docstore.document import Document
 from qdrant_client import QdrantClient, models
 
-from routes.workflow.utils.document_similarity_dto import DocumentSimilarityDTO
+from routes.flow.utils.document_similarity_dto import DocumentSimilarityDTO
 from shared.utils.opencopilot_utils import StoreOptions
 from shared.utils.opencopilot_utils.get_embeddings import get_embeddings
 from shared.utils.opencopilot_utils.get_vector_store import get_vector_store

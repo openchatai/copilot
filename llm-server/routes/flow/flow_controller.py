@@ -14,9 +14,9 @@ from models.repository.flow_repo import (
 )
 from presenters.flow_presenters import flow_to_dict, flow_variable_to_dict
 from routes.flow import flow_vector_service
+from routes.flow.utils.dynamic_flow_builder import build_dynamic_flow
 from utils.db import Database
 from utils.get_logger import CustomLogger
-from routes.workflow.utils.dynamic_flow_builder import build_dynamic_flow
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -24,12 +24,14 @@ mongo = db_instance.get_db()
 logger = CustomLogger("flow")
 flow = Blueprint("flow", __name__)
 
+
 @flow.route("/dynamic/bot/<bot_id>", methods=["POST"])
 async def build_flow_from_text(bot_id: str):
     data = request.get_json()
-    
-    json = await build_dynamic_flow(data.text,bot_id)
+
+    json = await build_dynamic_flow(data.text, bot_id)
     return Response(json.dict())
+
 
 @flow.route("/bot/<bot_id>", methods=["GET"])
 def get_all_flows_api(bot_id: str):

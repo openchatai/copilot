@@ -4,10 +4,10 @@ from typing import List, cast, Dict
 from langchain.schema import HumanMessage, SystemMessage, BaseMessage
 
 from custom_types.actionable_or_not_type import parse_actionable_or_not_response, ActionableOrNotType
-from routes.workflow.utils.document_similarity_dto import DocumentSimilarityDTO
+from routes.flow.utils.document_similarity_dto import DocumentSimilarityDTO
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
-from utils.llm_consts import VectorCollections, UserMessageResponseType
+from utils.llm_consts import VectorCollections
 
 logger = CustomLogger(module_name=__name__)
 chat = get_chat_model()
