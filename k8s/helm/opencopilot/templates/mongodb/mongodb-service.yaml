@@ -1,0 +1,16 @@
+# templates/mongodb/mongodb-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-mongodb
+  labels:
+    app: {{ .Release.Name }}-mongodb
+spec:
+  ports:
+    - name: "27017"
+      port: 27017
+      targetPort: 27017
+  selector:
+    app: {{ .Release.Name }}-mongodb
+status:
+  loadBalancer: {}

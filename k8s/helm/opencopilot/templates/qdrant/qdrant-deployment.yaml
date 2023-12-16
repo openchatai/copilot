@@ -1,0 +1,38 @@
+# templates/qdrant/qdrant-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-qdrant
+  labels:
+    app: {{ .Release.Name }}-qdrant
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-qdrant
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-qdrant
+    spec:
+      containers:
+        - image: qdrant/qdrant
+          name: qdrant
+          ports:
+            - containerPort: 6333
+              hostPort: 6333
+              protocol: TCP
+            - containerPort: 6334
+              hostPort: 6334
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - mountPath: /qdrant/storage
+              name: qdrant-storage
+      restartPolicy: Always
+      volumes:
+        - name: qdrant-storage
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-qdrant-storage
