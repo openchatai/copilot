@@ -21,7 +21,7 @@ def create_flow(flow_dto: FlowDTO) -> Flow:
     Returns:
         The newly created Flow object.
     """
-    blocks_json = [block.to_dict() for block in flow_dto.blocks]
+    blocks_json = [block.model_dump() for block in flow_dto.blocks]
 
     with Session() as session:
         # Create a new Flow instance using data from the DTO
@@ -30,12 +30,14 @@ def create_flow(flow_dto: FlowDTO) -> Flow:
             name=flow_dto.name,
             payload=blocks_json,
             description=flow_dto.description,
-            id=flow_dto.id
+            id=flow_dto.id,
         )
 
         session.add(new_flow)
         session.commit()
-        session.refresh(new_flow)  # Refresh the instance to load any unloaded attributes
+        session.refresh(
+            new_flow
+        )  # Refresh the instance to load any unloaded attributes
         return new_flow
 
 
@@ -50,7 +52,7 @@ def update_flow(flow_id: str, flow_dto: FlowDTO) -> Type[Flow]:
     Returns:
         The updated Flow object, or None if not found.
     """
-    blocks_json = [block.to_dict() for block in flow_dto.blocks]
+    blocks_json = [block.model_dump() for block in flow_dto.blocks]
 
     with Session() as session:
         flow = session.query(Flow).filter(Flow.id == flow_id).first()
@@ -107,8 +109,14 @@ def get_variables_for_flow(flow_id: str) -> list[Type[FlowVariable]]:
         return session.query(FlowVariable).filter(FlowVariable.flow_id == flow_id).all()
 
 
-def add_or_update_variable_in_flow(bot_id: str, flow_id: str, name: str, value: str, runtime_override_key: str = None,
-                                   runtime_override_action_id: str = None) -> FlowVariable:
+def add_or_update_variable_in_flow(
+    bot_id: str,
+    flow_id: str,
+    name: str,
+    value: str,
+    runtime_override_key: str = None,
+    runtime_override_action_id: str = None,
+) -> FlowVariable:
     """
     Adds a new variable to a flow or updates it if it already exists.
 
@@ -124,15 +132,27 @@ def add_or_update_variable_in_flow(bot_id: str, flow_id: str, name: str, value: 
         The updated or newly created FlowVariable object.
     """
     with Session() as session:
-        variable = session.query(FlowVariable).filter_by(bot_id=bot_id, flow_id=flow_id, name=name,
-                                                         runtime_override_action_id=runtime_override_action_id,
-                                                         runtime_override_key=runtime_override_key).first()
+        variable = (
+            session.query(FlowVariable)
+            .filter_by(
+                bot_id=bot_id,
+                flow_id=flow_id,
+                name=name,
+                runtime_override_action_id=runtime_override_action_id,
+                runtime_override_key=runtime_override_key,
+            )
+            .first()
+        )
         if variable:
             variable.value = value
         else:
-            variable = FlowVariable(bot_id=bot_id, flow_id=flow_id, name=name,
-                                    runtime_override_action_id=runtime_override_action_id,
-                                    runtime_override_key=runtime_override_key)
+            variable = FlowVariable(
+                bot_id=bot_id,
+                flow_id=flow_id,
+                name=name,
+                runtime_override_action_id=runtime_override_action_id,
+                runtime_override_key=runtime_override_key,
+            )
             session.add(variable)
         session.commit()
         return variable
