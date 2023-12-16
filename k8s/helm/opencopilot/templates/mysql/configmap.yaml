@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ .Release.Name }}-mysql-configmap
-data:
-  MYSQL_DATABASE: opencopilot
-  MYSQL_PASSWORD: dbpass
-  MYSQL_ROOT_PASSWORD: root
-  MYSQL_USER: dbuser
