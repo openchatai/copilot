@@ -21,6 +21,7 @@ function orderBlocksByNextOnSuccess(blocks: BlockType[]) {
 }
 export function autoLayout(blocks: BlockType[]) {
     const orderedBlocks = orderBlocksByNextOnSuccess(blocks);
+    console.log("orderedBlocks", orderedBlocks);
     const newNodes: BlockNodeType[] = orderedBlocks.map((block, index) => {
         // order blocks based on next_on_success
         return {

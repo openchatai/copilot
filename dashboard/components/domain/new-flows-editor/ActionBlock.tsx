@@ -12,7 +12,7 @@ import _, { uniqueId } from 'lodash';
 import { useController } from './Controller';
 import { DebounceInput } from 'react-debounce-input';
 import { BlockType } from './types/block';
-import { Settings2, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // @patch for the transform issue;
@@ -58,22 +58,20 @@ function DraggableActionInsideActionBlock({ action, index, id }: { action: Actio
 }
 
 function UpdateBlock({ id, name }: { id: string, name: string }) {
-    const { state, updateBlock } = useController();
+    const { updateBlock } = useController();
 
     function updateBlockName(name: string) {
-        _.throttle(() => {
-            updateBlock(id, { name });
-        }, 1000)
+        updateBlock(id, { name });
     }
-    return <DebounceInput required element='input' value={name} onChange={(ev) => {
+    return <DebounceInput required element='input' debounceTimeout={1000 * 2} value={name} onChange={(ev) => {
         updateBlockName(ev.target.value);
     }} type="text" className='outline-none flex-1 w-full text-white font-medium p-0.5 rounded text-sm bg-transparent placeholder:text-white' placeholder='Name' />
 }
 function DeleteBlockBtn({ id }: { id: string }) {
     const { deleteBlockById } = useController();
     return <button onClick={() => {
-        deleteBlockById(id);
-    }} className='p-1 rounded bg-destructive text-white transition-colors'>
+        confirm('Are you sure you want to delete this block?') && deleteBlockById(id);
+    }} className='p-1 rounded text-white transition-colors'>
         <Trash2 size={18} />
     </button>
 }
@@ -84,15 +82,12 @@ function BlockHandle({ type, position, className }: { type: 'source' | 'target',
 function ActionBlock({ data: { actions, name }, id, selected }: Props) {
 
     return (
-        <>
+        <React.Fragment key={id}>
             <BlockHandle type="target" position={Position.Right} />
             <div className={cn('w-[20rem] bg-white border transition-all nodrag overflow-hidden nopan rounded-lg h-auto flex flex-col')}>
-                <div className={cn('mb-2 p-2 flex items-center justify-between shrink-0 transition-colors', selected ? "bg-sky-600" : "bg-sky-800")}>
+                <div className={cn('mb-2 p-2 flex items-center justify-between shrink-0 transition-colors', !selected ? "bg-[#607D8B]" : "bg-[#607D8B]/80")}>
                     <UpdateBlock id={id} name={name} />
                     <div className='space-x-2'>
-                        <button className='text-white p-1 rounded hover:bg-white hover:text-sky-600 transition-colors'>
-                            <Settings2 size={18} />
-                        </button>
                         <DeleteBlockBtn id={id} />
                     </div>
                 </div>
@@ -110,7 +105,7 @@ function ActionBlock({ data: { actions, name }, id, selected }: Props) {
                 </Droppable>
             </div>
             <BlockHandle type="source" position={Position.Left} />
-        </>
+        </React.Fragment>
 
     )
 }

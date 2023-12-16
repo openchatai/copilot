@@ -4,45 +4,43 @@ import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Link } from '@/lib/router-events'
 import { useCopilot } from '../../../_context/CopilotProvider';
+import useSWR, { mutate } from 'swr';
+import { getFlowsByBotId } from '@/data/new_flows';
+import { format } from 'timeago.js';
+import _ from 'lodash';
+import { EmptyBlock } from '@/components/domain/EmptyBlock';
+export const revalidateWorkflows = (copilot_id: string) => mutate(copilot_id + '/workflows')
 
 function WorkflowsTable() {
     const { id: copilotId } = useCopilot();
     const baseUrl = `/copilot/${copilotId}/workflow`;
+    const { data: flows } = useSWR(copilotId + '/workflows', async () => (await getFlowsByBotId(copilotId)).data)
     return (
         <Table className='caption-top text-sm' wrapperClassName='rounded-lg'>
             <TableHeader>
                 <TableRow>
                     <TableHead className='px-8'>Name</TableHead>
-                    <TableHead className='px-8'>Status</TableHead>
-                    <TableHead className='px-8'>Created</TableHead>
-                    <TableHead className='px-8'>Updated</TableHead>
+                    <TableHead className='px-8'>Description</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
-                <TableRow className='bg-white'>
-                    <TableCell className='px-8'>
-                        <Button variant='link' className='text-left' asChild size='fit'>
-                            <Link href={`${baseUrl}/first_flow_id`}>
-                                Flow 1
-                            </Link>
-                        </Button>
+                {_.isEmpty(flows) ? <TableRow>
+                    <TableCell colSpan={2}>
+                        <EmptyBlock />
                     </TableCell>
-                    <TableCell className='px-8'>active</TableCell>
-                    <TableCell className='px-8'>2 days ago</TableCell>
-                    <TableCell className='px-8'>2 days ago</TableCell>
-                </TableRow>
-                <TableRow className='bg-white'>
-                    <TableCell className='px-8'>
-                        <Button variant='link' className='text-left' asChild size='fit'>
-                            <Link href={`${baseUrl}/second_flow_id`}>
-                                Flow 2
-                            </Link>
-                        </Button>
-                    </TableCell>
-                    <TableCell className='px-8'>active</TableCell>
-                    <TableCell className='px-8'>2 days ago</TableCell>
-                    <TableCell className='px-8'>2 days ago</TableCell>
-                </TableRow>
+                </TableRow> : flows?.map((flow, index) => {
+                    return <TableRow className='bg-white' key={index}>
+                        <TableCell className='px-8'>
+                            <Button variant='link' className='text-left' asChild size='fit'>
+                                <Link href={`${baseUrl}/${flow.flow_id}`}>
+                                    {flow.name}
+                                </Link>
+                            </Button>
+                        </TableCell>
+                        <TableCell className='px-8'>{flow.description}</TableCell>
+                    </TableRow>
+                })}
+
             </TableBody>
         </Table>
     )

@@ -9,6 +9,7 @@ import { Draggable, Droppable } from "react-beautiful-dnd";
 import { useController } from "./Controller";
 import { methodVariants } from "../MethodRenderer";
 import { format } from "timeago.js";
+import { EmptyBlock } from "../EmptyBlock";
 
 export function Action({ action }: { action: ActionResponseType }) {
     return <div className="flex flex-col gap-1 w-full px-4 shrink-0 transition-all py-2 data-[state=open]:!border-l-primary hover:bg-accent !border-transparent border-l-2">
@@ -80,8 +81,11 @@ export const ASIDE_DROPABLE_ID = "BASE-ACTIONS";
 
 export function ActionsList() {
     const { state: { actions } } = useController();
+
     return (
-        <Droppable droppableId={ASIDE_DROPABLE_ID} mode="standard">
+        _.isEmpty(actions) ? <EmptyBlock>
+            <div className="text-sm text-accent-foreground text-center w-full">No actions found</div>
+        </EmptyBlock> : <Droppable droppableId={ASIDE_DROPABLE_ID} mode="standard">
             {
                 (provided) => {
                     return <div ref={provided.innerRef} {...provided.droppableProps} className='w-full shrink-0 divide-y flex overflow-y-hidden flex-col items-center justify-center'>

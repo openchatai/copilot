@@ -8,34 +8,54 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-
+import { createFlowByBotId } from '@/data/new_flows';
+import { useCopilot } from '../../../_context/CopilotProvider';
+import { useAsyncFn } from 'react-use';
+import { toast } from '@/components/ui/use-toast';
+import { useRouter } from 'next/navigation';
+import { atom, useAtom } from 'jotai';
 
 const formSchema = z.object({
-    title: z.string().min(2, {
+    name: z.string().min(2, {
         message: "title must be at least 2 characters.",
     }),
     description: z.string().min(2, {
         message: "description must be at least 2 characters.",
     }),
-    edit_after_creation: z.boolean().default(false),
 })
 
+const modalAtom = atom(false);
+const useModal = () => useAtom(modalAtom);
 
 export default function CreateWorkflowForm() {
+    const { id: copilotId } = useCopilot();
+    const [open, setOpen] = useModal();
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            title: '',
+            name: '',
             description: '',
-            edit_after_creation: false,
         }
     })
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values)
+    const [state, createFlow] = useAsyncFn(createFlowByBotId)
+
+    const { push } = useRouter();
+
+    async function onSubmit({ name, description }: z.infer<typeof formSchema>) {
+        const { data } = await createFlow(copilotId, { name, description });
+        if (data.flow_id) {
+            push(`/copilot/${copilotId}/workflow/${data.flow_id}`)
+            setOpen(false);
+            toast({
+                title: 'Flow created',
+                description: `Flow ${data.name} was created successfully`,
+                variant: 'success'
+            })
+        }
     }
+
     return (
-        <AlertDialog>
+        <AlertDialog open={open} onOpenChange={setOpen}>
             <AlertDialogTrigger asChild>
                 <Button>
                     Create Flow
@@ -52,7 +72,7 @@ export default function CreateWorkflowForm() {
                     <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-2'>
                         <FormField
                             control={form.control}
-                            name="title"
+                            name="name"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel className="required-label">
@@ -80,35 +100,11 @@ export default function CreateWorkflowForm() {
                                 </FormItem>
                             )}
                         />
-                        <FormField
-                            control={form.control}
-                            name="edit_after_creation"
-                            render={({ field }) => {
-                                const { value, ...rest } = field;
-                                return <FormItem className='flex items-center justify-between'>
-                                    <FormLabel>
-                                        Edit after creation
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Switch
-                                            {...rest}
-                                            checked={value}
-                                            onCheckedChange={() => {
-                                                field.onChange(!value)
-                                            }}
-                                            value={value ? 'on' : 'off'}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            }
-                            }
-                        />
-                        <AlertDialogFooter className='!mt-5'>
+                        <AlertDialogFooter className='!mt-5 flex items-center gap-2'>
                             <AlertDialogCancel type='button'>
                                 Cancel
                             </AlertDialogCancel>
-                            <Button type='submit'>
+                            <Button type='submit' loading={state.loading}>
                                 Create
                             </Button>
                         </AlertDialogFooter>

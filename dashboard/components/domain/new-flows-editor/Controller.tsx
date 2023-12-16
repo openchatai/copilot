@@ -10,6 +10,7 @@ import useSWR, { mutate } from 'swr';
 import { BlockType } from './types/block';
 import _, { uniqueId } from 'lodash';
 import { atom, useAtom } from 'jotai';
+import { getFlowById } from '@/data/new_flows';
 
 const selectedNodeIds = atom<string[]>([]);
 
@@ -27,9 +28,9 @@ type ControllerType = {
     deleteActionFromBlock: (blockId: string, actionId: string) => void,
     addNextOnSuccess: (sourceId: string, destinationId: string) => void,
     deleteBlockById: (blockId: string) => void,
-    insertEmptyBlock: (sourceId: string) => void,
+    insertEmptyBlock: (sourceId?: string) => void,
     moveActionFromBlockToBlock: (sourceBlockId: string, destinationBlockId: string, index: number, action_id: string) => void,
-
+    dispatch: React.Dispatch<ActionsType>,
 }
 const [ControllerProvider, useController] = createSafeContext<ControllerType>('Controller');
 
@@ -99,8 +100,8 @@ type ActionsType = Union<[{
     }
 }, {
     type: "INSERT_EMPTY_BLOCK_AFTER",
-    payload: {
-        sourceId: string,
+    payload?: {
+        sourceId?: string,
     }
 }, {
     type: "MOVE_ACTION_FROM_BLOCK_TO_BLOCK",
@@ -110,6 +111,9 @@ type ActionsType = Union<[{
         index: number,
         action_id: string,
     }
+}, {
+    type: "SET_WORKFLOW_DATA",
+    payload: Partial<StateType>
 }]>;
 
 type StateType = {
@@ -117,48 +121,15 @@ type StateType = {
     description: string | null,
     actions: ActionResponseType[],
     blocks: BlockType[],
+    flow_id: string | null,
 }
 
 const initialState: StateType = {
     name: null,
+    flow_id: null,
     description: null,
     actions: [],
-    blocks: [{
-        id: "block-1",
-        name: "Start",
-        created_at: new Date().toISOString(),
-        next_on_success: "block-2",
-        updated_at: new Date().toISOString(),
-        actions: [{
-            id: "action-1",
-            name: "Create User",
-            description: "Create a new user",
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            request_type: "POST",
-            api_endpoint: "https://api.example.com/users",
-            operation_id: "create_user",
-            deleted_at: null,
-        }],
-    },
-    {
-        id: "block-2",
-        name: "Start",
-        created_at: new Date().toISOString(),
-        next_on_success: null,
-        updated_at: new Date().toISOString(),
-        actions: [{
-            id: "action-2",
-            name: "Delete a User",
-            description: "Deletes user",
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            request_type: "POST",
-            api_endpoint: "https://api.example.com/users",
-            operation_id: "delete_user",
-            deleted_at: null,
-        }],
-    }],
+    blocks: [],
 }
 export function reorderList<T extends any>(list: T[], startIndex: number, endIndex: number) {
     const result = Array.from(list);
@@ -251,19 +222,32 @@ function stateReducer(state: StateType, action: ActionsType) {
                 return;
             }
             case "INSERT_EMPTY_BLOCK_AFTER": {
-                const { sourceId } = action.payload;
-                const sourceBlock = draft.blocks.find(block => block.id === sourceId);
-                if (!sourceBlock) return;
-                const newBlock: BlockType = {
-                    id: "block-" + uniqueId(),
-                    name: "New Block",
-                    created_at: new Date().toISOString(),
-                    next_on_success: sourceBlock.next_on_success,
-                    updated_at: new Date().toISOString(),
-                    actions: [],
+                // will inset empty block after the source block (if present); else will insert at the end
+                if (action.payload?.sourceId) {
+                    const { sourceId } = action.payload;
+                    const sourceBlock = draft.blocks.find(block => block.id === sourceId);
+                    if (!sourceBlock) return;
+                    const newBlock: BlockType = {
+                        id: "block-" + uniqueId(),
+                        name: "New Block",
+                        created_at: new Date().toISOString(),
+                        next_on_success: sourceBlock.next_on_success,
+                        updated_at: new Date().toISOString(),
+                        actions: [],
+                    }
+                    draft.blocks.push(newBlock);
+                    sourceBlock.next_on_success = newBlock.id;
+                } else {
+                    const newBlock: BlockType = {
+                        id: "block-" + uniqueId(),
+                        name: "New Block",
+                        created_at: new Date().toISOString(),
+                        next_on_success: null,
+                        updated_at: new Date().toISOString(),
+                        actions: [],
+                    }
+                    draft.blocks.push(newBlock);
                 }
-                draft.blocks.push(newBlock);
-                sourceBlock.next_on_success = newBlock.id;
                 return;
             }
             case "MOVE_ACTION_FROM_BLOCK_TO_BLOCK": {
@@ -279,34 +263,31 @@ function stateReducer(state: StateType, action: ActionsType) {
                 }
                 return;
             }
+            case "SET_WORKFLOW_DATA": {
+                _.assign(draft, action.payload)
+                return;
+            }
             default:
                 return;
         }
     })
 }
 
+export const revalidateWorkflow = (copilotId: string, workflow_id: string) => mutate(copilotId + '/flow/' + workflow_id);
+
 function FlowsControllerV2({ children }: { children: React.ReactNode }) {
     const [state, dispatch] = useReducer(stateReducer, initialState);
-    const { id: copilotId } = useCopilot();
-    console.log("copilotId", state)
-    useSWR("actions/" + copilotId, async () => (await getActionsByBotId(copilotId)).data, {
-        onSuccess: (data) => {
-            dispatch({ type: "LOAD_ACTIONS", payload: data })
-        }
-    });
+
     // useCallback Hell :( 
     const loadActions = useCallback((actions: ActionResponseType[]) => {
         dispatch({ type: "LOAD_ACTIONS", payload: actions })
     }, [])
-
     const reset = useCallback(() => {
         dispatch({ type: "RESET" })
     }, [])
-
     const updateBlock = useCallback((blockId: string, block: Partial<BlockType>) => {
         dispatch({ type: "UPDATE_BLOCK", payload: { blockId, data: block } })
     }, [])
-
     const reorderActions = useCallback((sourceIndex: number, destinationIndex: number) => {
         dispatch({ type: "REORDER_ACTIONS", payload: { sourceIndex, destinationIndex } })
     }
@@ -335,7 +316,7 @@ function FlowsControllerV2({ children }: { children: React.ReactNode }) {
         dispatch({ type: "DELETE_BLOCK_BY_ID", payload: { blockId } })
     }
         , [])
-    const insertEmptyBlock = useCallback((sourceId: string) => {
+    const insertEmptyBlock = useCallback((sourceId?: string) => {
         dispatch({ type: "INSERT_EMPTY_BLOCK_AFTER", payload: { sourceId } })
     }
         , [])
@@ -344,7 +325,7 @@ function FlowsControllerV2({ children }: { children: React.ReactNode }) {
     }
         , [])
 
-    return <ControllerProvider value={{ insertEmptyBlock, moveActionFromBlockToBlock, state, deleteBlockById, addNextOnSuccess, deleteActionFromBlock, loadActions, reset, updateBlock, reorderActions, addActionToBlock, reorderActionsInBlock, deleteBlock }}>
+    return <ControllerProvider value={{ dispatch, insertEmptyBlock, moveActionFromBlockToBlock, state, deleteBlockById, addNextOnSuccess, deleteActionFromBlock, loadActions, reset, updateBlock, reorderActions, addActionToBlock, reorderActionsInBlock, deleteBlock }}>
         {children}
     </ControllerProvider>
 }

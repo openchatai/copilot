@@ -11,6 +11,7 @@ import { ASIDE_DROPABLE_ID, ActionsList } from './ActionsList';
 import { useEffect } from 'react';
 import BlockEdge from './BlockEdge';
 import { autoLayout } from './autoLayout';
+import _ from 'lodash';
 
 const nodeTypes = {
     actionBlock
@@ -24,11 +25,15 @@ const edgeTypes = {
 export function FlowRenderer() {
     const [nodes, setNodes, onNodeChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-
     const { state: {
         actions,
         blocks
-    }, reorderActions, addActionToBlock, reorderActionsInBlock, deleteBlock, deleteActionFromBlock, moveActionFromBlockToBlock } = useController();
+    }, reorderActions, addActionToBlock, reorderActionsInBlock,
+        deleteBlock, deleteActionFromBlock,
+        insertEmptyBlock,
+        moveActionFromBlockToBlock } = useController();
+
+    const isBlocksEmpty = _.isEmpty(blocks);
 
     useEffect(() => {
         const { newNodes, edges } = autoLayout(blocks);
@@ -71,8 +76,8 @@ export function FlowRenderer() {
             // reorder the actions inside the block
             const sourceBlockId = source.droppableId.split('|')[1];
             const destinationBlockId = destination.droppableId.split('|')[1];
+            // reorder the actions inside the block
             if (sourceBlockId && destinationBlockId && (sourceBlockId === destinationBlockId)) {
-                // reorder the actions inside the block
                 reorderActionsInBlock(sourceBlockId, source.index, destination.index);
             }
             // move action from one block to another
@@ -116,27 +121,42 @@ export function FlowRenderer() {
                         </div>
                     </aside>
                     <AddActionDrawer />
-                    <ReactFlow
-                        fitView
-                        fitViewOptions={{
-                            padding: 20,
-                            duration: 0.5,
-                        }}
-                        onNodesDelete={(nodes) => {
-                            nodes.forEach(node => {
-                                const blockId = node.id;
-                                if (blockId) {
-                                    deleteBlock(blockId);
-                                }
-                            })
-                        }}
-                        edges={edges}
-                        edgeTypes={edgeTypes}
-                        onEdgesChange={onEdgesChange}
-                        maxZoom={1} minZoom={1} nodeTypes={nodeTypes} nodes={nodes} onNodesChange={onNodeChange} className='flex-1'>
-                        <Controls position='bottom-right' />
-                        <Background color="var(--accent-foreground)" />
-                    </ReactFlow>
+                    <div className='flex-1 relative h-full'>
+                        {
+                            isBlocksEmpty && <div data-container='Empty block add button' className='absolute inset-0 z-50 flex-center bg-white'>
+                                <div className='text-center space-y-2'>
+                                    <p>
+                                        Click the button below to add a new block
+                                    </p>
+                                    <Button onClick={() => insertEmptyBlock()}>
+                                        Add a Block
+                                    </Button>
+                                </div>
+                            </div>
+                        }
+
+                        <ReactFlow
+                            fitView
+                            fitViewOptions={{
+                                padding: 20,
+                                duration: 0.5,
+                            }}
+                            onNodesDelete={(nodes) => {
+                                nodes.forEach(node => {
+                                    const blockId = node.id;
+                                    if (blockId) {
+                                        deleteBlock(blockId);
+                                    }
+                                })
+                            }}
+                            edges={edges}
+                            edgeTypes={edgeTypes}
+                            onEdgesChange={onEdgesChange}
+                            maxZoom={1} minZoom={1} nodeTypes={nodeTypes} nodes={nodes} onNodesChange={onNodeChange} className='w-full h-full'>
+                            <Controls position='bottom-right' />
+                            <Background color="var(--accent-foreground)" />
+                        </ReactFlow>
+                    </div>
                 </div>
             </DragDropContext>
         </ReactFlowProvider>
