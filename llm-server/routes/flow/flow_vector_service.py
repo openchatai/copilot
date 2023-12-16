@@ -23,19 +23,23 @@ def get_action(point_id: str):
     return points[0]
 
 
-def create_flows(flows: List[FlowDTO], bot_id: str):
-    documents: List[Document] = []
-    for action in flows:
-        document = Document(page_content=action.description + action.name)
-        document.metadata.update({
-        "bot_id": str(flow.bot_id),
-        "flow_id": str(flow.id)
-    })
-
-        documents.append(document)
-
-    vector_ids = flows_collection.add_documents(documents)
-    return vector_ids
+def get_flow_point_id_by_flow_id(flow_id: str):
+    [records, point_id] = client.scroll(
+        collection_name="flows",
+        scroll_filter=models.Filter(
+            must=[
+                models.FieldCondition(
+                    key="metadata.flow_id",
+                    match=models.MatchValue(value=str(flow_id)),
+                )
+            ],
+        ),
+        limit=1,
+        offset=0,
+        with_payload=True,
+        with_vectors=False,
+    )
+    return point_id
 
 
 def create_flow(flow: FlowDTO):
@@ -81,16 +85,6 @@ def get_all_flows(chatbot_id: str, limit: int = 20, offset: int = 0) -> List[Pay
             actions.append({"payload": payload, "id": record.id})
 
     return actions
-
-
-def update_flow(action: FlowDTO, point_id: str):
-    client.set_payload(
-        collection_name="flows",
-        payload={
-            "metadata": action
-        },
-        points=[point_id],
-    )
 
 
 def delete_flow(point_id: str):

@@ -12,7 +12,8 @@ from typing import cast
 class DynamicBuilder(BaseModel):
     bot_message: str
     operationIds: List[str]
-    
+
+
 def parse_json(content: str):
     parser = PydanticOutputParser(pydantic_object=DynamicBuilder)
     r = parser.parse(content)
