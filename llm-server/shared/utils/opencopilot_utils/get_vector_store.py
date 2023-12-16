@@ -8,10 +8,10 @@ from .get_embeddings import get_embeddings
 import qdrant_client
 
 
+embedding = get_embeddings()
 def get_vector_store(options: StoreOptions) -> VectorStore:
     """Gets the vector store for the given options."""
     vector_store: VectorStore
-    embedding = get_embeddings()
 
     store_type = os.environ.get("STORE")
 

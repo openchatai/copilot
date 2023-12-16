@@ -22,7 +22,7 @@ async def gen_body_from_schema(
     app: Optional[str],
     current_state: Optional[str],
 ) -> Any:
-    chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
+    chat = get_chat_model()
     api_generation_prompt = None
     if app:
         module_name = f"integrations.custom_prompts.{app}"
@@ -41,10 +41,7 @@ async def gen_body_from_schema(
         HumanMessage(content="prev api responses: {}".format(prev_api_response)),
         HumanMessage(content="current_state: {}".format(current_state)),
         HumanMessage(
-            content="If the user is asking to generate values for some fields, likes product descriptions, jokes etc add them."
-        ),
-        HumanMessage(
-            content="Given the provided information, generate the appropriate minified JSON payload to use as body for the API request. If a user doesn't provide a required parameter, use sensible defaults for required params, and leave optional params."
+            content="Generate the compact JSON payload for the API request based on the provided information, without adding commentary. If a user fails to provide a necessary parameter, default values for required parameters will be used, while optional parameters will be left unchanged."
         ),
     ]
 

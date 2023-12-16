@@ -18,6 +18,7 @@ async def run_workflow(
     data: WorkflowData,
     app: Optional[str],
     bot_id: str,
+    summary_prompt: str,
 ) -> ResponseDict:
     headers = data.headers or Headers()
     server_base_url = data.server_base_url
@@ -34,6 +35,7 @@ async def run_workflow(
             server_base_url,
             app,
             bot_id=bot_id,
+            summary_prompt=summary_prompt,
         )
     except Exception as e:
         payload_data = {
@@ -53,8 +55,6 @@ async def run_workflow(
 
     output: ResponseDict = {"response": result if not error else "", "error": error}
 
-    logging.info(
-        "Workflow output %s", json.dumps(output, separators=(",", ":"))
-    )
+    logging.info("Workflow output %s", json.dumps(output, separators=(",", ":")))
 
     return output

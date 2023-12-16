@@ -9,7 +9,7 @@
 **Documentation [available here](https://docs.opencopilot.so)**
 
 ------
-# 🔥 OpenCopilot [early beta]
+# 🔥 OpenCopilot
 
 ---- 
 OpenCopilot allows you to have your own product's AI copilot. It integrates with your underlying APIs and can execute API calls whenever needed. It uses LLMs to determine if the user's request requires calling an API endpoint. Then, it decides which endpoint to call and passes the appropriate payload based on the given API definition.
@@ -43,25 +43,47 @@ OPENAI_API_KEY=YOUR_TOKEN_HERE
 MYSQL_URI=mysql+pymysql://dbuser:dbpass@mysql:3306/opencopilot
 ```
 
-```
+
+
+
+# OpenCopilot
+
+## Installation
+
+### For Linux Machines
+
+To install the necessary dependencies and set up the environment for the OpenCopilot project, use the following command:
+
+```bash
 make install
 ```
+
+### For ARM Machines (Mac Silicon)
+
+If you are using an ARM machine, specifically Mac Silicon, use the following command to install dependencies and set up the environment:
+
+```bash
+make arm
+```
+
+Once the installation is complete, you can access the OpenCopilot console at [http://localhost:8888](http://localhost:8888).
+
+## Additional Commands
+
+- **make migrate**: Run Alembic migrations.
+- **make down**: Stop and remove all containers.
+- **make exec-dashboard**: Access the dashboard container's shell.
+- **make exec-llm-server**: Access the llm-server container's shell.
+- **make restart**: Restart all containers.
+- **make logs**: Show container logs.
+- **make purge**: Fully clean uninstall (remove containers, networks, volumes, .env).
+- **make help**: Display help message with available targets.
+
 
 This will install the necessary dependencies and set up the environment for the OpenCopilot project.
 
 Once the installation is complete, you can access the OpenCopilot console at http://localhost:8888
 
----
-
-If needed, you can also restart the local setup using:
-```
-make restart
-```
-
-Also, you can see the complete list of commands using 
-```
-make help
-```
 
 
 ## Try it out:

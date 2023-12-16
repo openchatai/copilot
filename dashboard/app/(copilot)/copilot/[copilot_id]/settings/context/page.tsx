@@ -82,11 +82,7 @@ export default function CopilotContextSettingsPage() {
                 <Alert variant="default">
                   <AlertTitle>What is base context ?</AlertTitle>
                   <AlertDescription>
-                    The context is Lorem ipsum dolor, sit amet consectetur
-                    adipisicing elit. Laboriosam unde ea, ullam quae velit
-                    provident quo quisquam ducimus nisi repudiandae perferendis
-                    aliquam nihil voluptatibus, quam perspiciatis pariatur
-                    debitis. Laudantium, ut!
+                    Context is the runtime instuctions for the copilot, used for tuning the responses
                   </AlertDescription>
                 </Alert>
               </PopoverContentPrimitive>

@@ -18,7 +18,7 @@ llm = get_llm()
 async def gen_params_from_schema(
     param_schema: str, text: str, prev_resp: str, current_state: Optional[str]
 ) -> Optional[JsonData]:
-    chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
+    chat = get_chat_model()
     messages = [
         SystemMessage(
             content="You are an intelligent machine learning model that can produce REST API's params / query params in json format, given the json schema, user input, data from previous api calls, and current application state."
@@ -28,12 +28,9 @@ async def gen_params_from_schema(
         HumanMessage(content="User's requirement: {}.".format(text)),
         HumanMessage(content="Current state: {}.".format(current_state)),
         HumanMessage(
-            content="If the user is asking to generate values for some fields, likes product descriptions, jokes etc add them."
-        ),
-        HumanMessage(
             content="Based on the information provided, construct a valid parameter object to be used with python requests library. In cases where user input doesnot contain information for a query, DO NOT add that specific query parameter to the output. If a user doesn't provide a required parameter, use sensible defaults for required params, and leave optional params."
         ),
-        HumanMessage(content="Your output must be a valid json"),
+        HumanMessage(content="Your output must be a valid json, without any commentary"),
     ]
     result = chat(messages)
     logger.info("[OpenCopilot] LLM Body Response: {}".format(result.content))

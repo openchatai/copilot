@@ -2,10 +2,7 @@ import json
 from opencopilot_types.workflow_type import WorkflowDataType
 from routes.workflow.generate_openapi_payload import generate_openapi_payload
 from utils.make_api_call import make_api_request
-from typing import Any, Optional
-from routes.workflow.extractors.transform_api_response import (
-    transform_api_response_from_schema,
-)
+from typing import Optional
 from routes.workflow.extractors.convert_json_to_text import convert_json_to_text
 from utils.process_app_state import process_state
 from prance import ResolvingParser
@@ -25,6 +22,7 @@ async def run_openapi_operations(
     server_base_url: str,
     app: Optional[str],
     bot_id: str,
+    summary_prompt: str,
 ) -> str:
     api_request_data = {}
     prev_api_response = ""
@@ -47,7 +45,12 @@ async def run_openapi_operations(
                 api_request_data[operation_id] = api_payload.__dict__
                 api_response = None
                 try:
-                    logger.info("Making API call", incident="make_api_call", body=json.dumps(api_payload.body_schema), params=api_payload.query_params)
+                    logger.info(
+                        "Making API call",
+                        incident="make_api_call",
+                        body=json.dumps(api_payload.body_schema),
+                        params=api_payload.query_params,
+                    )
 
                     api_response = make_api_request(
                         headers=headers, **api_payload.__dict__
@@ -59,10 +62,14 @@ async def run_openapi_operations(
                         raise ValueError("API response is not JSON")
 
                 except Exception as e:
-                    logger.error("Error occurred while making API call", incident="make_api_call_failed", error=str(e))
+                    logger.error(
+                        "Error occurred while making API call",
+                        incident="make_api_call_failed",
+                        error=str(e),
+                    )
                     raise e
 
-                logger.info("Got the following api response", text = api_response.text)
+                logger.info("Got the following api response", text=api_response.text)
                 # if a custom transformer function is defined for this operationId use that, otherwise forward it to the llm
                 # so we don't necessarily have to defined mappers for all api endpoints
                 partial_json = load_json_config(app, operation_id)
@@ -71,15 +78,15 @@ async def run_openapi_operations(
                         "Config map is not defined for this operationId",
                         incident="config_map_undefined",
                         operation_id=operation_id,
-                        app=app
+                        app=app,
                     )
                     record_info[operation_id] = api_response.text
-                    
+
                     # Removed this because this slows down the bot response instead of speeding it
                     # record_info[operation_id] = transform_api_response_from_schema(
                     #     api_payload.endpoint or "", api_response.text
                     # )
-                    
+
                     pass
                 else:
                     logger.info(
@@ -99,13 +106,19 @@ async def run_openapi_operations(
             except Exception as e:
                 logger.error(
                     "Error occurred during workflow check in store",
-                    incident="check_workflow_in_store",                    
-                    text= text,
-                    headers= headers,
-                    server_base_url= server_base_url,
-                    app= app,
+                    incident="check_workflow_in_store",
+                    text=text,
+                    headers=headers,
+                    server_base_url=server_base_url,
+                    app=app,
                     error=str(e),
                 )
-                
+
                 return str(e)
-    return convert_json_to_text(text, record_info, api_request_data, bot_id=bot_id)
+    return convert_json_to_text(
+        text,
+        record_info,
+        api_request_data,
+        bot_id=bot_id,
+        summary_prompt=summary_prompt,
+    )

@@ -11,7 +11,7 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 
 
 def transform_api_response_from_schema(server_url: str, responseText: str) -> str:
-    chat = get_chat_model(CHAT_MODELS.gpt_3_5_turbo_16k)
+    chat = get_chat_model()
 
     # responseText = truncate_json(json.loads(responseText))
     messages = [

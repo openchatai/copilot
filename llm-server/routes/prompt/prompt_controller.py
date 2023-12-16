@@ -66,7 +66,6 @@ def delete_prompt(id: str) -> Response:
 
     return Response(status=204)
 
-
 def get_validated_prompt_data(request) -> Optional[Prompt]:
     try:
         data = Prompt(**request.get_json())

@@ -10,18 +10,15 @@ It's a simple react application built to be used in any webpage as a widget, to 
 
 2. extract the zip file.
 
-3. copy the `assets/*` folder to your project.
-   this folder contains css and js files that are needed for the widget to work.
+3. copy the `assets/*.js` file to your project.
 
-4. add the js file in your html file as follows:
+4. reference the js file in your html file as follows:
 
    ```html
    <script src="[some_js_file].js"></script>
    ```
 
-5. don't add the css file in your html file, instead, the script will inject the css files dynamically.
-
-6. init the widget.
+5. init the widget.
 
    ```html
    <script>
@@ -36,6 +33,9 @@ It's a simple react application built to be used in any webpage as a widget, to 
            // headers that you want to send with every message request.
            Authorization: "Bearer your_auth_token_goes_here",
          },
+         user:{ // optional user object
+         nane:"Some User"
+         }
        });
      };
    </script>
