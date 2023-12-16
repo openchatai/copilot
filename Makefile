@@ -39,7 +39,7 @@ endif
 	@echo "$(COLOR_BOLD)=== 🔥🔥 You can now access the dashboard at -> http://localhost:8888 ===$(COLOR_RESET)"
 	@echo "$(COLOR_BOLD)=== Enjoy! ===$(COLOR_RESET)"
 
-arm: 
+install-arm: 
 ifndef DOCKER_INSTALLED
 	$(error Docker is not installed. Please visit https://www.docker.com/get-started to download and install Docker.)
 endif
