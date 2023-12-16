@@ -2,10 +2,10 @@ import json
 import os
 from typing import Optional
 
+from extractors.extract_body import gen_body_from_schema
+from extractors.extract_param import gen_params_from_schema
 from models.repository.action_repo import find_action_by_operation_id
-from routes.workflow.api_info import ApiInfo
-from routes.workflow.extractors.extract_body import gen_body_from_schema
-from routes.workflow.extractors.extract_param import gen_params_from_schema
+from routes.flow.api_info import ApiInfo
 from shared.utils.opencopilot_utils import get_llm
 
 openai_api_key = os.getenv("OPENAI_API_KEY")

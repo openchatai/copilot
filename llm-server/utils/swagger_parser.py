@@ -80,7 +80,7 @@ class SwaggerParser:
     def get_swagger_data(self):
         return self.swagger_data
 
-    def get_endpoints(self):
+    def get_endpoints(self) -> List[Endpoint]:
         endpoints = []
         paths = self.swagger_data.get("paths", {})
 
