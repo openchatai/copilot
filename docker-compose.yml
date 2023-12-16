@@ -155,7 +155,7 @@ services:
       - "7900:7900"
     shm_size: 2g
     deploy:
-      replicas: 2
+      replicas: 1
     healthcheck:
       test: ["CMD-SHELL", "curl -sSL http://localhost:4444/wd/hub/status || exit 1"]
       interval: 30s
