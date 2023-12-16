@@ -1,3 +1,4 @@
+import uuid
 from typing import List, Optional
 
 from pydantic import BaseModel
@@ -6,6 +7,7 @@ from entities.action_entity import ActionDTO
 
 
 class Block(BaseModel):
+    id: str = str(uuid.uuid4())
     actions: List[ActionDTO]
     name: str
     next_on_fail: Optional[str] = None
