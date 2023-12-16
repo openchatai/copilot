@@ -44,12 +44,6 @@ MYSQL_URI=mysql+pymysql://dbuser:dbpass@mysql:3306/opencopilot
 ```
 
 
-
-
-# OpenCopilot
-
-## Installation
-
 ### For Linux Machines
 
 To install the necessary dependencies and set up the environment for the OpenCopilot project, use the following command:
