@@ -4,13 +4,12 @@ import { createSafeContext } from '@/lib/createSafeContext'
 import React, { useCallback, useReducer } from 'react'
 import { produce } from 'immer';
 import { Union } from '@/types/utils';
-import { ActionResponseType, getActionsByBotId } from '@/data/actions';
-import { useCopilot } from '@/app/(copilot)/copilot/_context/CopilotProvider';
-import useSWR, { mutate } from 'swr';
+import { ActionResponseType } from '@/data/actions';
+import { mutate } from 'swr';
 import { BlockType } from './types/block';
 import _, { uniqueId } from 'lodash';
 import { atom, useAtom } from 'jotai';
-import { getFlowById } from '@/data/new_flows';
+import { ReactFlowProvider } from 'reactflow';
 
 const selectedNodeIds = atom<string[]>([]);
 
@@ -28,7 +27,8 @@ type ControllerType = {
     deleteActionFromBlock: (blockId: string, actionId: string) => void,
     addNextOnSuccess: (sourceId: string, destinationId: string) => void,
     deleteBlockById: (blockId: string) => void,
-    insertEmptyBlock: (sourceId?: string) => void,
+    insertEmptyBlockAfter: (sourceId?: string) => void,
+    insertEmptyBlockBefore: (sourceId?: string) => void,
     moveActionFromBlockToBlock: (sourceBlockId: string, destinationBlockId: string, index: number, action_id: string) => void,
     dispatch: React.Dispatch<ActionsType>,
 }
@@ -114,6 +114,11 @@ type ActionsType = Union<[{
 }, {
     type: "SET_WORKFLOW_DATA",
     payload: Partial<StateType>
+}, {
+    type: "INSERT_EMPTY_BLOCK_BEFORE",
+    payload: {
+        sourceId?: string,
+    }
 }]>;
 
 type StateType = {
@@ -138,7 +143,18 @@ export function reorderList<T extends any>(list: T[], startIndex: number, endInd
     result.splice(endIndex, 0, removed);
     return [...result];
 }
+function getEmptyBlock(next_on_success: string | null): BlockType {
+    const id = "block-" + uniqueId();
+    return {
+        id: id,
+        name: id,
+        created_at: new Date().toISOString(),
+        next_on_success,
+        updated_at: new Date().toISOString(),
+        actions: [],
+    }
 
+}
 function stateReducer(state: StateType, action: ActionsType) {
     return produce(state, (draft) => {
         switch (action.type) {
@@ -160,6 +176,12 @@ function stateReducer(state: StateType, action: ActionsType) {
                 const { blockId, action: $action, index } = action.payload;
                 const block = draft.blocks.find(block => block.id === blockId);
                 if (block) {
+                    // if the action id is already present,change the id and add it
+                    const action = block.actions.find(action => action.id === $action.id);
+                    if (action) {
+                        const id = action.id + "+" + uniqueId();
+                        _.assign(action, { id });
+                    }
                     block.actions.splice(index, 0, $action);
                 }
                 return;
@@ -196,14 +218,7 @@ function stateReducer(state: StateType, action: ActionsType) {
                 const sourceBlock = draft.blocks.find(block => block.id === sourceId);
                 const destinationBlock = draft.blocks.find(block => block.id === destinationId);
                 if (sourceBlock && destinationBlock) {
-                    const newBlock: BlockType = {
-                        id: "block-" + uniqueId(),
-                        name: "New Block",
-                        created_at: new Date().toISOString(),
-                        next_on_success: destinationId,
-                        updated_at: new Date().toISOString(),
-                        actions: [],
-                    }
+                    const newBlock: BlockType = getEmptyBlock(destinationId)
                     draft.blocks.push(newBlock);
                     sourceBlock.next_on_success = newBlock.id;
                 }
@@ -227,25 +242,26 @@ function stateReducer(state: StateType, action: ActionsType) {
                     const { sourceId } = action.payload;
                     const sourceBlock = draft.blocks.find(block => block.id === sourceId);
                     if (!sourceBlock) return;
-                    const newBlock: BlockType = {
-                        id: "block-" + uniqueId(),
-                        name: "New Block",
-                        created_at: new Date().toISOString(),
-                        next_on_success: sourceBlock.next_on_success,
-                        updated_at: new Date().toISOString(),
-                        actions: [],
-                    }
+                    const newBlock: BlockType = getEmptyBlock(sourceBlock.next_on_success)
                     draft.blocks.push(newBlock);
                     sourceBlock.next_on_success = newBlock.id;
                 } else {
-                    const newBlock: BlockType = {
-                        id: "block-" + uniqueId(),
-                        name: "New Block",
-                        created_at: new Date().toISOString(),
-                        next_on_success: null,
-                        updated_at: new Date().toISOString(),
-                        actions: [],
-                    }
+                    const newBlock: BlockType = getEmptyBlock(null);
+                    draft.blocks.push(newBlock);
+                }
+                return;
+            }
+            case "INSERT_EMPTY_BLOCK_BEFORE": {
+                // will inset empty block before the source block (if present); else will insert at the end
+                if (action.payload?.sourceId) {
+                    const { sourceId } = action.payload;
+                    const sourceBlock = draft.blocks.find(block => block.next_on_success === sourceId);
+                    if (!sourceBlock) return;
+                    const newBlock: BlockType = getEmptyBlock(sourceId);
+                    draft.blocks.push(newBlock);
+                    sourceBlock.next_on_success = newBlock.id;
+                } else {
+                    const newBlock: BlockType = getEmptyBlock(null);
                     draft.blocks.push(newBlock);
                 }
                 return;
@@ -316,7 +332,7 @@ function FlowsControllerV2({ children }: { children: React.ReactNode }) {
         dispatch({ type: "DELETE_BLOCK_BY_ID", payload: { blockId } })
     }
         , [])
-    const insertEmptyBlock = useCallback((sourceId?: string) => {
+    const insertEmptyBlockAfter = useCallback((sourceId?: string) => {
         dispatch({ type: "INSERT_EMPTY_BLOCK_AFTER", payload: { sourceId } })
     }
         , [])
@@ -324,10 +340,19 @@ function FlowsControllerV2({ children }: { children: React.ReactNode }) {
         dispatch({ type: "MOVE_ACTION_FROM_BLOCK_TO_BLOCK", payload: { sourceBlockId, destinationBlockId, index, action_id } })
     }
         , [])
+    const insertEmptyBlockBefore = useCallback((sourceId?: string) => {
+        dispatch({ type: "INSERT_EMPTY_BLOCK_BEFORE", payload: { sourceId } })
+    }
+        , [])
 
-    return <ControllerProvider value={{ dispatch, insertEmptyBlock, moveActionFromBlockToBlock, state, deleteBlockById, addNextOnSuccess, deleteActionFromBlock, loadActions, reset, updateBlock, reorderActions, addActionToBlock, reorderActionsInBlock, deleteBlock }}>
-        {children}
-    </ControllerProvider>
+    return (
+
+        <ReactFlowProvider>
+            <ControllerProvider value={{ insertEmptyBlockBefore, dispatch, insertEmptyBlockAfter, moveActionFromBlockToBlock, state, deleteBlockById, addNextOnSuccess, deleteActionFromBlock, loadActions, reset, updateBlock, reorderActions, addActionToBlock, reorderActionsInBlock, deleteBlock }}>
+                {children}
+            </ControllerProvider>
+        </ReactFlowProvider>
+    )
 }
 
 export const revalidateActions = (copilotId: string) => mutate(copilotId + '/actions');
