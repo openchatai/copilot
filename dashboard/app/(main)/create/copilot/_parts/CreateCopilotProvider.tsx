@@ -11,7 +11,7 @@ type State = {
   isLoading?: boolean;
   swaggerFiles?: File[] | null;
   currentlyEditingEndpointId?: string | null;
-  copilot_name: string | null
+  copilot_name: string
 };
 
 const actionTypes = {
@@ -61,7 +61,7 @@ function CreateCopilotProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = React.useReducer(reducer, {
     swaggerFiles: [],
     createdCopilot: undefined,
-    copilot_name: null
+    copilot_name: "My Copilot"
   });
   return (
     <CreateCopilotSafeProvider value={{ state, dispatch }}>
