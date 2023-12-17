@@ -18,7 +18,6 @@ import {
   useCreateCopilot,
 } from "./_parts/CreateCopilotProvider";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { useConfetti } from "@/app/_store/confetti";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAsyncFn } from "react-use";
@@ -113,16 +112,21 @@ function IntroStep() {
 function SetCopilotName() {
   const { state: { copilot_name, createdCopilot }, dispatch } = useCreateCopilot();
   const { nextStep } = useWizard();
-  const { pop: popConfetti } = useConfetti();
   const [value, $createCopilot] = useAsyncFn(createCopilot);
 
   const setCopilot = (copilot: CopilotType) => {
     dispatch({ type: "SET_COPILOT", payload: copilot });
-    popConfetti();
   };
 
   async function handleCreateCopilot() {
-    if (!copilot_name) return;
+    if (!copilot_name) {
+      toast({
+        title: "Please enter copilot name",
+        description: "Please enter copilot name",
+        variant: "destructive",
+      });
+      return;
+    }
     if (createdCopilot) {
       nextStep();
       return;
@@ -213,8 +217,9 @@ function DefineActionsStep() {
       // reset swagger files
       dispatch({
         type: "ADD_SWAGGER",
-        payload: null,
+        payload: [],
       });
+      revalidateActions(createdCopilot.id)
       setDialogs({
         ...dialogs,
         swagger: false
@@ -275,7 +280,9 @@ function DefineActionsStep() {
                   <AlertDialogCancel asChild>
                     <Button variant='outline'>Cancel</Button>
                   </AlertDialogCancel>
-                  <Button type="submit" loading={addActionState.loading}>Import</Button>
+                  <Button type="submit" loading={addActionState.loading}>
+                    Create Action
+                  </Button>
                 </AlertDialogFooter>
               } />
           </AlertDialogContent>
