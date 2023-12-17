@@ -29,7 +29,7 @@ function InstallationSection() {
               <Wand2 className="h-4 w-4" />
             </span>
             <div className="text-start">
-              <h1 className="text-base font-semibold">Pre-Bundled</h1>
+              <h1 className="text-base font-semibold">Simple install</h1>
               <p className="text-sm font-normal">
                 You can use the pre-bundled widget by adding the script to your
                 website
@@ -39,29 +39,28 @@ function InstallationSection() {
         </AccordionTrigger>
         <AccordionContent className="px-8 py-6">
           <p className="mb-2 font-medium">
-            Paste this code snippet before the closing
-            <strong>{`</body>`}</strong> tag on all pages you want the widget to
-            appear. Remember to version to run your Assistant.
+            Paste this code snippet before the closing <strong> {`</body>`}</strong> tag on all pages you want the widget to
+            appear. <a href="https://docs.opencopilot.so/widget/embed">Read more</a>
           </p>
           <CodeBlock
             code={`
-            <script src="${baseUrl}/pilot.js"></script>
-            <script> // be aware to call this function when the document/window is ready.
-            const options = {
-              apiUrl: "${baseUrl}/backend", // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:5000/api
-              initialMessages: ["How are the things"], // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
-              token: "${CopilotToken}", // you can get your token from the dashboard
-              triggerSelector: "#triggerSelector", // the selector of the element that will trigger the copilot when clicked
-              headers: { 
-                // optional: you can pass your authentication tokens to the copilot or any other header you want to send with every request
-                Authorization: "Bearer your_auth_token_goes_here",
-                AnyKey: "AnyValue"
-              },
-              user:{
-                name:"Default User"
-              }
-            }
-            window.addEventListener("DOMContentLoaded", ()=>initAiCoPilot(options)); // window.onload
+<script src="${baseUrl}/pilot.js"></script>
+<script> 
+      const options = {
+        apiUrl: "${baseUrl}/backend", 
+        initialMessages: ["How are the things"],
+        token: "${CopilotToken}", 
+        triggerSelector: "#triggerSelector", 
+        headers: { 
+          // optional: you can pass your authentication tokens to the copilot or any other header you want to send with every request
+          Authorization: "Bearer your_auth_token_goes_here",
+          AnyKey: "AnyValue"
+        },
+        user:{
+          name:"Default User"
+        }
+      }
+      window.addEventListener("DOMContentLoaded", ()=>initAiCoPilot(options));
 </script>
 `}
           />
@@ -82,22 +81,21 @@ function SelfHost() {
               <Inspect className="h-4 w-4" />
             </span>
             <div className="text-start">
-              <h1 className="text-base font-semibold">Self host the widget</h1>
+              <h1 className="text-base font-semibold">Via a package manager</h1>
               <p className="text-sm font-normal">
-                You can self host the widget by installing it from npm
+                Most common options are available
               </p>
             </div>
           </div>
         </AccordionTrigger>
         <AccordionContent className="px-8 py-6">
           <p className="mb-2">
-            You can follow this guide to self host the React Component
             <Button asChild variant="link" className="p-0">
               <Link
                 target="_blank"
                 href={"https://docs.opencopilot.so/widget/embed#as-a-react-component"}
               >
-                The Docs
+                You can get started by visiting the copilot embed guide
               </Link>
             </Button>
             .

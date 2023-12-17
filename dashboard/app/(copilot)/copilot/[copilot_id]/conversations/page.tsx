@@ -1,5 +1,4 @@
 import React from "react";
-import { ConversationAside } from "./_parts/ConversationAside";
 import { ChatScreen } from "./_parts/ChatScreen";
 
 import { ConversationHeader } from "./_parts/ConversationHeader";
@@ -12,7 +11,6 @@ export default function Conversations() {
           <ConversationHeader />
           <ChatScreen />
         </div>
-        <ConversationAside />
       </div>
     </div>
   );
