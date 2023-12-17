@@ -7,14 +7,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { ShieldAlert, Wand2, Inspect } from "lucide-react";
+import { Wand2, Inspect, Search } from "lucide-react";
 import { Link } from "@/lib/router-events";
 import React from "react";
 import { useCopilot } from "../_context/CopilotProvider";
 import dynamic from "next/dynamic";
-import { baseUrl } from "@/data/base-url";
+import { useSearchModal } from "@/app/_store/searchModal";
 
 const Widget = dynamic(() => import("./CopilotWidget"));
 
@@ -111,14 +110,19 @@ function SelfHost() {
 
 export default function CopilotPage() {
   const { name: CopilotName, token: CopilotToken } = useCopilot();
+  const [, setSearch] = useSearchModal()
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
       <HeaderShell className="justify-between bg-white">
         <h1 className="text-lg font-bold text-accent-foreground">
           {CopilotName}
         </h1>
-        <div className="space-x-2">
+        <div className="space-x-2 flex items-center">
+          <Button variant='ghost' onClick={() => setSearch(true)} size='fit'>
+            <Search className="h-5 w-5" />
+          </Button>
           <Button
+            size='sm'
             id="triggerSelector"
           >
             Chat with the Copilot
@@ -127,14 +131,6 @@ export default function CopilotPage() {
       </HeaderShell>
       <div className="flex-1 flex flex-row justify-between overflow-hidden">
         <div className="flex-1 max-w-screen-lg p-8 max-h-full overflow-auto">
-          <Alert variant="info" className="mb-5">
-            <ShieldAlert className="h-6 w-6" />
-            <AlertTitle>Attention</AlertTitle>
-            <AlertDescription>
-              If your APIs requires authorization then you might need to provide
-              the needed headers to enable OpenCopilot from accessing it
-            </AlertDescription>
-          </Alert>
           <h2 className="text-xl font-semibold mb-5">Installation</h2>
           <Accordion
             type="single"
