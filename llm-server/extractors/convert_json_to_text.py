@@ -14,11 +14,10 @@ def convert_json_to_text(
         user_input: str,
         api_response: Dict[str, Any],
         api_request_data: Dict[str, Any],
-        bot_id: str,
-        summary_prompt: str,
+        bot_id: str
 ) -> str:
     chat = get_chat_model()
-    system_message = SystemMessage(content=summary_prompt)
+    system_message = SystemMessage(content="Given a JSON response, summarize the key information in a concise manner. Include relevant details, references, and links if present. Format the summary in Markdown for clarity and readability.")
 
     messages = [
         system_message,

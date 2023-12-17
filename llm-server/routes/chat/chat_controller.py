@@ -152,7 +152,6 @@ async def send_chat():
             bot_id=str(bot.id),
             headers=headers_from_json,
             app=app_name,
-            summary_prompt=str(bot.summary_prompt),
         )
 
         if response_data["response"]:
