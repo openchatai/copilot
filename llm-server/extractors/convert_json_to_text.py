@@ -3,36 +3,21 @@ from typing import Dict, Any, cast
 
 from langchain.schema import HumanMessage, SystemMessage
 
-from integrations.custom_prompts.prompt_loader import load_prompts
-from utils.chat_models import CHAT_MODELS
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 logger = CustomLogger(module_name=__name__)
 
-chat = get_chat_model()
-
 
 def convert_json_to_text(
         user_input: str,
         api_response: Dict[str, Any],
         api_request_data: Dict[str, Any],
-        bot_id: str,
+        bot_id: str
 ) -> str:
     chat = get_chat_model()
-
-    api_summarizer_template = None
-    system_message = SystemMessage(
-        content="You are an ai assistant that can summarize api responses, include references and links if available"
-    )
-    prompt_templates = load_prompts(bot_id)
-    api_summarizer_template = (
-        prompt_templates.api_summarizer if prompt_templates else None
-    )
-
-    if api_summarizer_template is not None:
-        system_message = SystemMessage(content=api_summarizer_template)
+    system_message = SystemMessage(content="Given a JSON response, summarize the key information in a concise manner. Include relevant details, references, and links if present. Format the summary in Markdown for clarity and readability.")
 
     messages = [
         system_message,
@@ -44,7 +29,7 @@ def convert_json_to_text(
         HumanMessage(content=user_input),
         HumanMessage(
             content="Here is the response from the apis: {}".format(api_response)
-        )
+        ),
     ]
 
     result = chat(messages)

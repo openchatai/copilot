@@ -1,7 +1,7 @@
 import json
 from typing import Optional, Type, Any
 
-from opencopilot_db import engine
+from shared.models.opencopilot_db import engine
 from sqlalchemy.orm import sessionmaker
 
 from entities.flow_entity import FlowDTO

@@ -155,7 +155,9 @@ async def send_chat():
         )
 
         if response_data["response"]:
-            upsert_analytics_record(chatbot_id=str(bot.id), successful_operations=1, total_operations=1)
+            upsert_analytics_record(
+                chatbot_id=str(bot.id), successful_operations=1, total_operations=1
+            )
             create_chat_history(str(bot.id), session_id, True, message)
             create_chat_history(
                 chatbot_id=str(bot.id),
@@ -165,7 +167,8 @@ async def send_chat():
             )
         elif response_data["error"]:
             upsert_analytics_record(chatbot_id=str(bot.id), successful_operations=0, total_operations=1,
-                                    logs=response_data["error"])
+                                    logs=response_data["error"],
+            )
 
         return jsonify(
             {"type": "text", "response": {"text": response_data["response"]}}

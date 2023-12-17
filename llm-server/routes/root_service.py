@@ -149,7 +149,7 @@ async def run_actionable_item(
         flow=_flow,
         chat_context=ChatContext(text, headers, app),
         app=app,
-        bot_id=bot_id,
+        bot_id=bot_id
     )
 
     # @todo now take the output, put it into a chat message with the base prompt and ask the llm to present it

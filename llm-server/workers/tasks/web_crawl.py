@@ -1,9 +1,10 @@
+import os
+import re
 from celery import shared_task
 from selenium import webdriver
 from bs4 import BeautifulSoup
 import traceback
 
-import os, re, logging
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.remote.webdriver import BaseWebDriver
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -17,6 +18,11 @@ from shared.models.opencopilot_db.website_data_sources import (
 )
 from typing import Set
 from collections import deque
+
+from workers.utils.remove_escape_sequences import remove_escape_sequences
+from utils.get_logger import CustomLogger
+
+logger = CustomLogger(__name__)
 
 selenium_grid_url = os.getenv("SELENIUM_GRID_URL", "http://localhost:4444/wd/hub")
 
@@ -75,7 +81,7 @@ def scrape_website_in_bfs(
 
             driver.get(url)
             page_source = driver.page_source
-            soup = BeautifulSoup(page_source, "lxml")
+            soup = BeautifulSoup(page_source, features="lxml")
 
             for link in soup.find_all("a"):
                 if "href" in link.attrs:
@@ -89,7 +95,8 @@ def scrape_website_in_bfs(
             )  # Replace all whitespace with single spaces
             text = text.strip()  # Trim leading and trailing whitespace
 
-            print(text)
+            text = remove_escape_sequences(text)
+
             # push to vector db
             text_splitter = RecursiveCharacterTextSplitter(
                 chunk_size=1000, chunk_overlap=200, length_function=len
@@ -108,6 +115,7 @@ def scrape_website_in_bfs(
             driver.quit()
 
     except Exception as e:
+        logger.error("Failed to crawl", error=str(e))
         if driver is not None:
             driver.quit()
         update_website_data_source_status_by_url(url=url, status="FAILED", error=str(e))
@@ -144,12 +152,9 @@ def resume_failed_website_scrape(website_data_source_id: str):
 
     # Get the website data source.
     website_data_source = get_website_data_source_by_id(website_data_source_id)
-
+    
     # Get the URL of the website to scrape.
     url = website_data_source.url
-
-    # Create a new WebDriver object.
-    driver = webdriver.Chrome()
 
     # Scrape the website.
     unique_urls: set = set()
