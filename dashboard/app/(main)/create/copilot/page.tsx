@@ -416,7 +416,7 @@ function GetActionsFromSwagger() {
               to authorize your own requests by yourself
             </li>
             <li>
-              ✅ This *very* new product, so many things does not make
+              ✅ This is a *very* new product, so many things does not make
               sense/work at this stage{" "}
             </li>
           </ul>
