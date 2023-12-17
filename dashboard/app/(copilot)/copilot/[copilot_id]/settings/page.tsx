@@ -103,18 +103,6 @@ export default function GeneralSettingsPage() {
                   </Button>
                 </div>
               </div>
-              <Separator className="my-2" />
-              <div className="space-y-1.5 px-8 py-5">
-                <Label className="text-base font-semibold text-accent-foreground/80">
-                  Copilot Id
-                </Label>
-                <div className="flex items-center justify-between gap-2">
-                  <Input className="flex" readOnly defaultValue={copilotId} />
-                  <Button variant="outline" asChild>
-                    <CopyButton text={copilotId}>Copy</CopyButton>
-                  </Button>
-                </div>
-              </div>
             </div>
           </section>
 

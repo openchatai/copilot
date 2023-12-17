@@ -70,7 +70,7 @@ function UpdateBlock({ id, name }: { id: string, name: string }) {
 function DeleteBlockBtn({ id }: { id: string }) {
     const { deleteBlockById } = useController();
     return <button onClick={() => {
-        confirm('Are you sure you want to delete this block?') && deleteBlockById(id);
+        deleteBlockById(id);
     }} className='p-1 rounded text-white transition-colors'>
         <Trash2 size={18} />
     </button>
