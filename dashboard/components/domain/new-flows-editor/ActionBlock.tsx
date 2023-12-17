@@ -77,7 +77,7 @@ function DeleteBlockBtn({ id }: { id: string }) {
 }
 
 function BlockHandle({ type, position, className }: { type: 'source' | 'target', position: Position, className?: string }) {
-    return <Handle type={type} position={position} className={cn("!bg-white", className)} style={{ width: '10px', height: "10px" }} />
+    return <Handle type={type} position={position} className={cn("!bg-primary !border-accent-foreground", className)} style={{ width: '10px', height: "10px" }} />
 }
 
 function ActionBlock({ data: { actions, name, next_on_success }, id, selected }: Props) {
@@ -91,12 +91,12 @@ function ActionBlock({ data: { actions, name, next_on_success }, id, selected }:
     }, [nodes, id])
     return (
         <React.Fragment key={id}>
-            <BlockHandle type='target' position={Position.Left} className='!bg-white' />
-            <BlockHandle type='source' position={Position.Right} className='!bg-white' />
-            <div data-block-id={id} 
-            data-next-on-success={next_on_success ?? "is-last-one"} 
-            data-is-last={isLast} data-is-first={isFirst} 
-            className={cn('w-[20rem] bg-white border transition-all overflow-hidden rounded-lg h-auto flex flex-col')}>
+            <BlockHandle type='target' position={Position.Left} />
+            <BlockHandle type='source' position={Position.Right} />
+            <div data-block-id={id}
+                data-next-on-success={next_on_success ?? "is-last-one"}
+                data-is-last={isLast} data-is-first={isFirst}
+                className={cn('w-[20rem] bg-white border transition-all overflow-hidden rounded-lg h-auto flex flex-col')}>
                 <div className={cn('mb-2 p-2 flex items-center justify-between shrink-0 transition-colors', !selected ? "bg-[#607D8B]" : "bg-[#607D8B]/80")}>
                     <UpdateBlock id={id} name={name} />
                     <div className='space-x-2'>
