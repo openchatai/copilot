@@ -16,7 +16,7 @@ from routes.flow.utils.process_conversation_step import get_next_response_type
 from utils.db import Database
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
-from utils.llm_consts import VectorCollections, UserMessageResponseType
+from utils.llm_consts import VectorCollections
 
 logger = CustomLogger(module_name=__name__)
 
@@ -36,7 +36,17 @@ FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
 chat = get_chat_model()
 
 
-def is_the_llm_predicted_operation_id_actually_true(predicted_operation_id:str, actionable_items: dict[str, list[DocumentSimilarityDTO]]):
+def is_the_llm_predicted_operation_id_actually_true(predicted_operation_id: str,
+                                                    actionable_items: dict[str, list[DocumentSimilarityDTO]]):
+    """
+    If it is indeed true, it will return the action as DocumentSimilarityDTO, otherwise return None
+    Args:
+        predicted_operation_id:
+        actionable_items:
+
+    Returns:
+
+    """
     for action in actionable_items.get(VectorCollections.actions):
         if predicted_operation_id == action.document.metadata.get('operation_id'):
             return {VectorCollections.actions: [action]}
@@ -74,7 +84,8 @@ async def handle_request(
     if next_step.actionable:
 
         # if the LLM given operationID is actually exist, then use it, otherwise fallback to the highest vector space document
-        llm_predicted_operation_id = is_the_llm_predicted_operation_id_actually_true(next_step.operation_id, select_top_documents(actions))
+        llm_predicted_operation_id = is_the_llm_predicted_operation_id_actually_true(next_step.operation_id,
+                                                                                     select_top_documents(actions))
         if llm_predicted_operation_id:
             actionable_item = llm_predicted_operation_id
         else:
