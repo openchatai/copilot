@@ -49,7 +49,12 @@ function Header({ workflow_id }: { workflow_id: string }) {
     });
 
     return <HeaderShell className='justify-between'>
-        <h2 className='text-base font-semibold'>{state.name}</h2>
+        <div className=''>
+            <h2 className='text-lg font-semibold'>{state.name}</h2>
+            <p className='text-xs'>
+                {state.description}
+            </p>
+        </div>
         <div className='space-x-2'>
             <Button onClick={async () => {
                 if (state.flow_id) {
