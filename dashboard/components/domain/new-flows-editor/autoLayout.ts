@@ -5,6 +5,7 @@ function orderBlocksByNextOnSuccess(blocks: BlockType[]) {
     // order blocks based on next_on_success
     // every block should have a next_on_success that points to the next block in the flow
     // if there is no next_on_success, the block should be the last block in the flow
+    // add isLast to the blocks, isFirst to the blocks
     const orderedBlocks: BlockType[] = [];
     const blocksById = _.keyBy(blocks, "id");
     let currentBlock: null | any = blocks[0];
@@ -21,7 +22,6 @@ function orderBlocksByNextOnSuccess(blocks: BlockType[]) {
 }
 export function autoLayout(blocks: BlockType[]) {
     const orderedBlocks = orderBlocksByNextOnSuccess(blocks);
-    console.log("orderedBlocks", orderedBlocks);
     const newNodes: BlockNodeType[] = orderedBlocks.map((block, index) => {
         // order blocks based on next_on_success
         return {
@@ -42,8 +42,8 @@ export function autoLayout(blocks: BlockType[]) {
         if (next) {
             return {
                 id: node.id + "|" + next.id,
-                target: node.id,
-                source: next.id,
+                target: next.id,
+                source: node.id,
                 type: "BlockEdge",
             };
         }
