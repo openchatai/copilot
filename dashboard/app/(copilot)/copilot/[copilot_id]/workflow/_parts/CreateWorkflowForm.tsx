@@ -12,8 +12,8 @@ import { createFlowByBotId } from '@/data/new_flows';
 import { useCopilot } from '../../../_context/CopilotProvider';
 import { useAsyncFn } from 'react-use';
 import { toast } from '@/components/ui/use-toast';
-import { useRouter } from 'next/navigation';
 import { atom, useAtom } from 'jotai';
+import { useRouter } from '@/lib/router-events';
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -30,6 +30,7 @@ const useModal = () => useAtom(modalAtom);
 export default function CreateWorkflowForm() {
     const { id: copilotId } = useCopilot();
     const [open, setOpen] = useModal();
+
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
