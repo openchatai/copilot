@@ -1,4 +1,5 @@
 from routes.flow.utils.api_retrievers import get_relevant_actions
+from routes.flow.utils.document_similarity_dto import DocumentSimilarityDTO
 from utils.get_chat_model import get_chat_model
 from langchain.schema import BaseMessage, HumanMessage, SystemMessage
 from typing import List
@@ -6,6 +7,10 @@ from typing import List
 from langchain.output_parsers import PydanticOutputParser
 from langchain.pydantic_v1 import BaseModel
 from typing import cast
+from utils.get_logger import CustomLogger
+
+
+logger = CustomLogger(__name__)
 
 
 class DynamicBuilder(BaseModel):
@@ -39,7 +44,7 @@ async def build_dynamic_flow(text: str, bot_id: str):
             Your response should be of the following format
             ---
             {{
-                "bot_message": "Clarification for choosing the operation_ids",
+                "bot_message": "Any information you want to add",
                 "operationIds": ["list", "of", "operation ids", "for", "actions"]
             }}
             ---
@@ -58,7 +63,26 @@ async def build_dynamic_flow(text: str, bot_id: str):
         )
     )
 
-    content = await chat.ainvoke(messages)
+    result = await chat.ainvoke(messages)
+    dynamic_builder_payload = parse_json(cast(str, result.content))
 
-    json = parse_json(cast(str, content))
-    return json
+    # Sort the array of objects based on the order of operationIds in the list
+    sorted_data = sort_records(dynamic_builder_payload.operationIds, docs)
+
+    sorted_data_dict = [item.document.metadata for item in sorted_data]
+    return {"actions": sorted_data_dict, "reason": dynamic_builder_payload.bot_message}
+
+
+def sort_records(
+    order_list: List[str], records: List[DocumentSimilarityDTO]
+) -> List[DocumentSimilarityDTO]:
+    sorted_records = []
+    order_set = set(order_list)
+    for record in records:
+        if record.document.metadata["operation_id"] in order_set:
+            sorted_records.append(record)
+
+    sorted_records.sort(
+        key=lambda x: order_list.index(x.document.metadata["operation_id"])
+    )
+    return sorted_records
