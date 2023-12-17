@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { Handle, Position } from 'reactflow';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { Handle, Position, useNodes } from 'reactflow';
 import type { NodeProps } from 'reactflow';
 import { Draggable, DraggableProvided, Droppable } from 'react-beautiful-dnd';
 import { createPortal } from 'react-dom';
@@ -45,7 +45,6 @@ export const useDraggableInPortal = () => {
     }
 }
 
-
 type Props = NodeProps<BlockType>
 
 function DraggableActionInsideActionBlock({ action, index, id }: { action: ActionResponseType, index: number, id: string }) {
@@ -67,6 +66,7 @@ function UpdateBlock({ id, name }: { id: string, name: string }) {
         updateBlockName(ev.target.value);
     }} type="text" className='outline-none flex-1 w-full text-white font-medium p-0.5 rounded text-sm bg-transparent placeholder:text-white' placeholder='Name' />
 }
+
 function DeleteBlockBtn({ id }: { id: string }) {
     const { deleteBlockById } = useController();
     return <button onClick={() => {
@@ -75,16 +75,28 @@ function DeleteBlockBtn({ id }: { id: string }) {
         <Trash2 size={18} />
     </button>
 }
+
 function BlockHandle({ type, position, className }: { type: 'source' | 'target', position: Position, className?: string }) {
     return <Handle type={type} position={position} className={cn("!bg-white", className)} style={{ width: '10px', height: "10px" }} />
 }
 
-function ActionBlock({ data: { actions, name }, id, selected }: Props) {
-
+function ActionBlock({ data: { actions, name, next_on_success }, id, selected }: Props) {
+    const nodes = useNodes();
+    const { isFirst, isLast } = useMemo(() => {
+        const index = _.findIndex(nodes, { id });
+        return {
+            isFirst: index === 0,
+            isLast: index === nodes.length - 1
+        }
+    }, [nodes, id])
     return (
         <React.Fragment key={id}>
-            <BlockHandle type="target" position={Position.Right} />
-            <div className={cn('w-[20rem] bg-white border transition-all nodrag overflow-hidden nopan rounded-lg h-auto flex flex-col')}>
+            <BlockHandle type='target' position={Position.Left} className='!bg-white' />
+            <BlockHandle type='source' position={Position.Right} className='!bg-white' />
+            <div data-block-id={id} 
+            data-next-on-success={next_on_success ?? "is-last-one"} 
+            data-is-last={isLast} data-is-first={isFirst} 
+            className={cn('w-[20rem] bg-white border transition-all overflow-hidden rounded-lg h-auto flex flex-col')}>
                 <div className={cn('mb-2 p-2 flex items-center justify-between shrink-0 transition-colors', !selected ? "bg-[#607D8B]" : "bg-[#607D8B]/80")}>
                     <UpdateBlock id={id} name={name} />
                     <div className='space-x-2'>
@@ -104,7 +116,6 @@ function ActionBlock({ data: { actions, name }, id, selected }: Props) {
                     )}
                 </Droppable>
             </div>
-            <BlockHandle type="source" position={Position.Left} />
         </React.Fragment>
 
     )
