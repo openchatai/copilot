@@ -4,7 +4,6 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { atom, useAtom } from "jotai";
 import { ActionForm } from "../action-form/ActionForm";
 import { ActionType } from "../action-form/schema";
-import { useHotkeys } from "react-hotkeys-hook";
 import { createActionByBotId as createActionPromiseByBotId } from "@/data/actions";
 import { useCopilot } from "@/app/(copilot)/copilot/_context/CopilotProvider";
 import { useAsyncFn } from 'react-use';
@@ -22,11 +21,9 @@ export function AddActionDrawer() {
         const { data } = await createActionByBotId(copilotId, values);
         if (data.id) {
             revalidateActions(copilotId);
+            setDrawerState(false);
         }
     }
-    useHotkeys("ctrl+/", () => {
-        setDrawerState(true);
-    })
 
     return (
         <Sheet open={drawerState} onOpenChange={setDrawerState}>
