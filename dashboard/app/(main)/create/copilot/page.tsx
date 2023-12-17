@@ -31,6 +31,7 @@ import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
 import { revalidateActions } from "@/components/domain/new-flows-editor/Controller";
 import { methodVariants } from "@/components/domain/MethodRenderer";
 import { atom, useAtom } from "jotai";
+import { DebounceInput } from "react-debounce-input";
 
 function Header() {
   const { stepCount, activeStep, goToStep } = useWizard();
@@ -81,8 +82,8 @@ function IntroStep() {
       <h2 className="mb-6 text-3xl font-bold text-accent-foreground">
         Let's create your own product copilot 🔥
       </h2>
-      <p className="mb-2">And here how we are going to do it:</p>
-      <div className="my-8 px-2">
+      <p className="mb-2 font-medium">And here how we are going to do it:</p>
+      <div className="my-6 px-1.5">
         <Roadmap
           items={[
             {
@@ -127,7 +128,7 @@ function SetCopilotName() {
       return;
     }
     const response = await $createCopilot(copilot_name);
-    if (response.data.id) {
+    if (response?.data?.id) {
       setCopilot(response.data);
       nextStep();
     } else {
@@ -146,9 +147,15 @@ function SetCopilotName() {
       <Label htmlFor="copilotName" className="font-semibold">
         Copilot Name
       </Label>
-      <Input id="copilotName"
+      <DebounceInput
+        id="copilotName"
+        debounceTimeout={500}
+        // @ts-ignore
+        element={Input}
         disabled={!!createdCopilot}
-        className="mt-1" value={copilot_name ?? ''} onChange={(ev) => dispatch({ type: "CHANGE_NAME", payload: ev.target.value })} />
+        className="mt-1"
+        value={copilot_name}
+        onChange={(ev) => dispatch({ type: "CHANGE_NAME", payload: ev.target.value })} />
     </div>
     <div className="flex items-center justify-end">
       <Button onClick={handleCreateCopilot}
@@ -358,7 +365,9 @@ function DefineActionsStep() {
           Back
         </Button>
         {createdCopilot && (
-          <Button onClick={nextStep}>
+          <Button
+            variant='link'
+            onClick={nextStep}>
             {
               _.isEmpty(actions?.data) ? "Skip" : "Next"
             }
