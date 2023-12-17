@@ -8,13 +8,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronRight } from "lucide-react";
-import { useSetAtom } from "jotai";
 import { Link } from "@/lib/router-events";
-import { searchModalAtom } from "@/app/_store/searchModal";
+import { useSearchModal } from "@/app/_store/searchModal";
 
 // i'm bad at naming things
 export default function LogoMenu() {
-  const setSearchModal = useSetAtom(searchModalAtom);
+  const [, setSearchModal] = useSearchModal();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

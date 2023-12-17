@@ -1,6 +1,8 @@
-from shared.models.opencopilot_db.analytics import Analytics
 from sqlalchemy.orm import sessionmaker
+
 from shared.models.opencopilot_db import engine
+from shared.models.opencopilot_db.analytics import Analytics
+
 
 def upsert_analytics_record(chatbot_id: str, successful_operations: int, total_operations: int, logs: str = ""):
     Session = sessionmaker(bind=engine)

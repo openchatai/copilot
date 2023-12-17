@@ -4,8 +4,11 @@ import { CopilotType, getCopilot } from "@/data/copilot";
 import { createSafeContext } from "@/lib/createSafeContext";
 import { useParams } from "next/navigation";
 import React from "react";
-import useSwr from "swr";
+import useSwr, { mutate } from "swr";
 import { CopilotNotFound } from "../../_parts/CopilotNotFound";
+
+const revalidateCopilot = (copilotId: string) => mutate(copilotId);
+
 const [SafeCopilotProvider, useCopilot] = createSafeContext<CopilotType>(
   "[useCopilot] should be used within a CopilotProvider",
 );
@@ -31,4 +34,4 @@ function CopilotProvider({ children }: { children: React.ReactNode }) {
   }
 }
 
-export { CopilotProvider, useCopilot };
+export { CopilotProvider, useCopilot, revalidateCopilot };

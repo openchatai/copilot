@@ -1,14 +1,15 @@
-import os
 import json
-from flask import Blueprint, Response, request
-from werkzeug.utils import secure_filename
+import os
 import secrets
-from routes.uploads.celery_service import celery
-import validators
 from typing import Optional
 
-upload = Blueprint("upload", __name__)
+import validators
+from flask import Blueprint, Response, request
+from werkzeug.utils import secure_filename
 
+from routes.uploads.celery_service import celery
+
+upload = Blueprint("upload", __name__)
 
 SHARED_FOLDER = os.getenv("SHARED_FOLDER", "/app/shared_data/")
 os.makedirs(SHARED_FOLDER, exist_ok=True)

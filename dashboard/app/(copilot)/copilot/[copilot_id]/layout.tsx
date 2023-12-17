@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-
 import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
@@ -9,14 +8,12 @@ import {
 } from "@/components/ui/tooltip";
 import {
   AlertCircle,
-  Home,
   MessagesSquare,
   Settings,
   Workflow,
-  BrainCog,
+  SquareCode, Codesandbox
 } from "lucide-react";
 import React from "react";
-import LogoMenu from "../../_parts/LogoMenu";
 import { CopilotLayoutNavLink } from "../../_parts/CopilotNavLink";
 import {
   DropdownMenu,
@@ -27,6 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CopilotProvider } from "../_context/CopilotProvider";
 import { Link } from "@/lib/router-events";
+import { Logo } from "@/components/domain/Logo";
 
 type Props = {
   children: React.ReactNode;
@@ -40,29 +38,28 @@ export default function CopilotLayout({ children, params }: Props) {
   return (
     <div className="flex h-full overflow-hidden">
       <aside className="flex h-full w-header shrink-0 flex-col items-stretch justify-between border-r border-border bg-white">
-        <div className="flex h-header items-center justify-center border-b border-border p-1">
-          <LogoMenu />
-        </div>
+        <Link href="/" className="flex h-header items-center justify-center border-b border-border p-1">
+          <Logo />
+        </Link>
         <div className="mx-auto flex-1 overflow-hidden overflow-y-auto pt-5">
           <div className="flex flex-col items-center">
             <CopilotLayoutNavLink
               href={copilotBase}
-              IconComponent={Home}
-              label="Overview"
+              IconComponent={SquareCode}
+              label="Installation"
             />
           </div>
           <Separator className="my-2" />
           <div className="flex flex-col items-center gap-4">
             <CopilotLayoutNavLink
-              href={copilotBase + "/flows"}
+              href={copilotBase + "/workflow"}
               IconComponent={Workflow}
-              label="Flows"
+              label="Flows & Actions"
             />
             <CopilotLayoutNavLink
-              href={copilotBase + "/settings"}
-              segment="settings"
-              IconComponent={Settings}
-              label="Settings"
+              href={copilotBase + "/knowledge"}
+              IconComponent={Codesandbox}
+              label="Knowledge Base"
             />
             <CopilotLayoutNavLink
               href={copilotBase + "/conversations"}
@@ -70,9 +67,10 @@ export default function CopilotLayout({ children, params }: Props) {
               label="Conversations"
             />
             <CopilotLayoutNavLink
-              href={copilotBase + "/knowledge"}
-              IconComponent={BrainCog}
-              label="Knowledge Base"
+              href={copilotBase + "/settings"}
+              segment="settings"
+              IconComponent={Settings}
+              label="Settings"
             />
           </div>
         </div>
@@ -124,7 +122,7 @@ export default function CopilotLayout({ children, params }: Props) {
         </div>
       </aside>
       <main className="flex flex-1 flex-col overflow-hidden">
-        <div className="h-full max-w-full flex-1 bg-primary-foreground">
+        <div className="h-full min-h-full max-w-full flex-1 bg-primary-foreground">
           <CopilotProvider>{children}</CopilotProvider>
         </div>
       </main>

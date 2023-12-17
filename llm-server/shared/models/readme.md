@@ -41,7 +41,8 @@ session.commit()
 # Query PdfDataSources
 pdf_data_sources = session.query(PdfDataSource).all()
 for pdf_data_source in pdf_data_sources:
-    print(f"PdfDataSource ID: {pdf_data_source.id}, Chatbot ID: {pdf_data_source.chatbot_id}, Files: {pdf_data_source.files}")
+    print(
+        f"PdfDataSource ID: {pdf_data_source.id}, Chatbot ID: {pdf_data_source.bot_id}, Files: {pdf_data_source.files}")
 ```
 
 ### Working with the Chatbot Model

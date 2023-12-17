@@ -1,35 +1,22 @@
+import asyncio
 import os
-import json
-from typing import Dict, Any, Optional, List
-from langchain.schema import BaseMessage
-from custom_types.api_operation import ApiOperation_vs
-from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
-from prompts.consolidated_prompt import get_consolidate_question
-from routes.workflow.typings.response_dict import ResponseDict
-from routes.workflow.typings.run_workflow_input import WorkflowData
-from routes.workflow.utils import (
-    run_workflow,
-    create_workflow_from_operation_ids,
-)
-from bson import ObjectId
-from routes.workflow.utils.api_retrievers import (
-    get_relevant_apis_summaries,
-    get_relevant_docs,
-    get_relevant_flows,
-)
-from routes.workflow.utils.process_conversation_step import process_conversation_step
+from typing import Dict, Optional, List, cast
 
-from utils.chat_models import CHAT_MODELS
+from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
+
+from custom_types.response_dict import ResponseDict
+from custom_types.run_workflow_input import ChatContext
+from entities.flow_entity import FlowDTO
+from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
+from models.repository.flow_repo import get_flow_by_id
+from routes.flow.utils import create_flow_from_operation_ids, run_flow
+from routes.flow.utils.api_retrievers import get_relevant_knowledgebase, get_relevant_actions, get_relevant_flows
+from routes.flow.utils.document_similarity_dto import select_top_documents, DocumentSimilarityDTO
+from routes.flow.utils.process_conversation_step import get_next_response_type
 from utils.db import Database
 from utils.get_chat_model import get_chat_model
-from prance import ResolvingParser
-from langchain.docstore.document import Document
-from werkzeug.datastructures import Headers
-import asyncio
-from opencopilot_types.workflow_type import WorkflowFlowType
-
-
 from utils.get_logger import CustomLogger
+from utils.llm_consts import VectorCollections
 
 logger = CustomLogger(module_name=__name__)
 
@@ -49,187 +36,163 @@ FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
 chat = get_chat_model()
 
 
-def validate_steps(steps: List[str], swagger_doc: ResolvingParser):
-    try:
-        paths = swagger_doc.specification.get("paths", {})
-        operationIds: List[str] = []
+def is_the_llm_predicted_operation_id_actually_true(predicted_operation_id: str,
+                                                    actionable_items: dict[str, list[DocumentSimilarityDTO]]):
+    """
+    If it is indeed true, it will return the action as DocumentSimilarityDTO, otherwise return None
+    Args:
+        predicted_operation_id:
+        actionable_items:
 
-        for path in paths:
-            operations = paths[path]
-            for method in operations:
-                operation = operations[method]
-                operationId = operation.get("operationId")
-                if operationId:
-                    operationIds.append(operationId)
+    Returns:
 
-        if not operationIds:
-            logger.warn("No operationIds found in the Swagger document.")
-            return False
-
-        if all(x in operationIds for x in steps):
-            return True
-        else:
-            logger.warn(
-                "Model has hallucinated, made up operation id",
-                steps=steps,
-                operationIds=operationIds,
-            )
-            return False
-
-    except Exception as e:
-        logger.error(f"An error occurred: {str(e)}")
-        return False
+    """
+    for action in actionable_items.get(VectorCollections.actions):
+        if predicted_operation_id == action.document.metadata.get('operation_id'):
+            return {VectorCollections.actions: [action]}
+    return None
 
 
 async def handle_request(
-    text: str,
-    swagger_url: str,
-    session_id: str,
-    base_prompt: str,
-    bot_id: str,
-    headers: Dict[str, str],
-    server_base_url: str,
-    app: Optional[str],
-    summary_prompt: str,
+        text: str,
+        session_id: str,
+        base_prompt: str,
+        bot_id: str,
+        headers: Dict[str, str],
+        app: Optional[str],
 ) -> ResponseDict:
-    log_user_request(text)
-    check_required_fields(base_prompt, text, swagger_url)
-    context: str = ""
-    apis: List[ApiOperation_vs] = []
-    flows: List[WorkflowFlowType] = []
-    prev_conversations: List[BaseMessage] = []
-    prev_conversations = await get_chat_message_as_llm_conversation(session_id)
-    consolidated_question = await get_consolidate_question(
-        conversation_history=prev_conversations, user_input=text
+    check_required_fields(base_prompt, text)
+
+    tasks = [
+        get_relevant_knowledgebase(text, bot_id),
+        get_relevant_actions(text, bot_id),
+        get_relevant_flows(text, bot_id),
+        get_chat_message_as_llm_conversation(session_id),
+    ]
+
+    results = await asyncio.gather(*tasks)
+    knowledgebase, actions, flows, conversations_history = results
+    top_documents = select_top_documents(actions + flows + knowledgebase)
+
+    next_step = get_next_response_type(
+        user_message=text,
+        session_id=session_id,
+        chat_history=conversations_history,
+        top_documents=top_documents
     )
-    logger.info(
-        "Comparing consolidated prompt with user input",
-        consolidated_question=consolidated_question,
-        text=text,
-    )
-    try:
-        tasks = [
-            get_relevant_docs(consolidated_question, bot_id),
-            get_relevant_apis_summaries(consolidated_question, bot_id),
-            get_relevant_flows(consolidated_question, bot_id),
-        ]
 
-        results = await asyncio.gather(*tasks)
-        context, apis, flows = results
-        # also provide a list of workflows here itself, the llm should be able to figure out if a workflow needs to be run
-        step = process_conversation_step(
-            user_requirement=text,
-            context=context,
-            session_id=session_id,
-            app=app,
-            api_summaries=apis,
-            prev_conversations=prev_conversations,
-            flows=flows,
-            bot_id=bot_id,
-            base_prompt=base_prompt,
-        )
+    if next_step.actionable:
 
-        if len(step.ids) > 0:
-            swagger_doc = get_swagger_doc(swagger_url)
-            fl = validate_steps(step.ids, swagger_doc)
-
-            if fl is False:
-                return {"error": None, "response": step.bot_message}
-
-            response = await handle_api_calls(
-                ids=step.ids,
-                swagger_doc=swagger_doc,
-                app=app,
-                bot_id=bot_id,
-                headers=headers,
-                server_base_url=server_base_url,
-                text=text,
-                swagger_url=swagger_url,
-                summary_prompt=summary_prompt,
-            )
-
-            logger.info(
-                "chatbot response",
-                response=response,
-                method="handle_request",
-                apis=apis,
-                prev_conversations=prev_conversations,
-                context=context,
-                flows=flows,
-            )
-            return response
+        # if the LLM given operationID is actually exist, then use it, otherwise fallback to the highest vector space document
+        llm_predicted_operation_id = is_the_llm_predicted_operation_id_actually_true(next_step.operation_id,
+                                                                                     select_top_documents(actions))
+        if llm_predicted_operation_id:
+            actionable_item = llm_predicted_operation_id
         else:
-            return {"error": None, "response": step.bot_message}
-    except Exception as e:
-        logger.error(
-            "chatbot response",
-            error=str(e),
-            method="handle_request",
-            prev_conversations=prev_conversations,
+            actionable_item = select_top_documents(actions + flows,
+                                                   [VectorCollections.actions, VectorCollections.flows])
+        # now run it
+        response = await run_actionable_item(
+            bot_id=bot_id,
+            actionable_item=actionable_item,
+            base_prompt=base_prompt,
+            app=app,
+            headers=headers,
+            text=text,
         )
+        return response
+    else:
+        # it means that the user query is "informative" and can be answered using text only
+        # get the top knowledgeable documents (if any)
+        documents = select_top_documents(knowledgebase)
+        response = run_informative_item(
+            informative_item=documents,
+            base_prompt=base_prompt,
+            text=text,
+            conversations_history=conversations_history
+        )
+        return response
 
-        return {"response": str(e), "error": "An error occured in handle request"}
 
-
-def log_user_request(text: str) -> None:
-    logger.info(
-        "[OpenCopilot] Got the following user request: {}".format(text),
-        incident="log_user_request",
-        method="log_user_request",
-    )
-
-
-def check_required_fields(
-    base_prompt: str, text: str, swagger_url: Optional[str]
-) -> None:
+def check_required_fields(base_prompt: str, text: str) -> None:
     for required_field, error_msg in [
         ("base_prompt", BASE_PROMPT_REQUIRED),
         ("text", TEXT_REQUIRED),
-        ("swagger_url", SWAGGER_URL_REQUIRED),
     ]:
         if not locals()[required_field]:
             raise Exception(error_msg)
 
 
-def get_swagger_doc(swagger_url: str) -> ResolvingParser:
-    logger.info(f"Swagger url: {swagger_url}")
-    swagger_doc: Optional[Dict[str, Any]] = mongo.swagger_files.find_one(
-        {"meta.swagger_url": swagger_url}, {"meta": 0, "_id": 0}
-    )
-
-    if swagger_url.startswith("http:") or swagger_url.startswith("https:"):
-        return ResolvingParser(url=swagger_url)
-    elif swagger_url.endswith(".json") or swagger_url.endswith(".yaml"):
-        return ResolvingParser(url=shared_folder + swagger_url)
-    else:
-        return ResolvingParser(spec_string=swagger_doc)
-
-
-async def handle_api_calls(
-    ids: List[str],
-    swagger_doc: ResolvingParser,
-    text: str,
-    headers: Dict[str, str],
-    server_base_url: str,
-    swagger_url: Optional[str],
-    app: Optional[str],
-    bot_id: str,
-    summary_prompt: str,
+async def run_actionable_item(
+        actionable_item: dict[str, List[DocumentSimilarityDTO]],
+        base_prompt: str,
+        text: str,
+        headers: Dict[str, str],
+        app: Optional[str],
+        bot_id: str,
 ) -> ResponseDict:
-    _workflow = create_workflow_from_operation_ids(ids, swagger_doc, text)
-    output = await run_workflow(
-        _workflow,
-        swagger_doc,
-        WorkflowData(text, headers, server_base_url, swagger_url, app),
-        app,
-        bot_id=bot_id,
-        summary_prompt=summary_prompt,
+    if actionable_item.get(VectorCollections.actions):
+        document_similarity = actionable_item.get(VectorCollections.actions)[0]
+        vector_action = document_similarity.document  # this variable now holds Qdrant vector document, which is the Action metadata
+
+        _flow = create_flow_from_operation_ids(operation_ids=[vector_action.metadata.get('operation_id')],
+                                               bot_id=bot_id)
+    else:
+        document_similarity = actionable_item.get(VectorCollections.flows)[0]
+        vector_flow = document_similarity.document  # this variable now holds Qdrant vector document, which is the flow metadata
+        flow_id = vector_flow.metaata.get('flow_id')
+        flow_model = get_flow_by_id(flow_id)
+        _flow = FlowDTO(bot_id=bot_id, flow_id=flow_model.id, name=flow_model.name, description=flow_model.description,
+                        blocks=flow_model.payload, variables=[])
+
+    output = await run_flow(
+        flow=_flow,
+        chat_context=ChatContext(text, headers, app),
+        app=app,
+        bot_id=bot_id
     )
 
-    _workflow["swagger_url"] = swagger_url
-
+    # @todo now take the output, put it into a chat message with the base prompt and ask the llm to present it
     return output
 
 
-def handle_no_api_call(bot_message: str) -> ResponseDict:
-    return {"response": bot_message, "error": ""}
+def run_informative_item(
+        informative_item: dict[str, List[DocumentSimilarityDTO]],
+        base_prompt: str,
+        text: str,
+        conversations_history: List[BaseMessage]
+) -> ResponseDict:
+    # so we got all context, let's ask:
+
+    context = []
+    for vector_result in informative_item.get(VectorCollections.knowledgebase):
+        context.append(vector_result.document.metadata)
+
+    messages: List[BaseMessage] = [SystemMessage(content=base_prompt)]
+
+    if len(conversations_history) > 0:
+        messages.extend(conversations_history)
+
+    if len(context):
+        messages.append(
+            HumanMessage(
+                content=f"I found some relevant context that might be helpful. Here is the context: ```{','.join(str(context))}```. "
+            )
+        )
+
+    messages.append(
+        HumanMessage(
+            content="""Based on the information provided to you and the conversation history of this conversation, I want you to answer the questions that follow, make sure your answer is helpful
+            and clear and use advisable tune (at the end you advise based on the given context)"""
+        )
+    )
+    messages.append(
+        HumanMessage(
+            content="If you are unsure, or you think you can do a better job by asking clarification questions, then ask.")
+    )
+
+    messages.append(HumanMessage(content=text))
+
+    content = cast(str, chat(messages=messages).content)
+
+    return {"response": content, "error": None}

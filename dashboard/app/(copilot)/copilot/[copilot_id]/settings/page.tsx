@@ -21,12 +21,18 @@ import { useRouter } from "next/navigation";
 import { toast } from "@/components/ui/use-toast";
 import { CopyButton } from "@/components/headless/CopyButton";
 import { mutate } from "swr";
+import { useAsyncFn } from "react-use";
+
 export default function GeneralSettingsPage() {
   const { token, id: copilotId, name: copilotName } = useCopilot();
+  const [Name, setName] = React.useState(copilotName);
   const { replace } = useRouter();
+  const [deleteCopilotstate, $deleteCopilot] = useAsyncFn(deleteCopilot);
+  const [updateCopilotState, $updateCopilot] = useAsyncFn(updateCopilot);
+
   async function handleDelete() {
-    const response = await deleteCopilot(copilotId);
-    if (response.data.success) {
+    const { data } = await $deleteCopilot(copilotId);
+    if (data.success) {
       toast({
         variant: "success",
         title: "Copilot deleted",
@@ -35,11 +41,11 @@ export default function GeneralSettingsPage() {
       _.delay(() => replace("/"), 1000);
     }
   }
-  const [Name, setName] = React.useState(copilotName);
+
   async function handleSave() {
     if (Name === copilotName || Name.trim().length < 1) return;
-    const { data: respData } = await updateCopilot(copilotId, { name: Name });
-    if (respData.chatbot) {
+    const { data } = await $updateCopilot(copilotId, { name: Name });
+    if (data.chatbot) {
       toast({
         variant: "success",
         title: "Copilot updated",
@@ -55,7 +61,7 @@ export default function GeneralSettingsPage() {
           General settings
         </h1>
         <div className="space-x-2">
-          <Button size="sm" onClick={handleSave}>
+          <Button size="sm" loading={updateCopilotState.loading} onClick={handleSave}>
             Save
           </Button>
         </div>
@@ -97,18 +103,6 @@ export default function GeneralSettingsPage() {
                   </Button>
                 </div>
               </div>
-              <Separator className="my-2" />
-              <div className="space-y-1.5 px-8 py-5">
-                <Label className="text-base font-semibold text-accent-foreground/80">
-                  Copilot Id
-                </Label>
-                <div className="flex items-center justify-between gap-2">
-                  <Input className="flex" readOnly defaultValue={copilotId} />
-                  <Button variant="outline" asChild>
-                    <CopyButton text={copilotId}>Copy</CopyButton>
-                  </Button>
-                </div>
-              </div>
             </div>
           </section>
 
@@ -120,10 +114,10 @@ export default function GeneralSettingsPage() {
               <div className="flex flex-row items-center justify-between">
                 <div>
                   <h3 className="text-base font-semibold text-accent-foreground">
-                    Delete Assistant
+                    Delete Copilot
                   </h3>
                   <p className="text-sm font-normal">
-                    This action can't be reverted. Please proceed with caution.
+                    This action can't be reverted.
                   </p>
                 </div>
                 <AlertDialog>
@@ -144,7 +138,7 @@ export default function GeneralSettingsPage() {
                       <AlertDialogCancel asChild>
                         <Button variant="outline">Cancel</Button>
                       </AlertDialogCancel>
-                      <Button variant="destructive" onClick={handleDelete}>
+                      <Button variant="destructive" loading={deleteCopilotstate.loading} onClick={handleDelete}>
                         Delete
                       </Button>
                     </AlertDialogFooter>

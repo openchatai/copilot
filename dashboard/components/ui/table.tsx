@@ -10,7 +10,7 @@ const Table = React.forwardRef<
 >(({ className, wrapperClassName, ...props }, ref) => (
   <div
     className={cn(
-      "relative w-full overflow-auto border rounded-lg",
+      "relative w-full overflow-auto border",
       wrapperClassName
     )}
   >
@@ -37,7 +37,7 @@ const TableBody = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <tbody
     ref={ref}
-    className={cn("[&_tr:last-child]:border-0", className)}
+    className={cn("[&_tr:last-child]:border-0 odd:bg-white", className)}
     {...props}
   />
 ));

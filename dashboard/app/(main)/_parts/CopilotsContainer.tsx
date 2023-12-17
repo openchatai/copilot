@@ -1,13 +1,7 @@
 "use client";
 import React from "react";
-import { BotIcon, Terminal } from "lucide-react";
+import { BotIcon, GalleryHorizontalEnd, Terminal } from "lucide-react";
 import { Link } from "@/lib/router-events";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import useSwr from "swr";
 import { CopilotType, listCopilots } from "@/data/copilot";
 import Loading from "../loading";
@@ -18,6 +12,8 @@ import { filterAtom } from "./Search";
 import { useAtomValue } from "jotai";
 import { Button } from "@/components/ui/button";
 import { format } from "timeago.js";
+import { Tooltip } from "@/components/domain/Tooltip";
+import { motion, AnimatePresence } from 'framer-motion';
 
 function customSort(list: CopilotType[], sortBy: Filter["sort"]) {
   if (sortBy === "last-viewed") {
@@ -31,6 +27,7 @@ function customSort(list: CopilotType[], sortBy: Filter["sort"]) {
     return _.orderBy(list, ["name", "created_at"], ["asc", "desc"]);
   }
 }
+const AnimatedLink = motion(Link);
 
 export function CopilotsContainer() {
   const { data: copilots, isLoading } = useSwr("copilotsList", listCopilots);
@@ -64,45 +61,43 @@ export function CopilotsContainer() {
       )}
     </EmptyBlock>
   ) : (
-    <div className="grid grid-cols-2 gap-8 py-4 xl:grid-cols-4">
-      {$copilots?.map((copilot) => {
+    <div className="grid grid-cols-2 gap-6 md:grid-cols-3 auto-rows-fr py-4 lg:grid-cols-4">
+      {$copilots?.map((copilot, index) => {
         const copilotUrl = "/copilot/" + copilot.id;
         return (
-          <Link
-            href={copilotUrl}
-            className="transition-transform animate-in fade-in slide-in-from-top-2 xl:aspect-square"
-            key={copilot.id}
-          >
-            <div className="group relative flex h-56 items-center justify-center rounded-lg border bg-secondary p-5 shadow-sm">
-              <div className="absolute left-2 top-2">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger className="rounded-full bg-white p-1.5 shadow">
-                      <Terminal className="h-4 w-4" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      created via{" "}
-                      <span className="text-white">Web application</span>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-              <div>
-                <div className="grid aspect-square h-20 place-content-center rounded-lg bg-slate-950 text-gray-100">
-                  <BotIcon className="h-12 w-12" />
+          <AnimatePresence
+            key={copilot.id}>
+            <AnimatedLink
+              key={copilot.id}
+              href={copilotUrl}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              initial={{
+                opacity: 0, y: 50,
+                filter: "blur(10px)"
+              }}
+              exit={{
+                opacity: 0, y: 50,
+                filter: "blur(10px)"
+              }}
+              transition={{ duration: 0.2, delay: 0.01 * index }}
+              className="group"
+            >
+              <div className="group relative flex h-56 items-center justify-center rounded-lg border-2 bg-accent group-hover:bg-secondary p-5 group-hover:shadow transition-shadow">
+                <div className="grid aspect-square h-20 shadow-lg place-content-center group-hover:scale-95 bg-primary transition-transform rounded-lg text-gray-100">
+                  <GalleryHorizontalEnd className="h-12 w-12" />
                 </div>
               </div>
-            </div>
-            <div className="mt-1.5 ps-1">
-              <h2 className="line-clamp-1 text-ellipsis whitespace-nowrap text-sm font-semibold">
-                {copilot.name}
-              </h2>
-              <p className="text-xs text-gray-400">
-                created{" "}
-                <span className="font-semibold">{format(copilot.created_at)}</span>
-              </p>
-            </div>
-          </Link>
+              <div className="mt-1.5 ps-1">
+                <h2 className="line-clamp-1 text-sm font-semibold">
+                  {copilot.name}
+                </h2>
+                <p className="text-xs text-gray-400">
+                  created{" "}
+                  <span className="font-semibold">{format(copilot.created_at)}</span>
+                </p>
+              </div>
+            </AnimatedLink>
+          </AnimatePresence>
         );
       })}
     </div>

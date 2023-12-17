@@ -4,20 +4,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SelectTrigger } from "@radix-ui/react-select";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { useRef } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
 import { atom, useAtom } from "jotai";
+import { DebounceInput } from "react-debounce-input";
+
 const sortFilter = [
   { label: "Last Viewed", value: "last-viewed" },
   { label: "Date Created", value: "date-created" },
@@ -36,45 +30,32 @@ export const filterAtom = atom<Filter>({
 export const QUERY_KEY = "q";
 export const SORT_KEY = "sort";
 export function Search() {
-  const searchImputRef = useRef<HTMLInputElement>(null);
-  useHotkeys("/", (ev) => {
-    ev.preventDefault();
-    searchImputRef.current?.focus();
-  });
   const [filter, setFilter] = useAtom(filterAtom);
 
   return (
     <div className="flex items-center justify-between gap-5 py-5">
-      <div className="flex flex-1 items-center gap-1">
+      <div className="flex flex-1 max-w-sm gap-5 items-center">
         <Label htmlFor="search-copilots">
           <SearchIcon className="h-5 w-5 opacity-50" />
-          {/* <X className="h-5 w-5 opacity-50" /> */}
         </Label>
-        <TooltipProvider disableHoverableContent>
-          <Tooltip>
-            <TooltipTrigger>
-              <Input
-                value={filter.query}
-                type="text"
-                onChange={(event) => {
-                  setFilter((prev) => {
-                    return {
-                      ...prev,
-                      query: event.target.value.trim(),
-                    };
-                  });
-                }}
-                ref={searchImputRef}
-                id="search-copilots"
-                className="border-none font-medium shadow-none focus-visible:!ring-transparent"
-                placeholder="Search Copilots..."
-              />
-            </TooltipTrigger>
-            <TooltipContent>
-              Press <span className="px-1 text-white">/</span> to search
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <DebounceInput
+          // @ts-ignore
+          element={Input}
+          debounceTimeout={300}
+          value={filter.query}
+          type="text"
+          onChange={(event) => {
+            setFilter((prev) => {
+              return {
+                ...prev,
+                query: event.target.value.trim(),
+              };
+            });
+          }}
+          id="search-copilots"
+          className="w-full font-medium rounded-none border-x-0 border-t-0 px-0 border-b shadow-none focus-visible:!ring-transparent"
+          placeholder="Search Copilots..."
+        />
       </div>
 
       <Select

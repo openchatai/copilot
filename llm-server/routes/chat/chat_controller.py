@@ -1,20 +1,21 @@
+from typing import Optional
 from typing import cast
 
 from flask import jsonify, Blueprint, request, Response, abort, Request
-from routes.analytics.analytics_service import upsert_analytics_record
-from routes.chat.chat_dto import ChatInput
-from utils.get_logger import CustomLogger
-from utils.llm_consts import X_App_Name
-from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
+
 from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id,
     get_unique_sessions_with_first_message_by_bot_id,
     create_chat_history,
 )
 from models.repository.copilot_repo import find_one_or_fail_by_token
+from routes.analytics.analytics_service import upsert_analytics_record
+from routes.chat.chat_dto import ChatInput
 from utils.db import Database
+from utils.get_logger import CustomLogger
+from utils.llm_consts import X_App_Name
+from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
 from .. import root_service
-from typing import Optional
 
 db_instance = Database()
 mongo = db_instance.get_db()
@@ -111,8 +112,6 @@ def init_chat():
 @chat_workflow.route("/send", methods=["POST"])
 async def send_chat():
     json_data = request.get_json()
-    # if not isinstance(json_data, dict):
-    #     raise ValueError("Invalid JSON format. Expected a dictionary.")
 
     input_data = ChatInput(**json_data)
     message = input_data.content
@@ -125,15 +124,12 @@ async def send_chat():
         abort(400, description="Invalid content, the size is larger than 255 char")
 
     if not bot_token:
-        return Response(response="bot token is required", status=500)
+        return Response(response="bot token is required", status=400)
     bot = find_one_or_fail_by_token(bot_token)
 
     app_name = headers_from_json.pop(X_App_Name, None)
 
-    swagger_url = bot.swagger_url
-
     base_prompt = bot.prompt_message
-    server_base_url = request.form.get("server_base_url", "")
 
     if not bot:
         return (
@@ -151,14 +147,11 @@ async def send_chat():
     try:
         response_data = await root_service.handle_request(
             text=message,
-            swagger_url=str(swagger_url),
             session_id=session_id,
             base_prompt=str(base_prompt),
             bot_id=str(bot.id),
             headers=headers_from_json,
-            server_base_url=server_base_url,
             app=app_name,
-            summary_prompt=str(bot.summary_prompt),
         )
 
         if response_data["response"]:
@@ -167,17 +160,14 @@ async def send_chat():
             )
             create_chat_history(str(bot.id), session_id, True, message)
             create_chat_history(
-                str(bot.id),
-                session_id,
-                False,
-                response_data["response"] or response_data["error"] or "",
+                chatbot_id=str(bot.id),
+                session_id=session_id,
+                from_user=False,
+                message=response_data["response"] or response_data["error"] or "",
             )
         elif response_data["error"]:
-            upsert_analytics_record(
-                chatbot_id=str(bot.id),
-                successful_operations=0,
-                total_operations=1,
-                logs=response_data["error"],
+            upsert_analytics_record(chatbot_id=str(bot.id), successful_operations=0, total_operations=1,
+                                    logs=response_data["error"],
             )
 
         return jsonify(
