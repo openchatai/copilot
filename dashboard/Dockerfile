@@ -4,7 +4,7 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 # Install corepack and pnpm
 RUN corepack enable
-# Dependencies image
+RUN corepack prepare pnpm@8.7.0 --activate
 FROM base AS deps
 
 # Add libc6-compat if necessary for your application
