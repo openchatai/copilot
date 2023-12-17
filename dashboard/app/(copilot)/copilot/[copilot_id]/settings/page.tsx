@@ -83,10 +83,6 @@ export default function GeneralSettingsPage() {
                   }}
                   value={Name}
                 />
-                <p className="text-xs">
-                  Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-                  Culpa, a totam earum rem suscipit illum voluptas facere
-                </p>
               </div>
             </div>
           </section>
