@@ -39,11 +39,11 @@ export function AddActionDrawer() {
                         Crate a new action for your flow
                     </SheetDescription>
                 </SheetHeader>
-                <div className="w-full flex-1">
+                <div className="w-full flex-1 overflow-auto">
                     <ActionForm onSubmit={handleOnSubmit}
-                        className="h-full flex flex-col justify-between"
+                        className="flex flex-col"
                         footer={
-                            (form) => (<div className="space-x-2 mt-auto">
+                            (form) => (<div className="space-x-2 mt-4 sticky bottom-2 bg-white z-10 py-5">
                                 <Button disabled={!form.formState.isValid} loading={state.loading} type="submit">Create</Button>
                                 <Button variant='ghost' onClick={() => setDrawerState(false)}>Cancel</Button>
                             </div>)

@@ -18,6 +18,7 @@ import { ActionType, actionSchema } from "./schema";
 import { apiMethods } from "@/types/utils";
 import React from "react";
 import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
 
 export function ActionForm({
@@ -55,8 +56,8 @@ export function ActionForm({
 
     return (
         <Form {...form}>
-            <form className={cn("max-w-full w-full", className)} onSubmit={form.handleSubmit(handleSubmit)}>
-                <div className="w-full">
+            <form className={cn(className)} onSubmit={form.handleSubmit(handleSubmit)}>
+                <div className="w-full space-y-2">
                     <FormField
                         control={form.control}
                         name="name"
@@ -68,7 +69,9 @@ export function ActionForm({
                                 <FormControl>
                                     <Input {...field} />
                                 </FormControl>
-                                <FormDescription />
+                                <FormDescription>
+                                    A Descriptive name for the action
+                                </FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -84,13 +87,14 @@ export function ActionForm({
                                 <FormControl>
                                     <Textarea minRows={2} {...field} />
                                 </FormControl>
-                                <FormDescription />
+                                <FormDescription>
+                                    A short description about the action, what it does, etc.
+                                </FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
-
-                    <div className="flex items-center data-[valid=false]:!border-destructive h-12 gap-0.5 p-1 overflow-hidden border border-border w-full m-0 bg-white shadow-sm rounded-md focus:outline-none text-sm focus-visible:outline-none transition-colors">
+                    <div className="flex items-center data-[valid=false]:!border-destructive h-12 gap-0.5 p-0.5 overflow-hidden border border-border w-full m-0 bg-white shadow-sm rounded-md focus:outline-none text-sm focus-visible:outline-none transition-colors">
                         <Select {..._.omit(form.register('request_type'), ['ref'])}
                             onValueChange={(v) => {
                                 form.register('request_type').onChange({
@@ -114,9 +118,25 @@ export function ActionForm({
                         </Select>
                         <Input placeholder="API Endpoint...." {...form.register('api_endpoint')} className="flex-1 border-0 h-full py-1.5 shadow-none" />
                     </div>
-
+                    <FormField
+                        control={form.control}
+                        name="body"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>
+                                    Body (JSON)
+                                </FormLabel>
+                                <FormControl>
+                                    <Textarea minRows={3} {...field} />
+                                </FormControl>
+                                <FormDescription>
+                                    The body of the request in JSON format
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                     <div>
-
                         <div className="flex items-center justify-between">
                             <Label>
                                 Headers
@@ -130,13 +150,13 @@ export function ActionForm({
                             </Button>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-2 w-full">
+                        <div className="space-y-3">
                             {
                                 headerFields.map((field, index) => {
                                     const errorMessage = form.formState.errors.headers?.[index]?.value?.message;
                                     const isValid = errorMessage === undefined;
                                     return (
-                                        <div className="flex items-center gap-2 justify-between" key={field.id}>
+                                        <div className="flex items-center gap-2 animate-in fade-in slide-in-from-top-1" key={field.id}>
                                             <Input placeholder="Key"
                                                 {...form.register(`headers.${index}.key`)}
                                                 data-valid={isValid}
@@ -147,7 +167,7 @@ export function ActionForm({
                                                 {...form.register(`headers.${index}.value`)}
                                             />
 
-                                            <button className="p-2 text-destructive"
+                                            <button className="shrink-0 p-2 text-destructive"
                                                 type="button"
                                                 onClick={() => removeHeaderField(index)}>
                                                 <X className="w-4 h-4" />
@@ -193,22 +213,7 @@ export function ActionForm({
                             }
                         </div>
                     </div>
-                    <FormField
-                        control={form.control}
-                        name="body"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>
-                                    Body (JSON)
-                                </FormLabel>
-                                <FormControl>
-                                    <Textarea minRows={3} {...field} />
-                                </FormControl>
-                                <FormDescription />
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+
                 </div>
                 {footer?.(form)}
             </form>
