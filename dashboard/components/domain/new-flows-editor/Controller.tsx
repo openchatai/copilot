@@ -177,12 +177,12 @@ function stateReducer(state: StateType, action: ActionsType) {
                 const block = draft.blocks.find(block => block.id === blockId);
                 if (block) {
                     // if the action id is already present,change the id and add it
-                    const action = block.actions.find(action => action.id === $action.id);
-                    if (action) {
-                        const id = action.id + "+" + uniqueId();
-                        _.assign(action, { id });
+                    const action = { ...$action };
+                    if (block.actions.find(action => action.id === $action.id)) {
+                        action.id = uniqueId();
                     }
-                    block.actions.splice(index, 0, $action);
+                    block.actions.splice(index, 0, action);
+                    
                 }
                 return;
             }
