@@ -34,7 +34,7 @@ def is_it_informative_or_actionable(chat_history: List[BaseMessage], current_mes
         That means it is informative, and the LLM should be able to answer the question based on the given context or
         by itself (based on the base prompt).
         """
-        return False  # not actionable => informative
+        return parse_actionable_or_not_response({"actionable": False})
 
     actionable_tools = ""
     for document in available_documents:
@@ -96,12 +96,9 @@ def is_it_informative_or_actionable(chat_history: List[BaseMessage], current_mes
 
     content = cast(str, chat(messages=messages).content)
 
-    try:
-        content_parsed_as_dict = json.loads(content)
-    except Exception as e:
-        content_parsed_as_dict = {"needs_api": "no"}
+    content_parsed_as_dict = json.loads(content)
 
-    if content_parsed_as_dict.get("needs_api") is "yes":
+    if content_parsed_as_dict.get("needs_api") == "yes":
         response = parse_actionable_or_not_response(
             {"actionable": True, "operation_id": content_parsed_as_dict.get("api")})
     else:

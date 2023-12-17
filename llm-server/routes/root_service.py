@@ -39,7 +39,7 @@ chat = get_chat_model()
 def is_the_llm_predicted_operation_id_actually_true(predicted_operation_id:str, actionable_items: dict[str, list[DocumentSimilarityDTO]]):
     for action in actionable_items.get(VectorCollections.actions):
         if predicted_operation_id == action.document.metadata.get('operation_id'):
-            return {VectorCollections.actions: [DocumentSimilarityDTO(**action)]}
+            return {VectorCollections.actions: [action]}
     return None
 
 
