@@ -119,12 +119,6 @@ export default function CopilotPage() {
           <Button variant='ghost' onClick={() => setSearch(true)} size='fit'>
             <Search className="h-5 w-5" />
           </Button>
-          <Button
-            size='sm'
-            id="triggerSelector"
-          >
-            Chat with the Copilot
-          </Button>
         </div>
       </HeaderShell>
       <div className="flex-1 flex flex-row justify-between overflow-hidden">
