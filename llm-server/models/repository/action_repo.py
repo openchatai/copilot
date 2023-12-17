@@ -3,7 +3,7 @@ import datetime
 import uuid
 from typing import Optional, List
 
-from opencopilot_db.database_setup import engine
+from shared.models.opencopilot_db.database_setup import engine
 from sqlalchemy.orm import sessionmaker
 
 from entities.action_entity import ActionDTO

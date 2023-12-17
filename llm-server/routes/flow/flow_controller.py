@@ -29,8 +29,8 @@ flow = Blueprint("flow", __name__)
 async def build_flow_from_text(bot_id: str):
     data = request.get_json()
 
-    json = await build_dynamic_flow(data.text, bot_id)
-    return Response(json.dict())
+    response = await build_dynamic_flow(data.get("text"), bot_id)
+    return jsonify(response)
 
 
 @flow.route("/bot/<bot_id>", methods=["GET"])
