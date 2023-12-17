@@ -113,7 +113,7 @@ export function FlowRenderer() {
                                 </p>
                             </div>
                             <Button size='fit' variant='secondary' onClick={() => setDrawer(true)}>
-                                <Plus size={16} />
+                                <Plus size={12} />
                             </Button>
                         </div>
                         <div className='flex-1 w-full overflow-auto'>
@@ -152,6 +152,7 @@ export function FlowRenderer() {
                             edges={edges}
                             edgeTypes={edgeTypes}
                             onEdgesChange={onEdgesChange}
+                            nodeOrigin={[0.5, 0]}
                             maxZoom={1} minZoom={1} nodeTypes={nodeTypes} nodes={nodes} onNodesChange={onNodeChange} className='w-full h-full'>
                             <Controls position='bottom-right' />
                             <Background color="var(--accent-foreground)" />
