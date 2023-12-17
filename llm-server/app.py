@@ -13,8 +13,8 @@ from routes.uploads.upload_controller import upload_controller
 from shared.models.opencopilot_db import create_database_schema
 from utils.config import Config
 from utils.db import Database
-from utils.vector_store_setup import init_qdrant_collections
 
+from utils.vector_store_setup import init_qdrant_collections
 db_instance = Database()
 mongo = db_instance.get_db()
 
@@ -36,10 +36,10 @@ app.register_blueprint(action, url_prefix="/backend/actions")
 app.config.from_object(Config)
 
 
-@app.route('/healthcheck')
+@app.route("/healthcheck")
 def health_check():
     info = mongo.client
-    return jsonify(status='OK', servers={"mongo": info.options.pool_options.max_pool_size})
+    return jsonify(status="OK", servers={"mongo": info.options.pool_options.max_pool_size})
 
 
 init_qdrant_collections()
