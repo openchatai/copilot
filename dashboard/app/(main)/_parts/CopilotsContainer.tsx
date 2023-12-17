@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { BotIcon, Terminal } from "lucide-react";
+import { BotIcon, GalleryHorizontalEnd, Terminal } from "lucide-react";
 import { Link } from "@/lib/router-events";
 import useSwr from "swr";
 import { CopilotType, listCopilots } from "@/data/copilot";
@@ -83,17 +83,8 @@ export function CopilotsContainer() {
               className="group"
             >
               <div className="group relative flex h-56 items-center justify-center rounded-lg border-2 bg-accent group-hover:bg-secondary p-5 group-hover:shadow transition-shadow">
-                <Tooltip
-                  content={<>
-                    created via{" "}
-                    <span className="text-white">Web application</span>
-                  </>}>
-                  <span className="shadow bg-white absolute left-2 top-2 h-fit text-black p-1.5 rounded-full">
-                    <Terminal className="h-4 w-4" />
-                  </span>
-                </Tooltip>
-                <div className="grid aspect-square h-20 shadow-lg place-content-center group-hover:scale-95 transition-transform rounded-lg bg-slate-950 text-gray-100">
-                  <BotIcon className="h-12 w-12" />
+                <div className="grid aspect-square h-20 shadow-lg place-content-center group-hover:scale-95 bg-primary transition-transform rounded-lg text-gray-100">
+                  <GalleryHorizontalEnd className="h-12 w-12" />
                 </div>
               </div>
               <div className="mt-1.5 ps-1">

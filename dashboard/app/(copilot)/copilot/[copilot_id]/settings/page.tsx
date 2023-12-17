@@ -126,10 +126,10 @@ export default function GeneralSettingsPage() {
               <div className="flex flex-row items-center justify-between">
                 <div>
                   <h3 className="text-base font-semibold text-accent-foreground">
-                    Delete Assistant
+                    Delete Copilot
                   </h3>
                   <p className="text-sm font-normal">
-                    This action can't be reverted. Please proceed with caution.
+                    This action can't be reverted.
                   </p>
                 </div>
                 <AlertDialog>

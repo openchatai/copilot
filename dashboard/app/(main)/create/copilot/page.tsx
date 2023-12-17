@@ -179,7 +179,7 @@ function FinishStep() {
         <span className="inline-flex rounded-full bg-emerald-100 fill-current p-2.5 text-6xl text-emerald-500">
           <CheckCheck className="h-[1em] w-[1em]" />
         </span>
-        <span className="text-3xl">Thats it! 🙌</span>
+        <span className="text-3xl">That's it! 🙌</span>
       </h2>
       <div className="mx-auto mt-5 w-fit">
         <Button asChild>
@@ -333,7 +333,7 @@ function DefineActionsStep() {
                     No endpoints added yet.
                   </span>
                   <span className="block">
-                    You can add new acions via swagger files or manually
+                    You can add new actions via swagger files or manually
                   </span>
                 </div>
               </EmptyBlock>
