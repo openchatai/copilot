@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { Link } from "@/lib/router-events";
 import React, { useState } from "react";
 import { Wizard, useWizard } from "react-use-wizard";
-import { Check, CheckCheck, FileVideo, Plus, Trash2, Upload } from "lucide-react";
+import { Check, CheckCheck, FileVideo, Plus, Trash2, Upload, UploadCloud } from "lucide-react";
 import { CopilotType, createCopilot } from "@/data/copilot";
 import _ from "lodash";
 import { toast } from "@/components/ui/use-toast";
@@ -233,14 +233,6 @@ function DefineActionsStep() {
           Define your actions ✨
         </h2>
       </div>
-      {createdCopilot && (
-        <Alert variant="info" className="my-2">
-          <AlertTitle>Copilot Created Successfully</AlertTitle>
-          <AlertDescription>
-            You have created <strong>{createdCopilot?.name}</strong>
-          </AlertDescription>
-        </Alert>
-      )}
 
       <p className="mb-2">
         You copilot will use these APIs to communicate with your product and
@@ -288,10 +280,10 @@ function DefineActionsStep() {
           </AlertDialogContent>
           <AlertDialogTrigger asChild>
             <Button className="space-x-1" size='xs' variant='secondary'>
+              <Plus className="w-4 h-4" />
               <span>
                 Add Action
               </span>
-              <Plus className="w-4 h-4" />
             </Button>
           </AlertDialogTrigger>
         </AlertDialog>
@@ -315,10 +307,10 @@ function DefineActionsStep() {
           </AlertDialogContent>
           <AlertDialogTrigger asChild >
             <Button className="space-x-1" size='xs' variant='secondary'>
+              <UploadCloud className="w-4 h-4" />
               <span>
                 Import from Swagger
               </span>
-              <Upload className="w-4 h-4" />
             </Button>
           </AlertDialogTrigger>
         </AlertDialog>
@@ -330,10 +322,10 @@ function DefineActionsStep() {
               <EmptyBlock>
                 <div className="text-center text-sm">
                   <span className="block">
-                    No endpoints added yet.
+                    No actions added yet.
                   </span>
                   <span className="block">
-                    You can add new actions via swagger files or manually
+                    You can add one manually or import a bunch from swagger file
                   </span>
                 </div>
               </EmptyBlock>
@@ -373,10 +365,11 @@ function DefineActionsStep() {
         </Button>
         {createdCopilot && (
           <Button
-            variant='link'
+            variant='ghost'
+            className="flex items-center justify-center gap-1 underline"
             onClick={nextStep}>
             {
-              _.isEmpty(actions?.data) ? "Skip" : "Next"
+              _.isEmpty(actions?.data) ? "Skip for now ►" : "Next"
             }
           </Button>
         )}
