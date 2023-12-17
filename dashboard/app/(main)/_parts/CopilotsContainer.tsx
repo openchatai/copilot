@@ -59,13 +59,13 @@ export function CopilotsContainer() {
       )}
     </EmptyBlock>
   ) : (
-    <div className="grid grid-cols-2 gap-8 py-4 xl:grid-cols-4">
+    <div className="grid grid-cols-2 gap-6 md:grid-cols-3 auto-rows-fr py-4 lg:grid-cols-4">
       {$copilots?.map((copilot) => {
         const copilotUrl = "/copilot/" + copilot.id;
         return (
           <Link
             href={copilotUrl}
-            className="transition-transform animate-in fade-in slide-in-from-top-2 xl:aspect-square group"
+            className="transition-transform animate-in fade-in slide-in-from-top-2 group"
             key={copilot.id}
           >
             <div className="group relative flex h-56 items-center justify-center rounded-lg border-2 bg-accent group-hover:bg-secondary p-5 group-hover:shadow transition-shadow">
@@ -78,7 +78,7 @@ export function CopilotsContainer() {
                   <Terminal className="h-4 w-4" />
                 </span>
               </Tooltip>
-              <div className="grid aspect-square h-20 shadow-lg place-content-center group-hover:scale-90 transition-transform rounded-lg bg-slate-950 text-gray-100">
+              <div className="grid aspect-square h-20 shadow-lg place-content-center group-hover:scale-95 transition-transform rounded-lg bg-slate-950 text-gray-100">
                 <BotIcon className="h-12 w-12" />
               </div>
             </div>
