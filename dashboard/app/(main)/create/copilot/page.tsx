@@ -282,7 +282,7 @@ function DefineActionsStep() {
             <Button className="space-x-1" size='xs' variant='secondary'>
               <Plus className="w-4 h-4" />
               <span>
-                Add Action
+                Add action manually
               </span>
             </Button>
           </AlertDialogTrigger>
@@ -309,7 +309,7 @@ function DefineActionsStep() {
             <Button className="space-x-1" size='xs' variant='secondary'>
               <UploadCloud className="w-4 h-4" />
               <span>
-                Import from Swagger
+                Import actions from Swagger file
               </span>
             </Button>
           </AlertDialogTrigger>
