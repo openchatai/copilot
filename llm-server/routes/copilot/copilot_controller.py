@@ -11,6 +11,7 @@ from models.repository.copilot_repo import (
     SessionLocal,
     update_copilot,
 )
+from routes._swagger.reindex_service import migrate_actions
 from utils.get_logger import CustomLogger
 
 logger = CustomLogger(module_name=__name__)
@@ -107,3 +108,10 @@ def general_settings_update(copilot_id):
     except Exception as e:
         # Handle other exceptions
         return jsonify({"error": "An error occurred", "details": str(e)}), 500
+
+
+@copilot.route("/migrate", methods=["GET"])
+def migrate():
+    migrate_actions()
+    return jsonify({"message": "job started"}), 200
+

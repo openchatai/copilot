@@ -3,8 +3,10 @@ from typing import Iterable
 from urllib.parse import urlparse
 
 from celery import shared_task
+from celery.app import task
 from qdrant_client import QdrantClient
 
+from celery_app import app
 from models.repository.action_repo import create_action, find_action_by_method_id_and_bot_id
 from models.repository.copilot_repo import get_total_chatbots, get_chatbots_batch
 from routes.action import action_vector_service
@@ -20,7 +22,7 @@ db_instance = NoSQLDatabase()
 shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
 
 
-@shared_task
+@app.task
 def index_action(batch_size: int = 100):
     """
     Index chatbot data in batches.
