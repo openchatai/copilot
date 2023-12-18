@@ -38,7 +38,11 @@ def create_actions(actions: List[ActionDTO]):
 def create_action(action: ActionDTO):
     documents: List[Document] = []
 
-    document = Document(page_content=action.description + " " + action.name)
+    description = str(action.description) if action.description else ""
+    name = str(action.name) if action.name else ""
+
+    document = Document(page_content=description + " " + name)
+    
     document.metadata.update(action.model_dump())
 
     documents.append(document)

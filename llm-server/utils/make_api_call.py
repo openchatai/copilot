@@ -38,6 +38,9 @@ def make_api_request(
 
     try:
         endpoint = replace_url_placeholders(endpoint, path_params)
+        # @Todo check scheme before calling the api, dto validation to be added on actions that are of type api and don't have a scheme
+        # error: No scheme supplied. Perhaps you meant https:///v1/material
+        
         url: str = endpoint
         # Create a session and configure it with headers
         session = requests.Session()
