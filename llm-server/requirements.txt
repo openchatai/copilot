@@ -13,7 +13,7 @@ backoff==2.2.1
 bcrypt==4.0.1
 beautifulsoup4==4.12.2
 billiard==4.1.0
-blinker==1.6.3
+blinker==1.7.0
 cachetools==5.3.2
 celery==5.3.4
 certifi==2023.7.22
