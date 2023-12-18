@@ -91,6 +91,7 @@ function ActionBlock({ data: { actions, name, next_on_success }, id, selected }:
     }, [nodes, id])
     return (
         <React.Fragment key={id}>
+        
             <BlockHandle type='target' position={Position.Left} />
             <BlockHandle type='source' position={Position.Right} />
             <div data-block-id={id}

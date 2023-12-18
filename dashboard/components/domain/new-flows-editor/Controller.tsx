@@ -150,7 +150,7 @@ function getEmptyBlock(next_on_success: string | null): BlockType {
         name: id,
         created_at: new Date().toISOString(),
         next_on_success,
-        updated_at: new Date().toISOString(),
+        updated_at: null,
         actions: [],
     }
 
@@ -180,7 +180,6 @@ function stateReducer(state: StateType, action: ActionsType) {
                     const action = { ...$action };
                     action.id = uniqueId();
                     block.actions.splice(index, 0, action);
-
                 }
                 return;
             }
