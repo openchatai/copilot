@@ -82,7 +82,6 @@ async def handle_request(
     )
 
     if next_step.actionable:
-
         # if the LLM given operationID is actually exist, then use it, otherwise fallback to the highest vector space document
         llm_predicted_operation_id = is_the_llm_predicted_operation_id_actually_true(next_step.operation_id,
                                                                                      select_top_documents(actions))
@@ -95,7 +94,6 @@ async def handle_request(
         response = await run_actionable_item(
             bot_id=bot_id,
             actionable_item=actionable_item,
-            base_prompt=base_prompt,
             app=app,
             headers=headers,
             text=text,
@@ -125,7 +123,6 @@ def check_required_fields(base_prompt: str, text: str) -> None:
 
 async def run_actionable_item(
         actionable_item: dict[str, List[DocumentSimilarityDTO]],
-        base_prompt: str,
         text: str,
         headers: Dict[str, str],
         app: Optional[str],
@@ -152,7 +149,6 @@ async def run_actionable_item(
         bot_id=bot_id
     )
 
-    # @todo now take the output, put it into a chat message with the base prompt and ask the llm to present it
     return output
 
 
