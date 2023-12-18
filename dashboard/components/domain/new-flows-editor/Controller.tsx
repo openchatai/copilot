@@ -178,11 +178,9 @@ function stateReducer(state: StateType, action: ActionsType) {
                 if (block) {
                     // if the action id is already present,change the id and add it
                     const action = { ...$action };
-                    if (block.actions.find(action => action.id === $action.id)) {
-                        action.id = uniqueId();
-                    }
+                    action.id = uniqueId();
                     block.actions.splice(index, 0, action);
-                    
+
                 }
                 return;
             }
