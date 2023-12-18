@@ -2,6 +2,7 @@
 import * as React from "react";
 import {
   Bot,
+  BotIcon,
   FileStack,
   HelpCircle,
   User,
@@ -67,7 +68,7 @@ export function SearchModal() {
               key={copilot.id}
               onSelect={() => push("/copilot/" + copilot.id)}
             >
-              <User className="mr-2 h-4 w-4" />
+              <BotIcon className="mr-2 h-4 w-4" />
               <span>
                 {copilot.name}
                 <span className="hidden">{copilot.id}</span>
