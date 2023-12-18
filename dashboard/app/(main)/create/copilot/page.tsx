@@ -1,5 +1,4 @@
 "use client";
-import { DropZone } from "@/components/domain/DropZone";
 import { HeaderShell } from "@/components/domain/HeaderShell";
 import Roadmap from "@/components/ui/Roadmap";
 import { Button } from "@/components/ui/button";
@@ -7,31 +6,17 @@ import { cn } from "@/lib/utils";
 import { Link } from "@/lib/router-events";
 import React, { useState } from "react";
 import { Wizard, useWizard } from "react-use-wizard";
-import { Check, CheckCheck, FileVideo, Plus, Trash2, Upload, UploadCloud } from "lucide-react";
-import { CopilotType, createCopilot } from "@/data/copilot";
-import _ from "lodash";
-import { toast } from "@/components/ui/use-toast";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Check, CheckCheck, FileVideo } from "lucide-react";
 import Loader from "@/components/ui/Loader";
 import {
   CreateCopilotProvider,
   useCreateCopilot,
 } from "./_parts/CreateCopilotProvider";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useAsyncFn } from "react-use";
-import { createActionByBotId, getActionsByBotId, importActionsFromSwagger } from "@/data/actions";
-import useSWR from "swr";
-import { EmptyBlock } from "@/components/domain/EmptyBlock";
-import { ActionForm } from "@/components/domain/action-form/ActionForm";
-import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
-import { revalidateActions } from "@/components/domain/new-flows-editor/Controller";
-import { methodVariants } from "@/components/domain/MethodRenderer";
-import { atom, useAtom } from "jotai";
-import { DebounceInput } from "react-debounce-input";
-
+import { SetCopilotName } from "./_parts/SetCopilotNameStep";
+import { DefineActionsStep } from "./_parts/DefineActionsStep";
+import { AnimatePresence, motion } from "framer-motion";
+import { usePrevious } from "react-use";
 function Header() {
   const { stepCount, activeStep, goToStep } = useWizard();
   const steps = Array.from({ length: stepCount }).map((_, i) => ({
@@ -77,7 +62,7 @@ function Header() {
 function IntroStep() {
   const { nextStep } = useWizard();
   return (
-    <div>
+    <motion.div>
       <h2 className="mb-6 text-3xl font-bold text-accent-foreground">
         Let's create your own product copilot 🔥
       </h2>
@@ -106,68 +91,10 @@ function IntroStep() {
       <div className="flex items-center justify-end">
         <Button onClick={nextStep}>Let's do it!</Button>
       </div>
-    </div>
+    </motion.div>
   );
 }
-function SetCopilotName() {
-  const { state: { copilot_name, createdCopilot }, dispatch } = useCreateCopilot();
-  const { nextStep } = useWizard();
-  const [value, $createCopilot] = useAsyncFn(createCopilot);
 
-  const setCopilot = (copilot: CopilotType) => {
-    dispatch({ type: "SET_COPILOT", payload: copilot });
-  };
-
-  async function handleCreateCopilot() {
-    if (!copilot_name) {
-      toast({
-        title: "Please enter copilot name",
-        description: "Please enter copilot name",
-        variant: "destructive",
-      });
-      return;
-    }
-    if (createdCopilot) {
-      nextStep();
-      return;
-    }
-    const response = await $createCopilot(copilot_name);
-    if (response?.data?.id) {
-      setCopilot(response.data);
-      nextStep();
-    } else {
-      toast({
-        title: "Something went wrong",
-        description: "Please try again later",
-        variant: "destructive",
-      });
-    }
-  }
-  return <div>
-    <h2 className="mb-6 text-3xl font-bold text-accent-foreground">
-      Let's give your copilot a name 🤖
-    </h2>
-    <div className="px-2 my-4">
-      <Label htmlFor="copilotName" className="font-semibold">
-        Copilot Name
-      </Label>
-      <DebounceInput
-        id="copilotName"
-        debounceTimeout={500}
-        // @ts-ignore
-        element={Input}
-        disabled={!!createdCopilot}
-        className="mt-1"
-        value={copilot_name}
-        onChange={(ev) => dispatch({ type: "CHANGE_NAME", payload: ev.target.value })} />
-    </div>
-    <div className="flex items-center justify-end">
-      <Button onClick={handleCreateCopilot}
-        disabled={!copilot_name}
-        loading={value.loading}>Let's do it!</Button>
-    </div>
-  </div>
-}
 function FinishStep() {
   const {
     state: { createdCopilot },
@@ -189,243 +116,24 @@ function FinishStep() {
     </div>
   );
 }
-const formDialog = atom({
-  swagger: false,
-  manually: false
-})
-function DefineActionsStep() {
-  const { nextStep, previousStep } = useWizard();
-  const [state, $importActionsFromSwagger] = useAsyncFn(importActionsFromSwagger)
-  const [addActionState, $addAction] = useAsyncFn(createActionByBotId)
-  const {
-    state: { swaggerFiles, createdCopilot },
-    dispatch,
-  } = useCreateCopilot();
-  const [dialogs, setDialogs] = useAtom(formDialog)
-  const { data: actions } = useSWR(createdCopilot ? (createdCopilot?.id + '/actions') : null, async () => createdCopilot?.id ? await getActionsByBotId(createdCopilot?.id) : null)
-  async function addActionFromSwagger() {
-    const swaggerFile = _.first(swaggerFiles);
-    if (swaggerFile && createdCopilot) {
-      const response = await $importActionsFromSwagger(createdCopilot.id, swaggerFile)
-      if (response.data) {
-        toast({
-          title: "Actions imported successfully",
-          description: "We have imported your actions successfully",
-          variant: "success",
-        });
-      }
-      // reset swagger files
-      dispatch({
-        type: "ADD_SWAGGER",
-        payload: [],
-      });
-      revalidateActions(createdCopilot.id)
-      setDialogs({
-        ...dialogs,
-        swagger: false
-      })
-    }
-  }
+function MotionWrapper({ children }: { children?: React.ReactNode }) {
+  const { activeStep } = useWizard();
+  const isFirstStep = activeStep === 0;
   return (
-    <div className="relative p-1">
-      <div className="mb-5 flex items-center justify-between">
-        <h2 className="text-3xl font-bold text-accent-foreground">
-          Define your actions ✨
-        </h2>
-      </div>
-
-      <p className="mb-2">
-        You copilot will use these APIs to communicate with your product and
-        execute actions
-      </p>
-      <div className="flex items-center mb-2 space-x-2 justify-end">
-        <AlertDialog open={dialogs.manually} onOpenChange={(open) => setDialogs({
-          ...dialogs,
-          manually: open,
-        })}>
-          <AlertDialogContent>
-            <AlertDialogHeader className="flex items-center justify-between w-full flex-row">
-              <AlertDialogTitle className="flex-1 text-lg font-bold">
-                Define API action
-              </AlertDialogTitle>
-            </AlertDialogHeader>
-            <ActionForm
-              onSubmit={async (values) => {
-                if (createdCopilot) {
-                  const { data } = await $addAction(createdCopilot.id, values);
-                  if (data) {
-                    toast({
-                      title: "Action created successfully",
-                      description: "We have created your action successfully",
-                      variant: "success",
-                    });
-                    setDialogs({
-                      ...dialogs,
-                      manually: false
-                    })
-                    revalidateActions(createdCopilot.id)
-                  }
-                }
-              }}
-              footer={
-                () => <AlertDialogFooter>
-                  <AlertDialogCancel asChild>
-                    <Button variant='outline'>Cancel</Button>
-                  </AlertDialogCancel>
-                  <Button type="submit" loading={addActionState.loading}>
-                    Create Action
-                  </Button>
-                </AlertDialogFooter>
-              } />
-          </AlertDialogContent>
-          <AlertDialogTrigger asChild>
-            <Button className="space-x-1" size='xs' variant='secondary'>
-              <Plus className="w-4 h-4" />
-              <span>
-                Add action manually
-              </span>
-            </Button>
-          </AlertDialogTrigger>
-        </AlertDialog>
-        <AlertDialog open={dialogs.swagger} onOpenChange={(open) => setDialogs({
-          ...dialogs,
-          swagger: open,
-        })}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle className="flex-1 text-lg font-bold">
-                Import from Swagger
-              </AlertDialogTitle>
-            </AlertDialogHeader>
-            <GetActionsFromSwagger />
-            <AlertDialogFooter>
-              <AlertDialogCancel asChild>
-                <Button variant='outline'>Cancel</Button>
-              </AlertDialogCancel>
-              <Button onClick={addActionFromSwagger} loading={state.loading}>Import</Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-          <AlertDialogTrigger asChild >
-            <Button className="space-x-1" size='xs' variant='secondary'>
-              <UploadCloud className="w-4 h-4" />
-              <span>
-                Import actions from Swagger file
-              </span>
-            </Button>
-          </AlertDialogTrigger>
-        </AlertDialog>
-      </div>
-      <div className="flex items-start flex-col gap-2 overflow-auto max-h-60 px-2 py-1">
-        {
-          _.isEmpty(actions?.data) ?
-            <div className="mx-auto">
-              <EmptyBlock>
-                <div className="text-center text-sm">
-                  <span className="block">
-                    No actions added yet.
-                  </span>
-                  <span className="block">
-                    You can add one manually or import a bunch from swagger file
-                  </span>
-                </div>
-              </EmptyBlock>
-            </div>
-            :
-            _.map(actions?.data, (endpoint, index) => {
-              return <div key={index} className="w-full p-2 shrink-0 flex overflow-hidden max-w-full gap-4 items-center justify-between border border-border transition-colors rounded-lg">
-                <div className="flex-1 flex items-center justify-start overflow-hidden shrink-0">
-                  <div className="flex items-center gap-5 overflow-hidden shrink-0">
-                    <span className={cn(methodVariants({
-                      method: endpoint.request_type
-                    }))}>
-                      {endpoint.request_type}
-                    </span>
-                    <p className="flex-1 line-clamp-1 overflow-ellipsis font-medium text-xs">
-                      {endpoint.api_endpoint || endpoint.name}
-                    </p>
-                  </div>
-                </div>
-                <div className="space-x-2">
-                  <button className="text-destructive">
-                    <Trash2 className="w-4 h-4" onClick={() => confirm("are you sure")} />
-                  </button>
-                </div>
-              </div>
-            })
-        }
-      </div>
-
-      <footer className="flex w-full items-center justify-between gap-5 pt-5">
-        <Button
-          variant="ghost"
-          onClick={previousStep}
-          className="flex items-center justify-center gap-1 underline"
-        >
-          Back
-        </Button>
-        {createdCopilot && (
-          <Button
-            variant='ghost'
-            className="flex items-center justify-center gap-1 underline"
-            onClick={nextStep}>
-            {
-              _.isEmpty(actions?.data) ? "Skip for now ►" : "Next"
-            }
-          </Button>
-        )}
-      </footer>
-    </div >
+    <motion.div
+      key={activeStep}
+      variants={{
+        leave: { opacity: 0, filter: "blur(5px)" },
+        enter: { opacity: 1, filter: "blur(0px)" },
+      }}
+      initial={isFirstStep ? "enter" : "leave"}
+      animate="enter"
+      transition={{ duration: 0.2 }}
+    >
+      {children}
+    </motion.div>
   );
 }
-
-function GetActionsFromSwagger() {
-  const { state: { swaggerFiles }, dispatch } = useCreateCopilot();
-  return <div>
-    <div className="my-5">
-      <DropZone
-        multiple={false}
-        maxFiles={1}
-        accept={{ json: ["application/json"] }}
-        value={swaggerFiles || []}
-        onChange={(files) => {
-          dispatch({ type: "ADD_SWAGGER", payload: files });
-        }}
-      />
-    </div>
-    <div className="mb-8 mt-4 flex items-center justify-between space-x-6">
-      <div>
-        <div className="mb-1 text-sm font-medium text-slate-800">
-          Important Instructions
-        </div>
-        <div className="text-xs">
-          <ul>
-            <li>
-              ✅ Make sure each{" "}
-              <strong>endpoint have description and operation id</strong>,
-              results will be significantly better with a good description
-            </li>
-            <li>
-              ✅ Make sure that the swagger file is valid, the system
-              might not be able to parse invalid files,{" "}
-              <Link href="https://editor.swagger.io/" target="_blank">
-                use this tool validate your schema
-              </Link>
-            </li>
-            <li>
-              ✅ Do not add any Authorization layers, we will show you how
-              to authorize your own requests by yourself
-            </li>
-            <li>
-              ✅ This is a *very* new product, so many things does not make
-              sense/work at this stage{" "}
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-}
-
 export default function CreateCopilotPage() {
   const [loaded, setLoaded] = useState(false);
   return (
@@ -468,7 +176,7 @@ export default function CreateCopilotPage() {
       <div className="flex-center w-full flex-1 shrink-0 overflow-auto p-5">
         <div className="mx-auto mb-5 h-full w-full max-w-lg [&>div]:pb-8">
           <CreateCopilotProvider>
-            <Wizard header={<Header />}>
+            <Wizard header={<Header />} wrapper={<MotionWrapper />}>
               <IntroStep />
               <SetCopilotName />
               <DefineActionsStep />
