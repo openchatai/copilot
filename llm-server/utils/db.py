@@ -4,7 +4,7 @@ from pymongo.database import Database as PyMongoDatabase
 import os
 
 
-class Database:
+class NoSQLDatabase:
     _instance: MongoClient = None
 
     def __new__(cls, app=None):
@@ -20,4 +20,4 @@ class Database:
 
     @staticmethod
     def get_db() -> PyMongoDatabase:
-        return Database._instance.db
+        return NoSQLDatabase._instance.db
