@@ -1,13 +1,14 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Bot,
+  Github,
   PlaySquare,
 } from "lucide-react";
 import { Link } from "@/lib/router-events";
 import { Logo } from "@/components/domain/Logo";
 import { Tooltip } from "@/components/domain/Tooltip";
 import { CopilotLayoutNavLink } from "@/app/(copilot)/_parts/CopilotNavLink";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export default function Aside() {
@@ -30,6 +31,15 @@ export default function Aside() {
               className={cn("hover:text-primary text-accent-foreground/50 hover:bg-accent", buttonVariants({ size: "icon", variant: "link" }))}
             >
               <PlaySquare className="h-5 w-5" />
+            </Link>
+          </Tooltip>
+          <Tooltip content={<>Tutorials</>} side="right">
+            <Link
+              href="https://github.com/openchatai/opencopilot"
+              target="_blank"
+              className={cn("hover:text-primary text-accent-foreground/50 hover:bg-accent", buttonVariants({ size: "icon", variant: "link" }))}
+            >
+              <Github className="h-5 w-5" />
             </Link>
           </Tooltip>
         </div>
