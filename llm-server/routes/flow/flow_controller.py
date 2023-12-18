@@ -1,6 +1,6 @@
 import uuid
 
-from flask import Blueprint, Response, jsonify, request
+from flask import Blueprint, jsonify, request
 
 from entities.flow_entity import FlowDTO
 from models.repository.copilot_repo import find_one_or_fail_by_id
