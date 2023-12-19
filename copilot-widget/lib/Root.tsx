@@ -14,13 +14,15 @@ function Root({
   options: ConfigDataContextType;
 }) {
   return (
-    <ConfigDataProvider data={options}>
-      <WidgetState>
-        <AxiosProvider>
-          <InitialDataProvider>{children}</InitialDataProvider>
-        </AxiosProvider>
-      </WidgetState>
-    </ConfigDataProvider>
+    <React.Fragment>
+      <ConfigDataProvider data={options}>
+        <WidgetState>
+          <AxiosProvider>
+            <InitialDataProvider>{children}</InitialDataProvider>
+          </AxiosProvider>
+        </WidgetState>
+      </ConfigDataProvider>
+    </React.Fragment>
   );
 }
 

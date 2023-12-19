@@ -34,7 +34,7 @@ export default function ChatHeader() {
                         SetState(false);
                       }, 100);
                     }}
-                    className="opencopilot-block opencopilot-w-full opencopilot-px-2 opencopilot-text-white opencopilot-shadow opencopilot-py-1 opencopilot-border opencopilot-border-transparent opencopilot-rounded-md opencopilot-bg-rose-500"
+                    className="opencopilot-block opencopilot-w-full opencopilot-px-2 opencopilot-text-white opencopilot-py-1 opencopilot-rounded-md !opencopilot-bg-rose-500"
                   >
                     <span>Exit</span>
                   </DialogClose>

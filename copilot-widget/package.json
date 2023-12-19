@@ -7,7 +7,7 @@
     "dev": "vite",
     "clean": "rm -rf ./dist",
     "build:embed": "pnpm clean && tsc && vite build",
-    "build:lib": "tsup",
+    "build:lib": "vite build -c vite.lib.config.ts",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "release": "release-it",
@@ -49,9 +49,9 @@
     "tailwindcss": "^3.3.3",
     "tailwindcss-animate": "^1.0.6",
     "timeago.js": "^4.0.2",
-    "tsup": "^7.2.0",
     "typescript": "^5.0.2",
     "vite": "^4.4.12",
+    "vite-plugin-dts": "^3.6.4",
     "vite-tsconfig-paths": "^4.2.1"
   },
   "files": [
@@ -68,9 +68,9 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js",
+      "require": "./dist/index.cjs.js",
+      "import": "./dist/index.es.js",
+      "default": "./dist/index.es.js",
       "types": "./dist/index.d.ts"
     }
   },
