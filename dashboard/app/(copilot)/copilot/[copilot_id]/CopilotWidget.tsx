@@ -30,7 +30,7 @@ export default function Widget({
                 },
             }}
         >
-            <CopilotWidget triggerSelector="#triggerSelector" className='max-w-sm h-full max-h-screen' />
+            <CopilotWidget triggerSelector="#triggerSelector" className='max-w-sm min-w-full h-full max-h-screen' />
         </Root>
     </ErrorBoundary>
 }
