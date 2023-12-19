@@ -73,8 +73,7 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js",
       "types": "./dist/index.d.ts"
-    },
-    "./index.css": "./dist/index.css"
+    }
   },
   "dependencies": {}
 }
