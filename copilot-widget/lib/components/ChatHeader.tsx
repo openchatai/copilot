@@ -1,5 +1,5 @@
 import { useWidgetStateContext } from "../contexts/WidgetState";
-import { RxCross2 } from "react-icons/rx";
+import { X } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -22,7 +22,7 @@ export default function ChatHeader() {
           <div className="opencopilot-flex opencopilot-items-center opencopilot-gap-3">
             <Dialog>
               <DialogTrigger>
-                <RxCross2 size={19} />
+                <X size={20} />
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader className="opencopilot-mx-auto">Are you sure?</DialogHeader>
