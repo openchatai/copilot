@@ -10,7 +10,6 @@ import { useController } from "./Controller";
 import { methodVariants } from "../MethodRenderer";
 import { format } from "timeago.js";
 import { EmptyBlock } from "../EmptyBlock";
-import { UploadCloud } from "lucide-react";
 
 export function Action({ action }: { action: ActionResponseType }) {
     return <div className="flex flex-col gap-1 w-full px-4 shrink-0 transition-all py-2 data-[state=open]:!border-l-primary hover:bg-accent !border-transparent border-l-2">
@@ -86,13 +85,13 @@ export function ActionsList() {
     return (
         _.isEmpty(actions) ? <EmptyBlock>
             <div className="text-sm text-accent-foreground text-center w-full mt-3.5">
-                No actions found <br/> you can create a new one from above or <br/> drag and drop a swagger file here. <br/> <br/>
+                No actions found <br /> you can create a new one from above or <br /> drag and drop a swagger file here. <br /> <br />
             </div>
 
         </EmptyBlock> : <Droppable droppableId={ASIDE_DROPABLE_ID} mode="standard">
             {
                 (provided) => {
-                    return <div ref={provided.innerRef} {...provided.droppableProps} className='w-full shrink-0 divide-y flex overflow-y-hidden flex-col items-center justify-center'>
+                    return <div ref={provided.innerRef} {...provided.droppableProps} className='w-full shrink-0 divide-y flex overflow-y-hidden min-h-full flex-col items-start justify-start'>
                         {
                             !actions ? <Loader /> : _.map(actions, (action, index) => <DropableAsideAction key={uniqueId('key')} action={action} index={index} />)
                         }

@@ -1,5 +1,5 @@
 'use client';
-import ReactFlow, { Background, Controls, useEdgesState, useNodesState, OnConnectStart, OnConnect, OnConnectEnd, OnConnectStartParams } from 'reactflow';
+import ReactFlow, { Background, Controls, useEdgesState, useNodesState, OnConnectStart, OnConnect, OnConnectEnd, OnConnectStartParams, Node } from 'reactflow';
 import actionBlock from './ActionBlock';
 import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button';
@@ -8,10 +8,11 @@ import { AddActionDrawer, useActionFormState } from './AddFlowSheet';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { useController } from './Controller';
 import { ASIDE_DROPABLE_ID, ActionsList } from './ActionsList';
-import { useEffect, useRef } from 'react';
+import { ReactNode, memo, useCallback, useEffect, useRef } from 'react';
 import BlockEdge from './BlockEdge';
 import { autoLayout } from './autoLayout';
 import _ from 'lodash';
+import { ActionResponseType } from '@/data/actions';
 
 const nodeTypes = {
     actionBlock
@@ -20,39 +21,12 @@ const nodeTypes = {
 const edgeTypes = {
     BlockEdge
 }
-
-
-export function FlowRenderer() {
-    const reactFlowWrapper = useRef(null);
-    const connectingNodeParams = useRef<OnConnectStartParams | null>(null);
-    const [nodes, setNodes, onNodeChange] = useNodesState([]);
-    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-
-    const { state: {
-        actions,
-        blocks
-    }, reorderActions, addActionToBlock, reorderActionsInBlock,
-        deleteBlock, deleteActionFromBlock,
-        insertEmptyBlockAfter,
+function DndContext({ children, nodes, actions }: {
+    children: ReactNode, nodes: Node[], actions: ActionResponseType[]
+}) {
+    const { reorderActions, addActionToBlock, reorderActionsInBlock,
+        deleteActionFromBlock,
         moveActionFromBlockToBlock } = useController();
-
-    const isBlocksEmpty = _.isEmpty(blocks);
-
-    useEffect(() => {
-        const { newNodes, edges } = autoLayout(blocks);
-        setNodes(newNodes);
-        setEdges(edges);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [blocks, setNodes, setEdges, autoLayout]);
-
-    function getNodeBlockById(id: string) {
-        return nodes.find(node => node.id === id);
-    }
-
-    function getActionById(id: string) {
-        return actions.find(action => action.id === id);
-    }
-
     function handleDragEnd(result: DropResult) {
         if (!result.destination) return;
         const { source, destination, draggableId } = result;
@@ -101,10 +75,39 @@ export function FlowRenderer() {
             }
         }
     }
+    const getNodeBlockById = useCallback((id: string) => {
+        return nodes.find(node => node.id === id);
+    }, [nodes])
+
+    const getActionById = useCallback((id: string) => {
+        return actions.find(action => action.id === id);
+    }, [actions])
+    return (
+        <DragDropContext onDragEnd={handleDragEnd}>
+            {children}
+        </DragDropContext>
+    )
+}
+
+const MemoizedDndContext = memo(DndContext)
+export function FlowRenderer() {
+    const reactFlowWrapper = useRef(null);
+    const connectingNodeParams = useRef<OnConnectStartParams | null>(null);
+    const [nodes, setNodes, onNodeChange] = useNodesState([]);
+    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+    const { state: { blocks, actions }, deleteBlock, insertEmptyBlockAfter } = useController();
+    const isBlocksEmpty = _.isEmpty(blocks);
+
+    useEffect(() => {
+        const { newNodes, edges } = autoLayout(blocks);
+        setNodes(newNodes);
+        setEdges(edges);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [blocks, setNodes, setEdges, autoLayout]);
+
     const [, setDrawer] = useActionFormState();
 
     const onConnectStart: OnConnectStart = (ev, params) => {
-        console.log('connect start');
         connectingNodeParams.current = params
     }
 
@@ -124,11 +127,11 @@ export function FlowRenderer() {
         }
     }
 
-    const onConnect: OnConnect = (conn) => {
+    const onConnect: OnConnect = () => {
         connectingNodeParams.current = null;
     }
     return (
-        <DragDropContext onDragEnd={handleDragEnd}>
+        <MemoizedDndContext nodes={nodes} actions={actions}>
             <div className='flex items-center justify-between w-full h-full overflow-hidden'>
                 <aside className='w-full max-w-sm flex flex-col items-start h-full py-4 border-r bg-white overflow-hidden'>
                     <div className='flex flex-row justify-between w-full border-b pb-3 px-4 items-center'>
@@ -188,7 +191,7 @@ export function FlowRenderer() {
                     </ReactFlow>
                 </div>
             </div>
-        </DragDropContext>
+        </MemoizedDndContext>
 
     )
 }
