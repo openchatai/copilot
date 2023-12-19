@@ -13,6 +13,7 @@ import BlockEdge from './BlockEdge';
 import { autoLayout } from './autoLayout';
 import _ from 'lodash';
 import { ActionResponseType } from '@/data/actions';
+import { MagicAction } from './MagicAction';
 
 const nodeTypes = {
     actionBlock
@@ -103,7 +104,7 @@ export function FlowRenderer() {
     const connectingNodeParams = useRef<OnConnectStartParams | null>(null);
     const [nodes, setNodes, onNodeChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-    const { state: { blocks, actions }, deleteBlock, insertEmptyBlockAfter } = useController();
+    const { state: { blocks, actions, description }, deleteBlock, insertEmptyBlockAfter } = useController();
     const isBlocksEmpty = _.isEmpty(blocks);
 
     useEffect(() => {
@@ -163,14 +164,18 @@ export function FlowRenderer() {
                 <AddActionDrawer />
                 <div className='flex-1 relative h-full' ref={reactFlowWrapper}>
                     {
-                        isBlocksEmpty && <div data-container='Empty block add button' className='absolute inset-0 z-50 flex-center bg-white'>
-                            <div className='text-center space-y-2'>
-                                <p>
-                                    Click the button below to add a new block
+                        isBlocksEmpty && <div data-container='Empty block add button' className='absolute inset-0 z-50 flex-center bg-white p-4'>
+                            <div className='flex items-center flex-col gap-4 '>
+                                <p className='text-sm text-center font-medium'>
+                                    Empty flow, You can either
                                 </p>
-                                <Button onClick={() => insertEmptyBlockAfter()}>
-                                    Add a Block
-                                </Button>
+                                <div className='px-4 space-x-2'>
+                                    <Button size='sm' onClick={() => insertEmptyBlockAfter()}>
+                                        Add a Block
+                                    </Button>
+                                    <span className='text-base font-semibold'>OR</span>
+                                    <MagicAction defaultValue={description ?? ''} />
+                                </div>
                             </div>
                         </div>
                     }
