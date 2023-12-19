@@ -2,9 +2,9 @@ import json
 import os
 from typing import Optional
 
+from entities.action_entity import ActionDTO
 from extractors.extract_body import gen_body_from_schema
 from extractors.extract_param import gen_params_from_schema
-from models.repository.action_repo import find_action_by_operation_id
 from routes.flow.api_info import ApiInfo
 from shared.utils.opencopilot_utils import get_llm
 
@@ -14,12 +14,11 @@ llm = get_llm()
 
 async def generate_api_payload(
         text: str,
-        _operation_id: str,
+        action: ActionDTO,
         prev_api_response: str,
         app: Optional[str],
         current_state: Optional[str],
 ) -> ApiInfo:
-    action = find_action_by_operation_id(_operation_id)
     payload = action.payload
 
     parameters = payload.get("parameters", [])
