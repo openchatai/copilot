@@ -1,8 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useWidgetStateContext } from "./contexts/WidgetState";
 import cn from "./utils/cn";
 import ChatScreenWithSfxs from "./screens/ChatScreen";
 import { IS_SERVER } from "./utils/is_server";
+import css from "../styles/index.css?inline";
+import root from 'react-shadow'
 
 export function CopilotWidget({
   triggerSelector,
@@ -27,25 +29,30 @@ export function CopilotWidget({
     }
   }, [triggerSelector, toggle]);
   return (
-    <div
-      className={cn(
-        open &&
-          "!opencopilot-z-[100000] opencopilot-transition-all opencopilot-shadow-lg opencopilot-ease-in sm:opencopilot-w-96 opencopilot-fixed opencopilot-w-screen opencopilot-h-screen opencopilot-top-0 opencopilot-bottom-0 opencopilot-right-0"
-      )}
-    >
+    <root.div>
+      <style>{css}</style>
       <div
-        data-open={open}
+        id="opencopilot-aicopilot"
         className={cn(
-          "opencopilot-font-inter opencopilot-overflow-hidden opencopilot-h-full sm:opencopilot-rounded-xl opencopilot-bg-white",
-          "opencopilot-opacity-0 opencopilot-transition-opacity opencopilot-ease",
           open &&
-            "opencopilot-opacity-100 opencopilot-animate-in opencopilot-fade-in",
-          !open &&
-            "opencopilot-hidden opencopilot-animate-out opencopilot-fade-out"
+          "!opencopilot-z-[100000] opencopilot-transition-all opencopilot-shadow-lg opencopilot-ease-in sm:opencopilot-w-96 opencopilot-fixed opencopilot-w-screen opencopilot-h-screen opencopilot-top-0 opencopilot-bottom-0 opencopilot-right-0"
         )}
       >
-        <ChatScreenWithSfxs />
+        <div
+          data-open={open}
+          className={cn(
+            "opencopilot-font-inter opencopilot-overflow-hidden opencopilot-h-full sm:opencopilot-rounded-xl opencopilot-bg-white",
+            "opencopilot-opacity-0 opencopilot-transition-opacity opencopilot-ease",
+            open &&
+            "opencopilot-opacity-100 opencopilot-animate-in opencopilot-fade-in",
+            !open &&
+            "opencopilot-hidden opencopilot-animate-out opencopilot-fade-out"
+          )}
+        >
+          <ChatScreenWithSfxs />
+        </div>
       </div>
-    </div>
+    </root.div>
+
   );
 }
