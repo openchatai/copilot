@@ -1,6 +1,7 @@
 import axios from "axios";
 import { baseUrl } from "./base-url";
 import { BlockType } from "@/components/domain/new-flows-editor/types/block";
+import { ActionResponseType } from "./actions";
 const instance = axios.create({
     baseURL: baseUrl + "/backend/flows",
 });
@@ -52,4 +53,8 @@ export async function syncWorkflowById(flow_id: string, flow: Partial<Flow>) {
         description: string;
         blocks: any[];
     }>(`/${flow_id}/`, flow);
+}
+// {{backend_base}}/flows/dynamic/bot/:bot_id
+export async function createDynamicFlowsByBotId(copilot_id: string, prompt: string) {
+    return await instance.post<{ actions: ActionResponseType[] }>(`/dynamic/bot/${copilot_id}`, { text: prompt });
 }
