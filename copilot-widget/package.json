@@ -1,13 +1,13 @@
 {
   "name": "@openchatai/copilot-widget",
   "private": false,
-  "version": "1.5.0",
+  "version": "1.6.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "clean": "rm -rf ./dist",
     "build:embed": "pnpm clean && tsc && vite build",
-    "build:lib": "tsup",
+    "build:lib": "vite build -c vite.lib.config.ts",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "release": "release-it",
@@ -35,13 +35,12 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.3.4",
     "postcss": "^8.4.31",
-    "postcss-prefix-selector": "^1.16.0",
     "prettier": "^2.8.8",
     "react": "^18.x",
     "react-dom": "^18.x",
-    "react-icons": "^4.10.1",
     "react-loader-spinner": "^5.3.4",
     "react-markdown": "^8.0.7",
+    "react-shadow": "^20.4.0",
     "react-textarea-autosize": "^8.5.3",
     "release-it": "^16.2.1",
     "remark-gfm": "^3.0.1",
@@ -50,9 +49,9 @@
     "tailwindcss": "^3.3.3",
     "tailwindcss-animate": "^1.0.6",
     "timeago.js": "^4.0.2",
-    "tsup": "^7.2.0",
     "typescript": "^5.0.2",
     "vite": "^4.4.12",
+    "vite-plugin-dts": "^3.6.4",
     "vite-tsconfig-paths": "^4.2.1"
   },
   "files": [
@@ -69,11 +68,13 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js",
+      "require": "./dist/index.cjs.js",
+      "import": "./dist/index.es.js",
+      "default": "./dist/index.es.js",
       "types": "./dist/index.d.ts"
-    },
-    "./index.css": "./dist/index.css"
+    }
+  },
+  "dependencies": {
+    "lucide-react": "^0.298.0"
   }
 }

@@ -1,8 +1,21 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
-@tailwind base;
 @tailwind utilities;
 @tailwind components;
+@tailwind base;
 
+#opencopilot-aicopilot {
+  isolation: isolate;
+  --opencopilot-primary-clr: #703ea8;
+  --opencopilot-accent-clr: #f8f7f8;
+  --opencopilot-accnet-2-clr: #817f81;
+  --opencopilot-primary-light-clr: rgba(0, 87, 255, 0.1);
+}
+@layer base {
+  svg {
+    width: 1em;
+    height: 1em;
+  }
+}
 @keyframes fade-in-bottom {
   0% {
     transform: translateY(50px);
@@ -17,15 +30,6 @@
 
 .fade-in-bottom {
   animation: fade-in-bottom 0.4s cubic-bezier(0.39, 0.575, 0.565, 1) both;
-}
-
-@layer base {
-  :root {
-    --opencopilot-primary-clr: #703ea8;
-    --opencopilot-accent-clr: #f8f7f8;
-    --opencopilot-accnet-2-clr: #817f81;
-    --opencopilot-primary-light-clr: rgba(0, 87, 255, 0.1);
-  }
 }
 
 .flex-center {

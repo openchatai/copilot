@@ -9,8 +9,8 @@ dependencies:
     specifier: ^3.3.1
     version: 3.3.2(react-hook-form@7.47.0)
   '@openchatai/copilot-widget':
-    specifier: ^1.5.0
-    version: 1.5.0(react-dom@18.2.0)(react@18.2.0)
+    specifier: ^1.6.1
+    version: 1.6.1(react-dom@18.2.0)(react@18.2.0)
   '@radix-ui/react-accordion':
     specifier: ^1.1.2
     version: 1.1.2(@types/react-dom@18.2.13)(@types/react@18.2.28)(react-dom@18.2.0)(react@18.2.0)
@@ -476,12 +476,13 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.15.0
 
-  /@openchatai/copilot-widget@1.5.0(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-hX3g3aGFxZ4qJWBVpZlL5DzufuefRFASOS3WeFHtdGDfvRLmjdyGxH+weAjIBOFB91XY75D3m0WPy5O39ViuAQ==}
+  /@openchatai/copilot-widget@1.6.1(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-QHQOA18lfQ6A6SymvFGW1H/uzUy9ZxREMTqP2AStaZNdvzhke4lx/I5doWZn5A4ahioJK7pjUgxgukF5/r+8Dw==}
     peerDependencies:
       react: ^18.x
       react-dom: ^18.x
     dependencies:
+      lucide-react: 0.298.0(react@18.2.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     dev: false
@@ -3853,6 +3854,14 @@ packages:
 
   /lucide-react@0.294.0(react@18.2.0):
     resolution: {integrity: sha512-V7o0/VECSGbLHn3/1O67FUgBwWB+hmzshrgDVRJQhMh8uj5D3HBuIvhuAmQTtlupILSplwIZg5FTc4tTKMA2SA==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+    dev: false
+
+  /lucide-react@0.298.0(react@18.2.0):
+    resolution: {integrity: sha512-tWoxZ663Zf/n8VxXTHnTJsU/w1ysWT1LORnIL1pzqElFdSqBhWbZeJ3sLdCZ5FpzpbkpkYEtluhuTyG2BTDYNQ==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
     dependencies:

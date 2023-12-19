@@ -1,5 +1,5 @@
 import { useWidgetStateContext } from "../contexts/WidgetState";
-import { RxCross2 } from "react-icons/rx";
+import { X } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -22,7 +22,7 @@ export default function ChatHeader() {
           <div className="opencopilot-flex opencopilot-items-center opencopilot-gap-3">
             <Dialog>
               <DialogTrigger>
-                <RxCross2 size={19} />
+                <X size={20} />
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader className="opencopilot-mx-auto">Are you sure?</DialogHeader>
@@ -34,7 +34,7 @@ export default function ChatHeader() {
                         SetState(false);
                       }, 100);
                     }}
-                    className="opencopilot-block opencopilot-w-full opencopilot-px-2 opencopilot-text-white opencopilot-shadow opencopilot-py-1 opencopilot-border opencopilot-border-transparent opencopilot-rounded-md opencopilot-bg-rose-500"
+                    className="opencopilot-block opencopilot-w-full opencopilot-px-2 opencopilot-text-white opencopilot-py-1 opencopilot-rounded-md !opencopilot-bg-rose-500"
                   >
                     <span>Exit</span>
                   </DialogClose>
