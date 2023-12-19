@@ -1,9 +1,9 @@
 import json
-from utils.db import Database
+from utils.db import NoSQLDatabase
 from typing import Any, Dict, Optional
 import importlib
 
-db_instance = Database()
+db_instance = NoSQLDatabase()
 mongo = db_instance.get_db()
 
 

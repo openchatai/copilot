@@ -9,11 +9,11 @@ from shared.utils.opencopilot_utils import StoreOptions
 from langchain.docstore.document import Document
 from utils.get_logger import CustomLogger
 import os
-from utils.db import Database
+from utils.db import NoSQLDatabase
 
 client = QdrantClient(url=os.getenv("QDRANT_URL", "http://qdrant:6333"))
 
-db_instance = Database()
+db_instance = NoSQLDatabase()
 mongo = db_instance.get_db()
 
 logger = CustomLogger(module_name=__name__)
