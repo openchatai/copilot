@@ -58,7 +58,7 @@ def retry_failed_markdown_crawl(chatbot_id: str, file_name: str):
         chatbot_id=chatbot_id, file_name=file_name, status="PENDING"
     )
     try:
-        process_markdown(filename=file_name, bot_id=chatbot_id)
+        process_markdown(file_name=file_name, bot_id=chatbot_id)
     except Exception as e:
         update_pdf_data_source_status(
             chatbot_id=chatbot_id, file_name=file_name, status="FAILED"

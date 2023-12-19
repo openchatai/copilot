@@ -137,3 +137,20 @@ def action_to_dict(action: Action) -> dict:
         "updated_at": action.updated_at.isoformat(),
         "deleted_at": action.deleted_at.isoformat() if action.deleted_at else None,
     }
+
+
+def find_action_by_method_id_and_bot_id(operation_id: str, bot_id: str) -> Optional[Action]:
+    """
+    Retrieves an action from the database filtered by the given method_id and bot_id.
+    Returns a single Action object if found, otherwise None.
+
+    :param method_id: The method ID to filter by.
+    :param bot_id: The bot ID to filter by.
+    :return: An Action object or None.
+    """
+    with SessionLocal() as session:
+        action = session.query(Action).filter(
+            Action.operation_id == operation_id,
+            Action.bot_id == bot_id
+        ).first()
+        return action

@@ -4,9 +4,9 @@ from models.repository.datasource_repo import (
     get_all_pdf_datasource_by_bot_id,
     get_all_website_datasource_by_bot_id,
 )
-from utils.db import Database
+from utils.db import NoSQLDatabase
 
-db_instance = Database()
+db_instance = NoSQLDatabase()
 mongo = db_instance.get_db()
 
 datasource_workflow = Blueprint("datasource", __name__)

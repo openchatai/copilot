@@ -13,14 +13,14 @@ from routes.flow.utils import create_flow_from_operation_ids, run_flow
 from routes.flow.utils.api_retrievers import get_relevant_knowledgebase, get_relevant_actions, get_relevant_flows
 from routes.flow.utils.document_similarity_dto import select_top_documents, DocumentSimilarityDTO
 from routes.flow.utils.process_conversation_step import get_next_response_type
-from utils.db import Database
+from utils.db import NoSQLDatabase
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
 from utils.llm_consts import VectorCollections
 
 logger = CustomLogger(module_name=__name__)
 
-db_instance = Database()
+db_instance = NoSQLDatabase()
 mongo = db_instance.get_db()
 
 shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
@@ -82,7 +82,6 @@ async def handle_request(
     )
 
     if next_step.actionable:
-
         # if the LLM given operationID is actually exist, then use it, otherwise fallback to the highest vector space document
         llm_predicted_operation_id = is_the_llm_predicted_operation_id_actually_true(next_step.operation_id,
                                                                                      select_top_documents(actions))
@@ -95,7 +94,6 @@ async def handle_request(
         response = await run_actionable_item(
             bot_id=bot_id,
             actionable_item=actionable_item,
-            base_prompt=base_prompt,
             app=app,
             headers=headers,
             text=text,
@@ -125,7 +123,6 @@ def check_required_fields(base_prompt: str, text: str) -> None:
 
 async def run_actionable_item(
         actionable_item: dict[str, List[DocumentSimilarityDTO]],
-        base_prompt: str,
         text: str,
         headers: Dict[str, str],
         app: Optional[str],
@@ -142,7 +139,7 @@ async def run_actionable_item(
         vector_flow = document_similarity.document  # this variable now holds Qdrant vector document, which is the flow metadata
         flow_id = vector_flow.metadata.get('flow_id')
         flow_model = get_flow_by_id(flow_id)
-        _flow = FlowDTO(bot_id=bot_id, flow_id=flow_model.id, name=flow_model.name, description=flow_model.description,
+        _flow = FlowDTO(id=flow_model.id, bot_id=bot_id, flow_id=flow_model.id, name=flow_model.name, description=flow_model.description,
                         blocks=flow_model.payload, variables=[])
 
     output = await run_flow(
@@ -152,7 +149,6 @@ async def run_actionable_item(
         bot_id=bot_id
     )
 
-    # @todo now take the output, put it into a chat message with the base prompt and ask the llm to present it
     return output
 
 

@@ -12,10 +12,10 @@ from routes.prompt.prompt_template_controller import prompt_template_workflow
 from routes.uploads.upload_controller import upload_controller
 from shared.models.opencopilot_db import create_database_schema
 from utils.config import Config
-from utils.db import Database
+from utils.db import NoSQLDatabase
 
 from utils.vector_store_setup import init_qdrant_collections
-db_instance = Database()
+db_instance = NoSQLDatabase()
 mongo = db_instance.get_db()
 
 load_dotenv()
