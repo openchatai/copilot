@@ -285,13 +285,16 @@ function stateReducer(state: StateType, action: ActionsType) {
             }
             case "PATCH_CREATE_BLOCKS_FROM_ACTIONS": {
                 // create blocks for each action
-                const blocks = action.payload.map(action => {
+                draft.blocks = action.payload.map(action => {
                     return getEmptyBlock(null, [{ ...action, id: uniqueId() }]);
-                }).reduce((prev, current) => {
-                    prev.next_on_success = current.id;
-                    return current;
                 })
-                draft.blocks.push(blocks);
+                    .map((prev, index, arr) => {
+                        const next = arr?.[index + 1];
+                        if (next) {
+                            prev.next_on_success = next.id;
+                        }
+                        return prev;
+                    })
                 return;
             }
             default:
