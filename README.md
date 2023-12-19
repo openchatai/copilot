@@ -57,7 +57,7 @@ make install
 If you are using an ARM machine, specifically Mac Silicon, use the following command to install dependencies and set up the environment:
 
 ```bash
-make arm
+make install-arm
 ```
 
 Once the installation is complete, you can access the OpenCopilot console at [http://localhost:8888](http://localhost:8888).
