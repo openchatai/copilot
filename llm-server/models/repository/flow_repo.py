@@ -30,6 +30,7 @@ def create_flow(flow_dto: FlowDTO) -> Flow:
             name=flow_dto.name,
             payload=blocks_json,
             description=flow_dto.description,
+            operation_id=flow_dto.operation_id,
             id=flow_dto.id,
         )
 
