@@ -6,24 +6,29 @@ from utils.llm_consts import VectorCollections
 vector_size = int(os.getenv("VECTOR_SIZE", "1536"))
 
 
+client = QdrantClient(url=os.getenv("QDRANT_URL", "http://qdrant:6333"))
+
+
+def delete_collection(name: str):
+    client.delete_collection(name)
+
+
+def try_create_collection(name: str, vectors_config: models.VectorParams):
+    try:
+        client.create_collection(name, vectors_config=vectors_config)
+        client.create_payload_index(
+            collection_name=name,
+            field_name="bot_id",
+            field_schema=models.PayloadFieldSchema.KEYWORD,
+        )
+    except Exception:
+        print(f"{name} collection already exists, ignoring")
+
+
+vector_params = models.VectorParams(size=vector_size, distance=models.Distance.COSINE)
+
+
 def init_qdrant_collections():
-    client = QdrantClient(url=os.getenv("QDRANT_URL", "http://qdrant:6333"))
-
-    def try_create_collection(name: str, vectors_config: models.VectorParams):
-        try:
-            client.create_collection(name, vectors_config=vectors_config)
-            client.create_payload_index(
-                collection_name=name,
-                field_name="bot_id",
-                field_schema=models.PayloadFieldSchema.KEYWORD,
-            )
-        except Exception:
-            print(f"{name} collection already exists, ignoring")
-
-    vector_params = models.VectorParams(
-        size=vector_size, distance=models.Distance.COSINE
-    )
-
     try_create_collection(VectorCollections.knowledgebase, vector_params)
     try_create_collection(VectorCollections.actions, vector_params)
     try_create_collection(VectorCollections.flows, vector_params)
