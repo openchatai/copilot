@@ -7,7 +7,7 @@ type useTypeWriterOpts = { text: string, every?: number, onFinish?: () => void, 
 
 export default function useTypeWriter({ text, every, onFinish, shouldStart = true }: useTypeWriterOpts) {
     const [displayText, setDisplayText] = useState("");
-    const [currentIndex, setCurrentIndex] = useState(0);
+    const [currentIndex, setCurrentIndex] = useState(-1);
     const [isComplete, setIsComplete] = useState(false);
     const timeout = every || 0.00001;
 
