@@ -26,7 +26,8 @@ def get_action(point_id: str):
 def create_actions(actions: List[ActionDTO]):
     documents: List[Document] = []
     for action in actions:
-        document = Document(page_content=action.description + action.name)
+        description = action.description if action.description else ""
+        document = Document(page_content=description + action.name)
         document.metadata.update(action.model_dump())
 
         documents.append(document)
