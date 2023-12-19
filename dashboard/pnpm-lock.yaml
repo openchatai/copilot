@@ -9,8 +9,8 @@ dependencies:
     specifier: ^3.3.1
     version: 3.3.2(react-hook-form@7.47.0)
   '@openchatai/copilot-widget':
-    specifier: ^1.6.0
-    version: 1.6.0(react-dom@18.2.0)(react@18.2.0)
+    specifier: file:..\copilot-widget
+    version: file:../copilot-widget(react-dom@18.2.0)(react@18.2.0)
   '@radix-ui/react-accordion':
     specifier: ^1.1.2
     version: 1.1.2(@types/react-dom@18.2.13)(@types/react@18.2.28)(react-dom@18.2.0)(react@18.2.0)
@@ -475,17 +475,6 @@ packages:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.15.0
-
-  /@openchatai/copilot-widget@1.6.0(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-ORLfM33f5Ld1LrkZ0tqxy2DIo7c8KM09yXMS65/0Da0GzisYBQzUqlplauk0ihAvyINimrWXbpuG+YojFR3L8A==}
-    peerDependencies:
-      react: ^18.x
-      react-dom: ^18.x
-    dependencies:
-      lucide-react: 0.298.0(react@18.2.0)
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-    dev: false
 
   /@radix-ui/number@1.0.1:
     resolution: {integrity: sha512-T5gIdVO2mmPW3NNhjNgEP3cqMXjXL9UbO0BzWcXfvdBs+BohbQxvd/K5hSVKmn9/lbTdsQVKbUcP5WLCwvUbBg==}
@@ -5363,4 +5352,17 @@ packages:
       immer: 10.0.3
       react: 18.2.0
       use-sync-external-store: 1.2.0(react@18.2.0)
+    dev: false
+
+  file:../copilot-widget(react-dom@18.2.0)(react@18.2.0):
+    resolution: {directory: ../copilot-widget, type: directory}
+    id: file:../copilot-widget
+    name: '@openchatai/copilot-widget'
+    peerDependencies:
+      react: ^18.x
+      react-dom: ^18.x
+    dependencies:
+      lucide-react: 0.298.0(react@18.2.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: false
