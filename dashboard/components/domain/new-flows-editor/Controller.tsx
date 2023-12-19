@@ -119,6 +119,9 @@ type ActionsType = Union<[{
     payload: {
         sourceId?: string,
     }
+}, {
+    type: "PATCH_CREATE_BLOCKS_FROM_ACTIONS",
+    payload: ActionResponseType[]
 }]>;
 
 type StateType = {
@@ -143,7 +146,7 @@ export function reorderList<T extends any>(list: T[], startIndex: number, endInd
     result.splice(endIndex, 0, removed);
     return [...result];
 }
-function getEmptyBlock(next_on_success: string | null): BlockType {
+function getEmptyBlock(next_on_success: string | null, actions?: ActionResponseType[]): BlockType {
     const id = "block-" + uniqueId();
     return {
         id: id,
@@ -151,7 +154,7 @@ function getEmptyBlock(next_on_success: string | null): BlockType {
         created_at: new Date().toISOString(),
         next_on_success,
         updated_at: null,
-        actions: [],
+        actions: actions ?? [],
     }
 
 }
@@ -278,6 +281,17 @@ function stateReducer(state: StateType, action: ActionsType) {
             }
             case "SET_WORKFLOW_DATA": {
                 _.assign(draft, action.payload)
+                return;
+            }
+            case "PATCH_CREATE_BLOCKS_FROM_ACTIONS": {
+                // create blocks for each action
+                const blocks = action.payload.map(action => {
+                    return getEmptyBlock(null, [{ ...action, id: uniqueId() }]);
+                }).reduce((prev, current) => {
+                    prev.next_on_success = current.id;
+                    return current;
+                })
+                draft.blocks.push(blocks);
                 return;
             }
             default:
