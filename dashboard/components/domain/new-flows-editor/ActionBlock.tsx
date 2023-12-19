@@ -14,6 +14,8 @@ import { DebounceInput } from 'react-debounce-input';
 import { BlockType } from './types/block';
 import { Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 
 // @patch for the transform issue;
 export const useDraggableInPortal = () => {
@@ -22,8 +24,9 @@ export const useDraggableInPortal = () => {
     useEffect(() => {
         if (element) {
             element.style.pointerEvents = 'none'
+            element.style.isolation = 'isolate'
             element.style.position = 'absolute'
-            element.style.inset = '0 0 0 0'
+            element.style.inset = '0'
             element.style.zIndex = '9999'
             document.body.appendChild(element)
             return () => {
@@ -50,7 +53,7 @@ type Props = NodeProps<BlockType>
 function DraggableActionInsideActionBlock({ action, index, id }: { action: ActionResponseType, index: number, id: string }) {
     const draggableInPortal = useDraggableInPortal();
     return <Draggable key={id} draggableId={BLOCK_ACTION_DRAGGABLE_ID_PREFIX + id} index={index}>
-        {draggableInPortal((provided) => <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className='w-full bg-white shrink-0 border-2 border-accent-foreground border-dotted rounded-md'>
+        {draggableInPortal((provided) => <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className='w-full bg-white shrink-0 z-50 border-2 border-accent-foreground border-dotted rounded-md'>
             <Action action={action} />
         </div>)}
     </Draggable>
@@ -69,11 +72,34 @@ function UpdateBlock({ id, name }: { id: string, name: string }) {
 
 function DeleteBlockBtn({ id }: { id: string }) {
     const { deleteBlockById } = useController();
-    return <button onClick={() => {
-        deleteBlockById(id);
-    }} className='p-1 rounded text-white transition-colors'>
-        <Trash2 size={18} />
-    </button>
+    return <AlertDialog>
+        <AlertDialogTrigger asChild >
+            <button className='p-1 rounded text-white transition-colors'>
+                <Trash2 size={18} />
+            </button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>
+                    Are you sure ?
+                </AlertDialogTitle>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogAction asChild>
+                    <Button variant='destructive' onClick={() => {
+                        deleteBlockById(id);
+                    }}>
+                        Yes,Delete it
+                    </Button>
+                </AlertDialogAction>
+                <AlertDialogCancel asChild>
+                    <Button variant='secondary'>
+                        Nope
+                    </Button>
+                </AlertDialogCancel>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
 }
 
 function BlockHandle({ type, position, className }: { type: 'source' | 'target', position: Position, className?: string }) {
@@ -91,7 +117,7 @@ function ActionBlock({ data: { actions, name, next_on_success }, id, selected }:
     }, [nodes, id])
     return (
         <React.Fragment key={id}>
-        
+
             <BlockHandle type='target' position={Position.Left} />
             <BlockHandle type='source' position={Position.Right} />
             <div data-block-id={id}
@@ -106,7 +132,7 @@ function ActionBlock({ data: { actions, name, next_on_success }, id, selected }:
                 </div>
                 <Droppable droppableId={'BLOCK_DROPABLE|' + id}>
                     {(provided) => (
-                        <div ref={provided.innerRef} {...provided.droppableProps} className='flex-1 p-2 min-h-0 w-full transition-all nodrag nopan flex shrink-0 flex-col space-y-1 items-start justify-center'>
+                        <div ref={provided.innerRef} {...provided.droppableProps} className='flex-1 isolate p-2 min-h-0 w-full transition-all nodrag nopan flex shrink-0 flex-col space-y-1 items-start justify-center'>
                             {
                                 _.isEmpty(actions) ? <div className='text-sm text-gray-400 text-center p-4 w-full'>Drag and drop actions here</div> : actions.map((action, index) => {
                                     return <DraggableActionInsideActionBlock id={action.id} key={uniqueId('block_action_key')} action={action} index={index} />

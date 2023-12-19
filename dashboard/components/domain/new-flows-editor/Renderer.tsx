@@ -27,10 +27,10 @@ function DndContext({ children, nodes, actions }: {
     const { reorderActions, addActionToBlock, reorderActionsInBlock,
         deleteActionFromBlock,
         moveActionFromBlockToBlock } = useController();
-    function handleDragEnd(result: DropResult) {
-        if (!result.destination) return;
+    async function handleDragEnd(result: DropResult) {
+        if (!result.destination || !result.draggableId || !result.source) return;
         const { source, destination, draggableId } = result;
-        if (!draggableId) return;
+        console.log(result)
         // perform copy of the action to the flow's block;
         if (source.droppableId === ASIDE_DROPABLE_ID) {
             if (destination.droppableId === ASIDE_DROPABLE_ID) {
@@ -47,32 +47,37 @@ function DndContext({ children, nodes, actions }: {
                     addActionToBlock(blockId, action, destination.index);
                 }
             }
+            return;
         }
-        if (source.droppableId.startsWith('BLOCK_DROPABLE') && destination.droppableId.startsWith('BLOCK_DROPABLE')) {
-            // reorder the actions inside the block
+        else if (source.droppableId.startsWith('BLOCK_DROPABLE')) {
             const sourceBlockId = source.droppableId.split('|')[1];
-            const destinationBlockId = destination.droppableId.split('|')[1];
-            // reorder the actions inside the block
-            if (sourceBlockId && destinationBlockId && (sourceBlockId === destinationBlockId)) {
-                reorderActionsInBlock(sourceBlockId, source.index, destination.index);
-            }
-            // move action from one block to another
-            if (sourceBlockId && destinationBlockId && (sourceBlockId !== destinationBlockId)) {
-                const actionId = draggableId.split('|')[1];
-                if (actionId) {
-                    moveActionFromBlockToBlock(sourceBlockId, destinationBlockId, destination.index, actionId);
+
+            if (destination.droppableId.startsWith('BLOCK_DROPABLE')) {
+                // reorder the actions inside the block
+                const destinationBlockId = destination.droppableId.split('|')[1];
+                // reorder the actions inside the block
+                if (sourceBlockId && destinationBlockId && (sourceBlockId === destinationBlockId)) {
+                    reorderActionsInBlock(sourceBlockId, source.index, destination.index);
+                }
+                // move action from one block to another
+                if (sourceBlockId && destinationBlockId && (sourceBlockId !== destinationBlockId)) {
+                    const actionId = draggableId.split('|')[1];
+                    if (actionId) {
+                        moveActionFromBlockToBlock(sourceBlockId, destinationBlockId, destination.index, actionId);
+                    }
                 }
             }
 
-        }
-        // delete action form block 
-        if (source.droppableId.startsWith('BLOCK_DROPABLE') && destination.droppableId === ASIDE_DROPABLE_ID) {
-            const sourceBlockId = source.droppableId.split('|')[1];
-            const actionId = draggableId.split('|')[1];
-            console.log(sourceBlockId, actionId);
-            if (sourceBlockId && actionId) {
-                deleteActionFromBlock(sourceBlockId, actionId);
+            // delete action form block
+            else if (destination.droppableId === ASIDE_DROPABLE_ID) {
+                const actionId = draggableId.split('|')[1];
+                if (sourceBlockId && actionId) {
+                    deleteActionFromBlock(sourceBlockId, actionId);
+                }
             }
+        }
+        else {
+            console.log(result)
         }
     }
     const getNodeBlockById = useCallback((id: string) => {
@@ -82,8 +87,11 @@ function DndContext({ children, nodes, actions }: {
     const getActionById = useCallback((id: string) => {
         return actions.find(action => action.id === id);
     }, [actions])
+
     return (
-        <DragDropContext onDragEnd={handleDragEnd}>
+        <DragDropContext onDragStart={(start, provided) => {
+            console.log(start, provided)
+        }} onDragEnd={_.throttle(handleDragEnd, 300)}>
             {children}
         </DragDropContext>
     )
@@ -99,9 +107,11 @@ export function FlowRenderer() {
     const isBlocksEmpty = _.isEmpty(blocks);
 
     useEffect(() => {
-        const { newNodes, edges } = autoLayout(blocks);
-        setNodes(newNodes);
-        setEdges(edges);
+        _.throttle(async () => {
+            const { newNodes, edges } = autoLayout(blocks);
+            setNodes(newNodes);
+            setEdges(edges);
+        }, 500)()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [blocks, setNodes, setEdges, autoLayout]);
 
@@ -130,6 +140,7 @@ export function FlowRenderer() {
     const onConnect: OnConnect = () => {
         connectingNodeParams.current = null;
     }
+
     return (
         <MemoizedDndContext nodes={nodes} actions={actions}>
             <div className='flex items-center justify-between w-full h-full overflow-hidden'>
@@ -165,7 +176,9 @@ export function FlowRenderer() {
                     }
 
                     <ReactFlow
+                        nodeOrigin={[0.5, 0]}
                         fitView
+                        ref={reactFlowWrapper}
                         fitViewOptions={{
                             padding: 20,
                             duration: 0.5,
@@ -184,14 +197,18 @@ export function FlowRenderer() {
                         onConnect={onConnect}
                         onConnectStart={onConnectStart}
                         onConnectEnd={onConnectEnd}
-                        nodeOrigin={[0.5, 0]}
-                        maxZoom={1} minZoom={1} nodeTypes={nodeTypes} nodes={nodes} onNodesChange={onNodeChange} className='w-full h-full'>
+                        maxZoom={1}
+                        minZoom={1}
+                        nodeTypes={nodeTypes}
+                        nodes={nodes}
+                        onNodesChange={onNodeChange}
+                        className='w-full h-full'>
                         <Controls position='bottom-right' />
                         <Background color="var(--accent-foreground)" />
                     </ReactFlow>
                 </div>
             </div>
-        </MemoizedDndContext>
+        </MemoizedDndContext >
 
     )
 }
