@@ -17,27 +17,30 @@ def convert_json_to_text(
         bot_id: str
 ) -> str:
     chat = get_chat_model()
-    system_message = SystemMessage(content="Given a JSON response, summarize the key information in a concise manner. Include relevant details, references, and links if present. Format the summary in Markdown for clarity and readability.")
+    system_message = SystemMessage(content="""
+    Given a JSON response, summarize the key information in a concise manner.
+    Include relevant details, references, and links if present. Format the summary in Markdown for clarity and readability.
+    Make sure to NEVER mention technical terms like "APIs, JSON, Request, etc..." and use first person pronounce (say it as if you performed the action)
+    """)
 
     messages = [
         system_message,
-        HumanMessage(
-            content="You'll receive user input and server responses obtained by making calls to various APIs. Your "
-                    "task is to summarize the api response that is an answer to the user input. Try to be concise and "
-                    "accurate, and also include references if present."
-        ),
+
         HumanMessage(content=user_input),
         HumanMessage(
             content="Here is the response from the apis: {}".format(api_response)
+        ),
+        HumanMessage(
+            content="Now summarize the response in a non-tech way:"
         ),
     ]
 
     result = chat(messages)
     logger.info(
-        "Convert json to text",
+        "API call json response",
         content=result.content,
         incident="convert_json_to_text",
-        api_request_data=api_request_data,
+        api_request_data=api_response
     )
 
     return cast(str, result.content)
