@@ -81,7 +81,7 @@ services:
 
   mysql:
     restart: unless-stopped
-    platform: linux/x86_64
+    platform: linux/arm64
     image: "mysql:oraclelinux8"
     ports:
       - "3307:3306"
