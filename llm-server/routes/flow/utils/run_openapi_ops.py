@@ -38,11 +38,11 @@ async def run_actions(
                     continue
 
                 api_payload = await generate_api_payload(
-                    text,
-                    operation_id,
-                    prev_api_response,
-                    app,
-                    current_state,
+                    text=text,
+                    action=action,
+                    prev_api_response=prev_api_response,
+                    app=app,
+                    current_state=current_state,
                 )
                 api_request_data[operation_id] = api_payload.__dict__
 
