@@ -14,6 +14,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { toast } from '@/components/ui/use-toast';
+import { Sparkles } from "lucide-react";
 
 const schema = z.object({
     prompt: z.string().min(20)
@@ -53,7 +54,9 @@ export function MagicAction({ defaultValue }: { defaultValue?: string }) {
     return (
         <AlertDialog open={open} onOpenChange={setOpen}>
             <AlertDialogTrigger asChild>
-                <Button size='sm' variant='outline'>Magic Action</Button>
+                <Button size='sm' variant='outline'>
+                    <Sparkles></Sparkles>    Build flow with AI (beta)
+                </Button>
             </AlertDialogTrigger>
             <AlertDialogContent asChild>
                 <form onSubmit={form.handleSubmit(handleSubmit)}>

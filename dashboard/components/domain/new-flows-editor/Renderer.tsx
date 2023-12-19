@@ -167,13 +167,14 @@ export function FlowRenderer() {
                         isBlocksEmpty && <div data-container='Empty block add button' className='absolute inset-0 z-50 flex-center bg-white p-4'>
                             <div className='flex items-center flex-col gap-4 '>
                                 <p className='text-sm text-center font-medium'>
-                                    Empty flow, You can either
+                                    Start building your flow actions/steps:
                                 </p>
                                 <div className='px-4 space-x-2'>
                                     <Button size='sm' onClick={() => insertEmptyBlockAfter()}>
-                                        Add a Block
+                                        <Plus></Plus>
+                                        I'll do it myself (recommended)
                                     </Button>
-                                    <span className='text-base font-semibold'>OR</span>
+                                    <span className='text-base font-semibold'>/or/</span>
                                     <MagicAction defaultValue={description ?? ''} />
                                 </div>
                             </div>
