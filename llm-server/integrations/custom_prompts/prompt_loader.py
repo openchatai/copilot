@@ -1,10 +1,10 @@
 from cachetools import cached, TTLCache
 from typing import Optional
 
-from utils.db import Database
+from utils.db import NoSQLDatabase
 from utils.llm_consts import SUMMARIZATION_PROMPT, SYSTEM_MESSAGE_PROMPT
 
-db_instance = Database()
+db_instance = NoSQLDatabase()
 mongo = db_instance.get_db()
 
 

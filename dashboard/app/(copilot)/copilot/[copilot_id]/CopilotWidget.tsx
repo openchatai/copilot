@@ -30,11 +30,7 @@ export default function Widget({
                 },
             }}
         >
-            <div className="[&>div]:static [&>div]:!max-h-full [&>div]:!h-full h-full overflow-hidden [&>div]:!border-border [&>div]:!border rounded-lg">
-                <CopilotWidget
-                    triggerSelector="#triggerSelector"
-                />
-            </div>
+            <CopilotWidget triggerSelector="#triggerSelector" className='max-w-sm min-w-full h-full max-h-screen' />
         </Root>
     </ErrorBoundary>
 }

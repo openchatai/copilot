@@ -42,7 +42,7 @@ def create_action(action: ActionDTO):
     name = str(action.name) if action.name else ""
 
     document = Document(page_content=description + " " + name)
-    
+
     document.metadata.update(action.model_dump())
 
     documents.append(document)
@@ -84,9 +84,7 @@ def get_all_actions(chatbot_id: str, limit: int = 20, offset: int = 0) -> List[P
 def update_action(action: ActionDTO, point_id: str):
     client.set_payload(
         collection_name="actions",
-        payload={
-            "metadata": action
-        },
+        payload={"metadata": action},
         points=[point_id],
     )
 

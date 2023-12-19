@@ -3,12 +3,11 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ToolTip";
 import useTypeWriter from "../hooks/useTypeWriter";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { FaRegUserCircle } from "react-icons/fa";
+import { User, Clipboard, ClipboardCheck } from "lucide-react";
 import { format } from "timeago.js";
 import cn from "../utils/cn";
 import formatTimeFromTimestamp from "../utils/formatTime";
 import { useCopyToClipboard } from "@lib/hooks/useCopy";
-import { HiOutlineClipboard, HiOutlineClipboardCheck } from "react-icons/hi";
 import { FailedMessage, useChat } from "@lib/contexts/Controller";
 import { getLast } from "@lib/utils/utils";
 import { useConfigData } from "@lib/contexts/ConfigData";
@@ -37,7 +36,7 @@ function UserIcon() {
       <TooltipTrigger asChild>
         <div className="opencopilot-rounded-lg opencopilot-shrink-0 opencopilot-bg-accent opencopilot-h-7 opencopilot-w-7 opencopilot-object-cover opencopilot-aspect-square hover:opencopilot-shadow opencopilot-border-primary-light opencopilot-border opencopilot-flex opencopilot-items-center opencopilot-justify-center">
           <span className="opencopilot-text-xl opencopilot-text-primary opencopilot-fill-current">
-            <FaRegUserCircle />
+            <User />
           </span>
         </div>
       </TooltipTrigger>
@@ -96,9 +95,9 @@ export function BotTextMessage({
             onClick={() => copy(displayText)}
           >
             {copied ? (
-              <HiOutlineClipboardCheck className="opencopilot-text-emerald-500" />
+              <ClipboardCheck className="opencopilot-text-emerald-500" />
             ) : (
-              <HiOutlineClipboard />
+              <Clipboard />
             )}
           </button>
         </div>

@@ -1,10 +1,12 @@
 import TextareaAutosize from "react-textarea-autosize";
-import { VscSend } from "react-icons/vsc";
-import { CgRedo } from "react-icons/cg";
+import {
+  SendHorizonal,
+  Redo2,
+  AlertCircle
+} from 'lucide-react'
 import { useChat } from "../contexts/Controller";
 import { useRef, useState } from "react";
 import { useInitialData } from "../contexts/InitialDataContext";
-import { TbBulb } from "react-icons/tb";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ToolTip";
 import { getId, isEmpty } from "@lib/utils/utils";
 function MessageSuggestions() {
@@ -35,7 +37,7 @@ function MessageSuggestions() {
           <Tooltip>
             <TooltipTrigger>
               <span className="opencopilot-text-xl opencopilot-text-primary opencopilot-mb-auto">
-                <TbBulb />
+                <AlertCircle />
               </span>
             </TooltipTrigger>
             <TooltipContent asChild>
@@ -107,7 +109,7 @@ function ChatInputFooter() {
                 className="opencopilot-text-xl disabled:opencopilot-opacity-40 disabled:opencopilot-pointer-events-none disabled:opencopilot-cursor-not-allowed opencopilot-text-[#5e5c5e] opencopilot-transition-all"
                 disabled={!(messages.length > 0)}
               >
-                <CgRedo />
+                <Redo2 />
               </button>
             </TooltipTrigger>
             <TooltipContent>reset chat</TooltipContent>
@@ -117,7 +119,7 @@ function ChatInputFooter() {
             className="opencopilot-text-xl disabled:opencopilot-opacity-40 disabled:opencopilot-pointer-events-none disabled:opencopilot-cursor-not-allowed opencopilot-text-[#5e5c5e] opencopilot-transition-all"
             disabled={loading || !canSend}
           >
-            <VscSend />
+            <SendHorizonal />
           </button>
         </div>
       </div>

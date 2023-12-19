@@ -4,9 +4,9 @@ from bson.objectid import ObjectId
 from flask import Blueprint, Response, request
 from pydantic import BaseModel, Field, ValidationError
 
-from utils.db import Database
+from utils.db import NoSQLDatabase
 
-db_instance = Database()
+db_instance = NoSQLDatabase()
 mongo = db_instance.get_db()
 
 prompt_template_workflow = Blueprint("prompt_template", __name__)

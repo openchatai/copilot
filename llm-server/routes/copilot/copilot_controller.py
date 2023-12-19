@@ -1,3 +1,5 @@
+from http import HTTPStatus
+import os
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -11,6 +13,7 @@ from models.repository.copilot_repo import (
     SessionLocal,
     update_copilot,
 )
+from routes._swagger.reindex_service import migrate_actions
 from utils.get_logger import CustomLogger
 
 logger = CustomLogger(module_name=__name__)
@@ -107,3 +110,19 @@ def general_settings_update(copilot_id):
     except Exception as e:
         # Handle other exceptions
         return jsonify({"error": "An error occurred", "details": str(e)}), 500
+
+
+@copilot.route("/migrate/actions", methods=["POST"])
+def migrate():
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        token = auth_header.split(" ")[1]
+
+        if token == os.getenv("BASIC_AUTH_KEY"):
+            migrate_actions()
+            return jsonify({"message": "job started"}), HTTPStatus.OK
+
+    return (
+        jsonify({"message": "Authorization Failed!"}),
+        HTTPStatus.NETWORK_AUTHENTICATION_REQUIRED,
+    )

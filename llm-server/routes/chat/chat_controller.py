@@ -11,13 +11,13 @@ from models.repository.chat_history_repo import (
 from models.repository.copilot_repo import find_one_or_fail_by_token
 from routes.analytics.analytics_service import upsert_analytics_record
 from routes.chat.chat_dto import ChatInput
-from utils.db import Database
+from utils.db import NoSQLDatabase
 from utils.get_logger import CustomLogger
 from utils.llm_consts import X_App_Name
 from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
 from .. import root_service
 
-db_instance = Database()
+db_instance = NoSQLDatabase()
 mongo = db_instance.get_db()
 logger = CustomLogger(module_name=__name__)
 
