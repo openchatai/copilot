@@ -63,11 +63,9 @@ export function MagicAction({ defaultValue }: { defaultValue?: string }) {
                     <Form {...form}>
                         <AlertDialogHeader>
                             <AlertDialogTitle>
-                                Magic Action
+                                Describe your flow
                             </AlertDialogTitle>
-                            <AlertDialogDescription>
-                                Create flow from a prompt message
-                            </AlertDialogDescription>
+
                         </AlertDialogHeader>
                         <FormField
                             control={form.control}
@@ -75,10 +73,10 @@ export function MagicAction({ defaultValue }: { defaultValue?: string }) {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormControl>
-                                        <Textarea {...field} placeholder='Enter your prompt' minRows={2} />
+                                        <Textarea {...field} placeholder='e.g. get the latest sales analytics and then add discount on all low-sales prooducts then email the admin that the discount was applied' minRows={2} />
                                     </FormControl>
                                     <FormDescription>
-                                        A Descriptive name for the action
+                                        Try to detailed as much as you can and make sure to focus on the order of actions
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
