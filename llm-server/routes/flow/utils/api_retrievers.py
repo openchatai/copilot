@@ -10,9 +10,9 @@ from shared.utils.opencopilot_utils.get_embeddings import get_embeddings
 from shared.utils.opencopilot_utils.get_vector_store import get_vector_store
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
-from utils.llm_consts import vs_thresholds, VectorCollections
+from utils.llm_consts import vs_thresholds, VectorCollections, initialize_qdrant_client
 
-client = QdrantClient(url=os.getenv("QDRANT_URL", "http://qdrant:6333"))
+client = initialize_qdrant_client()
 logger = CustomLogger(module_name=__name__)
 chat = get_chat_model()
 

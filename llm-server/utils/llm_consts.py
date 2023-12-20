@@ -34,6 +34,8 @@ class UserMessageResponseType:
     actionable = "actionable"  # The user message should be answered with an action (flow or api action)
     informative = "informative"  # The user message should be answered a normal text response
 
+
+
 @lru_cache(maxsize=5)  # Cache all calls
 def initialize_qdrant_client() -> QdrantClient:
     # Get the API key and URL from environment variables if not provided
@@ -53,9 +55,11 @@ def get_mysql_uri():
     components = mysql_uri.split("://")[1].split("@")
     user_pass, host_port_db = components[0], components[1]
     username, password = user_pass.split(":")
-    host, port_database = host_port_db.split("/")
-    port, database = port_database.split(":")
-
+    
+    # Adjusting the parsing based on the expected format
+    host_port, database = host_port_db.split("/")
+    host, port = host_port.split(":")
+    
     # Creating pymysql format string
     pymysql_uri = f"mysql+pymysql://{username}:{password}@{host}:{port}/{database}"
 
