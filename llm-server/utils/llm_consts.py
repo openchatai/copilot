@@ -44,3 +44,23 @@ def initialize_qdrant_client() -> QdrantClient:
 
     client = QdrantClient(url=qdrant_url, api_key=api_key)
     return client
+
+def get_mysql_uri():
+    mysql_uri = os.getenv("MYSQL_URI", None)
+    if not mysql_uri:
+        raise ValueError("MYSQL_URI environment variable is not set")
+
+    # Assuming the MYSQL_URI is in the format: mysql://username:password@host:port/database
+    # You may need to adjust the parsing based on the actual format of your MYSQL_URI
+    components = mysql_uri.split("://")[1].split("@")
+    user_pass, host_port_db = components[0], components[1]
+    username, password = user_pass.split(":")
+    
+    # Adjusting the parsing based on the expected format
+    host_port, database = host_port_db.split("/")
+    host, port = host_port.split(":")
+    
+    # Creating pymysql format string
+    pymysql_uri = f"mysql+pymysql://{username}:{password}@{host}:{port}/{database}"
+
+    return pymysql_uri

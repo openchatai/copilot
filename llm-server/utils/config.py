@@ -1,10 +1,8 @@
 import os
-
+from utils.llm_consts import get_mysql_uri
 
 class Config:
-    SQLALCHEMY_DATABASE_URI = os.getenv(
-        "MYSQL_URI", "mysql+pymysql://dbuser:dbpass@localhost:3307/opencopilot"
-    )
+    SQLALCHEMY_DATABASE_URI = get_mysql_uri()
     SQLALCHEMY_TRACK_MODIFICATIONS = (
         False  # Disable tracking modifications for SQLAlchemy
     )
