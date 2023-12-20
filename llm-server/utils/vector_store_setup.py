@@ -1,12 +1,11 @@
 from qdrant_client import QdrantClient, models
 import os
 
-from utils.llm_consts import VectorCollections
+from utils.llm_consts import VectorCollections, initialize_qdrant_client
 
 vector_size = int(os.getenv("VECTOR_SIZE", "1536"))
 
-
-client = QdrantClient(url=os.getenv("QDRANT_URL", "http://qdrant:6333"))
+client = initialize_qdrant_client()
 
 
 def delete_collection(name: str):

@@ -130,6 +130,7 @@ services:
       - 6334:6334
     volumes:
       - qdrant_storage:/qdrant/storage
+      - ./nginx/qdrant_config.yaml:/qdrant/config/production.yaml:ro
     networks:
       - opencopilot-net
 
