@@ -8,10 +8,10 @@ from shared.utils.opencopilot_utils.get_vector_store import get_vector_store
 from shared.utils.opencopilot_utils import StoreOptions
 from langchain.docstore.document import Document
 from utils.get_logger import CustomLogger
-import os
+from utils.llm_consts import initialize_qdrant_client
 from utils.db import NoSQLDatabase
 
-client = QdrantClient(url=os.getenv("QDRANT_URL", "http://qdrant:6333"))
+client = initialize_qdrant_client()
 
 db_instance = NoSQLDatabase()
 mongo = db_instance.get_db()

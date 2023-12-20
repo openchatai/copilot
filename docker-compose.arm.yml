@@ -130,6 +130,7 @@ services:
       - 6334:6334
     volumes:
       - qdrant_storage:/qdrant/storage
+      - ./container_config/qdrant_config.yaml:/qdrant/config/production.yaml:ro
     networks:
       - opencopilot-net
 
@@ -156,7 +157,7 @@ services:
     ports:
       - "8888:80"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./container_config/nginx.conf:/etc/nginx/nginx.conf
     networks:
       - opencopilot-net
     depends_on:

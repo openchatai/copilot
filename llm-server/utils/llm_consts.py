@@ -1,5 +1,7 @@
 import os
 from typing import TypedDict
+from functools import lru_cache
+from qdrant_client import QdrantClient
 
 EXPERIMENTAL_FEATURES_ENABLED = os.getenv("EXPERIMENTAL_FEATURES_ENABLED", "NO")
 SYSTEM_MESSAGE_PROMPT = "system_message_prompt"
@@ -31,3 +33,14 @@ class VectorCollections:
 class UserMessageResponseType:
     actionable = "actionable"  # The user message should be answered with an action (flow or api action)
     informative = "informative"  # The user message should be answered a normal text response
+
+
+
+@lru_cache(maxsize=5)  # Cache all calls
+def initialize_qdrant_client() -> QdrantClient:
+    # Get the API key and URL from environment variables if not provided
+    api_key = os.getenv("QDRANT_PASS", "bW9tZW50bmVhcmZld2VyYXJ0YmVuZG1pbGticmVhdGhldGFsZXN3aGFsZW5vYm9keXM=")
+    qdrant_url = os.getenv("QDRANT_URL", "http://qdrant:6333")
+
+    client = QdrantClient(url=qdrant_url, api_key=api_key)
+    return client
