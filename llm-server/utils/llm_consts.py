@@ -1,5 +1,7 @@
 import os
 from typing import TypedDict
+from functools import lru_cache
+from qdrant_client import QdrantClient
 
 EXPERIMENTAL_FEATURES_ENABLED = os.getenv("EXPERIMENTAL_FEATURES_ENABLED", "NO")
 SYSTEM_MESSAGE_PROMPT = "system_message_prompt"
@@ -31,3 +33,30 @@ class VectorCollections:
 class UserMessageResponseType:
     actionable = "actionable"  # The user message should be answered with an action (flow or api action)
     informative = "informative"  # The user message should be answered a normal text response
+
+@lru_cache(maxsize=5)  # Cache all calls
+def initialize_qdrant_client() -> QdrantClient:
+    # Get the API key and URL from environment variables if not provided
+    api_key = os.getenv("QDRANT_PASS", "bW9tZW50bmVhcmZld2VyYXJ0YmVuZG1pbGticmVhdGhldGFsZXN3aGFsZW5vYm9keXM=")
+    qdrant_url = os.getenv("QDRANT_URL", "http://qdrant:6333")
+
+    client = QdrantClient(url=qdrant_url, api_key=api_key)
+    return client
+
+def get_mysql_uri():
+    mysql_uri = os.getenv("MYSQL_URI", None)
+    if not mysql_uri:
+        raise ValueError("MYSQL_URI environment variable is not set")
+
+    # Assuming the MYSQL_URI is in the format: mysql://username:password@host:port/database
+    # You may need to adjust the parsing based on the actual format of your MYSQL_URI
+    components = mysql_uri.split("://")[1].split("@")
+    user_pass, host_port_db = components[0], components[1]
+    username, password = user_pass.split(":")
+    host, port_database = host_port_db.split("/")
+    port, database = port_database.split(":")
+
+    # Creating pymysql format string
+    pymysql_uri = f"mysql+pymysql://{username}:{password}@{host}:{port}/{database}"
+
+    return pymysql_uri

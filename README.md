@@ -40,7 +40,12 @@ git clone git@github.com:openchatai/OpenCopilot.git
 
 ```
 OPENAI_API_KEY=YOUR_TOKEN_HERE
+<<<<<<< Updated upstream
 MYSQL_URI=mysql+pymysql://dbuser:dbpass@mysql:3306/opencopilot
+=======
+MYSQL_URI=mysql://dbuser:dbpass@mysql:3306/opencopilot
+QDRANT_PASS=bW9tZW50bmVhcmZld2VyYXJ0YmVuZG1pbGticmVhdGhldGFsZXN3aGFsZW5vYm9keXM=
+>>>>>>> Stashed changes
 ```
 
 
