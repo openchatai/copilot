@@ -36,16 +36,11 @@ class UserMessageResponseType:
 
 
 
-@lru_cache(maxsize=None)  # Cache all calls
+@lru_cache(maxsize=5)  # Cache all calls
 def initialize_qdrant_client() -> QdrantClient:
     # Get the API key and URL from environment variables if not provided
-    api_key = os.getenv("QDRANT_PASS", None)
+    api_key = os.getenv("QDRANT_PASS", "bW9tZW50bmVhcmZld2VyYXJ0YmVuZG1pbGticmVhdGhldGFsZXN3aGFsZW5vYm9keXM=")
     qdrant_url = os.getenv("QDRANT_URL", "http://qdrant:6333")
 
-    # Check if both API key and URL are defined
-    if api_key is None or qdrant_url is None:
-        raise ValueError("API key and URL must be defined.")
-
-    # Initialize the QdrantClient with the provided API key and URL
     client = QdrantClient(url=qdrant_url, api_key=api_key)
     return client

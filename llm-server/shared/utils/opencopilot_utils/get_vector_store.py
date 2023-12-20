@@ -5,10 +5,13 @@ from langchain.vectorstores.base import VectorStore
 from .store_type import StoreType
 from .interfaces import StoreOptions
 from .get_embeddings import get_embeddings
-import qdrant_client
+from utils.llm_consts import initialize_qdrant_client
 
 
 embedding = get_embeddings()
+client = initialize_qdrant_client()
+
+
 def get_vector_store(options: StoreOptions) -> VectorStore:
     """Gets the vector store for the given options."""
     vector_store: VectorStore
@@ -16,12 +19,6 @@ def get_vector_store(options: StoreOptions) -> VectorStore:
     store_type = os.environ.get("STORE")
 
     if store_type == StoreType.QDRANT.value:
-        client = qdrant_client.QdrantClient(
-            url=os.environ["QDRANT_URL"],
-            prefer_grpc=True,
-            api_key=os.getenv("QDRANT_API_KEY", None),
-        )
-
         vector_store = Qdrant(
             client, collection_name=options.namespace, embeddings=embedding
         )

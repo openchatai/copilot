@@ -36,13 +36,17 @@ OpenCopilot allows you to have your own product's AI copilot. It integrates with
 git clone git@github.com:openchatai/OpenCopilot.git
 ```
 
-- Update the `.env` file located in the `llm-server` directory with your `OPENAI_API_KEY`. You can use the `.env.example` file as a reference:
+Please find below an update concerning the API key configuration in our system.
+
+In the `.env` file located in the `llm-server` directory, make sure to replace the placeholder value for the `OPENAI_API_KEY` variable with your actual token:
 
 ```
 OPENAI_API_KEY=YOUR_TOKEN_HERE
 MYSQL_URI=mysql+pymysql://dbuser:dbpass@mysql:3306/opencopilot
+QDRANT_PASS=bW9tZW50bmVhcmZld2VyYXJ0YmVuZG1pbGticmVhdGhldGFsZXN3aGFsZW5vYm9keXM=
 ```
 
+Regarding the `QDRANT_PASS` variable, be advised that the current value functions as the default API key for Qdrant. We highly recommend customizing this key to suit your needs by modifying the corresponding value within the `qdrant_config.yaml` file.
 
 ### For Linux Machines
 
