@@ -174,7 +174,7 @@ async def send_chat():
                 {
                     "type": "text",
                     "response": {
-                        "text": f"Bot not found, Please try again later. **code: b500**\n```{e}```"
+                        "text": f"I'm unable to help you at the moment, please try again later. **code: b500**\n```{e}```"
                     },
                 }
             ),
