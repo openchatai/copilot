@@ -31,7 +31,7 @@ def convert_json_to_text(
             content="Here is the response from the apis: {}".format(api_response)
         ),
         HumanMessage(
-            content="Now summarize the response in a non-tech way:"
+            content="Now present the response in a non-tech way:"
         ),
     ]
 
