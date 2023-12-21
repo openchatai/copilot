@@ -1,6 +1,6 @@
 import React from 'react'
 import {
-    AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogTitle,
+    AlertDialog, AlertDialogContent, AlertDialogTitle,
     AlertDialogCancel, AlertDialogFooter, AlertDialogHeader, AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
@@ -55,7 +55,8 @@ export function MagicAction({ defaultValue }: { defaultValue?: string }) {
         <AlertDialog open={open} onOpenChange={setOpen}>
             <AlertDialogTrigger asChild>
                 <Button size='sm' variant='outline'>
-                    <Sparkles></Sparkles>    Build flow with AI (beta)
+                    Build flow with AI (beta)
+                    <Sparkles className='size-4 ms-1.5'/>
                 </Button>
             </AlertDialogTrigger>
             <AlertDialogContent asChild>
@@ -65,7 +66,6 @@ export function MagicAction({ defaultValue }: { defaultValue?: string }) {
                             <AlertDialogTitle>
                                 Describe your flow
                             </AlertDialogTitle>
-
                         </AlertDialogHeader>
                         <FormField
                             control={form.control}
