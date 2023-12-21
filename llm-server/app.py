@@ -65,10 +65,12 @@ def handle_send_chat(json_data):
         socketio.emit('error_response', {'error': 'Bot token is required'})
         return
 
-    send_chat_stream(message, bot_token, session_id, headers_from_json)
+    asyncio.run(send_chat_stream(message, bot_token, session_id, headers_from_json))
     
 
 init_qdrant_collections()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8002, debug=True)
+     socketio.run(
+        app, host="0.0.0.0", port=8002, debug=True, use_reloader=True, log_output=False
+    )
