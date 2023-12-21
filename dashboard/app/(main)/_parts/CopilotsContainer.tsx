@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { BotIcon, GalleryHorizontalEnd, Terminal } from "lucide-react";
+import { GalleryHorizontalEnd } from "lucide-react";
 import { Link } from "@/lib/router-events";
 import useSwr from "swr";
 import { CopilotType, listCopilots } from "@/data/copilot";
@@ -12,7 +12,6 @@ import { filterAtom } from "./Search";
 import { useAtomValue } from "jotai";
 import { Button } from "@/components/ui/button";
 import { format } from "timeago.js";
-import { Tooltip } from "@/components/domain/Tooltip";
 import { motion, AnimatePresence } from 'framer-motion';
 
 function customSort(list: CopilotType[], sortBy: Filter["sort"]) {
@@ -61,7 +60,7 @@ export function CopilotsContainer() {
       )}
     </EmptyBlock>
   ) : (
-    <div className="grid grid-cols-2 gap-6 md:grid-cols-3 auto-rows-fr py-4 lg:grid-cols-4">
+    <div className="grid gap-4 py-4 grid-cols-12">
       {$copilots?.map((copilot, index) => {
         const copilotUrl = "/copilot/" + copilot.id;
         return (
@@ -79,12 +78,12 @@ export function CopilotsContainer() {
                 opacity: 0, y: 50,
                 filter: "blur(10px)"
               }}
-              transition={{ duration: 0.2, delay: 0.01 * index }}
-              className="group"
+              transition={{ duration: 0.2, delay: 0.1 * index }}
+              className="group col-span-full lg:col-span-6 xl:col-span-3"
             >
-              <div className="group relative flex h-56 items-center justify-center rounded-lg border-2 bg-accent group-hover:bg-secondary p-5 group-hover:shadow transition-shadow">
-                <div className="grid aspect-square h-20 shadow-lg place-content-center group-hover:scale-95 bg-primary transition-transform rounded-lg text-gray-100">
-                  <GalleryHorizontalEnd className="h-12 w-12" />
+              <div className="group relative flex h-56 items-center justify-center rounded-lg border-2 bg-accent group-hover:bg-secondary transition-colors">
+                <div className="flex-center size-20 shadow-lg group-hover:scale-95 bg-primary transition-transform rounded-lg text-gray-100">
+                  <GalleryHorizontalEnd className="size-12" />
                 </div>
               </div>
               <div className="mt-1.5 ps-1">
