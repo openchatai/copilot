@@ -79,7 +79,7 @@ function DropableAsideAction({ action, index }: { action: ActionResponseType, in
 }
 export const ASIDE_DROPABLE_ID = "BASE-ACTIONS";
 
-export function ActionsList() {
+export function ActionsList({ disabled }: { disabled?: boolean }) {
     const { state: { actions } } = useController();
 
     return (
@@ -88,7 +88,7 @@ export function ActionsList() {
                 No actions found <br /> you can create a new one from above or <br /> drag and drop a swagger file here. <br /> <br />
             </div>
 
-        </EmptyBlock> : <Droppable droppableId={ASIDE_DROPABLE_ID} mode="standard">
+        </EmptyBlock> : <Droppable isDropDisabled={disabled} droppableId={ASIDE_DROPABLE_ID} mode="standard">
             {
                 (provided) => {
                     return <div ref={provided.innerRef} {...provided.droppableProps} className='w-full shrink-0 divide-y flex overflow-y-hidden min-h-full flex-col items-start justify-start'>
