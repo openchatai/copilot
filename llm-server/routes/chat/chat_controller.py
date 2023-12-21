@@ -181,8 +181,7 @@ async def handle_chat_send_common(message: str, bot_token: Optional[str], sessio
                                     logs=response_data["error"],
             )
 
-        if is_streaming:
-            emit(session_id, "|im_end|")
+        emit(session_id, "|im_end|") if is_streaming else None
         return jsonify(
             {"type": "text", "response": {"text": response_data["response"]}}
         )

@@ -58,11 +58,11 @@ def handle_send_chat(json_data):
     bot_token = headers_from_json.get("X-Bot-Token")
 
     if not message or len(message) > 255:
-        socketio.emit('error_response', {'error': 'Invalid content, the size is larger than 255 char'})
+        socketio.emit(session_id, {'error': 'Invalid content, the size is larger than 255 char'})
         return
 
     if not bot_token:
-        socketio.emit('error_response', {'error': 'Bot token is required'})
+        socketio.emit(session_id, {'error': 'Bot token is required'})
         return
 
     asyncio.run(send_chat_stream(message, bot_token, session_id, headers_from_json))

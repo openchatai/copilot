@@ -79,7 +79,7 @@ async def handle_request(
     top_documents = select_top_documents(actions + flows + knowledgebase)
 
 
-    emit(session_id, "Checking if actionable") if is_streaming else None
+    emit(f"{session_id}_info", "Checking if actionable ... \n") if is_streaming else None
     next_step = get_next_response_type(
         user_message=text,
         session_id=session_id,
@@ -87,7 +87,7 @@ async def handle_request(
         top_documents=top_documents
     )
 
-    emit(session_id, f"Is next step actionable: {next_step.actionable}") if is_streaming else None
+    emit(f"{session_id}_info", f"Is next step actionable: {next_step.actionable}... \n") if is_streaming else None
     if next_step.actionable and next_step.operation_id:
         # if the LLM given operationID is actually exist, then use it, otherwise fallback to the highest vector space document
         llm_predicted_operation_id = is_the_llm_predicted_operation_id_actually_true(next_step.operation_id,
@@ -98,19 +98,21 @@ async def handle_request(
             actionable_item = select_top_documents(actions + flows,
                                                    [VectorCollections.actions, VectorCollections.flows])
         # now run it
-        emit(session_id, "Executing the actionable item") if is_streaming else None
+        emit(f"{session_id}_info", "Executing the actionable item... \n") if is_streaming else None
         response = await run_actionable_item(
             bot_id=bot_id,
             actionable_item=actionable_item,
             app=app,
             headers=headers,
             text=text,
+            is_streaming=is_streaming,
+            session_id=session_id
         )
         return response
     else:
         # it means that the user query is "informative" and can be answered using text only
         # get the top knowledgeable documents (if any)
-        emit(session_id, "Running informative action") if is_streaming else None
+        emit(f"{session_id}_info", "Running informative action... \n") if is_streaming else None
         documents = select_top_documents(knowledgebase)
         response = run_informative_item(
             informative_item=documents,
@@ -140,6 +142,8 @@ async def run_actionable_item(
         headers: Dict[str, str],
         app: Optional[str],
         bot_id: str,
+        session_id: str,
+        is_streaming: bool
 ) -> ResponseDict:
     output: ResponseDict = {
         "error": "",
@@ -215,7 +219,7 @@ def run_informative_item(
             content="If you are unsure, or you think you can do a better job by asking clarification questions, then ask.")
     )
 
-    emit(session_id, "Executing the action") if is_streaming else None
+    emit(f"{session_id}_info", "Distilling the information received...\n") if is_streaming else None
     messages.append(HumanMessage(content=text))
 
     # convert to astream
