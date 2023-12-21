@@ -83,7 +83,7 @@ async def handle_request(
         top_documents=top_documents
     )
 
-    if next_step.actionable and next_step.operation_id:
+    if next_step.actionable:
         # if the LLM given operationID is actually exist, then use it, otherwise fallback to the highest vector space document
         llm_predicted_operation_id = is_the_llm_predicted_operation_id_actually_true(next_step.operation_id,
                                                                                      select_top_documents(actions))
