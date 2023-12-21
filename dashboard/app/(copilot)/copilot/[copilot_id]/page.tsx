@@ -133,7 +133,7 @@ export default function CopilotPage() {
             <SelfHost />
           </Accordion>
         </div>
-        <div className="h-full w-fit p-4 max-w-sm xl:max-w-md">
+        <div className="h-full w-full p-4 max-w-sm xl:max-w-md">
           <Widget token={CopilotToken} />
         </div>
       </div>
