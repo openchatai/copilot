@@ -9,7 +9,7 @@ declare global {
   }
 }
 
-function initAiCoPilot({ triggerSelector, ...options }: Options) {
+function initAiCoPilot({ triggerSelector, containerProps, ...options }: Options) {
   const container = document.createElement("div") as HTMLDivElement;
   container.id = "opencopilot-aicopilot";
   document.body.appendChild(container);
@@ -18,6 +18,7 @@ function initAiCoPilot({ triggerSelector, ...options }: Options) {
       options={{
         ...options,
       }}
+      containerProps={containerProps}
     >
       <CopilotWidget triggerSelector={triggerSelector} />
     </Root>
