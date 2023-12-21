@@ -7,6 +7,8 @@ from langchain.chat_models.base import BaseChatModel
 
 from utils import llm_consts
 from .chat_models import CHAT_MODELS
+from langchain.callbacks.manager import CallbackManager
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
 localip = os.getenv("LOCAL_IP", "localhost")
 
@@ -36,11 +38,13 @@ def get_chat_model() -> BaseChatModel:
     elif model_name == CHAT_MODELS.gpt_4_32k:
         model = ChatOpenAI(temperature=0, model=CHAT_MODELS.gpt_4_32k)
     elif model_name == CHAT_MODELS.gpt_4_1106_preview:
-        model = ChatOpenAI(temperature=0, model=CHAT_MODELS.gpt_4_1106_preview)
+        model = ChatOpenAI(temperature=0, model=CHAT_MODELS.gpt_4_1106_preview, streaming=True, callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]))
     elif model_name == CHAT_MODELS.gpt_3_5_turbo_16k:
         model = ChatOpenAI(
             model=CHAT_MODELS.gpt_3_5_turbo_16k,
-            temperature=0
+            temperature=0,
+            streaming=True,
+            callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]),
         )
     elif model_name == "claude":
         model = ChatAnthropic(

@@ -16,7 +16,7 @@ from utils.get_logger import CustomLogger
 from utils.llm_consts import X_App_Name
 from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
 from .. import root_service
-from flask_socketio import SocketIO
+from flask_socketio import emit
 
 db_instance = NoSQLDatabase()
 mongo = db_instance.get_db()
@@ -111,7 +111,7 @@ def init_chat():
 
 
 async def send_chat_stream(message: str, bot_token: str, session_id: str, headers_from_json: Dict[str, str]):
-    await handle_chat_send_common(message, bot_token, session_id, headers_from_json)
+    await handle_chat_send_common(message, bot_token, session_id, headers_from_json, is_streaming=True)
     
 
 @chat_workflow.route("/send", methods=["POST"])
@@ -124,12 +124,12 @@ async def send_chat():
     headers_from_json = input_data.headers
 
     bot_token = request.headers.get("X-Bot-Token")
-    return await handle_chat_send_common(message, bot_token, session_id, headers_from_json)
+    return await handle_chat_send_common(message, bot_token, session_id, headers_from_json, is_streaming=False)
 
     
     
     
-async def handle_chat_send_common(message: str, bot_token: str, session_id: str, headers_from_json: Dict[str, str]):
+async def handle_chat_send_common(message: str, bot_token: Optional[str], session_id: str, headers_from_json: Dict[str, str], is_streaming: bool):
     app_name = headers_from_json.pop(X_App_Name, None)
     if not message or len(message) > 255:
         abort(400, description="Invalid content, the size is larger than 255 char")
@@ -162,6 +162,7 @@ async def handle_chat_send_common(message: str, bot_token: str, session_id: str,
             bot_id=str(bot.id),
             headers=headers_from_json,
             app=app_name,
+            is_streaming=is_streaming
         )
 
         if response_data["response"]:
@@ -180,6 +181,8 @@ async def handle_chat_send_common(message: str, bot_token: str, session_id: str,
                                     logs=response_data["error"],
             )
 
+        if is_streaming:
+            emit(session_id, "|im_end|")
         return jsonify(
             {"type": "text", "response": {"text": response_data["response"]}}
         )

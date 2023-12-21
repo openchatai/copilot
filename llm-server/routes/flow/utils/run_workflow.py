@@ -18,6 +18,8 @@ async def run_flow(
         chat_context: ChatContext,
         app: Optional[str],
         bot_id: str,
+        session_id: str,
+        is_streaming: bool
 ) -> ResponseDict:
     headers = chat_context.headers or Headers()
 
@@ -31,6 +33,8 @@ async def run_flow(
             headers=headers,
             app=app,
             bot_id=bot_id,
+            session_id=session_id,
+            is_streaming=is_streaming
         )
     except Exception as e:
         payload_data = {

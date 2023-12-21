@@ -21,6 +21,8 @@ async def run_actions(
     headers: Headers,
     app: Optional[str],
     bot_id: str,
+    session_id: str,
+    is_streaming: bool
 ) -> str:
     api_request_data = {}
     prev_api_response = ""
@@ -67,8 +69,6 @@ async def run_actions(
                         app=app,
                     )
                     apis_calls_history[operation_id] = api_response.text
-
-                    pass
                 else:
                     logger.info(
                         "API Response",
@@ -98,5 +98,6 @@ async def run_actions(
 
         # @todo : replace this with a lighter and faster model
         return convert_json_to_text(
-            text, apis_calls_history, api_request_data, bot_id=bot_id
+            text, apis_calls_history, api_request_data, bot_id=bot_id,
+            session_id=session_id, is_streaming=is_streaming
         )

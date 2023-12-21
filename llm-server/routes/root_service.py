@@ -17,6 +17,7 @@ from utils.db import NoSQLDatabase
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
 from utils.llm_consts import VectorCollections
+from flask_socketio import emit
 
 logger = CustomLogger(module_name=__name__)
 
@@ -62,6 +63,7 @@ async def handle_request(
         bot_id: str,
         headers: Dict[str, str],
         app: Optional[str],
+        is_streaming: bool
 ) -> ResponseDict:
     check_required_fields(base_prompt, text)
 
@@ -76,6 +78,8 @@ async def handle_request(
     knowledgebase, actions, flows, conversations_history = results
     top_documents = select_top_documents(actions + flows + knowledgebase)
 
+
+    emit(session_id, "Checking if actionable") if is_streaming else None
     next_step = get_next_response_type(
         user_message=text,
         session_id=session_id,
@@ -83,6 +87,7 @@ async def handle_request(
         top_documents=top_documents
     )
 
+    emit(session_id, f"Is next step actionable: {next_step.actionable}") if is_streaming else None
     if next_step.actionable and next_step.operation_id:
         # if the LLM given operationID is actually exist, then use it, otherwise fallback to the highest vector space document
         llm_predicted_operation_id = is_the_llm_predicted_operation_id_actually_true(next_step.operation_id,
@@ -93,6 +98,7 @@ async def handle_request(
             actionable_item = select_top_documents(actions + flows,
                                                    [VectorCollections.actions, VectorCollections.flows])
         # now run it
+        emit(session_id, "Executing the actionable item") if is_streaming else None
         response = await run_actionable_item(
             bot_id=bot_id,
             actionable_item=actionable_item,
@@ -104,12 +110,15 @@ async def handle_request(
     else:
         # it means that the user query is "informative" and can be answered using text only
         # get the top knowledgeable documents (if any)
+        emit(session_id, "Running informative action") if is_streaming else None
         documents = select_top_documents(knowledgebase)
         response = run_informative_item(
             informative_item=documents,
             base_prompt=base_prompt,
             text=text,
-            conversations_history=conversations_history
+            conversations_history=conversations_history,
+            is_streaming=is_streaming,
+            session_id=session_id
         )
         return response
 
@@ -161,7 +170,9 @@ async def run_actionable_item(
             flow=_flow,
             chat_context=ChatContext(text, headers, app),
             app=app,
-            bot_id=bot_id
+            bot_id=bot_id,
+            session_id=session_id,
+            is_streaming=is_streaming
         )
 
     return output
@@ -171,7 +182,9 @@ def run_informative_item(
         informative_item: dict[str, List[DocumentSimilarityDTO]],
         base_prompt: str,
         text: str,
-        conversations_history: List[BaseMessage]
+        conversations_history: List[BaseMessage],
+        is_streaming: bool,
+        session_id: str
 ) -> ResponseDict:
     # so we got all context, let's ask:
 
@@ -202,8 +215,13 @@ def run_informative_item(
             content="If you are unsure, or you think you can do a better job by asking clarification questions, then ask.")
     )
 
+    emit(session_id, "Executing the action") if is_streaming else None
     messages.append(HumanMessage(content=text))
 
-    content = cast(str, chat(messages=messages).content)
+    # convert to astream
+    content = ""
+    for chunk in chat.stream(messages):
+        emit(session_id, chunk) if is_streaming else None
+        content+=str(chunk.content)
 
     return {"response": content, "error": None}
