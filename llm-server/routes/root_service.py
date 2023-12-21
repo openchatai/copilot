@@ -47,7 +47,9 @@ def is_the_llm_predicted_operation_id_actually_true(predicted_operation_id: str,
     Returns:
 
     """
-    for action in actionable_items.get(VectorCollections.actions):
+    actions = actionable_items.get(VectorCollections.actions) or []
+
+    for action in actions:
         if predicted_operation_id == action.document.metadata.get('operation_id'):
             return {VectorCollections.actions: [action]}
     return None
@@ -81,7 +83,7 @@ async def handle_request(
         top_documents=top_documents
     )
 
-    if next_step.actionable:
+    if next_step.actionable and next_step.operation_id:
         # if the LLM given operationID is actually exist, then use it, otherwise fallback to the highest vector space document
         llm_predicted_operation_id = is_the_llm_predicted_operation_id_actually_true(next_step.operation_id,
                                                                                      select_top_documents(actions))
@@ -121,6 +123,8 @@ def check_required_fields(base_prompt: str, text: str) -> None:
             raise Exception(error_msg)
 
 
+# @Todo: This can be improved, using dense and sparse matrix similarity or by using addition llm call
+# ref: https://qdrant.tech/articles/sparse-vectors/?utm_source=linkedin&utm_medium=social&utm_campaign=sparse-vectors&utm_content=article
 async def run_actionable_item(
         actionable_item: dict[str, List[DocumentSimilarityDTO]],
         text: str,
@@ -128,26 +132,37 @@ async def run_actionable_item(
         app: Optional[str],
         bot_id: str,
 ) -> ResponseDict:
-    if actionable_item.get(VectorCollections.actions):
-        document_similarity = actionable_item.get(VectorCollections.actions)[0]
-        vector_action = document_similarity.document  # this variable now holds Qdrant vector document, which is the Action metadata
-
-        _flow = create_flow_from_operation_ids(operation_ids=[vector_action.metadata.get('operation_id')],
+    output: ResponseDict = {
+        "error": "",
+        "response": "Sorry, I can't help you with that action"
+    }
+    
+    actions = actionable_item.get(VectorCollections.actions)
+    flows = actionable_item.get(VectorCollections.flows)
+    _flow = None
+    if actionable_item.get(VectorCollections.actions) and actions is not None:
+        action = actions[0]
+        operation_id = cast(str, action.document.metadata.get("operation_id"))  # this variable now holds Qdrant vector document, which is the Action metadata
+        
+        _flow = create_flow_from_operation_ids(operation_ids=[operation_id],
                                                bot_id=bot_id)
-    else:
-        document_similarity = actionable_item.get(VectorCollections.flows)[0]
-        vector_flow = document_similarity.document  # this variable now holds Qdrant vector document, which is the flow metadata
-        flow_id = vector_flow.metadata.get('flow_id')
+    elif flows is not None:
+        flow_with_relevance_score = flows[0]
+        flow = flow_with_relevance_score.document  # this variable now holds Qdrant vector document, which is the flow metadata
+        flow_id = cast(str, flow.metadata.get('flow_id'))
         flow_model = get_flow_by_id(flow_id)
-        _flow = FlowDTO(id=flow_model.id, bot_id=bot_id, flow_id=flow_model.id, name=flow_model.name, description=flow_model.description,
-                        blocks=flow_model.payload, variables=[])
-
-    output = await run_flow(
-        flow=_flow,
-        chat_context=ChatContext(text, headers, app),
-        app=app,
-        bot_id=bot_id
-    )
+        
+        if flow_model:            
+            _flow = FlowDTO(id=flow_model.id, bot_id=bot_id, flow_id=flow_model.id, name=flow_model.name, description=flow_model.description,
+                            blocks=flow_model.payload, variables=[])
+    
+    if _flow is not None:
+        output = await run_flow(
+            flow=_flow,
+            chat_context=ChatContext(text, headers, app),
+            app=app,
+            bot_id=bot_id
+        )
 
     return output
 
@@ -161,7 +176,7 @@ def run_informative_item(
     # so we got all context, let's ask:
 
     context = []
-    for vector_result in informative_item.get(VectorCollections.knowledgebase):
+    for vector_result in informative_item.get(VectorCollections.knowledgebase) or []:
         context.append(vector_result.document.metadata)
 
     messages: List[BaseMessage] = [SystemMessage(content=base_prompt)]
