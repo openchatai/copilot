@@ -110,9 +110,13 @@ def init_chat():
     )
 
 
-async def send_chat_stream(message: str, bot_token: str, session_id: str, headers_from_json: Dict[str, str]):
-    await handle_chat_send_common(message, bot_token, session_id, headers_from_json, is_streaming=True)
-    
+async def send_chat_stream(
+    message: str, bot_token: str, session_id: str, headers_from_json: Dict[str, str]
+):
+    await handle_chat_send_common(
+        message, bot_token, session_id, headers_from_json, is_streaming=True
+    )
+
 
 @chat_workflow.route("/send", methods=["POST"])
 async def send_chat():
@@ -124,12 +128,18 @@ async def send_chat():
     headers_from_json = input_data.headers
 
     bot_token = request.headers.get("X-Bot-Token")
-    return await handle_chat_send_common(message, bot_token, session_id, headers_from_json, is_streaming=False)
+    return await handle_chat_send_common(
+        message, bot_token, session_id, headers_from_json, is_streaming=False
+    )
 
-    
-    
-    
-async def handle_chat_send_common(message: str, bot_token: Optional[str], session_id: str, headers_from_json: Dict[str, str], is_streaming: bool):
+
+async def handle_chat_send_common(
+    message: str,
+    bot_token: Optional[str],
+    session_id: str,
+    headers_from_json: Dict[str, str],
+    is_streaming: bool,
+):
     app_name = headers_from_json.pop(X_App_Name, None)
     if not message or len(message) > 255:
         abort(400, description="Invalid content, the size is larger than 255 char")
@@ -137,7 +147,6 @@ async def handle_chat_send_common(message: str, bot_token: Optional[str], sessio
     if not bot_token:
         return Response(response="bot token is required", status=400)
     bot = find_one_or_fail_by_token(bot_token)
-
 
     base_prompt = bot.prompt_message
 
@@ -162,7 +171,7 @@ async def handle_chat_send_common(message: str, bot_token: Optional[str], sessio
             bot_id=str(bot.id),
             headers=headers_from_json,
             app=app_name,
-            is_streaming=is_streaming
+            is_streaming=is_streaming,
         )
 
         if response_data["response"]:
@@ -177,8 +186,11 @@ async def handle_chat_send_common(message: str, bot_token: Optional[str], sessio
                 message=response_data["response"] or response_data["error"] or "",
             )
         elif response_data["error"]:
-            upsert_analytics_record(chatbot_id=str(bot.id), successful_operations=0, total_operations=1,
-                                    logs=response_data["error"],
+            upsert_analytics_record(
+                chatbot_id=str(bot.id),
+                successful_operations=0,
+                total_operations=1,
+                logs=response_data["error"],
             )
 
         emit(session_id, "|im_end|") if is_streaming else None
