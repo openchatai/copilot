@@ -13,10 +13,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Setup pnpm
-        uses: pnpm/action-setup
-        with:
-          version: latest
+      - uses: pnpm/action-setup@v2
 
       - name: Install dependencies
         run: cd copilot-widget/ && pnpm install
