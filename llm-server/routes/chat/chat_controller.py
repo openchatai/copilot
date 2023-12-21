@@ -3,6 +3,7 @@ from typing import Optional
 from typing import cast
 
 from flask import jsonify, Blueprint, request, Response, abort, Request
+from custom_types.response_dict import ResponseDict
 
 from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id,
@@ -115,6 +116,10 @@ def init_chat():
 
 @chat_workflow.route("/send", methods=["POST"])
 async def send_chat():
+    response_data: ResponseDict = {
+        "error": "",
+        "response": "Something went wrong, please try again!",
+    }
     json_data = request.get_json()
 
     input_data = ChatInput(**json_data)
