@@ -3,12 +3,11 @@ import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Link } from '@/lib/router-events'
-import { useCopilot } from '../../../_context/CopilotProvider';
 import useSWR, { mutate } from 'swr';
 import { getFlowsByBotId } from '@/data/new_flows';
-import { format } from 'timeago.js';
 import _ from 'lodash';
 import { EmptyBlock } from '@/components/domain/EmptyBlock';
+import { useCopilot } from '@/app/(copilot)/copilot/_context/CopilotProvider';
 export const revalidateWorkflows = (copilot_id: string) => mutate(copilot_id + '/workflows')
 
 function WorkflowsTable() {

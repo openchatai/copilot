@@ -18,11 +18,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { createFlowByBotId } from "@/data/new_flows";
-import { useCopilot } from "../../../_context/CopilotProvider";
 import { useAsyncFn } from "react-use";
 import { toast } from "@/components/ui/use-toast";
 import { atom, useAtom } from "jotai";
 import { useRouter } from "@/lib/router-events";
+import { useCopilot } from "@/app/(copilot)/copilot/_context/CopilotProvider";
 
 const formSchema = z.object({
   name: z.string().min(2, {
