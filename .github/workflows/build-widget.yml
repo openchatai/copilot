@@ -13,11 +13,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - name: Setup pnpm
+        uses: pnpm/action-setup
+        with:
+          version: latest
+
       - name: Install dependencies
-        run: cd copilot-widget/ && npm install
+        run: cd copilot-widget/ && pnpm install
 
       - name: Build copilot-widget
-        run: cd copilot-widget/ && npm run build:embed
+        run: cd copilot-widget/ && pnpm build:embed
 
       - name: Upload embed as artifact.
         uses: actions/upload-artifact@v3
