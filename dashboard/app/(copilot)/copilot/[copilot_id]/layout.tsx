@@ -55,6 +55,7 @@ export default function CopilotLayout({ children, params }: Props) {
             <CopilotLayoutNavLink
               href={copilotBase + "/workflow"}
               IconComponent={Workflow}
+              segment="workflow"
               label="Flows & Actions"
             />
             <CopilotLayoutNavLink
