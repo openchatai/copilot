@@ -42,7 +42,6 @@ In the `.env` file located in the `llm-server` directory, make sure to replace t
 
 ```
 OPENAI_API_KEY=YOUR_TOKEN_HERE
-MYSQL_URI=mysql://dbuser:dbpass@mysql:3306/opencopilot
 ```
 
 ### For Linux Machines
