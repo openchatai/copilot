@@ -1,5 +1,5 @@
 from typing import Optional
-from typing import cast
+from typing import cast, Dict
 
 from flask import jsonify, Blueprint, request, Response, abort, Request
 
@@ -16,6 +16,7 @@ from utils.get_logger import CustomLogger
 from utils.llm_consts import X_App_Name
 from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
 from .. import root_service
+from flask_socketio import SocketIO
 
 db_instance = NoSQLDatabase()
 mongo = db_instance.get_db()
@@ -109,6 +110,10 @@ def init_chat():
     )
 
 
+async def send_chat_stream(message: str, bot_token: str, session_id: str, headers_from_json: Dict[str, str]):
+    await handle_chat_send_common(message, bot_token, session_id, headers_from_json)
+    
+
 @chat_workflow.route("/send", methods=["POST"])
 async def send_chat():
     json_data = request.get_json()
@@ -119,7 +124,13 @@ async def send_chat():
     headers_from_json = input_data.headers
 
     bot_token = request.headers.get("X-Bot-Token")
+    return await handle_chat_send_common(message, bot_token, session_id, headers_from_json)
 
+    
+    
+    
+async def handle_chat_send_common(message: str, bot_token: str, session_id: str, headers_from_json: Dict[str, str]):
+    app_name = headers_from_json.pop(X_App_Name, None)
     if not message or len(message) > 255:
         abort(400, description="Invalid content, the size is larger than 255 char")
 
@@ -127,7 +138,6 @@ async def send_chat():
         return Response(response="bot token is required", status=400)
     bot = find_one_or_fail_by_token(bot_token)
 
-    app_name = headers_from_json.pop(X_App_Name, None)
 
     base_prompt = bot.prompt_message
 
