@@ -139,6 +139,7 @@ async def run_actionable_item(
     
     actions = actionable_item.get(VectorCollections.actions)
     flows = actionable_item.get(VectorCollections.flows)
+
     _flow = None
     if actionable_item.get(VectorCollections.actions) and actions is not None:
         action = actions[0]
