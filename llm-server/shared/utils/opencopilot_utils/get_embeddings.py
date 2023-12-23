@@ -4,7 +4,6 @@ from functools import lru_cache
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.embeddings.ollama import OllamaEmbeddings
 from .embedding_type import EmbeddingProvider
-from langchain.embeddings.base import Embeddings
 from utils.get_logger import CustomLogger
 
 
@@ -20,13 +19,6 @@ def get_embeddings():
     if embedding_provider == EmbeddingProvider.azure.value:
         deployment = os.environ.get("AZURE_OPENAI_EMBEDDING_MODEL_NAME")
         client = os.environ.get("AZURE_OPENAI_API_TYPE")
-
-        # These keys should be set
-        # os.environ["OPENAI_API_TYPE"] = "azure"
-        # os.environ["OPENAI_API_BASE"] = "https://<your-endpoint.openai.azure.com/"
-        # os.environ["OPENAI_API_KEY"] = "your AzureOpenAI key"
-        # os.environ["OPENAI_API_VERSION"] = "2023-05-15"
-        # os.environ["OPENAI_PROXY"] = "http://your-corporate-proxy:8080"
 
         return OpenAIEmbeddings(
             deployment=deployment,

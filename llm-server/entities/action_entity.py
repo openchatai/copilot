@@ -9,12 +9,11 @@ class ActionDTO(BaseModel):
     request_type: str
     description: Optional[str]
     operation_id: Optional[str] = None  # Set as None initially
+    payload: Dict = {}
 
     # Additional Pydantic configuration
     class Config:
         extra = "allow"
-
-    payload: Dict = {}
 
     def __init__(self, **data):
         super().__init__(**data)
