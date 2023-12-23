@@ -46,7 +46,7 @@ def initialize_qdrant_client() -> QdrantClient:
     return client
 
 def get_mysql_uri():
-    mysql_uri = os.getenv("MYSQL_URI", None)
+    mysql_uri = os.getenv("MYSQL_URI", "mysql://dbuser:dbpass@mysql:3306/opencopilot")
     if not mysql_uri:
         raise ValueError("MYSQL_URI environment variable is not set")
 

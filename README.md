@@ -42,11 +42,7 @@ In the `.env` file located in the `llm-server` directory, make sure to replace t
 
 ```
 OPENAI_API_KEY=YOUR_TOKEN_HERE
-MYSQL_URI=mysql+pymysql://dbuser:dbpass@mysql:3306/opencopilot
-QDRANT_PASS=bW9tZW50bmVhcmZld2VyYXJ0YmVuZG1pbGticmVhdGhldGFsZXN3aGFsZW5vYm9keXM=
 ```
-
-Regarding the `QDRANT_PASS` variable, be advised that the current value functions as the default API key for Qdrant. We highly recommend customizing this key to suit your needs by modifying the corresponding value within the `qdrant_config.yaml` file.
 
 ### For Linux Machines
 

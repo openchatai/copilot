@@ -9,7 +9,7 @@ from .store_type import StoreType
 
 
 def init_vector_store(docs: list[Document], embeddings: Embeddings, options: StoreOptions) -> None:
-    store_type = StoreType[os.environ['STORE']]
+    store_type = StoreType[os.getenv('STORE', StoreType.QDRANT.value)]
 
     for doc in docs:
         doc.metadata.update(options.metadata)
