@@ -7,8 +7,9 @@
 tasks:
   - name: Install Conda
     command: |
+      cd
       curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-      bash Miniconda3-latest-Linux-x86_64.sh
+      bash Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda3
 
   - name: Activate Conda environment
     command: |
@@ -18,7 +19,7 @@ tasks:
     command: |
       cd /workspace/OpenCopilot
       llm-server && pip install -r requirements.txt
-      cd ..
+      cd ../dashboard
       pnpm dev
 
 vscode:
