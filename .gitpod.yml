@@ -6,5 +6,3 @@
 
 tasks:
   - init: pnpm install && make
-
-
