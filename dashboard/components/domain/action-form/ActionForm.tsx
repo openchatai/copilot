@@ -168,7 +168,9 @@ export function ActionForm({
                                                                     form.setValue(magic_field, !is_magic)
                                                                 }}
                                                                 data-value={is_magic}
-                                                                size='fit' variant='outline' className={cn("absolute right-1 p-1.5 top-1/2 -translate-y-1/2", is_magic ? 'opacity-75' : 'opacity-100')}>
+                                                                size='fit'
+                                                                variant={is_magic ? 'success' : 'outline'}
+                                                                className="absolute right-1 p-1.5 top-1/2 -translate-y-1/2">
                                                                 <Wand2 className="w-4 h-4" />
                                                             </Button>
                                                         </Tooltip>
@@ -240,7 +242,9 @@ export function ActionForm({
                                                                     form.setValue(magic_field, !is_magic)
                                                                 }}
                                                                 data-value={is_magic}
-                                                                size='fit' variant='outline' className={cn("absolute right-1 p-1.5 top-1/2 -translate-y-1/2", is_magic ? 'opacity-75' : 'opacity-100')}>
+                                                                size='fit'
+                                                                variant={is_magic ? 'success' : 'outline'}
+                                                                className="absolute right-1 p-1.5 top-1/2 -translate-y-1/2">
                                                                 <Wand2 className="w-4 h-4" />
                                                             </Button>
                                                         </Tooltip>
