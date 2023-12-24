@@ -8,10 +8,10 @@ from shared.models.opencopilot_db.pdf_data_sources import (
 from langchain.document_loaders import UnstructuredMarkdownLoader
 from shared.utils.opencopilot_utils import (
     get_embeddings,
-    init_vector_store,
     StoreOptions,
     get_file_path,
 )
+from shared.utils.opencopilot_utils.init_vector_store import init_vector_store
 from workers.utils.remove_escape_sequences import remove_escape_sequences
 
 
@@ -31,7 +31,6 @@ def process_markdown(file_name: str, bot_id: str):
         embeddings = get_embeddings()
         init_vector_store(
             docs,
-            embeddings,
             StoreOptions(namespace="knowledgebase", metadata={"bot_id": bot_id}),
         )
 

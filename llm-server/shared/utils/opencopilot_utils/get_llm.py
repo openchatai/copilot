@@ -67,8 +67,6 @@ def get_llm():
         'llama2': get_llama_llm
     }
     
-    api_type = os.environ.get('OPENAI_API_TYPE')
-    if api_type not in clients:
-        raise ValueError(f"Invalid OPENAI_API_TYPE: {api_type}")
+    api_type = os.environ.get('OPENAI_API_TYPE', 'openai')
     
     return clients[api_type]()

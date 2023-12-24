@@ -16,9 +16,9 @@ def get_vector_store(options: StoreOptions) -> VectorStore:
     """Gets the vector store for the given options."""
     vector_store: VectorStore
 
-    store_type = os.environ.get("STORE")
+    store_type = StoreType[os.environ.get("STORE", StoreType.QDRANT.value)]
 
-    if store_type == StoreType.QDRANT.value:
+    if store_type == StoreType.QDRANT:
         vector_store = Qdrant(
             client, collection_name=options.namespace, embeddings=embedding
         )

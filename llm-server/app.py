@@ -2,6 +2,7 @@ import asyncio
 from dotenv import load_dotenv
 from flask import Flask, request
 from flask import jsonify
+from utils.vector_store_setup import init_qdrant_collections
 
 from routes.action.action_controller import action
 from routes.chat.chat_controller import chat_workflow, send_chat_stream
@@ -17,8 +18,9 @@ from utils.db import NoSQLDatabase
 from routes.chat.chat_dto import ChatInput
 
 from flask_socketio import SocketIO
+from utils.get_logger import CustomLogger
 
-from utils.vector_store_setup import init_qdrant_collections
+logger = CustomLogger(__name__)
 
 db_instance = NoSQLDatabase()
 mongo = db_instance.get_db()
@@ -42,6 +44,11 @@ app.register_blueprint(action, url_prefix="/backend/actions")
 
 app.config.from_object(Config)
 
+@app.errorhandler(Exception)
+def internal_server_error(error):
+    # Log the error or perform any other necessary actions
+    logger.error(f"Internal Server Error: {str(error)}")
+    return jsonify({'error': 'Internal Server Error', 'message': 'An unexpected error occurred on the server.'}), 500
 
 @app.route("/healthcheck")
 def health_check():

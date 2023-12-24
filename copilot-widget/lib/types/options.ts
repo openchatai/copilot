@@ -5,6 +5,10 @@ export type Options = {
   triggerSelector: string;
   apiUrl: string;
   defaultOpen?: boolean;
+  containerProps?: React.DetailedHTMLProps<
+    React.HTMLAttributes<HTMLDivElement>,
+    HTMLDivElement
+  >;
   user?: {
     name?: string;
   };

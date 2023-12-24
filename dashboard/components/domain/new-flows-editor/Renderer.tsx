@@ -141,7 +141,7 @@ export function FlowRenderer() {
     const onConnect: OnConnect = () => {
         connectingNodeParams.current = null;
     }
-
+    
     return (
         <MemoizedDndContext nodes={nodes} actions={actions}>
             <div className='flex items-center justify-between w-full h-full overflow-hidden'>
@@ -158,23 +158,23 @@ export function FlowRenderer() {
                         </Button>
                     </div>
                     <div className='flex-1 w-full overflow-auto'>
-                        <ActionsList />
+                        <ActionsList disabled={isBlocksEmpty} />
                     </div>
                 </aside>
                 <AddActionDrawer />
                 <div className='flex-1 relative h-full' ref={reactFlowWrapper}>
                     {
-                        isBlocksEmpty && <div data-container='Empty block add button' className='absolute inset-0 z-50 flex-center bg-white p-4'>
-                            <div className='flex items-center flex-col gap-4 '>
-                                <p className='text-sm text-center font-medium'>
-                                    Start building your flow actions/steps:
+                        isBlocksEmpty && <div data-container='Empty block add button' className='absolute inset-0 z-50 flex-center bg-secondary p-4'>
+                            <div className='space-y-2'>
+                                <p className='text-base text-center font-medium'>
+                                    Start building your flow actions/steps
                                 </p>
-                                <div className='px-4 space-x-2'>
+                                <div className='px-4 flex items-center gap-3'>
                                     <Button size='sm' onClick={() => insertEmptyBlockAfter()}>
-                                        <Plus></Plus>
                                         I'll do it myself (recommended)
+                                        <Plus className='ms-1.5 size-4' />
                                     </Button>
-                                    <span className='text-base font-semibold'>/or/</span>
+                                    <span className='text-base font-semibold'>/OR/</span>
                                     <MagicAction defaultValue={description ?? ''} />
                                 </div>
                             </div>

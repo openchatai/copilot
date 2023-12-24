@@ -15,9 +15,8 @@
 OpenCopilot allows you to have your own product's AI copilot. It integrates with your underlying APIs and can execute API calls whenever needed. It uses LLMs to determine if the user's request requires calling an API endpoint. Then, it decides which endpoint to call and passes the appropriate payload based on the given API definition.
 
 ## How does it work?
-- Provide your API/backend definition, including your public endpoints and how to call them. Currently, OpenCopilot supports Swagger OpenAPI 3.0. We're also working on a UI to allow you to dynamically add endpoints.
+- Provide your APIs/actions definition, including your public endpoints and how to call them. Currently, OpenCopilot supports Swagger OpenAPI 3.0 for bulk import.
 - OpenCopilot validates your schema to achieve the best results.
-- We feed the API definition to an LLM.
 - Finally, you can integrate our user-friendly chat bubble into your SaaS app.
 
 
@@ -36,17 +35,11 @@ OpenCopilot allows you to have your own product's AI copilot. It integrates with
 git clone git@github.com:openchatai/OpenCopilot.git
 ```
 
-Please find below an update concerning the API key configuration in our system.
-
 In the `.env` file located in the `llm-server` directory, make sure to replace the placeholder value for the `OPENAI_API_KEY` variable with your actual token:
 
 ```
 OPENAI_API_KEY=YOUR_TOKEN_HERE
-MYSQL_URI=mysql+pymysql://dbuser:dbpass@mysql:3306/opencopilot
-QDRANT_PASS=bW9tZW50bmVhcmZld2VyYXJ0YmVuZG1pbGticmVhdGhldGFsZXN3aGFsZW5vYm9keXM=
 ```
-
-Regarding the `QDRANT_PASS` variable, be advised that the current value functions as the default API key for Qdrant. We highly recommend customizing this key to suit your needs by modifying the corresponding value within the `qdrant_config.yaml` file.
 
 ### For Linux Machines
 

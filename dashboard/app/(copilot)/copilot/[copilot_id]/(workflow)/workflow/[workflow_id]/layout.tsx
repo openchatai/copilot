@@ -6,10 +6,10 @@ import React from 'react'
 import { useAsyncFn } from 'react-use'
 import { syncWorkflowById as $syncWorkflowById, getFlowById } from '@/data/new_flows'
 import { toast } from '@/components/ui/use-toast';
-import { useCopilot } from '../../../_context/CopilotProvider'
 import useSWR from 'swr'
 import { getActionsByBotId } from '@/data/actions'
 import _, { uniqueId } from 'lodash'
+import { useCopilot } from '@/app/(copilot)/copilot/_context/CopilotProvider'
 
 type Props = {
     children: React.ReactNode;

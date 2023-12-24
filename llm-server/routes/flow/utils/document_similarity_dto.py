@@ -47,6 +47,10 @@ def select_top_documents(
         # Original logic with 0.3 score difference rule
         selected_documents = []
         previous_diff = 0
+        
+        if len(documents) == 1 and documents[0].score > 0.5:
+            selected_documents.append(documents[0])
+        
         for i in range(len(documents) - 1):
             selected_documents.append(documents[i])
             current_diff = documents[i].score - documents[i + 1].score

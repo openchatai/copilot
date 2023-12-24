@@ -3,8 +3,6 @@ import { useWidgetStateContext } from "./contexts/WidgetState";
 import cn from "./utils/cn";
 import ChatScreenWithSfxs from "./screens/ChatScreen";
 import { IS_SERVER } from "./utils/is_server";
-import root from 'react-shadow';
-import css from '../styles/index.css?inline';
 
 function useTrigger(selector: string, toggle: () => void) {
   const trigger = useRef<HTMLElement | null>(
@@ -24,32 +22,26 @@ function useTrigger(selector: string, toggle: () => void) {
 
 export function CopilotWidget({
   triggerSelector,
-  className,
 }: {
   triggerSelector: string;
-  className?: string;
 }) {
   const [open, toggle] = useWidgetStateContext();
   useTrigger(triggerSelector, toggle)
   return (
-    <root.div
-      className={className}>
-      <div
-        id="opencopilot-aicopilot"
-        data-open={open}
-        className={cn(
-          "opencopilot-font-inter opencopilot-w-full opencopilot-overflow-hidden opencopilot-h-full sm:opencopilot-rounded-xl opencopilot-bg-white",
-          "opencopilot-opacity-0 opencopilot-transition-opacity opencopilot-ease",
-          open &&
-          "opencopilot-opacity-100 opencopilot-animate-in opencopilot-fade-in",
-          !open &&
-          "opencopilot-hidden opencopilot-animate-out opencopilot-fade-out"
-        )}
-      >
-        <ChatScreenWithSfxs />
-      </div>
-      <style>{css}</style>
-    </root.div>
+    <div
+      id="opencopilot-aicopilot"
+      data-open={open}
+      className={cn(
+        "opencopilot-font-inter opencopilot-w-full opencopilot-overflow-hidden opencopilot-h-full sm:opencopilot-rounded-xl opencopilot-bg-white opencopilot-shadow",
+        "opencopilot-opacity-0 opencopilot-transition-opacity opencopilot-ease",
+        open &&
+        "opencopilot-opacity-100 opencopilot-animate-in opencopilot-fade-in",
+        !open &&
+        "opencopilot-hidden opencopilot-animate-out opencopilot-fade-out"
+      )}
+    >
+      <ChatScreenWithSfxs />
+    </div>
 
   );
 }

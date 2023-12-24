@@ -74,6 +74,11 @@ async def handle_request(
     app: Optional[str],
     is_streaming: bool,
 ) -> ResponseDict:
+    # Dict
+    response: ResponseDict = {
+        "error": "",
+        "response": "Something went wrong, please try again!",
+    }
     check_required_fields(base_prompt, text)
 
     tasks = [
@@ -170,6 +175,7 @@ async def run_actionable_item(
 
     actions = actionable_item.get(VectorCollections.actions)
     flows = actionable_item.get(VectorCollections.flows)
+
     _flow = None
     if actionable_item.get(VectorCollections.actions) and actions is not None:
         action = actions[0]
