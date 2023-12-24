@@ -1,5 +1,5 @@
 import { Field, Form } from "@/components/ui/form";
-import { FieldPath, FieldValues, FormState, UseControllerProps, useController, useForm } from "react-hook-form";
+import { FieldPath, FieldValues, FormState, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,6 +21,7 @@ import { FormErrorMessage } from "@/components/ui/FieldError";
 import { Tooltip } from "../Tooltip";
 import { Plus, Wand2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { produce } from "immer";
 
 function isValidField<
     TValues extends FieldValues = FieldValues,
@@ -54,7 +55,19 @@ export function ActionForm({
     });
 
 
-    function handleSubmit(data: ActionType) {
+    function handleSubmit(_data: ActionType) {
+        const data = produce(_data, (draft) => {
+            draft.parameters?.forEach((param) => {
+                if (param.is_magic) {
+                    param.value = `{{magic_field}}`
+                }
+            })
+            draft.headers?.forEach((header) => {
+                if (header.is_magic) {
+                    header.value = `{{magic_field}}`
+                }
+            })
+        })
         onSubmit?.(data, defaultValues);
     }
 
