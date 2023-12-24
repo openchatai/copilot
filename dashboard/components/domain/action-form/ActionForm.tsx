@@ -137,12 +137,14 @@ export function ActionForm({
                                             const isValid = isValidField(form.formState, `headers.${index}.value`)
                                             return (
                                                 <div className="flex items-center gap-2 animate-in fade-in slide-in-from-top-1" key={field.id}>
-                                                    <Input placeholder="Key"
+                                                    <input placeholder="Key"
+                                                        className="reset-input"
                                                         {...form.register(`headers.${index}.key`)}
                                                         data-valid={isValid}
                                                     />
 
-                                                    <Input placeholder="Value"
+                                                    <input placeholder="Value"
+                                                        className="reset-input"
                                                         data-valid={isValid}
                                                         {...form.register(`headers.${index}.value`)}
                                                     />
@@ -187,12 +189,16 @@ export function ActionForm({
                                             const isValid = isValidField(form.formState, `parameters.${index}.value`)
                                             return (
                                                 <div className="flex items-center gap-2 animate-in fade-in slide-in-from-top-1" key={field.id}>
-                                                    <Input placeholder="Key"
+                                                    <input
+                                                        className="reset-input"
+                                                        placeholder="Key"
                                                         {...form.register(`parameters.${index}.key`)}
                                                         data-valid={isValid}
                                                     />
 
-                                                    <Input placeholder="Value"
+                                                    <input
+                                                        className="reset-input"
+                                                        placeholder="Value"
                                                         data-valid={isValid}
                                                         {...form.register(`parameters.${index}.value`)}
                                                     />
