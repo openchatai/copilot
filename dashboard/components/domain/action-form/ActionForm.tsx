@@ -1,5 +1,5 @@
 import { Field, Form } from "@/components/ui/form";
-import { FieldPath, FieldValues, FormState, useForm } from "react-hook-form";
+import { FieldPath, FieldValues, FormState, UseControllerProps, useController, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,12 +13,14 @@ import {
 import _ from "lodash";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Plus, X } from "lucide-react";
 import { ActionType, actionSchema } from "./schema";
 import { apiMethods } from "@/types/utils";
 import React from "react";
 import { FieldArray } from "@/components/ui/FieldArray";
 import { FormErrorMessage } from "@/components/ui/FieldError";
+import { Tooltip } from "../Tooltip";
+import { Plus, Wand2, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 function isValidField<
     TValues extends FieldValues = FieldValues,
@@ -53,7 +55,7 @@ export function ActionForm({
     function handleSubmit(data: ActionType) {
         onSubmit?.(data, defaultValues);
     }
-
+    console.log(form.watch())
     return (
         <Form {...form}>
             <form className={className} onSubmit={form.handleSubmit(handleSubmit)}>
@@ -124,7 +126,7 @@ export function ActionForm({
                                         Headers
                                     </Label>
                                     <Button variant="link" size="fit"
-                                        onClick={() => append({ key: "", value: "" }, {
+                                        onClick={() => append({ key: "YOUR_KEY", value: "", is_magic: true }, {
                                             shouldFocus: true
                                         })}
                                     >
@@ -135,30 +137,50 @@ export function ActionForm({
                                     {
                                         fields.map((field, index) => {
                                             const isValid = isValidField(form.formState, `headers.${index}.value`)
+                                            const is_magic = form.watch(`headers.${index}.is_magic`)
+                                            const magic_field = `headers.${index}.is_magic`
                                             return (
                                                 <div className="flex items-center gap-2 animate-in fade-in slide-in-from-top-1" key={field.id}>
-                                                    <input placeholder="Key"
+                                                    <input
+                                                        placeholder="Key"
                                                         className="reset-input"
                                                         {...form.register(`headers.${index}.key`)}
                                                         data-valid={isValid}
                                                     />
-
-                                                    <input placeholder="Value"
-                                                        className="reset-input"
-                                                        data-valid={isValid}
-                                                        {...form.register(`headers.${index}.value`)}
-                                                    />
+                                                    <div className="relative w-fit reset-input">
+                                                        <input
+                                                            className="border-none outline-none h-full w-full pr-8"
+                                                            placeholder="Value"
+                                                            data-valid={isValid}
+                                                            disabled={is_magic}
+                                                            {...form.register(`headers.${index}.value`)}
+                                                        />
+                                                        <Tooltip delay={500} content={<p className="text-xs">
+                                                            Magic fields are automatically filled with data from the context of the flow/conversation
+                                                        </p>}>
+                                                            <Button
+                                                                onClick={() => {
+                                                                    // @ts-ignore
+                                                                    form.setValue(magic_field, !is_magic)
+                                                                }}
+                                                                data-value={is_magic}
+                                                                size='fit' variant='outline' className={cn("absolute right-1 p-1.5 top-1/2 -translate-y-1/2", is_magic ? 'opacity-75' : 'opacity-100')}>
+                                                                <Wand2 className="w-4 h-4" />
+                                                            </Button>
+                                                        </Tooltip>
+                                                    </div>
 
                                                     <button className="shrink-0 p-2 text-destructive"
                                                         type="button"
                                                         onClick={() => remove(index)}>
                                                         <X className="w-4 h-4" />
                                                     </button>
+
                                                 </div>
                                             )
                                         })
                                     }
-                                </div>
+                                </div >
                             </>
                         }}
                     />
@@ -176,7 +198,7 @@ export function ActionForm({
                                         Parameters
                                     </Label>
                                     <Button variant="link" size="fit"
-                                        onClick={() => append({ key: "", value: "" }, {
+                                        onClick={() => append({ key: "YOUR_KEY", value: "", is_magic: false }, {
                                             shouldFocus: true
                                         })}
                                     >
@@ -187,39 +209,57 @@ export function ActionForm({
                                     {
                                         fields.map((field, index) => {
                                             const isValid = isValidField(form.formState, `parameters.${index}.value`)
+                                            const is_magic = form.watch(`parameters.${index}.is_magic`)
+                                            const magic_field = `parameters.${index}.is_magic`
                                             return (
                                                 <div className="flex items-center gap-2 animate-in fade-in slide-in-from-top-1" key={field.id}>
                                                     <input
-                                                        className="reset-input"
                                                         placeholder="Key"
+                                                        className="reset-input"
                                                         {...form.register(`parameters.${index}.key`)}
                                                         data-valid={isValid}
                                                     />
-
-                                                    <input
-                                                        className="reset-input"
-                                                        placeholder="Value"
-                                                        data-valid={isValid}
-                                                        {...form.register(`parameters.${index}.value`)}
-                                                    />
+                                                    <div className="relative w-fit reset-input">
+                                                        <input
+                                                            className="border-none outline-none h-full w-full pr-8"
+                                                            placeholder="Value"
+                                                            data-valid={isValid}
+                                                            disabled={is_magic}
+                                                            {...form.register(`parameters.${index}.value`)}
+                                                        />
+                                                        <Tooltip delay={500} content={<p className="text-xs">
+                                                            Magic fields are automatically filled with data from the context of the flow/conversation
+                                                        </p>}>
+                                                            <Button
+                                                                onClick={() => {
+                                                                    // @ts-ignore
+                                                                    form.setValue(magic_field, !is_magic)
+                                                                }}
+                                                                data-value={is_magic}
+                                                                size='fit' variant='outline' className={cn("absolute right-1 p-1.5 top-1/2 -translate-y-1/2", is_magic ? 'opacity-75' : 'opacity-100')}>
+                                                                <Wand2 className="w-4 h-4" />
+                                                            </Button>
+                                                        </Tooltip>
+                                                    </div>
 
                                                     <button className="shrink-0 p-2 text-destructive"
                                                         type="button"
                                                         onClick={() => remove(index)}>
                                                         <X className="w-4 h-4" />
                                                     </button>
+
                                                 </div>
                                             )
                                         })
                                     }
-                                </div>
+                                </div >
                             </>
                         }}
                     />
                 </div>
                 {footer?.(form)}
             </form>
-        </Form>
+        </Form >
 
     )
 }
