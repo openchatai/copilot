@@ -130,7 +130,7 @@ export function DefineActionsStep() {
                             </AlertDialogTitle>
                         </AlertDialogHeader>
                         <ActionForm
-                            className="space-y-2.5 flex-1 overflow-auto"
+                            className="space-y-2.5 flex-1 overflow-auto no-scrollbar"
                             onSubmit={async (values) => {
                                 if (createdCopilot) {
                                     const { data } = await $addAction(createdCopilot.id, values);
