@@ -8,7 +8,7 @@ tasks:
       echo "Host github.com" > ~/.ssh/config
       echo "  IdentityFile ~/.ssh/id_rsa" >> ~/.ssh/config
       chmod 600 ~/.ssh/config
-      echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
+      echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
       chmod 600 ~/.ssh/id_rsa
       
       # Add the SSH key to the SSH agent
