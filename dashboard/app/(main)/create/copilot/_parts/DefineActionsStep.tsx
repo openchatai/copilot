@@ -130,6 +130,7 @@ export function DefineActionsStep() {
                             </AlertDialogTitle>
                         </AlertDialogHeader>
                         <ActionForm
+                            className="space-y-2.5 flex-1 overflow-auto no-scrollbar"
                             onSubmit={async (values) => {
                                 if (createdCopilot) {
                                     const { data } = await $addAction(createdCopilot.id, values);
@@ -148,14 +149,15 @@ export function DefineActionsStep() {
                                 }
                             }}
                             footer={
-                                () => <AlertDialogFooter>
-                                    <AlertDialogCancel asChild>
-                                        <Button variant='outline'>Cancel</Button>
-                                    </AlertDialogCancel>
-                                    <Button type="submit" loading={addActionState.loading}>
-                                        Create Action
-                                    </Button>
-                                </AlertDialogFooter>
+                                () =>
+                                    <AlertDialogFooter className="mt-5">
+                                        <AlertDialogCancel asChild>
+                                            <Button variant='outline'>Cancel</Button>
+                                        </AlertDialogCancel>
+                                        <Button type="submit" loading={addActionState.loading}>
+                                            Create Action
+                                        </Button>
+                                    </AlertDialogFooter>
                             } />
                     </AlertDialogContent>
                     <AlertDialogTrigger asChild>

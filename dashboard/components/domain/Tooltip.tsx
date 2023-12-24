@@ -2,9 +2,9 @@
 import React, { ComponentPropsWithoutRef } from "react";
 import { Tooltip as OriginalTooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
-export function Tooltip({ children, content, ...contentProps }: { children: React.ReactNode, content: React.ReactNode } & Omit<ComponentPropsWithoutRef<typeof TooltipContent>, 'content'>) {
+export function Tooltip({ children, content, delay = 0, ...contentProps }: { children: React.ReactNode, content: React.ReactNode, delay?: number } & Omit<ComponentPropsWithoutRef<typeof TooltipContent>, 'content'>) {
     return (
-        <TooltipProvider delayDuration={0}>
+        <TooltipProvider delayDuration={delay}>
             <OriginalTooltip>
                 <TooltipTrigger asChild>
                     {children}
