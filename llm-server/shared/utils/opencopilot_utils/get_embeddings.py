@@ -37,7 +37,8 @@ def get_embeddings():
         if embedding_provider is None:
             warnings.warn("No embedding provider specified. Defaulting to OpenAI.")
         return OpenAIEmbeddings()
-
+    elif embedding_provider == EmbeddingProvider.llama2.value:
+        return OllamaEmbeddings(model="llama2:7b")
     else:
         available_providers = ", ".join(
             [service.value for service in EmbeddingProvider]

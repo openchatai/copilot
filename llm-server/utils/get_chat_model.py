@@ -49,6 +49,8 @@ def get_chat_model() -> BaseChatModel:
         )
     elif model_name == "openchat":
         model = ChatOllama(base_url=f"{localip}:11434", model="openchat", temperature=0)
+    elif model_name == "llama2":
+        model = ChatOllama(base_url=f"{localip}:11434", model="llama2:7b-chat", temperature=0)
     else:
         raise ValueError(f"Unsupported model: {model_name}")
     return model
