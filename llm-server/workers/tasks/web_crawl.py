@@ -9,7 +9,7 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.remote.webdriver import BaseWebDriver
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-from shared.utils.opencopilot_utils import get_embeddings, init_vector_store
+from shared.utils.opencopilot_utils.init_vector_store import init_vector_store
 from shared.utils.opencopilot_utils.interfaces import StoreOptions
 from shared.models.opencopilot_db.website_data_sources import (
     create_website_data_source,
@@ -24,7 +24,7 @@ from utils.get_logger import CustomLogger
 
 logger = CustomLogger(__name__)
 
-selenium_grid_url = os.getenv("SELENIUM_GRID_URL", "http://localhost:4444/wd/hub")
+selenium_grid_url = os.getenv("SELENIUM_GRID_URL", "http://selenium:4444/wd/hub")
 
 
 def is_valid_url(url, target_url):
@@ -103,10 +103,8 @@ def scrape_website_in_bfs(
             )
 
             docs = text_splitter.create_documents([text])
-            embeddings = get_embeddings()
             init_vector_store(
                 docs,
-                embeddings,
                 StoreOptions(namespace="knowledgebase", metadata={"bot_id": bot_id}),
             )
             update_website_data_source_status_by_url(url=url, status="SUCCESS")

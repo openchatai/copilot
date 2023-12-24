@@ -27,29 +27,34 @@ Enhance your development experience with Mypy (optional):
 
 1. Begin by cloning the "opencopilot" Flask app repository to your local machine.
 
-### Environmental Configuration
+## Environmental Configuration
 
-Create a file named `.env` at the root of the "llm_server" directory for environmental configuration:
+To configure the environment for the "llm_server" project, follow these steps:
 
-**.env** (local development)
+1. **Create `.env` File:**
+   Create a file named `.env` at the root of the "llm_server" directory to store environmental configuration settings for local development.
 
-```ini
-OPENAI_API_KEY=<YOUR OPEN AI KEY>
-PINECONE_API_KEY=<YOUR PINECONE KEY>
-PINECONE_ENV=<YOUR PINECONE ENVIRONMENT>
-MONGODB_URI=<MONGODB CONNECTION STRING>
-QDRANT_SERVER_URI=<QDRANT SERVER URL>
-QDRANT_API_KEY=<YOUR QDRANT API KEY>
+   **Example .env File:**
+   ```ini
+   OPENAI_API_KEY=<YOUR OPEN AI KEY>
+   ```
 
-# QDRANT_PASS must be set to the following key
-QDRANT_PASS=bW9tZW50bmVhcmZld2VyYXJ0YmVuZG1pbGticmVhdGhldGFsZXN3aGFsZW5vYm9keXM=
-ACTIONS_SCORE_THRESHOLD=0.5
-FLOWS_SCORE_THRESHOLD=0.5
-KB_SCORE_THRESHOLD=0.5
-TARGET=development
-```
+2. **Additional Environment Variables (Optional):**
+   You can set additional environment variables to fine-tune your copilots. While these variables are not mandatory, you may choose to configure them based on your needs.
 
-Replace placeholders with the appropriate values.
+   - `PINECONE_API_KEY`: Your Pinecone API key.
+   - `PINECONE_ENV`: Your Pinecone environment.
+   - `MONGODB_URI`: MongoDB connection string.
+   - `QDRANT_SERVER_URI`: QDRANT server URL.
+   - `QDRANT_API_KEY`: Your QDRANT API key.
+   - `QDRANT_PASS`: Base64-encoded string for QDRANT pass.
+   - `ACTIONS_SCORE_THRESHOLD`: Threshold for actions score (default: 0.5).
+   - `FLOWS_SCORE_THRESHOLD`: Threshold for flows score (default: 0.5).
+   - `KB_SCORE_THRESHOLD`: Threshold for KB score (default: 0.5).
+   - `TARGET`: Environment target (default: development).
+
+   Note: Adjust the values according to your specific configuration requirements.
+
 
 ### Project Dependencies
 

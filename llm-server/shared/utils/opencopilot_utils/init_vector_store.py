@@ -6,16 +6,17 @@ from langchain.vectorstores.qdrant import Qdrant
 
 from .interfaces import StoreOptions
 from .store_type import StoreType
+from shared.utils.opencopilot_utils.get_vector_store import get_vector_store
 
-
-def init_vector_store(docs: list[Document], embeddings: Embeddings, options: StoreOptions) -> None:
-    store_type = StoreType[os.environ['STORE']]
+def init_vector_store(docs: list[Document], options: StoreOptions) -> None:
+    store_type = StoreType[os.getenv('STORE', StoreType.QDRANT.value)]
 
     for doc in docs:
         doc.metadata.update(options.metadata)
 
     if store_type == StoreType.QDRANT:
-        Qdrant.from_documents(docs, embeddings, collection_name=options.namespace, url=os.environ['QDRANT_URL'])
+        kb_vector_store = get_vector_store(StoreOptions("knowledgebase"))
+        kb_vector_store.add_documents(docs)
     else:
         valid_stores = ", ".join(StoreType._member_names())
         raise ValueError(

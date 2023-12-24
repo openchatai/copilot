@@ -1,7 +1,9 @@
+from http import HTTPStatus
 from typing import Optional
 from typing import cast
 
 from flask import jsonify, Blueprint, request, Response, abort, Request
+from custom_types.response_dict import ResponseDict
 
 from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id,
@@ -96,21 +98,28 @@ def init_chat():
             404,
         )
 
-    bot = find_one_or_fail_by_token(bot_token)
-    # Replace 'faq' and 'initialQuestions' with actual logic or data as needed.
-    return jsonify(
-        {
-            "bot_name": bot.name,
-            "logo": "logo",
-            "faq": [],  # Replace with actual FAQ data
-            "initial_questions": [],  # Replace with actual initial questions
-            "history": history,
-        }
-    )
+    try:
+        bot = find_one_or_fail_by_token(bot_token)
+        # Replace 'faq' and 'initialQuestions' with actual logic or data as needed.
+        return jsonify(
+            {
+                "bot_name": bot.name,
+                "logo": "logo",
+                "faq": [],  # Replace with actual FAQ data
+                "initial_questions": [],  # Replace with actual initial questions
+                "history": history,
+            }
+        )
+    except Exception as e:
+        return Response(status=HTTPStatus.NOT_FOUND, response="Bot Not Found")
 
 
 @chat_workflow.route("/send", methods=["POST"])
 async def send_chat():
+    response_data: ResponseDict = {
+        "error": "",
+        "response": "Something went wrong, please try again!",
+    }
     json_data = request.get_json()
 
     input_data = ChatInput(**json_data)
@@ -125,26 +134,13 @@ async def send_chat():
 
     if not bot_token:
         return Response(response="bot token is required", status=400)
-    bot = find_one_or_fail_by_token(bot_token)
 
     app_name = headers_from_json.pop(X_App_Name, None)
 
-    base_prompt = bot.prompt_message
-
-    if not bot:
-        return (
-            jsonify(
-                {
-                    "type": "text",
-                    "response": {
-                        "text": "I'm unable to help you at the moment, please try again later. **code: b404**"
-                    },
-                }
-            ),
-            404,
-        )
-
     try:
+        bot = find_one_or_fail_by_token(bot_token)
+        base_prompt = bot.prompt_message
+
         response_data = await root_service.handle_request(
             text=message,
             session_id=session_id,
@@ -166,8 +162,11 @@ async def send_chat():
                 message=response_data["response"] or response_data["error"] or "",
             )
         elif response_data["error"]:
-            upsert_analytics_record(chatbot_id=str(bot.id), successful_operations=0, total_operations=1,
-                                    logs=response_data["error"],
+            upsert_analytics_record(
+                chatbot_id=str(bot.id),
+                successful_operations=0,
+                total_operations=1,
+                logs=response_data["error"],
             )
 
         return jsonify(

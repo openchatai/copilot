@@ -13,6 +13,9 @@ from routes.uploads.upload_controller import upload_controller
 from shared.models.opencopilot_db import create_database_schema
 from utils.config import Config
 from utils.db import NoSQLDatabase
+from utils.get_logger import CustomLogger
+
+logger = CustomLogger(__name__)
 
 from utils.vector_store_setup import init_qdrant_collections
 db_instance = NoSQLDatabase()
@@ -35,6 +38,11 @@ app.register_blueprint(action, url_prefix="/backend/actions")
 
 app.config.from_object(Config)
 
+@app.errorhandler(Exception)
+def internal_server_error(error):
+    # Log the error or perform any other necessary actions
+    logger.error(f"Internal Server Error: {str(error)}")
+    return jsonify({'error': 'Internal Server Error', 'message': 'An unexpected error occurred on the server.'}), 500
 
 @app.route("/healthcheck")
 def health_check():
