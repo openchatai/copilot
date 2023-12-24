@@ -1,6 +1,6 @@
 'use client'
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetClose, SheetFooter } from "@/components/ui/sheet";
 import { atom, useAtom } from "jotai";
 import { ActionForm } from "../action-form/ActionForm";
 import { ActionType } from "../action-form/schema";
@@ -27,8 +27,8 @@ export function AddActionDrawer() {
 
     return (
         <Sheet open={drawerState} onOpenChange={setDrawerState}>
-            <SheetContent className="flex flex-col items-start p-0 justify-between sm:max-w-lg w-full [&>div]:p-6">
-                <SheetHeader className="border-b w-full">
+            <SheetContent className="overflow-auto pb-0">
+                <SheetHeader className="border-b pb-2 w-full">
                     <SheetTitle>
                         Define API action
                     </SheetTitle>
@@ -36,16 +36,19 @@ export function AddActionDrawer() {
                         Crate a new action for your flow
                     </SheetDescription>
                 </SheetHeader>
-                <div className="w-full flex-1 overflow-auto">
-                    <ActionForm onSubmit={handleOnSubmit}
-                        className="flex flex-col"
-                        footer={
-                            (form) => (<div className="space-x-2 mt-4 sticky bottom-2 bg-white z-10 py-5">
+                <ActionForm
+                    className="w-full flex-1 space-y-3 py-5 h-fit"
+                    onSubmit={handleOnSubmit}
+                    footer={
+                        (form) => (
+                            <SheetFooter className="sticky w-full py-3 bg-white bottom-0 inset-x-0">
                                 <Button disabled={!form.formState.isValid} loading={state.loading} type="submit">Create</Button>
-                                <Button variant='ghost' onClick={() => setDrawerState(false)}>Cancel</Button>
-                            </div>)
-                        } />
-                </div>
+                                <SheetClose asChild>
+                                    <Button variant='ghost'>Cancel</Button>
+                                </SheetClose>
+                            </SheetFooter>
+                        )
+                    } />
             </SheetContent>
         </Sheet>
 
