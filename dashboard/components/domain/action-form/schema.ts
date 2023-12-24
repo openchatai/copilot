@@ -51,23 +51,6 @@ export const actionSchema = z.object({
         });
     }),
     body: z.string().optional()
-        .refine((value) => {
-            if (typeof value === 'string' && value.trim().length === 0) {
-                return true;
-            }
-            try {
-                if (typeof value !== 'string') {
-                    return false;
-                }
-                JSON.parse(value);
-                return true;
-            } catch (e) {
-                return false;
-            }
-        }, {
-            message: 'Please enter a valid JSON string'
-        })
-    ,
 });
 
 export type ActionType = z.infer<typeof actionSchema>;
