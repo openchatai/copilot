@@ -48,14 +48,16 @@ export function ActionForm({
 
     const form = useForm<ActionType>({
         resolver: zodResolver(actionSchema),
-        defaultValues,
+        defaultValues: defaultValues ?? {
+            request_type: 'GET',
+        }
     });
 
 
     function handleSubmit(data: ActionType) {
         onSubmit?.(data, defaultValues);
     }
-    console.log(form.watch())
+
     return (
         <Form {...form}>
             <form className={className} onSubmit={form.handleSubmit(handleSubmit)}>
@@ -77,7 +79,9 @@ export function ActionForm({
                 />
                 <div>
                     <div data-valid={isValidField(form.formState, 'request_type') ?? isValidField(form.formState, 'api_endpoint')} className="flex items-center data-[valid=false]:!border-destructive h-12 gap-0.5 p-0.5 overflow-hidden border border-border w-full m-0 bg-white shadow-sm rounded-md focus:outline-none text-sm focus-visible:outline-none transition-colors">
-                        <Select {..._.omit(form.register('request_type'), ['ref'])}
+                        <Select
+                            value={form.watch('request_type')}
+                            {..._.omit(form.register('request_type'), ['ref'])}
                             onValueChange={(v) => {
                                 form.register('request_type').onChange({
                                     target: {
