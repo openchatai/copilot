@@ -47,13 +47,6 @@
       "icon": "rectangle-code"
     },
     {
-      "group": "Customization",
-      "pages": [
-        "dashboard/custom_state"
-      ]
-    },
-
-    {
       "group": "Copilot widget",
       "pages": [
         "widget/embed"
