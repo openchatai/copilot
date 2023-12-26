@@ -8,7 +8,7 @@ import cn from "../utils/cn";
 import formatTimeFromTimestamp from "../utils/formatTime";
 import { useCopyToClipboard } from "@lib/hooks/useCopy";
 import { FailedMessage, useChat } from "@lib/contexts/Controller";
-import { getLast } from "@lib/utils/utils";
+import { getLast, isEmpty } from "@lib/utils/utils";
 import { useConfigData } from "@lib/contexts/ConfigData";
 import { useTextRotator } from "@lib/hooks/useTextRotator";
 import useTypeWriter from "@lib/hooks/useTypeWriter";
@@ -56,6 +56,7 @@ export function BotTextMessage({
   const [copied, copy] = useCopyToClipboard();
   const { messages } = useChat();
   const isLast = getLast(messages)?.id === id;
+  if (isEmpty(message)) return null;
   return (
     <div className="opencopilot-p-2 group opencopilot-w-full opencopilot-shrink-0">
       <div
