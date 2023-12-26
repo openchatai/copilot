@@ -1,12 +1,12 @@
 import {
-  createContext,
-  useContext,
   type ReactNode,
   useEffect,
   useState,
 } from "react";
 import { useAxiosInstance } from "./axiosInstance";
 import { InitialDataType } from "@lib/types";
+import { getInitialData } from "@lib/data/chat";
+import { createSafeContext } from "./create-safe-context";
 
 type InitialDataContextType = {
   data: InitialDataType | undefined;
@@ -14,20 +14,22 @@ type InitialDataContextType = {
   refetch: () => void;
 };
 
-const InitialDataContext = createContext<InitialDataContextType>(
-  {} as InitialDataContextType
-);
+const [
+  useInitialData,
+  InitialDataSafeProvider,
+] = createSafeContext<InitialDataContextType>();
 
-export function InitialDataProvider({ children }: { children: ReactNode }) {
+
+
+function InitialDataProvider({ children }: { children: ReactNode }) {
   const { axiosInstance } = useAxiosInstance();
   const [data, setData] = useState<InitialDataType | undefined>();
   const [loading, setLoading] = useState<boolean>(true);
 
-  async function loadData() {
+  function loadData() {
     setLoading(true);
-    axiosInstance
-      .get<InitialDataType>("/chat/init")
-      .then(({ data }) => setData(data))
+    getInitialData(axiosInstance)
+      .then((data) => setData(data))
       .finally(() => setLoading(false));
   }
 
@@ -37,7 +39,7 @@ export function InitialDataProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <InitialDataContext.Provider
+    <InitialDataSafeProvider
       value={{
         data,
         loading,
@@ -45,14 +47,11 @@ export function InitialDataProvider({ children }: { children: ReactNode }) {
       }}
     >
       {children}
-    </InitialDataContext.Provider>
+    </InitialDataSafeProvider>
   );
 }
-
-export const useInitialData = (): InitialDataContextType => {
-  const context = useContext(InitialDataContext);
-  if (!context) {
-    console.warn("Error loading initial data....");
-  }
-  return context;
-};
+export {
+  // eslint-disable-next-line react-refresh/only-export-components
+  useInitialData,
+  InitialDataProvider,
+}
