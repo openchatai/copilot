@@ -1,5 +1,11 @@
 import structlog
 import logging
+import sentry_sdk
+
+sentry_sdk.init(
+    traces_sample_rate=1.0,
+    profiles_sample_rate=1.0,
+)
 
 structlog.configure(
     processors=[
@@ -14,7 +20,6 @@ structlog.configure(
     cache_logger_on_first_use=True,
 )
 
-
 class CustomLogger:
     def __init__(self, module_name: str = __name__, level: int = logging.INFO):
         self.logger = structlog.get_logger(module_name)
@@ -26,6 +31,8 @@ class CustomLogger:
             event=event,
             **kwargs
         )
+        # Send logs to Sentry
+        sentry_sdk.capture_message(event, level=level, scope=None)
 
     def info(self, event, **kwargs):
         self.log(logging.INFO, event, **kwargs)
