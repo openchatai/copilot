@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useWidgetStateContext } from "./contexts/WidgetState";
+import { useWidgetState } from "./contexts/WidgetState";
 import cn from "./utils/cn";
 import ChatScreenWithSfxs from "./screens/ChatScreen";
 import { IS_SERVER } from "./utils/is_server";
@@ -25,7 +25,7 @@ export function CopilotWidget({
 }: {
   triggerSelector: string;
 }) {
-  const [open, toggle] = useWidgetStateContext();
+  const [open, toggle] = useWidgetState();
   useTrigger(triggerSelector, toggle)
   return (
     <div
