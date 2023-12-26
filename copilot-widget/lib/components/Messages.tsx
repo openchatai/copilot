@@ -111,8 +111,8 @@ const waitingText = [
   "Almost there...",
 ]
 
-export function BotMessageLoading() {
-  const displayText = useTextRotator({ texts: waitingText, intervalInSeconds: 2 })
+export function BotMessageLoading({ displayText }: { displayText: string }) {
+  // const displayText = useTextRotator({ texts: waitingText, intervalInSeconds: 2 })
 
   return (
     <div className="opencopilot-p-2 opencopilot-flex opencopilot-items-center opencopilot-shrink-0 opencopilot-gap-3 opencopilot-w-full">
@@ -125,7 +125,7 @@ export function BotMessageLoading() {
         />
       </div>
       <div className="opencopilot-space-y-2 opencopilot-flex-1">
-        <div className="mesg_body opencopilot-w-fit opencopilot-max-w-full">
+        {/* <div className="mesg_body opencopilot-w-fit opencopilot-max-w-full">
           {
             displayText.map(({ isVisible, order, text }) => (
               <p data-visible={isVisible} key={order} className="opencopilot-text-sm 
@@ -138,6 +138,9 @@ export function BotMessageLoading() {
               </p>
             ))
           }
+        </div> */}
+        <div className="opencopilot-w-fit">
+          <p className="opencopilot-block opencopilot-text-sm">{displayText}</p>
         </div>
       </div>
     </div>

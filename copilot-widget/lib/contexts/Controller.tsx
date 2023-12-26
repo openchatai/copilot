@@ -16,6 +16,7 @@ export type FailedMessage = {
 
 interface ChatContextData {
   messages: Message[];
+  conversationInfo: string | null;
   sendMessage: (message: Extract<Message, { from: 'user' }>) => void;
   loading: boolean;
   failedMessage: FailedMessage | null;
@@ -28,11 +29,11 @@ const [
 
 
 const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [currnetMessagePair, setCurrentMessagePair] = useState<{ user: string; bot: string } | null>(null);
+  const [currentMessagePair, setCurrentMessagePair] = useState<{ user: string; bot: string } | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const config = useConfigData();
   const { sessionId } = useSessionId(config.token);
-
+  const [conversationInfo, setConversationInfo] = useState<string | null>(null);
   const socket = useMemo(() => io('http://localhost:8888', {
     extraHeaders: {
       "X-Bot-Token": config.token,
@@ -40,7 +41,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     },
   }), [config, sessionId]);
   const [failedMessage, setError] = useState<FailedMessage | null>(null);
-  const loading = currnetMessagePair !== null;
+  const loading = currentMessagePair !== null;
 
   const sendMessage = async (message: Extract<Message, { from: "user" }>) => {
     // abort 
@@ -64,11 +65,11 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     createEmptyBotMessage(botMessageId)
   };
 
-  function createUserMessage(message: Extract<Message, { from: "user" }>) {
+  const createUserMessage = useCallback((message: Extract<Message, { from: "user" }>) => {
     setMessages((m) => [...m, message]);
-  }
+  }, [setMessages]);
 
-  function createEmptyBotMessage(id: string) {
+  const createEmptyBotMessage = useCallback((id: string) => {
     setMessages((m) => [...m, {
       timestamp: now(),
       from: "bot",
@@ -78,7 +79,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         text: ""
       }
     }])
-  }
+  }, [setMessages]);
 
   const updateBotMessage = useCallback((id: string, text: string) => {
     const botMessage = messages.find(m => m.id === id) as BotResponse
@@ -93,7 +94,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   useEffect(() => {
     socket.on(`${sessionId}_info`, (msg: string) => {
-      console.log({ log_msg: msg })
+      setConversationInfo(msg)
     })
 
     return () => {
@@ -102,7 +103,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   }, [sessionId, socket]);
 
   useEffect(() => {
-    const current = currnetMessagePair
+    const current = currentMessagePair
     // the content is the message.content from the server
     socket.on(sessionId, (content: string) => {
       if (current) {
@@ -110,19 +111,21 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
           setCurrentMessagePair(null)
           return
         }
+        setConversationInfo(null)
         updateBotMessage(current.bot, content)
       }
     });
 
     return () => { socket.off(sessionId) }
 
-  }, [currnetMessagePair, sessionId, socket, updateBotMessage]);
+  }, [currentMessagePair, sessionId, socket, updateBotMessage]);
 
   function reset() {
     setMessages([]);
   }
 
   const chatContextValue: ChatContextData = {
+    conversationInfo,
     messages,
     sendMessage,
     loading,
