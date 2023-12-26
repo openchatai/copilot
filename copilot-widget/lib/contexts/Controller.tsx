@@ -39,10 +39,6 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       "X-Session-Id": sessionId,
     },
   }), [config, sessionId]);
-
-  useEffect(() => {
-    console.log('rerendered')
-  })
   const [failedMessage, setError] = useState<FailedMessage | null>(null);
   const loading = currnetMessagePair !== null;
 
@@ -65,14 +61,14 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     })
 
     createUserMessage(userMessage);
-    createBotMessage(botMessageId)
+    createEmptyBotMessage(botMessageId)
   };
 
   function createUserMessage(message: Extract<Message, { from: "user" }>) {
     setMessages((m) => [...m, message]);
   }
 
-  function createBotMessage(id: string) {
+  function createEmptyBotMessage(id: string) {
     setMessages((m) => [...m, {
       timestamp: now(),
       from: "bot",
@@ -105,7 +101,6 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     };
   }, [sessionId, socket]);
 
-
   useEffect(() => {
     const current = currnetMessagePair
     // the content is the message.content from the server
@@ -126,6 +121,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   function reset() {
     setMessages([]);
   }
+
   const chatContextValue: ChatContextData = {
     messages,
     sendMessage,
