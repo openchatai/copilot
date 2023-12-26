@@ -10,7 +10,6 @@ import { useCopyToClipboard } from "@lib/hooks/useCopy";
 import { FailedMessage, useChat } from "@lib/contexts/Controller";
 import { getLast, isEmpty } from "@lib/utils/utils";
 import { useConfigData } from "@lib/contexts/ConfigData";
-import { useTextRotator } from "@lib/hooks/useTextRotator";
 import useTypeWriter from "@lib/hooks/useTypeWriter";
 
 function BotIcon({ error }: { error?: boolean }) {
@@ -60,7 +59,7 @@ export function BotTextMessage({
   return (
     <div className="opencopilot-p-2 group opencopilot-w-full opencopilot-shrink-0">
       <div
-        className="opencopilot-flex opencopilot-select-none opencopilot-items-start opencopilot-gap-3 opencopilot-w-full"
+        className="opencopilot-flex opencopilot-items-start opencopilot-gap-3 opencopilot-w-full"
         dir="auto"
       >
         <BotIcon />

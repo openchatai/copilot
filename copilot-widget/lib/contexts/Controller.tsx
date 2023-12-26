@@ -8,7 +8,6 @@ import { useSessionId } from "@lib/hooks/useSessionId";
 import { BotResponse, UserMessage } from "@lib/types/messageTypes";
 import { createSafeContext } from "./create-safe-context";
 
-
 export type FailedMessage = {
   message: Message;
   reason?: string;
@@ -34,12 +33,14 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const config = useConfigData();
   const { sessionId } = useSessionId(config.token);
   const [conversationInfo, setConversationInfo] = useState<string | null>(null);
+
   const socket = useMemo(() => io('http://localhost:8888', {
     extraHeaders: {
       "X-Bot-Token": config.token,
       "X-Session-Id": sessionId,
     },
   }), [config, sessionId]);
+
   const [failedMessage, setError] = useState<FailedMessage | null>(null);
   const loading = currentMessagePair !== null;
 
@@ -47,12 +48,13 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     // abort 
     const userMessageId = getId();
     const botMessageId = getId();
-    const userMessage: UserMessage & { session_id: string } = {
+    const userMessage: UserMessage & { session_id: string, headers: Record<string, string> } = {
       timestamp: now(),
       id: userMessageId,
       content: message.content,
       from: "user",
       session_id: sessionId,
+      headers: config.headers ?? {},
     }
     socket.emit('send_chat', userMessage);
 
