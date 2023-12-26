@@ -30,8 +30,8 @@ score_thresholds: Dict[str, float] = {
 }
 
 
-async def get_relevant_documents(
-        text: str, bot_id: str, collection_name: str
+async def search_documents(
+        text: str, collection_name: str, field_key: str, field_value: str
 ) -> List[DocumentSimilarityDTO]:
     try:
         embedding = get_embeddings()
@@ -42,8 +42,8 @@ async def get_relevant_documents(
             query_filter=models.Filter(
                 must=[
                     models.FieldCondition(
-                        key="metadata.bot_id",
-                        match=models.MatchValue(value=bot_id),
+                        key=f"metadata.{field_key}",
+                        match=models.MatchValue(value=field_value),
                     )
                 ]
             ),
@@ -83,16 +83,22 @@ async def get_relevant_documents(
         )
         return []
 
+# This is to be used when having conversation with the bot, we want to fetch the relevant pieces of history
+async def get_chat_history(
+        text: str, session_id: str, collection_name: str
+) -> List[DocumentSimilarityDTO]:
+    return await search_documents(text, collection_name, "session_id", session_id)
+
 
 async def get_relevant_actions(text: str, bot_id: str) -> List[DocumentSimilarityDTO]:
-    return await get_relevant_documents(text, bot_id, VectorCollections.actions)
+    return await search_documents(text, VectorCollections.actions, "bot_id", bot_id)
 
 
 async def get_relevant_flows(text: str, bot_id: str) -> List[DocumentSimilarityDTO]:
-    return await get_relevant_documents(text, bot_id, VectorCollections.flows)
+    return await search_documents(text, VectorCollections.flows, "bot_id", bot_id)
 
 
 async def get_relevant_knowledgebase(
         text: str, bot_id: str
 ) -> List[DocumentSimilarityDTO]:
-    return await get_relevant_documents(text, bot_id, VectorCollections.knowledgebase)
+    return await search_documents(text, VectorCollections.knowledgebase, "bot_id", bot_id)
