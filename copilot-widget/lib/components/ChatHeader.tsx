@@ -1,4 +1,4 @@
-import { useWidgetStateContext } from "../contexts/WidgetState";
+import { useWidgetState } from "../contexts/WidgetState";
 import { X } from "lucide-react";
 import {
   Dialog,
@@ -9,7 +9,7 @@ import {
 } from "./Dialog";
 
 export default function ChatHeader() {
-  const [, , SetState] = useWidgetStateContext();
+  const [, , SetState] = useWidgetState();
   return (
     <header className="opencopilot-fade-in-top opencopilot-border-b opencopilot-border-b-black/10 opencopilot-w-full">
       <div className="opencopilot-p-3">
