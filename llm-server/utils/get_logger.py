@@ -1,12 +1,13 @@
 import structlog
 import logging
 import sentry_sdk
-
+import os
 sentry_sdk.init(
     traces_sample_rate=1.0,
     profiles_sample_rate=1.0,
 )
 
+dsn = os.getenv("SENTRY_DSN")
 structlog.configure(
     processors=[
         structlog.processors.add_log_level,
@@ -31,8 +32,9 @@ class CustomLogger:
             event=event,
             **kwargs
         )
-        # Send logs to Sentry
-        sentry_sdk.capture_message(event, level=level, scope=None)
+        
+        # only enable this for prod environment
+        sentry_sdk.capture_message(event, level=level, scope=None) if dsn is not None else None
 
     def info(self, event, **kwargs):
         self.log(logging.INFO, event, **kwargs)
