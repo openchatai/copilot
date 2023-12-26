@@ -7,6 +7,10 @@ RUN curl -o Miniconda.sh -LO https://repo.anaconda.com/miniconda/Miniconda3-late
     bash Miniconda.sh -b -p $HOME/miniconda && \
     rm Miniconda.sh
 
+# Install Fish shell
+RUN sudo apt-get update && \
+    sudo apt-get install -y fish
+
 # Add Miniconda to PATH
 ENV PATH=$HOME/miniconda/bin:$PATH
 
@@ -16,3 +20,6 @@ RUN conda init bash
 # Automatically activate the Conda environment on Gitpod workspace start
 ENV CONDA_AUTO_ACTIVATE=true
 ENV CONDA_DEFAULT_ENV=base
+
+# Set Fish as the default shell
+ENV SHELL=/usr/bin/fish

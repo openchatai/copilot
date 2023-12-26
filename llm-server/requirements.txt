@@ -167,3 +167,4 @@ wsproto==1.2.0
 yarl==1.9.2
 zipp==3.17.0
 lxml==4.9.3
+sentry_sdk==1.39.1

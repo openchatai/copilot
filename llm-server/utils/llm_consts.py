@@ -64,3 +64,4 @@ def get_mysql_uri():
     pymysql_uri = f"mysql+pymysql://{username}:{password}@{host}:{port}/{database}"
 
     return pymysql_uri
+
