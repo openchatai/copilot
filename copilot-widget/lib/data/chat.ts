@@ -1,7 +1,15 @@
 import { InitialDataType } from "@lib/types";
 import axios, { AxiosInstance } from "axios";
 
-export function createAxiosInstance(apiUrl?: string, sessionId?: string | null, botToken?: string) {
+export function createAxiosInstance({
+    apiUrl,
+    sessionId,
+    botToken,
+}: {
+    apiUrl: string;
+    sessionId: string;
+    botToken: string;
+}) {
     const instance = axios.create({
         baseURL: apiUrl,
         headers: {
