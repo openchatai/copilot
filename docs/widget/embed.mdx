@@ -1,0 +1,120 @@
+---
+title: "Embedding the copilot"
+description: "Learn how to embed the copilot in your app"
+icon: "message"
+---
+the chat widget enables you to interact with the Copilot from your dashboard and see the changes in realtime.
+OpenCopilot is a react web app that you can embed in your app. 
+
+## How to embed the copilot in your app
+
+there are several ways you can integrate the Copilot Chat widget into your application/webpage
+<CardGroup cols={2}>
+<Card title="As a JavaScript File" icon="js">
+</Card>
+<Card title='As a React Component (via npm)' icon='react'>
+</Card>
+  </CardGroup>
+
+### Using simple js script (recommended)
+
+1. Download the latest build from [GitHub](https://github.com/openchatai/OpenCopilot/actions)
+   and extract the zip file.
+
+2. Include the provided JavaScript file in the head of your document.
+   ```html
+   <script src="https://yourdomain.com/pilot.js"></script>
+   ```
+3. Init the copilot (when document fully loads) by calling the `initAiCoPilot` function and passing the required options.
+
+   ```html
+   <script>
+     // be aware to call this function when the document/window is ready.
+
+     const options = {
+        apiUrl: "https://yourdomain.com/api" // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:5000/api
+        initialMessages: ["How are the things"], // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
+        token: "your_copilot_token_goes_here", // you can get your token from the dashboard
+        triggerSelector: "#triggerSelector", // the selector of the element that will trigger the copilot when clicked
+        headers: {
+          // optional: you can pass your authentication tokens to the copilot or any other header you want to send with every request
+          Authorization: "Bearer your_auth_token_goes_here",
+          AnyKey: "AnyValue"
+        },
+      }
+      window.addEventListener("DOMContentLoaded", ()=>initAiCoPilot(options)); // window.onload
+   </script>
+   ```
+
+### As a React Component
+
+1. Install the widget from npm.
+
+   <Tabs>
+     <Tab title="npm">
+     ```bash
+      npm install @openchatai/copilot-widget 
+      ```
+      </Tab>
+     <Tab title="yarn">
+     ```bash
+      yarn add @openchatai/copilot-widget 
+      ```
+      </Tab>
+     <Tab title="pnpm">
+     ```bash 
+     pnpm add @openchatai/copilot-widget 
+     ```
+     </Tab>
+   </Tabs>
+
+2. Use the Component inside your application
+
+```jsx
+import { CopilotWidget,Root } from "@openchatai/copilot-widget"; // import the component
+import '@openchatai/copilot-widget/index.css' // the required styles
+const options = {
+  apiUrl: "https://yourdomain.com/api" // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:5000/api
+  initialMessages: ["How are the things"], // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
+  token: "your_copilot_token_goes_here", // you can get your token from the dashboard
+  headers: {
+    // optional: you can pass your authentication tokens to the copilot or any other header you want to send with every request
+    Authorization: "Bearer your_auth_token_goes_here",
+    AnyKey: "AnyValue"
+  },
+}
+function Widget(){
+  return (
+    <Root options={options}>
+    <CopilotWidget triggerSelector='#copilot-trigger' />
+    </Root>
+  )
+}
+```
+
+
+
+## Available options
+
+| Option            | Description                                                                                               | type                    |
+| ----------------- | --------------------------------------------------------------------------------------------------------- | ----------------------- |
+| `initialMessage`  | An array of messages that will be sent to the copilot when it's initialized                               | `string`                |
+| `token`           | Your copilot token                                                                                        | `string`                |
+| `triggerSelector` | The selector of the element that will trigger the copilot when clicked                                    | `string`                |
+| `apiUrl`          | the url of the copilot api.                                                                               | `string`                |
+| `headers`         | An object of headers that will be sent with every request (can be used to authenticate your api requests) | `Record<string,string>` |
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="I have a style conflict with the widget">
+    The copilot is styled using
+    [tailwindcss](https://tailwindcss.com/) and all the classes are prefixed so it should not conflict with your
+    exising style, however, if so, please feel free to [open an issue on our GitHub repo](https://github.com/openchatai/OpenCopilot/issues/new)
+  </Accordion>
+
+  <Accordion title="The copilot widget is not showing up">
+    Make sure that the `triggerSelector` is correct and the element exists in
+    the dom, if that did not work, please [open an issue on our GitHub repo](https://github.com/openchatai/OpenCopilot/issues/new)
+  </Accordion>
+</AccordionGroup>

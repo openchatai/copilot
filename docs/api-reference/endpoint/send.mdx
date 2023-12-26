@@ -1,0 +1,58 @@
+---
+title: "Send a message"
+api: "POST http://example.com/backend/api/chat/send"
+description: "This endpoint allow you to send a message to your copilot"
+---
+
+### Body
+
+<ParamField body="content" type="string">
+  The message content
+</ParamField>
+
+<ParamField body="headers" type="array or null">
+  Headers to be passed to your backend when the copilot calls it, can be used to authenticate your users or pass relevant data to your backend.
+</ParamField>
+
+<ParamField header="X-Bot-Token" type="string">
+    Your copilot uniuqe token, can be obtained from the dashboard or from `get` copilot endpoint
+</ParamField>
+
+### Response
+
+<ResponseField name="type" type="string">
+  The copilot response type, currently it only support `text`
+</ResponseField>
+
+<ResponseField name="response" type="object">
+  copilot information
+  <Expandable title="properties">
+    <ResponseField name="text" type="string">
+      The copilot response, formatted in Markdown by default
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+
+<RequestExample>
+
+```bash Example Request
+    curl --location --request POST 'http://example.com/backend/api/chat/send' \
+        --header 'Accept: application/json' \
+        --header 'X-Bot-Token: bot-token-goes-here' \
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Response
+{
+    "type": "text",
+    "response": [
+        "text" "The copilot response!"
+    ]
+}
+```
+
+</ResponseExample>

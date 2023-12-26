@@ -1,0 +1,100 @@
+---
+title: "Get All Copilots"
+api: "GET http://example.com/backend/api/copilots"
+description: "Get a list of all copilots in the database."
+---
+
+### Response
+
+<Card title="Replace with your domain" icon="lightbulb" iconType="duotone" color="#ca8b04">
+    We are using `example.com` here just for demonstration purposes only
+</Card>
+
+Array of JSON objects
+
+<ResponseField name="id" type="string">
+  The unique identifier for the copilot.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  The name of the copilot ("My first copilot" in this case).
+</ResponseField>
+
+<ResponseField name="token" type="string">
+  The token associated with the copilot ("L34L375dEvMxIuNKrTdy" in this case).
+</ResponseField>
+
+<ResponseField name="website" type="string">
+  The website URL associated with the copilot ("https://www.example.com" in this case).
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  The status of the copilot ("draft" in this case).
+</ResponseField>
+
+<ResponseField name="prompt_message" type="string">
+  A message describing the copilot's purpose and instructions.
+</ResponseField>
+
+<ResponseField name="enhanced_privacy" type="number">
+  A numeric value indicating enhanced privacy (0 in this case).
+</ResponseField>
+
+<ResponseField name="smart_sync" type="number">
+  A numeric value indicating smart synchronization (0 in this case).
+</ResponseField>
+
+<ResponseField name="swagger_url" type="string">
+  The URL to the Swagger documentation ("mbWwCbhHXqffJLEU98I8.json" in this case).
+</ResponseField>
+
+<ResponseField name="is_premade_demo_template" type="number">
+  A numeric value indicating whether it's a premade demo template (0 in this case).
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  The timestamp when the copilot was created ("2023-08-20T08:15:21.000000Z" in this case).
+</ResponseField>
+
+<ResponseField name="updated_at" type="string">
+  The timestamp when the copilot was last updated ("2023-08-20T08:15:21.000000Z" in this case).
+</ResponseField>
+
+<ResponseField name="deleted_at" type="null">
+  Indicates whether the copilot has been deleted (null in this case).
+</ResponseField>
+
+
+<RequestExample>
+
+```bash Example Request
+curl --location --request GET 'http://example.com/backend/api/copilots' \
+--header 'Accept: application/json'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Response
+[
+    {
+        "id": "bf1b1796-9639-48df-99f2-8e39ed4c0e9e",
+        "name": "My first copilot",
+        "token": "L34L375dEvMxIuNKrTdy",
+        "website": "https://www.example.com",
+        "status": "draft",
+        "prompt_message": "You are a helpful AI co-pilot. job is to support and help the user\nsometimes you might need to call some API endpoints to get the data you need to answer the user's question.\nyou will be given a context and a question, you need to answer the question based on the context.",
+        "enhanced_privacy": 0,
+        "smart_sync": 0,
+        "swagger_url": "mbWwCbhHXqffJLEU98I8.json",
+        "is_premade_demo_template": 0,
+        "created_at": "2023-08-20T08:15:21.000000Z",
+        "updated_at": "2023-08-20T08:15:21.000000Z",
+        "deleted_at": null
+
+    }
+]
+```
+
+</ResponseExample>
