@@ -18,9 +18,7 @@ const config: Config = {
   theme: {
     colors: {
       primary: "var(--opencopilot-primary-clr)",
-      "primary-light": "var(--opencopilot-primary-light-clr)",
       accent: "var(--opencopilot-accent-clr)",
-      accent2: "var(--opencopilot-accent-2-clr)",
       white,
       transparent,
       black,
