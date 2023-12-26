@@ -25,7 +25,7 @@ function InitialDataProvider({ children }: { children: ReactNode }) {
   const { axiosInstance } = useAxiosInstance();
   const [data, setData] = useState<InitialDataType | undefined>();
   const [loading, setLoading] = useState<boolean>(true);
-
+  console.log(data)
   function loadData() {
     setLoading(true);
     getInitialData(axiosInstance)

@@ -18,8 +18,12 @@ function AxiosProvider({ children }: { children: ReactNode }) {
   const config = useConfigData();
   const { sessionId } = useSessionId(config?.token || 'defaultToken');
   const axiosInstance: AxiosInstance = useMemo(() => {
-    return createAxiosInstance(sessionId);
-  }, [sessionId]);
+    return createAxiosInstance({
+      botToken: config?.token,
+      sessionId,
+      apiUrl: config?.apiUrl,
+    });
+  }, [config, sessionId]);
 
   return (
     <AxiosSafeProvider value={{ axiosInstance }}>
