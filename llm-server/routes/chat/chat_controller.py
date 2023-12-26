@@ -129,9 +129,6 @@ async def send_chat():
 
     bot_token = request.headers.get("X-Bot-Token")
 
-    if not message or len(message) > 255:
-        abort(400, description="Invalid content, the size is larger than 255 char")
-
     if not bot_token:
         return Response(response="bot token is required", status=400)
 
