@@ -11,6 +11,7 @@ from shared.utils.opencopilot_utils.get_vector_store import get_vector_store
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
 from utils.llm_consts import vs_thresholds, VectorCollections, initialize_qdrant_client
+from custom_types.conversation import Conversation
 
 client = initialize_qdrant_client()
 logger = CustomLogger(module_name=__name__)
@@ -84,10 +85,10 @@ async def search_documents(
         return []
 
 # This is to be used when having conversation with the bot, we want to fetch the relevant pieces of history
-async def get_chat_history(
-        text: str, session_id: str, collection_name: str
+async def get_chat_history_from_vector_store(
+        text: str, session_id: str
 ) -> List[DocumentSimilarityDTO]:
-    return await search_documents(text, collection_name, "session_id", session_id)
+    return await search_documents(text, "chat_history", "session_id", session_id)
 
 
 async def get_relevant_actions(text: str, bot_id: str) -> List[DocumentSimilarityDTO]:
@@ -102,3 +103,15 @@ async def get_relevant_knowledgebase(
         text: str, bot_id: str
 ) -> List[DocumentSimilarityDTO]:
     return await search_documents(text, VectorCollections.knowledgebase, "bot_id", bot_id)
+
+async def store_conversation_history(conversations: List[Conversation], session_id: str): 
+    history_store = get_vector_store(StoreOptions(namespace="chat_history"))
+    
+    docs: List[Document] = []
+    for c in conversations:
+        doc_text = c.human_message + " //// " + c.assistant_response  
+        doc = Document(page_content=doc_text)
+        doc.metadata.update({"session_id": session_id})
+        docs.append(doc)
+        
+    history_store.add_documents(docs)
