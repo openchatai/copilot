@@ -29,11 +29,9 @@ there are several ways you can integrate the Copilot Chat widget into your appli
 
    ```html
    <script>
-     // be aware to call this function when the document/window is ready.
-
      const options = {
         apiUrl: "https://yourdomain.com/api" // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:5000/api
-        initialMessages: ["How are the things"], // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
+        initialMessages: "How are the things", // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
         token: "your_copilot_token_goes_here", // you can get your token from the dashboard
         triggerSelector: "#triggerSelector", // the selector of the element that will trigger the copilot when clicked
         headers: {
@@ -41,6 +39,18 @@ there are several ways you can integrate the Copilot Chat widget into your appli
           Authorization: "Bearer your_auth_token_goes_here",
           AnyKey: "AnyValue"
         },
+        containerProps: {
+          // optional: you can pass any props to the container div
+          className: "your-custom-class-name",
+          style: {
+              position: "fixed",
+              height: "100%",
+              bottom: "0",
+              right: "0",
+              width: "400px",
+            },
+        } 
+
       }
       window.addEventListener("DOMContentLoaded", ()=>initAiCoPilot(options)); // window.onload
    </script>
@@ -103,7 +113,7 @@ function Widget(){
 | `triggerSelector` | The selector of the element that will trigger the copilot when clicked                                    | `string`                |
 | `apiUrl`          | the url of the copilot api.                                                                               | `string`                |
 | `headers`         | An object of headers that will be sent with every request (can be used to authenticate your api requests) | `Record<string,string>` |
-
+| `containerProps`  | An object of props that will be passed to the container div                                               | `Record<string,string>` |
 ## FAQ
 
 <AccordionGroup>
@@ -116,5 +126,10 @@ function Widget(){
   <Accordion title="The copilot widget is not showing up">
     Make sure that the `triggerSelector` is correct and the element exists in
     the dom, if that did not work, please [open an issue on our GitHub repo](https://github.com/openchatai/OpenCopilot/issues/new)
+  </Accordion>
+
+  <Accordion title="The copilot widget is so small">
+    The copilot widget is responsive and it's width is set to 100% by default, you can change that by passing the
+    `containerProps` option and setting the width to whatever you want.
   </Accordion>
 </AccordionGroup>
