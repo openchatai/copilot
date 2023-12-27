@@ -126,9 +126,9 @@ Less than <10 lines of codes to implement on your web app or desktop app
 
 
 ### Important links
-- [OpenCopilot Flows Editor](https://editor.opencopilot.so)
 - The backend server (API) is reachable via http://localhost:8888/backend
-- The dashboard server is reachable via http://localhost:8888/ or http://localhost:8888/dashboard
+- The dashboard server is reachable via http://localhost:8888/ 
+- You can also [use our SDK](https://github.com/openchatai/typescript-sdk)
  
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind are welcome!
