@@ -84,7 +84,7 @@ async def get_chat_message_as_llm_conversation2(text: str, session_id: str) -> L
     docs = await get_chat_history_from_vector_store(text, session_id)
     result: List[BaseMessage] = []
     for doc in docs:
-        (human, assistant) = doc.document.page_content.split("////")
+        human, assistant = doc.document.page_content.split("////")
         result.append(HumanMessage(content=human))
         result.append(AIMessage(content=assistant))
         
