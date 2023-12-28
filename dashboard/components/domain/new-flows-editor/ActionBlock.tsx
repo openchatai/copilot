@@ -16,37 +16,9 @@ import { Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { useDraggableInPortal } from './useDraginPortal';
 
 // @patch for the transform issue;
-export const useDraggableInPortal = () => {
-    const element = useRef<HTMLDivElement>(document.createElement('div')).current
-
-    useEffect(() => {
-        if (element) {
-            element.style.pointerEvents = 'none'
-            element.style.isolation = 'isolate'
-            element.style.position = 'absolute'
-            element.style.inset = '0'
-            element.style.zIndex = '9999'
-            document.body.appendChild(element)
-            return () => {
-                // check if the element was removed by something else
-                if (element.parentElement) {
-                    element.parentElement.removeChild(element)
-                }
-            }
-        }
-    }, [element])
-
-    return (render: (provided: DraggableProvided) => ReactElement) => (provided: DraggableProvided) => {
-        const result = render(provided,)
-        const style = provided.draggableProps.style as DraggingStyle
-        if (style.position === 'fixed') {
-            return createPortal(result, element)
-        }
-        return result
-    }
-}
 
 type Props = NodeProps<BlockType>
 
