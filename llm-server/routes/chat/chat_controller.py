@@ -3,7 +3,6 @@ from typing import Optional
 from typing import cast
 
 from flask import jsonify, Blueprint, request, Response, abort, Request
-from custom_types.response_dict import ResponseDict
 
 from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id,
@@ -116,10 +115,7 @@ def init_chat():
 
 @chat_workflow.route("/send", methods=["POST"])
 async def send_chat():
-    response_data: ResponseDict = {
-        "error": "",
-        "response": "Something went wrong, please try again!",
-    }
+
     json_data = request.get_json()
 
     input_data = ChatInput(**json_data)
@@ -138,7 +134,7 @@ async def send_chat():
         bot = find_one_or_fail_by_token(bot_token)
         base_prompt = bot.prompt_message
 
-        response_data = await root_service.handle_request(
+        bot_response = await root_service.handle_user_message(
             text=message,
             session_id=session_id,
             base_prompt=str(base_prompt),
@@ -147,7 +143,7 @@ async def send_chat():
             app=app_name,
         )
 
-        if response_data["response"]:
+        if bot_response.text:
             upsert_analytics_record(
                 chatbot_id=str(bot.id), successful_operations=1, total_operations=1
             )
@@ -156,18 +152,18 @@ async def send_chat():
                 chatbot_id=str(bot.id),
                 session_id=session_id,
                 from_user=False,
-                message=response_data["response"] or response_data["error"] or "",
+                message=bot_response.text or bot_response.errors or "",
             )
-        elif response_data["error"]:
+        elif bot_response.errors:
             upsert_analytics_record(
                 chatbot_id=str(bot.id),
                 successful_operations=0,
                 total_operations=1,
-                logs=response_data["error"],
+                logs=bot_response.errors,
             )
 
         return jsonify(
-            {"type": "text", "response": {"text": response_data["response"]}}
+            {"type": "text", "response": {"text": bot_response.text}}
         )
     except Exception as e:
         logger.error("An exception occurred", incident="chat/send", error=str(e))

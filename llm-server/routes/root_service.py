@@ -4,7 +4,7 @@ from typing import Dict, Optional, List, cast
 
 from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
 
-from custom_types.response_dict import ResponseDict
+from custom_types.bot_response import BotResponse
 from custom_types.run_workflow_input import ChatContext
 from entities.flow_entity import FlowDTO
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
@@ -64,19 +64,15 @@ def is_the_llm_predicted_operation_id_actually_true(
     return None
 
 
-async def handle_request(
+async def handle_user_message(
     text: str,
     session_id: str,
     base_prompt: str,
     bot_id: str,
     headers: Dict[str, str],
     app: Optional[str],
-) -> ResponseDict:
-    # Dict
-    response: ResponseDict = {
-        "error": "",
-        "response": "Something went wrong, please try again!",
-    }
+) -> BotResponse:
+
     check_required_fields(base_prompt, text)
 
     tasks = [
@@ -139,19 +135,13 @@ def check_required_fields(base_prompt: str, text: str) -> None:
             raise Exception(error_msg)
 
 
-# @Todo: This can be improved, using dense and sparse matrix similarity or by using addition llm call
-# ref: https://qdrant.tech/articles/sparse-vectors/?utm_source=linkedin&utm_medium=social&utm_campaign=sparse-vectors&utm_content=article
 async def run_actionable_item(
     actionable_item: dict[str, List[DocumentSimilarityDTO]],
     text: str,
     headers: Dict[str, str],
     app: Optional[str],
     bot_id: str,
-) -> ResponseDict:
-    output: ResponseDict = {
-        "error": "",
-        "response": "Sorry, I can't help you with that action",
-    }
+) -> BotResponse:
 
     actions = actionable_item.get(VectorCollections.actions)
     flows = actionable_item.get(VectorCollections.flows)
@@ -201,7 +191,7 @@ def run_informative_item(
     base_prompt: str,
     text: str,
     conversations_history: List[BaseMessage],
-) -> ResponseDict:
+) -> BotResponse:
     # so we got all context, let's ask:
 
     context = []
@@ -236,4 +226,4 @@ def run_informative_item(
 
     content = cast(str, chat(messages=messages).content)
 
-    return {"response": content, "error": None}
+    return BotResponse(text_response=content)
