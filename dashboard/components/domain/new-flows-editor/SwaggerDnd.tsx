@@ -74,13 +74,13 @@ export function SwaggerDnd({ children, onChange, copilotId }: { children: ReactN
             <input className='hidden absolute' {...getInputProps()} />
             <div
                 {...getRootProps({
-                    className: cn('flex-1 w-full relative', isDragActive ? 'overflow-hidden' : 'overflow-auto'),
+                    className: cn('flex-1 w-full z-10', active ? 'overflow-hidden' : 'overflow-auto'),
                     'data-active': active,
                 })}>
                 {
                     active &&
                     <div
-                        className='absolute inset-0 p-2 backdrop-blur-sm group-data-[active=false]:fade-out group-data-[active=false]:animate-out group-data-[active=true]:animate-in group-data-[active=true]:fade-in'>
+                        className='absolute z-20 inset-0 p-2 backdrop-blur-sm group-data-[active=false]:fade-out group-data-[active=false]:animate-out group-data-[active=true]:animate-in group-data-[active=true]:fade-in'>
                         <div className='w-full h-full flex-center bg-accent rounded-lg border-2 border-primary border-dashed relative'>
                             {
                                 acceptedFiles.length > 0 && <div className='absolute top-2 right-2'>
