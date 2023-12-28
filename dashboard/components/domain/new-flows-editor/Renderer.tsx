@@ -8,7 +8,7 @@ import { AddActionDrawer, useActionFormState } from './AddFlowSheet';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { useController } from './Controller';
 import { ASIDE_DROPABLE_ID, ActionsList } from './ActionsList';
-import { ReactNode, memo, useCallback, useEffect, useRef } from 'react';
+import { ReactNode, useCallback, useEffect, useRef } from 'react';
 import BlockEdge from './BlockEdge';
 import { autoLayout } from './autoLayout';
 import _ from 'lodash';
@@ -92,16 +92,12 @@ function DndContext({ children, nodes, actions }: {
     }, [actions])
 
     return (
-        <DragDropContext onDragStart={(start, provided) => {
-            console.log(start, provided)
-        }} onDragEnd={_.throttle(handleDragEnd, 300)}>
+        <DragDropContext
+            onDragEnd={handleDragEnd}>
             {children}
         </DragDropContext>
     )
 }
-
-
-const MemoizedDndContext = memo(DndContext)
 
 export function FlowRenderer() {
     const reactFlowWrapper = useRef(null);
@@ -148,10 +144,10 @@ export function FlowRenderer() {
         connectingNodeParams.current = null;
     }
     return (
-        <MemoizedDndContext nodes={nodes} actions={actions}>
+        <DndContext nodes={nodes} actions={actions}>
             <div className='flex items-center justify-between w-full h-full overflow-hidden'>
                 <aside className='w-full backdrop-blur-sm max-w-sm flex flex-col items-start h-full py-4 border-r bg-white'>
-                    <div className='flex flex-row justify-between w-full border-b pb-3 px-4 items-center'>
+                    <div className='flex flex-row justify-between w-full border-b pb-4 px-4 items-center'>
                         <div>
                             <h2 className='text-base font-semibold'>Actions</h2>
                             <p className='text-xs'>
@@ -167,7 +163,7 @@ export function FlowRenderer() {
                     </SwaggerDnd>
                 </aside>
                 <AddActionDrawer />
-                <div className='flex-1 relative h-full' ref={reactFlowWrapper}>
+                <div className='flex-1 relative h-full overflow-clip' ref={reactFlowWrapper}>
                     {
                         isBlocksEmpty && <div data-container='Empty block add button' className='absolute inset-0 z-50 flex-center bg-secondary p-4'>
                             <div className='space-y-2'>
@@ -219,7 +215,7 @@ export function FlowRenderer() {
                     </ReactFlow>
                 </div>
             </div>
-        </MemoizedDndContext >
+        </DndContext>
 
     )
 }
