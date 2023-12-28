@@ -14,6 +14,8 @@ import { autoLayout } from './autoLayout';
 import _ from 'lodash';
 import { ActionResponseType } from '@/data/actions';
 import { MagicAction } from './MagicAction';
+import { SwaggerDnd } from './SwaggerDnd';
+import { useCopilot } from '@/app/(copilot)/copilot/_context/CopilotProvider';
 
 const nodeTypes = {
     actionBlock
@@ -98,7 +100,9 @@ function DndContext({ children, nodes, actions }: {
     )
 }
 
+
 const MemoizedDndContext = memo(DndContext)
+
 export function FlowRenderer() {
     const reactFlowWrapper = useRef(null);
     const connectingNodeParams = useRef<OnConnectStartParams | null>(null);
@@ -106,7 +110,9 @@ export function FlowRenderer() {
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const { state: { blocks, actions, description }, deleteBlock, insertEmptyBlockAfter } = useController();
     const isBlocksEmpty = _.isEmpty(blocks);
-
+    const {
+        id: copilotId
+    } = useCopilot();
     useEffect(() => {
         _.throttle(async () => {
             const { newNodes, edges } = autoLayout(blocks);
@@ -141,11 +147,10 @@ export function FlowRenderer() {
     const onConnect: OnConnect = () => {
         connectingNodeParams.current = null;
     }
-    
     return (
         <MemoizedDndContext nodes={nodes} actions={actions}>
             <div className='flex items-center justify-between w-full h-full overflow-hidden'>
-                <aside className='w-full max-w-sm flex flex-col items-start h-full py-4 border-r bg-white overflow-hidden'>
+                <aside className='w-full backdrop-blur-sm max-w-sm flex flex-col items-start h-full py-4 border-r bg-white'>
                     <div className='flex flex-row justify-between w-full border-b pb-3 px-4 items-center'>
                         <div>
                             <h2 className='text-base font-semibold'>Actions</h2>
@@ -157,9 +162,9 @@ export function FlowRenderer() {
                             <Plus size={12} />
                         </Button>
                     </div>
-                    <div className='flex-1 w-full overflow-auto'>
+                    <SwaggerDnd copilotId={copilotId}>
                         <ActionsList disabled={isBlocksEmpty} />
-                    </div>
+                    </SwaggerDnd>
                 </aside>
                 <AddActionDrawer />
                 <div className='flex-1 relative h-full' ref={reactFlowWrapper}>
