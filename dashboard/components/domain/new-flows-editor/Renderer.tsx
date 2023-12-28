@@ -3,7 +3,7 @@ import ReactFlow, { Background, Controls, useEdgesState, useNodesState, OnConnec
 import actionBlock from './ActionBlock';
 import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { AlertCircle, Plus } from 'lucide-react';
 import { AddActionDrawer, useActionFormState } from './AddFlowSheet';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { useController } from './Controller';
@@ -146,8 +146,8 @@ export function FlowRenderer() {
     return (
         <DndContext nodes={nodes} actions={actions}>
             <div className='flex items-center justify-between w-full h-full overflow-hidden'>
-                <aside className='w-full backdrop-blur-sm max-w-xs flex flex-col items-start h-full py-4 border-r bg-white'>
-                    <div className='flex flex-row justify-between w-full border-b pb-4 gap-2 px-4 items-center'>
+                <aside className='w-full backdrop-blur-sm max-w-xs flex *:w-full flex-col items-start h-full pt-2 border-r border-accent bg-white'>
+                    <div className='flex flex-row justify-between border-b pb-4 gap-2 px-4 items-center'>
                         <div>
                             <h2 className='text-base font-bold'>Actions</h2>
                             <p className='text-xs'>
@@ -161,6 +161,11 @@ export function FlowRenderer() {
                     <SwaggerDnd copilotId={copilotId}>
                         <ActionsList disabled={isBlocksEmpty} />
                     </SwaggerDnd>
+                    <div className='px-4 py-3 border-t bg-accent'>
+                        <h2 className='text-xs text-start font-medium'>
+                            <AlertCircle size={14} className='inline-block me-0.5'/>Drag and Drop Swagger file to extract actions from
+                        </h2>
+                    </div>
                 </aside>
                 <AddActionDrawer />
                 <div className='flex-1 relative h-full overflow-clip' ref={reactFlowWrapper}>

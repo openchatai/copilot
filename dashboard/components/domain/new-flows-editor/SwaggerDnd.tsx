@@ -74,7 +74,7 @@ export function SwaggerDnd({ children, onChange, copilotId }: { children: ReactN
             <input className='hidden absolute' {...getInputProps()} />
             <div
                 {...getRootProps({
-                    className: cn('flex-1 w-full z-10', active ? 'overflow-hidden' : 'overflow-auto'),
+                    className: cn('flex-1 relative', active ? 'overflow-hidden' : 'overflow-auto'),
                     'data-active': active,
                 })}>
                 {
@@ -127,6 +127,7 @@ export function SwaggerDnd({ children, onChange, copilotId }: { children: ReactN
                     </div>
                 }
                 {children}
+
             </div>
         </>
     )
