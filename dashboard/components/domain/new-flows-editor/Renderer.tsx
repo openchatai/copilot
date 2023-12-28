@@ -146,10 +146,10 @@ export function FlowRenderer() {
     return (
         <DndContext nodes={nodes} actions={actions}>
             <div className='flex items-center justify-between w-full h-full overflow-hidden'>
-                <aside className='w-full backdrop-blur-sm max-w-sm flex flex-col items-start h-full py-4 border-r bg-white'>
-                    <div className='flex flex-row justify-between w-full border-b pb-4 px-4 items-center'>
+                <aside className='w-full backdrop-blur-sm max-w-xs flex flex-col items-start h-full py-4 border-r bg-white'>
+                    <div className='flex flex-row justify-between w-full border-b pb-4 gap-2 px-4 items-center'>
                         <div>
-                            <h2 className='text-base font-semibold'>Actions</h2>
+                            <h2 className='text-base font-bold'>Actions</h2>
                             <p className='text-xs'>
                                 Drag and drop actions to the Blocks inside the flow
                             </p>
