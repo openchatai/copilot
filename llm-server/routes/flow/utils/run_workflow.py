@@ -1,4 +1,3 @@
-import json
 from typing import Optional
 
 from werkzeug.datastructures import Headers

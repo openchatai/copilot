@@ -35,17 +35,13 @@ shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
 # Define constants for error messages
 BASE_PROMPT_REQUIRED = "base_prompt is required"
 TEXT_REQUIRED = "text is required"
-SWAGGER_URL_REQUIRED = "swagger_url is required"
-FAILED_TO_FETCH_SWAGGER_CONTENT = "Failed to fetch Swagger content"
-FILE_NOT_FOUND = "File not found"
-FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
 
 chat = get_chat_model()
 
 
 def is_the_llm_predicted_operation_id_actually_true(
-    predicted_operation_id: str,
-    actionable_items: dict[str, list[DocumentSimilarityDTO]],
+        predicted_operation_id: str,
+        actionable_items: dict[str, list[DocumentSimilarityDTO]],
 ):
     """
     If it is indeed true, it will return the action as DocumentSimilarityDTO, otherwise return None
@@ -65,14 +61,13 @@ def is_the_llm_predicted_operation_id_actually_true(
 
 
 async def handle_user_message(
-    text: str,
-    session_id: str,
-    base_prompt: str,
-    bot_id: str,
-    headers: Dict[str, str],
-    app: Optional[str],
+        text: str,
+        session_id: str,
+        base_prompt: str,
+        bot_id: str,
+        headers: Dict[str, str],
+        app: Optional[str],
 ) -> BotResponse:
-
     check_required_fields(base_prompt, text)
 
     tasks = [
@@ -136,61 +131,131 @@ def check_required_fields(base_prompt: str, text: str) -> None:
 
 
 async def run_actionable_item(
-    actionable_item: dict[str, List[DocumentSimilarityDTO]],
-    text: str,
-    headers: Dict[str, str],
-    app: Optional[str],
-    bot_id: str,
+        actionable_item: dict[str, List[DocumentSimilarityDTO]],
+        text: str,
+        headers: Dict[str, str],
+        app: Optional[str],
+        bot_id: str,
 ) -> BotResponse:
+    """
+    Process the actionable item and execute the appropriate flow.
+
+    Parameters:
+    actionable_item: dict containing actions and flows.
+    text: Text input from the user.
+    headers: Headers for the HTTP request.
+    app: Optional application identifier.
+    bot_id: Identifier for the bot.
+
+    Returns:
+    BotResponse: The response from the executed bot flow.
+    """
 
     actions = actionable_item.get(VectorCollections.actions)
     flows = actionable_item.get(VectorCollections.flows)
 
-    _flow = None
-    if actionable_item.get(VectorCollections.actions) and actions is not None:
-        action = actions[0]
-        operation_id = cast(
-            str, action.document.metadata.get("operation_id")
-        )  # this variable now holds Qdrant vector document, which is the Action metadata
+    flow_to_run = determine_flow_to_run(actions, flows, bot_id)
 
-        _flow = create_flow_from_operation_ids(
-            operation_ids=[operation_id], bot_id=bot_id
-        )
-    elif flows is not None:
-        flow_with_relevance_score = flows[0]
-        flow = (
-            flow_with_relevance_score.document
-        )  # this variable now holds Qdrant vector document, which is the flow metadata
-        flow_id = cast(str, flow.metadata.get("flow_id"))
-        flow_model = get_flow_by_id(flow_id)
+    if flow_to_run is not None:
+        output = await execute_flow(flow_to_run, text, headers, app, bot_id)
+        return output
 
-        if flow_model:
-            _flow = FlowDTO(
-                id=flow_model.id,
-                bot_id=bot_id,
-                flow_id=flow_model.id,
-                name=flow_model.name,
-                description=flow_model.description,
-                blocks=flow_model.payload,
-                variables=[],
-            )
+    logger.error("Failed to map the user requeest to any flow/actions")
+    return BotResponse(text="We could not match any actions/flows to your request, our technical team has been notified")
 
-    if _flow is not None:
-        output = await run_flow(
-            flow=_flow,
-            chat_context=ChatContext(text, headers, app),
-            app=app,
+
+def determine_flow_to_run(actions, flows, bot_id) -> Optional[FlowDTO]:
+    """
+    Determine which flow to run based on actions and flows.
+
+    Parameters:
+    actions: List of actions.
+    flows: List of flows.
+    bot_id: Identifier for the bot.
+
+    Returns:
+    Optional[FlowDTO]: The determined flow to run, or None if not found.
+    """
+
+    if actions:
+        return create_flow_from_actions(actions, bot_id)
+    elif flows:
+        return create_flow_from_flows(flows, bot_id)
+    return None
+
+
+def create_flow_from_actions(actions, bot_id) -> FlowDTO:
+    """
+    Create a flow from the provided actions.
+
+    Parameters:
+    actions: List of actions.
+    bot_id: Identifier for the bot.
+
+    Returns:
+    FlowDTO: The flow created from the actions.
+    """
+
+    action = actions[0]
+    operation_id = cast(str, action.document.metadata.get("operation_id"))
+    return create_flow_from_operation_ids(operation_ids=[operation_id], bot_id=bot_id)
+
+
+def create_flow_from_flows(flows, bot_id) -> FlowDTO:
+    """
+    Create a flow from the provided flows.
+
+    Parameters:
+    flows: List of flows.
+    bot_id: Identifier for the bot.
+
+    Returns:
+    FlowDTO: The flow created from the flows.
+    """
+
+    flow_with_relevance_score = flows[0]
+    flow = flow_with_relevance_score.document
+    flow_id = cast(str, flow.metadata.get("flow_id"))
+    flow_model = get_flow_by_id(flow_id)
+
+    if flow_model:
+        return FlowDTO(
+            id=flow_model.id,
             bot_id=bot_id,
+            flow_id=flow_model.id,
+            name=flow_model.name,
+            description=flow_model.description,
+            blocks=flow_model.payload,
+            variables=[],
         )
 
-    return output
+    return None
+
+
+async def execute_flow(flow, text, headers, app, bot_id) -> BotResponse:
+    """
+    Execute the specified flow.
+
+    Parameters:
+    flow: The flow to be executed.
+    text: Text input from the user.
+    headers: Headers for the HTTP request.
+    app: Optional application identifier.
+    bot_id: Identifier for the bot.
+
+    Returns:
+    BotResponse: The response from the executed flow.
+    """
+
+    chat_context = ChatContext(text, headers, app)
+    return await run_flow(flow=flow, chat_context=chat_context, app=app, bot_id=bot_id)
 
 
 def run_informative_item(
-    informative_item: dict[str, List[DocumentSimilarityDTO]],
-    base_prompt: str,
-    text: str,
-    conversations_history: List[BaseMessage],
+        informative_item: dict[str, List[DocumentSimilarityDTO]],
+        base_prompt: str,
+        text: str,
+        conversations_history: List[BaseMessage],
 ) -> BotResponse:
     # so we got all context, let's ask:
 
