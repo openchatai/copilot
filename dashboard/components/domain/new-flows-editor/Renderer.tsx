@@ -163,7 +163,7 @@ export function FlowRenderer() {
                     </SwaggerDnd>
                     <div className='px-4 py-3 border-t bg-accent'>
                         <h2 className='text-xs text-start font-medium'>
-                            <AlertCircle size={14} className='inline-block me-0.5'/>Drag and Drop Swagger file to extract actions from
+                            <AlertCircle size={14} className='inline-block me-0.5'/> Drag & drop any swagger file for bulk actions import
                         </h2>
                     </div>
                 </aside>
