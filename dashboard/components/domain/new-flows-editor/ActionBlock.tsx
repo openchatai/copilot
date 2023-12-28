@@ -14,15 +14,14 @@ import { cn } from '@/lib/utils';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useDraggableInPortal } from './useDraginPortal';
-
-// @patch for the transform issue;
+import { getStyle } from './utils';
 
 type Props = NodeProps<BlockType>
 
 function DraggableActionInsideActionBlock({ action, index, id }: { action: ActionResponseType, index: number, id: string }) {
     const draggableInPortal = useDraggableInPortal();
     return <Draggable key={id} draggableId={BLOCK_ACTION_DRAGGABLE_ID_PREFIX + id} index={index}>
-        {draggableInPortal((provided) => <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className='w-full bg-white shrink-0 z-50 border-2 border-accent-foreground border-dotted rounded-md'>
+        {draggableInPortal((provided, snapshot) => <div ref={provided.innerRef} {...provided.draggableProps} style={getStyle(provided.draggableProps.style, snapshot)} {...provided.dragHandleProps} className='w-full bg-white shrink-0 z-50 border-2 border-accent-foreground border-dotted rounded-md'>
             <Action action={action} />
         </div>)}
     </Draggable>
