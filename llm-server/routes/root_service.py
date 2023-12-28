@@ -68,7 +68,52 @@ async def handle_user_message(
         headers: Dict[str, str],
         app: Optional[str],
 ) -> BotResponse:
+    """
+    Handle a user's message by determining the appropriate response.
+
+    Parameters:
+    text: The user's message.
+    session_id: The session identifier.
+    base_prompt: The base prompt for responses.
+    bot_id: Identifier for the bot.
+    headers: Headers for the HTTP request.
+    app: Optional application identifier.
+
+    Returns:
+    BotResponse: The bot's response.
+    """
+
     check_required_fields(base_prompt, text)
+
+    knowledgebase, actions, flows, conversations_history = await gather_message_data(
+        text, session_id, bot_id
+    )
+
+    top_documents = select_top_documents(actions + flows + knowledgebase)
+    next_step = determine_next_step(text, session_id, conversations_history, top_documents)
+
+    if next_step.actionable:
+        actionable_item = determine_actionable_item(next_step.operation_id, actions, flows)
+        return await run_actionable_item(bot_id=bot_id, actionable_item=actionable_item, app=app, headers=headers,
+                                         text=text)
+
+    documents = select_top_documents(knowledgebase)
+    return run_informative_item(informative_item=documents, base_prompt=base_prompt, text=text,
+                                conversations_history=conversations_history)
+
+
+async def gather_message_data(text, session_id, bot_id):
+    """
+    Gather data related to the message from various sources.
+
+    Parameters:
+    text: The user's message.
+    session_id: The session identifier.
+    bot_id: Identifier for the bot.
+
+    Returns:
+    Tuple containing knowledgebase, actions, flows, and conversation history.
+    """
 
     tasks = [
         get_relevant_knowledgebase(text, bot_id),
@@ -77,48 +122,46 @@ async def handle_user_message(
         get_chat_message_as_llm_conversation(session_id),
     ]
 
-    results = await asyncio.gather(*tasks)
-    knowledgebase, actions, flows, conversations_history = results
-    top_documents = select_top_documents(actions + flows + knowledgebase)
+    return await asyncio.gather(*tasks)
 
-    next_step = get_next_response_type(
+
+def determine_next_step(text, session_id, conversations_history, top_documents):
+    """
+    Determine the next step based on the user's message and available documents.
+
+    Parameters:
+    text: The user's message.
+    session_id: The session identifier.
+    conversations_history: History of the conversation.
+    top_documents: Top documents selected.
+
+    Returns:
+    The next step to take (actionable or informative).
+    """
+    return get_next_response_type(
         user_message=text,
         session_id=session_id,
         chat_history=conversations_history,
         top_documents=top_documents,
     )
 
-    if next_step.actionable:
-        # if the LLM given operationID is actually exist, then use it, otherwise fallback to the highest vector space document
-        llm_predicted_operation_id = is_the_llm_predicted_operation_id_actually_true(
-            next_step.operation_id, select_top_documents(actions)
-        )
-        if llm_predicted_operation_id:
-            actionable_item = llm_predicted_operation_id
-        else:
-            actionable_item = select_top_documents(
-                actions + flows, [VectorCollections.actions, VectorCollections.flows]
-            )
-        # now run it
-        response = await run_actionable_item(
-            bot_id=bot_id,
-            actionable_item=actionable_item,
-            app=app,
-            headers=headers,
-            text=text,
-        )
-        return response
+
+def determine_actionable_item(predicted_operation_id, actions, flows):
+    """
+    Determine the actionable item based on predicted operation ID and available actions and flows.
+
+    Parameters:
+    predicted_operation_id: The operation ID predicted by the LLM.
+    actions: Available actions.
+    flows: Available flows.
+
+    Returns:
+    The actionable item to be executed.
+    """
+    if is_the_llm_predicted_operation_id_actually_true(predicted_operation_id, select_top_documents(actions)):
+        return predicted_operation_id
     else:
-        # it means that the user query is "informative" and can be answered using text only
-        # get the top knowledgeable documents (if any)
-        documents = select_top_documents(knowledgebase)
-        response = run_informative_item(
-            informative_item=documents,
-            base_prompt=base_prompt,
-            text=text,
-            conversations_history=conversations_history,
-        )
-        return response
+        return select_top_documents(actions + flows, [VectorCollections.actions, VectorCollections.flows])
 
 
 def check_required_fields(base_prompt: str, text: str) -> None:
