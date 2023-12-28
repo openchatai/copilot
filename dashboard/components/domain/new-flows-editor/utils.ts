@@ -10,6 +10,16 @@ export const getStyle = (
     }
     return {
         ...style,
-        transitionDuration: `0.005s`,
+        transitionDuration: `0.0001s`,
+        animationDelay: '0s !important',
     };
 };
+
+export function reorderList<T extends any>(list: T[], startIndex: number, endIndex: number) {
+    const result = list;
+    const [removed] = result.splice(startIndex, 1);
+    if (removed) {
+        result.splice(endIndex, 0, removed);
+    }
+    return result;
+}
