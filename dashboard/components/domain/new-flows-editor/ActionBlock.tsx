@@ -1,11 +1,7 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import { Handle, Position, useNodes } from 'reactflow';
 import type { NodeProps } from 'reactflow';
-import { Draggable, DraggableProvided, Droppable } from 'react-beautiful-dnd';
-import { createPortal } from 'react-dom';
-import { DraggingStyle } from 'react-beautiful-dnd'
-import { ReactElement } from 'react';
-import { BLOCK_ACTION_DRAGGABLE_ID_PREFIX } from './consts';
+import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { ActionResponseType } from '@/data/actions';
 import { Action } from './ActionsList';
 import _, { uniqueId } from 'lodash';
@@ -16,44 +12,16 @@ import { Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-
-// @patch for the transform issue;
-export const useDraggableInPortal = () => {
-    const element = useRef<HTMLDivElement>(document.createElement('div')).current
-
-    useEffect(() => {
-        if (element) {
-            element.style.pointerEvents = 'none'
-            element.style.isolation = 'isolate'
-            element.style.position = 'absolute'
-            element.style.inset = '0'
-            element.style.zIndex = '9999'
-            document.body.appendChild(element)
-            return () => {
-                // check if the element was removed by something else
-                if (element.parentElement) {
-                    element.parentElement.removeChild(element)
-                }
-            }
-        }
-    }, [element])
-
-    return (render: (provided: DraggableProvided) => ReactElement) => (provided: DraggableProvided) => {
-        const result = render(provided,)
-        const style = provided.draggableProps.style as DraggingStyle
-        if (style.position === 'fixed') {
-            return createPortal(result, element)
-        }
-        return result
-    }
-}
+import { useDraggableInPortal } from './useDraginPortal';
+import { getStyle } from './utils';
+export const BLOCK_ACTION_DRAGGABLE_ID_PREFIX = 'block-action-draggable|';
 
 type Props = NodeProps<BlockType>
 
 function DraggableActionInsideActionBlock({ action, index, id }: { action: ActionResponseType, index: number, id: string }) {
     const draggableInPortal = useDraggableInPortal();
     return <Draggable key={id} draggableId={BLOCK_ACTION_DRAGGABLE_ID_PREFIX + id} index={index}>
-        {draggableInPortal((provided) => <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className='w-full bg-white shrink-0 z-50 border-2 border-accent-foreground border-dotted rounded-md'>
+        {draggableInPortal((provided, snapshot) => <div ref={provided.innerRef} {...provided.draggableProps} style={getStyle(provided.draggableProps.style, snapshot)} {...provided.dragHandleProps} className='w-full bg-white shrink-0 z-50 border-2 border-accent-foreground border-dotted rounded-md'>
             <Action action={action} />
         </div>)}
     </Draggable>

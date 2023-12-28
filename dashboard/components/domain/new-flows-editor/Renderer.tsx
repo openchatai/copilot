@@ -3,17 +3,19 @@ import ReactFlow, { Background, Controls, useEdgesState, useNodesState, OnConnec
 import actionBlock from './ActionBlock';
 import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { AlertCircle, Plus } from 'lucide-react';
 import { AddActionDrawer, useActionFormState } from './AddFlowSheet';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { useController } from './Controller';
 import { ASIDE_DROPABLE_ID, ActionsList } from './ActionsList';
-import { ReactNode, memo, useCallback, useEffect, useRef } from 'react';
+import { ReactNode, useCallback, useEffect, useRef } from 'react';
 import BlockEdge from './BlockEdge';
 import { autoLayout } from './autoLayout';
 import _ from 'lodash';
 import { ActionResponseType } from '@/data/actions';
 import { MagicAction } from './MagicAction';
+import { SwaggerDnd } from './SwaggerDnd';
+import { useCopilot } from '@/app/(copilot)/copilot/_context/CopilotProvider';
 
 const nodeTypes = {
     actionBlock
@@ -90,15 +92,13 @@ function DndContext({ children, nodes, actions }: {
     }, [actions])
 
     return (
-        <DragDropContext onDragStart={(start, provided) => {
-            console.log(start, provided)
-        }} onDragEnd={_.throttle(handleDragEnd, 300)}>
+        <DragDropContext
+            onDragEnd={handleDragEnd}>
             {children}
         </DragDropContext>
     )
 }
 
-const MemoizedDndContext = memo(DndContext)
 export function FlowRenderer() {
     const reactFlowWrapper = useRef(null);
     const connectingNodeParams = useRef<OnConnectStartParams | null>(null);
@@ -106,7 +106,9 @@ export function FlowRenderer() {
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const { state: { blocks, actions, description }, deleteBlock, insertEmptyBlockAfter } = useController();
     const isBlocksEmpty = _.isEmpty(blocks);
-
+    const {
+        id: copilotId
+    } = useCopilot();
     useEffect(() => {
         _.throttle(async () => {
             const { newNodes, edges } = autoLayout(blocks);
@@ -141,14 +143,13 @@ export function FlowRenderer() {
     const onConnect: OnConnect = () => {
         connectingNodeParams.current = null;
     }
-    
     return (
-        <MemoizedDndContext nodes={nodes} actions={actions}>
+        <DndContext nodes={nodes} actions={actions}>
             <div className='flex items-center justify-between w-full h-full overflow-hidden'>
-                <aside className='w-full max-w-sm flex flex-col items-start h-full py-4 border-r bg-white overflow-hidden'>
-                    <div className='flex flex-row justify-between w-full border-b pb-3 px-4 items-center'>
+                <aside className='w-full backdrop-blur-sm max-w-xs flex *:w-full flex-col items-start h-full pt-2 border-r border-accent bg-white'>
+                    <div className='flex flex-row justify-between border-b pb-4 gap-2 px-4 items-center'>
                         <div>
-                            <h2 className='text-base font-semibold'>Actions</h2>
+                            <h2 className='text-base font-bold'>Actions</h2>
                             <p className='text-xs'>
                                 Drag and drop actions to the Blocks inside the flow
                             </p>
@@ -157,12 +158,17 @@ export function FlowRenderer() {
                             <Plus size={12} />
                         </Button>
                     </div>
-                    <div className='flex-1 w-full overflow-auto'>
+                    <SwaggerDnd copilotId={copilotId}>
                         <ActionsList disabled={isBlocksEmpty} />
+                    </SwaggerDnd>
+                    <div className='px-4 py-3 border-t bg-accent'>
+                        <h2 className='text-xs text-start font-medium'>
+                            <AlertCircle size={14} className='inline-block me-0.5'/>Drag and Drop Swagger file to extract actions from
+                        </h2>
                     </div>
                 </aside>
                 <AddActionDrawer />
-                <div className='flex-1 relative h-full' ref={reactFlowWrapper}>
+                <div className='flex-1 relative h-full overflow-clip' ref={reactFlowWrapper}>
                     {
                         isBlocksEmpty && <div data-container='Empty block add button' className='absolute inset-0 z-50 flex-center bg-secondary p-4'>
                             <div className='space-y-2'>
@@ -214,7 +220,7 @@ export function FlowRenderer() {
                     </ReactFlow>
                 </div>
             </div>
-        </MemoizedDndContext >
+        </DndContext>
 
     )
 }

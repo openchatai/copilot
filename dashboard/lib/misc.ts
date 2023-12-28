@@ -33,3 +33,15 @@ export function megabytesToBytes(megabytes: number) {
   const bytesInMegabyte = 1024 * 1024;
   return megabytes * bytesInMegabyte;
 }
+
+export const or = (...args: boolean[]) => args.some(Boolean);
+export const and = (...args: boolean[]) => args.every(Boolean);
+export const not = (arg: boolean) => !arg;
+
+export function getFileData(file: File) {
+  return {
+    name: file.name,
+    size: humanizeFileSize(file.size),
+    type: file.type,
+  }
+}
