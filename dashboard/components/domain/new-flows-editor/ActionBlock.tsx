@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import { Handle, Position, useNodes } from 'reactflow';
 import type { NodeProps } from 'reactflow';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
-import { BLOCK_ACTION_DRAGGABLE_ID_PREFIX } from './consts';
 import { ActionResponseType } from '@/data/actions';
 import { Action } from './ActionsList';
 import _, { uniqueId } from 'lodash';
@@ -15,6 +14,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Button } from '@/components/ui/button';
 import { useDraggableInPortal } from './useDraginPortal';
 import { getStyle } from './utils';
+export const BLOCK_ACTION_DRAGGABLE_ID_PREFIX = 'block-action-draggable|';
 
 type Props = NodeProps<BlockType>
 
