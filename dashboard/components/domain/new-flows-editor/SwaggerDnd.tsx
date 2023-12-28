@@ -20,7 +20,6 @@ export function SwaggerDnd({ children, onChange, copilotId }: { children: ReactN
         getInputProps,
         isDragActive,
     } = useDropzone({
-        accept: { '.json': ['application/json'] },
         multiple: false,
         noClick: true,
         validator(file) {
