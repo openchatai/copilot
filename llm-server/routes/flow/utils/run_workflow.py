@@ -1,5 +1,4 @@
 import json
-import logging
 from typing import Optional
 
 from werkzeug.datastructures import Headers
@@ -21,9 +20,6 @@ async def run_flow(
 ) -> BotResponse:
     headers = chat_context.headers or Headers()
 
-    result = ""
-    error = None
-
     try:
         result = await run_actions(
             flow=flow,
@@ -33,15 +29,7 @@ async def run_flow(
             bot_id=bot_id,
         )
     except Exception as e:
-        payload_data = {
-            "headers": dict(headers),
-            "app": app,
-        }
+        logger.error("An exception occurred during running actions", error=str(e))
+        return BotResponse(errors=str(e))
 
-        logger.error("An exception occurred", payload=json.dumps(payload_data), error=str(e))
-
-    output = BotResponse(text_response=result, errors=error)
-    logging.info(
-        "Workflow output %s", json.dumps(output, separators=(",", ":"))
-    )
-    return output
+    return result

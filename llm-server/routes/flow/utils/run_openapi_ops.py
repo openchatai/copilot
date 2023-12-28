@@ -3,6 +3,7 @@ from typing import Optional
 
 from werkzeug.datastructures import Headers
 
+from custom_types.bot_response import BotResponse
 from entities.flow_entity import FlowDTO
 from extractors.convert_json_to_text import convert_json_to_text
 from integrations.load_json_config import load_json_config
@@ -16,12 +17,12 @@ logger = CustomLogger(module_name=__name__)
 
 
 async def run_actions(
-    flow: FlowDTO,
-    text: str,
-    headers: Headers,
-    app: Optional[str],
-    bot_id: str,
-) -> str:
+        flow: FlowDTO,
+        text: str,
+        headers: Headers,
+        app: Optional[str],
+        bot_id: str,
+) -> BotResponse:
     api_request_data = {}
     prev_api_response = ""
     apis_calls_history = {}
@@ -60,12 +61,6 @@ async def run_actions(
 
                 partial_json = load_json_config(app, operation_id)
                 if not partial_json:
-                    logger.warn(
-                        "Config map is not defined for this operationId",
-                        incident="config_map_undefined",
-                        operation_id=operation_id,
-                        app=app,
-                    )
                     apis_calls_history[operation_id] = api_response.text
 
                     pass
@@ -94,9 +89,13 @@ async def run_actions(
                     error=str(e),
                 )
 
-                return str(e)
+                return BotResponse(
+                    errors=str(e)
+                )
 
-        # @todo : replace this with a lighter and faster model
-        return convert_json_to_text(
-            text, apis_calls_history, api_request_data, bot_id=bot_id
+        return BotResponse(
+            text=convert_json_to_text(
+                text, apis_calls_history, api_request_data, bot_id=bot_id
+            ),
+            apis_calls=apis_calls_history
         )
