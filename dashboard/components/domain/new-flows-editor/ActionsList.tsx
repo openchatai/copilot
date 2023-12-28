@@ -10,6 +10,7 @@ import { methodVariants } from "../MethodRenderer";
 import { format } from "timeago.js";
 import { EmptyBlock } from "../EmptyBlock";
 import { useDraggableInPortal } from "./useDraginPortal";
+import { getStyle } from "./utils";
 
 export function Action({ action }: { action: ActionResponseType }) {
     return <div className="flex flex-col gap-1 w-full px-4 shrink-0 transition-colors py-2 data-[state=open]:!border-l-primary hover:bg-accent !border-transparent border-l-2">
@@ -33,7 +34,7 @@ function DropableAsideAction({ action, index }: { action: ActionResponseType, in
         <Draggable draggableId={"ACTION|" + action.id} index={index}>
             {draggableInPortal((provided, snapshot) => {
                 const { isDragging } = snapshot;
-                return <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="w-full">
+                return <div ref={provided.innerRef} {...provided.draggableProps}  {...provided.dragHandleProps} style={getStyle(provided.draggableProps.style, snapshot)} className="w-full">
                     <Popover open={open && !isDragging} onOpenChange={setOpen}>
 
                         <PopoverTrigger asChild>
