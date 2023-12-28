@@ -3,7 +3,6 @@ import os
 from extractors.extract_json import extract_json_payload
 from utils.get_chat_model import get_chat_model
 from shared.utils.opencopilot_utils import get_llm
-from custom_types.t_json import JsonData
 from typing import Optional
 from langchain.schema import HumanMessage, SystemMessage
 from utils.get_logger import CustomLogger
@@ -16,7 +15,7 @@ llm = get_llm()
 
 async def gen_params_from_schema(
     param_schema: str, text: str, prev_resp: str, current_state: Optional[str]
-) -> Optional[JsonData]:
+):
     chat = get_chat_model()
     messages = [
         SystemMessage(
@@ -32,7 +31,6 @@ async def gen_params_from_schema(
         HumanMessage(content="Your output must be a valid json, without any commentary"),
     ]
     result = chat(messages)
-    logger.info("[OpenCopilot] LLM Body Response: {}".format(result.content))
-    d: Optional[JsonData] = extract_json_payload(result.content)
-    logger.info("Parsed params from schema", text=text, params=d)
+    logger.info("Generated request body Response: {}".format(result.content))
+    d = extract_json_payload(result.content)
     return d

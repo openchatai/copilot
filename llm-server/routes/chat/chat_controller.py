@@ -2,7 +2,7 @@ from http import HTTPStatus
 from typing import Optional
 from typing import cast
 
-from flask import jsonify, Blueprint, request, Response, abort, Request
+from flask import jsonify, Blueprint, request, Response, Request
 
 from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id,
