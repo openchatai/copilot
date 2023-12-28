@@ -142,9 +142,10 @@ const initialState: StateType = {
 export function reorderList<T extends any>(list: T[], startIndex: number, endIndex: number) {
     const result = Array.from(list);
     const [removed] = result.splice(startIndex, 1);
-    if (!removed) return [...result];
-    result.splice(endIndex, 0, removed);
-    return [...result];
+    if (removed) {
+        result.splice(endIndex, 0, removed);
+    }
+    return result;
 }
 function getEmptyBlock(next_on_success: string | null, actions?: ActionResponseType[]): BlockType {
     const id = "block-" + uniqueId();
