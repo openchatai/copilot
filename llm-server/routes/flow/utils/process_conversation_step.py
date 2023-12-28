@@ -6,6 +6,7 @@ from langchain.schema import HumanMessage, SystemMessage, BaseMessage
 from custom_types.actionable_or_not_type import (
     parse_actionable_or_not_response,
     ActionableOrNotType,
+    parse_informative_or_actionable_response,
 )
 from routes.flow.utils.document_similarity_dto import DocumentSimilarityDTO
 from utils.get_chat_model import get_chat_model
@@ -66,10 +67,10 @@ def is_it_informative_or_actionable(
     **User Input:** create a b-1 visa application
 
     **Available APIs:**
-    - API 1: This tool creates a b-1 visa application.
-    - API 2: This tool queries b-1 status.
+    - API(createVisaApplication): This api creates a b-1 visa application.
+    - API(getVisaStatus): This api queries b-1 status.
 
-    **Verdict:** Needs API call so the response should be {"needs_api": "yes", "justification": "the reason behind your verdict", "api": "name of the API to use" }
+    **Verdict:** Needs API call so the response should be {"needs_api": "yes", "justification": "the reason behind your verdict", "api": "createVisaApplication" }
 
     **Justification:** The user's request can be fulfilled by calling API 1
 
@@ -78,14 +79,14 @@ def is_it_informative_or_actionable(
     **User Input:** how to create a b-1 visa application
 
     **Available APIs:**
-    - Tool 1: This tool creates a b-1 visa application.
-    - Tool 2: This tool queries b-1 status.
+    - API(createVisaApplication): This api creates a b-1 visa application.
+    - API(getVisaStatus): This api queries b-1 status.
 
     **Verdict:** Does not need API call so the response should be {"needs_api": "no', "justification": "the reason behind your verdict",  "api": "name of the API to use" }
 
     **Justification:** The user is asking about how to create a visa application, which can be answered through text without the need to call an API + the APIs in are for create or query b1 applications
 
-    **Response Format:** Always respond with JSON, for example: {"needs_api": "no", "justification": "the reason behind your verdict", "api": "name of the API to use" } or {"needs_api": 'yes', "justification": "the reason behind your verdict"} (always with double quotation and without escaping)
+    **Response Format:** Always respond with JSON without any commentary, for example: {"needs_api": "no", "justification": "the reason behind your verdict", "api": "name of the API to use" }
     
     ===END EXAMPLES===
     The available tools :
@@ -96,7 +97,7 @@ def is_it_informative_or_actionable(
     """
     )
 
-    logger.info("cool", payload=actionable_tools)
+    # logger.info("cool", payload=actionable_tools)
     messages: List[BaseMessage] = [
         SystemMessage(content=prompt),
     ]
@@ -110,18 +111,15 @@ def is_it_informative_or_actionable(
 
     content = cast(str, chat(messages=messages).content)
 
-    content_parsed_as_dict = json.loads(content)
+    parsed_json = parse_informative_or_actionable_response(content)
 
-    if content_parsed_as_dict.get("needs_api") == "yes":
-        response = parse_actionable_or_not_response(
-            {"actionable": True, "operation_id": content_parsed_as_dict.get("api")}
-        )
-    else:
-        response = parse_actionable_or_not_response({"actionable": False})
+    response = parse_actionable_or_not_response(
+        json_dict={"actionable": parsed_json.needs_api, "api": parsed_json.api}
+    )
 
     logger.info(
         "Actionable or not response",
-        payload=content_parsed_as_dict,
+        payload=parsed_json,
         final_result=response.actionable,
     )
     return response

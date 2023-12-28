@@ -105,10 +105,10 @@ async def handle_request(
     emit(
         f"{session_id}_info", f"Is next step actionable: {next_step.actionable}... \n"
     ) if is_streaming else None
-    if next_step.actionable and next_step.operation_id:
+    if next_step.actionable and next_step.api:
         # if the LLM given operationID is actually exist, then use it, otherwise fallback to the highest vector space document
         llm_predicted_operation_id = is_the_llm_predicted_operation_id_actually_true(
-            next_step.operation_id, select_top_documents(actions)
+            next_step.api, select_top_documents(actions)
         )
         if llm_predicted_operation_id:
             actionable_item = llm_predicted_operation_id
