@@ -1,10 +1,7 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import { Handle, Position, useNodes } from 'reactflow';
 import type { NodeProps } from 'reactflow';
-import { Draggable, DraggableProvided, Droppable } from 'react-beautiful-dnd';
-import { createPortal } from 'react-dom';
-import { DraggingStyle } from 'react-beautiful-dnd'
-import { ReactElement } from 'react';
+import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { BLOCK_ACTION_DRAGGABLE_ID_PREFIX } from './consts';
 import { ActionResponseType } from '@/data/actions';
 import { Action } from './ActionsList';
