@@ -34,7 +34,7 @@ export default function RootLayout({
           <body
             className={cn(
               opensans.className,
-              "h-screen min-h-[100svh] max-h-[100svh] w-screen overflow-hidden scroll-smooth bg-background text-accent-foreground antialiased",
+              "h-svh min-h-svh max-h-svh w-svw overflow-hidden scroll-smooth bg-background text-accent-foreground antialiased",
               IS_DEV && "debug-screens",
             )}
           >
