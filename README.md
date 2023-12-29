@@ -1,6 +1,11 @@
-<p>
-<a href="https://discord.gg/yjEgCgvefr"><img alt="Discord" src="https://img.shields.io/discord/1111357170504699954"></a>
-</p>
+
+
+| Get 1:1 support, Join the community! | 1 Click install | 
+|:-:|:-:|
+| [![](https://dcbadge.vercel.app/api/server/yjEgCgvefr)](https://discord.gg/yjEgCgvefr)| [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/openchatai/opencopilot)
+ 
+
+
 
 
 <img width="1445" alt="image" style="border-radius:20px" src="https://github.com/openchatai/OpenCopilot/assets/32633162/340d174b-6ddd-452f-a66d-6c5567cc4583">
@@ -18,10 +23,6 @@ OpenCopilot allows you to have your own product's AI copilot. It integrates with
 - Provide your APIs/actions definition, including your public endpoints and how to call them. Currently, OpenCopilot supports Swagger OpenAPI 3.0 for bulk import.
 - OpenCopilot validates your schema to achieve the best results.
 - Finally, you can integrate our user-friendly chat bubble into your SaaS app.
-
-
-
-(In this example, the user was able to add a new fish to the store just by text commands)
 
 
 
@@ -125,9 +126,9 @@ Less than <10 lines of codes to implement on your web app or desktop app
 
 
 ### Important links
-- [OpenCopilot Flows Editor](https://editor.opencopilot.so)
 - The backend server (API) is reachable via http://localhost:8888/backend
-- The dashboard server is reachable via http://localhost:8888/ or http://localhost:8888/dashboard
+- The dashboard server is reachable via http://localhost:8888/ 
+- You can also [use our SDK](https://github.com/openchatai/typescript-sdk)
  
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind are welcome!

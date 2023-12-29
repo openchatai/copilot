@@ -1,0 +1,119 @@
+---
+title: Introduction
+description: "OpenCopilot is a free and open-source tool that allows you to create AI copilots for your SaaS product. The copilot can communicate with your underlying APIs and execute calls as needed. We are open-source under MIT license and also support OpenAPI standards."
+icon: "book"
+---
+
+
+## Getting started
+Update your docs to your brand and add valuable content for the best user conversion.
+
+<CardGroup cols={2}>
+    <Card
+        title="What is copilots? (start from here)"
+        icon="question"
+        href="ai-copilots"
+    >
+       Introduction to OpenCopilot. **start from here** for step-by-step guide
+    </Card>
+    <Card
+        title="Setting up"
+        icon="palette"
+        href="#setting-up"
+    >
+        Install the project locally and make it yours
+    </Card>
+    <Card
+        title="Create copilots"
+        icon="code"
+        href="api-reference/endpoint/get"
+    >
+        Create copilots programmatically (APIs, SDKs) or using the dashboard
+    </Card>
+    <Card
+        title="Authentications and Authorization"
+        icon="screwdriver-wrench"
+        href="authorization"
+    >
+        Handle Authentications and Authorization to your backend
+    </Card>
+    <Card
+        title="Embedding copilots on your app"
+        icon="lightbulb"
+        href="widget/embed"
+    >
+        How to use OpenCopilot widget and embed it on your web app
+    </Card>
+    <Card
+        title="Creating complex flows"
+        icon="rectangle-code"
+        href="flows"
+    >
+        Learn how to use OpenCopilot flows definition
+    </Card>
+    <Card
+        title="Roadmap"
+        icon="stars"
+        href="https://opencopilot.so/roadmap"
+    >
+        See what's coming next.
+    </Card>
+</CardGroup>
+
+
+
+
+## Setting up
+
+You can self-host OpenCopilot in a relatively easy way, please make sure you have the following requirements:
+
+- Docker engine and docker compose installed
+- Clone the repository
+
+```bash
+git clone https://github.com/openchatai/opencopilot.git
+```
+
+- Update your llm-server/.env with your OPENAI_API_KEY
+
+```dotenv
+OPENAI_API_KEY=YOUR_KEY_GOES_HERE
+```
+
+- Run the installation script
+
+```bash
+make install
+```
+Then your OpenCopilot dashboard will be accessible at http://localhost:8888
+
+
+----
+
+You also can see the complete list of commands using `make help`
+```
+➜  OpenCopilot git:(main) make help
+Usage: make [target]
+
+Available Targets:
+
+  install            - Install and set up the Docker environment
+  db-setup           - Set up the database (fresh migration with seeding)
+  down               - Stop and remove all containers
+  exec-backend      - Access the backend container's shell
+  exec-dashboard    - Access the dashboard container's shell
+  exec-llm-server   - Access the llm-server container's shell
+  restart            - Restart all containers
+  logs               - Show container logs
+
+  help               - Display this help message
+```
+
+-----
+
+Complete list of links:
+
+- http://localhost:8888/backend -> backend APIs (create, update, delete and validate copilots)
+- http://localhost:8888 or http://localhost:8888/dashbaord -> dashboard (UI to do the same)
+
+

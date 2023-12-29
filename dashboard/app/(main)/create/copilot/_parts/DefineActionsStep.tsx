@@ -8,62 +8,13 @@ import _ from "lodash";
 import { toast } from "@/components/ui/use-toast";
 import { AlertDialog, AlertDialogContent, AlertDialogCancel, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { createActionByBotId, getActionsByBotId, importActionsFromSwagger } from "@/data/actions";
-import Link from "next/link";
-import { DropZone } from "@/components/domain/DropZone";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2, UploadCloud } from "lucide-react";
 import { EmptyBlock } from "@/components/domain/EmptyBlock";
 import { ActionForm } from "@/components/domain/action-form/ActionForm";
 import { methodVariants } from "@/components/domain/MethodRenderer";
 import { cn } from "@/lib/utils";
-
-function GetActionsFromSwagger() {
-    const { state: { swaggerFiles }, dispatch } = useCreateCopilot();
-    return <div>
-        <div className="my-5">
-            <DropZone
-                multiple={false}
-                maxFiles={1}
-                accept={{ json: ["application/json"] }}
-                value={swaggerFiles || []}
-                onChange={(files) => {
-                    dispatch({ type: "ADD_SWAGGER", payload: files });
-                }}
-            />
-        </div>
-        <div className="mb-8 mt-4 flex items-center justify-between space-x-6">
-            <div>
-                <div className="mb-1 text-sm font-medium text-slate-800">
-                    Important Instructions
-                </div>
-                <div className="text-xs">
-                    <ul>
-                        <li>
-                            ✅ Make sure each{" "}
-                            <strong>endpoint have description and operation id</strong>,
-                            results will be significantly better with a good description
-                        </li>
-                        <li>
-                            ✅ Make sure that the swagger file is valid, the system
-                            might not be able to parse invalid files,{" "}
-                            <Link href="https://editor.swagger.io/" target="_blank">
-                                use this tool validate your schema
-                            </Link>
-                        </li>
-                        <li>
-                            ✅ Do not add any Authorization layers, we will show you how
-                            to authorize your own requests by yourself
-                        </li>
-                        <li>
-                            ✅ This is a *very* new product, so many things does not make
-                            sense/work at this stage{" "}
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-}
+import { GetActionsFromSwagger } from "@/components/domain/SwaggerUpload";
 
 
 const formDialog = atom({
@@ -130,6 +81,7 @@ export function DefineActionsStep() {
                             </AlertDialogTitle>
                         </AlertDialogHeader>
                         <ActionForm
+                            className="space-y-2.5 flex-1 overflow-auto no-scrollbar"
                             onSubmit={async (values) => {
                                 if (createdCopilot) {
                                     const { data } = await $addAction(createdCopilot.id, values);
@@ -148,14 +100,15 @@ export function DefineActionsStep() {
                                 }
                             }}
                             footer={
-                                () => <AlertDialogFooter>
-                                    <AlertDialogCancel asChild>
-                                        <Button variant='outline'>Cancel</Button>
-                                    </AlertDialogCancel>
-                                    <Button type="submit" loading={addActionState.loading}>
-                                        Create Action
-                                    </Button>
-                                </AlertDialogFooter>
+                                () =>
+                                    <AlertDialogFooter className="mt-5">
+                                        <AlertDialogCancel asChild>
+                                            <Button variant='outline'>Cancel</Button>
+                                        </AlertDialogCancel>
+                                        <Button type="submit" loading={addActionState.loading}>
+                                            Create Action
+                                        </Button>
+                                    </AlertDialogFooter>
                             } />
                     </AlertDialogContent>
                     <AlertDialogTrigger asChild>
@@ -178,7 +131,12 @@ export function DefineActionsStep() {
                                 Import from Swagger
                             </AlertDialogTitle>
                         </AlertDialogHeader>
-                        <GetActionsFromSwagger />
+                        <GetActionsFromSwagger swaggerFiles={swaggerFiles || []} onChange={(f) => {
+                            dispatch({
+                                type: "ADD_SWAGGER",
+                                payload: f,
+                            });
+                        }} />
                         <AlertDialogFooter>
                             <AlertDialogCancel asChild>
                                 <Button variant='outline'>Cancel</Button>

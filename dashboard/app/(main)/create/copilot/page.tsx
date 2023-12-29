@@ -15,8 +15,8 @@ import {
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { SetCopilotName } from "./_parts/SetCopilotNameStep";
 import { DefineActionsStep } from "./_parts/DefineActionsStep";
-import { AnimatePresence, motion } from "framer-motion";
-import { usePrevious } from "react-use";
+import { motion } from "framer-motion";
+
 function Header() {
   const { stepCount, activeStep, goToStep } = useWizard();
   const steps = Array.from({ length: stepCount }).map((_, i) => ({

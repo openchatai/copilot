@@ -10,6 +10,7 @@ import { BlockType } from './types/block';
 import _, { uniqueId } from 'lodash';
 import { atom, useAtom } from 'jotai';
 import { ReactFlowProvider } from 'reactflow';
+import { reorderList } from './utils';
 
 const selectedNodeIds = atom<string[]>([]);
 
@@ -139,13 +140,7 @@ const initialState: StateType = {
     actions: [],
     blocks: [],
 }
-export function reorderList<T extends any>(list: T[], startIndex: number, endIndex: number) {
-    const result = Array.from(list);
-    const [removed] = result.splice(startIndex, 1);
-    if (!removed) return [...result];
-    result.splice(endIndex, 0, removed);
-    return [...result];
-}
+
 function getEmptyBlock(next_on_success: string | null, actions?: ActionResponseType[]): BlockType {
     const id = "block-" + uniqueId();
     return {
@@ -165,7 +160,7 @@ function stateReducer(state: StateType, action: ActionsType) {
                 return initialState;
             case "LOAD_ACTIONS":
                 draft.actions = action.payload;
-                return;
+                break;
             case "UPDATE_BLOCK": {
                 // not all data will change, so we need to merge the data
                 const { blockId, data } = action.payload;
@@ -173,7 +168,7 @@ function stateReducer(state: StateType, action: ActionsType) {
                 if (block) {
                     _.assign(block, data);
                 }
-                return;
+                break;
             }
             case "ADD_ACTION_TO_BLOCK": {
                 const { blockId, action: $action, index } = action.payload;
@@ -184,12 +179,12 @@ function stateReducer(state: StateType, action: ActionsType) {
                     action.id = uniqueId();
                     block.actions.splice(index, 0, action);
                 }
-                return;
+                break;
             }
             case "REORDER_ACTIONS": {
                 const { sourceIndex, destinationIndex } = action.payload;
                 draft.actions = reorderList(draft.actions, sourceIndex, destinationIndex);
-                return;
+                break;
             }
             case "REORDER_ACTIONS_IN_BLOCK": {
                 const { blockId, sourceIndex, destinationIndex } = action.payload;
@@ -197,12 +192,12 @@ function stateReducer(state: StateType, action: ActionsType) {
                 if (block) {
                     block.actions = reorderList(block.actions, sourceIndex, destinationIndex);
                 }
-                return;
+                break;
             }
             case "DELETE_BLOCK": {
                 const { blockId } = action.payload;
                 draft.blocks = draft.blocks.filter(block => block.id !== blockId);
-                return;
+                break;
             }
             case "DELETE_ACTION_FROM_BLOCK": {
                 const { blockId, actionId } = action.payload;
@@ -210,7 +205,7 @@ function stateReducer(state: StateType, action: ActionsType) {
                 if (block) {
                     block.actions = block.actions.filter(action => action.id !== actionId);
                 }
-                return;
+                break;
             }
             case "ADD_EMPTY_NEXT_ON_SUCCESS_BETWEEN": {
                 // add empty block between two blocks
@@ -222,7 +217,7 @@ function stateReducer(state: StateType, action: ActionsType) {
                     draft.blocks.push(newBlock);
                     sourceBlock.next_on_success = newBlock.id;
                 }
-                return;
+                break;
             }
             case "DELETE_BLOCK_BY_ID": {
                 const { blockId } = action.payload;
@@ -234,7 +229,7 @@ function stateReducer(state: StateType, action: ActionsType) {
                     previousBlock.next_on_success = block.next_on_success;
                 }
                 draft.blocks = draft.blocks.filter(block => block.id !== blockId);
-                return;
+                break;
             }
             case "INSERT_EMPTY_BLOCK_AFTER": {
                 // will inset empty block after the source block (if present); else will insert at the end
@@ -249,7 +244,7 @@ function stateReducer(state: StateType, action: ActionsType) {
                     const newBlock: BlockType = getEmptyBlock(null);
                     draft.blocks.push(newBlock);
                 }
-                return;
+                break;
             }
             case "INSERT_EMPTY_BLOCK_BEFORE": {
                 // will inset empty block before the source block (if present); else will insert at the end
@@ -264,7 +259,7 @@ function stateReducer(state: StateType, action: ActionsType) {
                     const newBlock: BlockType = getEmptyBlock(null);
                     draft.blocks.push(newBlock);
                 }
-                return;
+                break;
             }
             case "MOVE_ACTION_FROM_BLOCK_TO_BLOCK": {
                 const { sourceBlockId, destinationBlockId, index, action_id } = action.payload;
@@ -277,11 +272,11 @@ function stateReducer(state: StateType, action: ActionsType) {
                         sourceBlock.actions = sourceBlock.actions.filter(action => action.id !== action_id);
                     }
                 }
-                return;
+                break;
             }
             case "SET_WORKFLOW_DATA": {
                 _.assign(draft, action.payload)
-                return;
+                break;
             }
             case "PATCH_CREATE_BLOCKS_FROM_ACTIONS": {
                 // create blocks for each action
@@ -295,7 +290,7 @@ function stateReducer(state: StateType, action: ActionsType) {
                         }
                         return prev;
                     })
-                return;
+                break;
             }
             default:
                 return;
@@ -307,60 +302,51 @@ export const revalidateWorkflow = (copilotId: string, workflow_id: string) => mu
 
 function FlowsControllerV2({ children }: { children: React.ReactNode }) {
     const [state, dispatch] = useReducer(stateReducer, initialState);
-
+    const execCb = useCallback(
+        // eslint-disable-next-line no-unused-vars
+        <T extends (...args: any[]) => void>(cb: T) => cb,
+        []
+    );
     // useCallback Hell :( 
-    const loadActions = useCallback((actions: ActionResponseType[]) => {
-        dispatch({ type: "LOAD_ACTIONS", payload: actions })
-    }, [])
-    const reset = useCallback(() => {
+    const loadActions = execCb((actions: ActionResponseType[]) => { dispatch({ type: "LOAD_ACTIONS", payload: actions }) })
+    const reset = execCb(() => {
         dispatch({ type: "RESET" })
-    }, [])
-    const updateBlock = useCallback((blockId: string, block: Partial<BlockType>) => {
+    })
+    const updateBlock = execCb((blockId: string, block: Partial<BlockType>) => {
         dispatch({ type: "UPDATE_BLOCK", payload: { blockId, data: block } })
-    }, [])
-    const reorderActions = useCallback((sourceIndex: number, destinationIndex: number) => {
+    })
+    const reorderActions = execCb((sourceIndex: number, destinationIndex: number) => {
         dispatch({ type: "REORDER_ACTIONS", payload: { sourceIndex, destinationIndex } })
-    }
-        , [])
-    const addActionToBlock = useCallback((blockId: string, action: ActionResponseType, index: number) => {
+    })
+    const addActionToBlock = execCb((blockId: string, action: ActionResponseType, index: number) => {
         dispatch({ type: "ADD_ACTION_TO_BLOCK", payload: { blockId, action, index } })
-    }
-        , [])
-    const reorderActionsInBlock = useCallback((blockId: string, sourceIndex: number, destinationIndex: number) => {
+    })
+    const reorderActionsInBlock = execCb((blockId: string, sourceIndex: number, destinationIndex: number) => {
         dispatch({ type: "REORDER_ACTIONS_IN_BLOCK", payload: { blockId, sourceIndex, destinationIndex } })
-    }
-        , [])
-    const deleteBlock = useCallback((blockId: string) => {
+    })
+    const deleteBlock = execCb((blockId: string) => {
         dispatch({ type: "DELETE_BLOCK", payload: { blockId } })
-    }
-        , [])
-    const deleteActionFromBlock = useCallback((blockId: string, actionId: string) => {
+    })
+    const deleteActionFromBlock = execCb((blockId: string, actionId: string) => {
         dispatch({ type: "DELETE_ACTION_FROM_BLOCK", payload: { blockId, actionId } })
     }
-        , [])
-    const addNextOnSuccess = useCallback((sourceId: string, destinationId: string) => {
+    )
+    const addNextOnSuccess = execCb((sourceId: string, destinationId: string) => {
         dispatch({ type: "ADD_EMPTY_NEXT_ON_SUCCESS_BETWEEN", payload: { sourceId, destinationId } })
-    }
-        , [])
-    const deleteBlockById = useCallback((blockId: string) => {
+    })
+    const deleteBlockById = execCb((blockId: string) => {
         dispatch({ type: "DELETE_BLOCK_BY_ID", payload: { blockId } })
-    }
-        , [])
-    const insertEmptyBlockAfter = useCallback((sourceId?: string) => {
+    })
+    const insertEmptyBlockAfter = execCb((sourceId?: string) => {
         dispatch({ type: "INSERT_EMPTY_BLOCK_AFTER", payload: { sourceId } })
-    }
-        , [])
-    const moveActionFromBlockToBlock = useCallback((sourceBlockId: string, destinationBlockId: string, index: number, action_id: string) => {
+    })
+    const moveActionFromBlockToBlock = execCb((sourceBlockId: string, destinationBlockId: string, index: number, action_id: string) => {
         dispatch({ type: "MOVE_ACTION_FROM_BLOCK_TO_BLOCK", payload: { sourceBlockId, destinationBlockId, index, action_id } })
-    }
-        , [])
-    const insertEmptyBlockBefore = useCallback((sourceId?: string) => {
+    })
+    const insertEmptyBlockBefore = execCb((sourceId?: string) => {
         dispatch({ type: "INSERT_EMPTY_BLOCK_BEFORE", payload: { sourceId } })
-    }
-        , [])
-
+    })
     return (
-
         <ReactFlowProvider>
             <ControllerProvider value={{ insertEmptyBlockBefore, dispatch, insertEmptyBlockAfter, moveActionFromBlockToBlock, state, deleteBlockById, addNextOnSuccess, deleteActionFromBlock, loadActions, reset, updateBlock, reorderActions, addActionToBlock, reorderActionsInBlock, deleteBlock }}>
                 {children}

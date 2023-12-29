@@ -3,8 +3,10 @@ import * as React from "react";
 import * as LabelPrimitive from "@radix-ui/react-label";
 import { Slot } from "@radix-ui/react-slot";
 import {
+  Control,
   Controller,
   ControllerProps,
+  ControllerRenderProps,
   FieldPath,
   FieldValues,
   FormProvider,
@@ -79,7 +81,7 @@ const FormItem = React.forwardRef<
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <div ref={ref} className={cn("space-y-2", className)} {...props} />
+      <div ref={ref} className={cn("space-y-1", className)} {...props} />
     </FormItemContext.Provider>
   );
 });
@@ -131,13 +133,13 @@ const FormDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => {
-  const { formDescriptionId } = useFormField();
+  const { formDescriptionId, invalid } = useFormField();
 
   return (
     <p
       ref={ref}
       id={formDescriptionId}
-      className={cn("ms-1 text-xs text-muted-foreground", className)}
+      className={cn("ms-1 text-xs text-muted-foreground", invalid ? 'animate-out fade-out hidden' : 'animate-in fade-in', className)}
       {...props}
     />
   );
@@ -159,7 +161,7 @@ const FormMessage = React.forwardRef<
     <p
       ref={ref}
       id={formMessageId}
-      className={cn("text-sm font-medium text-destructive", className)}
+      className={cn("text-xs font-medium text-destructive", className)}
       {...props}
     >
       {body}
@@ -167,6 +169,50 @@ const FormMessage = React.forwardRef<
   );
 });
 FormMessage.displayName = "FormMessage";
+
+// use this 
+function Field<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+>({
+  required,
+  label,
+  description,
+  name,
+  control,
+  render
+}: {
+  name: TName;
+  required?: boolean;
+  label?: string;
+  description?: string;
+  // eslint-disable-next-line no-unused-vars
+  render: (props: ControllerRenderProps<TFieldValues, TName>) => React.ReactNode;
+  control: Control<TFieldValues>
+}) {
+  return <FormField
+    control={control}
+    name={name}
+    render={({ field }) => (
+      <FormItem>
+        {
+          label && <FormLabel className={required ? "required-label" : ""}>
+            {label}
+          </FormLabel>
+        }
+        <FormControl>
+          {render(field)}
+        </FormControl>
+        <FormDescription>
+          {description}
+        </FormDescription>
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+}
+
+
 
 export {
   useFormField,
@@ -177,4 +223,5 @@ export {
   FormDescription,
   FormMessage,
   FormField,
+  Field
 };

@@ -3,7 +3,7 @@ import {
     BaseEdge,
     EdgeLabelRenderer,
     EdgeProps,
-    getSimpleBezierPath,
+    getBezierPath
 } from "reactflow";
 import { cn } from "@/lib/utils";
 import { memo } from "react";
@@ -15,14 +15,19 @@ function BlockEdge({
     targetX,
     targetY,
     selected,
+    sourcePosition,
+    targetPosition,
     id,
     ...props
 }: EdgeProps) {
-    const [edgePath, labelX, labelY] = getSimpleBezierPath({
+    const [edgePath, labelX, labelY] = getBezierPath({
         sourceX,
         sourceY,
         targetX,
         targetY,
+        curvature: 0.2,
+        sourcePosition,
+        targetPosition,
     });
     const { addNextOnSuccess } = useController();
     const addBlock = () => {

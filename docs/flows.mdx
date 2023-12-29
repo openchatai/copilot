@@ -1,0 +1,31 @@
+---
+title: "Introduction to flows"
+description: "OpenCopilot Flows Definition"
+---
+
+
+By default, OpenCopilot attempts to map the user's request to an action (or actions) automatically, and this works well for most simple use cases. However, if your backend contains flows that are not straightforward or intuitive, you may need to define these flows using OpenCopilot's flows.
+
+
+<Card title="Flows are optional" icon="lightbulb" iconType="duotone" color="#ca8b04">
+    Implementing them will give the copilot the ability to execute complex flows/cases. if your app
+    only serve simple CRUD operations, then you might not need to use the flows.
+</Card>
+
+## What is a Flow?
+
+A flow consists of a series of steps, where each step represents an API call to your backend (action). Each flow has a name and description to guide the copilot in determining when to invoke it based on the user's request.
+
+For example, imagine that your system includes an "add to cart" functionality, which involves calling multiple endpoints. You may want your copilot to handle user requests that require this functionality. To achieve this, you need to define a flow using OpenCopilot's flow definitions.
+
+![Conversion](/images/example-flow.png)
+
+**In this example:**
+
+1. The user requested the copilot to add 3 sunglasses to the cart.
+
+2. OpenCopilot automatically mapped the user request to the pre-defined "create cart" flow, passing the necessary parameters based on the user request.
+
+3. After making all the API calls, OpenCopilot responds to the user based on the results of the flow.
+
+

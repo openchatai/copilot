@@ -68,7 +68,6 @@ function Header({ workflow_id }: { workflow_id: string }) {
                         if (response.data) {
                             toast({
                                 title: 'Flow saved',
-                                description: 'Flow saved successfully',
                                 variant: 'success'
                             })
                             _.delay(mutateFlow, 1000)
