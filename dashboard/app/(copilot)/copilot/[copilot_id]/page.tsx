@@ -54,6 +54,7 @@ function InstallationSection() {
         initialMessage: "How are the things",
         token: "${CopilotToken}", 
         triggerSelector: "#triggerSelector", 
+        socketUrl: "${baseUrl}",
         headers: { 
           // optional: you can pass your authentication tokens to the copilot or any other header you want to send with every request
           Authorization: "Bearer your_auth_token_goes_here",
