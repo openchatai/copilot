@@ -117,82 +117,71 @@ def init_chat():
 @chat_workflow.route("/send", methods=["POST"])
 async def send_chat():
     json_data = request.get_json()
-
     input_data = ChatInput(**json_data)
-    message = input_data.content
-    session_id = input_data.session_id
-    headers_from_json = input_data.headers
 
     bot_token = request.headers.get("X-Bot-Token")
-
     if not bot_token:
-        return Response(response="bot token is required", status=400)
-
-    app_name = headers_from_json.pop(X_App_Name, None)
+        return Response(response="Bot token is required", status=400)
 
     try:
-        bot = find_one_or_fail_by_token(bot_token)
-        base_prompt = bot.prompt_message
-
-        bot_response = await root_service.handle_user_message(
-            text=message,
-            session_id=session_id,
-            base_prompt=str(base_prompt),
-            bot_id=str(bot.id),
-            headers=headers_from_json,
-            app=app_name,
-        )
-
-        logger.info(bot_response)
-
-        if bot_response.text:
-            upsert_analytics_record(
-                chatbot_id=str(bot.id), successful_operations=1, total_operations=1
-            )
-            create_chat_history(
-                chatbot_id=str(bot.id),
-                session_id=session_id,
-                from_user=True,
-                message=message
-            )
-
-            if bot_response.apis_calls:
-                create_chat_history(
-                    chatbot_id=str(bot.id),
-                    session_id=session_id,
-                    from_user=False,
-                    visible_for_user=False,
-                    message="API response {}".format(json.dumps(bot_response.apis_calls))
-                )
-
-            create_chat_history(
-                chatbot_id=str(bot.id),
-                session_id=session_id,
-                from_user=False,
-                message=bot_response.text or bot_response.errors or "",
-            )
-
-        elif bot_response.errors:
-            upsert_analytics_record(
-                chatbot_id=str(bot.id),
-                successful_operations=0,
-                total_operations=1,
-                logs=bot_response.errors,
-            )
-
-        return jsonify(
-            {"type": "text", "response": {"text": bot_response.text or bot_response.errors}}
-        )
+        bot_response = await process_chat_message(input_data, bot_token)
+        return jsonify({"type": "text", "response": {"text": bot_response}})
     except Exception as e:
         logger.error("An exception occurred", incident="chat/send", error=str(e))
-        return (
-            jsonify(
-                {
-                    "type": "text",
-                    "response": {
-                        "text": f"I'm unable to help you at the moment, please try again later. **code: b500**\n```{e}```"
-                    },
-                }
-            ),
-            500,
-        )
+        return jsonify_error_response(e)
+
+
+def jsonify_error_response(exception):
+    """
+    Creates a JSON response for an error.
+    """
+    error_message = f"I'm unable to help you at the moment, please try again later. **code: b500**\n```{exception}```"
+    return jsonify({"type": "text", "response": {"text": error_message}}), 500
+
+
+async def process_chat_message(input_data: ChatInput, bot_token: str) -> str:
+    """
+    Processes the chat message and returns the bot's response.
+    """
+    message, session_id, headers = input_data.content, input_data.session_id, input_data.headers
+    app_name = headers.pop(X_App_Name, None)
+    bot = find_one_or_fail_by_token(bot_token)  # This might raise BotNotFoundException
+
+    bot_response = await root_service.handle_user_message(
+        text=message,
+        session_id=session_id,
+        base_prompt=str(bot.prompt_message),
+        bot_id=str(bot.id),
+        headers=headers,
+        app=app_name,
+    )
+
+    logger.info(bot_response)
+    process_bot_response(bot_response, bot.id, session_id, message)
+
+    return bot_response.text or bot_response.errors
+
+
+def process_bot_response(bot_response, bot_id, session_id, user_message):
+    """
+    Process and log the bot response.
+    """
+    if bot_response.text:
+        upsert_analytics_record(chatbot_id=str(bot_id), successful_operations=1, total_operations=1)
+        create_chat_history(chatbot_id=str(bot_id), session_id=session_id, from_user=True, message=user_message)
+
+        if bot_response.apis_calls:
+            create_chat_history(
+                chatbot_id=str(bot_id),
+                session_id=session_id,
+                from_user=False,
+                visible_for_user=False,
+                message="API response {}".format(json.dumps(bot_response.apis_calls))
+            )
+
+        create_chat_history(chatbot_id=str(bot_id), session_id=session_id, from_user=False,
+                            message=bot_response.text or "")
+
+    elif bot_response.errors:
+        upsert_analytics_record(chatbot_id=str(bot_id), successful_operations=0, total_operations=1,
+                                logs=bot_response.errors)

@@ -49,10 +49,7 @@ async def run_actions(
 
                 api_response = make_api_request(headers=headers, **api_payload.__dict__)
 
-                logger.warn(
-                    "Config map is not defined for this operationId",
-                    paylooad=api_response.text,
-                )
+                logger.warn("Config map is not defined for this operationId", paylooad=api_response.text)
 
                 """ 
                 if a custom transformer function is defined for this operationId use that, otherwise forward it to the llm,
@@ -62,16 +59,9 @@ async def run_actions(
                 partial_json = load_json_config(app, operation_id)
                 if not partial_json:
                     apis_calls_history[operation_id] = api_response.text
-
                     pass
                 else:
-                    logger.info(
-                        "API Response",
-                        incident="log_api_response",
-                        api_response=api_response.text,
-                        json_config_used=partial_json,
-                        next_action="summarize_with_partial_json",
-                    )
+                    logger.info("API Response", incident="log_api_response", api_response=api_response.text, json_config_used=partial_json, next_action="summarize_with_partial_json")
                     api_json = json.loads(api_response.text)
                     apis_calls_history[operation_id] = json.dumps(
                         transform_response(
@@ -80,15 +70,7 @@ async def run_actions(
                     )
 
             except Exception as e:
-                logger.error(
-                    "Error occurred during workflow check in store",
-                    incident="check_workflow_in_store",
-                    text=text,
-                    headers=headers,
-                    app=app,
-                    error=str(e),
-                )
-
+                logger.error("Error occurred during workflow check in store", incident="check_workflow_in_store", text=text, headers=headers, app=app, error=str(e))
                 return BotResponse(
                     errors=str(e)
                 )
