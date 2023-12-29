@@ -82,11 +82,11 @@ def is_it_informative_or_actionable(
     - API(createVisaApplication): This api creates a b-1 visa application.
     - API(getVisaStatus): This api queries b-1 status.
 
-    **Verdict:** Does not need API call so the response should be {"needs_api": "no', "justification": "the reason behind your verdict",  "api": "name of the API to use" }
+    **Verdict:** Does not need API call so the response should be {"needs_api": "no", "justification": "the reason behind your verdict",  "api": "" }
 
     **Justification:** The user is asking about how to create a visa application, which is informative and can be answered through text without the need to call an API + the APIs in are for create or query b1 applications
 
-    **Response Format:** Always respond with JSON without any commentary, for example: {"needs_api": "no", "justification": "the reason behind your verdict", "api": "name of the API to use" }
+    **Response Format:** Always respond with JSON without any commentary, for example: {"needs_api": "no", "justification": "the reason behind your verdict", "api": "apiName" }
     
     ===END EXAMPLES===
     The available tools :
@@ -104,13 +104,12 @@ def is_it_informative_or_actionable(
     messages.extend(chat_history[-6:])
     messages.append(HumanMessage(content=current_message))
     messages.append(
-        HumanMessage(
-            content="Based on that, please answer if the previous user message is actionable or not in JSON"
-        )
+        HumanMessage(content="Return the corresponding json for the last user input")
     )
 
     content = cast(str, chat(messages=messages).content)
 
+    logger.info("informative_or_actionable_payload", str_content=content)
     parsed_json = parse_informative_or_actionable_response(content)
 
     response = parse_actionable_or_not_response(

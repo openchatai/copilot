@@ -170,3 +170,4 @@ lxml==4.9.3
 python-socketio==5.10.0
 Flask-SocketIO==5.3.6
 sentry_sdk==1.39.1
+anthropic==0.8.1
