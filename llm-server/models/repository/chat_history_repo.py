@@ -47,11 +47,12 @@ def create_chat_history(
 
 
 def get_all_chat_history_by_session_id(
-        session_id: str, limit: int = 20, offset: int = 0
+        session_id: str, limit: int = 20, offset: int = 0, visible_for_user=True
 ) -> List[ChatHistory]:
     """Retrieves all chat history records for a given session ID, sorted by created_at in descending order (most recent first).
 
     Args:
+      visible_for_user: Return the messages that is not visible for the user too (like the api response)
       session_id: The ID of the session to retrieve chat history for.
       limit: The maximum number of chat history records to retrieve.
       offset: The offset at which to start retrieving chat history records.
@@ -62,7 +63,7 @@ def get_all_chat_history_by_session_id(
     session = Session()
     chats = (
         session.query(ChatHistory)
-        .filter_by(session_id=session_id, visible_for_user=True)
+        .filter_by(session_id=session_id, visible_for_user=visible_for_user)
         .order_by(ChatHistory.id.desc())
         .limit(limit)
         .offset(offset)

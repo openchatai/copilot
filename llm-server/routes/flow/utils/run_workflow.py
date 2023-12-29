@@ -22,7 +22,7 @@ async def run_flow(
     try:
         result = await run_actions(
             flow=flow,
-            text=chat_context.text,
+            user_message=chat_context.text,
             headers=headers,
             app=app,
             bot_id=bot_id,

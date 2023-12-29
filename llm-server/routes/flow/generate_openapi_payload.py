@@ -15,13 +15,15 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
 
 
-async def generate_api_payload(
-        text: str,
+async def generate_api_request_payload(
+        user_message: str,
         action: ActionDTO,
-        prev_api_response: str,
         app: Optional[str],
         current_state: Optional[str],
+        previous_api_response=None,
 ) -> ApiInfo:
+    if previous_api_response is None:
+        previous_api_response = {}
     payload = action.payload
 
     parameters = payload.get("parameters", [])
@@ -55,24 +57,24 @@ async def generate_api_payload(
     if api_info.path_params["properties"]:
         api_info.path_params = await gen_params_from_schema(
             json.dumps(api_info.path_params, separators=(",", ":")),
-            text,
-            prev_api_response,
+            user_message,
+            previous_api_response,
             current_state,
         )
 
     if api_info.query_params["properties"]:
         api_info.query_params = await gen_params_from_schema(
             json.dumps(api_info.query_params, separators=(",", ":")),
-            text,
-            prev_api_response,
+            user_message,
+            previous_api_response,
             current_state,
         )
 
     if api_info.body_schema:
         api_info.body_schema = await gen_body_from_schema(
             json.dumps(api_info.body_schema, separators=(",", ":")),
-            text,
-            prev_api_response,
+            user_message,
+            previous_api_response,
             app,
             current_state,
         )
