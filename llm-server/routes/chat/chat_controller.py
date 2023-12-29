@@ -181,7 +181,7 @@ async def send_chat():
             )
 
         return jsonify(
-            {"type": "text", "response": {"text": bot_response.text}}
+            {"type": "text", "response": {"text": bot_response.text or bot_response.errors}}
         )
     except Exception as e:
         logger.error("An exception occurred", incident="chat/send", error=str(e))

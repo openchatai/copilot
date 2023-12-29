@@ -39,27 +39,6 @@ TEXT_REQUIRED = "text is required"
 chat = get_chat_model()
 
 
-def is_the_llm_predicted_operation_id_actually_true(
-        predicted_operation_id: str,
-        actionable_items: dict[str, list[DocumentSimilarityDTO]],
-):
-    """
-    If it is indeed true, it will return the action as DocumentSimilarityDTO, otherwise return None
-    Args:
-        predicted_operation_id:
-        actionable_items:
-
-    Returns:
-
-    """
-    actions = actionable_items.get(VectorCollections.actions) or []
-
-    for action in actions:
-        if predicted_operation_id == action.document.metadata.get("operation_id"):
-            return {VectorCollections.actions: [action]}
-    return None
-
-
 async def handle_user_message(
         text: str,
         session_id: str,
@@ -101,6 +80,27 @@ async def handle_user_message(
     return run_informative_item(informative_item=documents, base_prompt=base_prompt, text=text,
                                 conversations_history=conversations_history)
 
+
+
+def is_the_llm_predicted_operation_id_actually_true(
+        predicted_operation_id: str,
+        actionable_items: dict[str, list[DocumentSimilarityDTO]],
+):
+    """
+    If it is indeed true, it will return the action as DocumentSimilarityDTO, otherwise return None
+    Args:
+        predicted_operation_id:
+        actionable_items:
+
+    Returns:
+
+    """
+    actions = actionable_items.get(VectorCollections.actions) or []
+
+    for action in actions:
+        if predicted_operation_id == action.document.metadata.get("operation_id"):
+            return {VectorCollections.actions: [action]}
+    return None
 
 async def gather_message_data(text, session_id, bot_id):
     """
