@@ -34,8 +34,8 @@ export function Search() {
 
   return (
     <div className="flex items-center justify-between gap-5 py-5">
-      <div className="flex flex-1 max-w-sm gap-5 items-center">
-        <Label htmlFor="search-copilots">
+      <div className="flex-1 max-w-md relative">
+        <Label htmlFor="search-copilots" className="absolute left-2 top-1/2 -translate-y-1/2">
           <SearchIcon className="h-5 w-5 opacity-50" />
         </Label>
         <DebounceInput
@@ -53,7 +53,7 @@ export function Search() {
             });
           }}
           id="search-copilots"
-          className="w-full font-medium rounded-none border-x-0 border-t-0 px-0 border-b shadow-none focus-visible:!ring-transparent"
+          className="font-medium rounded-none border-x-0 ps-8 border-t-0 border-b shadow-none focus-visible:!ring-transparent"
           placeholder="Search Copilots..."
         />
       </div>
