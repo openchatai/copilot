@@ -4,8 +4,8 @@ from typing import Dict, Optional, List, cast
 
 from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
 
-from types.bot_response import BotResponse
-from types.run_workflow_input import ChatContext
+from custom_types.bot_response import BotResponse
+from custom_types.run_workflow_input import ChatContext
 from entities.flow_entity import FlowDTO
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from models.repository.flow_repo import get_flow_by_id

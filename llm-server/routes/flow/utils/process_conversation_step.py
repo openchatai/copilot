@@ -3,7 +3,7 @@ from typing import List, cast, Dict
 
 from langchain.schema import HumanMessage, SystemMessage, BaseMessage
 
-from types.actionable_or_not_type import (
+from custom_types.actionable_or_not_type import (
     parse_actionable_or_not_response,
     ActionableOrNotType,
 )
