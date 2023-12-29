@@ -38,9 +38,12 @@ function InstallationSection() {
           </div>
         </AccordionTrigger>
         <AccordionContent className="px-8 py-6">
-          <p className="mb-2 font-medium">
+          <p className="mb-1 font-medium">
             Paste this code snippet before the closing <strong> {`</body>`}</strong> tag on all pages you want the widget to
             appear. <a href="https://docs.opencopilot.so/widget/embed">Read more</a>
+          </p>
+          <p className="mb-2 font-medium">
+          <b>Note that: </b> the widget is fluid by default and will take the full width of the container. You can change this by passing a containerProps object to the initAiCoPilot function.
           </p>
           <CodeBlock
             code={`
@@ -48,7 +51,7 @@ function InstallationSection() {
 <script> 
       const options = {
         apiUrl: "${baseUrl}/backend", 
-        initialMessages: ["How are the things"],
+        initialMessage: "How are the things",
         token: "${CopilotToken}", 
         triggerSelector: "#triggerSelector", 
         headers: { 
@@ -58,6 +61,19 @@ function InstallationSection() {
         },
         user:{
           name:"Default User"
+        },
+        containerProps:{
+          style:{
+            // optional: you can pass any style you want to the container
+            width: "400px",
+            height: "500px",
+            position: "fixed",
+            bottom: "0",
+            right: "0",
+            zIndex: "9999",
+          },
+          className:"your class name" // if u are using tailwindcss or any className you can use the class name here
+          }
         }
       }
       window.addEventListener("DOMContentLoaded", ()=>initAiCoPilot(options));
