@@ -18,7 +18,10 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade():
-    op.add_column('chat_history', sa.Column('visible_for_user', sa.Boolean(), nullable=True, server_default=sa.true()))
+    if not op.get_bind().execute(
+        sa.text("SHOW COLUMNS FROM chat_history LIKE 'visible_for_user'")
+    ).fetchone():
+        op.add_column('chat_history', sa.Column('visible_for_user', sa.Boolean(), nullable=True, server_default=sa.true()))
 
 
 def downgrade():

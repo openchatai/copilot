@@ -62,7 +62,7 @@ def get_all_chat_history_by_session_id(
     session = Session()
     chats = (
         session.query(ChatHistory)
-        .filter_by(session_id=session_id)
+        .filter_by(session_id=session_id, visible_for_user=True)
         .order_by(ChatHistory.id.desc())
         .limit(limit)
         .offset(offset)
