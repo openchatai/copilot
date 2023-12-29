@@ -4,6 +4,7 @@ export type Options = {
   initialMessage: string;
   triggerSelector: string;
   apiUrl: string;
+  socketUrl: string;
   defaultOpen?: boolean;
   containerProps?: React.DetailedHTMLProps<
     React.HTMLAttributes<HTMLDivElement>,

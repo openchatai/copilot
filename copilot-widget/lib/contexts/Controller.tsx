@@ -37,14 +37,13 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const config = useConfigData();
   const { sessionId } = useSessionId(config.token);
   const [conversationInfo, setConversationInfo] = useState<string | null>(null);
-  
   useEffect(() => {
     getInitialData(axiosInstance).then((data) => {
       setMessages(historyToMessages(data.history))
     })
   }, [axiosInstance]);
 
-  const socket = useMemo(() => io('http://localhost:8888', {
+  const socket = useMemo(() => io(config.socketUrl, {
     extraHeaders: {
       "X-Bot-Token": config.token,
       "X-Session-Id": sessionId,
