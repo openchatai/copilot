@@ -1,0 +1,55 @@
+---
+title: "Step-by-step Guide to OpenCopilot"
+description: "A Comprehensive Guide to Get Started"
+---
+
+OpenCopilot is a free and open-source tool that enables you to create AI copilots for your SaaS product. These copilots can interact with your underlying APIs and execute calls as needed. We are open-source under the MIT license and also support OpenAPI standards.
+
+Watch this video from Shopify to understand what a Copilot (AKA sidekick) is:
+<iframe
+    width="700"
+    height="400"
+    src="https://www.youtube.com/embed/HVvbY7A7lIQ"
+    title="YouTube video player"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen
+></iframe>
+(OpenCopilot is inspired by Shopify's sidekick and is not affiliated with Shopify.)
+
+## Replace Button-Based UI with Text-Based Instructions
+
+OpenCopilot provides a new interface for your app, allowing your users to ask questions to the copilot. It can understand these questions, call your backend, and then provide state-of-the-art answers. There are unlimited use cases for the copilot; it can serve as an onboarding buddy, provide support, act as a sidekick, and much more.
+
+For example, let's say you run a pet shop. Traditionally, to get an answer to a simple question like "Based on last month's sales, can you explain where I'm lacking?" you would need to click many buttons, download last month's sales data, export it to Excel, perform calculations, and more. However, if you have the OpenCopilot widget integrated into your web app, the copilot will call your backend, retrieve the necessary data, analyze it on the fly, and provide you with an answer. This makes decision-making much easier. (You can even ask the copilot to create discounts on specific items.)
+
+![Pet Store Demo](/images/pet-store-demo.png)
+
+## But How Can the Copilot Call My Backend?
+
+When creating your copilot, OpenCopilot will prompt you to upload your Swagger file, which is a machine-readable document that describes and documents RESTful APIs. It makes it easier for developers to understand and interact with web services. OpenCopilot will validate this file and suggest recommended actions. If your APIs require authorization or authentication, you can still pass your tokens using one of the copilot options ([learn more about authorization](authorization)).
+
+Then, whenever a user sends any request, OpenCopilot will use Language Model-based algorithms to understand the request and determine if it requires API calls or not.
+
+In some cases, you might have complex workflows. In such situations, you can use OpenCopilot's flow definition, which is an easy way to define complex flows. It is optional and you might only need it to handle complex cases.
+
+![Complex Flows](/images/flows-file-example.png)
+
+## Can I Self-Host It?
+
+<video
+    autoPlay
+    muted
+    loop
+    playsinline
+    className="w-full aspect-video"
+    src="images/install.mp4"
+></video>
+(self hosting is as easy as running single `make install` command)
+
+OpenCopilot is open source, which means you can easily self-host it on your machine. [Follow these steps](introduction#setting-up), and it should work out of the box.
+
+## Is My Data Safe?
+
+You always have the option to self-host OpenCopilot, giving you full control over your data. We also support Qdrant (an offline vector DB) and many other open-source Large Language Models (LLMs), allowing you to run OpenCopilot 100% offline.
+

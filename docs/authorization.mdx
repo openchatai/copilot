@@ -1,0 +1,27 @@
+---
+title: "Authentication"
+description: "Learn how to authenticate the copilot's API calls to your backend"
+icon: "shield-halved"
+---
+
+Sometimes, your APIs might have some endpoints that require authentication. For example, you might want to restrict access to certain endpoints to only users that are logged in, and in order for the copilot to
+know who is logged in, you need to send some sort of token with your copilot requests.
+
+Currently, we support simple JWT authentication, and API tokens.
+
+## Pass your authentication tokens to the copilot
+
+When you embed the copilot in your app, you can pass the authentication token to the copilot by using the `headers` prop.
+
+```javascript
+    initAiCoPilot({
+        ...
+        headers: {
+            Authorization: "Bearer your_auth_token_goes_here",
+            AnyToken: "AnyValue"
+        },
+        ...
+    });
+```
+
+as you see, as long as you pass the token in the `headers` prop, the copilot will send it with every request it makes to your API.

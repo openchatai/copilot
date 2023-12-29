@@ -1,0 +1,35 @@
+---
+title: "Delete a Copilot"
+api: "DELETE http://example.com/backend/api/copilot/:id"
+description: "Delete single copilot by ID "
+---
+
+### Body
+
+<ParamField path="id" type="string">
+  The uuid of the copilot
+</ParamField>
+
+### Response
+
+<ResponseField name="success" type="string">
+  Indicates whether the call was successful.
+</ResponseField>
+
+<RequestExample>
+
+```bash Example Request
+curl --location --request DELETE 'http://example.com/backend/api/copilot/:id'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Response
+{
+    "success": "chatbot_deleted"
+}
+```
+
+</ResponseExample>

@@ -1,0 +1,54 @@
+---
+title: "Customizing the Copilot"
+icon: "pager"
+description: "Integrating 3rd party apps"
+---
+
+### To integrate a third-party application (e.g., Trello) with the OpenCopilot's LLM server, users should create functions similar to the provided `process_state` function and store them in the specified directory. Here's a step-by-step guide on what users need to do:
+
+1. **Access the Directory**: Users should navigate to the directory where the integration functions need to be stored. In this case, the directory path is: `llm-server/integrations/trello.py`
+2. **Create a Python File**: Users should create a new Python file with a meaningful name that reflects the integration they are building. For example, if integrating with Trello, they can name it `trello.py`. This file will contain the integration functions.
+3. **Write Integration Functions**: Inside the `trello.py` file, users should define functions similar to the `process_state` function provided in the example. These functions should perform the following tasks:
+
+    * **Retrieve Data**: Access the third-party API for relevant information.
+    * **Data Transformation**: Remove any properties from the API response that are not relevant to the entity or that are not needed to make future API calls. You can see an example of how to do this in the process_state function in the Trello integration file: https://github.com/openchatai/OpenCopilot/blob/6c266686d73371fb50961eeec8e85452e633ef91/llm-server/integrations/trello.py. In other words, the API response may contain more information than you need. For example, if you are only interested in the name and description of a Trello card, you can remove any other properties from the API response. This will make the API response smaller and easier to process..
+
+**When writing functions for the LLM server, please follow these guidelines:**
+
+* Structure and format the data returned by functions in a consistent way. The output of process_state should be compact, since there are size limitations on context. We plan to add features to automatically control context size, but for now try to keep it minimal through manual transformations.
+* By writing tidy, documented functions that return clean data, you will make it easier for the AI to understand and stay in context. This helps it provide useful responses to users. For example, an integration function for Trello could retrieve data about Trello cards or members and transform it as required.
+
+4. **Save the File**: Once the integration functions are defined, users should save the `trello.py` file in the specified directory.
+5. **Usage in LLM Server**: Usage is straightforward. You can invoke the integration functions within the LLM server by specifying the integration file's name when making calls to the server, just add another argument app: trello. The server will automatically detect and run the necessary functions, loading the data into memory. It will also periodically refresh the data to ensure it remains up-to-date and relevant.
+
+## Example
+
+```python
+def process_state(state):
+    """Processes the current state of the Copilot.
+    Args:
+        state: The current state of the Copilot.
+    Returns:
+        A dictionary containing the processed state.
+    """
+
+    # Retrieve data from Trello
+    trello_client = TrelloClient()
+    boards = trello_client.get_boards()
+
+    # Transform the data to match the LLM server's requirements
+    processed_boards = []
+    for board in boards:
+        processed_boards.append({
+            "id": board.id,
+            "name": board.name,
+            "lists": board.lists,
+        })
+
+    # Return the processed state
+    return {
+        "boards": processed_boards,
+    }
+
+
+This is just a simple example, but it should give you an idea of how to write integration functions for the LLM server. You can use the same principles to integrate with any

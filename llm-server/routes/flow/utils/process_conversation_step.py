@@ -59,8 +59,8 @@ def is_it_informative_or_actionable(
 
     prompt = (
         """
-    You are an AI tool that classifies user input needs an API call or not. You should only recommend using API if the user request match one of the APIs description below, the user requests that can be fulfilled by calling an external API to either execute something or fetch more data
-    to help in answering the question, also, if the user questions are CRUD (create, update, delete) then probably you will need to use an API (LLMs can't store data)
+    You are an AI tool that classifies user input needs an API call or not. You should recommend using API if the user request matches one of the APIs description below, the user requests that can be fulfilled by calling an external API to either execute something or fetch more data
+    to help in answering the question, also, if the user questions are verbs and asking you to perform actions e.g (list, create, update, delete) then you will need to use an API
     
     Examples:
 
@@ -72,7 +72,7 @@ def is_it_informative_or_actionable(
 
     **Verdict:** Needs API call so the response should be {"needs_api": "yes", "justification": "the reason behind your verdict", "api": "createVisaApplication" }
 
-    **Justification:** The user's request can be fulfilled by calling API 1
+    **Justification:** The user is asking to create a visa application and (createVisaApplication) api can be used to satisfy the user requirement
 
     **Another Example:**
 
@@ -84,7 +84,7 @@ def is_it_informative_or_actionable(
 
     **Verdict:** Does not need API call so the response should be {"needs_api": "no', "justification": "the reason behind your verdict",  "api": "name of the API to use" }
 
-    **Justification:** The user is asking about how to create a visa application, which can be answered through text without the need to call an API + the APIs in are for create or query b1 applications
+    **Justification:** The user is asking about how to create a visa application, which is informative and can be answered through text without the need to call an API + the APIs in are for create or query b1 applications
 
     **Response Format:** Always respond with JSON without any commentary, for example: {"needs_api": "no", "justification": "the reason behind your verdict", "api": "name of the API to use" }
     
@@ -105,7 +105,7 @@ def is_it_informative_or_actionable(
     messages.append(HumanMessage(content=current_message))
     messages.append(
         HumanMessage(
-            content="Based on that, please answer if the previous user messages is actionable or not in JSON"
+            content="Based on that, please answer if the previous user message is actionable or not in JSON"
         )
     )
 
@@ -114,7 +114,7 @@ def is_it_informative_or_actionable(
     parsed_json = parse_informative_or_actionable_response(content)
 
     response = parse_actionable_or_not_response(
-        json_dict={"actionable": parsed_json.needs_api, "api": parsed_json.api}
+        json_dict={"actionable": parsed_json.needs_api == "yes", "api": parsed_json.api}
     )
 
     logger.info(

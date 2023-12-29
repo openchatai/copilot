@@ -1,0 +1,55 @@
+---
+title: "Run predefined API flow"
+api: "POST http://example.com/backend/flows/run_workflow"
+description: "This API endpoint will run one of your predefined conversational flows based on the input text's similarity score to known intents. Calling this endpoint directly is intended for testing purposes - it has already been unified with the /handle endpoint, which uses the large language model to decide whether to invoke a predefined flow or have an AI agent respond directly. The /handle endpoint is recommended for production usage, while this /run_workflow endpoint can be used to test that your conversational flows are triggering as expected before deploying."
+---
+
+## Request
+
+<ParamField body="text" type="string">
+  The text describing the workflow.
+</ParamField>
+
+<ParamField body="swagger_url" type="string">
+  The URL to the Swagger/OpenAPI specification.
+</ParamField>
+
+<ParamField body="namespace" type="string">
+  The namespace for the workflow.
+</ParamField>
+
+<ParamField body="server_base_url" type="string">
+  The base URL of the server.
+</ParamField>
+
+<ParamField body="base_prompt" type="string">
+  The initial system message.
+</ParamField>
+
+<RequestExample>
+
+```bash Example Request
+curl --location 'http://example.com/backend/flows/run_workflow' \
+--header 'Content-Type: application/json' \
+--data '{
+    "swagger_url": "https://petstore3.swagger.io/api/v3/openapi.yaml",
+    "namespace": "workflows",
+    "server_base_url": "https://petstore3.swagger.io/api/v3",
+    "base_prompt": "System alignment prompt",
+    "text": "List available pets and place order for the first pet in that list"
+}'
+```
+</RequestExample>
+
+<ResponseExample>
+
+```json Response
+{
+  "status": 200,
+  "data": {
+    "message": "Workflow executed successfully."
+  }
+}
+```
+
+</ResponseExample>

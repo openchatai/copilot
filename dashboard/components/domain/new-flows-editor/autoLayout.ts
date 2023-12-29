@@ -45,6 +45,7 @@ export function autoLayout(blocks: BlockType[]) {
                 target: next.id,
                 source: node.id,
                 type: "BlockEdge",
+                animated: true,
             };
         }
     }).filter((v) => typeof v !== "undefined") as Edge[];

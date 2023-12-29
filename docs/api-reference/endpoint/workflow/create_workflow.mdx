@@ -1,0 +1,76 @@
+---
+title: "Create an APIs flow"
+api: "POST http://127.0.0.1:5000/workflow"
+description: "This JSON configuration defines workflows for the OpenCopilot API."
+---
+
+## Overview
+
+This JSON configuration defines workflows for the OpenCopilot API.
+
+---
+
+<RequestExample>
+
+```bash Example Request
+curl --location 'http://example.com/backend/flows/' \
+--header 'Content-Type: application/json' \
+--data '{
+    "opencopilot": "0.1",
+    "info": {
+      "title": "This contains multiple worksflows defined for the petstore app",
+      "version": "1.0.0"
+    },
+    "flows": [
+      {
+        "name": "Add and retrieve the newly added pet to petstore",
+        "description": "Add and retrieve a new pet",
+        "requires_confirmation": false,
+        "steps": [
+          {
+            "stepId": "1",
+            "operation": "call",
+            "open_api_operation_id": "addPet",
+            "description": "Add a pet"
+          },
+          {
+            "stepId": "2",
+            "operation": "call",
+            "open_api_operation_id": "getPetById",
+            "parameters": {
+              "user_verification": "xx.response.some_key"
+            }
+          },
+          {
+            "operation": "call",
+            "open_api_operation_id": "placeOrder"
+          }
+        ],
+        "on_success": [
+          {
+            "handler": "plotOutcomeJsFunction"
+          }
+        ],
+        "on_failure": [
+          {
+            "handler": "plotOutcomeJsFunction"
+          }
+        ]
+      }
+    ]
+}'
+```
+
+</RequestExample>
+
+
+<ResponseExample>
+
+```json Response
+{
+    "message": "Workflow created",
+    "workflow_id": "64f78265f23f9be82fd8caf2"
+}
+```
+
+</ResponseExample>

@@ -1,0 +1,82 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "OpenCopilot Docs",
+  "logo": {
+    "dark": "/logo/dark.png",
+    "light": "/logo/light.png"
+  },
+  "favicon": "/favicon.png",
+  "colors": {
+    "primary": "#0069ED",
+    "light": "#4D9CFF",
+    "dark": "#0050B4"
+  },
+  "topbarLinks": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com/openchatai/opencopilot"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Get Started",
+    "url": "https://opencopilot.so"
+  },
+  "anchors": [
+    {
+      "name": "Changelog",
+      "icon": "list",
+      "url": "https://github.com/openchatai/opencopilot/releases"
+    },
+    {
+      "name": "GitHub",
+      "url": "https://github.com/openchatai/opencopilot",
+      "icon": "github"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Getting started",
+      "pages": ["introduction", "authorization"]
+    },
+    {
+      "group": "Flows definition",
+      "pages": [
+        "flows",
+        "create-flow"
+      ],
+      "icon": "rectangle-code"
+    },
+    {
+      "group": "Copilot widget",
+      "pages": [
+        "widget/embed"
+      ],
+      "icon": "chat"
+    },
+    {
+      "group": "Managing copilots via API",
+      "pages": [
+        "api-reference/endpoint/get",
+        "api-reference/endpoint/create",
+        "api-reference/endpoint/validate-get",
+        "api-reference/endpoint/send",
+        "api-reference/endpoint/update",
+        "api-reference/endpoint/delete"
+      ]
+    },
+    {
+      "group": "Flows APIs",
+      "pages": [
+        "api-reference/endpoint/workflow/create_workflow",
+        "api-reference/endpoint/workflow/run_workflow"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "github": "https://github.com/openchatai"
+  },
+  "api": {
+    "playground": {
+    }
+  }
+}

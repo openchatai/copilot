@@ -1,0 +1,97 @@
+---
+title: "Update a Copilot"
+api: "POST http://example.com/backend/api/copilot/:id"
+description: "Update single copilot by ID (it does not support changing the swagger file)"
+---
+
+### Body
+
+<ParamField path="id" type="string">
+  The uuid of the copilot
+</ParamField>
+
+### Response
+
+
+<ResponseField name="copilot" type="object">
+  copilot information
+  <Expandable title="properties">
+    <ResponseField name="id" type="string">
+      The ID of the copilot
+    </ResponseField>
+    <ResponseField name="name" type="string">
+      The name of the copilot
+    </ResponseField>
+    <ResponseField name="token" type="string">
+      The token associated with the copilot
+    </ResponseField>
+    <ResponseField name="website" type="string">
+      The website URL of the copilot
+    </ResponseField>
+    <ResponseField name="status" type="string">
+      The status of the copilot
+    </ResponseField>
+    <ResponseField name="prompt_message" type="string">
+      The prompt message of the copilot
+    </ResponseField>
+    <ResponseField name="enhanced_privacy" type="number">
+      The level of enhanced privacy
+    </ResponseField>
+    <ResponseField name="smart_sync" type="number">
+      The level of smart sync
+    </ResponseField>
+    <ResponseField name="created_at" type="string">
+      The creation timestamp of the copilot
+    </ResponseField>
+    <ResponseField name="updated_at" type="string">
+      The update timestamp of the copilot
+    </ResponseField>
+    <ResponseField name="deleted_at" type="null">
+      The deletion timestamp of the copilot
+    </ResponseField>
+    <ResponseField name="swagger_url" type="string">
+      The Swagger URL of the copilot
+    </ResponseField>
+    <ResponseField name="is_premade_demo_template" type="number">
+      Indicates if the copilot is a premade demo template
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+
+
+
+<RequestExample>
+
+```bash Example Request
+curl --location 'http://example.com/backend/api/copilot/:id' \
+--header 'Accept: application/json' \
+--form 'name="My new copilot name"' \
+--form 'prompt_message="My new prompt message"'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Response
+{
+    "copilot": {
+        "id": "1ca91513-fc59-4868-9965-0112ca3393f4",
+        "name": "Hey",
+        "token": "2RX5OFLTTrh4ovONfFBt",
+        "website": "https://www.example.com",
+        "status": "draft",
+        "prompt_message": "Hello",
+        "enhanced_privacy": 0,
+        "smart_sync": 0,
+        "created_at": "2023-08-31T10:25:21.000000Z",
+        "updated_at": "2023-08-31T10:57:00.000000Z",
+        "deleted_at": null,
+        "swagger_url": "hfBh7WIRr3m1FMek3YJk.json",
+        "is_premade_demo_template": 0
+    }
+}
+```
+
+</ResponseExample>
