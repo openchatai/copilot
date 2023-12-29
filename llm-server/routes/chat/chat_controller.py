@@ -1,3 +1,4 @@
+import json
 from http import HTTPStatus
 from typing import Optional
 from typing import cast
@@ -154,12 +155,22 @@ async def send_chat():
                 from_user=True,
                 message=message
             )
+
+            if bot_response.apis_calls:
+                create_chat_history(
+                    chatbot_id=str(bot.id),
+                    session_id=session_id,
+                    from_user=False,
+                    message="API response {}".format(json.dumps(bot_response.apis_calls))
+                )
+
             create_chat_history(
                 chatbot_id=str(bot.id),
                 session_id=session_id,
                 from_user=False,
                 message=bot_response.text or bot_response.errors or "",
             )
+
         elif bot_response.errors:
             upsert_analytics_record(
                 chatbot_id=str(bot.id),
