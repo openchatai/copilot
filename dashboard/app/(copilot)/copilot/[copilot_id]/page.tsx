@@ -13,7 +13,7 @@ import { Link } from "@/lib/router-events";
 import React from "react";
 import { useCopilot } from "../_context/CopilotProvider";
 import dynamic from "next/dynamic";
-import { useSearchModal } from "@/app/_store/searchModal";
+import { useSearchModal } from "@/app/search-modal-atom";
 
 const Widget = dynamic(() => import("./CopilotWidget"));
 
