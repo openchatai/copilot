@@ -108,7 +108,7 @@ async def handle_request(
     if next_step.actionable and next_step.api:
         # if the LLM given operationID is actually exist, then use it, otherwise fallback to the highest vector space document
         llm_predicted_operation_id = is_the_llm_predicted_operation_id_actually_true(
-            next_step.api, select_top_documents(actions)
+            next_step.api, top_documents
         )
         if llm_predicted_operation_id:
             actionable_item = llm_predicted_operation_id
@@ -136,9 +136,8 @@ async def handle_request(
         emit(
             f"{session_id}_info", "Running informative action... \n"
         ) if is_streaming else None
-        documents = select_top_documents(knowledgebase)
         response = run_informative_item(
-            informative_item=documents,
+            informative_item=top_documents,
             base_prompt=base_prompt,
             text=text,
             conversations_history=conversations_history,
