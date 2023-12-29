@@ -1,43 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Openchat AI-Copilot</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1,maximum-scale=1"
+    />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Openchat AI-Copilot</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1" />
-</head>
-
-<body>
-  <button id="triggerSelector">toggle the chat widget</button>
-  <script type="module" src="/src/main.tsx"></script>
-  <script>
-    window.onload = () => {
-      initAiCoPilot({
-        initialMessage: "Hi Sir",
-        token: "5AciN2ZUgIxh43BH",
-        triggerSelector: "#triggerSelector",
-        apiUrl: "http://localhost:8888/backend",
-        defaultOpen: true,
-        headers:
-        {
-          Authorization: "Bearer BQAlIe479yo16aXf",
-        },
-        user: {
-          name: "John Doe",
-        },
-        containerProps: {
-          style: {
-            position: "fixed",
-            height: "100%",
-            bottom: "0",
-            right: "0",
-            width: "400px",
+  <body>
+    <button id="triggerSelector">toggle the chat widget</button>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      window.onload = () => {
+        initAiCoPilot({
+          initialMessage: "Hi Sir",
+          token: "5AciN2ZUgIxh43BH",
+          triggerSelector: "#triggerSelector",
+          apiUrl: "http://localhost:8888/backend",
+          socketUrl: "http://localhost:8888",
+          defaultOpen: true,
+          headers: {
+            Authorization: "Bearer BQAlIe479yo16aXf",
           },
-        },
-      });
-    };
-  </script>
-</body>
-
+          user: {
+            name: "John Doe",
+          },
+          containerProps: {
+            style: {
+              position: "fixed",
+              height: "100%",
+              bottom: "0",
+              right: "0",
+              width: "400px",
+            },
+          },
+        });
+      };
+    </script>
+  </body>
 </html>
