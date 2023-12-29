@@ -1,14 +1,17 @@
-import { Options } from "@lib/types";
-import { ReactNode, createContext, useContext } from "react";
+import type { Options } from "@lib/types";
+import type { ReactNode } from "react";
+import { createSafeContext } from "./create-safe-context";
 
-export type ConfigDataContextType = Pick<
+export type ConfigDataContextType = Omit<
   Options,
-  "token" | "initialMessage" | "headers" | "apiUrl" | "user" | "defaultOpen"
+  'containerProps' | 'triggerSelector'
 >;
 
-const ConfigDataContext = createContext<ConfigDataContextType | undefined>(
-  undefined
-);
+const [
+  useConfigData,
+  ConfigDataSafeProvider,
+
+] = createSafeContext<ConfigDataContextType>();
 
 export default function ConfigDataProvider({
   children,
@@ -18,17 +21,11 @@ export default function ConfigDataProvider({
   children: ReactNode;
 }) {
   return (
-    <ConfigDataContext.Provider value={data}>
+    <ConfigDataSafeProvider value={data}>
       {children}
-    </ConfigDataContext.Provider>
+    </ConfigDataSafeProvider>
   );
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
-export function useConfigData(): ConfigDataContextType | undefined {
-  const context = useContext(ConfigDataContext);
-  if (!context) {
-    throw new Error("useConfigData must be used within a ConfigDataProvider");
-  }
-  return context;
-}
+// eslint-disable-next-line react-refresh/only-export-components 
+export { useConfigData }

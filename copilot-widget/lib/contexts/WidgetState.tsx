@@ -1,22 +1,20 @@
-import { ReactNode, createContext, useContext } from "react";
+import type { ReactNode } from "react";
 import useToggle from "../hooks/useToggle";
 import { useConfigData } from "./ConfigData";
+import { createSafeContext } from "./create-safe-context";
 
-const StateContext = createContext<ReturnType<typeof useToggle> | undefined>(
-  undefined
-);
-export function useWidgetStateContext(): ReturnType<typeof useToggle> {
-  const context = useContext(StateContext);
+type StateContextType = ReturnType<typeof useToggle>
 
-  if (!context) {
-    throw new Error("useAppContext must be used within an AppProvider");
-  }
-
-  return context;
-}
+const [
+  useWidgetState,
+  WidgetStateSafeProvider,
+] = createSafeContext<StateContextType>()
 
 export default function WidgetState({ children }: { children: ReactNode }) {
-  const cdata = useConfigData()
-  const data = useToggle(cdata?.defaultOpen || false)
-  return <StateContext.Provider value={data}>{children}</StateContext.Provider>;
+  const { defaultOpen } = useConfigData()
+  const data = useToggle(defaultOpen ?? false)
+  return <WidgetStateSafeProvider value={data}>{children}</WidgetStateSafeProvider>;
 }
+
+// eslint-disable-next-line react-refresh/only-export-components
+export { useWidgetState }

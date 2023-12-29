@@ -1,13 +1,19 @@
 // original shape
-export type Message = {
-  timestamp?: number | Date;
+type TS = Date | number;
+export type BotResponse = {
   id: string | number;
-} & (
-    | { from: "user"; content: string }
-    | ({ from: "bot" } & {
-      type: "text";
-      response: {
-        text: string;
-      };
-    })
-  );
+  timestamp: TS;
+  from: "bot";
+  type: "text";
+  response: {
+    text: string;
+  };
+}
+export type UserMessage = {
+  id: string | number;
+  timestamp: TS;
+  from: "user";
+  content: string;
+}
+
+export type Message = BotResponse | UserMessage;

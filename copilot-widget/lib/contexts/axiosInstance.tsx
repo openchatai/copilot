@@ -1,49 +1,36 @@
-import axios, { AxiosInstance } from "axios";
-import { ReactNode, createContext, useContext } from "react";
+import { AxiosInstance } from "axios";
+import { ReactNode, useMemo } from "react";
 import { useConfigData } from "./ConfigData";
 import { useSessionId } from "@lib/hooks/useSessionId";
+import { createAxiosInstance } from "@lib/data/chat";
+import { createSafeContext } from "./create-safe-context";
 
 interface AxiosInstanceProps {
   axiosInstance: AxiosInstance;
 }
 
-function createAxiosInstance(apiUrl?: string, sessionId?: string | null, botToken?: string) {
-  const instance = axios.create({
-    baseURL: apiUrl,
-    headers: {
-      "X-Session-Id": sessionId,
-      "X-Bot-Token": botToken,
-    },
-  });
+const [
+  useAxiosInstance,
+  AxiosSafeProvider,
+] = createSafeContext<AxiosInstanceProps>();
 
-  instance.interceptors.request.use((config) => {
-    config.data = {
-      ...config.data,
-      session_id: sessionId,
-    };
-    return config;
-  });
-  return instance;
-}
-
-const AxiosContext = createContext<AxiosInstanceProps | undefined>(undefined);
-// prefred it separated for the future.
-export function AxiosProvider({ children }: { children: ReactNode }) {
+function AxiosProvider({ children }: { children: ReactNode }) {
   const config = useConfigData();
   const { sessionId } = useSessionId(config?.token || 'defaultToken');
-  const axiosInstance: AxiosInstance = createAxiosInstance(config?.apiUrl, sessionId, config?.token);
+  const axiosInstance: AxiosInstance = useMemo(() => {
+    return createAxiosInstance({
+      botToken: config?.token,
+      sessionId,
+      apiUrl: config?.apiUrl,
+    });
+  }, [config, sessionId]);
 
   return (
-    <AxiosContext.Provider value={{ axiosInstance }}>
+    <AxiosSafeProvider value={{ axiosInstance }}>
       {children}
-    </AxiosContext.Provider>
+    </AxiosSafeProvider>
   );
 }
 
-export const useAxiosInstance = (): AxiosInstanceProps => {
-  const context = useContext(AxiosContext);
-  if (!context) {
-    throw new Error("useAxiosInstance must be used within a AxiosProvider");
-  }
-  return context;
-};
+// eslint-disable-next-line react-refresh/only-export-components
+export { useAxiosInstance, AxiosProvider };

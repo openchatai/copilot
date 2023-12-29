@@ -24,6 +24,7 @@ from utils.db import NoSQLDatabase
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
 from utils.llm_consts import VectorCollections
+from flask_socketio import emit
 
 logger = CustomLogger(module_name=__name__)
 
@@ -71,6 +72,7 @@ async def handle_request(
     bot_id: str,
     headers: Dict[str, str],
     app: Optional[str],
+    is_streaming: bool,
 ) -> ResponseDict:
     # Dict
     response: ResponseDict = {
@@ -90,6 +92,9 @@ async def handle_request(
     knowledgebase, actions, flows, conversations_history = results
     top_documents = select_top_documents(actions + flows + knowledgebase)
 
+    emit(
+        f"{session_id}_info", "Checking if actionable ... \n"
+    ) if is_streaming else None
     next_step = get_next_response_type(
         user_message=text,
         session_id=session_id,
@@ -97,10 +102,13 @@ async def handle_request(
         top_documents=top_documents,
     )
 
-    if next_step.actionable:
+    emit(
+        f"{session_id}_info", f"Is next step actionable: {next_step.actionable}... \n"
+    ) if is_streaming else None
+    if next_step.actionable and next_step.api:
         # if the LLM given operationID is actually exist, then use it, otherwise fallback to the highest vector space document
         llm_predicted_operation_id = is_the_llm_predicted_operation_id_actually_true(
-            next_step.operation_id, select_top_documents(actions)
+            next_step.api, top_documents
         )
         if llm_predicted_operation_id:
             actionable_item = llm_predicted_operation_id
@@ -109,23 +117,32 @@ async def handle_request(
                 actions + flows, [VectorCollections.actions, VectorCollections.flows]
             )
         # now run it
+        emit(
+            f"{session_id}_info", "Executing the actionable item... \n"
+        ) if is_streaming else None
         response = await run_actionable_item(
             bot_id=bot_id,
             actionable_item=actionable_item,
             app=app,
             headers=headers,
             text=text,
+            is_streaming=is_streaming,
+            session_id=session_id,
         )
         return response
     else:
         # it means that the user query is "informative" and can be answered using text only
         # get the top knowledgeable documents (if any)
-        documents = select_top_documents(knowledgebase)
+        emit(
+            f"{session_id}_info", "Running informative action... \n"
+        ) if is_streaming else None
         response = run_informative_item(
-            informative_item=documents,
+            informative_item=top_documents,
             base_prompt=base_prompt,
             text=text,
             conversations_history=conversations_history,
+            is_streaming=is_streaming,
+            session_id=session_id,
         )
         return response
 
@@ -147,6 +164,8 @@ async def run_actionable_item(
     headers: Dict[str, str],
     app: Optional[str],
     bot_id: str,
+    session_id: str,
+    is_streaming: bool,
 ) -> ResponseDict:
     output: ResponseDict = {
         "error": "",
@@ -191,6 +210,8 @@ async def run_actionable_item(
             chat_context=ChatContext(text, headers, app),
             app=app,
             bot_id=bot_id,
+            session_id=session_id,
+            is_streaming=is_streaming,
         )
 
     return output
@@ -201,12 +222,17 @@ def run_informative_item(
     base_prompt: str,
     text: str,
     conversations_history: List[BaseMessage],
+    is_streaming: bool,
+    session_id: str,
 ) -> ResponseDict:
     # so we got all context, let's ask:
 
     context = []
     for vector_result in informative_item.get(VectorCollections.knowledgebase) or []:
-        context.append(vector_result.document.metadata)
+        context.append(
+            vector_result.document.page_content
+            + f" metadata: {vector_result.document.metadata}"
+        )
 
     messages: List[BaseMessage] = [SystemMessage(content=base_prompt)]
 
@@ -232,8 +258,15 @@ def run_informative_item(
         )
     )
 
+    emit(
+        f"{session_id}_info", "Distilling the information received...\n"
+    ) if is_streaming else None
     messages.append(HumanMessage(content=text))
 
-    content = cast(str, chat(messages=messages).content)
+    # convert to astream
+    content = ""
+    for chunk in chat.stream(messages):
+        emit(session_id, chunk.content) if is_streaming else None
+        content += str(chunk.content)
 
     return {"response": content, "error": None}

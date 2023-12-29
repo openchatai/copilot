@@ -15,7 +15,7 @@ import { Map } from "../utils/Map";
 function ChatScreen() {
   const scrollElementRef = useRef(null);
   const [setPos] = useScrollToPercentage(scrollElementRef);
-  const { messages, loading, failedMessage } = useChat();
+  const { messages, loading, failedMessage, conversationInfo } = useChat();
   const config = useConfigData();
   const initialMessage = config?.initialMessage;
   useEffect(() => {
@@ -65,7 +65,7 @@ function ChatScreen() {
               }
             }}
           />
-          {loading && <BotMessageLoading />}
+          {loading && conversationInfo && <BotMessageLoading displayText={conversationInfo} />}
           {failedMessage && <BotMessageError message={failedMessage} />}
         </div>
       </main>

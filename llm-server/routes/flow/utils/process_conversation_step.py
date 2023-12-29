@@ -6,6 +6,7 @@ from langchain.schema import HumanMessage, SystemMessage, BaseMessage
 from custom_types.actionable_or_not_type import (
     parse_actionable_or_not_response,
     ActionableOrNotType,
+    parse_informative_or_actionable_response,
 )
 from routes.flow.utils.document_similarity_dto import DocumentSimilarityDTO
 from utils.get_chat_model import get_chat_model
@@ -58,34 +59,34 @@ def is_it_informative_or_actionable(
 
     prompt = (
         """
-    You are an AI tool that classifies user input needs an API call or not. You should only recommend using API if the user request match one of the APIs description below, the user requests that can be fulfilled by calling an external API to either execute something or fetch more data
-    to help in answering the question, also, if the user questions are CRUD (create, update, delete) then probably you will need to use an API (LLMs can't store data)
+    You are an AI tool that classifies user input needs an API call or not. You should recommend using API if the user request matches one of the APIs description below, the user requests that can be fulfilled by calling an external API to either execute something or fetch more data
+    to help in answering the question, also, if the user questions are verbs and asking you to perform actions e.g (list, create, update, delete) then you will need to use an API
     
     Examples:
 
     **User Input:** create a b-1 visa application
 
     **Available APIs:**
-    - API 1: This tool creates a b-1 visa application.
-    - API 2: This tool queries b-1 status.
+    - API(createVisaApplication): This api creates a b-1 visa application.
+    - API(getVisaStatus): This api queries b-1 status.
 
-    **Verdict:** Needs API call so the response should be {"needs_api": "yes", "justification": "the reason behind your verdict", "api": "name of the API to use" }
+    **Verdict:** Needs API call so the response should be {"needs_api": "yes", "justification": "the reason behind your verdict", "api": "createVisaApplication" }
 
-    **Justification:** The user's request can be fulfilled by calling API 1
+    **Justification:** The user is asking to create a visa application and (createVisaApplication) api can be used to satisfy the user requirement
 
     **Another Example:**
 
     **User Input:** how to create a b-1 visa application
 
     **Available APIs:**
-    - Tool 1: This tool creates a b-1 visa application.
-    - Tool 2: This tool queries b-1 status.
+    - API(createVisaApplication): This api creates a b-1 visa application.
+    - API(getVisaStatus): This api queries b-1 status.
 
-    **Verdict:** Does not need API call so the response should be {"needs_api": "no', "justification": "the reason behind your verdict",  "api": "name of the API to use" }
+    **Verdict:** Does not need API call so the response should be {"needs_api": "no", "justification": "the reason behind your verdict",  "api": "" }
 
-    **Justification:** The user is asking about how to create a visa application, which can be answered through text without the need to call an API + the APIs in are for create or query b1 applications
+    **Justification:** The user is asking about how to create a visa application, which is informative and can be answered through text without the need to call an API + the APIs in are for create or query b1 applications
 
-    **Response Format:** Always respond with JSON, for example: {"needs_api": "no", "justification": "the reason behind your verdict", "api": "name of the API to use" } or {"needs_api": 'yes', "justification": "the reason behind your verdict"} (always with double quotation and without escaping)
+    **Response Format:** Always respond with JSON without any commentary, for example: {"needs_api": "no", "justification": "the reason behind your verdict", "api": "apiName" }
     
     ===END EXAMPLES===
     The available tools :
@@ -96,32 +97,28 @@ def is_it_informative_or_actionable(
     """
     )
 
-    logger.info("cool", payload=actionable_tools)
+    # logger.info("cool", payload=actionable_tools)
     messages: List[BaseMessage] = [
         SystemMessage(content=prompt),
     ]
     messages.extend(chat_history[-6:])
     messages.append(HumanMessage(content=current_message))
     messages.append(
-        HumanMessage(
-            content="Based on that, please answer if the previous user messages is actionable or not in JSON"
-        )
+        HumanMessage(content="Return the corresponding json for the last user input")
     )
 
     content = cast(str, chat(messages=messages).content)
 
-    content_parsed_as_dict = json.loads(content)
+    logger.info("informative_or_actionable_payload", str_content=content)
+    parsed_json = parse_informative_or_actionable_response(content)
 
-    if content_parsed_as_dict.get("needs_api") == "yes":
-        response = parse_actionable_or_not_response(
-            {"actionable": True, "operation_id": content_parsed_as_dict.get("api")}
-        )
-    else:
-        response = parse_actionable_or_not_response({"actionable": False})
+    response = parse_actionable_or_not_response(
+        json_dict={"actionable": parsed_json.needs_api == "yes", "api": parsed_json.api}
+    )
 
     logger.info(
         "Actionable or not response",
-        payload=content_parsed_as_dict,
+        payload=parsed_json,
         final_result=response.actionable,
     )
     return response

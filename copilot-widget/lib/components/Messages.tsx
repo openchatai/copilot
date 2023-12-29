@@ -1,6 +1,5 @@
 import { Grid } from "react-loader-spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ToolTip";
-import useTypeWriter from "../hooks/useTypeWriter";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { User, Clipboard, ClipboardCheck } from "lucide-react";
@@ -9,16 +8,16 @@ import cn from "../utils/cn";
 import formatTimeFromTimestamp from "../utils/formatTime";
 import { useCopyToClipboard } from "@lib/hooks/useCopy";
 import { FailedMessage, useChat } from "@lib/contexts/Controller";
-import { getLast } from "@lib/utils/utils";
+import { getLast, isEmpty } from "@lib/utils/utils";
 import { useConfigData } from "@lib/contexts/ConfigData";
-import { useTextRotator } from "@lib/hooks/useTextRotator";
+import useTypeWriter from "@lib/hooks/useTypeWriter";
 
 function BotIcon({ error }: { error?: boolean }) {
   return (
     <img
       className={cn(
         "opencopilot-h-7 opencopilot-w-7 opencopilot-rounded-lg opencopilot-shrink-0 opencopilot-object-cover opencopilot-aspect-square hover:opencopilot-shadow",
-        error && "border opencopilot-border-rose-500 opencopilot-shadow-none"
+        error && "opencopilot-border opencopilot-border-rose-500 opencopilot-shadow-none"
       )}
       src="https://cdn.dribbble.com/users/281679/screenshots/14897126/media/f52c47307ac2daa0c727b1840c41d5ab.png?compress=1&resize=1600x1200&vertical=center"
       alt="bot's avatar"
@@ -34,7 +33,7 @@ function UserIcon() {
         {config?.user?.name}
       </TooltipContent>
       <TooltipTrigger asChild>
-        <div className="opencopilot-rounded-lg opencopilot-shrink-0 opencopilot-bg-accent opencopilot-h-7 opencopilot-w-7 opencopilot-object-cover opencopilot-aspect-square hover:opencopilot-shadow opencopilot-border-primary-light opencopilot-border opencopilot-flex opencopilot-items-center opencopilot-justify-center">
+        <div className="opencopilot-rounded-lg opencopilot-shrink-0 opencopilot-bg-accent opencopilot-h-7 opencopilot-w-7 opencopilot-object-cover opencopilot-aspect-square opencopilot-border opencopilot-border-primary opencopilot-flex opencopilot-items-center opencopilot-justify-center">
           <span className="opencopilot-text-xl opencopilot-text-primary opencopilot-fill-current">
             <User />
           </span>
@@ -53,18 +52,14 @@ export function BotTextMessage({
   timestamp?: number | Date;
   id?: string | number;
 }) {
-  const { displayText } = useTypeWriter({
-    text: message,
-    every: 0.0001,
-    shouldStart: true,
-  });
   const [copied, copy] = useCopyToClipboard();
   const { messages } = useChat();
   const isLast = getLast(messages)?.id === id;
+  if (isEmpty(message)) return null;
   return (
     <div className="opencopilot-p-2 group opencopilot-w-full opencopilot-shrink-0">
       <div
-        className="opencopilot-flex opencopilot-select-none opencopilot-items-start opencopilot-gap-3 opencopilot-w-full"
+        className="opencopilot-flex opencopilot-items-start opencopilot-gap-3 opencopilot-w-full"
         dir="auto"
       >
         <BotIcon />
@@ -75,7 +70,7 @@ export function BotTextMessage({
                 remarkPlugins={[remarkGfm]}
                 className="opencopilot-prose opencopilot-prose-slate opencopilot-font-medium opencopilot-text-sm opencopilot-prose-sm prose-h1:opencopilot-font-medium prose-h2:opencopilot-font-normal prose-headings:opencopilot-my-1 opencopilot-max-w-full"
               >
-                {displayText}
+                {message}
               </ReactMarkdown>
             </div>
           </div>
@@ -92,7 +87,7 @@ export function BotTextMessage({
           </div>
           <button
             className="opencopilot-text-lg opencopilot-justify-self-end"
-            onClick={() => copy(displayText)}
+            onClick={() => copy(message)}
           >
             {copied ? (
               <ClipboardCheck className="opencopilot-text-emerald-500" />
@@ -115,8 +110,8 @@ const waitingText = [
   "Almost there...",
 ]
 
-export function BotMessageLoading() {
-  const displayText = useTextRotator({ texts: waitingText, intervalInSeconds: 2 })
+export function BotMessageLoading({ displayText }: { displayText: string }) {
+  // const displayText = useTextRotator({ texts: waitingText, intervalInSeconds: 2 })
 
   return (
     <div className="opencopilot-p-2 opencopilot-flex opencopilot-items-center opencopilot-shrink-0 opencopilot-gap-3 opencopilot-w-full">
@@ -129,7 +124,7 @@ export function BotMessageLoading() {
         />
       </div>
       <div className="opencopilot-space-y-2 opencopilot-flex-1">
-        <div className="mesg_body opencopilot-w-fit opencopilot-max-w-full">
+        {/* <div className="mesg_body opencopilot-w-fit opencopilot-max-w-full">
           {
             displayText.map(({ isVisible, order, text }) => (
               <p data-visible={isVisible} key={order} className="opencopilot-text-sm 
@@ -142,6 +137,9 @@ export function BotMessageLoading() {
               </p>
             ))
           }
+        </div> */}
+        <div className="opencopilot-w-fit">
+          <p className="opencopilot-block opencopilot-text-sm">{displayText}</p>
         </div>
       </div>
     </div>

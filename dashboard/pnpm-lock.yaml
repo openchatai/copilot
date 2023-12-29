@@ -9,8 +9,8 @@ dependencies:
     specifier: ^3.3.1
     version: 3.3.2(react-hook-form@7.47.0)
   '@openchatai/copilot-widget':
-    specifier: ^1.7.0
-    version: 1.7.0(react-dom@18.2.0)(react@18.2.0)
+    specifier: ^2.0.0
+    version: 2.0.0(react@18.2.0)
   '@radix-ui/react-accordion':
     specifier: ^1.1.2
     version: 1.1.2(@types/react-dom@18.2.13)(@types/react@18.2.28)(react-dom@18.2.0)(react@18.2.0)
@@ -672,15 +672,13 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.15.0
 
-  /@openchatai/copilot-widget@1.7.0(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-asyXEjr8fu4Oeal2kF2jCz1emzXl00MYjAKnKvYtEF4/cE2P8T+qfR5L1wwbbJ1V04q8gCFYQ5r5u6FAGJ7pJw==}
+  /@openchatai/copilot-widget@2.0.0(react@18.2.0):
+    resolution: {integrity: sha512-ZubBw6yW6Htr/KqhFpQRV7cePOcFsRrUkH1uATYT7fi2TOjJKoEFD5HZ//8CeykjR0Me4OzBQPfzaD16yVZ1xg==}
     peerDependencies:
       react: ^18.x
-      react-dom: ^18.x
     dependencies:
       lucide-react: 0.298.0(react@18.2.0)
       react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /@radix-ui/number@1.0.1:

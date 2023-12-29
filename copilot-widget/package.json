@@ -1,7 +1,7 @@
 {
   "name": "@openchatai/copilot-widget",
   "private": false,
-  "version": "1.7.0",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,8 +15,7 @@
     "update-dashboard-pilot": "pnpm build:embed && mv ./dist/assets/*.js ../dashboard/public/pilot.js"
   },
   "peerDependencies": {
-    "react": "^18.x",
-    "react-dom": "^18.x"
+    "react": "^18.x"
   },
   "devDependencies": {
     "@radix-ui/react-dialog": "^1.0.5",
@@ -44,6 +43,7 @@
     "react-textarea-autosize": "^8.5.3",
     "release-it": "^16.2.1",
     "remark-gfm": "^3.0.1",
+    "socket.io-client": "^4.7.2",
     "tailwind-merge": "^1.13.2",
     "tailwind-scrollbar": "^3.0.4",
     "tailwindcss": "^3.3.3",
