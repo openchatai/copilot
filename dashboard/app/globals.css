@@ -74,7 +74,7 @@
 
 @layer base {
   * {
-    @apply !border-border;
+    @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
@@ -135,10 +135,22 @@
   color: hsl(var(--destructive));
   margin-left: 0.25rem;
 }
-#opencopilot-aicopilot {
-  position: static !important;
-}
-
 .reset-input {
   @apply m-0 h-10 rounded-md border border-border bg-background bg-white px-3 py-2 text-sm shadow-sm ring-offset-accent transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus:outline-none focus-visible:border-primary focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[valid=false]:!border-destructive;
+}
+
+.glass {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+}
+.glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: inherit;
+  color: transparent;
+  backdrop-filter: inherit;
 }

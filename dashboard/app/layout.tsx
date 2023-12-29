@@ -10,12 +10,7 @@ import { SWRProvider } from "./swr-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { HandleOnComplete } from "@/lib/router-events";
 import { TopLoader } from "@/lib/Toploader";
-import dynamic from "next/dynamic";
 import { JotaiProvider } from "./jotai-provider";
-
-const Confetti = dynamic(() => import("@/components/domain/confetti-canvas"), {
-  ssr: false,
-});
 
 const opensans = Open_Sans({
   subsets: ["latin"],
@@ -39,7 +34,7 @@ export default function RootLayout({
           <body
             className={cn(
               opensans.className,
-              "h-screen min-h-[100svh] max-h-[100svh] w-screen overflow-hidden scroll-smooth bg-background text-accent-foreground antialiased",
+              "h-svh min-h-svh max-h-svh w-svw overflow-hidden scroll-smooth bg-background text-accent-foreground antialiased",
               IS_DEV && "debug-screens",
             )}
           >
@@ -64,7 +59,6 @@ export default function RootLayout({
             <TopLoader
               color="hsl(var(--primary))"
             />
-            <Confetti />
             <HandleOnComplete />
           </body>
         </html>

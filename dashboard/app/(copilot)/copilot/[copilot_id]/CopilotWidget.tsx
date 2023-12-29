@@ -29,6 +29,9 @@ export default function Widget({
                     "X-Copilot": "copilot"
                 },
             }}
+            containerProps={{
+                className: "border rounded-lg overflow-hidden",
+            }}
         >
             <CopilotWidget triggerSelector="#triggerSelector" />
         </Root>

@@ -1,11 +1,9 @@
 "use client";
-import * as React from "react";
 import {
   Bot,
   BotIcon,
   FileStack,
   HelpCircle,
-  User,
 } from "lucide-react";
 import {
   CommandDialog,
@@ -22,7 +20,7 @@ import useSwr from "swr";
 import { listCopilots } from "@/data/copilot";
 import { useRouter } from "next/navigation";
 import { Link } from "@/lib/router-events";
-import { useSearchModal } from "@/app/_store/searchModal";
+import { useSearchModal } from "@/app/search-modal-atom";
 
 export function SearchModal() {
   const [open, setOpen] = useSearchModal();
