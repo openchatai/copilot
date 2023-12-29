@@ -22,6 +22,7 @@ export default function Widget({
         <Root
             options={{
                 apiUrl: baseUrl + "/backend",
+                socketUrl: baseUrl,
                 defaultOpen: true,
                 token,
                 initialMessage: "Hey Pal!",
