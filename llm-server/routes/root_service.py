@@ -158,8 +158,9 @@ def determine_actionable_item(predicted_operation_id, actions, flows):
     Returns:
     The actionable item to be executed.
     """
-    if is_the_llm_predicted_operation_id_actually_true(predicted_operation_id, select_top_documents(actions)):
-        return predicted_operation_id
+    action = is_the_llm_predicted_operation_id_actually_true(predicted_operation_id, select_top_documents(actions))
+    if action:
+        return action
     else:
         return select_top_documents(actions + flows, [VectorCollections.actions, VectorCollections.flows])
 
