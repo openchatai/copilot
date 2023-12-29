@@ -1,23 +1,27 @@
 from datetime import datetime
-from typing import Optional, List, Dict, Union, Tuple
-from shared.models.opencopilot_db import ChatHistory, engine
-from sqlalchemy.orm import sessionmaker
+from typing import Optional, List, Dict, Tuple
+
+from langchain.schema import BaseMessage, AIMessage, HumanMessage
 from sqlalchemy import distinct
 from sqlalchemy.orm import class_mapper
-from langchain.schema import BaseMessage, AIMessage, HumanMessage
+from sqlalchemy.orm import sessionmaker
+
+from shared.models.opencopilot_db import ChatHistory, engine
 
 Session = sessionmaker(bind=engine)
 
 
 def create_chat_history(
-    chatbot_id: str,
-    session_id: str,
-    from_user: bool,
-    message: str,
+        chatbot_id: str,
+        session_id: str,
+        from_user: bool,
+        message: str,
+        visible_for_user: bool = True
 ) -> ChatHistory:
     """Creates a new chat history record.
 
     Args:
+      visible_for_user: Will the message be visible for the end user
       chatbot_id: The ID of the chatbot that sent the message.
       session_id: The ID of the chat session.
       from_user: The user who sent the message.
@@ -33,6 +37,7 @@ def create_chat_history(
             session_id=session_id,
             from_user=from_user,
             message=message,
+            visible_for_user=visible_for_user
         )
 
         session.add(chat_history)
@@ -42,7 +47,7 @@ def create_chat_history(
 
 
 def get_all_chat_history_by_session_id(
-    session_id: str, limit: int = 20, offset: int = 0
+        session_id: str, limit: int = 20, offset: int = 0
 ) -> List[ChatHistory]:
     """Retrieves all chat history records for a given session ID, sorted by created_at in descending order (most recent first).
 
@@ -95,11 +100,11 @@ def get_all_chat_history(limit: int = 10, offset: int = 0) -> List[ChatHistory]:
 
 
 def update_chat_history(
-    chat_history_id: str,
-    chatbot_id: Optional[str] = None,
-    session_id: Optional[str] = None,
-    from_user: Optional[str] = None,
-    message: Optional[str] = None,
+        chat_history_id: str,
+        chatbot_id: Optional[str] = None,
+        session_id: Optional[str] = None,
+        from_user: Optional[str] = None,
+        message: Optional[str] = None,
 ) -> ChatHistory:
     """Updates a chat history record.
 
@@ -146,7 +151,7 @@ def delete_chat_history(chat_history_id: str) -> None:
 
 
 def get_chat_history_for_retrieval_chain(
-    session_id: str, limit: Optional[int] = None
+        session_id: str, limit: Optional[int] = None
 ) -> List[Tuple[str, str]]:
     """Fetches limited ChatHistory entries by session ID and converts to chat_history format.
 
@@ -188,7 +193,7 @@ def get_chat_history_for_retrieval_chain(
 
 
 def get_unique_sessions_with_first_message_by_bot_id(
-    bot_id: str, limit: int = 20, offset: int = 0
+        bot_id: str, limit: int = 20, offset: int = 0
 ) -> List[Dict[str, object]]:
     # Using a context manager to automatically close the session
     with Session() as session:

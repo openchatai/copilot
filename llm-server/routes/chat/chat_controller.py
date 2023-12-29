@@ -161,6 +161,7 @@ async def send_chat():
                     chatbot_id=str(bot.id),
                     session_id=session_id,
                     from_user=False,
+                    visible_for_user=False,
                     message="API response {}".format(json.dumps(bot_response.apis_calls))
                 )
 
