@@ -1,7 +1,7 @@
 {
   "name": "@openchatai/copilot-widget",
   "private": false,
-  "version": "1.7.0",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,8 +15,7 @@
     "update-dashboard-pilot": "pnpm build:embed && mv ./dist/assets/*.js ../dashboard/public/pilot.js"
   },
   "peerDependencies": {
-    "react": "^18.x",
-    "react-dom": "^18.x"
+    "react": "^18.x"
   },
   "devDependencies": {
     "@radix-ui/react-dialog": "^1.0.5",

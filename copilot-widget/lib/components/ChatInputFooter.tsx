@@ -9,6 +9,7 @@ import { useRef, useState } from "react";
 import { useInitialData } from "../contexts/InitialDataContext";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ToolTip";
 import { getId, isEmpty } from "@lib/utils/utils";
+import now from "@lib/utils/timenow";
 function MessageSuggestions() {
   const { data } = useInitialData();
   const { messages, sendMessage } = useChat();
@@ -27,6 +28,7 @@ function MessageSuggestions() {
                     from: "user",
                     content: q,
                     id: getId(),
+                    timestamp: now(),
                   });
                 }}
               >
@@ -73,6 +75,7 @@ function ChatInputFooter() {
         from: "user",
         content: input,
         id: getId(),
+        timestamp: now(),
       });
     }
   }
