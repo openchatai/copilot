@@ -5,7 +5,7 @@ from langchain.schema import HumanMessage, SystemMessage
 
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
-
+from flask_socketio import emit
 openai_api_key = os.getenv("OPENAI_API_KEY")
 logger = CustomLogger(module_name=__name__)
 
@@ -14,7 +14,9 @@ def convert_json_to_text(
         user_input: str,
         api_response: Dict[str, Any],
         api_request_data: Dict[str, Any],
-        bot_id: str
+        bot_id: str,
+        is_streaming: bool,
+        session_id: str
 ) -> str:
     chat = get_chat_model()
     system_message = SystemMessage(content="""
@@ -35,12 +37,16 @@ def convert_json_to_text(
         ),
     ]
 
-    result = chat(messages)
+    result = ""
+    for chunk in chat.stream(messages):
+        emit(session_id, chunk.content) if is_streaming else None
+        result += str(chunk.content)
+        
     logger.info(
         "API call json response",
-        content=result.content,
+        content=result,
         incident="convert_json_to_text",
         api_request_data=api_response
     )
 
-    return cast(str, result.content)
+    return cast(str, result)

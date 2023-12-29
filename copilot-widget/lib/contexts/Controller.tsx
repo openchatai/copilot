@@ -1,95 +1,143 @@
-import React, { ReactNode, createContext, useContext, useLayoutEffect, useState } from "react";
+import React, { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import now from "../utils/timenow";
-import { useAxiosInstance } from "./axiosInstance";
 import { useConfigData } from "./ConfigData";
-import { useSoundEffectes } from "../hooks/useSoundEffects";
 import { Message } from "@lib/types";
 import { getId } from "@lib/utils/utils";
-import { useInitialData } from "./InitialDataContext";
+import io from 'socket.io-client';
+import { useSessionId } from "@lib/hooks/useSessionId";
+import { BotResponse, UserMessage } from "@lib/types/messageTypes";
+import { createSafeContext } from "./create-safe-context";
+import { getInitialData } from "@lib/data/chat";
 import { historyToMessages } from "@lib/utils/historyToMessages";
+import { useAxiosInstance } from "./axiosInstance";
+
 export type FailedMessage = {
   message: Message;
   reason?: string;
 };
-interface ChatContextProps {
+
+interface ChatContextData {
   messages: Message[];
-  sendMessage: (message: Message) => void;
+  conversationInfo: string | null;
+  sendMessage: (message: Extract<Message, { from: 'user' }>) => void;
   loading: boolean;
   failedMessage: FailedMessage | null;
   reset: () => void;
 }
+const [
+  useChat,
+  ChatSafeProvider,
+] = createSafeContext<ChatContextData>();
 
-const ChatContext = createContext<ChatContextProps | undefined>(undefined);
 
 const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { data: idata } = useInitialData()
-  const [messages, setMessages] = useState<Message[]>([]);
-
-  useLayoutEffect(() => {
-    if (idata?.history) {
-      setMessages(historyToMessages(idata?.history));
-    }
-  }, [idata?.history]);
-
-  const sfx = useSoundEffectes();
-  const [loading, setLoading] = useState(false);
-  const [failedMessage, setError] = useState<FailedMessage | null>(null);
   const { axiosInstance } = useAxiosInstance();
+  const [currentMessagePair, setCurrentMessagePair] = useState<{ user: string; bot: string } | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const config = useConfigData();
-  const addMessage = (message: Message) => {
-    if (message.from === "user") {
-      sfx?.submit.play();
-    } else {
-      sfx?.notify?.play();
-    }
-    const messageWithTimestamp: Message = {
-      ...message,
-      timestamp: message.timestamp ? message.timestamp : now(),
-    };
+  const { sessionId } = useSessionId(config.token);
+  const [conversationInfo, setConversationInfo] = useState<string | null>(null);
+  
+  useEffect(() => {
+    getInitialData(axiosInstance).then((data) => {
+      setMessages(historyToMessages(data.history))
+    })
+  }, [axiosInstance]);
 
-    setMessages((prevMessages) => [...prevMessages, messageWithTimestamp]);
+  const socket = useMemo(() => io('http://localhost:8888', {
+    extraHeaders: {
+      "X-Bot-Token": config.token,
+      "X-Session-Id": sessionId,
+    },
+  }), [config, sessionId]);
+
+  const [failedMessage, setError] = useState<FailedMessage | null>(null);
+  const loading = currentMessagePair !== null;
+
+  const sendMessage = async (message: Extract<Message, { from: "user" }>) => {
+    // abort 
+    const userMessageId = getId();
+    const botMessageId = getId();
+    const userMessage: UserMessage & { session_id: string, headers: Record<string, string> } = {
+      timestamp: now(),
+      id: userMessageId,
+      content: message.content,
+      from: "user",
+      session_id: sessionId,
+      headers: config.headers ?? {},
+    }
+    socket.emit('send_chat', userMessage);
+
+    setCurrentMessagePair({
+      user: userMessageId,
+      bot: botMessageId,
+    })
+
+    createUserMessage(userMessage);
+    createEmptyBotMessage(botMessageId)
   };
-  // will be called from BotInputMessage component
-  // NOTE:need some adjustments in production
 
-  const sendMessage = async (message: Message) => {
-    // send user message
-    if (message.from === "user") {
-      addMessage(message);
-    }
-    setError(null);
-    setLoading(true);
-    try {
-      const { data, status, statusText } = await axiosInstance.post(
-        "/chat/send",
-        {
-          ...message,
-          headers: config?.headers,
-          user: config?.user,
-        }
-      );
-      if (status === 200) {
-        addMessage({ ...data, id: getId(), from: "bot" });
-      } else {
-        setError({
-          message,
-          reason: statusText,
-        });
+  const createUserMessage = useCallback((message: Extract<Message, { from: "user" }>) => {
+    setMessages((m) => [...m, message]);
+  }, [setMessages]);
+
+  const createEmptyBotMessage = useCallback((id: string) => {
+    setMessages((m) => [...m, {
+      timestamp: now(),
+      from: "bot",
+      id: id,
+      type: "text",
+      response: {
+        text: ""
       }
-    } catch (error: any) {
-      setError({
-        message,
-        reason: error?.message,
-      });
-    } finally {
-      setLoading(false);
+    }])
+  }, [setMessages]);
+
+  const updateBotMessage = useCallback((id: string, text: string) => {
+    const botMessage = messages.find(m => m.id === id) as BotResponse
+    console.log({ botMessage })
+    if (botMessage) {
+      // append the text to the bot message
+      const textt = botMessage.response.text + text
+      botMessage.response.text = textt
+      setMessages([...messages])
     }
-  };
+  }, [messages])
+
+  useEffect(() => {
+    socket.on(`${sessionId}_info`, (msg: string) => {
+      setConversationInfo(msg)
+    })
+
+    return () => {
+      socket.off(`${sessionId}_info`);
+    };
+  }, [sessionId, socket]);
+
+  useEffect(() => {
+    const current = currentMessagePair
+    // the content is the message.content from the server
+    socket.on(sessionId, (content: string) => {
+      if (current) {
+        if (content === "|im_end|") {
+          setCurrentMessagePair(null)
+          return
+        }
+        setConversationInfo(null)
+        updateBotMessage(current.bot, content)
+      }
+    });
+
+    return () => { socket.off(sessionId) }
+
+  }, [currentMessagePair, sessionId, socket, updateBotMessage]);
 
   function reset() {
     setMessages([]);
   }
-  const chatContextValue: ChatContextProps = {
+
+  const chatContextValue: ChatContextData = {
+    conversationInfo,
     messages,
     sendMessage,
     loading,
@@ -98,19 +146,12 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   return (
-    <ChatContext.Provider value={chatContextValue}>
+    <ChatSafeProvider value={chatContextValue}>
       {children}
-    </ChatContext.Provider>
+    </ChatSafeProvider>
   );
 };
 
-// custom react hook to access the context from child components
-const useChat = (): ChatContextProps => {
-  const context = useContext(ChatContext);
-  if (!context) {
-    throw new Error("useChat must be used within a ChatProvider");
-  }
-  return context;
-};
 
+// eslint-disable-next-line react-refresh/only-export-components
 export { ChatProvider, useChat };

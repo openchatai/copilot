@@ -2,7 +2,8 @@ import { Message } from "@lib/types"
 import { HistoryMessage } from "@lib/types/initialDataType"
 
 export function historyToMessages(history?: HistoryMessage[]): Message[] {
-    let $messages: Message[] = []
+    const $messages: Message[] = [];
+
     if (history) {
         history.forEach((m) => {
             if (m.from_user) {
