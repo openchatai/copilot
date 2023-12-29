@@ -2,8 +2,8 @@ from typing import Optional
 
 from werkzeug.datastructures import Headers
 
-from custom_types.bot_response import BotResponse
-from custom_types.run_workflow_input import ChatContext
+from types.bot_response import BotResponse
+from types.run_workflow_input import ChatContext
 from entities.flow_entity import FlowDTO
 from routes.flow.utils import run_actions
 from utils.get_logger import CustomLogger

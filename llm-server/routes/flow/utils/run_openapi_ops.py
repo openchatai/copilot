@@ -3,7 +3,7 @@ from typing import Optional
 
 from werkzeug.datastructures import Headers
 
-from custom_types.bot_response import BotResponse
+from types.bot_response import BotResponse
 from entities.flow_entity import FlowDTO
 from extractors.convert_json_to_text import convert_json_to_text
 from integrations.load_json_config import load_json_config
