@@ -13,6 +13,7 @@ class ChatHistory(Base):
     chatbot_id = Column(String(36), nullable=True)
     session_id = Column(String(255), nullable=True)
     from_user = Column(Boolean, default=False)
+    visible_for_user = Column(Boolean, default=True)
     message = Column(String(8192))
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(
