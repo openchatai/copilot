@@ -229,7 +229,10 @@ def run_informative_item(
 
     context = []
     for vector_result in informative_item.get(VectorCollections.knowledgebase) or []:
-        context.append(vector_result.document.metadata)
+        context.append(
+            vector_result.document.page_content
+            + f" metadata: {vector_result.document.metadata}"
+        )
 
     messages: List[BaseMessage] = [SystemMessage(content=base_prompt)]
 
