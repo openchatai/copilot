@@ -115,7 +115,6 @@ def init_chat():
 
 @chat_workflow.route("/send", methods=["POST"])
 async def send_chat():
-
     json_data = request.get_json()
 
     input_data = ChatInput(**json_data)
@@ -149,7 +148,12 @@ async def send_chat():
             upsert_analytics_record(
                 chatbot_id=str(bot.id), successful_operations=1, total_operations=1
             )
-            create_chat_history(str(bot.id), session_id, True, message)
+            create_chat_history(
+                chatbot_id=str(bot.id),
+                session_id=session_id,
+                from_user=True,
+                message=message
+            )
             create_chat_history(
                 chatbot_id=str(bot.id),
                 session_id=session_id,
