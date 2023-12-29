@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronRight } from "lucide-react";
 import { Link } from "@/lib/router-events";
-import { useSearchModal } from "@/app/_store/searchModal";
+import { useSearchModal } from "@/app/search-modal-atom";
 
 // i'm bad at naming things
 export default function LogoMenu() {

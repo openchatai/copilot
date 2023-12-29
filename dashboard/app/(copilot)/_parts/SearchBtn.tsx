@@ -1,8 +1,7 @@
 'use client';
-import { useSearchModal } from '@/app/_store/searchModal';
+import { useSearchModal } from '@/app/search-modal-atom';
 import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react'
-import React from 'react'
 
 
 export function SearchBtn() {
