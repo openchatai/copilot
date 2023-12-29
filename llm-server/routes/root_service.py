@@ -334,4 +334,4 @@ def run_informative_item(
 
     content = cast(str, chat(messages=messages).content)
 
-    return BotResponse(text_response=content)
+    return BotResponse(text=content)

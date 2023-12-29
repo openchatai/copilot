@@ -143,6 +143,8 @@ async def send_chat():
             app=app_name,
         )
 
+        logger.info(bot_response)
+
         if bot_response.text:
             upsert_analytics_record(
                 chatbot_id=str(bot.id), successful_operations=1, total_operations=1
