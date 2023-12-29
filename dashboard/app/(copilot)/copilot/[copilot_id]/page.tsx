@@ -111,7 +111,7 @@ export default function CopilotPage() {
   const [, setSearch] = useSearchModal()
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
-      <HeaderShell className="justify-between bg-white">
+      <HeaderShell className="justify-between">
         <h1 className="text-lg font-bold text-accent-foreground">
           {CopilotName}
         </h1>
