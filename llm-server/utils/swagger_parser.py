@@ -1,6 +1,7 @@
 from entities.action_entity import ActionDTO
 import json
 from typing import List
+from urllib.parse import urlparse
 
 
 class Endpoint:
@@ -128,6 +129,20 @@ class SwaggerParser:
         }
         return validations
 
+    def validate_url(self, url):
+        """
+        Validates the given URL.
+        """
+        try:
+            result = urlparse(url)
+            # Check if scheme and netloc (host) are present
+            if all([result.scheme, result.netloc]):
+                return True
+            else:
+                return False
+        except ValueError:
+            return False
+
     def get_base_uri(self):
         """
         Retrieves the base URI from the Swagger file's "servers" object, specific to OpenAPI 3.0.0.
@@ -135,8 +150,15 @@ class SwaggerParser:
         servers = self.swagger_data.get("servers", [])
         if servers:
             # Use the first server's URL as the base URI
-            return servers[0].get("url", "")
-        return ""
+            base_url = servers[0].get("url", "")
+
+            # Validate the base URL
+            if not self.validate_url(base_url):
+                raise ValueError("Invalid base URL: {}".format(base_url))
+
+            return base_url
+
+        raise ValueError("No servers found in Swagger data.")
 
     def resolve_schema_references(self, schema):
         """
