@@ -66,6 +66,12 @@ export function SwaggerDnd({ children, onChange, copilotId }: { children: ReactN
                     description: 'Successfully imported actions from swagger file'
                 })
                 _.delay(() => clearFiles(), 1000)
+            } else if (data.is_error === true) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Error',
+                    description: data.message
+                })
             }
         }
     })
