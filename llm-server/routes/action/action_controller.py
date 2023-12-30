@@ -46,7 +46,15 @@ def import_actions_from_swagger_file(chatbot_id):
             actions = swagger_parser.get_all_actions(chatbot_id)
         except Exception as e:
             logger.error("Failed to parse Swagger file", error=e)
-            return jsonify({"error": f"Failed to parse Swagger file: {str(e)}"}), 400
+            return (
+                jsonify(
+                    {
+                        "message": f"Failed to parse Swagger file: {str(e)}",
+                        "is_error": True,
+                    }
+                ),
+                400,
+            )
 
         is_error = False
         # Store actions in the database
