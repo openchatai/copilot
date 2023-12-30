@@ -1,5 +1,6 @@
-from http import HTTPStatus
 import os
+from http import HTTPStatus
+
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -11,7 +12,7 @@ from models.repository.copilot_repo import (
     create_copilot,
     chatbot_to_dict,
     SessionLocal,
-    update_copilot,
+    update_copilot, store_copilot_global_variables,
 )
 from routes._swagger.reindex_service import migrate_actions
 from utils.get_logger import CustomLogger
@@ -125,7 +126,7 @@ def update_global_variables(copilot_id):
         if not isinstance(data, dict):
             return jsonify({"error": "Invalid data format, expected a JSON object"}), 400
 
-        store_copilot_global_variables(copilot_id=copilot_id, json_data=data)
+        store_copilot_global_variables(copilot_id=copilot_id, variables=data)
 
         # Return a success response
         return jsonify({"message": "JSON data stored successfully"})
