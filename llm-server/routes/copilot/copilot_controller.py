@@ -125,8 +125,7 @@ def update_global_variables(copilot_id):
         if not isinstance(data, dict):
             return jsonify({"error": "Invalid data format, expected a JSON object"}), 400
 
-        # Store the entire JSON object
-        # store_copilot_data(copilot_id=copilot_id, json_data=data)
+        store_copilot_global_variables(copilot_id=copilot_id, json_data=data)
 
         # Return a success response
         return jsonify({"message": "JSON data stored successfully"})
