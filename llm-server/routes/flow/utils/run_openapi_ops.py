@@ -1,9 +1,10 @@
 import json
 from typing import Optional
+from flask_socketio import emit
 from openai import InvalidRequestError
 
 from werkzeug.datastructures import Headers
-
+from requests.exceptions import MissingSchema
 from entities.flow_entity import FlowDTO
 from extractors.convert_json_to_text import convert_json_to_text
 from integrations.load_json_config import load_json_config
@@ -52,11 +53,6 @@ async def run_actions(
 
                 api_response = make_api_request(headers=headers, **api_payload.__dict__)
 
-                logger.warn(
-                    "Config map is not defined for this operationId",
-                    paylooad=api_response.text,
-                )
-
                 """ 
                 if a custom transformer function is defined for this operationId use that, otherwise forward it to the llm,
                 so we don't necessarily have to defined mappers for all api endpoints
@@ -85,7 +81,6 @@ async def run_actions(
                             full_json=api_json, partial_json=partial_json
                         )
                     )
-
             except Exception as e:
                 logger.error(
                     "Error occurred during workflow check in store",
@@ -96,6 +91,7 @@ async def run_actions(
                     error=str(e),
                 )
 
+                emit(session_id, str(e)) if is_streaming else None
                 return str(e)
 
         try:
@@ -108,9 +104,11 @@ async def run_actions(
                 is_streaming=is_streaming,
             )
         except InvalidRequestError as e:
-            logger.error("OpenAI exception", messages=str(e))
-            return (
+            error_message = (
                 f"Api response too large for the endpoint: {api_payload.endpoint}"
                 if api_payload is not None
                 else ""
             )
+            logger.error("OpenAI exception", messages=str(e))
+            emit(session_id, error_message) if is_streaming else None
+            return error_message

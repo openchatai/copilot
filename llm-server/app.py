@@ -47,7 +47,7 @@ app.config.from_object(Config)
 @app.errorhandler(Exception)
 def internal_server_error(error):
     # Log the error or perform any other necessary actions
-    logger.error(f"Internal Server Error: {str(error)}")
+    logger.error("Internal Server Error", error=error)
     return jsonify({'error': 'Internal Server Error', 'message': 'An unexpected error occurred on the server.'}), 500
 
 @app.route("/healthcheck")
