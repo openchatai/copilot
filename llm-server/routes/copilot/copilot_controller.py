@@ -1,5 +1,6 @@
-from http import HTTPStatus
 import os
+from http import HTTPStatus
+
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -11,7 +12,7 @@ from models.repository.copilot_repo import (
     create_copilot,
     chatbot_to_dict,
     SessionLocal,
-    update_copilot,
+    update_copilot, store_copilot_global_variables,
 )
 from routes._swagger.reindex_service import migrate_actions
 from utils.get_logger import CustomLogger
@@ -104,6 +105,46 @@ def general_settings_update(copilot_id):
 
         # Return the updated chatbot information
         return jsonify({"chatbot": updated_copilot})
+    except ValueError as e:
+        # Handle not found error
+        return jsonify({"error": str(e)}), 404
+    except Exception as e:
+        # Handle other exceptions
+        return jsonify({"error": "An error occurred", "details": str(e)}), 500
+
+
+@copilot.route("/<string:copilot_id>/variables", methods=["POST", "PATCH", "PUT"])
+def update_global_variables(copilot_id):
+    try:
+        # Ensure the chatbot exists
+        find_one_or_fail_by_id(copilot_id)
+
+        # Retrieve JSON data from the request
+        data = request.json
+
+        # Validate that data is a dictionary
+        if not isinstance(data, dict):
+            return jsonify({"error": "Invalid data format, expected a JSON object"}), 400
+
+        store_copilot_global_variables(copilot_id=copilot_id, variables=data)
+
+        # Return a success response
+        return jsonify({"message": "JSON data stored successfully"})
+    except ValueError as e:
+        # Handle not found error
+        return jsonify({"error": str(e)}), 404
+    except Exception as e:
+        # Handle other exceptions
+        return jsonify({"error": "An error occurred", "details": str(e)}), 500
+
+
+@copilot.route("/<string:copilot_id>/variables", methods=["GET"])
+def get_global_variables(copilot_id):
+    try:
+        # Ensure the chatbot exists
+        chatbot = find_one_or_fail_by_id(copilot_id)
+
+        return jsonify(chatbot.global_variables), 200
     except ValueError as e:
         # Handle not found error
         return jsonify({"error": str(e)}), 404
