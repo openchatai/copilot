@@ -156,7 +156,7 @@ export default function CreateCopilotPage() {
                     "aspect-video w-full transition-opacity",
                     loaded ? "opacity-100" : "opacity-0",
                   )}
-                  src="https://www.youtube.com/embed/WqcNpE5yTNg?si=5NjK9Tfi3gIIZdJM"
+                  src="https://www.youtube.com/embed/-TgrM_6G_yA?si=eTOWsEeSQM5bYsg_"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
                   onLoad={() => setLoaded(true)}
