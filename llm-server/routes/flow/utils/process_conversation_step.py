@@ -58,38 +58,45 @@ def is_it_informative_or_actionable(
             )
 
     prompt = (
-        """
-    You are an AI tool that classifies user input needs an API call or not. You should recommend using API if the user request matches one of the APIs description below, the user requests that can be fulfilled by calling an external API to either execute something or fetch more data
-    to help in answering the question, also, if the user questions is asking you to perform actions e.g (list, create, update, delete) then you will need to use an API
-    
-    Examples:
+        """You are an AI tool that classifies whether user input requires an API call or not. You should recommend using an API if the user request matches one of the APIs descriptions below. The user requests that can be fulfilled by calling an external API to either execute something or fetch more data to help in answering the question. Also, if the user question is asking you to perform actions (e.g. list, create, update, delete) then you will need to use an API.
 
-    **User Input:** create a b-1 visa application
+Examples:  
 
-    **Available APIs:**
-    - API(createVisaApplication): This api creates a b-1 visa application.
-    - API(getVisaStatus): This api queries b-1 status.
+**User Input:** Create a B-1 visa application
 
-    **Verdict:** Needs API call so the response should be {"needs_api": "yes", "justification": "the reason behind your verdict", "api": "createVisaApplication" }
+**Available APIs:**  
+- API(createVisaApplication): This API creates a B-1 visa application. 
+- API(getVisaStatus): This API queries B-1 visa status.   
 
-    **Justification:** The user is asking to create a visa application and (createVisaApplication) api can be used to satisfy the user requirement
+**Verdict:** Needs API call so the response should be {"needs_api": "yes", "justification": "The reason behind your verdict", "api": "createVisaApplication"}
 
-    **Another Example:**
+**Justification:** The user is asking to create a visa application and the (createVisaApplication) API can be used to satisfy the user requirement.  
 
-    **User Input:** how to create a b-1 visa application
+**Another Example:**
 
-    **Available APIs:**
-    - API(createVisaApplication): This api creates a b-1 visa application.
-    - API(getVisaStatus): This api queries b-1 status.
+**User Input:** How to renew a B-1 visa  
 
-    **Verdict:** Does not need API call so the response should be {"needs_api": "no", "justification": "the reason behind your verdict",  "api": "" }
+**Available APIs:**   
+- API(createVisaApplication): This API creates a B-1 visa application.  
+- API(renewVisa): This API renews an existing B-1 visa.
 
-    **Justification:** The user is asking **how to** create a visa application, which is informative and can be answered through text without the need to call an API + the APIs in are for create or query b1 applications
+**Verdict:** Does not need API call so the response should be {"needs_api": "no", "justification": "The reason behind your verdict", "api": ""}  
 
-    **Response Format:** Always respond with JSON without any commentary, for example: {"needs_api": "no", "justification": "the reason behind your verdict", "api": "apiName" }
-    
-    ===END EXAMPLES===
-    The available tools :
+**Justification:** The user is asking how to renew a B-1 visa, which is an informational question that does not require an API call.
+
+**One More Example:**
+
+**User Input:** Get status of my B-1 visa application  
+
+**Available APIs:**    
+- API(getVisaStatus): This API queries status of a B-1 visa application.
+
+**Verdict:** Needs API call so the response should be {"needs_api": "yes", "justification": "The user is asking to get visa status", "api": "getVisaStatus"}
+
+**Response Format:** Always respond with JSON without any commentary, for example: {"needs_api": "no", "justification": "The reason behind your verdict", "api": "apiName"}  
+
+===END EXAMPLES===
+The available tools:
     """
         + actionable_tools
         + """
