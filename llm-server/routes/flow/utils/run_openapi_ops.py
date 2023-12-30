@@ -4,7 +4,7 @@ from flask_socketio import emit
 from openai import InvalidRequestError
 
 from werkzeug.datastructures import Headers
-
+from requests.exceptions import MissingSchema
 from entities.flow_entity import FlowDTO
 from extractors.convert_json_to_text import convert_json_to_text
 from integrations.load_json_config import load_json_config
@@ -86,7 +86,11 @@ async def run_actions(
                             full_json=api_json, partial_json=partial_json
                         )
                     )
-
+            except MissingSchema as e:
+                requests_schema_error="Failed while calling the api, bad / missing scheme provided, please check the api endpoint in `action`"
+                logger.error("Bad Schema", error=requests_schema_error)
+                emit(session_id, requests_schema_error)
+                return requests_schema_error
             except Exception as e:
                 logger.error(
                     "Error occurred during workflow check in store",

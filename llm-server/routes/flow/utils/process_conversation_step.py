@@ -60,7 +60,7 @@ def is_it_informative_or_actionable(
     prompt = (
         """
     You are an AI tool that classifies user input needs an API call or not. You should recommend using API if the user request matches one of the APIs description below, the user requests that can be fulfilled by calling an external API to either execute something or fetch more data
-    to help in answering the question, also, if the user questions are verbs and asking you to perform actions e.g (list, create, update, delete) then you will need to use an API
+    to help in answering the question, also, if the user questions is asking you to perform actions e.g (list, create, update, delete) then you will need to use an API
     
     Examples:
 
@@ -84,7 +84,7 @@ def is_it_informative_or_actionable(
 
     **Verdict:** Does not need API call so the response should be {"needs_api": "no", "justification": "the reason behind your verdict",  "api": "" }
 
-    **Justification:** The user is asking about how to create a visa application, which is informative and can be answered through text without the need to call an API + the APIs in are for create or query b1 applications
+    **Justification:** The user is asking **how to** create a visa application, which is informative and can be answered through text without the need to call an API + the APIs in are for create or query b1 applications
 
     **Response Format:** Always respond with JSON without any commentary, for example: {"needs_api": "no", "justification": "the reason behind your verdict", "api": "apiName" }
     
