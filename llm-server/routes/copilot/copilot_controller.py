@@ -138,6 +138,21 @@ def update_global_variables(copilot_id):
         return jsonify({"error": "An error occurred", "details": str(e)}), 500
 
 
+@copilot.route("/<string:copilot_id>/variables", methods=["GET"])
+def get_global_variables(copilot_id):
+    try:
+        # Ensure the chatbot exists
+        chatbot = find_one_or_fail_by_id(copilot_id)
+
+        return jsonify(chatbot.global_variables), 200
+    except ValueError as e:
+        # Handle not found error
+        return jsonify({"error": str(e)}), 404
+    except Exception as e:
+        # Handle other exceptions
+        return jsonify({"error": "An error occurred", "details": str(e)}), 500
+
+
 @copilot.route("/migrate/actions", methods=["POST"])
 def migrate():
     auth_header = request.headers.get("Authorization")
