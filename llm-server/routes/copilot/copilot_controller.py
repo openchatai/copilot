@@ -112,6 +112,32 @@ def general_settings_update(copilot_id):
         return jsonify({"error": "An error occurred", "details": str(e)}), 500
 
 
+@copilot.route("/<string:copilot_id>/variables", methods=["POST", "PATCH", "PUT"])
+def update_global_variables(copilot_id):
+    try:
+        # Ensure the chatbot exists
+        find_one_or_fail_by_id(copilot_id)
+
+        # Retrieve JSON data from the request
+        data = request.json
+
+        # Validate that data is a dictionary
+        if not isinstance(data, dict):
+            return jsonify({"error": "Invalid data format, expected a JSON object"}), 400
+
+        # Store the entire JSON object
+        # store_copilot_data(copilot_id=copilot_id, json_data=data)
+
+        # Return a success response
+        return jsonify({"message": "JSON data stored successfully"})
+    except ValueError as e:
+        # Handle not found error
+        return jsonify({"error": str(e)}), 404
+    except Exception as e:
+        # Handle other exceptions
+        return jsonify({"error": "An error occurred", "details": str(e)}), 500
+
+
 @copilot.route("/migrate/actions", methods=["POST"])
 def migrate():
     auth_header = request.headers.get("Authorization")
