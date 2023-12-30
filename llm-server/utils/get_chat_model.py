@@ -1,8 +1,8 @@
 import os
 from functools import lru_cache
 
+from openpipe.langchain_llm import ChatOpenAI
 from langchain.chat_models import ChatOllama, ChatAnthropic
-from langchain.chat_models import ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
 
 from utils import llm_consts
@@ -31,23 +31,41 @@ const chat = new ChatOpenAI({
 @lru_cache(maxsize=1)
 def get_chat_model() -> BaseChatModel:
     if model_name == CHAT_MODELS.gpt_3_5_turbo:
-        model = ChatOpenAI(model=CHAT_MODELS.gpt_3_5_turbo, temperature=0)
+        model = ChatOpenAI(
+            model=CHAT_MODELS.gpt_3_5_turbo,
+            temperature=0,
+            openpipe_kwargs={
+                "api_key": llm_consts.openpipe_api_key,
+            },
+        )
     elif model_name == CHAT_MODELS.gpt_4_32k:
-        model = ChatOpenAI(temperature=0, model=CHAT_MODELS.gpt_4_32k)
+        model = ChatOpenAI(
+            temperature=0,
+            model=CHAT_MODELS.gpt_4_32k,
+            openpipe_kwargs={
+                "api_key": llm_consts.openpipe_api_key,
+            },
+        ).with_tags(chain_name="classify", caller="shanur")
     elif model_name == CHAT_MODELS.gpt_4_1106_preview:
         model = ChatOpenAI(
             temperature=0,
             model=CHAT_MODELS.gpt_4_1106_preview,
             streaming=True,
             callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]),
-        )
+            openpipe_kwargs={
+                "api_key": llm_consts.openpipe_api_key,
+            },
+        ).with_tags(chain_name="classify", caller="shanur")
     elif model_name == CHAT_MODELS.gpt_3_5_turbo_16k:
         model = ChatOpenAI(
             model=CHAT_MODELS.gpt_3_5_turbo_16k,
             temperature=0,
             streaming=True,
             callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]),
-        )
+            openpipe_kwargs={
+                "api_key": llm_consts.openpipe_api_key,
+            },
+        ).with_tags(chain_name="classify", caller="shanur")
     elif model_name == "claude":
         model = ChatAnthropic(
             anthropic_api_key=os.getenv("CLAUDE_API_KEY"),

@@ -33,7 +33,9 @@ class VectorCollections:
 
 class UserMessageResponseType:
     actionable = "actionable"  # The user message should be answered with an action (flow or api action)
-    informative = "informative"  # The user message should be answered a normal text response
+    informative = (
+        "informative"  # The user message should be answered a normal text response
+    )
 
 
 @lru_cache(maxsize=5)  # Cache all calls
@@ -65,3 +67,5 @@ def get_mysql_uri():
 
     return pymysql_uri
 
+
+openpipe_api_key = os.getenv("OPENPIPE_API_KEY", "")

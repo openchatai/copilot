@@ -1,10 +1,8 @@
 import json
 from typing import Optional
 from flask_socketio import emit
-from openai import InvalidRequestError
 
 from werkzeug.datastructures import Headers
-from requests.exceptions import MissingSchema
 from entities.flow_entity import FlowDTO
 from extractors.convert_json_to_text import convert_json_to_text
 from integrations.load_json_config import load_json_config
@@ -103,11 +101,9 @@ async def run_actions(
                 session_id=session_id,
                 is_streaming=is_streaming,
             )
-        except InvalidRequestError as e:
+        except Exception as e:
             error_message = (
-                f"Api response too large for the endpoint: {api_payload.endpoint}"
-                if api_payload is not None
-                else ""
+                f"{str(e)}: {api_payload.endpoint}" if api_payload is not None else ""
             )
             logger.error("OpenAI exception", messages=str(e))
             emit(session_id, error_message) if is_streaming else None
