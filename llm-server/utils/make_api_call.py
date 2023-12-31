@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 import requests
 from requests import Response
@@ -30,8 +30,8 @@ def make_api_request(
     method: str,
     endpoint: str,
     body_schema: Any,
-    path_params: Dict[str, str],
-    query_params: Dict[str, str],
+    path_params: Dict[str, Union[str, int, bool]],
+    query_params: Dict[str, Union[str, int, bool]],
     headers: Any,
 ) -> Response:
     url = ""
