@@ -49,7 +49,7 @@ async def get_relevant_documents(
             ),
             query_vector=query_vector,
             with_payload=True,
-            limit=4,
+            limit=5,
             search_params=models.SearchParams(hnsw_ef=128, exact=False),
             score_threshold=score_thresholds.get(collection_name, 0.0),
         )

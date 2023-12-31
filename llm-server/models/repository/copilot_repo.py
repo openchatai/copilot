@@ -1,4 +1,5 @@
 import datetime
+import json
 import uuid
 from typing import Iterable, List, Optional, Any
 
@@ -214,6 +215,32 @@ def chatbot_to_dict(chatbot: Chatbot):
         # Converts datetime to ISO format string
         "swagger_url": chatbot.swagger_url,
     }
+
+
+def store_copilot_global_variables(copilot_id: str, variables: dict):
+    session: Session = SessionLocal()
+
+    try:
+        # Fetch the existing Chatbot
+        chatbot = session.query(Chatbot).filter(Chatbot.id == copilot_id).one()
+
+        # Todo: introduce encryption
+        # Store the encrypted JSON in the global_variables field
+        chatbot.global_variables = variables
+        chatbot.updated_at = datetime.datetime.utcnow()
+
+        session.commit()
+        session.refresh(chatbot)
+        return variables
+
+    except exc.NoResultFound:
+        session.rollback()
+        raise ValueError(f"No Chatbot found with id: {copilot_id}")
+    except Exception as e:
+        session.rollback()
+        logger.error("An exception occurred", app="OPENCOPILOT", error=str(e), incident="store_global_variables")
+    finally:
+        session.close()
 
 
 def update_copilot(

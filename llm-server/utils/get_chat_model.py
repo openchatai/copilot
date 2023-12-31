@@ -1,19 +1,18 @@
 import os
 from functools import lru_cache
 
+from langchain.callbacks.manager import CallbackManager
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.chat_models import ChatOllama, ChatAnthropic
 from langchain.chat_models import ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
 
 from utils import llm_consts
 from .chat_models import CHAT_MODELS
-from langchain.callbacks.manager import CallbackManager
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
 localip = os.getenv("LOCAL_IP", "localhost")
 
 model_name = os.getenv(llm_consts.model_env_var, CHAT_MODELS.gpt_3_5_turbo_16k)
-
 
 # To allow support for json responses, pass the modelKwargs
 """

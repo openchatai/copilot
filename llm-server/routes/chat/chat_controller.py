@@ -156,6 +156,10 @@ async def handle_chat_send_common(
     if not bot_token:
         return Response(response="bot token is required", status=400)
 
+    emit(
+        f"{session_id}_info", "Thinking... \n"
+    ) if is_streaming else None
+
     try:
         bot = find_one_or_fail_by_token(bot_token)
         base_prompt = bot.prompt_message
