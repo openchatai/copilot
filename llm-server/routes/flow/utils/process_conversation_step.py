@@ -106,12 +106,12 @@ def process_user_instruction(
                 else:
                     raise Exception("The function call didn't succeed")
 
-            if completion_response.message:
+            elif completion_response.message is not None:
                 messages.append(
                     {"content": completion_response.message, "role": "assistant"}
                 )
 
-                raise Exception("No more actions...")
+                # raise Exception("No more actions...")
 
             num_calls += 1
         except Exception as e:
