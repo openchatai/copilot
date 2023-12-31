@@ -44,7 +44,7 @@ OPENAI_API_KEY=YOUR_TOKEN_HERE
 
 ### For Linux Machines
 
-To install the necessary dependencies and set up the environment for the OpenCopilot project, use the following command:
+To install the necessary dependencies and set up the environment for OpenCopilot, use the following command:
 
 ```bash
 make install
