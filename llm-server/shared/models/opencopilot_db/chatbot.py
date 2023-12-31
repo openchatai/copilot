@@ -1,8 +1,9 @@
+import datetime
 import uuid
 
+from sqlalchemy import Column, String, DateTime, Boolean, Text, JSON
+
 from shared.models.opencopilot_db.database_setup import Base, engine
-from sqlalchemy import Column, String, DateTime, Boolean, Text
-import datetime
 
 
 class Chatbot(Base):
@@ -18,6 +19,7 @@ class Chatbot(Base):
     swagger_url = Column(Text)
     enhanced_privacy = Column(Boolean, default=False)
     smart_sync = Column(Boolean, default=False)
+    global_variables = Column(JSON, default={}, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(
         DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
