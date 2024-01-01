@@ -60,8 +60,7 @@ def process_user_instruction(
     is_streaming: bool,
 ):
     SYSTEM_MESSAGE = """
-    You are a helpful assistant.
-    Respond to the user's requests by calling functions if necessary. Check if a function has already been called before calling it again. Once you have gathered the necessary information, respond helpfully to the user in markdown formatting and append |im_end| at the end.
+You are a helpful assistant. Respond to the user prompt below by using function_call if the user message requires it. Otherwise, respond helpfully to the user in Markdown formatting. Make sure not to call the same function with the same arguments more than once. It is okay to make the same API call multiple times if different entities need to be modified, but the parameters would be different in each case.
     """
 
     num_calls = 0
@@ -74,9 +73,10 @@ def process_user_instruction(
     logger.info(instruction)
     logger.info(functions)
     completion_response = StreamingCompletionResponse(message="", function_call=None)
-    while num_calls < 5:
+    while num_calls <= 5:
         try:
-            completion_response = get_openai_completion(
+            logger.info("num_calls", num_calls=num_calls)
+            completion_response: StreamingCompletionResponse = get_openai_completion(
                 functions, messages, session_id, is_streaming, num_calls
             )
             if completion_response.function_call is None and num_calls == 0:
@@ -84,60 +84,52 @@ def process_user_instruction(
 
             if (
                 completion_response.function_call
-                and completion_response.function_call.name is not None
+                and completion_response.function_call["name"] is not None
             ):
                 emit(
                     f"{session_id}_info",
-                    f"{camel_case_to_normal_with_capital(completion_response.function_call.name)} ... \n",
+                    f"{camel_case_to_normal_with_capital(completion_response.function_call['name'])} ... \n",
                 )
 
                 logger.info(completion_response.function_call)
                 action_response = execute_single_action_call(
-                    operation_id=completion_response.function_call.name,
+                    operation_id=completion_response.function_call["name"],
                     bot_id=bot_id,
-                    args=completion_response.function_call.arguments,
+                    args=completion_response.function_call["arguments"],
                 )
 
-                if action_response:
-                    emit(
-                        f"{session_id}_info",
-                        f"Collected data from {camel_case_to_normal_with_capital(completion_response.function_call.name)} ... \n",
-                    )
-                    messages.append(
-                        {
-                            "role": "function",
-                            "content": action_response,
-                            "name": completion_response.function_call.name,
-                        }
-                    )
-                else:
-                    raise Exception("The function call didn't succeed")
-            elif (
-                completion_response.message is not None
-                and "im_end" in completion_response.message
-            ):
-                raise Exception("All actions completed...")
-            elif completion_response.message is not None:
-                messages.append(
-                    {"content": completion_response.message, "role": "assistant"}
+                emit(
+                    f"{session_id}_info",
+                    f"Collected data from {camel_case_to_normal_with_capital(completion_response.function_call['name'])} ... \n",
                 )
+                messages.append(
+                    {
+                        "role": "function",
+                        "content": f"arguments: {completion_response.function_call['arguments']}, response: {action_response}"
+                        or f"Failed to get response from {camel_case_to_normal_with_capital(completion_response.function_call['name'])}",
+                        "name": completion_response.function_call["name"],
+                    }
+                )
+            elif completion_response.message is not None:
+                return completion_response.message
+
             num_calls += 1
         except Exception as e:
-            logger.error("Failed to call function", error=e)
+            logger.error("Finished processing function chain ", error=e)
             if num_calls > 0:
                 return completion_response.message
             return False
 
     if num_calls >= 5:
-        print(f"Reached max chained function calls: {5}")
+        raise Exception(f"Reached max chained function calls: {5}")
 
 
 class StreamingCompletionResponse:
-    function_call: Optional[ChoiceDeltaFunctionCall]
+    function_call: Optional[Dict[str, Any]]
     message: Optional[str]
 
     def __init__(
-        self, function_call: Optional[ChoiceDeltaFunctionCall], message: Optional[str]
+        self, function_call: Optional[Dict[str, Any]], message: Optional[str]
     ) -> None:
         self.function_call = function_call
         self.message = message
@@ -156,16 +148,28 @@ def get_openai_completion(
         stream=True,
     )
     complete_content = ""
+    _func_call = {
+        "name": None,
+        "arguments": "",
+    }
     for chunk in completion:
-        if chunk.choices[0].delta.function_call:
+        function_call = chunk.choices[0].delta.function_call
+        if function_call and function_call.name:
+            _func_call["name"] = function_call.name
             emit(
                 f"{session_id}_info",
                 f"Selected action: {chunk.choices[0].delta.function_call}",
             )
+
+        if function_call and function_call.arguments and function_call.arguments != "":
+            _func_call["arguments"] += function_call.arguments
+
+        if chunk.choices[0].finish_reason == "function_call":
             return StreamingCompletionResponse(
-                function_call=chunk.choices[0].delta.function_call,
+                function_call=_func_call,
                 message=None,
             )
+
         elif chunk.choices[0].delta.content:
             complete_content += chunk.choices[0].delta.content
             if num_calls > 0:
@@ -243,7 +247,7 @@ def get_defined_params(input_str: str):
     data = json.loads(input_str)
 
     # Extract the parameters sub-dictionary
-    params = data.get("parameters")
+    params = data.get("parameters") or {}
 
     # Filter out any undefined values (i.e., None or empty strings)
     filtered_params = {k: v for k, v in params.items() if v is not None and v != ""}
