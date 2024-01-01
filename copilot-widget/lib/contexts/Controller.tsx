@@ -116,18 +116,21 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   useEffect(() => {
     const current = currentMessagePair
     // the content is the message.content from the server
-    socket.on(sessionId, (content: string) => {
-      if (current) {
-        if (content === "|im_end|") {
-          setCurrentMessagePair(null)
-          return
+    try {
+      socket.on(sessionId, (content: string) => {
+        if (current) {
+          if (content === "|im_end|") {
+            setCurrentMessagePair(null)
+            return
+          }
+          setConversationInfo(null)
+          updateBotMessage(current.bot, content)
         }
-        setConversationInfo(null)
-        updateBotMessage(current.bot, content)
-      }
-    });
-
-    return () => { socket.off(sessionId) }
+      });
+      return () => { socket.off(sessionId) }
+    } catch (error) {
+      setConversationInfo(null)
+    }
 
   }, [currentMessagePair, sessionId, socket, updateBotMessage]);
 
