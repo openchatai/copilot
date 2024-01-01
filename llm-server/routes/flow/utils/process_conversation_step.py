@@ -60,7 +60,7 @@ def process_user_instruction(
     is_streaming: bool,
 ):
     SYSTEM_MESSAGE = """
-You are a helpful assistant. Respond to the user prompt below by using function_call if the user message requires it. Otherwise, respond helpfully to the user in Markdown formatting and append |im_end| when you are done. Make sure not to call the same function with the same arguments more than once. It is okay to make the same API call multiple times if different entities need to be modified, but the parameters would be different in each case.
+You are a helpful assistant. Respond to the user prompt below by using function_call if the user message requires it. Otherwise, respond helpfully to the user in Markdown formatting. Make sure not to call the same function with the same arguments more than once. It is okay to make the same API call multiple times if different entities need to be modified, but the parameters would be different in each case.
     """
 
     num_calls = 0
@@ -73,8 +73,9 @@ You are a helpful assistant. Respond to the user prompt below by using function_
     logger.info(instruction)
     logger.info(functions)
     completion_response = StreamingCompletionResponse(message="", function_call=None)
-    while num_calls < 5:
+    while num_calls <= 5:
         try:
+            logger.info("num_calls", num_calls=num_calls)
             completion_response: StreamingCompletionResponse = get_openai_completion(
                 functions, messages, session_id, is_streaming, num_calls
             )
@@ -109,15 +110,9 @@ You are a helpful assistant. Respond to the user prompt below by using function_
                         "name": completion_response.function_call["name"],
                     }
                 )
-            elif (
-                completion_response.message is not None
-                and "im_end" in completion_response.message
-            ):
-                raise Exception("All actions completed...")
             elif completion_response.message is not None:
-                messages.append(
-                    {"content": completion_response.message, "role": "assistant"}
-                )
+                return completion_response.message
+
             num_calls += 1
         except Exception as e:
             logger.error("Finished processing function chain ", error=e)
