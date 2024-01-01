@@ -52,7 +52,8 @@ function InstallationSection() {
       const options = {
         apiUrl: "${baseUrl}/backend", 
         initialMessage: "How are the things",
-        token: "${CopilotToken}", 
+        token: "${CopilotToken}",
+        defaultOpen: true,
         triggerSelector: "#triggerSelector", 
         socketUrl: "${baseUrl}",
         headers: { 
@@ -76,7 +77,6 @@ function InstallationSection() {
           className:"your class name" // if u are using tailwindcss or any className you can use the class name here
           }
         }
-      }
       window.addEventListener("DOMContentLoaded", ()=>initAiCoPilot(options));
 </script>
 `}
