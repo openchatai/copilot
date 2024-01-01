@@ -5,7 +5,7 @@ import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { ActionResponseType } from '@/data/actions';
 import { Action } from './ActionsList';
 import _, { uniqueId } from 'lodash';
-import { useController } from './Controller';
+import { SelectedActionPosition, useController } from './Controller';
 import { DebounceInput } from 'react-debounce-input';
 import { BlockType } from './types/block';
 import { Trash2 } from 'lucide-react';
@@ -14,16 +14,30 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Button } from '@/components/ui/button';
 import { useDraggableInPortal } from './useDraginPortal';
 import { getStyle } from './utils';
+import { useInView } from 'framer-motion';
 export const BLOCK_ACTION_DRAGGABLE_ID_PREFIX = 'block-action-draggable|';
 
 type Props = NodeProps<BlockType>
 
-function DraggableActionInsideActionBlock({ action, index, id }: { action: ActionResponseType, index: number, id: string }) {
+function DraggableActionInsideActionBlock({ action, index, id, position }: { action: ActionResponseType, index: number, id: string, position: SelectedActionPosition }) {
     const draggableInPortal = useDraggableInPortal();
+    const { selectedActions } = useController();
+    const isSelected = selectedActions.isSelected(position);
+
     return <Draggable key={id} draggableId={BLOCK_ACTION_DRAGGABLE_ID_PREFIX + id} index={index}>
-        {draggableInPortal((provided, snapshot) => <div ref={provided.innerRef} {...provided.draggableProps} style={getStyle(provided.draggableProps.style, snapshot)} {...provided.dragHandleProps} className='w-full bg-white shrink-0 z-50 border-2 border-accent-foreground border-dotted rounded-md'>
-            <Action action={action} />
-        </div>)}
+        {draggableInPortal((provided, snapshot) =>
+            <div
+                ref={provided.innerRef}
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+                style={getStyle(provided.draggableProps.style, snapshot)}
+                className={cn('w-full shrink-0 border border-dotted rounded-md transition-colors', isSelected ? 'border-primary/50 bg-accent' : 'border-accent bg-white')}>
+                <div
+                    className='contents cursor-pointer'
+                    onClickCapture={() => selectedActions.toggleSelectAction(position)}>
+                    <Action action={action} />
+                </div>
+            </div>)}
     </Draggable>
 }
 
@@ -76,6 +90,8 @@ function BlockHandle({ type, position, className }: { type: 'source' | 'target',
 
 function ActionBlock({ data: { actions, name, next_on_success }, id, selected }: Props) {
     const nodes = useNodes();
+    const containerRef = React.useRef<HTMLDivElement>(null);
+    const inView = useInView(containerRef, { amount: "all" });
     const { isFirst, isLast } = useMemo(() => {
         const index = _.findIndex(nodes, { id });
         return {
@@ -85,10 +101,10 @@ function ActionBlock({ data: { actions, name, next_on_success }, id, selected }:
     }, [nodes, id])
     return (
         <React.Fragment key={id}>
-
             <BlockHandle type='target' position={Position.Left} />
             <BlockHandle type='source' position={Position.Right} />
             <div data-block-id={id}
+                ref={containerRef}
                 data-next-on-success={next_on_success ?? "is-last-one"}
                 data-is-last={isLast} data-is-first={isFirst}
                 className={cn('w-[20rem] bg-white border transition-all overflow-hidden rounded-lg h-auto flex flex-col')}>
@@ -98,13 +114,15 @@ function ActionBlock({ data: { actions, name, next_on_success }, id, selected }:
                         <DeleteBlockBtn id={id} />
                     </div>
                 </div>
-                <Droppable droppableId={'BLOCK_DROPABLE|' + id}>
+                <Droppable
+                    isDropDisabled={!inView}
+                    droppableId={'BLOCK_DROPABLE|' + id}>
                     {(provided) => (
-                        <div ref={provided.innerRef} {...provided.droppableProps} className='flex-1 isolate p-2 min-h-0 w-full transition-all nodrag nopan flex shrink-0 flex-col space-y-1 items-start justify-center'>
+                        <div ref={provided.innerRef} {...provided.droppableProps} className='flex-1 isolate p-2 w-full transition-all nodrag nopan flex shrink-0 flex-col space-y-1 items-start justify-center'>
                             {
-                                _.isEmpty(actions) ? <div className='text-sm text-gray-400 text-center p-4 w-full'>Drag and drop actions here</div> : actions.map((action, index) => {
-                                    return <DraggableActionInsideActionBlock id={action.id} key={uniqueId('block_action_key')} action={action} index={index} />
-                                })
+                                _.isEmpty(actions) ? <div className='text-sm text-gray-400 text-center p-4 w-full'>Drag and drop actions here</div> : actions.map((action, index) => (
+                                    <DraggableActionInsideActionBlock position={`${id}.${action.id}`} id={action.id} key={uniqueId('block_action_key')} action={action} index={index} />)
+                                )
                             }
                             {provided.placeholder}
                         </div>
