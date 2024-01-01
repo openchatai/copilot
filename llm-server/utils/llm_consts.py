@@ -31,9 +31,17 @@ class VectorCollections:
     knowledgebase = "knowledgebase"
 
 
+class ChatStrategy:
+    chain = "chain"
+    function = "function"
+    tool = "tool"
+
+
 class UserMessageResponseType:
     actionable = "actionable"  # The user message should be answered with an action (flow or api action)
-    informative = "informative"  # The user message should be answered a normal text response
+    informative = (
+        "informative"  # The user message should be answered a normal text response
+    )
 
 
 @lru_cache(maxsize=5)  # Cache all calls
@@ -65,3 +73,5 @@ def get_mysql_uri():
 
     return pymysql_uri
 
+
+chat_strategy = os.getenv("CHAT_STRATEGY", ChatStrategy.chain)

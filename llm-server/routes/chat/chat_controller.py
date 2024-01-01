@@ -13,9 +13,13 @@ from models.repository.chat_history_repo import (
 from models.repository.copilot_repo import find_one_or_fail_by_token
 from routes.analytics.analytics_service import upsert_analytics_record
 from routes.chat.chat_dto import ChatInput
+from routes.chat.implementation.chain_strategy import ChainStrategy
+from routes.chat.implementation.functions_strategy import FunctionStrategy
+from routes.chat.implementation.handler_interface import ChatRequestHandler
+from routes.chat.implementation.tools_strategy import ToolStrategy
 from utils.db import NoSQLDatabase
 from utils.get_logger import CustomLogger
-from utils.llm_consts import X_App_Name
+from utils.llm_consts import X_App_Name, chat_strategy, ChatStrategy
 from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
 from .. import root_service
 from flask_socketio import emit
@@ -160,14 +164,21 @@ async def handle_chat_send_common(
         bot = find_one_or_fail_by_token(bot_token)
         base_prompt = bot.prompt_message
 
-        response_data = await root_service.handle_request(
-            text=message,
-            session_id=session_id,
-            base_prompt=str(base_prompt),
-            bot_id=str(bot.id),
-            headers=headers_from_json,
-            app=app_name,
-            is_streaming=is_streaming,
+        strategy: ChatRequestHandler = ChainStrategy()
+        if chat_strategy == ChatStrategy.function:
+            strategy = FunctionStrategy()
+
+        elif chat_strategy == ChatStrategy.tool:
+            strategy = ToolStrategy()
+
+        response_data = await strategy.handle_request(
+            message,
+            session_id,
+            str(base_prompt),
+            str(bot.id),
+            headers_from_json,
+            app_name,
+            is_streaming,
         )
 
         if response_data["response"]:
