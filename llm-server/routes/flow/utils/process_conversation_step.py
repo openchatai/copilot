@@ -21,17 +21,18 @@ chat = get_chat_model()
 
 
 def try_to_action(
-    session_id: str,
-    user_message: str,
-    chat_history: List[BaseMessage],
-    top_documents: Dict[str, List[DocumentSimilarityDTO]],
-    bot_id,
-    is_streaming: bool,
+        session_id: str,
+        user_message: str,
+        chat_history: List[BaseMessage],
+        top_documents: Dict[str, List[DocumentSimilarityDTO]],
+        bot_id,
+        is_streaming: bool,
 ) -> Any:
     """
     Processes a conversation step by generating a response based on the provided inputs.
 
     Args:
+        is_streaming:
         bot_id:
         top_documents:
         session_id (str): The ID of the session for the chat conversation.
@@ -52,11 +53,11 @@ def try_to_action(
 
 
 def process_user_instruction(
-    functions: Union[List[Any], Literal[False]],
-    instruction: str,
-    bot_id: str,
-    session_id: str,
-    is_streaming: bool,
+        functions: Union[List[Any], Literal[False]],
+        instruction: str,
+        bot_id: str,
+        session_id: str,
+        is_streaming: bool,
 ):
     SYSTEM_MESSAGE = """
     You are a helpful assistant.
@@ -72,39 +73,31 @@ def process_user_instruction(
 
     logger.info(instruction)
     logger.info(functions)
-    completion_response = StreamingCompletionResponse(message="", function_call=None)
     while num_calls < 5:
+        completion_response = get_openai_completion(
+            functions, messages, session_id, is_streaming
+        )
         try:
-            completion_response = get_openai_completion(
-                functions, messages, session_id, is_streaming
+            emit(
+                f"{session_id}_info",
+                f"{camel_case_to_normal_with_capital(completion_response.function_call.name)} ... \n",
             )
 
-            if (
-                completion_response.function_call
-                and completion_response.function_call.name is not None
-            ):
-                emit(
-                    f"{session_id}_info",
-                    f"{camel_case_to_normal_with_capital(completion_response.function_call.name)} ... \n",
-                )
+            logger.info(completion_response.function_call)
+            action_response = execute_single_action_call(
+                operation_id=completion_response.function_call.name,
+                bot_id=bot_id,
+                args=completion_response.function_call.arguments,
+            )
 
-                logger.info(completion_response.function_call)
-                action_response = execute_single_action_call(
-                    operation_id=completion_response.function_call.name,
-                    bot_id=bot_id,
-                    args=completion_response.function_call.arguments,
+            if action_response:
+                messages.append(
+                    {
+                        "role": "function",
+                        "content": action_response,
+                        "name": completion_response.function_call.name,
+                    }
                 )
-
-                if action_response:
-                    messages.append(
-                        {
-                            "role": "function",
-                            "content": action_response,
-                            "name": completion_response.function_call.name,
-                        }
-                    )
-                else:
-                    raise Exception("The function call didn't succeed")
 
             elif completion_response.message is not None:
                 messages.append(
@@ -115,7 +108,6 @@ def process_user_instruction(
 
             num_calls += 1
         except Exception as e:
-            logger.error("Failed to call function", error=e)
             if num_calls > 0:
                 return completion_response.message
             return False
@@ -129,7 +121,7 @@ class StreamingCompletionResponse:
     message: Optional[str]
 
     def __init__(
-        self, function_call: Optional[ChoiceDeltaFunctionCall], message: Optional[str]
+            self, function_call: Optional[ChoiceDeltaFunctionCall], message: Optional[str]
     ) -> None:
         self.function_call = function_call
         self.message = message
@@ -165,7 +157,7 @@ def get_openai_completion(functions, messages, session_id: str, is_streaming: bo
 
 
 def convert_top_documents_to_functions(
-    top_documents: Dict[str, List[DocumentSimilarityDTO]]
+        top_documents: Dict[str, List[DocumentSimilarityDTO]]
 ):
     actions = top_documents.get(VectorCollections.actions)
     if not actions:
