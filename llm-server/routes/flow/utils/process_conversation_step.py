@@ -1,5 +1,6 @@
 import os
-from typing import List, Dict
+import json
+from typing import List, Dict, Any, Union, Literal, Optional
 
 from langchain.schema import BaseMessage
 from openai import OpenAI
@@ -12,17 +13,22 @@ from utils.llm_consts import VectorCollections
 from utils.make_api_call import make_api_request
 from flask_socketio import emit
 
+from openai.types.chat.chat_completion_message import ChatCompletionMessage
+from openai.types.chat.chat_completion_chunk import ChoiceDeltaFunctionCall
+from utils.chat_models import CHAT_MODELS
+
 logger = CustomLogger(module_name=__name__)
 chat = get_chat_model()
 
 
 def try_to_action(
-        session_id: str,
-        user_message: str,
-        chat_history: List[BaseMessage],
-        top_documents: Dict[str, List[DocumentSimilarityDTO]],
-        bot_id
-) -> str:
+    session_id: str,
+    user_message: str,
+    chat_history: List[BaseMessage],
+    top_documents: Dict[str, List[DocumentSimilarityDTO]],
+    bot_id,
+    is_streaming: bool,
+) -> Any:
     """
     Processes a conversation step by generating a response based on the provided inputs.
 
@@ -32,26 +38,34 @@ def try_to_action(
         session_id (str): The ID of the session for the chat conversation.
         user_message (str): The message from the user.
         chat_history (List[BaseMessage]): A list of previous conversation messages.
-
-    Raises:
-        ValueError: If the session ID is not defined.
     """
 
-    if not session_id:
-        raise ValueError("Session id must be defined for chat conversations")
-
+    emit(f"{session_id}_info", "Finding the right actions... \n")
     functions = convert_top_documents_to_functions(top_documents)
 
-    return process_user_instruction(functions=functions, instruction=user_message, bot_id=bot_id, session_id=session_id)
+    return process_user_instruction(
+        functions=functions,
+        instruction=user_message,
+        bot_id=bot_id,
+        session_id=session_id,
+        is_streaming=is_streaming,
+    )
 
 
-def process_user_instruction(functions, instruction, bot_id, session_id):
+def process_user_instruction(
+    functions: Union[List[Any], Literal[False]],
+    instruction: str,
+    bot_id: str,
+    session_id: str,
+    is_streaming: bool,
+):
     SYSTEM_MESSAGE = """
     You are a helpful assistant.
-    Respond to the following prompt by using function_call is the user message REQUIRE that, other than that just respond by text formatted as markdown
+    Respond to the user's requests by calling functions if necessary. Check if a function has already been called before calling it again. Once you have gathered the necessary information, respond helpfully to the user in markdown formatting and append |im_end| at the end.
     """
 
     num_calls = 0
+
     messages = [
         {"content": SYSTEM_MESSAGE, "role": "system"},
         {"content": instruction, "role": "user"},
@@ -59,53 +73,119 @@ def process_user_instruction(functions, instruction, bot_id, session_id):
 
     logger.info(instruction)
     logger.info(functions)
+    completion_response = StreamingCompletionResponse(message="", function_call=None)
     while num_calls < 5:
-        message = ""
         try:
-            response = get_openai_response(functions, messages)
-            message = response.choices[0].message
-            print(message)
-            messages.append(message)
-
-            emit(
-                f"{session_id}_info", f"{camel_case_to_normal_with_capital(message.function_call.name)} ... \n"
+            completion_response = get_openai_completion(
+                functions, messages, session_id, is_streaming, num_calls
             )
+            if completion_response.function_call is None and num_calls == 0:
+                raise Exception("This user input doesn't require any actions")
 
-            logger.info(message.function_call)
-            response = execute_single_action_call(operation_id=message.function_call.name, bot_id=bot_id,
-                                                  args=message.function_call.arguments)
+            if (
+                completion_response.function_call
+                and completion_response.function_call.name is not None
+            ):
+                emit(
+                    f"{session_id}_info",
+                    f"{camel_case_to_normal_with_capital(completion_response.function_call.name)} ... \n",
+                )
 
-            messages.append(
-                {
-                    "role": "function",
-                    "content": response,
-                    "name": message.function_call.name
-                }
-            )
+                logger.info(completion_response.function_call)
+                action_response = execute_single_action_call(
+                    operation_id=completion_response.function_call.name,
+                    bot_id=bot_id,
+                    args=completion_response.function_call.arguments,
+                )
 
+                if action_response:
+                    emit(
+                        f"{session_id}_info",
+                        f"Collected data from {camel_case_to_normal_with_capital(completion_response.function_call.name)} ... \n",
+                    )
+                    messages.append(
+                        {
+                            "role": "function",
+                            "content": action_response,
+                            "name": completion_response.function_call.name,
+                        }
+                    )
+                else:
+                    raise Exception("The function call didn't succeed")
+            elif (
+                completion_response.message is not None
+                and "im_end" in completion_response.message
+            ):
+                raise Exception("All actions completed...")
+            elif completion_response.message is not None:
+                messages.append(
+                    {"content": completion_response.message, "role": "assistant"}
+                )
             num_calls += 1
         except Exception as e:
+            logger.error("Failed to call function", error=e)
             if num_calls > 0:
-                return message.content
+                return completion_response.message
             return False
 
     if num_calls >= 5:
         print(f"Reached max chained function calls: {5}")
 
 
-def get_openai_response(functions, messages):
+class StreamingCompletionResponse:
+    function_call: Optional[ChoiceDeltaFunctionCall]
+    message: Optional[str]
+
+    def __init__(
+        self, function_call: Optional[ChoiceDeltaFunctionCall], message: Optional[str]
+    ) -> None:
+        self.function_call = function_call
+        self.message = message
+
+
+def get_openai_completion(
+    functions, messages, session_id: str, is_streaming: bool, num_calls: int
+):
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-    return client.chat.completions.create(
-        model="gpt-3.5-turbo-16k",
+    completion = client.chat.completions.create(
+        model=CHAT_MODELS.gpt_3_5_turbo_16k,
         functions=functions,
         function_call="auto",  # "auto" means the model can pick between generating a message or calling a function.
         temperature=0,
         messages=messages,
+        stream=True,
     )
+    complete_content = ""
+    for chunk in completion:
+        if chunk.choices[0].delta.function_call:
+            emit(
+                f"{session_id}_info",
+                f"Selected action: {chunk.choices[0].delta.function_call}",
+            )
+            return StreamingCompletionResponse(
+                function_call=chunk.choices[0].delta.function_call,
+                message=None,
+            )
+        elif chunk.choices[0].delta.content:
+            complete_content += chunk.choices[0].delta.content
+            if num_calls > 0:
+                emit(
+                    session_id, chunk.choices[0].delta.content
+                ) if is_streaming else None
+
+            else:
+                emit(f"{session_id}_info", "Informational query found...")
+
+    return StreamingCompletionResponse(function_call=None, message=complete_content)
 
 
-def convert_top_documents_to_functions(top_documents: Dict[str, List[DocumentSimilarityDTO]]):
+def convert_top_documents_to_functions(
+    top_documents: Dict[str, List[DocumentSimilarityDTO]]
+):
     actions = top_documents.get(VectorCollections.actions)
+    if not actions:
+        return None
+
     if len(actions) == 0:
         return False
 
@@ -125,7 +205,9 @@ def convert_single_action_to_function(action: DocumentSimilarityDTO):
     return {
         "name": operation_id,
         "description": description,
-        "parameters": extract_parameters_schema_from_openapi_payload(openapi_payload_schema)
+        "parameters": extract_parameters_schema_from_openapi_payload(
+            openapi_payload_schema or {}
+        ),
     }
 
 
@@ -144,9 +226,7 @@ def extract_parameters_schema_from_openapi_payload(payload: dict):
     params = payload.get("parameters", [])
     if params:
         param_properties = {
-            param["name"]: param["schema"]
-            for param in params
-            if "schema" in param
+            param["name"]: param["schema"] for param in params if "schema" in param
         }
         schema["properties"]["parameters"] = {
             "type": "object",
@@ -156,12 +236,39 @@ def extract_parameters_schema_from_openapi_payload(payload: dict):
     return schema
 
 
-def execute_single_action_call(operation_id, bot_id, args):
-    action = find_action_by_method_id_and_bot_id(operation_id=operation_id, bot_id=bot_id)
+def get_defined_params(input_str: str):
+    if input_str == "":
+        return {}
+    # Parse the input string as JSON
+    data = json.loads(input_str)
 
-    response = make_api_request(method=action.request_type, endpoint=action.api_endpoint, body_schema={},
-                                path_params={},
-                                query_params={}, headers={})
+    # Extract the parameters sub-dictionary
+    params = data.get("parameters")
+
+    # Filter out any undefined values (i.e., None or empty strings)
+    filtered_params = {k: v for k, v in params.items() if v is not None and v != ""}
+
+    return filtered_params
+
+
+def execute_single_action_call(operation_id: str, bot_id: str, args: Optional[str]):
+    action = find_action_by_method_id_and_bot_id(
+        operation_id=operation_id, bot_id=bot_id
+    )
+
+    if not action:
+        return
+
+    parsed_args = get_defined_params(args)
+
+    response = make_api_request(
+        method=str(action.request_type),
+        endpoint=str(action.api_endpoint),
+        body_schema={},
+        path_params=parsed_args,
+        query_params=parsed_args,
+        headers={},
+    )
 
     return response.text
 
@@ -187,4 +294,3 @@ def camel_case_to_normal_with_capital(input_str):
 
     # Capitalize the first letter of the result and return it
     return result.capitalize()
-

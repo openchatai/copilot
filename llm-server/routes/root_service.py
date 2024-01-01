@@ -45,13 +45,13 @@ chat = get_chat_model()
 
 
 async def handle_request(
-        text: str,
-        session_id: str,
-        base_prompt: str,
-        bot_id: str,
-        headers: Dict[str, str],
-        app: Optional[str],
-        is_streaming: bool,
+    text: str,
+    session_id: str,
+    base_prompt: str,
+    bot_id: str,
+    headers: Dict[str, str],
+    app: Optional[str],
+    is_streaming: bool,
 ) -> ResponseDict:
     # Dict
     response: ResponseDict = {
@@ -80,7 +80,8 @@ async def handle_request(
         session_id=session_id,
         chat_history=conversations_history,
         top_documents=top_documents,
-        bot_id=bot_id
+        bot_id=bot_id,
+        is_streaming=is_streaming,
     )
 
     logger.info(actioning_response)
@@ -115,13 +116,13 @@ def check_required_fields(base_prompt: str, text: str) -> None:
 # @Todo: This can be improved, using dense and sparse matrix similarity or by using addition llm call
 # ref: https://qdrant.tech/articles/sparse-vectors/?utm_source=linkedin&utm_medium=social&utm_campaign=sparse-vectors&utm_content=article
 async def run_actionable_item(
-        actionable_item: dict[str, List[DocumentSimilarityDTO]],
-        text: str,
-        headers: Dict[str, str],
-        app: Optional[str],
-        bot_id: str,
-        session_id: str,
-        is_streaming: bool,
+    actionable_item: dict[str, List[DocumentSimilarityDTO]],
+    text: str,
+    headers: Dict[str, str],
+    app: Optional[str],
+    bot_id: str,
+    session_id: str,
+    is_streaming: bool,
 ) -> ResponseDict:
     output: ResponseDict = {
         "error": "",
@@ -134,10 +135,13 @@ async def run_actionable_item(
     _flow = None
     if actionable_item.get(VectorCollections.actions) and actions is not None:
         action = actions[0]
-        operation_id = cast(str, action.document.metadata.get(
-            "operation_id"))  # this variable now holds Qdrant vector document, which is the Action metadata
+        operation_id = cast(
+            str, action.document.metadata.get("operation_id")
+        )  # this variable now holds Qdrant vector document, which is the Action metadata
 
-        _flow = create_flow_from_operation_ids(operation_ids=[operation_id], bot_id=bot_id)
+        _flow = create_flow_from_operation_ids(
+            operation_ids=[operation_id], bot_id=bot_id
+        )
     elif flows is not None:
         flow_with_relevance_score = flows[0]
         flow = (
@@ -171,12 +175,12 @@ async def run_actionable_item(
 
 
 def run_informative_item(
-        informative_item: dict[str, List[DocumentSimilarityDTO]],
-        base_prompt: str,
-        text: str,
-        conversations_history: List[BaseMessage],
-        is_streaming: bool,
-        session_id: str,
+    informative_item: dict[str, List[DocumentSimilarityDTO]],
+    base_prompt: str,
+    text: str,
+    conversations_history: List[BaseMessage],
+    is_streaming: bool,
+    session_id: str,
 ) -> ResponseDict:
     # so we got all context, let's ask:
 
@@ -211,9 +215,7 @@ def run_informative_item(
         )
     )
 
-    emit(
-        f"{session_id}_info", "Almost there...\n"
-    ) if is_streaming else None
+    emit(f"{session_id}_info", "Almost there...\n") if is_streaming else None
     messages.append(HumanMessage(content=text))
 
     # convert to astream
