@@ -15,6 +15,7 @@ from flask_socketio import emit
 
 from openai.types.chat.chat_completion_message import ChatCompletionMessage
 from openai.types.chat.chat_completion_chunk import ChoiceDeltaFunctionCall
+from utils.chat_models import CHAT_MODELS
 
 logger = CustomLogger(module_name=__name__)
 chat = get_chat_model()
@@ -60,7 +61,7 @@ def process_user_instruction(
 ):
     SYSTEM_MESSAGE = """
     You are a helpful assistant.
-    Respond to the following prompt by using function_call if the user message REQUIRES that, other than that just respond by text formatted as markdown. If all api's have been called and user has been answered, you should output |im_end|
+    Respond to the following prompt by using function_call if the user message REQUIRES that, other than that just respond by text formatted as markdown. You must first try to make all function_call before responding. Don't call the same function_call twice. Once all the necessary function calls have been made, respond with |im_end|.
     """
 
     num_calls = 0
@@ -76,8 +77,10 @@ def process_user_instruction(
     while num_calls < 5:
         try:
             completion_response = get_openai_completion(
-                functions, messages, session_id, is_streaming
+                functions, messages, session_id, is_streaming, num_calls
             )
+            if completion_response.function_call is None and num_calls == 0:
+                raise Exception("This user input doesn't require any actions")
 
             if (
                 completion_response.function_call
@@ -96,6 +99,10 @@ def process_user_instruction(
                 )
 
                 if action_response:
+                    emit(
+                        f"{session_id}_info",
+                        f"Collected data from {camel_case_to_normal_with_capital(completion_response.function_call.name)} ... \n",
+                    )
                     messages.append(
                         {
                             "role": "function",
@@ -136,10 +143,12 @@ class StreamingCompletionResponse:
         self.message = message
 
 
-def get_openai_completion(functions, messages, session_id: str, is_streaming: bool):
+def get_openai_completion(
+    functions, messages, session_id: str, is_streaming: bool, num_calls: int
+):
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     completion = client.chat.completions.create(
-        model="gpt-4-1106-preview",
+        model=CHAT_MODELS.gpt_4_1106_preview,
         functions=functions,
         function_call="auto",  # "auto" means the model can pick between generating a message or calling a function.
         temperature=0,
@@ -157,10 +166,15 @@ def get_openai_completion(functions, messages, session_id: str, is_streaming: bo
                 function_call=chunk.choices[0].delta.function_call,
                 message=None,
             )
-
         elif chunk.choices[0].delta.content:
             complete_content += chunk.choices[0].delta.content
-            emit(session_id, chunk.choices[0].delta.content) if is_streaming else None
+            if num_calls > 0:
+                emit(
+                    session_id, chunk.choices[0].delta.content
+                ) if is_streaming else None
+
+            else:
+                emit(f"{session_id}_info", "Informational query found...")
 
     return StreamingCompletionResponse(function_call=None, message=complete_content)
 
