@@ -111,7 +111,7 @@ You are a helpful assistant. Respond to the user prompt below by using function_
                     }
                 )
             elif completion_response.message is not None:
-                return completion_response.message
+                raise Exception("Actions completed!!!")
 
             num_calls += 1
         except Exception as e:
