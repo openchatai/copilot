@@ -61,7 +61,7 @@ def process_user_instruction(
 ):
     SYSTEM_MESSAGE = """
     You are a helpful assistant.
-    Respond to the following prompt by using function_call if the user message REQUIRES that, other than that just respond by text formatted as markdown. You must first try to make all function_call before responding. Don't call the same function_call twice. Once all the necessary function calls have been made, respond with |im_end|.
+    Respond to the user's requests by calling functions if necessary. Check if a function has already been called before calling it again. Once you have gathered the necessary information, respond helpfully to the user in markdown formatting and append |im_end| at the end.
     """
 
     num_calls = 0
@@ -148,7 +148,7 @@ def get_openai_completion(
 ):
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     completion = client.chat.completions.create(
-        model=CHAT_MODELS.gpt_4_1106_preview,
+        model=CHAT_MODELS.gpt_3_5_turbo_16k,
         functions=functions,
         function_call="auto",  # "auto" means the model can pick between generating a message or calling a function.
         temperature=0,
