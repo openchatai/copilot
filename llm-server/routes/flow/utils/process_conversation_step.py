@@ -60,7 +60,7 @@ def process_user_instruction(
 ):
     SYSTEM_MESSAGE = """
     You are a helpful assistant.
-    Respond to the following prompt by using function_call if the user message REQUIRES that, other than that just respond by text formatted as markdown
+    Respond to the following prompt by using function_call if the user message REQUIRES that, other than that just respond by text formatted as markdown. If all api's have been called and user has been answered, you should output |im_end|
     """
 
     num_calls = 0
@@ -105,14 +105,15 @@ def process_user_instruction(
                     )
                 else:
                     raise Exception("The function call didn't succeed")
-
+            elif (
+                completion_response.message is not None
+                and "im_end" in completion_response.message
+            ):
+                raise Exception("All actions completed...")
             elif completion_response.message is not None:
                 messages.append(
                     {"content": completion_response.message, "role": "assistant"}
                 )
-
-                # raise Exception("No more actions...")
-
             num_calls += 1
         except Exception as e:
             logger.error("Failed to call function", error=e)
@@ -138,7 +139,7 @@ class StreamingCompletionResponse:
 def get_openai_completion(functions, messages, session_id: str, is_streaming: bool):
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     completion = client.chat.completions.create(
-        model="gpt-3.5-turbo-16k",
+        model="gpt-4-1106-preview",
         functions=functions,
         function_call="auto",  # "auto" means the model can pick between generating a message or calling a function.
         temperature=0,
