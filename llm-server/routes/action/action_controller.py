@@ -43,9 +43,7 @@ def import_actions_from_swagger_file(chatbot_id):
         # Parse Swagger file
         try:
             swagger_parser = SwaggerParser(swagger_content)
-            swagger_summary = swagger_parser.summarize_swagger()
-
-            logger.debug("swagger_summary", swagger_summary=swagger_summary)
+            swagger_parser.ingest_swagger_summary(chatbot_id)
             actions = swagger_parser.get_all_actions(chatbot_id)
         except Exception as e:
             logger.error("Failed to parse Swagger file", error=e)

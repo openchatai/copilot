@@ -9,6 +9,9 @@ from langchain.schema import HumanMessage, SystemMessage
 from shared.utils.opencopilot_utils.init_vector_store import init_vector_store
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from shared.utils.opencopilot_utils.interfaces import StoreOptions
+from utils.get_logger import CustomLogger
+
+logger = CustomLogger(__name__)
 
 
 class Endpoint:
@@ -262,30 +265,41 @@ class SwaggerParser:
 
         return metadata
 
-    def summarize_swagger(self) -> None:
+    def ingest_swagger_summary(self, bot_id: str) -> None:
         """
         Summarizes Swagger metadata by gathering essential information from each endpoint definition and concatenating them into one string.
         Returns the summary as a single string suitable for inputting into a large language model.
         """
         metadata = self.gather_metadata(self.swagger_data)
         response = ""
-        for host, endpoints in metadata.items():
-            for endpoint, meta in endpoints.items():
-                response += f"\nSummary: {meta['summary']}\nDescription: {meta['description']}\nTags: {meta['tags']}\n\nPath: {endpoint}\nHost: {host}"
 
-        chat = get_chat_model()
-        messages = [
-            SystemMessage(
-                content="You are an assistant that can take some text and generate a correct summary of capabilities of a bot that is equipped with these api endpoints. Summarize in less than 500 words. The summary should begin with - As an ai assistant i have the following capabilities"
-            ),
-            HumanMessage(content=f"Summary: {response}"),
-        ]
+        try:
+            for host, endpoints in metadata.items():
+                for endpoint, meta in endpoints.items():
+                    response += f"\nSummary: {meta['summary']}\nDescription: {meta['description']}\nTags: {meta['tags']}\n\nPath: {endpoint}\nHost: {host}"
 
-        summary = cast(str, chat(messages).content)
+            chat = get_chat_model()
+            messages = [
+                SystemMessage(
+                    content="You are an assistant that can take some text and generate a correct summary of capabilities of a bot that is equipped with these api endpoints. The summary should begin with - As an ai assistant i have the following capabilities. Keep the summary concise, try to summarize in 3 sentences or less"
+                ),
+                HumanMessage(content=f"Summary: {response}"),
+            ]
 
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000, chunk_overlap=200, length_function=len
-        )
+            summary = cast(str, chat(messages).content)
 
-        docs = text_splitter.create_documents([summary])
-        init_vector_store(docs=docs, options=StoreOptions(namespace="knowledgebase"))
+            text_splitter = RecursiveCharacterTextSplitter(
+                chunk_size=1000, chunk_overlap=200, length_function=len
+            )
+
+            docs = text_splitter.create_documents([summary])
+            init_vector_store(
+                docs=docs,
+                options=StoreOptions(
+                    namespace="knowledgebase", metadata={"bot_id": bot_id}
+                ),
+            )
+
+        except Exception as error:
+            # report the issue without crashing
+            logger.warn("swagger_parsing_failed", error=error)
