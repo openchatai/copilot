@@ -85,6 +85,7 @@ def process_swagger_file(chatbot: Chatbot):
             f_content = f.read()
 
         swagger_parser = SwaggerParser(f_content)
+        swagger_parser.ingest_swagger_summary(bot_id)
         actions = swagger_parser.get_all_actions(bot_id=bot_id)
         num_actions = len(actions)
 

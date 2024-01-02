@@ -2,6 +2,16 @@ from entities.action_entity import ActionDTO
 import json
 from typing import List
 from urllib.parse import urlparse
+from collections import defaultdict
+from typing import DefaultDict, Dict, Any, cast
+from utils.get_chat_model import get_chat_model
+from langchain.schema import HumanMessage, SystemMessage
+from shared.utils.opencopilot_utils.init_vector_store import init_vector_store
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from shared.utils.opencopilot_utils.interfaces import StoreOptions
+from utils.get_logger import CustomLogger
+
+logger = CustomLogger(__name__)
 
 
 class Endpoint:
@@ -223,3 +233,77 @@ class SwaggerParser:
                 actions.append(action_dto)
 
         return actions
+
+    def gather_metadata(self, api_data: dict) -> DefaultDict[str, Dict[str, str]]:
+        """
+        Gathers metadata such as summary, description, and tags from each API definition in the Swagger document.
+        Returns the extracted metadata stored in a nested dictionary format using the combination of <host>:<http_verb><relative_path> as keys.
+        """
+        metadata: DefaultDict[str, Dict[str, str]] = defaultdict(dict)
+
+        try:
+            url = api_data["servers"][0]["url"]
+        except IndexError:
+            raise ValueError("No valid server specified.")
+        except KeyError:
+            raise ValueError("Missing 'servers' field or invalid schema.")
+
+        relative_paths: DefaultDict[str, Dict[str, Any]] = defaultdict(dict)
+
+        for path, path_item in api_data["paths"].items():
+            for http_verb, http_details in path_item.items():
+                summary = http_details.get("summary") or ""
+                description = http_details.get("description") or ""
+                # inconsistent tag behaviour..
+                # tags = (
+                #     ", ".join([t["name"] for t in http_details.get("tags", [])])
+                #     if http_details.get("tags", [])
+                #     else ""
+                # )
+                key = f"{path}"
+                relative_paths[key]["summary"] = summary
+                relative_paths[key]["description"] = description
+                # relative_paths[key]["tags"] = tags
+
+        for key, value in relative_paths.items():
+            metadata[url].update({key: value})
+
+        return metadata
+
+    def ingest_swagger_summary(self, bot_id: str) -> None:
+        """
+        Summarizes Swagger metadata by gathering essential information from each endpoint definition and concatenating them into one string.
+        Returns the summary as a single string suitable for inputting into a large language model.
+        """
+        metadata = self.gather_metadata(self.swagger_data)
+        response = ""
+
+        try:
+            for host, endpoints in metadata.items():
+                for endpoint, meta in endpoints.items():
+                    response += f"\nSummary: {meta['summary']}\nDescription: {meta['description']}\n\nPath: {endpoint}\nHost: {host}"
+
+            chat = get_chat_model()
+            messages = [
+                SystemMessage(
+                    content="You are an assistant that can take some text and generate a correct summary of capabilities of a bot that is equipped with these api endpoints. The summary should begin with - As an ai assistant i have the following capabilities. Keep the summary concise, try to summarize in 3 sentences or less"
+                ),
+                HumanMessage(content=f"Summary: {response}"),
+            ]
+
+            summary = cast(str, chat(messages).content)
+
+            text_splitter = RecursiveCharacterTextSplitter(
+                chunk_size=1000, chunk_overlap=200, length_function=len
+            )
+
+            docs = text_splitter.create_documents([summary])
+            init_vector_store(
+                docs=docs,
+                options=StoreOptions(
+                    namespace="knowledgebase", metadata={"bot_id": bot_id}
+                ),
+            )
+
+        except Exception as error:
+            logger.error("swagger_parsing_failed", error=error)
