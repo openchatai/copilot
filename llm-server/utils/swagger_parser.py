@@ -254,11 +254,16 @@ class SwaggerParser:
             for http_verb, http_details in path_item.items():
                 summary = http_details.get("summary") or ""
                 description = http_details.get("description") or ""
-                tags = ", ".join([t["name"] for t in http_details.get("tags", [])])
+                # inconsistent tag behaviour..
+                # tags = (
+                #     ", ".join([t["name"] for t in http_details.get("tags", [])])
+                #     if http_details.get("tags", [])
+                #     else ""
+                # )
                 key = f"{path}"
                 relative_paths[key]["summary"] = summary
                 relative_paths[key]["description"] = description
-                relative_paths[key]["tags"] = tags
+                # relative_paths[key]["tags"] = tags
 
         for key, value in relative_paths.items():
             metadata[url].update({key: value})
@@ -276,7 +281,7 @@ class SwaggerParser:
         try:
             for host, endpoints in metadata.items():
                 for endpoint, meta in endpoints.items():
-                    response += f"\nSummary: {meta['summary']}\nDescription: {meta['description']}\nTags: {meta['tags']}\n\nPath: {endpoint}\nHost: {host}"
+                    response += f"\nSummary: {meta['summary']}\nDescription: {meta['description']}\n\nPath: {endpoint}\nHost: {host}"
 
             chat = get_chat_model()
             messages = [
@@ -301,5 +306,4 @@ class SwaggerParser:
             )
 
         except Exception as error:
-            # report the issue without crashing
-            logger.warn("swagger_parsing_failed", error=error)
+            logger.error("swagger_parsing_failed", error=error)
