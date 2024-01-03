@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from .get_declarative_base import Base
 from .database_setup import engine
-from .chatbot import Chatbot
 
 
+# Analytics.increment_counter(session, chatbot_id, "functions")
 class Analytics(Base):
     __tablename__ = "analytics"
 

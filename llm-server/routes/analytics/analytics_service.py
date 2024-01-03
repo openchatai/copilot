@@ -40,3 +40,18 @@ def delete_analytics(chatbot_id):
     except Exception as e:
         print(f"Encountered unexpected error while deleting analytics entry: {str(e)}")
         session.rollback()
+
+def get_analytics_by_chatbot_id(chatbot_id):
+    """Get analytics data by chatbot ID."""
+    result = session.query(Analytics).filter_by(chatbot_id=chatbot_id).first()
+    if result is None:
+        return {}
+    else:
+        return {
+            "chatbot_id": result.chatbot_id,
+            "knowledgebase": result.knowledgebase,
+            "actions": result.actions,
+            "functions": result.functions,
+            "ref_id": result.ref_id,
+        }
+
