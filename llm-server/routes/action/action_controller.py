@@ -5,7 +5,7 @@ from entities.action_entity import ActionDTO
 from models.repository.action_repo import (
     list_all_actions,
     action_to_dict,
-    create_action,
+    create_actions,
     find_action_by_id,
 )
 from routes.action import action_vector_service
@@ -59,14 +59,11 @@ def import_actions_from_swagger_file(chatbot_id):
 
         is_error = False
         # Store actions in the database
-        for action_data in actions:
-            try:
-                create_action(chatbot_id, action_data)
-                action_vector_service.create_action(action_data)
-            except Exception as e:
-                logger.error(str(e), failed_action=action_data)
-                isError = True
-                continue
+        try:
+            create_actions(chatbot_id, actions)
+            action_vector_service.create_actions(actions)
+        except Exception as e:
+            logger.error(str(e), message="Something failed while parsing swagger file")
 
         return (
             jsonify(
