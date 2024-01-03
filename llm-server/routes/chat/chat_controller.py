@@ -11,7 +11,6 @@ from models.repository.chat_history_repo import (
     create_chat_history,
 )
 from models.repository.copilot_repo import find_one_or_fail_by_token
-from routes.analytics.analytics_service import upsert_analytics_record
 from routes.chat.chat_dto import ChatInput
 from routes.chat.implementation.chain_strategy import ChainStrategy
 from routes.chat.implementation.functions_strategy import FunctionStrategy
@@ -182,9 +181,9 @@ async def handle_chat_send_common(
         )
 
         if response_data["response"]:
-            upsert_analytics_record(
-                chatbot_id=str(bot.id), successful_operations=1, total_operations=1
-            )
+            # upsert_analytics_record(
+            #     chatbot_id=str(bot.id), successful_operations=1, total_operations=1
+            # )
             create_chat_history(str(bot.id), session_id, True, message)
             create_chat_history(
                 chatbot_id=str(bot.id),
@@ -193,12 +192,13 @@ async def handle_chat_send_common(
                 message=response_data["response"] or response_data["error"] or "",
             )
         elif response_data["error"]:
-            upsert_analytics_record(
-                chatbot_id=str(bot.id),
-                successful_operations=0,
-                total_operations=1,
-                logs=response_data["error"],
-            )
+            pass
+            # upsert_analytics_record(
+            #     chatbot_id=str(bot.id),
+            #     successful_operations=0,
+            #     total_operations=1,
+            #     logs=response_data["error"],
+            # )
 
         emit(session_id, "|im_end|") if is_streaming else None
         return jsonify(
