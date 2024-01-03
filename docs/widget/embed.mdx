@@ -31,6 +31,7 @@ there are several ways you can integrate the Copilot Chat widget into your appli
    <script>
      const options = {
         apiUrl: "https://yourdomain.com/api" // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:5000/api
+        socketUrl: "https://yourdomain.com/socket" 
         initialMessages: "How are the things", // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
         token: "your_copilot_token_goes_here", // you can get your token from the dashboard
         triggerSelector: "#triggerSelector", // the selector of the element that will trigger the copilot when clicked
@@ -85,17 +86,30 @@ import { CopilotWidget,Root } from "@openchatai/copilot-widget"; // import the c
 import '@openchatai/copilot-widget/index.css' // the required styles
 const options = {
   apiUrl: "https://yourdomain.com/api" // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:5000/api
-  initialMessages: ["How are the things"], // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
+  socketUrl: "https://yourdomain.com/socket", // the url of the socket url that will be used to send and receive messages
+  initialMessage: "How are the things", // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
   token: "your_copilot_token_goes_here", // you can get your token from the dashboard
+  defaultOpen: true,
   headers: {
     // optional: you can pass your authentication tokens to the copilot or any other header you want to send with every request
     Authorization: "Bearer your_auth_token_goes_here",
     AnyKey: "AnyValue"
   },
 }
+const containerProps = {
+  // optional: you can pass any props to the container div
+  className: "your-custom-class-name",
+  style: {
+      position: "fixed",
+      height: "100%",
+      bottom: "0",
+      right: "0",
+      width: "400px",
+    },
+}
 function Widget(){
   return (
-    <Root options={options}>
+    <Root containerProps={containerProps} options={options}>
     <CopilotWidget triggerSelector='#copilot-trigger' />
     </Root>
   )
@@ -114,6 +128,7 @@ function Widget(){
 | `apiUrl`          | the url of the copilot api.                                                                               | `string`                |
 | `headers`         | An object of headers that will be sent with every request (can be used to authenticate your api requests) | `Record<string,string>` |
 | `containerProps`  | An object of props that will be passed to the container div                                               | `Record<string,string>` |
+| `socketUrl`       | The url of the socket url that will be used to send and receive messages                               | `string`                |
 ## FAQ
 
 <AccordionGroup>
