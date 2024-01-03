@@ -14,6 +14,7 @@ class ChatHistory(Base):
     session_id = Column(String(255), nullable=True)
     from_user = Column(Boolean, default=False)
     message = Column(String(8192))
+    liked = Column(String(10))  # Added field for liked/disliked/no response
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(
         DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
