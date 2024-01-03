@@ -7,19 +7,31 @@ from .chatbot import Chatbot
 class Analytics(Base):
     __tablename__ = "analytics"
 
-    chatbot_id = Column(String(36), primary_key=True)
-    actions = Column(Integer)
-    knowledgebase = Column(Integer)
-    functions = Column(Integer)
-
-    # some key to identify the user
+    id = Column(Integer, primary_key=True)
+    chatbot_id = Column(String(36))
+    knowledgebase = Column(Integer, default=0)
+    actions = Column(Integer, default=0)
+    functions = Column(Integer, default=0)
     ref_id = Column(Integer)
 
-    def __init__(self, chatbot_id, knowlegebase, actions, functions):
-        self.chatbot_id = chatbot_id
-        self.actions = actions
-        self.knowledgebase = knowlegebase
-        self.functions = functions
+    @staticmethod
+    def increment_counter(session, chatbot_id, counter_type):
+        """Increment the specified counter type ('knowledgebase', 'actions', or 'functions') for the given chatbot_id."""
+        try:
+            query = (
+                session.query(Analytics).filter_by(chatbot_id=chatbot_id).one_or_none()
+            )
+
+            if not query:
+                query = Analytics(chatbot_id=chatbot_id)
+
+            setattr(query, counter_type, getattr(query, counter_type) + 1)
+            session.merge(query)
+            session.commit()
+
+        except Exception as e:
+            print(f"Encountered exception while incrementing counter: {str(e)}")
+            session.rollback()
 
 
 Base.metadata.create_all(engine)

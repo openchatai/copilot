@@ -2,32 +2,41 @@ from sqlalchemy.orm import sessionmaker
 
 from shared.models.opencopilot_db import engine
 from shared.models.opencopilot_db.analytics import Analytics
+from sqlalchemy.exc import IntegrityError
+
+Session = sessionmaker(bind=engine)
+session = Session()
 
 
-def upsert_analytics_record(chatbot_id: str, successful_operations: int, total_operations: int, logs: str = ""):
-    Session = sessionmaker(bind=engine)
-    session = Session()
+def initialize_analytics(chatbot_id, ref_id):
+    """Initialize the analytics entry for a chatbot with initial values."""
+    try:
+        new_entry = Analytics(chatbot_id=chatbot_id, ref_id=ref_id)
+        session.add(new_entry)
+        session.commit()
 
-    # Fetch the existing record, if any
-    existing_record = session.query(Analytics).filter_by(chatbot_id=chatbot_id).first()
+    except IntegrityError as e:
+        print(f"Encountered integrity error while creating analytics entry: {str(e)}")
+        session.rollback()
 
-    if existing_record:
-        # Increment existing values
-        existing_record.successful_operations += successful_operations
-        existing_record.total_operations += total_operations
-        if logs:
-            existing_record.logs = logs
-        print("Analytics record updated for chatbot_id:", chatbot_id)
-    else:
-        # Create a new record
-        record_to_upsert = Analytics(
-            chatbot_id=chatbot_id,
-            successful_operations=successful_operations,
-            total_operations=total_operations,
-            logs=logs
-        )
-        session.add(record_to_upsert)
-        print("Analytics record inserted for chatbot_id:", chatbot_id)
+    except Exception as e:
+        print(f"Encountered unexpected error while creating analytics entry: {str(e)}")
+        session.rollback()
 
-    session.commit()
-    session.close()
+
+def delete_analytics(chatbot_id):
+    """Remove analytics data from the database for the given chatbot_id."""
+    try:
+        query = session.query(Analytics).filter_by(chatbot_id=chatbot_id).one_or_none()
+
+        if query:
+            session.delete(query)
+            session.commit()
+
+    except IntegrityError as e:
+        print(f"Encountered integrity error while deleting analytics entry: {str(e)}")
+        session.rollback()
+
+    except Exception as e:
+        print(f"Encountered unexpected error while deleting analytics entry: {str(e)}")
+        session.rollback()
