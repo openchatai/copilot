@@ -38,7 +38,9 @@ def convert_json_to_text(
         HumanMessage(content="Now present the response in a non-tech way:"),
     ]
 
-    result = stream_messages(system_message, messages, is_streaming, session_id)
+    result = stream_messages(
+        system_message, messages, is_streaming, session_id, "convert_json_to_text"
+    )
 
     return cast(str, result)
 
@@ -56,7 +58,9 @@ def convert_json_error_to_text(error: str, is_streaming: bool, session_id: str) 
         )
     )
 
-    result = stream_messages(system_message, messages, is_streaming, session_id)
+    result = stream_messages(
+        system_message, messages, is_streaming, session_id, "convert_json_error_to_text"
+    )
 
     return cast(str, result)
 
@@ -66,6 +70,7 @@ def stream_messages(
     messages: List[HumanMessage],
     is_streaming: bool,
     session_id: str,
+    tag: str,
 ) -> str:
     chat = get_chat_model()
 
