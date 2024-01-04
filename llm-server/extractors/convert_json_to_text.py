@@ -49,7 +49,11 @@ def convert_json_error_to_text(
 ) -> str:
     # Construct a system message prompting the AI to explain the error in a non-technical way
     system_message = SystemMessage(
-        content="I am here to help you understand an error returned by an API. Based on the provided error message and any additional information, please provide a clear explanation of what went wrong, without using technical jargon or referring to APIs or JSON. Speak as if you were explaining the issue to someone who has no experience with programming. Recommend steps to be take n to navigate the issue."
+        content="""I am here to help you understand an error returned by an API.
+Based on the provided error message and any additional information, please provide a clear explanation of what went wrong, without using technical jargon or referring to APIs or JSON.
+
+Prevent any sensitive data from leaking.
+Speak as if you were explaining the issue to someone who has no experience with programming. Recommend steps to be taken to navigate the issue."""
     )
 
     messages: List[HumanMessage] = []
