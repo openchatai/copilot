@@ -6,7 +6,10 @@ from openai import InvalidRequestError
 from werkzeug.datastructures import Headers
 from requests.exceptions import MissingSchema
 from entities.flow_entity import FlowDTO
-from extractors.convert_json_to_text import convert_json_to_text
+from extractors.convert_json_to_text import (
+    convert_json_error_to_text,
+    convert_json_to_text,
+)
 from integrations.load_json_config import load_json_config
 from integrations.transformers.transformer import transform_response
 from routes.flow.api_info import ApiInfo
@@ -91,8 +94,10 @@ async def run_actions(
                     error=str(e),
                 )
 
-                emit(session_id, str(e)) if is_streaming else None
-                return str(e)
+                formatted_error = convert_json_error_to_text(
+                    str(e), is_streaming, session_id
+                )
+                return str(formatted_error)
 
         try:
             return convert_json_to_text(

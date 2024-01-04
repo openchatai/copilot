@@ -43,7 +43,7 @@ def convert_json_to_text(
 
 
 def convert_json_error_to_text(
-    error_dict: Dict[str, Union[str, dict]],
+    error: str,
     is_streaming: bool,
     session_id: str,
 ) -> str:
@@ -57,11 +57,7 @@ Speak as if you were explaining the issue to someone who has no experience with 
     )
 
     messages: List[HumanMessage] = []
-    messages.append(
-        HumanMessage(
-            content=f"The following error occurred: \n\n{json.dumps(error_dict, indent=2)}"
-        )
-    )
+    messages.append(HumanMessage(content=f"The following error occurred: \n\n{error}"))
 
     # Call the streaming function to generate a human-friendly explanation of the error
     result = stream_messages(system_message, messages, is_streaming, session_id)
