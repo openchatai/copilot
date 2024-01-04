@@ -7,6 +7,7 @@ from langchain.schema import HumanMessage, SystemMessage, BaseMessage
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
 from flask_socketio import emit
+from entities.action_entity import ActionDTO
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 logger = CustomLogger(module_name=__name__)
@@ -42,24 +43,19 @@ def convert_json_to_text(
     return cast(str, result)
 
 
-def convert_json_error_to_text(
-    error: str,
-    is_streaming: bool,
-    session_id: str,
-) -> str:
-    # Construct a system message prompting the AI to explain the error in a non-technical way
+def convert_json_error_to_text(error: str, is_streaming: bool, session_id: str) -> str:
+    # Define a system message requesting the LLM to explain the API error in user-friendly language
     system_message = SystemMessage(
-        content="""I am here to help you understand an error returned by an API.
-Based on the provided error message and any additional information, please provide a clear explanation of what went wrong, without using technical jargon or referring to APIs or JSON.
-
-Prevent any sensitive data from leaking.
-Speak as if you were explaining the issue to someone who has no experience with programming. Recommend steps to be taken to navigate the issue."""
+        content="""As an ai chat assistant, your job is to help the user understand and resolve API error messages. When offering solutions, You will clarify without going into unnecessary detail. You must respond in less than 100 words. You should commence by saying "An error occured while trying to process your request ..." """
     )
 
     messages: List[HumanMessage] = []
-    messages.append(HumanMessage(content=f"The following error occurred: \n\n{error}"))
+    messages.append(
+        HumanMessage(
+            content=f"The following error occurred while processing your request:\n\n{error}"
+        )
+    )
 
-    # Call the streaming function to generate a human-friendly explanation of the error
     result = stream_messages(system_message, messages, is_streaming, session_id)
 
     return cast(str, result)
