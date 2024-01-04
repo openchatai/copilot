@@ -37,6 +37,7 @@ class ChainStrategy(ChatRequestHandler):
         response: ResponseDict = {
             "error": "",
             "response": "Something went wrong, please try again!",
+            "source": set(),
         }
         check_required_fields(base_prompt, text)
 
@@ -92,6 +93,8 @@ class ChainStrategy(ChatRequestHandler):
                 is_streaming=is_streaming,
                 session_id=session_id,
             )
+
+            response["source"].add("chain")
             return response
         else:
             # it means that the user query is "informative" and can be answered using text only
@@ -107,4 +110,5 @@ class ChainStrategy(ChatRequestHandler):
                 is_streaming=is_streaming,
                 session_id=session_id,
             )
+            response["source"].add("knowledgebase")
             return response

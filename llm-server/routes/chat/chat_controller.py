@@ -6,6 +6,7 @@ from flask import jsonify, Blueprint, request, Response, abort, Request
 from custom_types.response_dict import ResponseDict
 
 from models.repository.chat_history_repo import (
+    create_chat_histories,
     get_all_chat_history_by_session_id,
     get_unique_sessions_with_first_message_by_bot_id,
     create_chat_history,
@@ -16,11 +17,11 @@ from routes.chat.implementation.chain_strategy import ChainStrategy
 from routes.chat.implementation.functions_strategy import FunctionStrategy
 from routes.chat.implementation.handler_interface import ChatRequestHandler
 from routes.chat.implementation.tools_strategy import ToolStrategy
+from shared.models.opencopilot_db.analytics import Analytics
 from utils.db import NoSQLDatabase
 from utils.get_logger import CustomLogger
-from utils.llm_consts import X_App_Name, chat_strategy, ChatStrategy
+from utils.llm_consts import X_App_Name, chat_strategy
 from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
-from .. import root_service
 from flask_socketio import emit
 
 db_instance = NoSQLDatabase()
@@ -164,11 +165,11 @@ async def handle_chat_send_common(
         base_prompt = bot.prompt_message
 
         strategy: ChatRequestHandler = ChainStrategy()
-        if chat_strategy == ChatStrategy.function:
+        if chat_strategy == "function":
             strategy = FunctionStrategy()
 
-        elif chat_strategy == ChatStrategy.tool:
-            strategy = ToolStrategy()
+        elif chat_strategy == "chain":
+            strategy = ChainStrategy()
 
         response_data = await strategy.handle_request(
             message,
@@ -181,16 +182,23 @@ async def handle_chat_send_common(
         )
 
         if response_data["response"]:
-            # upsert_analytics_record(
-            #     chatbot_id=str(bot.id), successful_operations=1, total_operations=1
-            # )
-            create_chat_history(str(bot.id), session_id, True, message)
-            create_chat_history(
-                chatbot_id=str(bot.id),
-                session_id=session_id,
-                from_user=False,
-                message=response_data["response"] or response_data["error"] or "",
-            )
+            chat_records = [
+                {
+                    "session_id": session_id,
+                    "from_user": True,
+                    "message": message,
+                },
+                {
+                    "session_id": session_id,
+                    "from_user": False,
+                    "message": response_data["response"]
+                    or response_data["error"]
+                    or "",
+                },
+            ]
+
+            create_chat_histories(str(bot.id), chat_records)
+            Analytics.increment_counter(str(bot.id), response_data["source"])
         elif response_data["error"]:
             pass
             # upsert_analytics_record(

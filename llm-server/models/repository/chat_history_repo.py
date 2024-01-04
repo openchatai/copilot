@@ -41,6 +41,38 @@ def create_chat_history(
     return chat_history
 
 
+def create_chat_histories(
+    chatbot_id: str, chat_records: list[dict[str, Union[str, bool]]]
+) -> list[ChatHistory]:
+    """Creates multiple chat history records.
+
+    Args:
+      chatbot_id: The ID of the chatbot that sent the message.
+      chat_records: A list of dictionaries containing chat records.
+                    Each dictionary should have the keys 'session_id', 'from_user', and 'message'.
+
+    Returns:
+      A list of the newly created ChatHistory objects.
+    """
+
+    with Session() as session:
+        chat_histories = []
+
+        for record in chat_records:
+            chat_history = ChatHistory(
+                chatbot_id=chatbot_id,
+                session_id=record["session_id"],
+                from_user=record["from_user"],
+                message=record["message"],
+            )
+
+            session.add(chat_history)
+            chat_histories.append(chat_history)
+        session.commit()
+
+    return chat_histories
+
+
 def get_all_chat_history_by_session_id(
     session_id: str, limit: int = 20, offset: int = 0
 ) -> List[ChatHistory]:
