@@ -20,7 +20,7 @@ logger = CustomLogger(module_name=__name__)
 
 
 def save_swaggerfile_to_mongo(
-        filename: str, bot_id: str, swagger_doc: ResolvingParser
+    filename: str, bot_id: str, swagger_doc: ResolvingParser
 ) -> bool:
     spec = swagger_doc.specification
     spec["meta"] = {"bot_id": bot_id, "swagger_url": filename}
@@ -45,12 +45,10 @@ def save_swagger_paths_to_qdrant(swagger_doc: ResolvingParser, bot_id: str):
                     del operation["responses"]
 
                     # Check if "summary" key is present before accessing it
-                    summary = operation.get('summary', '')
-                    description = operation.get('description', '')
+                    summary = operation.get("summary", "")
+                    description = operation.get("description", "")
 
-                    document = Document(
-                        page_content=f"{summary}; {description}"
-                    )
+                    document = Document(page_content=f"{summary}; {description}")
                     document.metadata["bot_id"] = bot_id
                     document.metadata["operation"] = operation
 
@@ -62,7 +60,9 @@ def save_swagger_paths_to_qdrant(swagger_doc: ResolvingParser, bot_id: str):
                     documents.append(document)
                 except KeyError as e:
                     # Handle the specific key error, log, or take necessary action
-                    logger.error(f"KeyError in processing document: {e}")
+                    logger.error(
+                        f"KeyError in processing document: {str(e)}", bot_id=bot_id
+                    )
 
         point_ids = vector_store.add_documents(documents)
         logger.info(
@@ -72,10 +72,10 @@ def save_swagger_paths_to_qdrant(swagger_doc: ResolvingParser, bot_id: str):
         )
     except KeyError as e:
         # Handle the specific key error at a higher level if needed
-        logger.error(f"KeyError in processing paths: {e}")
+        logger.error(f"KeyError in processing paths: {e}", bot_id=bot_id)
     except Exception as e:
         # Handle other exceptions
-        logger.error(f"An error occurred: {e}")
+        logger.error(f"An error occurred: {e}", bot_id=bot_id)
 
 
 def add_swagger_file(request: Request, id: str) -> Dict[str, str]:
@@ -96,7 +96,7 @@ def add_swagger_file(request: Request, id: str) -> Dict[str, str]:
                 return {"error": "Invalid JSON format in uploaded file"}
 
         elif file.filename and (
-                file.filename.endswith(".yaml") or file.filename.endswith(".yml")
+            file.filename.endswith(".yaml") or file.filename.endswith(".yml")
         ):
             try:
                 file_content = yaml.safe_load(file)
