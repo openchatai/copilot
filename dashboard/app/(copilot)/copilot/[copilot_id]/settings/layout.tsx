@@ -1,5 +1,5 @@
 import { SubNavLink } from "@/app/(copilot)/_parts/SubNavLink";
-import { BrainCircuit, Settings2 } from "lucide-react";
+import { BrainCircuit, Settings2, Variable } from "lucide-react";
 import React from "react";
 
 type Props = {
@@ -26,6 +26,11 @@ export default function SettingsLayout({ children, params }: Props) {
               href={copilotBase + "/context"}
               Icon={BrainCircuit}
               label="Context"
+            />
+            <SubNavLink
+              href={copilotBase + "/variables"}
+              Icon={Variable}
+              label="Global Variables"
             />
           </ul>
         </div>
