@@ -9,7 +9,7 @@ function useTrigger(selector: string, toggle: () => void) {
     IS_SERVER ? null : document.querySelector(selector)
   ).current;
   useEffect(() => {
-    if (trigger) {
+    if (trigger && !IS_SERVER) {
       trigger.addEventListener("click", toggle);
       return () => trigger.removeEventListener("click", toggle);
     } else {
@@ -29,7 +29,6 @@ export function CopilotWidget({
   useTrigger(triggerSelector, toggle)
   return (
     <div
-      id="opencopilot-aicopilot"
       data-open={open}
       className={cn(
         "opencopilot-font-inter opencopilot-w-full opencopilot-overflow-hidden opencopilot-h-full sm:opencopilot-rounded-xl opencopilot-bg-white opencopilot-shadow",
