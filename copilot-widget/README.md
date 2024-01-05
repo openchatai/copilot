@@ -27,15 +27,15 @@ It's a simple react application built to be used in any webpage as a widget, to 
        initAiCoPilot({
          initialMessage: "Hi Sir", // initial message obiviously.
          token: "not_super_secret_token", // your copilot token.
+         rootId: "copilot-widget", //@optional: the root element id in which the widget will mount on
          triggerSelector: "#triggerSelector", // the selector of the element that will trigger the widget on click.
          apiUrl: "https://cloud.openchat.so/api", // the url of the copilot api.
          headers: {
            // headers that you want to send with every message request.
            Authorization: "Bearer your_auth_token_goes_here",
          },
-         user:{ // optional user object
-         nane:"Some User"
-         }
+         user: { name: "Some User" }, // @optional: user object
+         containerProps: {}, // @optional: `HTMLProps`
        });
      };
    </script>
@@ -48,4 +48,3 @@ It's a simple react application built to be used in any webpage as a widget, to 
 2. type your message and press enter to send it.
 
 <img width="394" alt="OpenCopilot widget" src="https://github.com/openchatai/OpenCopilot/assets/32633162/77b30faa-c59e-4a3a-821a-d14a61a49a65">
-
