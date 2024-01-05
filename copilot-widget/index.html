@@ -11,31 +11,33 @@
   </head>
 
   <body>
+    <style>
+      #opencopilot-root {
+        width: 400px;
+        height: 600px;
+      }
+    </style>
     <button id="triggerSelector">toggle the chat widget</button>
     <script type="module" src="/src/main.tsx"></script>
+    <main style="background-color: red; padding: 10px">
+      <div id="opencopilot-root"></div>
+    </main>
     <script>
       window.onload = () => {
         initAiCoPilot({
           initialMessage: "Hi Sir",
           token: "5AciN2ZUgIxh43BH",
           triggerSelector: "#triggerSelector",
+          rootId: "opencopilot-root",
           apiUrl: "http://localhost:8888/backend",
           socketUrl: "http://localhost:8888",
           defaultOpen: true,
+          containerProps: {},
           headers: {
             Authorization: "Bearer BQAlIe479yo16aXf",
           },
           user: {
             name: "John Doe",
-          },
-          containerProps: {
-            style: {
-              position: "fixed",
-              height: "100%",
-              bottom: "0",
-              right: "0",
-              width: "400px",
-            },
           },
         });
       };
