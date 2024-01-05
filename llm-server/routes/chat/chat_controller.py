@@ -9,6 +9,7 @@ from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id,
     get_unique_sessions_with_first_message_by_bot_id,
     create_chat_history,
+    create_chat_histories,
 )
 from models.repository.copilot_repo import find_one_or_fail_by_token
 from routes.analytics.analytics_service import upsert_analytics_record
@@ -182,16 +183,25 @@ async def handle_chat_send_common(
         )
 
         if response_data["response"]:
+            chat_records = [
+                {
+                    "session_id": session_id,
+                    "from_user": True,
+                    "message": message,
+                },
+                {
+                    "session_id": session_id,
+                    "from_user": False,
+                    "message": response_data["response"]
+                    or response_data["error"]
+                    or "",
+                },
+            ]
+
             upsert_analytics_record(
                 chatbot_id=str(bot.id), successful_operations=1, total_operations=1
             )
-            create_chat_history(str(bot.id), session_id, True, message)
-            create_chat_history(
-                chatbot_id=str(bot.id),
-                session_id=session_id,
-                from_user=False,
-                message=response_data["response"] or response_data["error"] or "",
-            )
+            create_chat_histories(str(bot.id), chat_records)
         elif response_data["error"]:
             upsert_analytics_record(
                 chatbot_id=str(bot.id),
