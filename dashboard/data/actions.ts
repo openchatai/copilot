@@ -7,6 +7,19 @@ const instance = axios.create({
     baseURL: baseUrl + "/backend/actions",
 });
 
+export type PayloadType = {
+    description: string;
+    parameters: {
+        description: string;
+        in: string;
+        name: string;
+        required: boolean;
+        schema: {
+            type: string;
+        }
+    }[];
+    request_body: any;
+}
 export type ActionResponseType = {
     name: string;
     description: string;
@@ -17,7 +30,7 @@ export type ActionResponseType = {
     created_at: string;
     updated_at: string;
     deleted_at: string | null;
-    payload?: any;
+    payload?: PayloadType;
 }
 
 // {{backend_base}}/actions/bot/:chatbot_id

@@ -49,3 +49,11 @@ export async function createCopilot(copilot_name: string) {
   form.append('name', copilot_name)
   return await instance.post<CopilotType>('/', form)
 }
+// {{backend_base}}/copilot/:id/variables
+export async function getVariables(id: string) {
+  return (await instance.get<{ variables: any[] }>(`/${id}/variables`)).data;
+}
+// {{backend_base}}/copilot/:id/variables
+export async function createVariable(id: string, name: string, value: string) {
+  return await instance.post<{ message: string }>(`/${id}/variables`, { [name]: value })
+}

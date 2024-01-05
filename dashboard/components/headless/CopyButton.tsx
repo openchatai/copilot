@@ -14,6 +14,7 @@ const CopyButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         {...props}
         data-copied={copied}
+        disabled={copied}
         onClick={(ev) => {
           copy(text);
           onClick?.(ev);
