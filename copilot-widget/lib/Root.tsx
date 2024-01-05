@@ -8,21 +8,26 @@ import { InitialDataProvider } from "./contexts/InitialDataContext";
 import root from 'react-shadow';
 import css from '../styles/index.css?inline';
 
-function Root({
-  children,
-  options,
-  containerProps,
-}: {
+const cssColors = {
+  '--opencopilot-primary-clr': 'hsl(200 18% 46%)',
+  '--opencopilot-accent-clr': 'hsl(300, 7%, 97%)',
+}
+type RootProps = {
   children: React.ReactNode;
   options: ConfigDataContextType;
   containerProps?: React.DetailedHTMLProps<
     React.HTMLAttributes<HTMLDivElement>,
     HTMLDivElement
   >;
-}) {
-  const { style, id, ...containerProp } = containerProps || {}
+}
+function Root({
+  children,
+  options,
+  containerProps,
+}: RootProps) {
+  const { style, ...containerProp } = containerProps || {}
   return (
-    <root.div {...containerProp} id="copilot-widget" style={{ width: '100%', height: '100%', ...style }}>
+    <root.div {...containerProp} style={{ width: '100%', height: '100%', ...cssColors, ...style }}>
       <ConfigDataProvider data={options}>
         <WidgetState>
           <AxiosProvider>
