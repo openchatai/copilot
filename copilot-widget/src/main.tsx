@@ -2,6 +2,9 @@ import ReactDOM from "react-dom/client";
 import { Options } from "@lib/types";
 import Root from "@lib/Root";
 import { CopilotWidget } from "@lib/CopilotWidget";
+import { composeRoot } from "./utils";
+
+const defaultRootId = "opencopilot-root";
 
 declare global {
   interface Window {
@@ -9,10 +12,16 @@ declare global {
   }
 }
 
-function initAiCoPilot({ triggerSelector, containerProps, ...options }: Options) {
-  const container = document.createElement("div") as HTMLDivElement;
-  container.id = "opencopilot-aicopilot";
-  document.body.appendChild(container);
+/**
+ * @param rootId The id of the root element for more control, you don't need to use this unless you want more control over the widget
+ * @description Initialize the widget
+ */
+function initAiCoPilot({ triggerSelector, containerProps, rootId, ...options }: Options & { rootId?: string }) {
+  const container = composeRoot(rootId ?? defaultRootId, {
+    isolation: "isolate",
+    width: "100%",
+    height: "100%",
+  });
   ReactDOM.createRoot(container).render(
     <Root
       options={{
