@@ -101,7 +101,7 @@ def process_swagger_file(chatbot: Chatbot):
 
     except Exception as e:
         logger.error(
-            f"Error processing Swagger file for bot {bot_id}: {e}: {swagger_url}"
+            f"Error processing Swagger file {e}", bot_id=bot_id, swagger_url=swagger_url
         )
 
 

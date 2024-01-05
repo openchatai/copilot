@@ -14,12 +14,12 @@ logger = CustomLogger(module_name=__name__)
 
 
 async def run_flow(
-        flow: FlowDTO,
-        chat_context: ChatContext,
-        app: Optional[str],
-        bot_id: str,
-        session_id: str,
-        is_streaming: bool
+    flow: FlowDTO,
+    chat_context: ChatContext,
+    app: Optional[str],
+    bot_id: str,
+    session_id: str,
+    is_streaming: bool,
 ) -> ResponseDict:
     headers = chat_context.headers or Headers()
 
@@ -34,7 +34,7 @@ async def run_flow(
             app=app,
             bot_id=bot_id,
             session_id=session_id,
-            is_streaming=is_streaming
+            is_streaming=is_streaming,
         )
     except Exception as e:
         payload_data = {
@@ -42,11 +42,14 @@ async def run_flow(
             "app": app,
         }
 
-        logger.error("An exception occurred", payload=json.dumps(payload_data), error=str(e))
+        logger.error(
+            "An exception occurred",
+            bot_id=bot_id,
+            payload=json.dumps(payload_data),
+            error=str(e),
+        )
 
     output = {"response": result if not error else "", "error": error}
 
-    logging.info(
-        "Workflow output %s", json.dumps(output, separators=(",", ":"))
-    )
+    logging.info("Workflow output %s", json.dumps(output, separators=(",", ":")))
     return output

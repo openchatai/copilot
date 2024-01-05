@@ -47,7 +47,7 @@ def import_actions_from_swagger_file(chatbot_id):
             swagger_parser.ingest_swagger_summary(chatbot_id)
             actions = swagger_parser.get_all_actions(chatbot_id)
         except Exception as e:
-            logger.error("Failed to parse Swagger file", error=e)
+            logger.error("Failed to parse Swagger file", error=e, bot_id=chatbot_id)
             return (
                 jsonify(
                     {
@@ -64,7 +64,11 @@ def import_actions_from_swagger_file(chatbot_id):
             create_actions(chatbot_id, actions)
             action_vector_service.create_actions(actions)
         except Exception as e:
-            logger.error(str(e), message="Something failed while parsing swagger file")
+            logger.error(
+                str(e),
+                message="Something failed while parsing swagger file",
+                bot_id=chatbot_id,
+            )
 
         return (
             jsonify(

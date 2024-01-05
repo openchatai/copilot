@@ -215,7 +215,12 @@ async def handle_chat_send_common(
             {"type": "text", "response": {"text": response_data["response"]}}
         )
     except Exception as e:
-        logger.error("An exception occurred", incident="chat/send", error=str(e))
+        logger.error(
+            "An exception occurred",
+            incident="chat/send",
+            error=str(e),
+            bot_token=bot_token,
+        )
         emit(session_id, str(e))
         return (
             jsonify(

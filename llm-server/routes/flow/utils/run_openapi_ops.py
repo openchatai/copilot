@@ -88,6 +88,7 @@ async def run_actions(
                 logger.error(
                     "Error occurred during workflow check in store",
                     incident="check_workflow_in_store",
+                    bot_id=bot_id,
                     text=text,
                     headers=headers,
                     app=app,
@@ -114,6 +115,6 @@ async def run_actions(
                 if api_payload is not None
                 else ""
             )
-            logger.error("OpenAI exception", messages=str(e))
+            logger.error("OpenAI exception", bot_id=bot_id, error=str(e))
             emit(session_id, error_message) if is_streaming else None
             return error_message

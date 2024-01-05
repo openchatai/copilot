@@ -306,4 +306,4 @@ class SwaggerParser:
             )
 
         except Exception as error:
-            logger.error("swagger_parsing_failed", error=error)
+            logger.error("swagger_parsing_failed", bot_id=bot_id, error=error)
