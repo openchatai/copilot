@@ -1,80 +1,97 @@
-# Getting Started Guide: Debugging "opencopilot" with VS Code
+# **Guide to Debugging "opencopilot" with VS Code**
 
-Welcome to the world of local development and debugging for the "opencopilot" Flask application! This comprehensive guide will walk you through the setup process, leveraging the power of VS Code for a seamless debugging experience. Let's dive in!
+Welcome to the local development and debugging guide for the "opencopilot" Flask application. This guide will help you set up your environment and effectively utilize VS Code for debugging.
 
-## Prerequisites
+## **Table of Contents**
 
-Before we embark on this debugging journey, ensure you have the following tools installed on your machine:
+- [Getting Started Guide: Debugging "opencopilot" with VS Code](#getting-started-guide-debugging-opencopilot-with-vs-code)
+  - [Prerequisites](#prerequisites)
+    - [Conda Installation](#conda-installation)
+    - [Mypy Installation (Optional)](#mypy-installation-optional)
+  - [Copilot LLM Flask Application Setup](#copilot-llm-flask-application-setup)
+    - [Prerequisites](#prerequisites-1)
+  - [Environmental Configuration](#environmental-configuration)
+  - [Project Dependencies](#project-dependencies)
+  - [Debugging Locally with VS Code](#debugging-locally-with-vs-code)
+  - [Docker Debugging](#docker-debugging)
+- [Use Open Source Model Environment Variables](#use-open-source-model-environment-variables)
 
-- [Conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
-- [VS Code](https://code.visualstudio.com/download)
-- [Python extension for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+---
 
-## Conda Installation
+## **Getting Started Guide: Debugging "opencopilot" with VS Code**
 
-Refer to the [official Conda installation guide](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) suitable for your operating system. Once installed, validate your Conda setup by running `conda --version` in your terminal.
+This section guides you through setting up your environment and using VS Code for debugging the "opencopilot" Flask application.
 
-## Mypy Installation [Optional]
+### **Prerequisites**
 
-Enhance your development experience with Mypy (optional):
+#### *Conda Installation*
 
-1. Activate your Conda environment.
-2. Install Mypy: `pip install mypy`
+Install Conda by following the [official Conda installation guide](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html), then check your Conda version with `conda --version`.
 
-## Copilot LLM Flask Application Setup
+#### *Mypy Installation (Optional)*
 
-### Prerequisites
+For an enhanced development experience with Mypy (optional), activate your Conda environment and run `pip install mypy`.
 
-1. Begin by cloning the "opencopilot" Flask app repository to your local machine.
+### **Copilot LLM Flask Application Setup**
 
-## Environmental Configuration
+#### *Prerequisites*
 
-To configure the environment for the "llm_server" project, follow these steps:
+1. Clone the "opencopilot" Flask App repository onto your local machine.
 
-1. **Create `.env` File:**
-   Create a file named `.env` at the root of the "llm_server" directory to store environmental configuration settings for local development.
+## **Environmental Configuration**
 
-   **Example .env File:**
+Configure the "llm\_server" project environment as follows:
+
+1. **Create `.env` File**: At the root of the "llm\_server" directory, create a new `.env` file to hold environmental configuration settings for local development.
+
+   Example `.env` File:
    ```ini
    OPENAI_API_KEY=<YOUR OPEN AI KEY>
    ```
 
-2. **Additional Environment Variables (Optional):**
-   You can set additional environment variables to fine-tune your copilots. While these variables are not mandatory, you may choose to configure them based on your needs.
+2. **Set Additional Environment Variables (Optional)**
+   Set any desired optional environment variables for copilot customization within the `.env` file.
 
-   - `PINECONE_API_KEY`: Your Pinecone API key.
-   - `PINECONE_ENV`: Your Pinecone environment.
-   - `MONGODB_URI`: MongoDB connection string.
-   - `QDRANT_SERVER_URI`: QDRANT server URL.
-   - `QDRANT_API_KEY`: Your QDRANT API key.
-   - `QDRANT_PASS`: Base64-encoded string for QDRANT pass.
-   - `ACTIONS_SCORE_THRESHOLD`: Threshold for actions score (default: 0.5).
-   - `FLOWS_SCORE_THRESHOLD`: Threshold for flows score (default: 0.5).
-   - `KB_SCORE_THRESHOLD`: Threshold for KB score (default: 0.5).
-   - `TARGET`: Environment target (default: development).
+   Optional variable examples include:
+   ```ini
+   PINECONE_API_KEY=your_pinecone_api_key
+   PINECONE_ENV=your_pinecone_environment
+   ...
+   ```
+   Replace placeholders with appropriate configurations. For more information about these options, see the original documentation.
 
-   Note: Adjust the values according to your specific configuration requirements.
+### **Project Dependencies**
 
+To install required packages, execute `pip install -r requirements.txt` from the project directory.
 
-### Project Dependencies
+### **Debugging Locally with VS Code**
 
-Install project dependencies: `pip install -r requirements.txt`
+1. Select the 'Flask' debug configuration.
+2. Launch debug mode with F5.
 
-### Debugging Locally with VS Code
+### **Docker Debugging**
 
-1. Enable debugging by selecting the 'Flask' debug configuration.
-2. Press 'F5' to start debugging.
+With Docker and Docker Compose installed, perform the following tasks:
 
-## Docker Debugging
+1. In the Makefile, set `TARGET=development`.
+2. Execute either `make install` or `make install-arm`, depending on your system architecture.
+3. Within the "llm-server" directory, locate the Docker container for debugging purposes.
+4. Attach the VSCode debugger to the running container for debugging. Wait for the Flask process to begin before proceeding.
 
-Assuming you have Docker and Docker Compose installed, set `TARGET=development` in [Makefile].
-
-1. Run `make install` or `make install-arm` based on the system architecture
-2. Navigate to the "llm-server" directory.
-3. Configure the 'Attach to flask in docker' option in VS Code and attach to the running container for debugging. The Flask process will not start until the debugger is attached.
-   
-Enjoy the magic of hot reloading during debugging sessions inside Docker containers. No need to restart the container after each code change.
+Benefit from convenient hot reloading while debugging inside Docker containers without needing to restart the container after every code modification.
 
 Happy debugging! 🚀
 
 ---
+
+## **Use Open Source Model Environment Variables**
+
+To use the open-source model, set the following environment variables, thanks to [Justin van Grootveld](https://github.com/jvgrootveld):
+
+```plaintext
+OPENAI_API_KEY=unused
+CHAT_MODEL=openchat
+EMBEDDING_PROVIDER=openchat
+LOCAL_IP=http://host.docker.internal
+VECTOR_SIZE=4096
+```
