@@ -53,10 +53,15 @@ Configure the "llm\_server" project environment as follows:
    Set any desired optional environment variables for copilot customization within the `.env` file.
 
    Optional variable examples include:
-   ```ini
-   PINECONE_API_KEY=your_pinecone_api_key
-   PINECONE_ENV=your_pinecone_environment
-   ...
+   ```js
+      - `MONGODB_URI`: MongoDB connection string.
+      - `QDRANT_SERVER_URI`: QDRANT server URL.
+      - `QDRANT_API_KEY`: Your QDRANT API key.
+      - `QDRANT_PASS`: Base64-encoded string for QDRANT pass.
+      - `ACTIONS_SCORE_THRESHOLD`: Threshold for actions score (default: 0.5).
+      - `FLOWS_SCORE_THRESHOLD`: Threshold for flows score (default: 0.5).
+      - `KB_SCORE_THRESHOLD`: Threshold for KB score (default: 0.5).
+      - `TARGET`: Environment target (default: production).
    ```
    Replace placeholders with appropriate configurations. For more information about these options, see the original documentation.
 
