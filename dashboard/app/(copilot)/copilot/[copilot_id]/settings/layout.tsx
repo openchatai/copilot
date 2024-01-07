@@ -14,7 +14,7 @@ export default function SettingsLayout({ children, params }: Props) {
   return (
     <div className="flex h-full flex-row overflow-hidden">
       <div className="h-full w-aside shrink-0 border-r bg-primary-foreground">
-        <div className="flex-center h-header justify-start border-b px-6">
+        <div className="flex-center h-header justify-start border-b px-6 bg-white">
           <h1 className="text-lg font-bold text-secondary-foreground">
             Settings
           </h1>
@@ -26,11 +26,6 @@ export default function SettingsLayout({ children, params }: Props) {
               href={copilotBase + "/context"}
               Icon={BrainCircuit}
               label="Context"
-            />
-            <SubNavLink
-              href={copilotBase + "/variables"}
-              Icon={Variable}
-              label="Global Variables"
             />
           </ul>
         </div>
