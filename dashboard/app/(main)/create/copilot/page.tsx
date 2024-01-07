@@ -123,12 +123,13 @@ function MotionWrapper({ children }: { children?: React.ReactNode }) {
     <motion.div
       key={activeStep}
       variants={{
-        leave: { opacity: 0, filter: "blur(5px)" },
+        leave: { opacity: 0, filter: "blur(10px)" },
         enter: { opacity: 1, filter: "blur(0px)" },
       }}
       initial={isFirstStep ? "enter" : "leave"}
       animate="enter"
-      transition={{ duration: 0.2 }}
+      exit="leave"
+      transition={{ duration: 0.4 }}
     >
       {children}
     </motion.div>
