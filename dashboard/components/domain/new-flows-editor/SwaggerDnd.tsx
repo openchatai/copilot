@@ -5,12 +5,15 @@ import { useDropzone } from 'react-dropzone';
 import { cn } from '@/lib/utils';
 import { ReactNode, useCallback, useMemo, useState } from "react";
 import { getFileData, not, or } from "@/lib/misc";
-import { useAsyncFn, useUpdateEffect } from 'react-use';
-import { importActionsFromSwagger } from "@/data/actions";
+import { useUpdateEffect } from 'react-use';
 import { revalidateActions } from "./Controller";
-import { toast } from "@/components/ui/use-toast";
+import { useSwaggerAdd } from "@/hooks/useAddSwagger";
 
-export function SwaggerDnd({ children, onChange, copilotId }: { children: ReactNode, onChange?: (files: File[]) => void, copilotId?: string }) {
+export function SwaggerDnd({ children, onChange, copilotId }: { children: ReactNode, copilotId: string, onChange?: (files: File[]) => void }) {
+    const [state, addSwagger] = useSwaggerAdd({
+        copilotId,
+    });
+
     const [
         acceptedFiles,
         setAcceptedFiles,
@@ -47,6 +50,7 @@ export function SwaggerDnd({ children, onChange, copilotId }: { children: ReactN
     );
     const clearFiles = execCb(() => setAcceptedFiles([]))
     const active = or(isDragActive, not(_.isEmpty(acceptedFiles)));
+
     const fileData = useMemo(() => {
         const first = _.first(acceptedFiles)
         if (first) {
@@ -54,27 +58,41 @@ export function SwaggerDnd({ children, onChange, copilotId }: { children: ReactN
         }
         return null;
     }, [acceptedFiles]);
-    const [state, $importActionsFromSwagger] = useAsyncFn(importActionsFromSwagger)
+
+
     const uploadSwagActions = execCb(async (file?: File) => {
         if (file && copilotId) {
-            const { data } = await $importActionsFromSwagger(copilotId, file);
-            if (data.is_error === false) {
-                revalidateActions(copilotId);
-                toast({
-                    variant: 'success',
-                    title: 'Success',
-                    description: 'Successfully imported actions from swagger file'
-                })
-                _.delay(() => clearFiles(), 1000)
-            } else if (data.is_error === true) {
-                toast({
-                    variant: 'destructive',
-                    title: 'Error',
-                    description: data.message
-                })
-            }
+            addSwagger({
+                swagger: file,
+                onSuccess: () => {
+                    revalidateActions(copilotId);
+                    _.delay(() => clearFiles(), 1000)
+                },
+            })
         }
     })
+
+    // const uploadSwagActions = execCb(async (file?: File) => {
+    //     if (file && copilotId) {
+    //         const { data } = await $importActionsFromSwagger(copilotId, file);
+    //         if (data.is_error === false) {
+    //             revalidateActions(copilotId);
+    //             toast({
+    //                 variant: 'success',
+    //                 title: 'Success',
+    //                 description: 'Successfully imported actions from swagger file'
+    //             })
+    //             _.delay(() => clearFiles(), 1000)
+    //         } else if (data.is_error === true) {
+    //             toast({
+    //                 variant: 'destructive',
+    //                 title: 'Error',
+    //                 description: data.message
+    //             })
+    //         }
+    //     }
+    // })
+
     return (
         <>
             <input className='hidden absolute' {...getInputProps()} />
@@ -132,8 +150,9 @@ export function SwaggerDnd({ children, onChange, copilotId }: { children: ReactN
                         </div>
                     </div>
                 }
-                {children}
-
+                <div style={{ display: active ? 'none' : 'contents' }}>
+                    {children}
+                </div>
             </div>
         </>
     )
