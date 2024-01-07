@@ -3,6 +3,10 @@ import { baseUrl } from "./base-url";
 
 const instance = axios.create({
   baseURL: baseUrl + "/backend/copilot",
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  }
 });
 
 export type CopilotType = {
@@ -49,11 +53,12 @@ export async function createCopilot(copilot_name: string) {
   form.append('name', copilot_name)
   return await instance.post<CopilotType>('/', form)
 }
-// {{backend_base}}/copilot/:id/variables
-export async function getVariables(id: string) {
-  return (await instance.get<{ variables: any[] }>(`/${id}/variables`)).data;
+// localhost:8888/backend/copilot/5a958877-63b6-47a5-afa3-621dc57e7d1b/variables
+export async function getVariablesByBotId(id: string) {
+  return (await instance.get<Record<string, string>>(`/${id}/variables`)).data;
 }
-// {{backend_base}}/copilot/:id/variables
+// {{backend_base}}/backend/copilot/:id/variables
 export async function createVariable(id: string, name: string, value: string) {
+  console.log(name,value)
   return await instance.post<{ message: string }>(`/${id}/variables`, { [name]: value })
 }
