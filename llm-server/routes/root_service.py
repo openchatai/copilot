@@ -160,7 +160,7 @@ def run_informative_item(
     if len(context):
         messages.append(
             HumanMessage(
-                content=f"I found some relevant context that might be helpful. Here is the context: ```{','.join(str(context))}```. "
+                content=f"I found some relevant context that might be helpful. Here is the context: ```{','.join(context)}```. "
             )
         )
 
