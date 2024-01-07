@@ -8,9 +8,9 @@ import { Button } from '@/components/ui/button'
 import { PlusCircle } from 'lucide-react';
 import { useAsyncFn } from 'react-use';
 import { createVariable } from '@/data/copilot';
-import { useCopilot } from '../../../_context/CopilotProvider';
 import { toast } from '@/components/ui/use-toast';
 import _ from 'lodash';
+import { useCopilot } from '../../_context/CopilotProvider';
 
 type Variable = {
     name: string,
@@ -29,6 +29,7 @@ export function SingleVariableForm({ onSubmit, footer }: Props) {
         const data = new FormData(e.currentTarget)
         const name = data.get('name') as string
         const value = data.get('value') as string
+        console.log(name, value);
         onSubmit?.({ name, value })
     }
     return (
@@ -37,13 +38,13 @@ export function SingleVariableForm({ onSubmit, footer }: Props) {
                 <Label>
                     Name
                 </Label>
-                <Input type='text' required placeholder='ENV_NAME' />
+                <Input type='text' required name='name' placeholder='ENV_NAME' />
             </div>
             <div>
                 <Label>
                     Value
                 </Label>
-                <Textarea minRows={2} required maxRows={4} placeholder='ENV_VALUE' />
+                <Textarea minRows={2} name='value' required maxRows={4} placeholder='ENV_VALUE' />
             </div>
             {footer}
         </form>
