@@ -12,7 +12,8 @@ from models.repository.copilot_repo import (
     create_copilot,
     chatbot_to_dict,
     SessionLocal,
-    update_copilot, store_copilot_global_variables,
+    update_copilot,
+    store_copilot_global_variables,
 )
 from routes._swagger.reindex_service import migrate_actions
 from utils.get_logger import CustomLogger
@@ -124,9 +125,12 @@ def update_global_variables(copilot_id):
 
         # Validate that data is a dictionary
         if not isinstance(data, dict):
-            return jsonify({"error": "Invalid data format, expected a JSON object"}), 400
+            return (
+                jsonify({"error": "Invalid data format, expected a JSON object"}),
+                400,
+            )
 
-        store_copilot_global_variables(copilot_id=copilot_id, variables=data)
+        store_copilot_global_variables(copilot_id=copilot_id, new_variables=data)
 
         # Return a success response
         return jsonify({"message": "JSON data stored successfully"})
