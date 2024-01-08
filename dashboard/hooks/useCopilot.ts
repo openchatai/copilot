@@ -10,7 +10,7 @@ export function useCopilot() {
     async function updateCopilotAsync(copilot: Partial<CopilotType>) {
         if (!copilot_id) throw new Error("Copilot id is required");
         const copilotId = copilot_id as string;
-        return await updateCopilot(copilotId, copilot);
+        return await updateCopilot(copilotId, copilot).finally(copilotData.mutate);
     }
     const [state,] = useAsyncFn(updateCopilotAsync);
     return [copilotData, state] as const;
