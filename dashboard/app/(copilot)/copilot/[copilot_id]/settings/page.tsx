@@ -28,9 +28,12 @@ import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover
 import { Section } from "./Section";
 import { SingleVariableForm } from "./SingleVariableForm";
 import { useVariables } from "./useVariables";
+import { useForm } from "react-hook-form";
+import { FieldArray } from "@/components/ui/FieldArray";
 
 function VariablesSection({ copilot_id }: { copilot_id: string }) {
   const [vars, createVar, status] = useVariables(copilot_id);
+
   const data = useMemo(() => {
     const _data: { name: string; value: string }[] = [];
     const __data = vars.data;
@@ -41,7 +44,32 @@ function VariablesSection({ copilot_id }: { copilot_id: string }) {
       })
     }
     return _data
-  }, [vars])
+  }, [vars.data])
+
+  const form = useForm<{ d: { name: string; value: string }[] }>({
+    values: {
+      d: data
+    }
+  });
+  console.log(form.formState)
+  const hasChanged = form.formState.isDirty;
+
+  function updateWhatChanged() {
+    // get the corresponding name that changed first;
+    const changed = form.formState.dirtyFields.d;
+    if (changed) {
+      const changedIndex = changed.findIndex((v) => v?.value === true);
+      if (changedIndex > -1 && data[changedIndex] && changedIndex) {
+        const nvOriginal = data.at(changedIndex);
+        const nv = form.getValues().d.at(changedIndex);
+        if (nv && nvOriginal?.name) {
+          // for now unntil we have a better way to do this
+          createVar(nvOriginal?.name, nv.value)
+        }
+      }
+
+    }
+  }
 
   return <Section header={<header className="flex items-center justify-between w-full">
     <h2 className="text-base font-bold">Global Variables</h2>
@@ -69,23 +97,30 @@ function VariablesSection({ copilot_id }: { copilot_id: string }) {
             <TableCell colSpan={2}>
               <EmptyBlock />
             </TableCell>
-          </tr> : data.map((variable, index) => {
-            return <tr className='bg-white [&>td]:p-1' key={index}>
-              <td>
-                <Input defaultValue={variable.name} />
-              </td>
-              <td>
-                <Input defaultValue={variable.value} />
-              </td>
-            </tr>
-          })}
+          </tr> :
+            <FieldArray
+              control={form.control}
+              name="d"
+              render={({ fields }) => {
+                return fields.map((field, index) => {
+                  return <tr className='bg-white [&>td]:p-1' key={index}>
+                    <td>
+                      <Input readOnly type="text" {...form.register(`d.${index}.name`)} />
+                    </td>
+                    <td>
+                      <Input type="text" {...form.register(`d.${index}.value`)} />
+                    </td>
+                  </tr>
+                })
+              }} />
+          }
         </tbody>
         <tfoot>
           <tr>
             <td colSpan={2} className="p-2">
               <div className="w-full flex gap-2 items-center justify-end">
-                <Button variant='destructiveOutline' size='sm'>Reset</Button>
-                <Button size='sm'>Save</Button>
+                <Button disabled={!hasChanged} variant='destructiveOutline' onClick={() => form.reset()} size='sm'>Reset</Button>
+                <Button size='sm' disabled={!hasChanged} onClick={updateWhatChanged}>Save</Button>
               </div>
             </td>
           </tr>
