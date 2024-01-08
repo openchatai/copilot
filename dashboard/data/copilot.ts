@@ -59,6 +59,5 @@ export async function getVariablesByBotId(id: string) {
 }
 // {{backend_base}}/backend/copilot/:id/variables
 export async function createVariable(id: string, name: string, value: string) {
-  console.log(name,value)
   return await instance.post<{ message: string }>(`/${id}/variables`, { [name]: value })
 }
