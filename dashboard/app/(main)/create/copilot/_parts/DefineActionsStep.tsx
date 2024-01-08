@@ -185,7 +185,7 @@ export function DefineActionsStep() {
                                             {endpoint.request_type}
                                         </span>
                                         <p className="flex-1 line-clamp-1 overflow-ellipsis font-medium text-xs">
-                                            {endpoint.api_endpoint || endpoint.name}
+                                            {endpoint.name || endpoint.api_endpoint}
                                         </p>
                                     </div>
                                 </div>
