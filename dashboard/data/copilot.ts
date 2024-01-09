@@ -57,7 +57,17 @@ export async function createCopilot(copilot_name: string) {
 export async function getVariablesByBotId(id: string) {
   return (await instance.get<Record<string, string>>(`/${id}/variables`)).data;
 }
+export type VariableType = {
+  name: string;
+  value: string;
+}
 // {{backend_base}}/backend/copilot/:id/variables
-export async function createVariable(id: string, name: string, value: string) {
-  return await instance.post<{ message: string }>(`/${id}/variables`, { [name]: value })
+export async function createVariable(id: string, variables: VariableType[]) {
+  // data = {key1: value1, key2: value2}
+  const data = variables.reduce((acc, { name, value }) => ({ ...acc, [name]: value }), {})
+  return await instance.post<{ message: string }>(`/${id}/variables`, data)
+}
+// {{backend_base}}/backend/copilot/:id/variable/:var_name
+export async function deleteVariableByKey(id: string, name: string) {
+  return await instance.delete<{ message: string }>(`/${id}/variable/${name}`)
 }
