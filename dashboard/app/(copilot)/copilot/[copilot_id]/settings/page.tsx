@@ -91,9 +91,11 @@ function VariablesSection() {
           </tr>
         </thead>
         <tbody>
-          {_.isEmpty(['']) ? <tr>
+          {_.isEmpty(data) ? <tr>
             <TableCell colSpan={2}>
-              <EmptyBlock />
+              <EmptyBlock>
+                <p className='text-sm'>No variables found</p>
+              </EmptyBlock>
             </TableCell>
           </tr> :
             <FieldArray
