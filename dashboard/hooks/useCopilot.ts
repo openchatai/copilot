@@ -1,7 +1,7 @@
-import { CopilotType, getCopilot, updateCopilot } from "@/data/copilot";
+import { CopilotType, deleteCopilot, getCopilot, updateCopilot } from "@/data/copilot";
 import { useParams } from "next/navigation";
 import { useAsyncFn } from "react-use";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 
 export function useCopilot() {
     const { copilot_id } = useParams();
@@ -12,6 +12,15 @@ export function useCopilot() {
         const copilotId = copilot_id as string;
         return await updateCopilot(copilotId, copilot).finally(copilotData.mutate);
     }
-    const [state,] = useAsyncFn(updateCopilotAsync);
-    return [copilotData, state] as const;
+
+    async function deleteCopilotAsync() {
+        if (!copilot_id) throw new Error("Copilot id is required");
+        const copilotId = copilot_id as string;
+        deleteCopilot(copilotId).finally(() => mutate('copilots'));
+    }
+
+    const [state, update] = useAsyncFn(updateCopilotAsync);
+    const [stateDelete, deleteCopilot$] = useAsyncFn(deleteCopilotAsync);
+
+    return { copilotData, updateCopilot: update, deleteCopilot: deleteCopilot$, };
 }
