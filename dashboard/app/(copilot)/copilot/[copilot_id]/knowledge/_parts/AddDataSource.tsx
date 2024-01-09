@@ -215,6 +215,7 @@ function AddFileDataSource() {
             csv: ["text/csv"],
             xml: ["text/xml"],
             pdf: ["application/pdf"],
+            md: ["text/markdown"],
           }}
         />
         <AlertDialogFooter>

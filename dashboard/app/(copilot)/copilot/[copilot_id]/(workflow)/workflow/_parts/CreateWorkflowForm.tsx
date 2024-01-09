@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import React from "react";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Field, Form } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,6 +23,7 @@ import { toast } from "@/components/ui/use-toast";
 import { atom, useAtom } from "jotai";
 import { useRouter } from "@/lib/router-events";
 import { useCopilot } from "@/app/(copilot)/copilot/_context/CopilotProvider";
+import { revalidateWorkflows } from "./WorkflowsTable";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -54,6 +55,7 @@ export default function CreateWorkflowForm() {
   async function onSubmit({ name, description }: z.infer<typeof formSchema>) {
     const { data } = await createFlow(copilotId, { name, description });
     if (data.flow_id) {
+      revalidateWorkflows(copilotId);
       push(`/copilot/${copilotId}/workflow/${data.flow_id}`);
       setOpen(false);
       toast({
@@ -80,35 +82,19 @@ export default function CreateWorkflowForm() {
         </AlertDialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
-            <FormField
+            <Field
               control={form.control}
               name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="required-label">
-                    Title
-                  </FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              required
+              label="Title"
+              render={(field) => <Input {...field} />}
             />
-            <FormField
+            <Field
               control={form.control}
               name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="required-label">
-                    Description
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea minRows={3} {...field}/>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              required
+              label="Description"
+              render={(field) => <Textarea minRows={3} {...field} />}
             />
             <AlertDialogFooter className="!mt-5 flex items-center gap-2">
               <AlertDialogCancel type="button">

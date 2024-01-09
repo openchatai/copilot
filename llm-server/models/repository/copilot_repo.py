@@ -6,6 +6,7 @@ from typing import Iterable, List, Optional, Any
 from sqlalchemy import exc
 from sqlalchemy.orm import sessionmaker, Session
 
+from copy import deepcopy
 from shared.models.opencopilot_db.chatbot import Chatbot, engine
 from utils.base import generate_random_token
 from utils.get_logger import CustomLogger
@@ -85,12 +86,12 @@ def find_or_fail_by_bot_id(bot_id: bytes) -> Optional[Chatbot]:
 
 
 def create_copilot(
-        name: str,
-        prompt_message: str,
-        swagger_url: str,
-        enhanced_privacy: bool = False,
-        smart_sync: bool = False,
-        website: Optional[str] = None,
+    name: str,
+    prompt_message: str,
+    swagger_url: str,
+    enhanced_privacy: bool = False,
+    smart_sync: bool = False,
+    website: Optional[str] = None,
 ):
     """
     Creates a new Chatbot instance and adds it to the database.
@@ -123,7 +124,6 @@ def create_copilot(
             smart_sync=smart_sync,
             created_at=datetime.datetime.utcnow(),
             updated_at=datetime.datetime.utcnow(),
-            email="example@example.com",
         )
 
         try:
@@ -133,7 +133,12 @@ def create_copilot(
             return chatbot_to_dict(new_chatbot)
         except Exception as e:
             session.rollback()
-            logger.error("An exception occurred", app="OPENCOPILOT", error=str(e), incident="swagger")
+            logger.error(
+                "An exception occurred",
+                app="OPENCOPILOT",
+                error=str(e),
+                incident="swagger",
+            )
             raise e
         finally:
             session.close()
@@ -217,40 +222,44 @@ def chatbot_to_dict(chatbot: Chatbot):
     }
 
 
-def store_copilot_global_variables(copilot_id: str, variables: dict):
-    session: Session = SessionLocal()
+def store_copilot_global_variables(copilot_id: str, new_variables: dict):
+    with SessionLocal() as session:
+        try:
+            chatbot = session.query(Chatbot).filter(Chatbot.id == copilot_id).one()
 
-    try:
-        # Fetch the existing Chatbot
-        chatbot = session.query(Chatbot).filter(Chatbot.id == copilot_id).one()
+            # Update the existing global variables with new keys and values
+            existing_variables = deepcopy(dict(chatbot.global_variables or {}))
+            existing_variables.update(new_variables)
 
-        # Todo: introduce encryption
-        # Store the encrypted JSON in the global_variables field
-        chatbot.global_variables = variables
-        chatbot.updated_at = datetime.datetime.utcnow()
+            # Todo: introduce encryption
+            # Store the updated global variables in the database
+            chatbot.global_variables = existing_variables
+            chatbot.updated_at = datetime.datetime.utcnow()
 
-        session.commit()
-        session.refresh(chatbot)
-        return variables
-
-    except exc.NoResultFound:
-        session.rollback()
-        raise ValueError(f"No Chatbot found with id: {copilot_id}")
-    except Exception as e:
-        session.rollback()
-        logger.error("An exception occurred", app="OPENCOPILOT", error=str(e), incident="store_global_variables")
-    finally:
-        session.close()
+            session.commit()
+            session.refresh(chatbot)
+            return existing_variables
+        except exc.NoResultFound:
+            session.rollback()
+            raise ValueError(f"No Chatbot found with id: {copilot_id}")
+        except Exception as e:
+            session.rollback()
+            logger.error(
+                "An exception occurred",
+                app="OPENCOPILOT",
+                error=str(e),
+                incident="update_global_variables",
+            )
 
 
 def update_copilot(
-        copilot_id: str,
-        name: Optional[str] = None,
-        prompt_message: Optional[str] = None,
-        swagger_url: Optional[str] = None,
-        enhanced_privacy: Optional[bool] = None,
-        smart_sync: Optional[bool] = None,
-        website: Optional[str] = None,
+    copilot_id: str,
+    name: Optional[str] = None,
+    prompt_message: Optional[str] = None,
+    swagger_url: Optional[str] = None,
+    enhanced_privacy: Optional[bool] = None,
+    smart_sync: Optional[bool] = None,
+    website: Optional[str] = None,
 ) -> dict[str, Any]:
     """
     Updates an existing Chatbot instance in the database.
@@ -300,6 +309,11 @@ def update_copilot(
         raise ValueError(f"No Chatbot found with id: {copilot_id}")
     except Exception as e:
         session.rollback()
-        logger.error("An exception occurred", app="OPENCOPILOT", error=str(e), incident="update_copilot")
+        logger.error(
+            "An exception occurred",
+            app="OPENCOPILOT",
+            error=str(e),
+            incident="update_copilot",
+        )
     finally:
         session.close()

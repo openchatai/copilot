@@ -60,7 +60,7 @@ export function CopilotsContainer() {
       )}
     </EmptyBlock>
   ) : (
-    <div className="grid gap-4 py-4 grid-cols-12">
+    <div className="grid gap-4 py-4 grid-cols-12 copilot__container">
       {$copilots?.map((copilot, index) => {
         const copilotUrl = "/copilot/" + copilot.id;
         return (
@@ -79,10 +79,14 @@ export function CopilotsContainer() {
                 filter: "blur(10px)"
               }}
               transition={{ duration: 0.2, delay: 0.1 * index }}
-              className="group col-span-full lg:col-span-6 xl:col-span-3"
+              className="group col-span-full lg:col-span-6 xl:col-span-3 copilot"
             >
-              <div className="group relative flex h-56 items-center justify-center rounded-lg border-2 bg-accent group-hover:bg-secondary transition-colors">
-                <div className="flex-center size-20 shadow-lg group-hover:scale-95 bg-primary transition-transform rounded-lg text-gray-100">
+              <div
+                style={{
+                  transitionDelay: `max(0.1s, ${0.1 * index}ms)`,
+                }}
+                className="group relative flex h-56 items-center justify-center rounded-lg border-2 transition-colors box">
+                <div className="flex-center size-20 shadow-lg group-hover:scale-95 transition-transform rounded-lg bg-primary text-gray-100">
                   <GalleryHorizontalEnd className="size-12" />
                 </div>
               </div>

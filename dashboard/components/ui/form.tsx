@@ -12,7 +12,6 @@ import {
   FormProvider,
   useFormContext,
 } from "react-hook-form";
-
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 
@@ -180,7 +179,8 @@ function Field<
   description,
   name,
   control,
-  render
+  render,
+  className,
 }: {
   name: TName;
   required?: boolean;
@@ -188,13 +188,14 @@ function Field<
   description?: string;
   // eslint-disable-next-line no-unused-vars
   render: (props: ControllerRenderProps<TFieldValues, TName>) => React.ReactNode;
-  control: Control<TFieldValues>
+  control: Control<TFieldValues>;
+  className?: string;
 }) {
   return <FormField
     control={control}
     name={name}
     render={({ field }) => (
-      <FormItem>
+      <FormItem className={className}>
         {
           label && <FormLabel className={required ? "required-label" : ""}>
             {label}
@@ -211,7 +212,6 @@ function Field<
     )}
   />
 }
-
 
 
 export {

@@ -16,6 +16,7 @@ const opensans = Open_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
   fallback: ["Roboto", "sans-serif"],
+  preload: true,
 });
 
 export const metadata: Metadata = {
