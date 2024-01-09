@@ -16,7 +16,6 @@ import { ActionResponseType } from '@/data/actions';
 import { MagicAction } from './MagicAction';
 import { SwaggerDnd } from './SwaggerDnd';
 import { useCopilot } from '@/app/(copilot)/copilot/_context/CopilotProvider';
-import { ActionVariablesDrawer } from './ActionVariables';
 
 const nodeTypes = {
     actionBlock
@@ -169,7 +168,6 @@ export function FlowRenderer() {
                     </div>
                 </aside>
                 <AddActionDrawer />
-                <ActionVariablesDrawer />
                 <div className='flex-1 relative h-full overflow-clip' ref={reactFlowWrapper}>
                     {
                         isBlocksEmpty && <div data-container='Empty block add button' className='absolute inset-0 z-50 flex-center bg-secondary p-4'>
