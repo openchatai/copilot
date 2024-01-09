@@ -2,6 +2,7 @@ import datetime
 import json
 import uuid
 from typing import Iterable, List, Optional, Any
+from flask import jsonify
 
 from sqlalchemy import exc
 from sqlalchemy.orm import sessionmaker, Session
@@ -221,6 +222,22 @@ def chatbot_to_dict(chatbot: Chatbot):
         "swagger_url": chatbot.swagger_url,
     }
 
+def delete_copilot_global_key(copilot_id: str, variable_key: str):
+    with SessionLocal() as session:
+        try:
+            copilot = find_one_or_fail_by_id(copilot_id)
+            vars_dict = deepcopy(dict(copilot.global_variables))
+
+            if (variable_key in vars_dict):
+                del vars_dict[variable_key]
+                copilot.global_variables = vars_dict
+                session.add(copilot)
+                session.commit()
+                session.refresh(copilot)
+        except Exception:
+            session.rollback()
+            raise ValueError(f"No Chatbot found with id: {copilot_id}")
+    return jsonify({"message": "JSON data stored successfully"})
 
 def store_copilot_global_variables(copilot_id: str, new_variables: dict):
     with SessionLocal() as session:
