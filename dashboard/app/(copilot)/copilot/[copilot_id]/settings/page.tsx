@@ -18,7 +18,7 @@ import _ from "lodash";
 import { CopyButton } from "@/components/headless/CopyButton";
 import { TableCell } from '@/components/ui/table';
 import { EmptyBlock } from '@/components/domain/EmptyBlock';
-import { Plus } from 'lucide-react';
+import { Plus, XCircle } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Section } from "./Section";
 import { SingleVariableForm } from "./SingleVariableForm";
@@ -34,11 +34,21 @@ import { mutate } from "swr";
 
 function VariablesSection() {
   const { id: copilotId } = useCopilot();
-  const [vars, createVar, status] = useVariables(copilotId);
+  const [
+    formOpen,
+    setFormOpen
+  ] = React.useState(false);
+  const {
+    swr: { data: vars },
+    createVarAsync,
+    deleteVarAsync,
+    asyncCreateStatus,
+    asyncDeleteStatus
+  } = useVariables(copilotId);
 
   const data = useMemo(() => {
     const _data: { name: string; value: string }[] = [];
-    const __data = vars.data;
+    const __data = vars;
     if (__data) {
       Object.keys(__data).forEach((key) => {
         const val = __data[key];
@@ -46,7 +56,7 @@ function VariablesSection() {
       })
     }
     return _data
-  }, [vars.data])
+  }, [vars])
 
   const form = useForm<{ d: { name: string; value: string }[] }>({
     values: {
@@ -59,28 +69,29 @@ function VariablesSection() {
   async function updateWhatChanged() {
     const changed = form.formState.dirtyFields.d;
     if (changed) {
-      console.log(changed)
       const changedData = changed.map((v, i) => {
         if (v.value === true || v.name === true) {
           return form.getValues().d.at(i)
         }
-      }).filter(Boolean)
-      Promise.allSettled(
-        changedData.map((cv) => cv?.name && createVar(cv?.name, cv?.value, false))
-      ).finally(vars.mutate)
+      }).filter((v) => !_.isUndefined(v))
+      // @ts-ignore
+      createVarAsync(changedData, true)
     }
   }
 
   return <Section header={<header className="flex items-center justify-between w-full">
     <h2 className="text-base font-bold">Global Variables</h2>
-    <Popover>
+    <Popover
+      open={formOpen}
+      onOpenChange={setFormOpen}
+    >
       <PopoverTrigger asChild>
         <Button size='fit' variant='outline' className="p-1.5">
           <Plus className='h-4 w-4' />
         </Button>
       </PopoverTrigger>
       <PopoverContent className='mx-2'>
-        <SingleVariableForm onSubmit={(data) => { createVar(data.name, data.value) }} footer={<Button loading={status.loading} type='submit' size='xs'>create</Button>} />
+        <SingleVariableForm onSubmit={async (data) => { await (await createVarAsync([data])).message && setFormOpen(false) }} footer={<Button loading={asyncCreateStatus.loading} type='submit' size='xs'>create</Button>} />
       </PopoverContent>
     </Popover>
   </header>}>
@@ -94,7 +105,7 @@ function VariablesSection() {
         </thead>
         <tbody>
           {_.isEmpty(data) ? <tr>
-            <TableCell colSpan={2}>
+            <TableCell colSpan={3}>
               <EmptyBlock>
                 <p className='text-sm'>No variables found</p>
               </EmptyBlock>
@@ -119,6 +130,15 @@ function VariablesSection() {
                         <td>
                           <Input type="text" {...form.register(`d.${index}.value`)} />
                         </td>
+                        <td className="px-0 text-right">
+                          <Button variant='destructive' size='icon'
+                            loading={asyncDeleteStatus.loading}
+                            onClick={() => {
+                              confirm("are you sure ?") && deleteVarAsync(field.name)
+                            }}>
+                            <XCircle className='h-4 w-4' />
+                          </Button>
+                        </td>
                       </motion.tr>
                     </AnimatePresence>
                   )
@@ -128,7 +148,7 @@ function VariablesSection() {
         </tbody>
         <tfoot>
           <tr>
-            <td colSpan={2} className="p-2">
+            <td colSpan={3} className="pt-3">
               <div className="w-full flex gap-2 items-center justify-end">
                 <Button disabled={!hasChanged} variant='destructiveOutline' onClick={() => form.reset()} size='sm'>Reset</Button>
                 <Button size='sm' disabled={!hasChanged} onClick={updateWhatChanged}>Save</Button>
