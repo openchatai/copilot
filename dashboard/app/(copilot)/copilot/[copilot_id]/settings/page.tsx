@@ -53,19 +53,21 @@ function VariablesSection() {
       d: data
     }
   });
+
   const hasChanged = form.formState.isDirty;
+
   async function updateWhatChanged() {
     const changed = form.formState.dirtyFields.d;
     if (changed) {
+      console.log(changed)
       const changedData = changed.map((v, i) => {
-        if (v.value === true && v.name === true) {
+        if (v.value === true || v.name === true) {
           return form.getValues().d.at(i)
         }
       }).filter(Boolean)
       Promise.allSettled(
         changedData.map((cv) => cv?.name && createVar(cv?.name, cv?.value, false))
       ).finally(vars.mutate)
-
     }
   }
 
