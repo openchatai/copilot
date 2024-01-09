@@ -4,10 +4,10 @@ import useSWR from "swr";
 
 export function useVariables(copilot_id: string) {
     const swr = useSWR(copilot_id + '/variables', async () => getVariablesByBotId(copilot_id));
-    const [asyncStatus, createVar] = useAsyncFn(async (name: string, value: string) => {
+    const [asyncStatus, createVar] = useAsyncFn(async (name: string, value: string, mutate: boolean = true) => {
         const { data, status } = await createVariable(copilot_id, name, value);
         if (data.message && status === 200) {
-            swr.mutate()
+            mutate && swr.mutate()
         }
         return data
     })
