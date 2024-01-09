@@ -7,19 +7,14 @@ import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTrigger,
 import { Button } from '@/components/ui/button'
 import { PlusCircle } from 'lucide-react';
 import { useAsyncFn } from 'react-use';
-import { createVariable } from '@/data/copilot';
+import { VariableType, createVariable } from '@/data/copilot';
 import { toast } from '@/components/ui/use-toast';
 import _ from 'lodash';
 import { useCopilot } from '../../_context/CopilotProvider';
 
-type Variable = {
-    name: string,
-    value: string,
-}
-
 type Props = {
     // eslint-disable-next-line no-unused-vars
-    onSubmit?: (data: Variable) => void,
+    onSubmit?: (data: VariableType) => void,
     footer?: React.ReactNode,
 }
 
@@ -67,7 +62,7 @@ export function AddSingleVariable() {
                 <div>
                     <SingleVariableForm
                         onSubmit={async (_data) => {
-                            const { data } = await $createVariable(copilotId, _data.name, _data.value)
+                            const { data } = await $createVariable(copilotId, [_data])
                             if (data.message) {
                                 toast({
                                     variant: "success",
