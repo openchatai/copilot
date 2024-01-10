@@ -18,15 +18,12 @@ from routes.chat.implementation.chain_strategy import ChainStrategy
 from routes.chat.implementation.functions_strategy import FunctionStrategy
 from routes.chat.implementation.handler_interface import ChatRequestHandler
 from routes.chat.implementation.tools_strategy import ToolStrategy
-from utils.db import NoSQLDatabase
 from utils.get_logger import CustomLogger
 from utils.llm_consts import X_App_Name, chat_strategy, ChatStrategy
 from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
 from .. import root_service
 from flask_socketio import emit
 
-db_instance = NoSQLDatabase()
-mongo = db_instance.get_db()
 logger = CustomLogger(module_name=__name__)
 
 chat_workflow = Blueprint("chat", __name__)

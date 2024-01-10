@@ -7,29 +7,18 @@ from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
 from custom_types.response_dict import ResponseDict
 from custom_types.run_workflow_input import ChatContext
 from entities.flow_entity import FlowDTO
-from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from models.repository.flow_repo import get_flow_by_id
 from routes.flow.utils import create_flow_from_operation_ids, run_flow
-from routes.flow.utils.api_retrievers import (
-    get_relevant_knowledgebase,
-    get_relevant_actions,
-    get_relevant_flows,
-)
+
 from routes.flow.utils.document_similarity_dto import (
-    select_top_documents,
     DocumentSimilarityDTO,
 )
-from routes.flow.utils.process_conversation_step import get_next_response_type
-from utils.db import NoSQLDatabase
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
 from utils.llm_consts import VectorCollections
 from flask_socketio import emit
 
 logger = CustomLogger(module_name=__name__)
-
-db_instance = NoSQLDatabase()
-mongo = db_instance.get_db()
 
 shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
 

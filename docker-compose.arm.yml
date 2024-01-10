@@ -28,8 +28,7 @@ services:
         condition: service_healthy
       qdrant:
         condition: service_started
-      mongodb:
-        condition: service_started
+
   redis:
     image: redis:latest
     container_name: redis_cache
@@ -60,8 +59,6 @@ services:
       mysql:
         condition: service_healthy
       qdrant:
-        condition: service_started
-      mongodb:
         condition: service_started
 
   dashboard:
@@ -100,19 +97,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
-    ports:
-      - 27017:27017
-    volumes:
-      - mongodb_data:/data/db
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: dbuser
-      MONGO_INITDB_ROOT_PASSWORD: dbpass
-    networks:
-      - opencopilot-net
 
   adminer:
     image: adminer
@@ -174,7 +158,6 @@ networks:
 volumes:
   shared_data:
   database:
-  mongodb_data:
   qdrant_storage:
   redis_data:
   minio_data:
