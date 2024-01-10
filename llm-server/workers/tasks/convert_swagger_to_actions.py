@@ -12,7 +12,6 @@ from models.repository.action_repo import (
 from models.repository.copilot_repo import get_total_chatbots, get_chatbots_batch
 from routes.action import action_vector_service
 from shared.models.opencopilot_db.chatbot import Chatbot
-from utils.db import NoSQLDatabase
 from utils.get_logger import CustomLogger
 from utils.llm_consts import VectorCollections, initialize_qdrant_client
 from utils.swagger_parser import SwaggerParser
@@ -20,7 +19,7 @@ from utils.swagger_parser import SwaggerParser
 # Initialize Qdrant Client and other global variables
 client = initialize_qdrant_client()
 logger = CustomLogger(module_name=__name__)
-db_instance = NoSQLDatabase()
+
 shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
 
 

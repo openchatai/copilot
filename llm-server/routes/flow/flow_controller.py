@@ -15,11 +15,7 @@ from models.repository.flow_repo import (
 from presenters.flow_presenters import flow_to_dict, flow_variable_to_dict
 from routes.flow import flow_vector_service
 from routes.flow.utils.dynamic_flow_builder import build_dynamic_flow
-from utils.db import NoSQLDatabase
 from utils.get_logger import CustomLogger
-
-db_instance = NoSQLDatabase()
-mongo = db_instance.get_db()
 
 logger = CustomLogger("flow")
 flow = Blueprint("flow", __name__)
