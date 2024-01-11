@@ -11,6 +11,12 @@
   </head>
 
   <body>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap");
+      body {
+        font-family: "Cairo", sans-serif;
+      }
+    </style>
     <button id="triggerSelector">toggle the chat widget</button>
     <script type="module" src="/src/main.tsx"></script>
     <script>
@@ -29,6 +35,7 @@
             name: "John Doe",
           },
           containerProps: {
+            dir: "ltr",
             style: {
               position: "fixed",
               height: "100%",
