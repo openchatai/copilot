@@ -11,7 +11,7 @@ import {
   MessagesSquare,
   Settings,
   Workflow,
-  SquareCode, Codesandbox
+  SquareCode, Codesandbox, Route
 } from "lucide-react";
 import React from "react";
 import { CopilotLayoutNavLink } from "../../_parts/CopilotNavLink";
@@ -73,6 +73,11 @@ export default function CopilotLayout({ children, params }: Props) {
               segment="settings"
               IconComponent={Settings}
               label="Settings"
+            />
+            <CopilotLayoutNavLink
+              href={copilotBase + "/actions"}
+              IconComponent={Route}
+              label="Actions"
             />
           </div>
         </div>
