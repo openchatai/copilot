@@ -51,7 +51,12 @@ export async function updateCopilot(id: string, copilot: Partial<CopilotType>) {
 export async function createCopilot(copilot_name: string) {
   const form = new FormData()
   form.append('name', copilot_name)
-  return await instance.post<CopilotType>('/', form)
+  return await instance.post<CopilotType>('/', form, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      'Accept': 'application/json'
+    }
+  })
 }
 // localhost:8888/backend/copilot/5a958877-63b6-47a5-afa3-621dc57e7d1b/variables
 export async function getVariablesByBotId(id: string) {
