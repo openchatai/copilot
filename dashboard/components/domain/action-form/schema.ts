@@ -50,7 +50,17 @@ export const actionSchema = z.object({
             return false;
         });
     }),
-    body: z.string().optional()
+    body: z.string().refine((val) => {
+        if (!val) {
+            return true;
+        }
+        try {
+            JSON.parse(val);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    },"invalid JSON object").optional(),
 });
 
 export type ActionType = z.infer<typeof actionSchema>;
