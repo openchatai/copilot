@@ -22,7 +22,7 @@ function Root({
 }) {
   const { style, id, ...containerProp } = containerProps || {}
   return (
-    <root.div {...containerProp} id="copilot-widget" style={{ width: '100%', height: '100%', ...style }}>
+    <root.div {...containerProp} id="copilot-widget" style={{ width: '100%', height: '100%', fontFamily: "inherit", ...style }}>
       <ConfigDataProvider data={options}>
         <WidgetState>
           <AxiosProvider>
