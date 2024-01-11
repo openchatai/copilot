@@ -42,7 +42,7 @@ export function AddActionDrawer() {
                     footer={
                         (form) => (
                             <SheetFooter className="sticky w-full py-3 bg-white bottom-0 inset-x-0">
-                                <Button disabled={!form.formState.isValid} loading={state.loading} type="submit">Create</Button>
+                                <Button loading={state.loading} type="submit">Create</Button>
                                 <SheetClose asChild>
                                     <Button variant='ghost'>Cancel</Button>
                                 </SheetClose>

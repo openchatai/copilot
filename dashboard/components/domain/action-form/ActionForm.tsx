@@ -21,6 +21,7 @@ import { FormErrorMessage } from "@/components/ui/FieldError";
 import { Tooltip } from "../Tooltip";
 import { Plus, Wand2, X } from "lucide-react";
 import { produce } from "immer";
+import { JsonInput } from "../JsonInput";
 
 function isValidField<
     TValues extends FieldValues = FieldValues,
@@ -127,7 +128,7 @@ export function ActionForm({
                     name="body"
                     description="The body of the request in JSON format"
                     label="Body (JSON)"
-                    render={(props) => <Textarea minRows={3} {...props} />}
+                    render={(props) => <JsonInput {...props} />}
                 />
 
                 <div>
