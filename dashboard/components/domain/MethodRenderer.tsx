@@ -1,7 +1,7 @@
 import { cva } from "class-variance-authority";
 
 
-export const methodVariants = cva('text-accent uppercase rounded-md px-2 py-1.5 font-semibold text-xs', {
+export const methodVariants = cva('text-accent uppercase text-xs font-semibold', {
     variants: {
         method: {
             GET: 'bg-green-500',
@@ -13,6 +13,13 @@ export const methodVariants = cva('text-accent uppercase rounded-md px-2 py-1.5 
             HEAD: 'bg-gray-500',
             TRACE: 'bg-gray-500',
             CONNECT: 'bg-gray-500',
+        },
+        size: {
+            tiny: 'px-1 py-0.5 rounded-sm',
+            xs: 'px-2 py-1.5 rounded-md',
         }
+    }, defaultVariants: {
+        size: 'xs',
+        method: 'GET'
     }
 })
