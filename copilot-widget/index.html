@@ -11,41 +11,108 @@
   </head>
 
   <body>
+    <main>
+      <h2>
+        This is an Example on how the widget is fluid and can be placed
+        anywhere;
+      </h2>
+    </main>
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap");
+      /* reset */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
       body {
-        font-family: "Cairo", sans-serif;
+        background-color: #f5f5f5;
+        font-family: sans-serif;
       }
     </style>
-    <button id="triggerSelector">toggle the chat widget</button>
+
+    <style>
+      #opencopilot-root {
+        margin-top: 50px;
+        background-color: red;
+        padding: 20px;
+        border-radius: 10px;
+        width: 500px;
+        height: 500px;
+        margin-inline: auto;
+        position: relative;
+      }
+
+      #opencopilot-root::after {
+        content: "Cotainer";
+        position: absolute;
+        top: 0;
+        translate: -50% -50%;
+        left: 0;
+        background-color: #fff;
+        padding: 5px;
+        border-radius: 5px;
+        color: black;
+      }
+    </style>
     <script type="module" src="/src/main.tsx"></script>
+    <div id="opencopilot-root"></div>
+
     <script>
-      window.onload = () => {
+      document.addEventListener("DOMContentLoaded", () => {
         initAiCoPilot({
-          initialMessage: "Hi Sir",
-          token: "Rntz9NnnsF3t4742",
-          triggerSelector: "#triggerSelector",
-          apiUrl: "http://localhost:8888/backend",
-          socketUrl: "http://localhost:8888",
-          defaultOpen: true,
+          initialMessage: "Hi Sir", // optional
+          token: "Y64j2MMWd5yfvlei", // required
+          triggerSelector: "#triggerSelector", // optional
+          rootId: "opencopilot-root", // optional otherwise it will create a div with id opencopilot-root
+          apiUrl: "https://cloud.opencopilot.so/backend", // required
+          socketUrl: "https://cloud.opencopilot.so", // required
+          defaultOpen: true, // optional
+          containerProps: {}, // optional
           headers: {
+            // optional
             Authorization: "Bearer BQAlIe479yo16aXf",
           },
           user: {
+            // optional
             name: "John Doe",
           },
+        });
+      });
+    </script>
+
+    <script>
+      // this one is rendered on the bottom right corner
+      document.addEventListener("DOMContentLoaded", () => {
+        initAiCoPilot({
+          initialMessage: "Hi Sir", // optional
+          token: "Y64j2MMWd5yfvlei", // required
+          triggerSelector: "#triggerSelector", // optional
+          rootId: "opencopilot-root-2", // optional otherwise it will create a div with id opencopilot-root
+          apiUrl: "https://cloud.opencopilot.so/backend", // required
+          socketUrl: "https://cloud.opencopilot.so", // required
+          defaultOpen: true, // optional
           containerProps: {
-            dir: "ltr",
+            // optional
             style: {
+              // optional
               position: "fixed",
-              height: "100%",
-              bottom: "0",
-              right: "0",
+              bottom: "10px",
+              right: "10px",
               width: "400px",
+              height: "500px",
+              overflow: "hidden",
             },
+          }, // optional
+          headers: {
+            // optional
+            Authorization: "Bearer BQAlIe479yo16aXf",
+          },
+          user: {
+            // optional
+            name: "John Doe",
           },
         });
-      };
+      });
     </script>
   </body>
 </html>

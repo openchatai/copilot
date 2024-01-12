@@ -4,14 +4,19 @@ import cn from "./utils/cn";
 import ChatScreenWithSfxs from "./screens/ChatScreen";
 import { IS_SERVER } from "./utils/is_server";
 
-function useTrigger(selector: string, toggle: () => void) {
+function useTrigger(selector?: string, toggle?: () => void) {
+
   const trigger = useRef<HTMLElement | null>(
-    IS_SERVER ? null : document.querySelector(selector)
+    !selector ? null : IS_SERVER ? null : document.querySelector(selector)
   ).current;
+
   useEffect(() => {
-    if (trigger) {
-      trigger.addEventListener("click", toggle);
-      return () => trigger.removeEventListener("click", toggle);
+    if (!selector) {
+      return;
+    }
+    if (trigger && !IS_SERVER) {
+      trigger.addEventListener("click", () => toggle?.());
+      return () => trigger.removeEventListener("click", () => toggle?.());
     } else {
       console.warn(
         "The trigger element can't be found, make sure it is present in the DOM"
@@ -29,7 +34,6 @@ export function CopilotWidget({
   useTrigger(triggerSelector, toggle)
   return (
     <div
-      id="opencopilot-aicopilot"
       data-open={open}
       className={cn(
         "opencopilot-w-full opencopilot-overflow-hidden opencopilot-h-full sm:opencopilot-rounded-xl opencopilot-bg-white opencopilot-shadow",
