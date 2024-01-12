@@ -1,7 +1,6 @@
 ---
 title: "Embedding the copilot"
 description: "Learn how to embed the copilot in your app"
-icon: "message"
 ---
 the chat widget enables you to interact with the Copilot from your dashboard and see the changes in realtime.
 OpenCopilot is a react web app that you can embed in your app. 
@@ -116,13 +115,40 @@ function Widget(){
 }
 ```
 
+## Options
+
+<ResponseField name="Options" type="Object">
+  <Expandable title="properties">
+    <ResponseField name="initialMessage" type="string">
+      The message that will be first present when the copilot is initialized
+    </ResponseField>
+    <ResponseField name="token" type="string">
+      Your copilot token
+    </ResponseField>
+    <ResponseField name="triggerSelector" type="string">
+      The selector of the element that will trigger the copilot when clicked
+    </ResponseField>
+    <ResponseField name="apiUrl" type="string">
+      the url of the copilot api.
+    </ResponseField>
+    <ResponseField name="headers" type="Object">
+      An object of headers that will be sent with every request (can be used to authenticate your api requests)
+    </ResponseField>
+    <ResponseField name="containerProps" type="Object">
+      An object of props that will be passed to the container div
+    </ResponseField>
+    <ResponseField name="socketUrl" type="string">
+      The url of the socket url that will be used to send and receive messages
+    </ResponseField>
+  </Expandable>
+</ResponseField>
 
 
 ## Available options
 
 | Option            | Description                                                                                               | type                    |
 | ----------------- | --------------------------------------------------------------------------------------------------------- | ----------------------- |
-| `initialMessage`  | An array of messages that will be sent to the copilot when it's initialized                               | `string`                |
+| `initialMessage`  | The message that will be first present when the copilot is initialized                                    | `string`                |
 | `token`           | Your copilot token                                                                                        | `string`                |
 | `triggerSelector` | The selector of the element that will trigger the copilot when clicked                                    | `string`                |
 | `apiUrl`          | the url of the copilot api.                                                                               | `string`                |
