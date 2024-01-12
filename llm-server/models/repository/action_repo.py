@@ -15,6 +15,38 @@ SessionLocal = sessionmaker(bind=engine)
 logger = CustomLogger(module_name=__name__)
 
 
+def create_actions(chatbot_id: str, data: List[ActionDTO]) -> List[dict]:
+    """
+    Creates multiple new Action instances and adds them to the database with validations.
+    """
+    with SessionLocal() as session:
+        actions = []
+        for dto in data:
+            new_action = Action(
+                id=str(uuid.uuid4()),
+                bot_id=chatbot_id,
+                name=dto.name,
+                description=dto.description,
+                operation_id=dto.operation_id,
+                api_endpoint=dto.api_endpoint,
+                request_type=dto.request_type,
+                payload=dto.payload,
+                created_at=datetime.datetime.utcnow(),
+                updated_at=datetime.datetime.utcnow(),
+            )
+            actions.append(new_action)
+        try:
+            session.add_all(actions)
+            session.commit()
+            for action in actions:
+                session.refresh(action)
+            return actions
+        except Exception as e:
+            session.rollback()
+            logger.error("An exception occurred", error=str(e))
+            raise
+
+
 def create_action(chatbot_id: str, data: ActionDTO) -> dict:
     """
     Creates a new Action instance and adds it to the database with validations.
@@ -88,7 +120,9 @@ def find_action_by_operation_id(operation_id: str) -> Optional[Action]:
     Returns a single Action object if found, otherwise None.
     """
     with SessionLocal() as session:
-        action = session.query(Action).filter(Action.operation_id == operation_id).first()
+        action = (
+            session.query(Action).filter(Action.operation_id == operation_id).first()
+        )
         return action
 
 
@@ -139,7 +173,9 @@ def action_to_dict(action: Action) -> dict:
     }
 
 
-def find_action_by_method_id_and_bot_id(operation_id: str, bot_id: str) -> Optional[Action]:
+def find_action_by_method_id_and_bot_id(
+    operation_id: str, bot_id: str
+) -> Optional[Action]:
     """
     Retrieves an action from the database filtered by the given method_id and bot_id.
     Returns a single Action object if found, otherwise None.
@@ -149,8 +185,9 @@ def find_action_by_method_id_and_bot_id(operation_id: str, bot_id: str) -> Optio
     :return: An Action object or None.
     """
     with SessionLocal() as session:
-        action = session.query(Action).filter(
-            Action.operation_id == operation_id,
-            Action.bot_id == bot_id
-        ).first()
+        action = (
+            session.query(Action)
+            .filter(Action.operation_id == operation_id, Action.bot_id == bot_id)
+            .first()
+        )
         return action

@@ -7,7 +7,7 @@ import useSWR from "swr";
 import _ from "lodash";
 import { toast } from "@/components/ui/use-toast";
 import { AlertDialog, AlertDialogContent, AlertDialogCancel, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { createActionByBotId, getActionsByBotId, importActionsFromSwagger } from "@/data/actions";
+import { createActionByBotId, getActionsByBotId } from "@/data/actions";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2, UploadCloud } from "lucide-react";
 import { EmptyBlock } from "@/components/domain/EmptyBlock";
@@ -15,6 +15,7 @@ import { ActionForm } from "@/components/domain/action-form/ActionForm";
 import { methodVariants } from "@/components/domain/MethodRenderer";
 import { cn } from "@/lib/utils";
 import { GetActionsFromSwagger } from "@/components/domain/SwaggerUpload";
+import { useSwaggerAdd } from "@/hooks/useAddSwagger";
 
 
 const formDialog = atom({
@@ -25,35 +26,39 @@ const formDialog = atom({
 
 export function DefineActionsStep() {
     const { nextStep, previousStep } = useWizard();
-    const [state, $importActionsFromSwagger] = useAsyncFn(importActionsFromSwagger)
     const [addActionState, $addAction] = useAsyncFn(createActionByBotId)
     const {
         state: { swaggerFiles, createdCopilot },
         dispatch,
     } = useCreateCopilot();
-    const [dialogs, setDialogs] = useAtom(formDialog)
+    const [state, addSwagger] = useSwaggerAdd({ copilotId: createdCopilot?.id })
+    const [dialogs, setDialogs] = useAtom(formDialog);
     const { data: actions } = useSWR(createdCopilot ? (createdCopilot?.id + '/actions') : null, async () => createdCopilot?.id ? await getActionsByBotId(createdCopilot?.id) : null)
+
     async function addActionFromSwagger() {
         const swaggerFile = _.first(swaggerFiles);
         if (swaggerFile && createdCopilot) {
-            const response = await $importActionsFromSwagger(createdCopilot.id, swaggerFile)
-            if (response.data) {
-                toast({
-                    title: "Actions imported successfully",
-                    description: "We have imported your actions successfully",
-                    variant: "success",
-                });
-            }
-            // reset swagger files
-            dispatch({
-                type: "ADD_SWAGGER",
-                payload: [],
-            });
-            revalidateActions(createdCopilot.id)
-            setDialogs({
-                ...dialogs,
-                swagger: false
+            addSwagger({
+                swagger: swaggerFile, onSuccess(data) {
+                    dispatch({
+                        type: "ADD_SWAGGER",
+                        payload: [],
+                    });
+                    revalidateActions(createdCopilot.id)
+                    setDialogs({
+                        ...dialogs,
+                        swagger: false
+                    })
+                },
+                onError(data) {
+                    dispatch({
+                        type: "ADD_SWAGGER",
+                        payload: [],
+                    });
+                },
             })
+
+
         }
     }
     return (
@@ -180,7 +185,7 @@ export function DefineActionsStep() {
                                             {endpoint.request_type}
                                         </span>
                                         <p className="flex-1 line-clamp-1 overflow-ellipsis font-medium text-xs">
-                                            {endpoint.api_endpoint || endpoint.name}
+                                            {endpoint.name || endpoint.api_endpoint}
                                         </p>
                                     </div>
                                 </div>

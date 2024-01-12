@@ -3,6 +3,10 @@ import { baseUrl } from "./base-url";
 
 const instance = axios.create({
   baseURL: baseUrl + "/backend/copilot",
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  }
 });
 
 export type CopilotType = {
@@ -47,5 +51,28 @@ export async function updateCopilot(id: string, copilot: Partial<CopilotType>) {
 export async function createCopilot(copilot_name: string) {
   const form = new FormData()
   form.append('name', copilot_name)
-  return await instance.post<CopilotType>('/', form)
+  return await instance.post<CopilotType>('/', form, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      'Accept': 'application/json'
+    }
+  })
+}
+// localhost:8888/backend/copilot/5a958877-63b6-47a5-afa3-621dc57e7d1b/variables
+export async function getVariablesByBotId(id: string) {
+  return (await instance.get<Record<string, string>>(`/${id}/variables`)).data;
+}
+export type VariableType = {
+  name: string;
+  value: string;
+}
+// {{backend_base}}/backend/copilot/:id/variables
+export async function createVariable(id: string, variables: VariableType[]) {
+  // data = {key1: value1, key2: value2}
+  const data = variables.reduce((acc, { name, value }) => ({ ...acc, [name]: value }), {})
+  return await instance.post<{ message: string }>(`/${id}/variables`, data)
+}
+// {{backend_base}}/backend/copilot/:id/variable/:var_name
+export async function deleteVariableByKey(id: string, name: string) {
+  return await instance.delete<{ message: string }>(`/${id}/variable/${name}`)
 }

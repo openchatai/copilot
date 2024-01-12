@@ -1,5 +1,5 @@
 import { SubNavLink } from "@/app/(copilot)/_parts/SubNavLink";
-import { BrainCircuit, Settings2 } from "lucide-react";
+import { BrainCircuit, Settings2, Variable } from "lucide-react";
 import React from "react";
 
 type Props = {
@@ -14,7 +14,7 @@ export default function SettingsLayout({ children, params }: Props) {
   return (
     <div className="flex h-full flex-row overflow-hidden">
       <div className="h-full w-aside shrink-0 border-r bg-primary-foreground">
-        <div className="flex-center h-header justify-start border-b px-6">
+        <div className="flex-center h-header justify-start border-b px-6 bg-white">
           <h1 className="text-lg font-bold text-secondary-foreground">
             Settings
           </h1>

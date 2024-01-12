@@ -26,11 +26,6 @@ const config: Config = {
       current,
       emerald,
     },
-    extend: {
-      fontFamily: {
-        inter: ["Inter", "sans-serif", "system-ui"],
-      },
-    },
   },
   plugins: [
     require("tailwindcss-animate"),

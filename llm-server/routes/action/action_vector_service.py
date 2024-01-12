@@ -37,6 +37,7 @@ def create_actions(actions: List[ActionDTO]):
     return vector_ids
 
 
+# @deprecated, using create_actions
 def create_action(action: ActionDTO):
     documents: List[Document] = []
 

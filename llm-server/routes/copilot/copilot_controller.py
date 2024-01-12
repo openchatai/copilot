@@ -1,3 +1,4 @@
+from copy import deepcopy
 import os
 from http import HTTPStatus
 
@@ -6,13 +7,15 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from enums.initial_prompt import ChatBotInitialPromptEnum
 from models.repository.copilot_repo import (
+    delete_copilot_global_key,
     list_all_with_filter,
     find_or_fail_by_bot_id,
     find_one_or_fail_by_id,
     create_copilot,
     chatbot_to_dict,
     SessionLocal,
-    update_copilot, store_copilot_global_variables,
+    update_copilot,
+    store_copilot_global_variables,
 )
 from routes._swagger.reindex_service import migrate_actions
 from utils.get_logger import CustomLogger
@@ -124,9 +127,12 @@ def update_global_variables(copilot_id):
 
         # Validate that data is a dictionary
         if not isinstance(data, dict):
-            return jsonify({"error": "Invalid data format, expected a JSON object"}), 400
+            return (
+                jsonify({"error": "Invalid data format, expected a JSON object"}),
+                400,
+            )
 
-        store_copilot_global_variables(copilot_id=copilot_id, variables=data)
+        store_copilot_global_variables(copilot_id=copilot_id, new_variables=data)
 
         # Return a success response
         return jsonify({"message": "JSON data stored successfully"})
@@ -137,6 +143,9 @@ def update_global_variables(copilot_id):
         # Handle other exceptions
         return jsonify({"error": "An error occurred", "details": str(e)}), 500
 
+@copilot.route("/<string:copilot_id>/variable/<string:variable_key>", methods=["DELETE"])
+def delete_global_variable(copilot_id:str, variable_key:str):
+    return delete_copilot_global_key(copilot_id=copilot_id, variable_key=variable_key)
 
 @copilot.route("/<string:copilot_id>/variables", methods=["GET"])
 def get_global_variables(copilot_id):

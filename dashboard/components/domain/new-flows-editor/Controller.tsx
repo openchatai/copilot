@@ -13,8 +13,16 @@ import { ReactFlowProvider } from 'reactflow';
 import { reorderList } from './utils';
 
 const selectedNodeIds = atom<string[]>([]);
+export type SelectedActionPosition = `${string}.${string}`
 
 export const useSelectedNodes = () => useAtom(selectedNodeIds);
+type SelectActionObj = {
+    unselectAction: () => void;
+    selectAction: (action: SelectedActionPosition) => void;
+    toggleSelectAction: (action: SelectedActionPosition) => void;
+    isSelected: (action?: SelectedActionPosition) => boolean;
+    getSelectedActionData: () => ActionResponseType | null;
+} & (() => SelectedActionPosition | null);
 
 type ControllerType = {
     state: StateType,
@@ -32,6 +40,7 @@ type ControllerType = {
     insertEmptyBlockBefore: (sourceId?: string) => void,
     moveActionFromBlockToBlock: (sourceBlockId: string, destinationBlockId: string, index: number, action_id: string) => void,
     dispatch: React.Dispatch<ActionsType>,
+    selectedActions: SelectActionObj,
 }
 const [ControllerProvider, useController] = createSafeContext<ControllerType>('Controller');
 
@@ -40,17 +49,6 @@ type ActionsType = Union<[{
 }, {
     type: "LOAD_ACTIONS",
     payload: ActionResponseType[]
-}, {
-    type: "APPEND_BLOCK_AFTER",
-    payload: {
-        blockId: string,
-        blockType: "ON_SUCCESS"
-    }
-}, {
-    type: "ADD_BLOCK",
-    payload: {
-        blockType: "ON_ERROR" | "ON_SUCCESS" | null
-    }
 }, {
     type: "UPDATE_BLOCK",
     payload: {
@@ -123,14 +121,17 @@ type ActionsType = Union<[{
 }, {
     type: "PATCH_CREATE_BLOCKS_FROM_ACTIONS",
     payload: ActionResponseType[]
+}, {
+    type: "SET_SELECTED_NODES",
+    payload: SelectedActionPosition | null,
 }]>;
-
 type StateType = {
     name: string | null,
     description: string | null,
     actions: ActionResponseType[],
     blocks: BlockType[],
     flow_id: string | null,
+    selectedNodes: SelectedActionPosition | null,
 }
 
 const initialState: StateType = {
@@ -139,6 +140,7 @@ const initialState: StateType = {
     description: null,
     actions: [],
     blocks: [],
+    selectedNodes: null,
 }
 
 function getEmptyBlock(next_on_success: string | null, actions?: ActionResponseType[]): BlockType {
@@ -292,6 +294,9 @@ function stateReducer(state: StateType, action: ActionsType) {
                     })
                 break;
             }
+            case "SET_SELECTED_NODES":
+                draft.selectedNodes = action.payload;
+                break;
             default:
                 return;
         }
@@ -307,7 +312,7 @@ function FlowsControllerV2({ children }: { children: React.ReactNode }) {
         <T extends (...args: any[]) => void>(cb: T) => cb,
         []
     );
-    // useCallback Hell :( 
+    // useCallback Hell :( // i will move to a better solution once i get this working/stable
     const loadActions = execCb((actions: ActionResponseType[]) => { dispatch({ type: "LOAD_ACTIONS", payload: actions }) })
     const reset = execCb(() => {
         dispatch({ type: "RESET" })
@@ -329,8 +334,7 @@ function FlowsControllerV2({ children }: { children: React.ReactNode }) {
     })
     const deleteActionFromBlock = execCb((blockId: string, actionId: string) => {
         dispatch({ type: "DELETE_ACTION_FROM_BLOCK", payload: { blockId, actionId } })
-    }
-    )
+    })
     const addNextOnSuccess = execCb((sourceId: string, destinationId: string) => {
         dispatch({ type: "ADD_EMPTY_NEXT_ON_SUCCESS_BETWEEN", payload: { sourceId, destinationId } })
     })
@@ -346,9 +350,38 @@ function FlowsControllerV2({ children }: { children: React.ReactNode }) {
     const insertEmptyBlockBefore = execCb((sourceId?: string) => {
         dispatch({ type: "INSERT_EMPTY_BLOCK_BEFORE", payload: { sourceId } })
     })
+    const selectedActions = _.assign({
+        unselectAction: execCb(() => {
+            dispatch({ type: "SET_SELECTED_NODES", payload: null })
+        }),
+        selectAction: execCb((action: SelectedActionPosition) => {
+            dispatch({ type: "SET_SELECTED_NODES", payload: action })
+        }),
+        toggleSelectAction: execCb((action: SelectedActionPosition) => {
+            if (state.selectedNodes === action) {
+                dispatch({ type: "SET_SELECTED_NODES", payload: null })
+            } else {
+                dispatch({ type: "SET_SELECTED_NODES", payload: action })
+            }
+        }),
+        isSelected: execCb((action?: SelectedActionPosition) => {
+            if (!action) {
+                return state.selectedNodes !== null;
+            }
+            return state.selectedNodes === action;
+        }),
+        getSelectedActionData: execCb(() => {
+            if (!state.selectedNodes) return null;
+            const [blockId, actionId] = state.selectedNodes.split('.');
+            const block = state.blocks.find(block => block.id === blockId);
+            if (!block) return null;
+            const action = block.actions.find(action => action.id === actionId);
+            return action ?? null;
+        })
+    }, () => state.selectedNodes);
     return (
         <ReactFlowProvider>
-            <ControllerProvider value={{ insertEmptyBlockBefore, dispatch, insertEmptyBlockAfter, moveActionFromBlockToBlock, state, deleteBlockById, addNextOnSuccess, deleteActionFromBlock, loadActions, reset, updateBlock, reorderActions, addActionToBlock, reorderActionsInBlock, deleteBlock }}>
+            <ControllerProvider value={{ selectedActions, insertEmptyBlockBefore, dispatch, insertEmptyBlockAfter, moveActionFromBlockToBlock, state, deleteBlockById, addNextOnSuccess, deleteActionFromBlock, loadActions, reset, updateBlock, reorderActions, addActionToBlock, reorderActionsInBlock, deleteBlock }}>
                 {children}
             </ControllerProvider>
         </ReactFlowProvider>

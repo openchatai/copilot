@@ -9,6 +9,7 @@ from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id,
     get_unique_sessions_with_first_message_by_bot_id,
     create_chat_history,
+    create_chat_histories,
 )
 from models.repository.copilot_repo import find_one_or_fail_by_token
 from routes.analytics.analytics_service import upsert_analytics_record
@@ -17,15 +18,12 @@ from routes.chat.implementation.chain_strategy import ChainStrategy
 from routes.chat.implementation.functions_strategy import FunctionStrategy
 from routes.chat.implementation.handler_interface import ChatRequestHandler
 from routes.chat.implementation.tools_strategy import ToolStrategy
-from utils.db import NoSQLDatabase
 from utils.get_logger import CustomLogger
 from utils.llm_consts import X_App_Name, chat_strategy, ChatStrategy
 from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
 from .. import root_service
 from flask_socketio import emit
 
-db_instance = NoSQLDatabase()
-mongo = db_instance.get_db()
 logger = CustomLogger(module_name=__name__)
 
 chat_workflow = Blueprint("chat", __name__)
@@ -182,16 +180,25 @@ async def handle_chat_send_common(
         )
 
         if response_data["response"]:
+            chat_records = [
+                {
+                    "session_id": session_id,
+                    "from_user": True,
+                    "message": message,
+                },
+                {
+                    "session_id": session_id,
+                    "from_user": False,
+                    "message": response_data["response"]
+                    or response_data["error"]
+                    or "",
+                },
+            ]
+
             upsert_analytics_record(
                 chatbot_id=str(bot.id), successful_operations=1, total_operations=1
             )
-            create_chat_history(str(bot.id), session_id, True, message)
-            create_chat_history(
-                chatbot_id=str(bot.id),
-                session_id=session_id,
-                from_user=False,
-                message=response_data["response"] or response_data["error"] or "",
-            )
+            create_chat_histories(str(bot.id), chat_records)
         elif response_data["error"]:
             upsert_analytics_record(
                 chatbot_id=str(bot.id),
@@ -205,7 +212,12 @@ async def handle_chat_send_common(
             {"type": "text", "response": {"text": response_data["response"]}}
         )
     except Exception as e:
-        logger.error("An exception occurred", incident="chat/send", error=str(e))
+        logger.error(
+            "An exception occurred",
+            incident="chat/send",
+            error=str(e),
+            bot_token=bot_token,
+        )
         emit(session_id, str(e))
         return (
             jsonify(

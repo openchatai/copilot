@@ -78,6 +78,7 @@ async def get_relevant_documents(
         logger.error(
             f"Error occurred while getting relevant {collection_name} summaries",
             incident=f"get_relevant_{collection_name}",
+            bot_id=bot_id,
             payload=text,
             error=str(e),
         )

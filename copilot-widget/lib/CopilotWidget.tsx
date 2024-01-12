@@ -36,7 +36,7 @@ export function CopilotWidget({
     <div
       data-open={open}
       className={cn(
-        "opencopilot-font-inter opencopilot-w-full opencopilot-overflow-hidden opencopilot-h-full sm:opencopilot-rounded-xl opencopilot-bg-white opencopilot-shadow",
+        "opencopilot-w-full opencopilot-overflow-hidden opencopilot-h-full sm:opencopilot-rounded-xl opencopilot-bg-white opencopilot-shadow",
         "opencopilot-opacity-0 opencopilot-transition-opacity opencopilot-ease",
         open &&
         "opencopilot-opacity-100 opencopilot-animate-in opencopilot-fade-in",

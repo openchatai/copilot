@@ -1,6 +1,5 @@
 "use client";
-import React from "react";
-import { Separator } from "@/components/ui/separator";
+import React, { useMemo } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,138 +14,291 @@ import {
   AlertDialogHeader,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { deleteCopilot, updateCopilot } from "@/data/copilot";
 import _ from "lodash";
-import { useRouter } from "next/navigation";
-import { toast } from "@/components/ui/use-toast";
 import { CopyButton } from "@/components/headless/CopyButton";
-import { mutate } from "swr";
+import { TableCell } from '@/components/ui/table';
+import { EmptyBlock } from '@/components/domain/EmptyBlock';
+import { Plus, XCircle } from 'lucide-react';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Section } from "./Section";
+import { SingleVariableForm } from "./SingleVariableForm";
+import { useVariables } from "./useVariables";
+import { useForm } from "react-hook-form";
+import { FieldArray } from "@/components/ui/FieldArray";
+import { AnimatePresence, motion } from 'framer-motion';
+import { Field, Form } from "@/components/ui/form";
 import { useAsyncFn } from "react-use";
+import { deleteCopilot, updateCopilot } from "@/data/copilot";
+import { toast } from "@/components/ui/use-toast";
+import { mutate } from "swr";
+
+function VariablesSection() {
+  const { id: copilotId } = useCopilot();
+  const [
+    formOpen,
+    setFormOpen
+  ] = React.useState(false);
+  const {
+    swr: { data: vars },
+    createVarAsync,
+    deleteVarAsync,
+    asyncCreateStatus,
+    asyncDeleteStatus
+  } = useVariables(copilotId);
+
+  const data = useMemo(() => {
+    const _data: { name: string; value: string }[] = [];
+    const __data = vars;
+    if (__data) {
+      Object.keys(__data).forEach((key) => {
+        const val = __data[key];
+        _data.push({ name: key, value: val || '' });
+      })
+    }
+    return _data
+  }, [vars])
+
+  const form = useForm<{ d: { name: string; value: string }[] }>({
+    values: {
+      d: data
+    }
+  });
+
+  const hasChanged = form.formState.isDirty;
+
+  async function updateWhatChanged() {
+    const changed = form.formState.dirtyFields.d;
+    if (changed) {
+      const changedData = changed.map((v, i) => {
+        if (v.value === true || v.name === true) {
+          return form.getValues().d.at(i)
+        }
+      }).filter((v) => !_.isUndefined(v))
+      // @ts-ignore
+      createVarAsync(changedData, true)
+    }
+  }
+
+  return <Section header={<header className="flex items-center justify-between w-full">
+    <h2 className="text-base font-bold">Global Variables</h2>
+    <Popover
+      open={formOpen}
+      onOpenChange={setFormOpen}
+    >
+      <PopoverTrigger asChild>
+        <Button size='fit' variant='outline' className="p-1.5">
+          <Plus className='h-4 w-4' />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className='mx-2'>
+        <SingleVariableForm onSubmit={async (data) => { await (await createVarAsync([data])).message && setFormOpen(false) }} footer={<Button loading={asyncCreateStatus.loading} type='submit' size='xs'>create</Button>} />
+      </PopoverContent>
+    </Popover>
+  </header>}>
+    <div>
+      <table className='w-full table'>
+        <thead>
+          <tr className="[&>th]:p-1">
+            <th className='font-medium text-left'>Name</th>
+            <th className='font-medium text-left'>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          {_.isEmpty(data) ? <tr>
+            <TableCell colSpan={3}>
+              <EmptyBlock>
+                <p className='text-sm'>No variables found</p>
+              </EmptyBlock>
+            </TableCell>
+          </tr> :
+            <FieldArray
+              control={form.control}
+              name="d"
+              render={({ fields }) => {
+                return fields.map((field, index) => {
+                  return (
+                    <AnimatePresence key={field.name}>
+                      <motion.tr className='bg-white [&>td]:p-1' key={field.name}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ duration: 0.1, delay: index * 0.05, bounce: 0.1 }}
+                      >
+                        <td>
+                          <Input readOnly type="text" {...form.register(`d.${index}.name`)} />
+                        </td>
+                        <td>
+                          <Input type="text" {...form.register(`d.${index}.value`)} />
+                        </td>
+                        <td className="px-0 text-right">
+                          <Button variant='destructive' size='icon'
+                            loading={asyncDeleteStatus.loading}
+                            onClick={() => {
+                              confirm("are you sure ?") && deleteVarAsync(field.name)
+                            }}>
+                            <XCircle className='h-4 w-4' />
+                          </Button>
+                        </td>
+                      </motion.tr>
+                    </AnimatePresence>
+                  )
+                })
+              }} />
+          }
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colSpan={3} className="pt-3">
+              <div className="w-full flex gap-2 items-center justify-end">
+                <Button disabled={!hasChanged} variant='destructiveOutline' onClick={() => form.reset()} size='sm'>Reset</Button>
+                <Button size='sm' disabled={!hasChanged} onClick={updateWhatChanged}>Save</Button>
+              </div>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </Section>
+}
+
+function GeneralSettingsSection() {
+  const { id: copilotId, name: copilotName, website } = useCopilot();
+  const [state, handleUpdateCopilot] = useAsyncFn(updateCopilot)
+  const form = useForm<{ copilotName: string; website: string }>({
+    values: {
+      copilotName,
+      website
+    }
+  });
+
+  const hasChanged = form.formState.isDirty;
+
+  return <Section>
+    <Form {...form}>
+      <form className="contents space-y-2" onSubmit={form.handleSubmit(async ({ copilotName, website }) => {
+        const { data } = await handleUpdateCopilot(copilotId, { name: copilotName, website });
+        console.log(data)
+        if (data.chatbot) {
+          toast({
+            title: 'Copilot updated',
+            description: 'Copilot was updated successfully',
+            variant: "success"
+          })
+          mutate(copilotId)
+        } else {
+          toast({
+            title: 'Copilot update failed',
+            description: 'Copilot update failed',
+            variant: "destructive"
+          })
+        }
+      })}>
+        <Field label="Copilot Name" control={form.control} name="copilotName" render={(field) => <Input {...field} />} />
+        <Field label="Website" control={form.control} name="website" render={(field) => <Input {...field} />} />
+        <footer className="flex items-center justify-end gap-2 mt-3">
+          <Button variant="destructiveOutline" disabled={!hasChanged} type="reset" size="sm">
+            Reset
+          </Button>
+          <Button size="sm" loading={state.loading} type="submit" disabled={!hasChanged}>Save</Button>
+        </footer>
+      </form>
+    </Form>
+  </Section >
+}
+
+function MetadataSection() {
+  const { token } = useCopilot();
+  return <Section title="Metadata">
+    <Label>
+      Token
+    </Label>
+    <div className="flex items-center justify-between gap-2">
+      <Input className="flex" readOnly defaultValue={token} />
+      <Button variant="outline" asChild>
+        <CopyButton text={token}>Copy</CopyButton>
+      </Button>
+    </div>
+  </Section>
+}
+
+function DeleteSection() {
+  const { id: copilotId } = useCopilot();
+  const [state, handleDeleteCopilot] = useAsyncFn(async () => deleteCopilot(copilotId));
+
+  return <Section
+    title="Danger Zone" intent="danger" className="shadow shadow-destructive/30">
+    <div className="flex flex-row items-center justify-between">
+      <div>
+        <Label className="text-base font-semibold">
+          Delete Copilot
+        </Label>
+        <p className="text-sm font-normal">
+          This action can't be reverted.
+        </p>
+      </div>
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button variant="destructive" size="sm" loading={state.loading}>
+            Delete
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            Are you sure you want to delete this assistant?
+          </AlertDialogHeader>
+          <AlertDialogDescription>
+            This action can't be reverted. Please proceed with
+            caution.
+          </AlertDialogDescription>
+          <AlertDialogFooter>
+            <AlertDialogCancel asChild>
+              <Button variant="outline">Cancel</Button>
+            </AlertDialogCancel>
+            <Button
+              variant="destructive"
+              loading={state.loading}
+              onClick={async () => {
+                const { data } = await handleDeleteCopilot()
+                if (data.success) {
+                  toast({
+                    title: 'Copilot deleted',
+                    description: 'Copilot was deleted successfully',
+                    variant: "success"
+                  })
+                } else {
+                  toast({
+                    title: 'Copilot deletion failed',
+                    description: 'Copilot deletion failed',
+                    variant: "destructive"
+                  })
+                }
+              }}>
+              Delete
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  </Section>
+}
 
 export default function GeneralSettingsPage() {
-  const { token, id: copilotId, name: copilotName } = useCopilot();
-  const [Name, setName] = React.useState(copilotName);
-  const { replace } = useRouter();
-  const [deleteCopilotstate, $deleteCopilot] = useAsyncFn(deleteCopilot);
-  const [updateCopilotState, $updateCopilot] = useAsyncFn(updateCopilot);
 
-  async function handleDelete() {
-    const { data } = await $deleteCopilot(copilotId);
-    if (data.success) {
-      toast({
-        variant: "success",
-        title: "Copilot deleted",
-        description: "Your copilot has been deleted successfully.",
-      });
-      _.delay(() => replace("/"), 1000);
-    }
-  }
 
-  async function handleSave() {
-    if (Name === copilotName || Name.trim().length < 1) return;
-    const { data } = await $updateCopilot(copilotId, { name: Name });
-    if (data.chatbot) {
-      toast({
-        variant: "success",
-        title: "Copilot updated",
-        description: "Your copilot has been updated successfully.",
-      });
-      mutate(copilotId);
-    }
-  }
   return (
     <div className="flex h-full w-full flex-col overflow-hidden [&_input]:font-semibold">
       <HeaderShell className="items-center justify-between">
         <h1 className="text-lg font-bold text-secondary-foreground">
           General settings
         </h1>
-        <div className="space-x-2">
-          <Button size="sm" loading={updateCopilotState.loading} onClick={handleSave}>
-            Save
-          </Button>
-        </div>
       </HeaderShell>
 
       <div className="flex-1 overflow-auto bg-accent/25 px-4 py-8">
         <div className="container max-w-screen-md space-y-10">
-          <section className="block rounded-lg border border-border bg-white shadow shadow-accent">
-            <div className="space-y-1.5 px-8 py-5">
-              <Label className="text-base font-semibold text-accent-foreground/80">
-                Copilot Name
-              </Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  className="w-10/12"
-                  defaultValue={copilotName}
-                  onChange={(ev) => {
-                    setName(ev.target.value);
-                  }}
-                  value={Name}
-                />
-              </div>
-            </div>
-          </section>
-
-          <section className="block ">
-            <h2 className="mb-4 text-base font-bold text-accent-foreground">
-              Metadata
-            </h2>
-            <div className="rounded-lg border border-border bg-white shadow shadow-accent">
-              <div className="space-y-1.5 px-8 py-5">
-                <Label className="text-base font-semibold text-accent-foreground/80">
-                  Token
-                </Label>
-                <div className="flex items-center justify-between gap-2">
-                  <Input className="flex" readOnly defaultValue={token} />
-                  <Button variant="outline" asChild>
-                    <CopyButton text={token}>Copy</CopyButton>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section>
-            <h2 className="mb-4 text-base font-bold text-destructive">
-              Danger Zone
-            </h2>
-            <div className="block rounded-lg border border-border bg-white px-8 py-5 shadow shadow-accent">
-              <div className="flex flex-row items-center justify-between">
-                <div>
-                  <h3 className="text-base font-semibold text-accent-foreground">
-                    Delete Copilot
-                  </h3>
-                  <p className="text-sm font-normal">
-                    This action can't be reverted.
-                  </p>
-                </div>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive" size="sm">
-                      Delete
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      Are you sure you want to delete this assistant?
-                    </AlertDialogHeader>
-                    <AlertDialogDescription>
-                      This action can't be reverted. Please proceed with
-                      caution.
-                    </AlertDialogDescription>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel asChild>
-                        <Button variant="outline">Cancel</Button>
-                      </AlertDialogCancel>
-                      <Button variant="destructive" loading={deleteCopilotstate.loading} onClick={handleDelete}>
-                        Delete
-                      </Button>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
-            </div>
-          </section>
+          <GeneralSettingsSection />
+          <MetadataSection />
+          <VariablesSection />
+          <DeleteSection />
         </div>
       </div>
     </div>
