@@ -1,4 +1,4 @@
-import ReactDOM from "react-dom/client";
+import { createRoot } from "react-dom/client";
 import { Options } from "@lib/types";
 import Root from "@lib/Root";
 import { CopilotWidget } from "@lib/CopilotWidget";
@@ -17,12 +17,8 @@ declare global {
  * @description Initialize the widget
  */
 function initAiCoPilot({ triggerSelector, containerProps, rootId, ...options }: Options & { rootId?: string }) {
-  const container = composeRoot(rootId ?? defaultRootId, {
-    isolation: "isolate",
-    width: "100%",
-    height: "100%",
-  });
-  ReactDOM.createRoot(container).render(
+  const container = composeRoot(rootId ?? defaultRootId, rootId === undefined);
+  createRoot(container).render(
     <Root
       options={{
         ...options,
