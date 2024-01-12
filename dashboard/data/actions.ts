@@ -1,7 +1,7 @@
 import axios from "axios";
 import { baseUrl } from "./base-url";
-import { ActionType } from "@/components/domain/action-form/schema";
 import { apiMethods } from "@/types/utils";
+import type { ActionWithModifiedParameters } from "@/components/domain/action-form/ActionForm";
 
 const instance = axios.create({
     baseURL: baseUrl + "/backend/actions",
@@ -44,7 +44,7 @@ export function getActionById(action_id: string) {
 }
 
 // {{backend_base}}/actions/bot/:bot_id
-export function createActionByBotId(bot_id: string, data: ActionType) {
+export function createActionByBotId(bot_id: string, data: ActionWithModifiedParameters) {
     return instance.post<ActionResponseType>(`/bot/${bot_id}`, data);
 }
 

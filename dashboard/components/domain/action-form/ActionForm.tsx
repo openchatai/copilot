@@ -20,8 +20,34 @@ import { FieldArray } from "@/components/ui/FieldArray";
 import { FormErrorMessage } from "@/components/ui/FieldError";
 import { Tooltip } from "../Tooltip";
 import { Plus, Wand2, X } from "lucide-react";
-import { produce } from "immer";
 import { JsonInput } from "../JsonInput";
+
+type ParameterType = {
+    value: string | null;
+    name: string;
+    in: "query" | "path";
+    schema: {
+        type: "string";
+    }
+}
+
+export type ActionWithModifiedParameters = { payload: { parameters: ParameterType[], headers: ActionType['headers'] } } & Omit<ActionType, 'parameters' | 'headers'>;
+
+function transformAction(action: ActionType): ActionWithModifiedParameters {
+    const parameters: ParameterType[] = [];
+    _.pick(action, ['parameters']).parameters?.forEach((parameter) => {
+        const value = parameter.is_magic ? null : parameter.value ?? null;
+        parameters.push({
+            name: parameter.key,
+            in: 'path',
+            value: value,
+            schema: {
+                type: 'string'
+            }
+        })
+    })
+    return _.merge(_.omit(action, ['parameters', 'headers']), { payload: { parameters, headers: action.headers } })
+}
 
 function isValidField<
     TValues extends FieldValues = FieldValues,
@@ -41,7 +67,7 @@ export function ActionForm({
 }: {
     defaultValues?: ActionType,
     // eslint-disable-next-line no-unused-vars
-    onSubmit?: (data: ActionType, defaultValues?: ActionType) => void
+    onSubmit?: (data: ActionWithModifiedParameters, defaultValues?: ActionType) => void
     // eslint-disable-next-line no-unused-vars
     footer?: (form: ReturnType<typeof useForm<ActionType>>) => React.ReactNode
     className?: string
@@ -56,21 +82,8 @@ export function ActionForm({
 
 
     function handleSubmit(_data: ActionType) {
-        const data = produce(_data, (draft) => {
-            draft.parameters?.forEach((param) => {
-                if (param.is_magic) {
-                    param.value = `{{magic_field}}`
-                }
-            })
-            draft.headers?.forEach((header) => {
-                if (header.is_magic) {
-                    header.value = `{{magic_field}}`
-                }
-            })
-        })
-        onSubmit?.(data, defaultValues);
+        onSubmit?.(transformAction(_data), defaultValues);
     }
-
     return (
         <Form {...form}>
             <form className={className} onSubmit={form.handleSubmit(handleSubmit)}>
