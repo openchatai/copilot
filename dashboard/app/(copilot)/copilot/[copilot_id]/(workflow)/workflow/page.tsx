@@ -19,7 +19,7 @@ export default function ListWorkflows({ params }: Props) {
             <HeaderShell className='justify-between'>
                 <div className='flex items-center gap-2'>
                     <Workflow size={24} />
-                    <h1 className='text-lg font-semibold'>Flows & Actions</h1>
+                    <h1 className='text-lg font-semibold'>Flows</h1>
                 </div>
                 <div>
                     <CreateWorkflowForm />
