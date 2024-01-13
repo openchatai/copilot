@@ -126,7 +126,7 @@ function payloadToVariables(payload: PayloadType): VariablesType {
 export function ActionVariablesDrawer() {
     const { selectedActions } = useController();
     const action = useMemo(() => selectedActions.getSelectedActionData(), [selectedActions]);
-    const actionVars = useMemo(() => action?.payload && payloadToVariables(action.payload), [action]);
+    // const actionVars = useMemo(() => action?.payload && payloadToVariables(action.payload), [action]);
     return (
         <Sheet
             open={selectedActions.isSelected()}
@@ -149,7 +149,7 @@ export function ActionVariablesDrawer() {
                         onSubmit={(da) => {
                             console.log(da);
                         }}
-                        variables={actionVars}
+                        // variables={actionVars}
                         footer={
                             (form) => (
                                 <SheetFooter className="sticky w-full py-3 bg-white bottom-0 inset-x-0">
