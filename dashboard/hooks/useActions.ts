@@ -1,4 +1,4 @@
-import { ActionType } from "@/components/domain/action-form/schema";
+import type { ActionWithModifiedParameters } from "@/components/domain/action-form/ActionForm";
 import { getActionsByBotId, createActionByBotId } from "@/data/actions";
 import { useAsyncFn } from "react-use";
 import useSWR, { mutate } from "swr";
@@ -10,7 +10,7 @@ function useListActions(copilot_id: string) {
 }
 
 function useCreateAction(copilot_id: string) {
-    async function createAction(data: ActionType) {
+    async function createAction(data: ActionWithModifiedParameters) {
         const res = await createActionByBotId(copilot_id, data);
         if (typeof res.data.id === 'string') {
             revalidateActions(copilot_id);

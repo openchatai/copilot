@@ -2,8 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetClose, SheetFooter } from "@/components/ui/sheet";
 import { atom, useAtom } from "jotai";
-import { ActionForm } from "../action-form/ActionForm";
-import { ActionType } from "../action-form/schema";
+import { ActionForm, ActionWithModifiedParameters } from "../action-form/ActionForm";
 import { useCopilot } from "@/app/(copilot)/copilot/_context/CopilotProvider";
 import { useCreateAction } from "@/hooks/useActions";
 
@@ -15,7 +14,7 @@ export function AddActionDrawer() {
     const [drawerState, setDrawerState] = useActionFormState();
     const { id: copilotId } = useCopilot();
     const [state, createAction] = useCreateAction(copilotId);
-    async function handleOnSubmit(values: ActionType) {
+    async function handleOnSubmit(values: ActionWithModifiedParameters) {
         const { data } = await createAction(values);
         if (data.id) {
             setDrawerState(false);
