@@ -1,5 +1,6 @@
 import type { ActionWithModifiedParameters } from "@/components/domain/action-form/ActionForm";
-import { getActionsByBotId, createActionByBotId } from "@/data/actions";
+import { toast } from "@/components/ui/use-toast";
+import { getActionsByBotId, createActionByBotId, editActionById } from "@/data/actions";
 import { useAsyncFn } from "react-use";
 import useSWR, { mutate } from "swr";
 
@@ -24,9 +25,16 @@ function useCreateAction(copilot_id: string) {
     ] as const;
 }
 
-function useUpdateAction() {
-    async function updateAction() {
-
+function useUpdateAction(copilot_id: string, action_id: string) {
+    async function updateAction(_: ActionWithModifiedParameters) {
+        const data = await editActionById(action_id, _);
+        if (data) {
+            toast({
+                title: "Action Updated Successfully",
+                variant: "success"
+            })
+            revalidateActions(copilot_id);
+        }
     }
     const [state, updateActionAsync] = useAsyncFn(updateAction);
     return [
