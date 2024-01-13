@@ -1,12 +1,9 @@
 from urllib.parse import urlparse, urljoin
 import requests
 from celery import shared_task
-import concurrent.futures
 from bs4 import BeautifulSoup
 import traceback
 
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.remote.webdriver import BaseWebDriver
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 from shared.utils.opencopilot_utils.init_vector_store import init_vector_store
@@ -14,7 +11,6 @@ from shared.utils.opencopilot_utils.interfaces import StoreOptions
 from shared.models.opencopilot_db.website_data_sources import (
     create_website_data_source,
     get_website_data_source_by_id,
-    upsert_website_data_source,
 )
 from typing import Set
 from collections import deque
@@ -41,10 +37,20 @@ def get_links(url: str) -> list:
         # Filter out relative links and create absolute URLs
         absolute_links = [urljoin(url, link) for link in links if urlparse(link).scheme]
 
-        # Remove trailing '/' from each link
-        absolute_links = [link.rstrip("/") for link in absolute_links]
+        # Filter out links with a different host or subdomain
+        same_host_links = [
+            link
+            for link in absolute_links
+            if urlparse(link).hostname == urlparse(url).hostname
+        ]
 
-        return absolute_links
+        # Remove trailing '/' from each link using urlparse
+        same_host_links = [
+            urlparse(link)._replace(path=urlparse(link).path.rstrip("/")).geturl()
+            for link in same_host_links
+        ]
+
+        return same_host_links
     else:
         # Print an error message if the request was not successful
         print(f"Failed to retrieve content. Status code: {response.status_code}")
