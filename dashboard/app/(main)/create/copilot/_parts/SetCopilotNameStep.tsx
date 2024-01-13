@@ -13,7 +13,6 @@ export function SetCopilotName() {
     const { state: { copilot_name, createdCopilot }, dispatch } = useCreateCopilot();
     const { nextStep } = useWizard();
     const [value, $createCopilot] = useAsyncFn(createCopilot);
-
     const setCopilot = (copilot: CopilotType) => {
         dispatch({ type: "SET_COPILOT", payload: copilot });
     };
@@ -53,7 +52,7 @@ export function SetCopilotName() {
             </Label>
             <DebounceInput
                 id="copilotName"
-                debounceTimeout={500}
+                debounceTimeout={300}
                 // @ts-ignore
                 element={Input}
                 disabled={!!createdCopilot}

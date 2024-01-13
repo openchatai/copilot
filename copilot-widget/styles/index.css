@@ -1,18 +1,10 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @tailwind utilities;
 @tailwind components;
 @tailwind base;
 
-#opencopilot-aicopilot {
-  isolation: isolate;
-  --opencopilot-primary-clr: hsl(200 18% 46%);
-  --opencopilot-accent-clr: hsl(300, 7%, 97%);
-}
-@layer base {
-  svg {
-    width: 1em;
-    height: 1em;
-  }
+svg {
+  width: 1em;
+  height: 1em;
 }
 @keyframes fade-in-bottom {
   0% {
@@ -31,7 +23,9 @@
 }
 
 .flex-center {
-  @apply opencopilot-flex opencopilot-items-center opencopilot-justify-center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @keyframes fade-in-top {
@@ -62,16 +56,6 @@
 
 .fade-in {
   animation: fade-in 1.2s cubic-bezier(0.39, 0.575, 0.565, 1) both;
-}
-
-em-emoji-picker {
-  --background-rgb: 85, 170, 255;
-  --border-radius: 10px;
-  --category-icon-size: 24px;
-  --font-family: inherit;
-  --font-size: 14px;
-  min-height: 250px;
-  max-height: 300px;
 }
 
 .PopoverContent {
