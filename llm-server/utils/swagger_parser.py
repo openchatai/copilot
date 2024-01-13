@@ -157,20 +157,29 @@ class SwaggerParser:
 
     def get_base_uri(self):
         """
-        Retrieves the base URI from the Swagger file's "servers" object, specific to OpenAPI 3.0.0.
+        Retrieves the base URI from the Swagger file.
+        If using OpenAPI 3.0.0, it uses the 'servers' object.
+        If 'servers' is not available, it falls back to OpenAPI 2.0 properties: 'host', 'basePath', and 'schemes'.
         """
+        # Try using 'servers' from OpenAPI 3.0
         servers = self.swagger_data.get("servers", [])
         if servers:
-            # Use the first server's URL as the base URI
             base_url = servers[0].get("url", "")
+            if self.validate_url(base_url):
+                return base_url
 
-            # Validate the base URL
-            if not self.validate_url(base_url):
-                raise ValueError("Invalid base URL: {}".format(base_url))
+        # Fallback to OpenAPI 2.0 properties
+        host = self.swagger_data.get("host", "")
+        base_path = self.swagger_data.get("basePath", "/")
+        schemes = self.swagger_data.get("schemes", ["http"])
 
-            return base_url
+        if host:
+            # Construct the base URL using host, basePath, and the first scheme
+            base_url = "{}://{}{}".format(schemes[0], host, base_path)
+            if self.validate_url(base_url):
+                return base_url
 
-        raise ValueError("No servers found in Swagger data.")
+        raise ValueError("No valid servers or host information found in Swagger data.")
 
     def resolve_schema_references(self, schema):
         """
