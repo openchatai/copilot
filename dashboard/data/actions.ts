@@ -32,20 +32,25 @@ export type ActionResponseType = {
     deleted_at: string | null;
     payload?: PayloadType;
 }
-
+export type ActionWithModifiedParametersResponse = ActionWithModifiedParameters & {
+    id: string;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+}
 // {{backend_base}}/actions/bot/:chatbot_id
 export function getActionsByBotId(bot_id: string) {
-    return instance.get<ActionResponseType[]>(`/bot/${bot_id}`);
+    return instance.get<ActionWithModifiedParametersResponse[]>(`/bot/${bot_id}`);
 }
 
 // http://localhost:8888/backend/actions/p/:action_id
 export function getActionById(action_id: string) {
-    return instance.get<ActionResponseType>(`/p/${action_id}`);
+    return instance.get<ActionWithModifiedParametersResponse>(`/p/${action_id}`);
 }
 
 // {{backend_base}}/actions/bot/:bot_id
 export function createActionByBotId(bot_id: string, data: ActionWithModifiedParameters) {
-    return instance.post<ActionResponseType>(`/bot/${bot_id}`, data);
+    return instance.post<ActionWithModifiedParametersResponse>(`/bot/${bot_id}`, data);
 }
 
 // {{backend_base}}/actions/bot/:bot_id/import-from-swagger
@@ -56,4 +61,8 @@ export function importActionsFromSwagger(bot_id: string, swagger: File) {
         is_error: boolean;
         message: string;
     }>(`/bot/${bot_id}/import-from-swagger`, formData);
+}
+// {{backend_base}}/backend/actions/:action_id
+export async function editActionById(action_id: string, data: ActionWithModifiedParameters) {
+    return (await instance.patch<ActionWithModifiedParametersResponse>(`/${action_id}`, data)).data;
 }
