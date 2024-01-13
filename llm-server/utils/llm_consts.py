@@ -48,8 +48,10 @@ class UserMessageResponseType:
 def initialize_qdrant_client() -> QdrantClient:
     # Get the API key and URL from environment variables if not provided
     qdrant_url = os.getenv("QDRANT_URL", "http://qdrant:6333")
+    qdrant_api_key = os.getenv("QDRANT_API_KEY", None)
 
-    client = QdrantClient(url=qdrant_url)
+    client = QdrantClient(url=qdrant_url, api_key=qdrant_api_key)
+
     return client
 
 

@@ -86,7 +86,11 @@ def scrape_website_in_bfs(
             for link in soup.find_all("a"):
                 if "href" in link.attrs:
                     next_url = link["href"]
-                    if next_url.startswith("http") and next_url not in visited_urls:
+                    if (
+                        next_url.startswith("http")
+                        and next_url not in visited_urls
+                        and is_valid_url(url, next_url)
+                    ):
                         queue.append(next_url)
 
             text = soup.get_text()
