@@ -12,7 +12,7 @@ import { ReactNode, useCallback, useEffect, useRef } from 'react';
 import BlockEdge from './BlockEdge';
 import { autoLayout } from './autoLayout';
 import _ from 'lodash';
-import { ActionResponseType } from '@/data/actions';
+import { ActionWithModifiedParametersResponse } from '@/data/actions';
 import { MagicAction } from './MagicAction';
 import { SwaggerDnd } from './SwaggerDnd';
 import { useCopilot } from '@/app/(copilot)/copilot/_context/CopilotProvider';
@@ -25,7 +25,7 @@ const edgeTypes = {
     BlockEdge
 }
 function DndContext({ children, nodes, actions }: {
-    children: ReactNode, nodes: Node[], actions: ActionResponseType[]
+    children: ReactNode, nodes: Node[], actions: ActionWithModifiedParametersResponse[]
 }) {
     const { reorderActions, addActionToBlock, reorderActionsInBlock,
         deleteActionFromBlock,

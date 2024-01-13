@@ -4,7 +4,7 @@ import { createSafeContext } from '@/lib/createSafeContext'
 import React, { useCallback, useReducer } from 'react'
 import { produce } from 'immer';
 import { Union } from '@/types/utils';
-import { ActionResponseType } from '@/data/actions';
+import { ActionWithModifiedParametersResponse } from '@/data/actions';
 import { mutate } from 'swr';
 import { BlockType } from './types/block';
 import _, { uniqueId } from 'lodash';
@@ -21,16 +21,16 @@ type SelectActionObj = {
     selectAction: (action: SelectedActionPosition) => void;
     toggleSelectAction: (action: SelectedActionPosition) => void;
     isSelected: (action?: SelectedActionPosition) => boolean;
-    getSelectedActionData: () => ActionResponseType | null;
+    getSelectedActionData: () => ActionWithModifiedParametersResponse | null;
 } & (() => SelectedActionPosition | null);
 
 type ControllerType = {
     state: StateType,
-    loadActions: (actions: ActionResponseType[]) => void,
+    loadActions: (actions: ActionWithModifiedParametersResponse[]) => void,
     reset: () => void,
     updateBlock: (blockId: string, block: Partial<BlockType>) => void,
     reorderActions: (sourceIndex: number, destinationIndex: number) => void,
-    addActionToBlock: (blockId: string, action: ActionResponseType, index: number) => void,
+    addActionToBlock: (blockId: string, action: ActionWithModifiedParametersResponse, index: number) => void,
     reorderActionsInBlock: (blockId: string, sourceIndex: number, destinationIndex: number) => void,
     deleteBlock: (blockId: string) => void,
     deleteActionFromBlock: (blockId: string, actionId: string) => void,
@@ -48,7 +48,7 @@ type ActionsType = Union<[{
     type: "RESET",
 }, {
     type: "LOAD_ACTIONS",
-    payload: ActionResponseType[]
+    payload: ActionWithModifiedParametersResponse[]
 }, {
     type: "UPDATE_BLOCK",
     payload: {
@@ -65,7 +65,7 @@ type ActionsType = Union<[{
     type: "ADD_ACTION_TO_BLOCK",
     payload: {
         blockId: string,
-        action: ActionResponseType,
+        action: ActionWithModifiedParametersResponse,
         index: number,
     }
 }, {
@@ -120,7 +120,7 @@ type ActionsType = Union<[{
     }
 }, {
     type: "PATCH_CREATE_BLOCKS_FROM_ACTIONS",
-    payload: ActionResponseType[]
+    payload: ActionWithModifiedParametersResponse[]
 }, {
     type: "SET_SELECTED_NODES",
     payload: SelectedActionPosition | null,
@@ -128,7 +128,7 @@ type ActionsType = Union<[{
 type StateType = {
     name: string | null,
     description: string | null,
-    actions: ActionResponseType[],
+    actions: ActionWithModifiedParametersResponse[],
     blocks: BlockType[],
     flow_id: string | null,
     selectedNodes: SelectedActionPosition | null,
@@ -143,7 +143,7 @@ const initialState: StateType = {
     selectedNodes: null,
 }
 
-function getEmptyBlock(next_on_success: string | null, actions?: ActionResponseType[]): BlockType {
+function getEmptyBlock(next_on_success: string | null, actions?: ActionWithModifiedParametersResponse[]): BlockType {
     const id = "block-" + uniqueId();
     return {
         id: id,
@@ -313,7 +313,7 @@ function FlowsControllerV2({ children }: { children: React.ReactNode }) {
         []
     );
     // useCallback Hell :( // i will move to a better solution once i get this working/stable
-    const loadActions = execCb((actions: ActionResponseType[]) => { dispatch({ type: "LOAD_ACTIONS", payload: actions }) })
+    const loadActions = execCb((actions: ActionWithModifiedParametersResponse[]) => { dispatch({ type: "LOAD_ACTIONS", payload: actions }) })
     const reset = execCb(() => {
         dispatch({ type: "RESET" })
     })
@@ -323,7 +323,7 @@ function FlowsControllerV2({ children }: { children: React.ReactNode }) {
     const reorderActions = execCb((sourceIndex: number, destinationIndex: number) => {
         dispatch({ type: "REORDER_ACTIONS", payload: { sourceIndex, destinationIndex } })
     })
-    const addActionToBlock = execCb((blockId: string, action: ActionResponseType, index: number) => {
+    const addActionToBlock = execCb((blockId: string, action: ActionWithModifiedParametersResponse, index: number) => {
         dispatch({ type: "ADD_ACTION_TO_BLOCK", payload: { blockId, action, index } })
     })
     const reorderActionsInBlock = execCb((blockId: string, sourceIndex: number, destinationIndex: number) => {
