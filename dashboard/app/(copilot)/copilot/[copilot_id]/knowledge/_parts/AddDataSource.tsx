@@ -20,12 +20,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
-import { Plus, RefreshCcw, Trash } from "lucide-react";
+import { Plus, RefreshCw, Trash } from "lucide-react";
 import { ingestDataSources, uploadFile } from "@/data/knowledge";
 import { useCopilot } from "../../../_context/CopilotProvider";
 import _ from "lodash";
 import { toast } from "@/components/ui/use-toast";
-import { mutate } from "swr";
+import useSWR, { mutate } from "swr";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useFieldArray, useForm, SubmitHandler } from "react-hook-form";
 import { Form } from "@/components/ui/form";
@@ -33,6 +33,7 @@ import * as zod from 'zod';
 import {
   zodResolver
 } from '@hookform/resolvers/zod'
+import { cn } from "@/lib/utils";
 type DialogTypes = "url" | "file" | null;
 const activeDialog = atom<DialogTypes>(null);
 
@@ -236,6 +237,8 @@ export function AddDataSource() {
   const setDialog = useSetAtom(activeDialog);
   useHotkeys("shift+u", () => setDialog("url"));
   useHotkeys("shift+f", () => setDialog("file"));
+  const { isLoading, isValidating, mutate: mutateDataSources } = useSWR(copilotId + '/data_sources');
+  const loading = isLoading || isValidating;
   return (
     <div className="flex items-center gap-2">
       <DropdownMenu modal={false}>
@@ -271,8 +274,8 @@ export function AddDataSource() {
             <Button
               variant="outline"
               size="icon"
-              onClick={() => mutate(copilotId + '/data_sources')}>
-              <RefreshCcw className="h-4 w-4" />
+              onClick={mutateDataSources}>
+              <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
             </Button>
           </TooltipTrigger>
           <TooltipContent>Refresh</TooltipContent>
