@@ -15,6 +15,10 @@ function useCreateAction(copilot_id: string) {
         const res = await createActionByBotId(copilot_id, data);
         if (typeof res.data.id === 'string') {
             revalidateActions(copilot_id);
+            toast({
+                title: "Action created successfully",
+                variant: "success"
+            })
         }
         return res;
     }
@@ -34,6 +38,11 @@ function useUpdateAction(copilot_id: string, action_id: string) {
                 variant: "success"
             })
             revalidateActions(copilot_id);
+        } else {
+            toast({
+                title: "Error occured",
+                variant: "destructive"
+            })
         }
     }
     const [state, updateActionAsync] = useAsyncFn(updateAction);
