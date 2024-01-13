@@ -14,7 +14,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Minus, Trash2, ChevronsUpDown, RotateCcw, CheckCircle, XCircle, RotateCw } from "lucide-react";
+import { Minus, Trash2, ChevronsUpDown, CheckCircle, XCircle, RotateCw } from "lucide-react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -38,6 +38,7 @@ import { Datasource, getDataSourcesByBotId } from "@/data/knowledge";
 import { useCopilot } from "../../../_context/CopilotProvider";
 import { Link } from "@/lib/router-events";
 import { format } from 'timeago.js'
+import { DataTablePagination } from "@/components/ui/TablePagination";
 export type DataSources = {
   id: string;
   name: string;
@@ -164,7 +165,7 @@ export function KnowledgeTable() {
 
     return data
   }, {
-    refreshInterval: 1000 * 10
+    refreshInterval: 1000 * 10,
   })
   const table = useReactTable({
     data: dataSources || [],
@@ -229,6 +230,7 @@ export function KnowledgeTable() {
         </TableHeader>
 
         <HoverCardTrigger asChild>
+
           <TableBody className="odd:bg-white">
             {!_.isEmpty(table.getRowModel().rows) ? (
               table.getRowModel().rows.map((row, i) => (
@@ -265,6 +267,9 @@ export function KnowledgeTable() {
           </TableBody>
         </HoverCardTrigger>
       </Table>
+      <div className="p-4">
+        <DataTablePagination table={table} />
+      </div>
       <HoverCardContent
         side="bottom"
         className="h-14 w-[400px] rounded-xl border-none bg-[#33373A] p-2 text-white"
