@@ -1,14 +1,16 @@
-from entities.action_entity import ActionDTO
 import json
-from typing import List
-from urllib.parse import urlparse
 from collections import defaultdict
 from typing import DefaultDict, Dict, Any, cast
-from utils.get_chat_model import get_chat_model
+from typing import List
+from urllib.parse import urlparse
+
 from langchain.schema import HumanMessage, SystemMessage
-from shared.utils.opencopilot_utils.init_vector_store import init_vector_store
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+from entities.action_entity import ActionDTO
+from shared.utils.opencopilot_utils.init_vector_store import init_vector_store
 from shared.utils.opencopilot_utils.interfaces import StoreOptions
+from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
 
 logger = CustomLogger(__name__)
@@ -16,15 +18,15 @@ logger = CustomLogger(__name__)
 
 class Endpoint:
     def __init__(
-        self,
-        operation_id,
-        endpoint_type,
-        name,
-        description,
-        request_body,
-        parameters,
-        response,
-        path,
+            self,
+            operation_id,
+            endpoint_type,
+            name,
+            description,
+            request_body,
+            parameters,
+            response,
+            path,
     ):
         self.operation_id = operation_id
         self.type = endpoint_type
@@ -224,7 +226,7 @@ class SwaggerParser:
 
                 action_dto = ActionDTO(
                     api_endpoint=base_uri + path,
-                    name=method_data.get("name", method_data.get("summary", "")),
+                    name=method_data.get("name", method_data.get("summary", method_data.get('description'))),
                     description=method_data.get("description"),
                     request_type=method.upper(),
                     payload=processed_payload,
@@ -281,7 +283,7 @@ class SwaggerParser:
         try:
             for host, endpoints in metadata.items():
                 for endpoint, meta in endpoints.items():
-                    response += f"\nSummary: {meta['summary']}\nDescription: {meta['description']}\n\nPath: {endpoint}\nHost: {host}"
+                    response += f"\nSummary: {meta['summary']}\nDescription: {meta['description']}"
 
             chat = get_chat_model()
             messages = [
