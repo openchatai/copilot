@@ -18,6 +18,7 @@ from shared.models.opencopilot_db.website_data_sources import (
 )
 from typing import Set
 from collections import deque
+from utils.llm_consts import max_pages_to_crawl
 
 from workers.utils.remove_escape_sequences import remove_escape_sequences
 from utils.get_logger import CustomLogger
@@ -139,7 +140,7 @@ def web_crawl(url, bot_id: str):
         print(f"Received: {url}, {bot_id}")
         create_website_data_source(chatbot_id=bot_id, status="PENDING", url=url)
         unique_urls: set = set()
-        scrape_website_in_bfs(url, bot_id, unique_urls, 5)
+        scrape_website_in_bfs(url, bot_id, unique_urls, max_pages_to_crawl)
     except Exception as e:
         traceback.print_exc()
 

@@ -77,3 +77,4 @@ def get_mysql_uri():
 
 
 chat_strategy = os.getenv("CHAT_STRATEGY", ChatStrategy.chain)
+max_pages_to_crawl = int(os.getenv("MAX_PAGES_TO_CRAWL", "15"))
