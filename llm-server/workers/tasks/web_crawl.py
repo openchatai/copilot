@@ -1,12 +1,9 @@
-import os
-import re
+from urllib.parse import urlparse, urljoin
+import requests
 from celery import shared_task
-from selenium import webdriver
 from bs4 import BeautifulSoup
 import traceback
 
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.remote.webdriver import BaseWebDriver
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 from shared.utils.opencopilot_utils.init_vector_store import init_vector_store
@@ -14,42 +11,77 @@ from shared.utils.opencopilot_utils.interfaces import StoreOptions
 from shared.models.opencopilot_db.website_data_sources import (
     create_website_data_source,
     get_website_data_source_by_id,
-    update_website_data_source_status_by_url,
 )
 from typing import Set
 from collections import deque
+from utils.llm_consts import max_pages_to_crawl
 
 from workers.utils.remove_escape_sequences import remove_escape_sequences
 from utils.get_logger import CustomLogger
 
 logger = CustomLogger(__name__)
 
-selenium_grid_url = os.getenv("SELENIUM_GRID_URL", "http://selenium:4444/wd/hub")
+
+def get_links(url: str) -> list:
+    # Send a GET request to the URL
+    response = requests.get(url)
+
+    # Check if the request was successful (status code 200)
+    if response.status_code == 200:
+        # Parse the HTML content using BeautifulSoup
+        soup = BeautifulSoup(response.text, "lxml")
+
+        # Extract all links on the page
+        links = [a.get("href") for a in soup.find_all("a", href=True)]
+
+        # Filter out relative links and create absolute URLs
+        absolute_links = [urljoin(url, link) for link in links if urlparse(link).scheme]
+
+        # Filter out links with a different host or subdomain
+        same_host_links = [
+            link
+            for link in absolute_links
+            if urlparse(link).hostname == urlparse(url).hostname
+        ]
+
+        # Remove trailing '/' from each link using urlparse
+        same_host_links = [
+            urlparse(link)._replace(path=urlparse(link).path.rstrip("/")).geturl()
+            for link in same_host_links
+        ]
+
+        return same_host_links
+    else:
+        # Print an error message if the request was not successful
+        print(f"Failed to retrieve content. Status code: {response.status_code}")
+        return []
 
 
-def is_valid_url(url, target_url):
-    """Returns True if the URL is valid and the root of both URLs are the same, False otherwise."""
+def scrape_url(url: str) -> str:
+    # Send a GET request to the URL
+    response = requests.get(url)
 
-    # Regular expression for matching valid URLs.
-    regex = re.compile(
-        r"^(?:http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&:/~+#-])$"
-    )
+    # Check if the request was successful (status code 200)
+    if response.status_code == 200:
+        # Parse the HTML content using BeautifulSoup
+        soup = BeautifulSoup(response.text, "lxml")
 
-    # Check if the URL is valid.
-    if regex.match(url) is None:
-        return False
+        # Extract all text content
+        text_content = " ".join(
+            [
+                p.text.strip()
+                for p in soup.find_all(["p", "h1", "h2", "h3", "h4", "h5", "h6"])
+            ]
+        )
 
-    # Get the root of the URL.
-    url_root = regex.match(url).group(1)
-    target_url_root = regex.match(target_url).group(1)
+        return text_content
+    else:
+        # Print an error message if the request was not successful
+        print(f"Failed to retrieve content. Status code: {response.status_code}")
+        return None
 
-    # Check if the root of both URLs are the same.
-    return url_root == target_url_root
 
-
-def scrape_website_in_bfs(
-    url: str, bot_id: str, unique_urls: Set[str], max_pages: int
-) -> int:
+def scrape_website(url: str, bot_id: str, max_pages: int) -> int:
     """Scrapes a website in breadth-first order, following all of the linked pages.
 
     Args:
@@ -59,74 +91,53 @@ def scrape_website_in_bfs(
     Returns:
       The total number of scraped pages.
     """
-
-    driver: BaseWebDriver = None
     total_pages_scraped = 0
     visited_urls = set()
-    queue = deque([url])
 
-    try:
-        while queue:
-            url = queue.popleft()
-            if url in visited_urls or total_pages_scraped >= max_pages:
-                continue
+    # Use a queue for breadth-first scraping
+    queue = [url]
 
-            create_website_data_source(chatbot_id=bot_id, status="PENDING", url=url)
-            visited_urls.add(url)
-            unique_urls.add(url)
-            total_pages_scraped += 1
+    while queue and total_pages_scraped < max_pages:
+        current_url = queue.pop(0)
 
-            if driver is None:
-                driver = get_web_driver()
+        # Skip if the URL has been visited
+        if current_url in visited_urls:
+            continue
 
-            driver.get(url)
-            page_source = driver.page_source
-            soup = BeautifulSoup(page_source, features="lxml")
+        # Scrape the content of the current URL
+        text_content = scrape_url(current_url)
 
-            for link in soup.find_all("a"):
-                if "href" in link.attrs:
-                    next_url = link["href"]
-                    if next_url.startswith("http") and next_url not in visited_urls:
-                        queue.append(next_url)
-
-            text = soup.get_text()
-            text = re.sub(
-                r"\s+", " ", text
-            )  # Replace all whitespace with single spaces
-            text = text.strip()  # Trim leading and trailing whitespace
-
-            text = remove_escape_sequences(text)
-
-            # push to vector db
+        # Check if scraping was successful
+        if text_content:
+            # Process the scraped content as needed
+            text_content = remove_escape_sequences(text_content)
             text_splitter = RecursiveCharacterTextSplitter(
                 chunk_size=1000, chunk_overlap=200, length_function=len
             )
-
-            docs = text_splitter.create_documents([text])
+            docs = text_splitter.create_documents([text_content])
             init_vector_store(
                 docs,
-                StoreOptions(namespace="knowledgebase", metadata={"bot_id": bot_id}),
+                StoreOptions(
+                    namespace="knowledgebase",
+                    metadata={"bot_id": bot_id, "link": current_url},
+                ),
             )
-            update_website_data_source_status_by_url(url=url, status="SUCCESS")
+            create_website_data_source(
+                chatbot_id=bot_id, url=current_url, status="SUCCESS"
+            )
 
-        if driver is not None:
-            driver.quit()
+            total_pages_scraped += 1
 
-    except Exception as e:
-        logger.error("Failed to crawl", bot_id=bot_id, error=str(e))
-        if driver is not None:
-            driver.quit()
-        update_website_data_source_status_by_url(url=url, status="FAILED", error=str(e))
+            # Get links on the current page
+            links = get_links(current_url)
+
+            # Add new links to the queue
+            queue.extend(links)
+
+        # Mark the URL as visited
+        visited_urls.add(current_url)
 
     return total_pages_scraped
-
-
-def get_web_driver():
-    options = Options()
-    driver = webdriver.Remote(command_executor=selenium_grid_url, options=options)
-    driver.set_script_timeout(300)
-    driver.set_page_load_timeout(300)
-    return driver
 
 
 @shared_task
@@ -134,8 +145,7 @@ def web_crawl(url, bot_id: str):
     try:
         print(f"Received: {url}, {bot_id}")
         create_website_data_source(chatbot_id=bot_id, status="PENDING", url=url)
-        unique_urls: set = set()
-        scrape_website_in_bfs(url, bot_id, unique_urls, 5)
+        scrape_website(url, bot_id, max_pages_to_crawl)
     except Exception as e:
         traceback.print_exc()
 
@@ -154,6 +164,4 @@ def resume_failed_website_scrape(website_data_source_id: str):
     # Get the URL of the website to scrape.
     url = website_data_source.url
 
-    # Scrape the website.
-    unique_urls: set = set()
-    scrape_website_in_bfs(url, website_data_source.bot_id, unique_urls, 5)
+    scrape_website(url, website_data_source.bot_id, max_pages_to_crawl)
