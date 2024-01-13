@@ -6,7 +6,7 @@ from models.repository.action_repo import (
     list_all_actions,
     action_to_dict,
     create_action,
-    find_action_by_id,
+    find_action_by_id, update_action,
 )
 from routes.action import action_vector_service
 from utils.get_logger import CustomLogger
@@ -87,6 +87,17 @@ def add_action(chatbot_id):
     # Todo make sure either both or non go in
     saved_action = create_action(chatbot_id, action_dto)
     action_vector_service.create_action(action_dto)
+
+    return jsonify(action_to_dict(saved_action)), 201
+
+
+@action.route("/<string:chatbot_id>", methods=["PATCH"])
+def update_single_action(chatbot_id):
+    action_dto = ActionDTO(bot_id=chatbot_id, **request.get_json())
+
+    # Todo make sure either both or non go in
+    saved_action = update_action(chatbot_id, action_dto)
+    # action_vector_service.update_action(action_dto) todo, update the vector too
 
     return jsonify(action_to_dict(saved_action)), 201
 

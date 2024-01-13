@@ -83,12 +83,6 @@ def get_all_actions(chatbot_id: str, limit: int = 20, offset: int = 0) -> List[P
     return actions
 
 
-def update_action(action: ActionDTO, point_id: str):
-    client.set_payload(
-        collection_name="actions",
-        payload={"metadata": action},
-        points=[point_id],
-    )
 
 
 def delete_action(point_id: str):
