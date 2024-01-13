@@ -30,8 +30,9 @@ def upsert_website_data_source(
 
     if website_data_source is None:
         # If the record doesn't exist, insert a new one
-        website_data_source = WebsiteDataSource(url=url, status=status, error=error)
-        website_data_source.chatbot_id = chatbot_id
+        website_data_source = WebsiteDataSource(
+            url=url, status=status, error=error, chatbot_id=chatbot_id
+        )
         session.add(website_data_source)
     else:
         # If the record exists, update the status (and error if applicable)

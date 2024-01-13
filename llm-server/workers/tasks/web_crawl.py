@@ -1,7 +1,7 @@
 from urllib.parse import urlparse, urljoin
 import requests
 from celery import shared_task
-
+import concurrent.futures
 from bs4 import BeautifulSoup
 import traceback
 
@@ -33,13 +33,16 @@ def get_links(url: str) -> list:
     # Check if the request was successful (status code 200)
     if response.status_code == 200:
         # Parse the HTML content using BeautifulSoup
-        soup = BeautifulSoup(response.text, "html.parser")
+        soup = BeautifulSoup(response.text, "lxml")
 
         # Extract all links on the page
         links = [a.get("href") for a in soup.find_all("a", href=True)]
 
         # Filter out relative links and create absolute URLs
         absolute_links = [urljoin(url, link) for link in links if urlparse(link).scheme]
+
+        # Remove trailing '/' from each link
+        absolute_links = [link.rstrip("/") for link in absolute_links]
 
         return absolute_links
     else:
@@ -55,7 +58,7 @@ def scrape_url(url: str) -> str:
     # Check if the request was successful (status code 200)
     if response.status_code == 200:
         # Parse the HTML content using BeautifulSoup
-        soup = BeautifulSoup(response.text, "html.parser")
+        soup = BeautifulSoup(response.text, "lxml")
 
         # Extract all text content
         text_content = " ".join(
@@ -113,9 +116,10 @@ def scrape_website(url: str, bot_id: str, max_pages: int) -> int:
                     metadata={"bot_id": bot_id, "link": current_url},
                 ),
             )
-            upsert_website_data_source(
+            create_website_data_source(
                 chatbot_id=bot_id, url=current_url, status="SUCCESS"
             )
+
             total_pages_scraped += 1
 
             # Get links on the current page
