@@ -1,7 +1,10 @@
 'use client';
 import AceEditor from "react-ace";
 import 'ace-builds';
-import 'ace-builds/webpack-resolver';
+import "ace-builds/src-noconflict/ext-beautify";
+import "ace-builds/src-noconflict/ext-language_tools";
+import "ace-builds/src-noconflict/mode-json";
+import "ace-builds/src-noconflict/theme-xcode";
 import { ComponentPropsWithoutRef, ElementRef, forwardRef } from "react";
 
 export const JsonInput = forwardRef<ElementRef<typeof AceEditor>, ComponentPropsWithoutRef<typeof AceEditor>>((props, ref) => <AceEditor
