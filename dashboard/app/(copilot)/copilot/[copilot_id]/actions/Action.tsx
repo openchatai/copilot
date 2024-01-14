@@ -62,11 +62,11 @@ export function Action({ getValue, original }: Row<ActionWithModifiedParametersR
                             }}
                             footer={() => <AlertDialogFooter className="my-4">
                                 <AlertDialogCancel asChild>
-                                    <Button variant='secondary' size='fit' loading={state.loading}>
+                                    <Button variant='secondary'>
                                         Cancel
                                     </Button>
                                 </AlertDialogCancel>
-                                <Button variant='default' type="submit" size='fit'>
+                                <Button variant='default' type="submit" loading={state.loading}>
                                     Save
                                 </Button>
                             </AlertDialogFooter>
