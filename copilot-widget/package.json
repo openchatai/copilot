@@ -41,7 +41,7 @@
     "react-markdown": "^8.0.7",
     "react-shadow": "^20.4.0",
     "react-textarea-autosize": "^8.5.3",
-    "release-it": "^16.2.1",
+    "release-it": "^17.0.1",
     "remark-gfm": "^3.0.1",
     "socket.io-client": "^4.7.2",
     "tailwind-merge": "^1.13.2",
