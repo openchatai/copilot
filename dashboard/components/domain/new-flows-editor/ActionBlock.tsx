@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Handle, Position, useNodes } from 'reactflow';
 import type { NodeProps } from 'reactflow';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
-import { ActionResponseType } from '@/data/actions';
+import { ActionWithModifiedParametersResponse } from '@/data/actions';
 import { Action } from './ActionsList';
 import _, { uniqueId } from 'lodash';
 import { SelectedActionPosition, useController } from './Controller';
@@ -19,7 +19,7 @@ export const BLOCK_ACTION_DRAGGABLE_ID_PREFIX = 'block-action-draggable|';
 
 type Props = NodeProps<BlockType>
 
-function DraggableActionInsideActionBlock({ action, index, id, position }: { action: ActionResponseType, index: number, id: string, position: SelectedActionPosition }) {
+function DraggableActionInsideActionBlock({ action, index, id, position }: { action: ActionWithModifiedParametersResponse, index: number, id: string, position: SelectedActionPosition }) {
     const draggableInPortal = useDraggableInPortal();
     const { selectedActions } = useController();
     const isSelected = selectedActions.isSelected(position);

@@ -1,5 +1,5 @@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ActionResponseType } from "@/data/actions";
+import { ActionWithModifiedParametersResponse } from "@/data/actions";
 import { cn } from "@/lib/utils";
 import { PopoverArrow } from "@radix-ui/react-popover";
 import _, { uniqueId } from "lodash";
@@ -12,7 +12,7 @@ import { EmptyBlock } from "../EmptyBlock";
 import { useDraggableInPortal } from "./useDraginPortal";
 import { getStyle } from "./utils";
 
-export function Action({ action }: { action: ActionResponseType }) {
+export function Action({ action }: { action: ActionWithModifiedParametersResponse }) {
     return <div className="flex flex-col gap-1 w-full px-4 shrink-0 transition-colors py-2 data-[state=open]:!border-l-primary hover:bg-accent !border-transparent border-l-2">
         <h3 className='text-sm font-semibold'>{action.name}</h3>
         <div className="flex items-center justify-between">
@@ -26,7 +26,7 @@ export function Action({ action }: { action: ActionResponseType }) {
     </div>
 }
 
-function DropableAsideAction({ action, index }: { action: ActionResponseType, index: number }) {
+function DropableAsideAction({ action, index }: { action: ActionWithModifiedParametersResponse, index: number }) {
     const [open, setOpen] = useState(false);
     const draggableInPortal = useDraggableInPortal();
 
@@ -58,7 +58,7 @@ function DropableAsideAction({ action, index }: { action: ActionResponseType, in
                                         <span className="font-medium">Request URL: </span><code className="text-xs px-1 py-0.5 bg-black max-w-full whitespace-nowrap select-text text-accent text-left text-white rounded">{action.api_endpoint}</code>
                                     </li>
                                     <li>
-                                        <span className="font-medium">Operation Id: </span><code className="text-xs px-1 py-0.5 bg-black select-text text-accent rounded">{action.operation_id}</code>
+                                        {/* <span className="font-medium">Operation Id: </span><code className="text-xs px-1 py-0.5 bg-black select-text text-accent rounded">{action.name}</code> */}
                                     </li>
                                 </ul>
                             </div>

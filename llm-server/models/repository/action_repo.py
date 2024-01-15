@@ -1,7 +1,7 @@
 # action_repo.py
 import datetime
 import uuid
-from typing import Optional, List
+from typing import Optional, List, Type
 
 from shared.models.opencopilot_db.database_setup import engine
 from sqlalchemy.orm import sessionmaker
@@ -75,7 +75,7 @@ def create_action(chatbot_id: str, data: ActionDTO) -> dict:
             raise
 
 
-def update_action(action_id: str, data: ActionDTO) -> Action:
+def update_action(action_id: str, data: ActionDTO) -> Type[Action]:
     """
     Updates an existing Action instance in the database with new data.
     """

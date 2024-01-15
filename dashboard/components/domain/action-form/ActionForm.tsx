@@ -48,7 +48,19 @@ function transformAction(action: ActionType): ActionWithModifiedParameters {
     })
     return _.merge(_.omit(action, ['parameters', 'headers']), { payload: { parameters, headers: action.headers } })
 }
+function actionToForm(action: ActionWithModifiedParameters): ActionType {
+    const parameters: ActionType['parameters'] = [];
 
+    action.payload.parameters?.forEach((parameter) => {
+        const value = parameter.value ?? undefined;
+        parameters.push({
+            key: parameter.name,
+            value: value,
+            is_magic: parameter.value === null
+        })
+    })
+    return _.merge(_.omit(action, ['payload']), { parameters, headers: action.payload.headers })
+}
 function isValidField<
     TValues extends FieldValues = FieldValues,
     TName extends FieldPath<TValues> = FieldPath<TValues>
@@ -65,9 +77,9 @@ export function ActionForm({
     footer,
     className
 }: {
-    defaultValues?: ActionType,
+    defaultValues?: ActionWithModifiedParameters,
     // eslint-disable-next-line no-unused-vars
-    onSubmit?: (data: ActionWithModifiedParameters, defaultValues?: ActionType) => void
+    onSubmit?: (data: ActionWithModifiedParameters, defaultValues?: ActionWithModifiedParameters) => void
     // eslint-disable-next-line no-unused-vars
     footer?: (form: ReturnType<typeof useForm<ActionType>>) => React.ReactNode
     className?: string
@@ -75,7 +87,7 @@ export function ActionForm({
 
     const form = useForm<ActionType>({
         resolver: zodResolver(actionSchema),
-        defaultValues: defaultValues ?? {
+        defaultValues: defaultValues ? actionToForm(defaultValues) : {
             request_type: 'GET',
         }
     });
@@ -168,7 +180,6 @@ export function ActionForm({
                                         fields.map((field, index) => {
                                             const isValid = isValidField(form.formState, `headers.${index}.value`)
                                             const is_magic = form.watch(`headers.${index}.is_magic`)
-                                            const magic_field = `headers.${index}.is_magic`
                                             return (
                                                 <div className="flex items-center gap-2 animate-in fade-in slide-in-from-top-1" key={field.id}>
                                                     <input
@@ -190,8 +201,7 @@ export function ActionForm({
                                                         </p>}>
                                                             <Button
                                                                 onClick={() => {
-                                                                    // @ts-ignore
-                                                                    form.setValue(magic_field, !is_magic)
+                                                                    form.setValue(`headers.${index}.is_magic`, !is_magic)
                                                                 }}
                                                                 data-value={is_magic}
                                                                 size='fit'
