@@ -5,8 +5,6 @@ description: "Learn how to embed the copilot in your app"
 the chat widget enables you to interact with the Copilot from your dashboard and see the changes in realtime.
 OpenCopilot is a react web app that you can embed in your app. 
 
-## How to embed the copilot in your app
-
 there are several ways you can integrate the Copilot Chat widget into your application/webpage
 <CardGroup cols={2}>
 <Card title="As a JavaScript File" href='#using-simple-js-script-recommended' icon="js">
@@ -155,22 +153,18 @@ function Widget(){
 | `headers`         | An object of headers that will be sent with every request (can be used to authenticate your api requests) | `Record<string,string>` |
 | `containerProps`  | An object of props that will be passed to the container div                                               | `Record<string,string>` |
 | `socketUrl`       | The url of the socket url that will be used to send and receive messages                               | `string`                |
+
 ## FAQ
 
 <AccordionGroup>
-  <Accordion title="I have a style conflict with the widget">
-    The copilot is styled using
-    [tailwindcss](https://tailwindcss.com/) and all the classes are prefixed so it should not conflict with your
-    exising style, however, if so, please feel free to [open an issue on our GitHub repo](https://github.com/openchatai/OpenCopilot/issues/new)
-  </Accordion>
-
   <Accordion title="The copilot widget is not showing up">
     Make sure that the `triggerSelector` is correct and the element exists in
-    the dom, if that did not work, please [open an issue on our GitHub repo](https://github.com/openchatai/OpenCopilot/issues/new)
+    the dom,instead you can set `defaultOpen` to `true` to make the copilot open by default.
+    if that did not work, please [open an issue on our GitHub repo](https://github.com/openchatai/OpenCopilot/issues/new)
   </Accordion>
 
   <Accordion title="The copilot widget is so small">
-    The copilot widget is responsive and it's width is set to 100% by default, you can change that by passing the
+    The copilot widget is responsive and it's width is set to 100% by default of the container, you can change that by passing the
     `containerProps` option and setting the width to whatever you want.
   </Accordion>
 </AccordionGroup>
