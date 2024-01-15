@@ -1,14 +1,16 @@
-from entities.action_entity import ActionDTO
 import json
-from typing import List
-from urllib.parse import urlparse
 from collections import defaultdict
 from typing import DefaultDict, Dict, Any, cast
-from utils.get_chat_model import get_chat_model
+from typing import List
+from urllib.parse import urlparse
+
 from langchain.schema import HumanMessage, SystemMessage
-from shared.utils.opencopilot_utils.init_vector_store import init_vector_store
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+from entities.action_entity import ActionDTO
+from shared.utils.opencopilot_utils.init_vector_store import init_vector_store
 from shared.utils.opencopilot_utils.interfaces import StoreOptions
+from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
 
 logger = CustomLogger(__name__)
@@ -16,15 +18,15 @@ logger = CustomLogger(__name__)
 
 class Endpoint:
     def __init__(
-        self,
-        operation_id,
-        endpoint_type,
-        name,
-        description,
-        request_body,
-        parameters,
-        response,
-        path,
+            self,
+            operation_id,
+            endpoint_type,
+            name,
+            description,
+            request_body,
+            parameters,
+            response,
+            path,
     ):
         self.operation_id = operation_id
         self.type = endpoint_type
@@ -155,20 +157,29 @@ class SwaggerParser:
 
     def get_base_uri(self):
         """
-        Retrieves the base URI from the Swagger file's "servers" object, specific to OpenAPI 3.0.0.
+        Retrieves the base URI from the Swagger file.
+        If using OpenAPI 3.0.0, it uses the 'servers' object.
+        If 'servers' is not available, it falls back to OpenAPI 2.0 properties: 'host', 'basePath', and 'schemes'.
         """
+        # Try using 'servers' from OpenAPI 3.0
         servers = self.swagger_data.get("servers", [])
         if servers:
-            # Use the first server's URL as the base URI
             base_url = servers[0].get("url", "")
+            if self.validate_url(base_url):
+                return base_url
 
-            # Validate the base URL
-            if not self.validate_url(base_url):
-                raise ValueError("Invalid base URL: {}".format(base_url))
+        # Fallback to OpenAPI 2.0 properties
+        host = self.swagger_data.get("host", "")
+        base_path = self.swagger_data.get("basePath", "/")
+        schemes = self.swagger_data.get("schemes", ["http"])
 
-            return base_url
+        if host:
+            # Construct the base URL using host, basePath, and the first scheme
+            base_url = "{}://{}{}".format(schemes[0], host, base_path)
+            if self.validate_url(base_url):
+                return base_url
 
-        raise ValueError("No servers found in Swagger data.")
+        raise ValueError("No valid servers or host information found in Swagger data.")
 
     def resolve_schema_references(self, schema):
         """
@@ -224,7 +235,7 @@ class SwaggerParser:
 
                 action_dto = ActionDTO(
                     api_endpoint=base_uri + path,
-                    name=method_data.get("name", method_data.get("summary", "")),
+                    name=method_data.get("name", method_data.get("summary", method_data.get('description'))),
                     description=method_data.get("description"),
                     request_type=method.upper(),
                     payload=processed_payload,
@@ -281,7 +292,7 @@ class SwaggerParser:
         try:
             for host, endpoints in metadata.items():
                 for endpoint, meta in endpoints.items():
-                    response += f"\nSummary: {meta['summary']}\nDescription: {meta['description']}\n\nPath: {endpoint}\nHost: {host}"
+                    response += f"\nSummary: {meta['summary']}\nDescription: {meta['description']}"
 
             chat = get_chat_model()
             messages = [

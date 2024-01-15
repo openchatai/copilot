@@ -48,8 +48,10 @@ class UserMessageResponseType:
 def initialize_qdrant_client() -> QdrantClient:
     # Get the API key and URL from environment variables if not provided
     qdrant_url = os.getenv("QDRANT_URL", "http://qdrant:6333")
+    qdrant_api_key = os.getenv("QDRANT_API_KEY", None)
 
-    client = QdrantClient(url=qdrant_url)
+    client = QdrantClient(url=qdrant_url, api_key=qdrant_api_key)
+
     return client
 
 
@@ -75,3 +77,4 @@ def get_mysql_uri():
 
 
 chat_strategy = os.getenv("CHAT_STRATEGY", ChatStrategy.chain)
+max_pages_to_crawl = int(os.getenv("MAX_PAGES_TO_CRAWL", "15"))
