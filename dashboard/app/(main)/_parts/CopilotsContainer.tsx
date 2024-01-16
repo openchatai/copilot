@@ -3,9 +3,8 @@ import React from "react";
 import { GalleryHorizontalEnd } from "lucide-react";
 import { Link } from "@/lib/router-events";
 import useSwr from "swr";
-import { CopilotType, listCopilots } from "@/data/copilot";
+import { listCopilots } from "@/data/copilot";
 import Loading from "../loading";
-import { Filter } from "./Search";
 import _ from "lodash";
 import { EmptyBlock } from "@/components/domain/EmptyBlock";
 import { filterAtom } from "./Search";
@@ -14,34 +13,26 @@ import { Button } from "@/components/ui/button";
 import { format } from "timeago.js";
 import { motion, AnimatePresence } from 'framer-motion';
 
-function customSort(list: CopilotType[], sortBy: Filter["sort"]) {
-  if (sortBy === "last-viewed") {
-    return _.orderBy(list, ["last_viewed", "name"], ["desc", "asc"]);
-  } else if (sortBy === "date-created") {
-    return _.orderBy(list, ["created_at", "name"], ["desc", "asc"]);
-  } else if (sortBy === "alphapetically") {
-    return _.orderBy(list, ["name", "created_at"], ["asc", "desc"]);
-  } else {
-    // Default to alphabetical sorting if sortBy is not recognized
-    return _.orderBy(list, ["name", "created_at"], ["asc", "desc"]);
-  }
-}
 const AnimatedLink = motion(Link);
 
 export function CopilotsContainer() {
   const { data: copilots, isLoading } = useSwr("copilotsList", listCopilots);
-  const { sort, query } = useAtomValue(filterAtom);
+  const { query } = useAtomValue(filterAtom);
 
-  if (isLoading && !copilots)
+  const $copilots = React.useMemo(() => {
+    if (!copilots?.data) return [];
+    if (!query) return copilots.data;
+    return copilots.data.filter((copilot) => {
+      return copilot.name.toLowerCase().includes(query.toLowerCase());
+    });
+  }, [copilots, query]);
+  if (isLoading)
     return (
       <div className="flex-center py-4">
         <Loading />
       </div>
     );
-  const $copilots = customSort(
-    _.filter(copilots?.data, (item) => item.name.toLowerCase().includes(query)),
-    sort,
-  );
+
   return _.isEmpty($copilots) ? (
     <EmptyBlock>
       {_.isEmpty(query) ? (
@@ -61,7 +52,7 @@ export function CopilotsContainer() {
     </EmptyBlock>
   ) : (
     <div className="grid gap-4 py-4 grid-cols-12 copilot__container">
-      {$copilots?.map((copilot, index) => {
+      {$copilots.map((copilot, index) => {
         const copilotUrl = "/copilot/" + copilot.id;
         return (
           <AnimatePresence
