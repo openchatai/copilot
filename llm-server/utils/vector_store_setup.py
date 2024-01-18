@@ -17,7 +17,7 @@ def try_create_collection(name: str, vectors_config: models.VectorParams):
         client.create_collection(name, vectors_config=vectors_config)
         client.create_payload_index(
             collection_name=name,
-            field_name="bot_id",
+            field_name="metadata.bot_id",
             field_schema=models.PayloadFieldSchema.KEYWORD,
         )
     except Exception:
