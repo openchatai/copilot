@@ -21,6 +21,7 @@ import { FormErrorMessage } from "@/components/ui/FieldError";
 import { Tooltip } from "../Tooltip";
 import { Plus, Wand2, X } from "lucide-react";
 import { JsonInput } from "../JsonInput";
+import { toShema } from "./utils";
 
 type ParameterType = {
     value: string | null;
@@ -46,7 +47,8 @@ function transformAction(action: ActionType): ActionWithModifiedParameters {
             }
         })
     })
-    return _.merge(_.omit(action, ['parameters', 'headers']), { payload: { parameters, headers: action.headers } })
+    const body = toShema(action.body)
+    return _.merge(_.omit(action, ['parameters', 'headers', "body"]), { payload: { parameters, headers: action.headers, body } })
 }
 function actionToForm(action: ActionWithModifiedParameters): ActionType {
     const parameters: ActionType['parameters'] = [];
@@ -151,7 +153,7 @@ export function ActionForm({
                 <Field
                     control={form.control}
                     name="body"
-                    description="The body of the request in JSON format"
+                    description="The JSON Schema of your request body, If you don't know you can provide the body as a JSON object and we will try to infer the schema for you."
                     label="Body (JSON)"
                     render={(props) => <JsonInput {...props} />}
                 />
