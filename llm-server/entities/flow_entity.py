@@ -4,7 +4,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 from entities.action_entity import ActionDTO
-from entities.utils import generate_operation_id_from_name
+from .utils import generate_operation_id_from_name
 
 
 class Block(BaseModel):

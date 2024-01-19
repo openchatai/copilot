@@ -1,7 +1,7 @@
 from typing import Optional, Dict
 from pydantic import BaseModel
 
-from entities.flow_entity import generate_operation_id_from_name
+from .utils import generate_operation_id_from_name
 
 
 class ActionDTO(BaseModel):
