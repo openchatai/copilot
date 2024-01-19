@@ -5,7 +5,6 @@ import { useCreateCopilot } from "./CreateCopilotProvider";
 import { useAsyncFn } from "react-use";
 import { toast } from "@/components/ui/use-toast";
 import { Label } from "@/components/ui/label";
-import { DebounceInput } from "react-debounce-input";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -50,11 +49,8 @@ export function SetCopilotName() {
             <Label htmlFor="copilotName" className="font-semibold">
                 Copilot Name
             </Label>
-            <DebounceInput
+            <Input
                 id="copilotName"
-                debounceTimeout={300}
-                // @ts-ignore
-                element={Input}
                 disabled={!!createdCopilot}
                 className="mt-1"
                 value={copilot_name}
