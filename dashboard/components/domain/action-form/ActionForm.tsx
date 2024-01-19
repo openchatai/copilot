@@ -89,7 +89,8 @@ export function ActionForm({
         resolver: zodResolver(actionSchema),
         defaultValues: defaultValues ? actionToForm(defaultValues) : {
             request_type: 'GET',
-        }
+        },
+        values: defaultValues
     });
 
 
