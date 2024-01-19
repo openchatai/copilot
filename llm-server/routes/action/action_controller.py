@@ -9,6 +9,7 @@ from models.repository.action_repo import (
     create_action,
     find_action_by_id,
     update_action,
+    delete_action_by_id,
 )
 from routes.action import action_vector_service
 from utils.get_logger import CustomLogger
@@ -112,3 +113,18 @@ def get_action(action_id):
     if action is None:
         return jsonify({"error": "Action not found"}), 404
     return jsonify(action_to_dict(action))
+
+
+@action.route("/<string:action_id>", methods=["DELETE"])
+def delete_action(action_id):
+    action = find_action_by_id(action_id)
+    if action is None:
+        return jsonify({"error": "Action not found"}), 404
+
+    action_vector_service.delete_action_by_operation_id(
+        bot_id=str(action.bot_id), operation_id=str(action.operation_id)
+    )
+    delete_action_by_id(
+        operation_id=str(action.operation_id), bot_id=str(action.bot_id)
+    )
+    return jsonify({"message": "Action deleted successfully"}), 200

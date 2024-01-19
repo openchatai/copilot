@@ -4,12 +4,12 @@ from typing import List
 
 from langchain.docstore.document import Document
 from qdrant_client import models
+from shared.utils.opencopilot_utils.get_embeddings import get_embeddings
 
 from entities.action_entity import ActionDTO
 from shared.utils.opencopilot_utils import get_vector_store
 from shared.utils.opencopilot_utils.interfaces import StoreOptions
-from utils.llm_consts import initialize_qdrant_client
-from utils.llm_consts import VectorCollections, initialize_qdrant_client
+from utils.llm_consts import initialize_qdrant_client, VectorCollections
 
 from utils.get_logger import CustomLogger
 
@@ -95,12 +95,30 @@ def update_action_by_operation_id(action: ActionDTO):
     description = str(action.description) if action.description else ""
     name = str(action.name) if action.name else ""
 
-    document = Document(page_content=description + " " + name)
+    document = Document(page_content=name + ", " + description)
 
     document.metadata.update(action.model_dump())
 
     documents.append(document)
 
+    result = delete_action_by_operation_id(
+        bot_id=str(action.bot_id), operation_id=str(action.operation_id)
+    )
+
+    logger.info("qdrant_point_delete", result=result)
+    return create_action(action)
+
+
+# def delete_action(point_id: str):
+#     return client.clear_payload(
+#         collection_name="actions",
+#         points_selector=models.PointIdsList(
+#             points=[point_id],
+#         ),
+#     )
+
+
+def delete_action_by_operation_id(bot_id: str, operation_id: str):
     result = client.delete(
         collection_name=VectorCollections.actions,
         points_selector=models.FilterSelector(
@@ -108,25 +126,15 @@ def update_action_by_operation_id(action: ActionDTO):
                 must=[
                     models.FieldCondition(
                         key="metadata.bot_id",
-                        match=models.MatchValue(value=action.bot_id),
+                        match=models.MatchValue(value=bot_id),
                     ),
                     models.FieldCondition(
                         key="metadata.operation_id",
-                        match=models.MatchValue(value=action.operation_id or ""),
+                        match=models.MatchValue(value=operation_id),
                     ),
                 ],
             )
         ),
     )
 
-    logger.info("qdrant_point_delete", result=result)
-    return create_action(action)
-
-
-def delete_action(point_id: str):
-    client.clear_payload(
-        collection_name="actions",
-        points_selector=models.PointIdsList(
-            points=[point_id],
-        ),
-    )
+    return result
