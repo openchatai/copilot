@@ -1,6 +1,6 @@
 import type { ActionWithModifiedParameters } from "@/components/domain/action-form/ActionForm";
 import { toast } from "@/components/ui/use-toast";
-import { getActionsByBotId, createActionByBotId, editActionById } from "@/data/actions";
+import { getActionsByBotId, createActionByBotId, editActionById, deleteActionById } from "@/data/actions";
 import { useAsyncFn } from "react-use";
 import useSWR, { mutate } from "swr";
 
@@ -52,9 +52,22 @@ function useUpdateAction(copilot_id: string, action_id: string) {
     ] as const;
 }
 
-function useDeleteAction() {
+function useDeleteAction(action_id: string, copilot_id?: string) {
     async function deleteAction() {
-
+        const { data } = await deleteActionById(action_id);
+        if (data) {
+            toast({
+                title: "Action Deleted Successfully",
+                variant: "success"
+            })
+            copilot_id && revalidateActions(copilot_id);
+        } else {
+            toast({
+                title: "Error occured",
+                variant: "destructive"
+            })
+        }
+        return data
     }
     const [state, deleteActionAsync] = useAsyncFn(deleteAction);
     return [
