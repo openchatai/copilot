@@ -101,9 +101,9 @@ def update_single_action(chatbot_id):
 
     # Todo make sure either both or non go in
     saved_action = update_action(chatbot_id, action_dto)
-    action_vector_service.update_action_by_operation_id(action_dto)
+    action_id = action_vector_service.update_action_by_operation_id(action_dto)
 
-    return jsonify(action_to_dict(saved_action)), 201
+    return jsonify(action_id), 201
 
 
 @action.route("/<string:action_id>", methods=["GET"])
