@@ -7,7 +7,8 @@ from models.repository.action_repo import (
     action_to_dict,
     create_actions,
     create_action,
-    find_action_by_id, update_action,
+    find_action_by_id,
+    update_action,
 )
 from routes.action import action_vector_service
 from utils.get_logger import CustomLogger
@@ -100,7 +101,7 @@ def update_single_action(chatbot_id):
 
     # Todo make sure either both or non go in
     saved_action = update_action(chatbot_id, action_dto)
-    # action_vector_service.update_action(action_dto) todo, update the vector too
+    action_vector_service.update_action_by_operation_id(action_dto)
 
     return jsonify(action_to_dict(saved_action)), 201
 
