@@ -2,8 +2,10 @@ from typing import Optional, Dict
 from pydantic import BaseModel
 
 from .utils import generate_operation_id_from_name
+from dataclasses import dataclass
 
 
+@dataclass
 class ActionDTO(BaseModel):
     bot_id: str
     name: str

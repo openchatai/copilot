@@ -75,7 +75,7 @@ def create_action(chatbot_id: str, data: ActionDTO) -> dict:
             raise
 
 
-def update_action(action_id: str, data: ActionDTO) -> Type[Action]:
+def update_action(action_id: str, data: ActionDTO) -> Action:
     """
     Updates an existing Action instance in the database with new data.
     """
