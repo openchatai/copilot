@@ -30,7 +30,7 @@ export function Action({ getValue, original }: Row<ActionWithModifiedParametersR
         <Stack ic="start" gap={10} id="some" direction="row">
             <div className='text-sm font-semibold flex-1'>{getValue("name")}</div>
             {/* @ts-ignore */}
-            <div className={methodVariants({ size: "tiny", method: String(getValue("request_type")).toUpperCase() })}>{getValue("request_type")}</div>
+            <div className={methodVariants({ size: "xs", method: String(getValue("request_type")).toUpperCase() })}>{getValue("request_type")}</div>
         </Stack>
         <div className='text-xs text-gray-500'>{getValue("description")}</div>
         <Stack

@@ -20,7 +20,7 @@ export function Search() {
 
   return (
     <div className="flex items-center justify-between gap-5 py-5">
-      <div className="flex-1 max-w-md relative">
+      <div className="flex-1 max-w-lg relative">
         <Label htmlFor="search-copilots" className="absolute left-2 top-1/2 -translate-y-1/2">
           <SearchIcon className="h-5 w-5 opacity-50" />
         </Label>
@@ -39,7 +39,7 @@ export function Search() {
             });
           }}
           id="search-copilots"
-          className="font-medium rounded-none border-x-0 ps-8 border-t-0 border-b shadow-none focus-visible:!ring-transparent"
+          className="font-medium ps-8 placeholder:text-xs focus-visible:!ring-transparent"
           placeholder="Search Copilots..."
         />
       </div>
