@@ -67,3 +67,8 @@ export function importActionsFromSwagger(bot_id: string, swagger: File) {
 export async function editActionById(bot_id: string, action_id: string, data: ActionWithModifiedParameters) {
     return (await instance.patch<ActionWithModifiedParametersResponse>(`/bot/${bot_id}/action/${action_id}`, data)).data;
 }
+
+// @action.route("/<string:action_id>", methods=["DELETE"])
+export async function deleteActionById(action_id: string) {
+    return await instance.delete<{ message: string }>(`/${action_id}`)
+}

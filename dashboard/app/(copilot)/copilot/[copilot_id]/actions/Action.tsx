@@ -7,7 +7,7 @@ import { Row } from "@tanstack/react-table";
 import { Stack } from "@/components/ui/Stack";
 import { ActionForm } from "@/components/domain/action-form/ActionForm";
 import { ActionWithModifiedParametersResponse } from "@/data/actions";
-import { useUpdateAction } from "@/hooks/useActions";
+import { useDeleteAction, useUpdateAction } from "@/hooks/useActions";
 import { useCopilot } from "../../_context/CopilotProvider";
 
 export function Action({ getValue, original }: Row<ActionWithModifiedParametersResponse>) {
@@ -20,7 +20,10 @@ export function Action({ getValue, original }: Row<ActionWithModifiedParametersR
         state,
         updateAction
     ] = useUpdateAction(copilotId, original.id)
-
+    const [
+        deleteState,
+        deleteIt
+    ] = useDeleteAction(original.id, copilotId)
     return <Stack
         ref={containerRef}
         ic="start"
@@ -91,7 +94,7 @@ export function Action({ getValue, original }: Row<ActionWithModifiedParametersR
                                 </Button>
                             </AlertDialogCancel>
                             <AlertDialogAction asChild>
-                                <Button variant='destructive' size='fit'>
+                                <Button variant='destructive' size='fit' onClick={deleteIt} loading={deleteState.loading}>
                                     Delete
                                 </Button>
                             </AlertDialogAction>
