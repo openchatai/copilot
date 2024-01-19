@@ -1,4 +1,6 @@
 import json
+
+import jsonref
 from collections import defaultdict
 from typing import DefaultDict, Dict, Any, cast
 from typing import List
@@ -18,15 +20,15 @@ logger = CustomLogger(__name__)
 
 class Endpoint:
     def __init__(
-            self,
-            operation_id,
-            endpoint_type,
-            name,
-            description,
-            request_body,
-            parameters,
-            response,
-            path,
+        self,
+        operation_id,
+        endpoint_type,
+        name,
+        description,
+        request_body,
+        parameters,
+        response,
+        path,
     ):
         self.operation_id = operation_id
         self.type = endpoint_type
@@ -181,38 +183,6 @@ class SwaggerParser:
 
         raise ValueError("No valid servers or host information found in Swagger data.")
 
-    def resolve_schema_references(self, schema):
-        """
-        Resolves $ref references in the schema to their corresponding definitions.
-        """
-        if "$ref" in schema:
-            ref_path = schema["$ref"]
-            parts = ref_path.split("/")
-            # Navigate through the swagger data to find the referenced schema
-            ref_schema = self.swagger_data
-            for part in parts[1:]:  # Skip the first element as it's just a '#'
-                ref_schema = ref_schema.get(part, {})
-            return ref_schema
-        return schema
-
-    def process_payload(self, payload):
-        """
-        Processes the payload to include full schema definitions for any $ref references.
-        """
-        if "request_body" in payload and "content" in payload["request_body"]:
-            for content_type, content_data in payload["request_body"][
-                "content"
-            ].items():
-                if "schema" in content_data:
-                    content_data["schema"] = self.resolve_schema_references(
-                        content_data["schema"]
-                    )
-        if "parameters" in payload:
-            for param in payload["parameters"]:
-                if "schema" in param:
-                    param["schema"] = self.resolve_schema_references(param["schema"])
-        return payload
-
     def get_all_actions(self, bot_id: str):
         """
         Retrieves all actions defined in the Swagger file as ActionDTO instances.
@@ -221,6 +191,7 @@ class SwaggerParser:
         """
         actions: List[ActionDTO] = []
         base_uri = self.get_base_uri()
+        self.swagger_data = jsonref.replace_refs(self.swagger_data)
         paths = self.swagger_data.get("paths", {})
 
         for path, path_data in paths.items():
@@ -230,15 +201,15 @@ class SwaggerParser:
                     "parameters": method_data.get("parameters", []),
                 }
 
-                # Process the payload to resolve any $ref references
-                processed_payload = self.process_payload(payload)
-
                 action_dto = ActionDTO(
                     api_endpoint=base_uri + path,
-                    name=method_data.get("name", method_data.get("summary", method_data.get('description'))),
+                    name=method_data.get(
+                        "name",
+                        method_data.get("summary", method_data.get("description")),
+                    ),
                     description=method_data.get("description"),
                     request_type=method.upper(),
-                    payload=processed_payload,
+                    payload=payload,
                     bot_id=bot_id,
                 )
                 actions.append(action_dto)
@@ -261,6 +232,8 @@ class SwaggerParser:
 
         relative_paths: DefaultDict[str, Dict[str, Any]] = defaultdict(dict)
 
+        # @todo: the case where parameters are common for all paths is a valid way of defining apis, and we are not handling it
+        # check postman collection in _swaggers folder
         for path, path_item in api_data["paths"].items():
             for http_verb, http_details in path_item.items():
                 summary = http_details.get("summary") or ""
