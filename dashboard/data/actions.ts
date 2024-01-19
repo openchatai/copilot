@@ -63,6 +63,7 @@ export function importActionsFromSwagger(bot_id: string, swagger: File) {
     }>(`/bot/${bot_id}/import-from-swagger`, formData);
 }
 // {{backend_base}}/backend/actions/:action_id
-export async function editActionById(action_id: string, data: ActionWithModifiedParameters) {
-    return (await instance.patch<ActionWithModifiedParametersResponse>(`/${action_id}`, data)).data;
+// @action.route("/bot/<string:chatbot_id>/action/<string:action_id>", methods=["PATCH"])
+export async function editActionById(bot_id: string, action_id: string, data: ActionWithModifiedParameters) {
+    return (await instance.patch<ActionWithModifiedParametersResponse>(`/bot/${bot_id}/action/${action_id}`, data)).data;
 }

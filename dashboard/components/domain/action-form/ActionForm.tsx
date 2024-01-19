@@ -89,8 +89,9 @@ export function ActionForm({
 
     const form = useForm<ActionType>({
         resolver: zodResolver(actionSchema),
-        defaultValues: defaultValues ? actionToForm(defaultValues) : {
-            request_type: 'GET',
+        values: defaultValues && actionToForm(defaultValues),
+        defaultValues: {
+            request_type: 'GET'
         }
     });
 

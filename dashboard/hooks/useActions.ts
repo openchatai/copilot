@@ -31,7 +31,7 @@ function useCreateAction(copilot_id: string) {
 
 function useUpdateAction(copilot_id: string, action_id: string) {
     async function updateAction(_: ActionWithModifiedParameters) {
-        const data = await editActionById(action_id, _);
+        const data = await editActionById(copilot_id, action_id, _);
         if (data) {
             toast({
                 title: "Action Updated Successfully",

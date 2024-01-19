@@ -7,7 +7,9 @@ from models.repository.action_repo import (
     action_to_dict,
     create_actions,
     create_action,
-    find_action_by_id, update_action,
+    find_action_by_id,
+    update_action,
+    delete_action_by_id,
 )
 from routes.action import action_vector_service
 from utils.get_logger import CustomLogger
@@ -94,15 +96,15 @@ def add_action(chatbot_id):
     return jsonify(action_to_dict(saved_action)), 201
 
 
-@action.route("/<string:chatbot_id>", methods=["PATCH"])
-def update_single_action(chatbot_id):
+@action.route("/bot/<string:chatbot_id>/action/<string:action_id>", methods=["PATCH"])
+def update_single_action(chatbot_id: str, action_id: str):
     action_dto = ActionDTO(bot_id=chatbot_id, **request.get_json())
 
     # Todo make sure either both or non go in
-    saved_action = update_action(chatbot_id, action_dto)
-    # action_vector_service.update_action(action_dto) todo, update the vector too
+    saved_action = update_action(action_id, action_dto)
+    action_vector_service.update_action_by_operation_id(action_dto)
 
-    return jsonify(action_to_dict(saved_action)), 201
+    return jsonify(saved_action), 201
 
 
 @action.route("/<string:action_id>", methods=["GET"])
@@ -111,3 +113,18 @@ def get_action(action_id):
     if action is None:
         return jsonify({"error": "Action not found"}), 404
     return jsonify(action_to_dict(action))
+
+
+@action.route("/<string:action_id>", methods=["DELETE"])
+def delete_action(action_id):
+    action = find_action_by_id(action_id)
+    if action is None:
+        return jsonify({"error": "Action not found"}), 404
+
+    action_vector_service.delete_action_by_operation_id(
+        bot_id=str(action.bot_id), operation_id=str(action.operation_id)
+    )
+    delete_action_by_id(
+        operation_id=str(action.operation_id), bot_id=str(action.bot_id)
+    )
+    return jsonify({"message": "Action deleted successfully"}), 200

@@ -2,7 +2,7 @@ import os
 from typing import List, Dict
 
 from langchain.docstore.document import Document
-from qdrant_client import QdrantClient, models
+from qdrant_client import models
 
 from routes.flow.utils.document_similarity_dto import DocumentSimilarityDTO
 from shared.utils.opencopilot_utils import StoreOptions
@@ -31,7 +31,7 @@ score_thresholds: Dict[str, float] = {
 
 
 async def get_relevant_documents(
-        text: str, bot_id: str, collection_name: str
+    text: str, bot_id: str, collection_name: str
 ) -> List[DocumentSimilarityDTO]:
     try:
         embedding = get_embeddings()
@@ -94,6 +94,6 @@ async def get_relevant_flows(text: str, bot_id: str) -> List[DocumentSimilarityD
 
 
 async def get_relevant_knowledgebase(
-        text: str, bot_id: str
+    text: str, bot_id: str
 ) -> List[DocumentSimilarityDTO]:
     return await get_relevant_documents(text, bot_id, VectorCollections.knowledgebase)

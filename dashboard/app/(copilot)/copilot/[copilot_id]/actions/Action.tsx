@@ -26,7 +26,7 @@ export function Action({ getValue, original }: Row<ActionWithModifiedParametersR
         ic="start"
         gap={5}
         direction="column"
-        className='bg-secondary p-3.5 rounded-lg transition-all col-span-full lg:col-span-6 xl:col-span-4 border border-primary/20 shadow-sm'>
+        className='bg-secondary p-3.5 rounded-lg overflow-hidden transition-all col-span-full lg:col-span-6 xl:col-span-4 border border-primary/20 shadow-sm'>
         <Stack ic="start" gap={10} id="some" direction="row">
             <div className='text-sm font-semibold flex-1'>{getValue("name")}</div>
             {/* @ts-ignore */}

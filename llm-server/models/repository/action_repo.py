@@ -75,7 +75,7 @@ def create_action(chatbot_id: str, data: ActionDTO) -> dict:
             raise
 
 
-def update_action(action_id: str, data: ActionDTO) -> Type[Action]:
+def update_action(action_id: str, data: ActionDTO) -> Action:
     """
     Updates an existing Action instance in the database with new data.
     """
@@ -191,3 +191,22 @@ def find_action_by_method_id_and_bot_id(
             .first()
         )
         return action
+
+
+def delete_action_by_id(operation_id: str, bot_id: str):
+    # Find the action to be deleted
+    with SessionLocal() as session:
+        action = (
+            session.query(Action)
+            .filter(Action.operation_id == operation_id, Action.bot_id == bot_id)
+            .first()
+        )
+
+        # Check if action exists
+        if action is not None:
+            # Delete the action
+            session.delete(action)
+            session.commit()
+            return {"message": "Action deleted successfully"}
+        else:
+            return {"error": "Action not found"}, 404
