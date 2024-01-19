@@ -65,6 +65,7 @@
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.7",
     "timeago.js": "^4.0.2",
+    "to-json-schema": "^0.2.5",
     "zod": "^3.22.3"
   },
   "devDependencies": {
@@ -74,6 +75,7 @@
     "@types/react-beautiful-dnd": "^13.1.7",
     "@types/react-dom": "^18",
     "@types/react-syntax-highlighter": "^15.5.8",
+    "@types/to-json-schema": "^0.2.4",
     "autoprefixer": "^10",
     "cross-env": "^7.0.3",
     "eslint": "^8",
