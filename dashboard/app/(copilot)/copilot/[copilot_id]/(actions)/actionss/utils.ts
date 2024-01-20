@@ -1,0 +1,1 @@
+export const ACTIVE_ACTION_KEY = 'active-action'
