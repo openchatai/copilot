@@ -296,8 +296,8 @@ export default function GeneralSettingsPage() {
       <div className="flex-1 overflow-auto bg-accent/25 px-4 py-8">
         <div className="container max-w-screen-md space-y-10">
           <GeneralSettingsSection />
-          <MetadataSection />
           <VariablesSection />
+          <MetadataSection />
           <DeleteSection />
         </div>
       </div>
