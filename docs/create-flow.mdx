@@ -2,45 +2,31 @@
 title: "Create your first flow"
 ---
 
-Creating flow require having a copilot with a valid swagger file, you can read on how to create a copilot with swagger file from here
-
-## OpenCopilot flows definition (FD)
-
-A OpenCopilot flows definition is a single json file that describe different flows in your APIs, for example, if your product contain "add to cart" functionality, then you can
-map this functionality to a flow, which represent set of APIs calls.
+To create a flow, you will need to have a good description and name, so the LLM model (planning engine) can understand what you want to achieve, with many customers we were able to achieve +98% accuracy with better descriptions and names.
 
 
-**This is an example on OpenCopilot flows definition file:**
+## Create a flow
 
-![API Playground](/images/flows-file-example.png)
+- Open your OpenCopilot dashboard navigate to the flows section and click on the `+` button to create a new flow.
+- Give your flow a name and description.
+- Click on the `Create` button to create your flow.
+- Now you can add steps to your flow either .
 
-
-
-## How to Define Your OpenCopilot Flows File?
-
-![API Playground](/images/editor.png)
-
-
-It's easy! you can use the [flows editor](https://editor.opencopilot.so/) to write your flows, their description and the APIs calls of each flow.
-
-If you do not like writing json blocks, you can use our flow UI editor to visually build flows, for example, we were able to create search and create pet flow with few click
-
-![API Playground](/images/ui-editor.png)
-
+<video
+    autoPlay
+    muted
+    loop
+    playsinline
+    className="w-full aspect-video"
+    src="images/flow-creation.mp4"
+></video>
 
 
-## Feed the flows file to your copilot
+Notice how we did not define any loops or conditions, OpenCopilot will automatically detect them for you based on the user context/message and the flow definition.
 
-[Create flow endpoint](/api-reference/endpoint/workflow/create_workflow)
-
-## Flows Best Practices
-
-Flows are still in beta, and there are some areas where they currently lack functionality. To make the most of flows in OpenCopilot, ensure that your flow definition files always align with your Swagger file in terms of `open_api_operation_id`. Additionally, try to minimize the response data from each step (only pass the important fields between steps, not the entire API response).
-
-If you have a specific use case and need support from our team, we would love to assist you. Please join our Discord server or schedule a call with us.
 
 
 ## Suggestions and Questions ❤️
 
-OpenCopilot flow definition is new and still in beta. We highly appreciate your suggestions. You can join our [Discord server](https://discord.gg/yjEgCgvefr), [hey@openchat.so](mailto:hey@openchat.so)email us, or [book a call](https://calendly.com/hey-pk0) with us to share your feedback.
+OpenCopilot flows is new and still in beta. We highly appreciate your suggestions. You can join our [Discord server](https://discord.gg/yjEgCgvefr), [hey@openchat.so](mailto:hey@openchat.so)email us, or [book a call](https://cal.com/opencopilot) with us to share your feedback.
 

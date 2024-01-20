@@ -16,7 +16,7 @@ By default, OpenCopilot attempts to map the user's request to an action (or acti
 
 A flow consists of a series of steps, where each step represents an API call to your backend (action). Each flow has a name and description to guide the copilot in determining when to invoke it based on the user's request.
 
-For example, imagine that your system includes an "add to cart" functionality, which involves calling multiple endpoints. You may want your copilot to handle user requests that require this functionality. To achieve this, you need to define a flow using OpenCopilot's flow definitions.
+For example, imagine that your system includes an "add to cart" functionality, which involves calling multiple endpoints. You may want your copilot to handle user requests that require this functionality. To achieve this, you need to define a flow flows editor
 
 ![Conversion](/images/example-flow.png)
 
@@ -26,6 +26,6 @@ For example, imagine that your system includes an "add to cart" functionality, w
 
 2. OpenCopilot automatically mapped the user request to the pre-defined "create cart" flow, passing the necessary parameters based on the user request.
 
-3. After making all the API calls, OpenCopilot responds to the user based on the results of the flow.
+3. OpenCopilot will handle loops, conditions, and other complex steps by itself, so you don't have to worry about them. (for example: creating a cart with 3 items, or 100 items)
 
 

@@ -39,7 +39,7 @@
       "pages": ["introduction", "authorization"]
     },
     {
-      "group": "Flows definition",
+      "group": "Flows",
       "pages": [
         "flows",
         "create-flow"
