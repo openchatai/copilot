@@ -80,7 +80,7 @@ function VariablesSection() {
   }
 
   return <Section header={<header className="flex items-center justify-between w-full">
-    <h2 className="text-base font-bold">Global Variables</h2>
+    <h2 className="text-base font-bold">Global Headers</h2>
     <Popover
       open={formOpen}
       onOpenChange={setFormOpen}
@@ -296,8 +296,8 @@ export default function GeneralSettingsPage() {
       <div className="flex-1 overflow-auto bg-accent/25 px-4 py-8">
         <div className="container max-w-screen-md space-y-10">
           <GeneralSettingsSection />
-          <MetadataSection />
           <VariablesSection />
+          <MetadataSection />
           <DeleteSection />
         </div>
       </div>

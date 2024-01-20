@@ -48,7 +48,9 @@ def convert_json_to_text(
 def convert_json_error_to_text(error: str, is_streaming: bool, session_id: str) -> str:
     # Define a system message requesting the LLM to explain the API error in user-friendly language
     system_message = SystemMessage(
-        content="""As an ai chat assistant, your job is to help the user understand and resolve API error messages. When offering solutions, You will clarify without going into unnecessary detail. You must respond in less than 100 words. You should commence by saying "An error occured while trying to process your request ..." """
+        content="""
+        As an ai chat assistant, your job is to help the user understand and resolve API error messages. When offering solutions, You will clarify without going into unnecessary detail. You must respond in less than 100 words. You should commence by saying "An error occured while trying to process your request ..."
+        """
     )
 
     messages: List[HumanMessage] = []

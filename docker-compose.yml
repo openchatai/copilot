@@ -130,23 +130,6 @@ services:
     networks:
       - opencopilot-net
 
-  selenium:
-    image: selenium/standalone-firefox:4.14.1-20231025
-    ports:
-      - "4444:4444"
-      - "7900:7900"
-    shm_size: 2g
-    deploy:
-      replicas: 1
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sSL http://localhost:4444/wd/hub/status || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    restart: always
-    networks:
-      - opencopilot-net
-
   nginx:
     image: nginx
     restart: unless-stopped
