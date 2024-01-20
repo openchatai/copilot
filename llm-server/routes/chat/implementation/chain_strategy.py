@@ -1,10 +1,10 @@
 from flask_socketio import emit
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
 from routes.chat.implementation.handler_interface import ChatRequestHandler
-from typing import Callable, Dict, Optional
+from typing import Awaitable, Callable, Dict, Optional
 import asyncio
 
-from custom_types.response_dict import ResponseDict
+from custom_types.response_dict import LLMResponse
 from routes.flow.utils.api_retrievers import (
     get_relevant_actions,
     get_relevant_flows,
@@ -32,12 +32,7 @@ class ChainStrategy(ChatRequestHandler):
         headers: Dict[str, str],
         app: Optional[str],
         is_streaming: bool,
-    ) -> ResponseDict:
-        # Dict
-        response: ResponseDict = {
-            "error": "",
-            "response": "Something went wrong, please try again!",
-        }
+    ) -> LLMResponse:
         check_required_fields(base_prompt, text)
 
         tasks = [

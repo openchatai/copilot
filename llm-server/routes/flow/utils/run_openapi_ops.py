@@ -1,10 +1,10 @@
 import json
 from typing import Optional
 from flask_socketio import emit
-from openai import InvalidRequestError
 
 from werkzeug.datastructures import Headers
 from requests.exceptions import MissingSchema
+from copilot_exceptions.api_call_failed_exception import APICallFailedException
 from entities.flow_entity import FlowDTO
 from extractors.convert_json_to_text import (
     convert_json_error_to_text,
@@ -69,21 +69,22 @@ async def run_actions(
                         operation_id=operation_id,
                         app=app,
                     )
-                    apis_calls_history[operation_id] = api_response.text
+                    apis_calls_history[operation_id] = api_response.response.text
                 else:
                     logger.info(
                         "API Response",
                         incident="log_api_response",
-                        api_response=api_response.text,
+                        api_response=api_response.response.text,
                         json_config_used=partial_json,
                         next_action="summarize_with_partial_json",
                     )
-                    api_json = json.loads(api_response.text)
+                    api_json = json.loads(api_response.response.text)
                     apis_calls_history[operation_id] = json.dumps(
                         transform_response(
                             full_json=api_json, partial_json=partial_json
                         )
                     )
+
             except Exception as e:
                 logger.error(
                     "Error occurred during workflow check in store",
@@ -109,11 +110,9 @@ async def run_actions(
                 session_id=session_id,
                 is_streaming=is_streaming,
             )
-        except InvalidRequestError as e:
+        except Exception as e:
             error_message = (
-                f"Api response too large for the endpoint: {api_payload.endpoint}"
-                if api_payload is not None
-                else ""
+                f"{str(e)}: {api_payload.endpoint}" if api_payload is not None else ""
             )
             logger.error("OpenAI exception", bot_id=bot_id, error=str(e))
             emit(session_id, error_message) if is_streaming else None
