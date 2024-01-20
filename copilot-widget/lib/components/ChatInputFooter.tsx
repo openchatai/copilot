@@ -2,7 +2,6 @@ import TextareaAutosize from "react-textarea-autosize";
 import {
   SendHorizonal,
   Redo2,
-  AlertCircle
 } from 'lucide-react'
 import { useChat } from "../contexts/Controller";
 import { useRef, useState } from "react";
@@ -10,18 +9,20 @@ import { useInitialData } from "../contexts/InitialDataContext";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ToolTip";
 import { getId, isEmpty } from "@lib/utils/utils";
 import now from "@lib/utils/timenow";
+import { useDocumentDirection } from "@lib/hooks/useDocumentDirection";
 function MessageSuggestions() {
   const { data } = useInitialData();
   const { messages, sendMessage } = useChat();
 
   return (
     <>
-      {isEmpty(messages) && !isEmpty(data?.inital_questions) && (
-        <div className="opencopilot-flex opencopilot-items-center opencopilot-gap-4 opencopilot-justify-between opencopilot-w-full opencopilot-px-4">
-          <div className="opencopilot-flex opencopilot-items-center opencopilot-flex-wrap opencopilot-gap-2 opencopilot-flex-1">
-            {data?.inital_questions.map((q, index) => (
+      {
+        isEmpty(messages) && !isEmpty(data?.inital_questions) &&
+        (
+          <div className="opencopilot-flex no-scrollbar opencopilot-items-center opencopilot-flex-wrap opencopilot-justify-start opencopilot-gap-2 opencopilot-flex-1">
+            {data?.inital_questions?.map((q, index) => (
               <button
-                className="opencopilot-text-xs opencopilot-w-fit opencopilot-font-semibold opencopilot-whitespace-nowrap opencopilot-px-2.5 opencopilot-py-1 opencopilot-rounded-full opencopilot-bg-accent opencopilot-text-primary"
+                className="opencopilot-text-sm opencopilot-font-medium opencopilot-whitespace-nowrap opencopilot-px-2.5 opencopilot-py-1.5 opencopilot-rounded-lg opencopilot-bg-accent opencopilot-text-primary"
                 key={index}
                 onClick={() => {
                   sendMessage({
@@ -36,20 +37,7 @@ function MessageSuggestions() {
               </button>
             ))}
           </div>
-          <Tooltip>
-            <TooltipTrigger>
-              <span className="opencopilot-text-xl opencopilot-text-primary opencopilot-mb-auto">
-                <AlertCircle />
-              </span>
-            </TooltipTrigger>
-            <TooltipContent asChild>
-              <span className="opencopilot-text-xs opencopilot-font-medium fade-in-bottom opencopilot-px-2 opencopilot-py-1 opencopilot-mb-3">
-                suggestions
-              </span>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-      )}
+        )}
     </>
   );
 }
@@ -60,7 +48,9 @@ function ChatInputFooter() {
   const { sendMessage, reset, messages } = useChat();
   const { loading } = useChat();
   const canSend = input.trim().length > 0;
-
+  const {
+    direction
+  } = useDocumentDirection();
   const handleTextareaChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
@@ -81,9 +71,7 @@ function ChatInputFooter() {
   }
   return (
     <footer className="opencopilot-p-2 opencopilot-flex opencopilot-w-full opencopilot-flex-col opencopilot-gap-2">
-      <div className="opencopilot-overflow-y-auto opencopilot-w-full ">
-        <MessageSuggestions />
-      </div>
+      <MessageSuggestions />
       <div className="opencopilot-w-full opencopilot-flex opencopilot-items-center opencopilot-ring-[#334155]/60 opencopilot-transition-colors opencopilot-justify-between opencopilot-ring-1 opencopilot-overflow-hidden focus-within:opencopilot-ring-primary opencopilot-gap-2 opencopilot-bg-accent opencopilot-p-2 opencopilot-rounded-2xl">
         <div className="opencopilot-flex-1">
           <TextareaAutosize
@@ -104,7 +92,9 @@ function ChatInputFooter() {
             className="opencopilot-w-full opencopilot-resize-none opencopilot-bg-transparent focus-visible:opencopilot-outline-none opencopilot-border-none focus:opencopilot-outline-none focus:opencopilot-border-none opencopilot-scrollbar-thin opencopilot-leading-tight opencopilot-whitespace-pre-wrap opencopilot-py-1.5 opencopilot-px-4 placeholder:opencopilot-align-middle opencopilot-overflow-auto opencopilot-outline-none opencopilot-text-accent2 opencopilot-text-[14px] placeholder:opencopilot-text-xs opencopilot-font-normal"
           />
         </div>
-        <div className="opencopilot-flex opencopilot-items-center opencopilot-justify-center opencopilot-gap-2 opencopilot-h-fit opencopilot-px-2 opencopilot-text-lg">
+        <div
+          dir={direction}
+          className="opencopilot-flex opencopilot-items-center opencopilot-justify-center opencopilot-gap-2 opencopilot-h-fit opencopilot-px-2 opencopilot-text-lg">
           <Tooltip>
             <TooltipTrigger asChild>
               <button
@@ -112,7 +102,7 @@ function ChatInputFooter() {
                 className="opencopilot-text-xl disabled:opencopilot-opacity-40 disabled:opencopilot-pointer-events-none disabled:opencopilot-cursor-not-allowed opencopilot-text-[#5e5c5e] opencopilot-transition-all"
                 disabled={!(messages.length > 0)}
               >
-                <Redo2 />
+                <Redo2 className="rtl:opencopilot-rotate-180" />
               </button>
             </TooltipTrigger>
             <TooltipContent>reset chat</TooltipContent>
@@ -122,7 +112,7 @@ function ChatInputFooter() {
             className="opencopilot-text-xl disabled:opencopilot-opacity-40 disabled:opencopilot-pointer-events-none disabled:opencopilot-cursor-not-allowed opencopilot-text-[#5e5c5e] opencopilot-transition-all"
             disabled={loading || !canSend}
           >
-            <SendHorizonal />
+            <SendHorizonal className="rtl:opencopilot-rotate-180" />
           </button>
         </div>
       </div>
