@@ -8,7 +8,6 @@ const instance = axios.create({
 });
 
 export type PayloadType = {
-    description: string;
     parameters: {
         description: string;
         in: string;
@@ -20,16 +19,19 @@ export type PayloadType = {
     }[];
     request_body: any;
 }
+
 export type ActionResponseType = {
+    api_endpoint: string;
+    bot_id: string;
+    id: string;
     name: string;
     description: string;
-    api_endpoint: string;
     request_type: typeof apiMethods[number];
     operation_id: string;
-    id: string;
     created_at: string;
     updated_at: string;
     deleted_at: string | null;
+    status: string;
     payload?: PayloadType;
 }
 export type ActionWithModifiedParametersResponse = ActionWithModifiedParameters & {
@@ -63,7 +65,6 @@ export function importActionsFromSwagger(bot_id: string, swagger: File) {
     }>(`/bot/${bot_id}/import-from-swagger`, formData);
 }
 // {{backend_base}}/backend/actions/:action_id
-// @action.route("/bot/<string:chatbot_id>/action/<string:action_id>", methods=["PATCH"])
 export async function editActionById(bot_id: string, action_id: string, data: ActionWithModifiedParameters) {
     return (await instance.patch<ActionWithModifiedParametersResponse>(`/bot/${bot_id}/action/${action_id}`, data)).data;
 }

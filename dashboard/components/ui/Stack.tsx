@@ -20,8 +20,8 @@ function getStackStyles(opts: StackProps, styles: React.CSSProperties = {}) {
     const {
         direction = "row",
         gap = 0,
-        ic = "start",
-        js,
+        ic = "center",
+        js = "start",
         fluid = true
     } = opts;
 

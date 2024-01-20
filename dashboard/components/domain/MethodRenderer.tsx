@@ -1,7 +1,8 @@
-import { cva } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+import { cva, VariantProps } from "class-variance-authority";
+import React, { forwardRef } from "react";
 
-
-export const methodVariants = cva('text-accent uppercase text-xs font-semibold', {
+const methodVariants = cva('text-accent uppercase text-xs font-semibold', {
     variants: {
         method: {
             GET: 'bg-green-500',
@@ -23,3 +24,14 @@ export const methodVariants = cva('text-accent uppercase text-xs font-semibold',
         method: 'GET'
     }
 })
+type MethodProps = VariantProps<typeof methodVariants>
+const Method = forwardRef<HTMLSpanElement, { method: string, size?: MethodProps['size'] } & React.HTMLAttributes<HTMLSpanElement>>(({ method, size, className, ...props }, ref) => {
+    const cs = methodVariants({ method, size } as MethodProps)
+    return <span {...props} ref={ref} className={cn(cs, className)} />
+})
+Method.displayName = 'Method'
+
+export {
+    Method,
+    methodVariants
+}
