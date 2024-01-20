@@ -24,7 +24,7 @@ const TooltipContent = forwardRef<
     sideOffset={sideOffset}
     dir="auto"
     className={cn(
-      "opencopilot-text-primary opencopilot-font-medium opencopilot-px-2 opencopilot-bg-accent opencopilot-z-[50000] opencopilot-py-1 opencopilot-overflow-hidden opencopilot-shadow opencopilot-min-w-fit opencopilot-max-w-[15rem] opencopilot-select-none opencopilot-rounded-sm opencopilot-p-0.5 opencopilot-text-xs opencopilot-leading-none",
+      "opencopilot-text-white opencopilot-rounded-md opencopilot-font-medium opencopilot-px-2 opencopilot-bg-black opencopilot-z-[50000] opencopilot-py-1 opencopilot-overflow-hidden opencopilot-shadow opencopilot-min-w-fit opencopilot-max-w-[15rem] opencopilot-p-1 opencopilot-text-xs",
       "opencopilot-animate-in opencopilot-fade-in-0 opencopilot-slide-in-from-bottom-5 data-[state=closed]:animate-out data-[state=closed]:opencopilot-slide-in-from-top-0",
       className
     )}

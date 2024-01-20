@@ -5,6 +5,8 @@
 svg {
   width: 1em;
   height: 1em;
+  vector-effect: non-scaling-stroke;
+  stroke-width: 1.5;
 }
 @keyframes fade-in-bottom {
   0% {
@@ -144,4 +146,7 @@ svg {
 
 .scale-out-br {
   animation: scale-out-br 0.5s ease-in-out forwards;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

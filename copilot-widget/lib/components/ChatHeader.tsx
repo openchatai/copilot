@@ -18,7 +18,7 @@ export default function ChatHeader() {
     <header className="opencopilot-fade-in-top opencopilot-p-3 opencopilot-border-b opencopilot-border-b-black/10 opencopilot-w-full">
       <div className="opencopilot-w-full opencopilot-flex opencopilot-items-center opencopilot-justify-between">
         <h1 className="opencopilot-font-semibold opencopilot-text-sm">
-          {data?.bot_name}
+          {data?.bot_name || "opencopilot"}
         </h1>
         <div className="opencopilot-flex opencopilot-items-center opencopilot-gap-3">
           <Dialog>
