@@ -2,11 +2,10 @@ import { Grid } from "react-loader-spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ToolTip";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { User, Clipboard, ClipboardCheck } from "lucide-react";
+import { User } from "lucide-react";
 import { format } from "timeago.js";
 import cn from "../utils/cn";
 import formatTimeFromTimestamp from "../utils/formatTime";
-import { useCopyToClipboard } from "@lib/hooks/useCopy";
 import { FailedMessage, useChat } from "@lib/contexts/Controller";
 import { getLast, isEmpty } from "@lib/utils/utils";
 import { useConfigData } from "@lib/contexts/ConfigData";
@@ -52,7 +51,6 @@ export function BotTextMessage({
   timestamp?: number | Date;
   id?: string | number;
 }) {
-  const [copied, copy] = useCopyToClipboard();
   const { messages } = useChat();
   const isLast = getLast(messages)?.id === id;
   if (isEmpty(message)) return null;
@@ -85,34 +83,13 @@ export function BotTextMessage({
               </span>
             )}
           </div>
-          <button
-            className="opencopilot-text-lg opencopilot-justify-self-end"
-            onClick={() => copy(message)}
-          >
-            {copied ? (
-              <ClipboardCheck className="opencopilot-text-emerald-500" />
-            ) : (
-              <Clipboard />
-            )}
-          </button>
         </div>
       )}
     </div>
   );
 }
 
-// this hook swaps the texts aarray in order every n seconds to display the next text
-// when the last text is reached, it stops 
-const waitingText = [
-  "The copilot is thinking...",
-  "Checking if we need to proceed with external call...",
-  "Crunching some numbers...",
-  "Almost there...",
-]
-
 export function BotMessageLoading({ displayText }: { displayText: string }) {
-  // const displayText = useTextRotator({ texts: waitingText, intervalInSeconds: 2 })
-
   return (
     <div className="opencopilot-p-2 opencopilot-flex opencopilot-items-center opencopilot-shrink-0 opencopilot-gap-3 opencopilot-w-full">
       <div className="loading opencopilot-flex-col opencopilot-w-7 opencopilot-flex opencopilot-h-7 opencopilot-bg-accent opencopilot-text-primary opencopilot-rounded-lg opencopilot-shrink-0 opencopilot-mt-auto flex-center">
@@ -124,20 +101,6 @@ export function BotMessageLoading({ displayText }: { displayText: string }) {
         />
       </div>
       <div className="opencopilot-space-y-2 opencopilot-flex-1">
-        {/* <div className="mesg_body opencopilot-w-fit opencopilot-max-w-full">
-          {
-            displayText.map(({ isVisible, order, text }) => (
-              <p data-visible={isVisible} key={order} className="opencopilot-text-sm 
-              opencopilot-lowercase 
-              data-[visible=false]:!opencopilot-hidden 
-              opencopilot-fade-in data-[visible=false]:opencopilot-fade-out 
-              data-[visible=false]:opencopilot-animate-out 
-              opencopilot-animate-in">
-                {text}
-              </p>
-            ))
-          }
-        </div> */}
         <div className="opencopilot-w-fit">
           <p className="opencopilot-block opencopilot-text-sm">{displayText}</p>
         </div>
