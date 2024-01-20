@@ -80,7 +80,7 @@ function VariablesSection() {
   }
 
   return <Section header={<header className="flex items-center justify-between w-full">
-    <h2 className="text-base font-bold">Global Variables</h2>
+    <h2 className="text-base font-bold">Global Headers</h2>
     <Popover
       open={formOpen}
       onOpenChange={setFormOpen}
