@@ -1,6 +1,6 @@
 'use client';
 import { HeaderShell } from '@/components/domain/HeaderShell'
-import { RouteIcon } from 'lucide-react';
+import { RouteIcon, Zap } from 'lucide-react';
 import { ActionsDataGrid } from './ActionsDataGrid';
 import { Suspense } from 'react';
 import { Stack } from '@/components/ui/Stack';
@@ -26,7 +26,7 @@ export default function ActionsPage({ params }: Props) {
             className='size-full'>
             <HeaderShell className='justify-between'>
                 <div className='flex items-center gap-2'>
-                    <RouteIcon size={24} />
+                    <Zap size={24} />
                     <h1 className='text-lg font-semibold'>Actions</h1>
                 </div>
                 <div>
