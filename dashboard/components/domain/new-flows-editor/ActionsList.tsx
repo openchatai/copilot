@@ -75,7 +75,7 @@ export function ActionsList({ disabled }: { disabled?: boolean }) {
     const { state: { actions } } = useController();
 
     return (
-        _.isEmpty(actions) ? <EmptyBlock className="h-full text-xs">
+        _.isEmpty(actions) ? <EmptyBlock className="h-full w-full text-xs">
             <div className="text-accent-foreground text-center w-full">
                 No actions found <br /> You can create a new one from above or <br /> drag and drop a swagger file here. <br /> <br />
             </div>
