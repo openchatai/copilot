@@ -5,8 +5,9 @@ from sqlalchemy import Column, String, DateTime, Boolean, Integer, JSON
 from .database_setup import engine
 from .get_declarative_base import Base
 import json
+from dataclasses import dataclass
 
-
+@dataclass
 class ChatHistory(Base):
     __tablename__ = "chat_history"
 

@@ -64,6 +64,7 @@ def get_session_chats(session_id: str) -> Response:
                 "id": chat.id,
                 "message": chat.message,
                 "session_id": chat.session_id,
+                "debug_json": chat.debug_json,
             }
         )
 
