@@ -21,7 +21,7 @@ there are several ways you can integrate the Copilot Chat widget into your appli
 1. Download the latest build from [GitHub](https://github.com/openchatai/OpenCopilot/actions)
    and extract the zip file.
 
-2. Include the provided JavaScript file in the head of your document.
+2. Include the provided JavaScript file in the head of your document (use `http://localhost:8888/pilot.js` for local setup).
    ```html
    <script src="https://cloud.opencopilot.so/pilot.js"></script>
    ```
@@ -85,8 +85,8 @@ there are several ways you can integrate the Copilot Chat widget into your appli
 import { CopilotWidget,Root } from "@openchatai/copilot-widget"; // import the component
 import '@openchatai/copilot-widget/index.css' // the required styles
 const options = {
-  apiUrl: "https://yourdomain.com/api" // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:5000/api
-  socketUrl: "https://yourdomain.com/socket", // the url of the socket url that will be used to send and receive messages
+  apiUrl: "https://api.opencopilot.so/backend" // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:8888/backend
+  socketUrl: "https://api.opencopilot.so/socket" // your socket server, usually it's http://localhost:8888/socket
   initialMessage: "How are the things", // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
   token: "your_copilot_token_goes_here", // you can get your token from the dashboard
   defaultOpen: true,
