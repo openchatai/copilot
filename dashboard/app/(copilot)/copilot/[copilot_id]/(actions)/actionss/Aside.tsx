@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { ACTIVE_ACTION_KEY } from './utils';
 import { cn } from '@/lib/utils';
+import { H3 } from '@/components/ui/Typography';
 
 
 function ActionItem({ action }: { action: any }) {
@@ -41,7 +42,7 @@ export function Aside() {
     return <> <ResizablePanel defaultSize={25} maxSize={25} data-dragging={isDragging} collapsible className='data-[dragging="true"]:opacity-50'>
         <Stack direction='column' fluid className='h-full'>
             <HeaderShell className='justify-between px-3'>
-                <h2 className='text-lg font-bold'>Actions</h2>
+                <H3 className='text-lg font-bold'>Actions</H3>
                 <div className='space-y-2'>
                     <Button variant='default' size='fit' asChild>
                         <Link href={`/copilot/${copilotId}/actionss`}>
@@ -51,7 +52,12 @@ export function Aside() {
                 </div>
             </HeaderShell>
             <div className='w-full px-3 animate-in fade-in py-2 border-b'>
-                <Input placeholder='Search....' />
+                <Input placeholder='Search....' list='items' />
+                <datalist id='items'>
+                    {
+                        data?.map(action => <option key={action.id} value={action.name} />)
+                    }
+                </datalist>
             </div>
             <div className='flex-1 no-scrollbar p-2 w-full overflow-y-auto overflow-hidden'>
                 {data?.map(action => <ActionItem key={action.id} action={action} />)}

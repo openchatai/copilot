@@ -47,8 +47,8 @@ function transformAction(action: ActionType): ActionWithModifiedParameters {
             }
         })
     })
-    const body = toShema(action.body)
-    return _.merge(_.omit(action, ['parameters', 'headers', "body"]), { payload: { parameters, headers: action.headers, body } })
+    const request_body = toShema(action.body)
+    return _.merge(_.omit(action, ['parameters', 'headers', "body"]), { payload: { parameters, headers: action.headers, request_body } })
 }
 function actionToForm(action: ActionWithModifiedParameters): ActionType {
     const parameters: ActionType['parameters'] = [];

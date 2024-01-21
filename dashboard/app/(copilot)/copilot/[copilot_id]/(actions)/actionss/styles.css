@@ -1,0 +1,22 @@
+.tab-trigger {
+  position: relative;
+}
+.tab-trigger::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  transform-origin: left center;
+  transition: height 0.2s ease-out;
+  @apply inset-x-0 rounded-lg bg-foreground;
+}
+.tab-trigger[data-state="active"] {
+  @apply text-foreground;
+}
+.tab-trigger[data-state="active"]::after {
+  height: 1px;
+  @apply bg-foreground;
+}
+.tab-trigger[data-state="inactive"]::after {
+  height: 0;
+}
