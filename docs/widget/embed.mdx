@@ -31,8 +31,8 @@ there are several ways you can integrate the Copilot Chat widget into your appli
    <script>
      const options = {
         apiUrl: "https://api.opencopilot.so/backend" // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:8888/backend
-        socketUrl: "https://api.opencopilot.so/socket" // your socket server, usually it's http://localhost:8888/socket
-        initialMessages: "How are the things", // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
+        socketUrl: "https://api.opencopilot.so" // your socket server, usually it's http://localhost:8888/socket
+        initialMessage: "Hey! happy to help.", // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
         token: "your_copilot_token_goes_here", // you can get your token from the dashboard
         triggerSelector: "#triggerSelector", // the selector of the element that will trigger the copilot when clicked
         headers: {
@@ -86,8 +86,8 @@ import { CopilotWidget,Root } from "@openchatai/copilot-widget"; // import the c
 import '@openchatai/copilot-widget/index.css' // the required styles
 const options = {
   apiUrl: "https://api.opencopilot.so/backend" // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:8888/backend
-  socketUrl: "https://api.opencopilot.so/socket" // your socket server, usually it's http://localhost:8888/socket
-  initialMessage: "How are the things", // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
+  socketUrl: "https://api.opencopilot.so" // your socket server, usually it's http://localhost:8888/socket
+  initialMessage: "Hey! happy to help.", // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
   token: "your_copilot_token_goes_here", // you can get your token from the dashboard
   defaultOpen: true,
   headers: {
