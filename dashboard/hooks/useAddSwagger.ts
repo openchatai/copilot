@@ -1,4 +1,4 @@
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { importActionsFromSwagger } from "@/data/actions";
 import { AxiosError } from "axios";
 import { useAsyncFn } from "react-use";
@@ -23,11 +23,7 @@ export function useSwaggerAdd({ copilotId }: Params) {
         onError?: (data: TData) => void;
     }) {
         if (!copilotId) {
-            toast({
-                title: "Error",
-                variant: "destructive",
-                description: "Copilot ID is required",
-            })
+            toast.error("Copilot ID is required")
             onError?.({ is_error: true, message: "Copilot ID is required" });
             return;
         }
@@ -35,27 +31,15 @@ export function useSwaggerAdd({ copilotId }: Params) {
             const { data } = await importActionsFromSwagger(copilotId, swagger);
             if (data.is_error === true) {
                 onError?.(data);
-                toast({
-                    title: "Error",
-                    description: data.message,
-                    variant: "destructive",
-                })
+                toast.error(data.message)
             } else {
-                toast({
-                    title: "Success",
-                    description: data.message,
-                    variant: "success",
-                })
+                toast.success(data.message)
                 onSuccess?.(data);
             }
             return data;
         } catch (error) {
-            toast({
-                title: "Error",
-                variant: "destructive",
-                // @ts-ignore
-                description: (error as AxiosError).response?.data.message,
-            })
+            // @ts-ignore
+            toast.error((error as AxiosError).response?.data.message)
             // @ts-ignore
             onError?.({ is_error: true, message: (error as AxiosError).response?.data.message });
         }

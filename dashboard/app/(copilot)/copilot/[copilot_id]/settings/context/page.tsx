@@ -9,7 +9,7 @@ import { contexts } from "./_parts/data/contexts";
 import { TextDisplay } from "@/components/headless/TextDisplay";
 import { updateCopilot } from "@/data/copilot";
 import { revalidateCopilot, useCopilot } from "../../../_context/CopilotProvider";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 export default function CopilotContextSettingsPage() {
   const { id: copilotId, name: copilotName, prompt_message } = useCopilot();
@@ -22,16 +22,11 @@ export default function CopilotContextSettingsPage() {
       name: copilotName,
     });
     if (status === 200) {
-      toast({
-        title: "Context updated successfully",
-        variant: "success",
-      });
+      toast.success("Context updated successfully")
+
       revalidateCopilot(copilotId);
     } else {
-      toast({
-        title: "Failed to update context",
-        variant: "destructive",
-      });
+      toast.error("Something went wrong")
     }
   }
 

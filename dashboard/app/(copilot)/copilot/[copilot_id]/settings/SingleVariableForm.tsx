@@ -8,9 +8,9 @@ import { Button } from '@/components/ui/button'
 import { PlusCircle } from 'lucide-react';
 import { useAsyncFn } from 'react-use';
 import { VariableType, createVariable } from '@/data/copilot';
-import { toast } from '@/components/ui/use-toast';
 import _ from 'lodash';
 import { useCopilot } from '../../_context/CopilotProvider';
+import { toast } from 'sonner';
 
 type Props = {
     // eslint-disable-next-line no-unused-vars
@@ -64,11 +64,7 @@ export function AddSingleVariable() {
                         onSubmit={async (_data) => {
                             const { data } = await $createVariable(copilotId, [_data])
                             if (data.message) {
-                                toast({
-                                    variant: "success",
-                                    title: "Variable Added Successfully",
-                                    description: data.message,
-                                })
+                                toast.success("Variable Added Successfully")
                                 _.delay(() => setDialogOpen(false), 1000)
                             }
                         }}

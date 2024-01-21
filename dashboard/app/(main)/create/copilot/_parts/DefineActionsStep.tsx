@@ -5,7 +5,6 @@ import { useWizard } from "react-use-wizard";
 import { revalidateActions, useCreateCopilot } from "./CreateCopilotProvider";
 import useSWR from "swr";
 import _ from "lodash";
-import { toast } from "@/components/ui/use-toast";
 import { AlertDialog, AlertDialogContent, AlertDialogCancel, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { createActionByBotId, getActionsByBotId } from "@/data/actions";
 import { Button } from "@/components/ui/button";
@@ -16,6 +15,7 @@ import { methodVariants } from "@/components/domain/MethodRenderer";
 import { cn } from "@/lib/utils";
 import { GetActionsFromSwagger } from "@/components/domain/SwaggerUpload";
 import { useSwaggerAdd } from "@/hooks/useAddSwagger";
+import { toast } from "sonner";
 
 
 const formDialog = atom({
@@ -91,11 +91,7 @@ export function DefineActionsStep() {
                                 if (createdCopilot) {
                                     const { data } = await $addAction(createdCopilot.id, values);
                                     if (data) {
-                                        toast({
-                                            title: "Action created successfully",
-                                            description: "We have created your action successfully",
-                                            variant: "success",
-                                        });
+                                        toast.success("Action created successfully");
                                         setDialogs({
                                             ...dialogs,
                                             manually: false

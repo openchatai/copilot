@@ -29,7 +29,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Field, Form } from "@/components/ui/form";
 import { useAsyncFn } from "react-use";
 import { deleteCopilot, updateCopilot } from "@/data/copilot";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { mutate } from "swr";
 
 function VariablesSection() {
@@ -179,18 +179,10 @@ function GeneralSettingsSection() {
         const { data } = await handleUpdateCopilot(copilotId, { name: copilotName, website });
         console.log(data)
         if (data.chatbot) {
-          toast({
-            title: 'Copilot updated',
-            description: 'Copilot was updated successfully',
-            variant: "success"
-          })
+          toast.success("Copilot updated successfully")
           mutate(copilotId)
         } else {
-          toast({
-            title: 'Copilot update failed',
-            description: 'Copilot update failed',
-            variant: "destructive"
-          })
+          toast.error("Copilot update failed")
         }
       })}>
         <Field label="Copilot Name" control={form.control} name="copilotName" render={(field) => <Input {...field} />} />
@@ -260,17 +252,9 @@ function DeleteSection() {
               onClick={async () => {
                 const { data } = await handleDeleteCopilot()
                 if (data.success) {
-                  toast({
-                    title: 'Copilot deleted',
-                    description: 'Copilot was deleted successfully',
-                    variant: "success"
-                  })
+                  toast.success("Copilot deleted successfully")
                 } else {
-                  toast({
-                    title: 'Copilot deletion failed',
-                    description: 'Copilot deletion failed',
-                    variant: "destructive"
-                  })
+                  toast.error("Copilot deletion failed")
                 }
               }}>
               Delete
