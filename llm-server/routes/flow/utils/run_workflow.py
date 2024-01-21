@@ -26,9 +26,9 @@ async def run_flow(
 
     result = ""
     error = None
-
+    api_request_data = {}
     try:
-        result = await run_actions(
+        response, api_request_data = await run_actions(
             flow=flow,
             text=chat_context.text,
             headers=headers,
@@ -54,7 +54,7 @@ async def run_flow(
 
     logging.info("Workflow output %s", json.dumps(output, separators=(",", ":")))
     return LLMResponse(
-        api_request_response=ApiRequestResult(),
+        api_request_response=ApiRequestResult(api_request_data),
         error=output["error"],
         message=output["response"],
     )

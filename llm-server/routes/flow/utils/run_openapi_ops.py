@@ -1,5 +1,5 @@
 import json
-from typing import Optional
+from typing import Optional, Tuple
 from flask_socketio import emit
 
 from werkzeug.datastructures import Headers
@@ -29,7 +29,7 @@ async def run_actions(
     bot_id: str,
     session_id: str,
     is_streaming: bool,
-) -> str:
+) -> Tuple[str, dict]:
     api_request_data = {}
     prev_api_response = ""
     apis_calls_history = {}
@@ -101,10 +101,10 @@ async def run_actions(
                 formatted_error = convert_json_error_to_text(
                     str(e), is_streaming, session_id
                 )
-                return str(formatted_error)
+                return str(formatted_error), api_request_data
 
     try:
-        return convert_json_to_text(
+        readable_response = convert_json_to_text(
             text,
             apis_calls_history,
             api_request_data,
@@ -112,10 +112,12 @@ async def run_actions(
             session_id=session_id,
             is_streaming=is_streaming,
         )
+
+        return readable_response, api_request_data
     except Exception as e:
         error_message = (
             f"{str(e)}: {api_payload.endpoint}" if api_payload is not None else ""
         )
         logger.error("OpenAI exception", bot_id=bot_id, error=str(e))
         emit(session_id, error_message) if is_streaming else None
-        return error_message
+        return error_message, api_request_data
