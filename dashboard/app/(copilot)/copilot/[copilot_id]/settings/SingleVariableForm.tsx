@@ -33,13 +33,13 @@ export function SingleVariableForm({ onSubmit, footer }: Props) {
                 <Label>
                     Name
                 </Label>
-                <Input type='text' required name='name' placeholder='ENV_NAME' />
+                <Input type='text' required name='name' placeholder='HEADER_NAME' />
             </div>
             <div>
                 <Label>
                     Value
                 </Label>
-                <Textarea minRows={2} name='value' required maxRows={4} placeholder='ENV_VALUE' />
+                <Textarea minRows={2} name='value' required maxRows={4} placeholder='HEADER_VALUE' />
             </div>
             {footer}
         </form>

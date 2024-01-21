@@ -91,23 +91,17 @@ function VariablesSection() {
         </Button>
       </PopoverTrigger>
       <PopoverContent className='mx-2'>
-        <SingleVariableForm onSubmit={async (data) => { await (await createVarAsync([data])).message && setFormOpen(false) }} footer={<Button loading={asyncCreateStatus.loading} type='submit' size='xs'>create</Button>} />
+        <SingleVariableForm onSubmit={async (data) => { (await createVarAsync([data])).message && setFormOpen(false) }} footer={<Button loading={asyncCreateStatus.loading} type='submit' size='xs'>create</Button>} />
       </PopoverContent>
     </Popover>
   </header>}>
     <div>
       <table className='w-full table'>
-        <thead>
-          <tr className="[&>th]:p-1">
-            <th className='font-medium text-left'>Name</th>
-            <th className='font-medium text-left'>Value</th>
-          </tr>
-        </thead>
         <tbody>
           {_.isEmpty(data) ? <tr>
             <TableCell colSpan={3}>
               <EmptyBlock>
-                <p className='text-sm'>No variables found</p>
+                <p className='text-sm'>No headers found</p>
               </EmptyBlock>
             </TableCell>
           </tr> :
