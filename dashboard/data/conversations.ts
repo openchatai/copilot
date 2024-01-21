@@ -10,6 +10,7 @@ export type ChatMessageType = {
   message: string;
   from_user: boolean;
   created_at: string;
+  debug_json: null | string;
 };
 
 // http://localhost:8888/backend/chat/sessions/:sessionId/chats
