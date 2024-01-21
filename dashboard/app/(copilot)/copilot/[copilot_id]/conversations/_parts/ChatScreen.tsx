@@ -7,6 +7,8 @@ import { ChatMessageType, getConversationBySessionId } from "@/data/conversation
 import Loader from "@/components/ui/Loader";
 import { format } from 'timeago.js';
 import { EmptyBlock } from "@/components/domain/EmptyBlock";
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
+import { BaseCodeBlock } from "@/components/domain/CodeBlock";
 
 function UserMessage({ message, created_at }: ChatMessageType) {
   return (
@@ -22,19 +24,26 @@ function UserMessage({ message, created_at }: ChatMessageType) {
     </div>
   );
 }
-function CopilotMessage({ message, created_at }: ChatMessageType) {
+function CopilotMessage({ message, created_at, debug_json }: ChatMessageType) {
   return (
-    <div className="flex w-full flex-row items-start justify-start gap-2 relative">
-      <Avatar size="large" className="sticky top-0">
-        <AvatarFallback>C</AvatarFallback>
-      </Avatar>
-      <div className="flex items-start flex-col gap-1.5">
-        <p className="w-fit max-w-sm rounded-lg bg-secondary px-4 py-3 text-sm text-accent-foreground select-none">
-          {message}
-        </p>
-        <span className="text-xs">{format(created_at)}</span>
+    <HoverCard>
+      <div className="flex w-full flex-row items-start justify-start gap-2 relative">
+        <Avatar size="large" className="sticky top-0">
+          <AvatarFallback>C</AvatarFallback>
+        </Avatar>
+        <div className="flex items-start flex-col gap-1.5">
+          <HoverCardTrigger asChild>
+            <p className="w-fit max-w-sm rounded-lg bg-secondary px-4 py-3 text-sm text-accent-foreground select-none">
+              {message}
+            </p>
+          </HoverCardTrigger>
+          <span className="text-xs">{format(created_at)}</span>
+        </div>
       </div>
-    </div>
+      <HoverCardContent animated={false} side="right" align="center" className="p-0 overflow-hidden">
+        <BaseCodeBlock code={debug_json || ''} language="javascript" />
+      </HoverCardContent>
+    </HoverCard>
   );
 }
 function ChatDivider({ content }: { content: string }) {
@@ -53,7 +62,7 @@ export function ChatScreen() {
     data: chat,
     isLoading
   } = useSWR(activeId, getConversationBySessionId)
-  
+
   return (
     <div className="flex-1 space-y-3 overflow-auto p-4 font-medium">
       {
