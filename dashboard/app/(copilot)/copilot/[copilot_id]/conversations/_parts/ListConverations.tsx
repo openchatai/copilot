@@ -24,9 +24,11 @@ function Conversation(props: ConversationType) {
       )}
     >
       <div
-        className="h-full w-full text-start">
-        <p className="line-clamp-1 text-base">{props.first_message.message}</p>
-        <p className="text-[10px]">{format(props.first_message.created_at)}</p>
+        className="h-full w-full">
+        <p className="line-clamp-1 text-base text-start"
+          dir="auto"
+        >{props.first_message.message}</p>
+        <p className="text-[10px]">started{" "}{format(props.first_message.created_at)}</p>
       </div>
     </li>
   );
