@@ -59,6 +59,7 @@
     "react-resizable-panels": "^1.0.9",
     "react-syntax-highlighter": "^15.5.0",
     "react-textarea-autosize": "^8.5.3",
+    "react-twc": "^1.4.1",
     "react-use": "^17.4.0",
     "react-use-wizard": "^2.2.3",
     "reactflow": "^11.10.1",
