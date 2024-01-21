@@ -109,7 +109,7 @@ def init_chat():
                 "bot_name": bot.name,
                 "logo": "logo",
                 "faq": [],  # Replace with actual FAQ data
-                "initial_questions": [],  # Replace with actual initial questions
+                "inital_questions": [],
                 "history": history,
             }
         )
@@ -136,7 +136,7 @@ async def send_chat():
     input_data = ChatInput(**json_data)
     message = input_data.content
     session_id = input_data.session_id
-    headers_from_json = input_data.headers
+    headers_from_json = input_data.headers or {}
 
     bot_token = request.headers.get("X-Bot-Token")
     return await handle_chat_send_common(
@@ -169,6 +169,7 @@ async def handle_chat_send_common(
         elif chat_strategy == ChatStrategy.tool:
             strategy = ToolStrategy()
 
+        headers_from_json.update(bot.global_variables or {})
         response_data = await strategy.handle_request(
             message,
             session_id,
