@@ -1,5 +1,5 @@
 from typing import Any, Dict, NamedTuple
-
+import json
 import requests
 from copilot_exceptions.api_call_failed_exception import APICallFailedException
 from custom_types.response_dict import ApiRequestResult
@@ -69,7 +69,14 @@ def make_api_request(
         response.raise_for_status()
 
         return ApiRequestResult(
-            response, path_params, query_params, method.lower(), body_schema
+            api_requests={
+                "method": method,
+                "endpoint": endpoint,
+                "body": json.dumps(body_schema),
+                "path_param": json.dumps(path_params),
+                "query_param": json.dumps(query_params),
+                "response": response.text,
+            }
         )
 
     except requests.exceptions.RequestException as e:

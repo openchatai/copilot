@@ -69,16 +69,18 @@ async def run_actions(
                         operation_id=operation_id,
                         app=app,
                     )
-                    apis_calls_history[operation_id] = api_response.response.text
+                    apis_calls_history[operation_id] = api_response.api_requests[
+                        "response"
+                    ]
                 else:
                     logger.info(
                         "API Response",
                         incident="log_api_response",
-                        api_response=api_response.response.text,
+                        api_response=api_response.api_requests,
                         json_config_used=partial_json,
                         next_action="summarize_with_partial_json",
                     )
-                    api_json = json.loads(api_response.response.text)
+                    api_json = json.loads(api_response.api_requests["response"])
                     apis_calls_history[operation_id] = json.dumps(
                         transform_response(
                             full_json=api_json, partial_json=partial_json
