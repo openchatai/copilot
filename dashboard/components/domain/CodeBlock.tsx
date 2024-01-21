@@ -5,6 +5,18 @@ import { Check, Copy } from "lucide-react";
 import { useCopyToClipboard } from "@/hooks/copy-to-clipboard";
 import { ExpandCollapse } from "../headless/Collapse";
 
+export function BaseCodeBlock({ code, language = "html" }: { code: string, language?: string }) {
+  return (
+    <SyntaxHighlighter
+      style={ocean}
+      language={language}
+      wrapLongLines
+    >
+      {code.trim()}
+    </SyntaxHighlighter>
+  );
+}
+
 function CodeBlock({
   code,
   language = "html",
