@@ -255,6 +255,7 @@ def create_chat_histories(
                 session_id=record["session_id"],
                 from_user=record["from_user"],
                 message=record["message"],
+                debug_json=record.get("debug_json"),
             )
 
             session.add(chat_history)

@@ -3,7 +3,7 @@ from typing import Optional
 from typing import cast, Dict
 
 from flask import jsonify, Blueprint, request, Response, abort, Request
-from custom_types.response_dict import ResponseDict
+from custom_types.response_dict import LLMResponse, ResponseDict
 
 from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id,
@@ -23,6 +23,7 @@ from utils.llm_consts import X_App_Name, chat_strategy, ChatStrategy
 from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
 from .. import root_service
 from flask_socketio import emit
+import asyncio
 
 logger = CustomLogger(module_name=__name__)
 
@@ -127,10 +128,6 @@ async def send_chat_stream(
 
 @chat_workflow.route("/send", methods=["POST"])
 async def send_chat():
-    response_data: ResponseDict = {
-        "error": "",
-        "response": "Something went wrong, please try again!",
-    }
     json_data = request.get_json()
 
     input_data = ChatInput(**json_data)
@@ -170,7 +167,8 @@ async def handle_chat_send_common(
             strategy = ToolStrategy()
 
         headers_from_json.update(bot.global_variables or {})
-        response_data = await strategy.handle_request(
+
+        result = await strategy.handle_request(
             message,
             session_id,
             str(base_prompt),
@@ -180,7 +178,8 @@ async def handle_chat_send_common(
             is_streaming,
         )
 
-        if response_data["response"]:
+        # if the llm replied correctly
+        if result.message is not None:
             chat_records = [
                 {
                     "session_id": session_id,
@@ -190,9 +189,8 @@ async def handle_chat_send_common(
                 {
                     "session_id": session_id,
                     "from_user": False,
-                    "message": response_data["response"]
-                    or response_data["error"]
-                    or "",
+                    "message": result.message,
+                    "debug_json": str(result.api_request_response.__dict__),
                 },
             ]
 
@@ -200,17 +198,16 @@ async def handle_chat_send_common(
                 chatbot_id=str(bot.id), successful_operations=1, total_operations=1
             )
             create_chat_histories(str(bot.id), chat_records)
-        elif response_data["error"]:
+
+        elif result.error:
             upsert_analytics_record(
                 chatbot_id=str(bot.id),
                 successful_operations=0,
                 total_operations=1,
-                logs=response_data["error"],
+                logs=result.error,
             )
-
-        emit(session_id, "|im_end|") if is_streaming else None
-        return jsonify(
-            {"type": "text", "response": {"text": response_data["response"]}}
+        emit(session_id, "|im_end|") if is_streaming else jsonify(
+            {"type": "text", "response": {"text": result.message}}
         )
     except Exception as e:
         logger.error(

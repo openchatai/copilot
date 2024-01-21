@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Optional
-from custom_types.response_dict import ResponseDict
+from typing import Awaitable, Dict, Optional
+from custom_types.response_dict import LLMResponse
 from asyncio import Future
 
 
@@ -15,5 +15,5 @@ class ChatRequestHandler(ABC):
         headers: Dict[str, str],
         app: Optional[str],
         is_streaming: bool,
-    ) -> Future[ResponseDict]:
+    ) -> LLMResponse:
         pass

@@ -1,7 +1,8 @@
-from typing import Any, Dict
-
+from typing import Any, Dict, NamedTuple
+import json
 import requests
-from requests import Response
+from copilot_exceptions.api_call_failed_exception import APICallFailedException
+from custom_types.response_dict import ApiRequestResult
 
 from utils.get_logger import CustomLogger
 
@@ -33,7 +34,7 @@ def make_api_request(
     path_params: Dict[str, str],
     query_params: Dict[str, str],
     headers: Any,
-) -> Response:
+) -> ApiRequestResult:
     url = ""
 
     try:
@@ -67,7 +68,16 @@ def make_api_request(
         # Raise an exception for HTTP errors (4xx and 5xx)
         response.raise_for_status()
 
-        return response
+        return ApiRequestResult(
+            api_requests={
+                "method": method,
+                "endpoint": endpoint,
+                "body": json.dumps(body_schema),
+                "path_param": json.dumps(path_params),
+                "query_param": json.dumps(query_params),
+                "response": response.text,
+            }
+        )
 
     except requests.exceptions.RequestException as e:
         logger.error(
@@ -78,5 +88,6 @@ def make_api_request(
             params=path_params,
             query_params=query_params,
             method=method,
+            body=body_schema,
         )
-        raise (e)
+        raise APICallFailedException(str(e))
