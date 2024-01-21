@@ -193,6 +193,7 @@ async def handle_chat_send_common(
                     "session_id": session_id,
                     "from_user": False,
                     "message": result.message,
+                    "debug_json": str(result.api_request_response.__dict__),
                 },
             ]
 

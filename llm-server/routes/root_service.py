@@ -4,7 +4,7 @@ from typing import Dict, Optional, List, cast
 
 from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
 
-from custom_types.response_dict import ResponseDict
+from custom_types.response_dict import LLMResponse, ApiRequestResult
 from custom_types.run_workflow_input import ChatContext
 from entities.flow_entity import FlowDTO
 from models.repository.flow_repo import get_flow_by_id
@@ -73,15 +73,12 @@ async def run_actionable_item(
     bot_id: str,
     session_id: str,
     is_streaming: bool,
-) -> ResponseDict:
-    output: ResponseDict = {
-        "error": "",
-        "response": "Sorry, I can't help you with that action",
-    }
-
+) -> LLMResponse:
     actions = actionable_item.get(VectorCollections.actions)
     flows = actionable_item.get(VectorCollections.flows)
-
+    output = LLMResponse(
+        error=None, message=None, api_request_response=ApiRequestResult()
+    )
     _flow = None
     if actionable_item.get(VectorCollections.actions) and actions is not None:
         action = actions[0]
@@ -131,7 +128,7 @@ def run_informative_item(
     conversations_history: List[BaseMessage],
     is_streaming: bool,
     session_id: str,
-) -> ResponseDict:
+) -> LLMResponse:
     # so we got all context, let's ask:
 
     context = []
@@ -176,4 +173,7 @@ def run_informative_item(
         emit(session_id, chunk.content) if is_streaming else None
         content += str(chunk.content)
 
-    return {"response": content, "error": None}
+    # return {"response": content, "error": None}
+    return LLMResponse(
+        message=content, error=None, api_request_response=ApiRequestResult()
+    )

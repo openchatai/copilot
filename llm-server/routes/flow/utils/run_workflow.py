@@ -1,10 +1,11 @@
 import json
 import logging
 from typing import Optional
+import requests
 
 from werkzeug.datastructures import Headers
 
-from custom_types.response_dict import ResponseDict
+from custom_types.response_dict import ApiRequestResult, LLMResponse
 from custom_types.run_workflow_input import ChatContext
 from entities.flow_entity import FlowDTO
 from routes.flow.utils import run_actions
@@ -20,7 +21,7 @@ async def run_flow(
     bot_id: str,
     session_id: str,
     is_streaming: bool,
-) -> ResponseDict:
+) -> LLMResponse:
     headers = chat_context.headers or Headers()
 
     result = ""
@@ -52,4 +53,8 @@ async def run_flow(
     output = {"response": result if not error else "", "error": error}
 
     logging.info("Workflow output %s", json.dumps(output, separators=(",", ":")))
-    return output
+    return LLMResponse(
+        api_request_response=ApiRequestResult(),
+        error=output["error"],
+        message=output["response"],
+    )

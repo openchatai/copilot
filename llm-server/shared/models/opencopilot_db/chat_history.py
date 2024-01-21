@@ -4,6 +4,7 @@ from sqlalchemy import Column, String, DateTime, Boolean, Integer, JSON
 
 from .database_setup import engine
 from .get_declarative_base import Base
+import json
 
 
 class ChatHistory(Base):
@@ -18,7 +19,7 @@ class ChatHistory(Base):
     updated_at = Column(
         DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
     )
-    debug_json = JSON()
+    debug_json = Column(JSON, default={}, nullable=True)
 
 
 Base.metadata.create_all(engine)

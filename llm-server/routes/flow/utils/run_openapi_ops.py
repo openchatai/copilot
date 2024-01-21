@@ -101,19 +101,19 @@ async def run_actions(
                 )
                 return str(formatted_error)
 
-        try:
-            return convert_json_to_text(
-                text,
-                apis_calls_history,
-                api_request_data,
-                bot_id=bot_id,
-                session_id=session_id,
-                is_streaming=is_streaming,
-            )
-        except Exception as e:
-            error_message = (
-                f"{str(e)}: {api_payload.endpoint}" if api_payload is not None else ""
-            )
-            logger.error("OpenAI exception", bot_id=bot_id, error=str(e))
-            emit(session_id, error_message) if is_streaming else None
-            return error_message
+    try:
+        return convert_json_to_text(
+            text,
+            apis_calls_history,
+            api_request_data,
+            bot_id=bot_id,
+            session_id=session_id,
+            is_streaming=is_streaming,
+        )
+    except Exception as e:
+        error_message = (
+            f"{str(e)}: {api_payload.endpoint}" if api_payload is not None else ""
+        )
+        logger.error("OpenAI exception", bot_id=bot_id, error=str(e))
+        emit(session_id, error_message) if is_streaming else None
+        return error_message
