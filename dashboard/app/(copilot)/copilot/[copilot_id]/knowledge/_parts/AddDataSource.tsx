@@ -24,8 +24,7 @@ import { Plus, RefreshCw, Trash } from "lucide-react";
 import { ingestDataSources, uploadFile } from "@/data/knowledge";
 import { useCopilot } from "../../../_context/CopilotProvider";
 import _ from "lodash";
-import { toast } from "@/components/ui/use-toast";
-import useSWR, { mutate } from "swr";
+import useSWR from "swr";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useFieldArray, useForm, SubmitHandler } from "react-hook-form";
 import { Form } from "@/components/ui/form";
@@ -34,6 +33,7 @@ import {
   zodResolver
 } from '@hookform/resolvers/zod'
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 type DialogTypes = "url" | "file" | null;
 const activeDialog = atom<DialogTypes>(null);
 
@@ -78,16 +78,12 @@ function AddUrlDataSource() {
     try {
       const resp = await ingestDataSources(urls, copilotId);
       if (resp.status === 200) {
-        toast({
-          title: "Data source(s) added successfully",
-          variant: "success"
-        });
+        toast.success("Data source(s) added successfully");
         _.delay(() => setDialog(null), 1000)
       } else {
-        toast({
-          title: "Error adding data source(s)",
-          variant: "destructive"
-        });
+        toast.error(
+          "Error adding data source(s)",
+        );
       }
 
     } catch (error) {
@@ -178,10 +174,7 @@ function AddFileDataSource() {
       // @ts-ignore
       const resp = await ingestDataSources(success.map((f) => f?.filename), copilotId);
       if (resp.status === 200) {
-        toast({
-          title: "Data source(s) added successfully",
-          variant: "success"
-        });
+        toast.success("Data source(s) added successfully");
         setDialog(null);
       }
     }

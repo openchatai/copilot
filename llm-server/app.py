@@ -34,23 +34,22 @@ app.register_blueprint(copilot, url_prefix="/backend/copilot")
 app.register_blueprint(upload_controller, url_prefix="/backend/uploads")
 app.register_blueprint(datasource_workflow, url_prefix="/backend/data_sources")
 app.register_blueprint(action, url_prefix="/backend/actions")
+from werkzeug.exceptions import HTTPException
 
 app.config.from_object(Config)
 
 
 @app.errorhandler(Exception)
-def internal_server_error(error):
-    # Log the error or perform any other necessary actions
+def handle_exception(error):
+    # If the exception is an HTTPException (includes 4XX and 5XX errors)
+    if isinstance(error, HTTPException):
+        # Log the error or perform any other necessary actions
+        logger.error("HTTP Error", error=error)
+        return jsonify({"error": error.name, "message": error.description}), error.code
+
+    # If it's not an HTTPException, it's a 500 Internal Server Error
     logger.error("Internal Server Error", error=error)
-    return (
-        jsonify(
-            {
-                "error": "Internal Server Error",
-                "message": "An unexpected error occurred on the server.",
-            }
-        ),
-        500,
-    )
+    return jsonify({"error": "Internal Server Error", "message": "An unexpected error occurred on the server."}), 500
 
 
 @socketio.on("send_chat")

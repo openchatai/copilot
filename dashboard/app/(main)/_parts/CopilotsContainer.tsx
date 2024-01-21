@@ -3,7 +3,7 @@ import React from "react";
 import { GalleryHorizontalEnd } from "lucide-react";
 import { Link } from "@/lib/router-events";
 import useSwr from "swr";
-import { listCopilots } from "@/data/copilot";
+import { CopilotType, listCopilots } from "@/data/copilot";
 import Loading from "../loading";
 import _ from "lodash";
 import { EmptyBlock } from "@/components/domain/EmptyBlock";
@@ -12,7 +12,12 @@ import { useAtomValue } from "jotai";
 import { Button } from "@/components/ui/button";
 import { format } from "timeago.js";
 import { motion, AnimatePresence } from 'framer-motion';
-
+import { Stack } from "@/components/ui/Stack";
+function orderByCreatedAt(copilots: CopilotType[]) {
+  return copilots.sort((a, b) => {
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
+}
 const AnimatedLink = motion(Link);
 
 export function CopilotsContainer() {
@@ -52,7 +57,7 @@ export function CopilotsContainer() {
     </EmptyBlock>
   ) : (
     <div className="grid gap-4 py-4 grid-cols-12 copilot__container">
-      {$copilots.map((copilot, index) => {
+      {orderByCreatedAt($copilots).map((copilot, index) => {
         const copilotUrl = "/copilot/" + copilot.id;
         return (
           <AnimatePresence
@@ -81,15 +86,15 @@ export function CopilotsContainer() {
                   <GalleryHorizontalEnd className="size-12" />
                 </div>
               </div>
-              <div className="mt-1.5 ps-1">
-                <h2 className="line-clamp-1 text-sm font-semibold">
+              <Stack className="mt-1.5 ps-1 justify-between" gap={10} fluid>
+                <h2 className="flex-1 text-sm font-semibold line-clamp-1" title={copilot.name}>
                   {copilot.name}
                 </h2>
-                <p className="text-xs text-gray-400">
-                  created{" "}
+                <p className="text-xs text-black">
+                  Created{" "}
                   <span className="font-semibold">{format(copilot.created_at)}</span>
                 </p>
-              </div>
+              </Stack>
             </AnimatedLink>
           </AnimatePresence>
         );

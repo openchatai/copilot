@@ -3,10 +3,10 @@ import { CopilotType, createCopilot } from "@/data/copilot";
 import { useWizard } from "react-use-wizard";
 import { useCreateCopilot } from "./CreateCopilotProvider";
 import { useAsyncFn } from "react-use";
-import { toast } from "@/components/ui/use-toast";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export function SetCopilotName() {
     const { state: { copilot_name, createdCopilot }, dispatch } = useCreateCopilot();
@@ -18,11 +18,7 @@ export function SetCopilotName() {
 
     async function handleCreateCopilot() {
         if (!copilot_name) {
-            toast({
-                title: "Please enter copilot name",
-                description: "Please enter copilot name",
-                variant: "destructive",
-            });
+            toast.message("Please enter copilot name");
             return;
         }
         if (createdCopilot) {
@@ -34,11 +30,7 @@ export function SetCopilotName() {
             setCopilot(response.data);
             nextStep();
         } else {
-            toast({
-                title: "Something went wrong",
-                description: "Please try again later",
-                variant: "destructive",
-            });
+            toast.error("Failed to create copilot");
         }
     }
     return <div>

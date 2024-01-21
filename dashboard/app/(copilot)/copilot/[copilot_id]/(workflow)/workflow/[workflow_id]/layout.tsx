@@ -5,11 +5,11 @@ import { Button } from '@/components/ui/button'
 import React from 'react'
 import { useAsyncFn } from 'react-use'
 import { syncWorkflowById as $syncWorkflowById, getFlowById } from '@/data/new_flows'
-import { toast } from '@/components/ui/use-toast';
 import useSWR from 'swr'
 import { getActionsByBotId } from '@/data/actions'
 import _, { uniqueId } from 'lodash'
 import { useCopilot } from '@/app/(copilot)/copilot/_context/CopilotProvider'
+import { toast } from 'sonner'
 
 type Props = {
     children: React.ReactNode;
@@ -66,10 +66,7 @@ function Header({ workflow_id }: { workflow_id: string }) {
                             description: state.description!
                         })
                         if (response.data) {
-                            toast({
-                                title: 'Flow saved',
-                                variant: 'success'
-                            })
+                            toast.success("Flow saved successfully")
                             _.delay(mutateFlow, 1000)
                         }
                     }

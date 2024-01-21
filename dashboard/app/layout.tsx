@@ -1,23 +1,16 @@
 import { cn } from "@/lib/utils";
 import "./globals.css";
 import type { Metadata } from "next";
-import { Open_Sans } from "next/font/google";
 import { Tv2 } from "lucide-react";
 import { IS_DEV } from "@/lib/consts";
 import { SearchModal } from "./(main)/_parts/SearchModal";
 import React from "react";
 import { SWRProvider } from "./swr-provider";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/sonner"
 import { HandleOnComplete } from "@/lib/router-events";
 import { TopLoader } from "@/lib/Toploader";
 import { JotaiProvider } from "./jotai-provider";
-
-const opensans = Open_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  fallback: ["Roboto", "sans-serif"],
-  preload: true,
-});
+import { cairoFont, opensansFont } from "./fonts";
 
 export const metadata: Metadata = {
   title: "OpenCopilot",
@@ -34,10 +27,14 @@ export default function RootLayout({
         <html lang="en">
           <body
             className={cn(
-              opensans.className,
+              cairoFont.variable,
+              opensansFont.variable,
               "h-svh min-h-svh max-h-svh w-svw overflow-hidden scroll-smooth bg-background text-accent-foreground antialiased",
               IS_DEV && "debug-screens",
             )}
+            style={{
+              fontFamily: 'var(--opensans-font),var(--cairo-font),ui-sans-serif,system-ui,sans-serif'
+            }}
           >
             {children}
             {/* browser too small message */}
