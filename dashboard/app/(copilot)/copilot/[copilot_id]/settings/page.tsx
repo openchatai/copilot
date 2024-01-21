@@ -29,7 +29,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Field, Form } from "@/components/ui/form";
 import { useAsyncFn } from "react-use";
 import { deleteCopilot, updateCopilot } from "@/data/copilot";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { mutate } from "swr";
 
 function VariablesSection() {
@@ -91,23 +91,17 @@ function VariablesSection() {
         </Button>
       </PopoverTrigger>
       <PopoverContent className='mx-2'>
-        <SingleVariableForm onSubmit={async (data) => { await (await createVarAsync([data])).message && setFormOpen(false) }} footer={<Button loading={asyncCreateStatus.loading} type='submit' size='xs'>create</Button>} />
+        <SingleVariableForm onSubmit={async (data) => { (await createVarAsync([data])).message && setFormOpen(false) }} footer={<Button loading={asyncCreateStatus.loading} type='submit' size='xs'>create</Button>} />
       </PopoverContent>
     </Popover>
   </header>}>
     <div>
       <table className='w-full table'>
-        <thead>
-          <tr className="[&>th]:p-1">
-            <th className='font-medium text-left'>Name</th>
-            <th className='font-medium text-left'>Value</th>
-          </tr>
-        </thead>
         <tbody>
           {_.isEmpty(data) ? <tr>
             <TableCell colSpan={3}>
               <EmptyBlock>
-                <p className='text-sm'>No variables found</p>
+                <p className='text-sm'>No headers found</p>
               </EmptyBlock>
             </TableCell>
           </tr> :
@@ -179,18 +173,10 @@ function GeneralSettingsSection() {
         const { data } = await handleUpdateCopilot(copilotId, { name: copilotName, website });
         console.log(data)
         if (data.chatbot) {
-          toast({
-            title: 'Copilot updated',
-            description: 'Copilot was updated successfully',
-            variant: "success"
-          })
+          toast.success("Copilot updated successfully")
           mutate(copilotId)
         } else {
-          toast({
-            title: 'Copilot update failed',
-            description: 'Copilot update failed',
-            variant: "destructive"
-          })
+          toast.error("Copilot update failed")
         }
       })}>
         <Field label="Copilot Name" control={form.control} name="copilotName" render={(field) => <Input {...field} />} />
@@ -260,17 +246,9 @@ function DeleteSection() {
               onClick={async () => {
                 const { data } = await handleDeleteCopilot()
                 if (data.success) {
-                  toast({
-                    title: 'Copilot deleted',
-                    description: 'Copilot was deleted successfully',
-                    variant: "success"
-                  })
+                  toast.success("Copilot deleted successfully")
                 } else {
-                  toast({
-                    title: 'Copilot deletion failed',
-                    description: 'Copilot deletion failed',
-                    variant: "destructive"
-                  })
+                  toast.error("Copilot deletion failed")
                 }
               }}>
               Delete

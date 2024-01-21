@@ -7,7 +7,7 @@ import { IS_DEV } from "@/lib/consts";
 import { SearchModal } from "./(main)/_parts/SearchModal";
 import React from "react";
 import { SWRProvider } from "./swr-provider";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/sonner"
 import { HandleOnComplete } from "@/lib/router-events";
 import { TopLoader } from "@/lib/Toploader";
 import { JotaiProvider } from "./jotai-provider";

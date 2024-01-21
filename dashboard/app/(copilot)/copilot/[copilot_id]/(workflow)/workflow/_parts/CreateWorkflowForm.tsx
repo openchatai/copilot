@@ -19,11 +19,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { createFlowByBotId } from "@/data/new_flows";
 import { useAsyncFn } from "react-use";
-import { toast } from "@/components/ui/use-toast";
 import { atom, useAtom } from "jotai";
 import { useRouter } from "@/lib/router-events";
 import { useCopilot } from "@/app/(copilot)/copilot/_context/CopilotProvider";
 import { revalidateWorkflows } from "./WorkflowsTable";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -58,11 +58,9 @@ export default function CreateWorkflowForm() {
       revalidateWorkflows(copilotId);
       push(`/copilot/${copilotId}/workflow/${data.flow_id}`);
       setOpen(false);
-      toast({
-        title: "Flow created",
-        description: `Flow ${data.name} was created successfully`,
-        variant: "success"
-      });
+      toast.success("Flow created", {
+        description: `Flow ${data.name} was created successfully`
+      })
     }
   }
 

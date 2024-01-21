@@ -13,8 +13,8 @@ import { useController } from './Controller';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormMessage } from '@/components/ui/form';
-import { toast } from '@/components/ui/use-toast';
 import { Sparkles } from "lucide-react";
+import { toast } from 'sonner';
 
 const schema = z.object({
     prompt: z.string().min(20)
@@ -44,11 +44,7 @@ export function MagicAction({ defaultValue }: { defaultValue?: string }) {
                 type: "PATCH_CREATE_BLOCKS_FROM_ACTIONS",
                 payload: _data.actions
             })
-            toast({
-                title: 'Blocks added successfully',
-                variant: 'success',
-                description: 'You can now edit the flow'
-            })
+            toast.success('Blocks added successfully')
         }
     }
     return (
