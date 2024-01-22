@@ -75,7 +75,7 @@ def get_session_chats(session_id: str) -> Response:
     # Calculate total pages
     total_pages = (total_messages + limit - 1) // limit
 
-    response_data = {"chats": chats_filtered, "total_pages": total_pages}
+    response_data = {"data": chats_filtered, "total_pages": total_pages}
 
     return jsonify(response_data)
 
