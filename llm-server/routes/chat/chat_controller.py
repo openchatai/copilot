@@ -232,3 +232,35 @@ async def handle_chat_send_common(
             ),
             500,
         )
+
+@chat_workflow.route("/vote/<message_id>", methods=["POST"])
+async def send_chat():
+    message_id = request.args.get("message_id")
+    bot_token = request.headers.get("X-Bot-Token")
+    session_id = request.headers.get("X-Session-Id")
+
+    if not bot_token:
+        return Response(response="Invalid bot token prodived", status=400)
+    
+    try:
+        bot = find_one_or_fail_by_token(bot_token)
+        chat_history = create_chat_history(session_id, message_id, bot.id)
+        return jsonify(chat_history)
+    
+    
+
+
+@chat_workflow.route("/vote/<message_id>", methods=["DELETE"])
+async def send_chat():
+    json_data = request.get_json()
+
+    input_data = ChatInput(**json_data)
+    message = input_data.content
+    session_id = input_data.session_id
+    headers_from_json = input_data.headers or {}
+
+    bot_token = request.headers.get("X-Bot-Token")
+    return await handle_chat_send_common(
+        message, bot_token, session_id, headers_from_json, is_streaming=False
+    )
+
