@@ -41,6 +41,7 @@ def create_chat_history(
 
     return chat_history
 
+
 def get_all_chat_history_by_session_id_with_total(
     session_id: str, limit: int = 20, offset: int = 0
 ) -> Tuple[List[ChatHistory], int]:
@@ -67,7 +68,9 @@ def get_all_chat_history_by_session_id_with_total(
 
 
 async def get_chat_message_as_llm_conversation(session_id: str) -> List[BaseMessage]:
-    chats, total_messages = get_all_chat_history_by_session_id_with_total(session_id, 100)
+    chats, total_messages = get_all_chat_history_by_session_id_with_total(
+        session_id, 100
+    )
     conversations: List[BaseMessage] = []
     for chat in chats:
         if chat.from_user:
@@ -187,11 +190,8 @@ def get_chat_history_for_retrieval_chain(
 
 
 def get_unique_sessions_with_first_message_by_bot_id(
-    bot_id: str, limit: int = 20, page: int = 1
+    bot_id: str, limit: int = 20, offset: int = 1
 ) -> Tuple[List[Dict[str, object]], int]:
-    # Calculate offset based on the page number and limit
-    offset = (page - 1) * limit
-
     # Using a context manager to automatically close the session
     with Session() as session:
         # Use distinct to get unique session_ids

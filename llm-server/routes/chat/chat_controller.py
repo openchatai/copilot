@@ -81,7 +81,7 @@ def get_session_chats(session_id: str) -> Response:
 
 
 @chat_workflow.route("/b/<bot_id>/chat_sessions", methods=["GET"])
-def get_chat_sessions(bot_id: str) -> list[dict[str, object]]:
+def get_chat_sessions(bot_id: str):
     # Get limit and page from query parameters
     limit = int(request.args.get("limit", 20))
     page = int(request.args.get("page", 1))
@@ -90,11 +90,12 @@ def get_chat_sessions(bot_id: str) -> list[dict[str, object]]:
     offset = (page - 1) * limit
 
     # Fetch chat sessions based on the calculated offset and limit
-    chat_history_sessions = get_unique_sessions_with_first_message_by_bot_id(
-        bot_id, limit, offset
-    )
+    (
+        chat_history_sessions,
+        total_pages,
+    ) = get_unique_sessions_with_first_message_by_bot_id(bot_id, limit, offset)
 
-    return chat_history_sessions
+    return {"data": chat_history_sessions, "total_pages": total_pages}
 
 
 @chat_workflow.route("/init", methods=["GET"])
