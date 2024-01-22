@@ -19,5 +19,6 @@ class ChatVote(Base):
 
 
 
+
 Base.metadata.create_all(engine)
 
