@@ -16,11 +16,11 @@ llm = get_llm()
 
 
 async def generate_api_payload(
-        text: str,
-        action: ActionDTO,
-        prev_api_response: str,
-        app: Optional[str],
-        current_state: Optional[str],
+    text: str,
+    action: ActionDTO,
+    prev_api_response: str,
+    app: Optional[str],
+    current_state: Optional[str],
 ) -> ApiInfo:
     payload = action.payload
 
@@ -39,9 +39,9 @@ async def generate_api_payload(
     }
 
     # Extract body schema, handle different content types
-    request_body = payload.get("requestBody", {}).get("content", {})
+    request_body = payload.get("request_body", {}).get("content", {})
     # Default to empty schema if specific content type not found
-    body_schema = request_body.get("application/octet-stream", {}).get("schema", {})
+    body_schema = request_body.get("application/json", {}).get("schema", {})
 
     # Assuming action.api_endpoint and action.request_type are provided
     api_info = ApiInfo(

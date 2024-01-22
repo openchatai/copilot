@@ -180,7 +180,10 @@ async def handle_chat_send_common(
         )
 
         # if the llm replied correctly
-        if result.message is not None:
+        if (
+            result.message is not None
+            or len(result.api_request_response.api_requests) > 0
+        ):
             chat_records = [
                 {
                     "session_id": session_id,
@@ -191,7 +194,7 @@ async def handle_chat_send_common(
                     "session_id": session_id,
                     "from_user": False,
                     "message": result.message,
-                    "debug_json": str(result.api_request_response.__dict__),
+                    "debug_json": result.api_request_response.api_requests,
                 },
             ]
 
