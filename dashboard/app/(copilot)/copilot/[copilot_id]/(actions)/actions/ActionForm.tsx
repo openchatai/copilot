@@ -6,6 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useForm } from 'react-hook-form';
 import HeadersField from './HeadersField';
 import { BodyField } from './BodyField';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 type Props<T> = {
     defaultData?: Partial<T>;
@@ -13,9 +15,14 @@ type Props<T> = {
     // setData: (data: Partial<T>) => void;
     onChange?: (data: T) => void;
 }
+const schema = z.object({
+
+})
 
 export function ActionForm() {
-    const actionForm = useForm();
+    const actionForm = useForm({
+        resolver: zodResolver(schema)
+    });
 
     return (
         <div className="contents">
