@@ -204,6 +204,9 @@ async def handle_chat_send_common(
             )
             create_chat_histories(str(bot.id), chat_records)
 
+        if result.error:
+            logger.error("chat_conversation_error", message=result.error)
+
         # elif result.error:
         #     upsert_analytics_record(
         #         chatbot_id=str(bot.id),

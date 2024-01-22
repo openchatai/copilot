@@ -31,8 +31,7 @@ endif
 	$(COMMON_SETUP)
 	$(DOCKER_COMPOSE) build
 	$(DOCKER_COMPOSE) up -d #--force-recreate
-	@echo "$(COLOR_BOLD)=== 🟢 Waiting for services to start (~30 seconds) ===$(COLOR_RESET)"
-	@sleep 30
+
 	@echo "$(COLOR_BOLD)=== 🟢 Running Alembic migrations ===$(COLOR_RESET)"
 	$(DOCKER_COMPOSE) exec -T llm-server sh -c "cd models && python setup_alembic.py && alembic upgrade head"
 	@echo "$(COLOR_BOLD)=== Installation completed ===$(COLOR_RESET)"
