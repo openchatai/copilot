@@ -28,7 +28,7 @@ async def run_flow(
     error = None
     api_request_data = {}
     try:
-        response, api_request_data = await run_actions(
+        result, api_request_data = await run_actions(
             flow=flow,
             text=chat_context.text,
             headers=headers,

@@ -34,7 +34,7 @@ def make_api_request(
     path_params: Dict[str, str],
     query_params: Dict[str, str],
     headers: Any,
-) -> ApiRequestResult:
+) -> dict[str, Any]:
     url = ""
 
     try:
@@ -68,16 +68,14 @@ def make_api_request(
         # Raise an exception for HTTP errors (4xx and 5xx)
         response.raise_for_status()
 
-        return ApiRequestResult(
-            api_requests={
-                "method": method,
-                "endpoint": endpoint,
-                "body": json.dumps(body_schema),
-                "path_param": json.dumps(path_params),
-                "query_param": json.dumps(query_params),
-                "response": response.text,
-            }
-        )
+        return {
+            "method": method,
+            "endpoint": endpoint,
+            "body": body_schema,
+            "path_param": path_params,
+            "query_param": query_params,
+            "response": response.json(),
+        }
 
     except requests.exceptions.RequestException as e:
         logger.error(
@@ -90,4 +88,15 @@ def make_api_request(
             method=method,
             body=body_schema,
         )
-        raise APICallFailedException(str(e))
+
+        raise APICallFailedException(
+            json.dumps(
+                {
+                    "method": method,
+                    "endpoint": endpoint,
+                    "body": body_schema,
+                    "path_param": path_params,
+                    "query_param": query_params,
+                }
+            )
+        )
