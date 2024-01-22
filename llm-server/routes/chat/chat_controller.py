@@ -150,8 +150,8 @@ async def handle_chat_send_common(
     is_streaming: bool,
 ):
     app_name = headers_from_json.pop(X_App_Name, None)
-    if not message or len(message) > 255:
-        abort(400, description="Invalid content, the size is larger than 255 char")
+    if not message:
+        abort(400, description="Content cannot be null")
 
     if not bot_token:
         return Response(response="bot token is required", status=400)
@@ -183,6 +183,7 @@ async def handle_chat_send_common(
         if (
             result.message is not None
             or len(result.api_request_response.api_requests) > 0
+            or result.error is not None
         ):
             chat_records = [
                 {
@@ -193,7 +194,7 @@ async def handle_chat_send_common(
                 {
                     "session_id": session_id,
                     "from_user": False,
-                    "message": result.message,
+                    "message": result.message or result.error,
                     "debug_json": result.api_request_response.api_requests,
                 },
             ]
@@ -203,13 +204,13 @@ async def handle_chat_send_common(
             )
             create_chat_histories(str(bot.id), chat_records)
 
-        elif result.error:
-            upsert_analytics_record(
-                chatbot_id=str(bot.id),
-                successful_operations=0,
-                total_operations=1,
-                logs=result.error,
-            )
+        # elif result.error:
+        #     upsert_analytics_record(
+        #         chatbot_id=str(bot.id),
+        #         successful_operations=0,
+        #         total_operations=1,
+        #         logs=result.error,
+        #     )
         emit(session_id, "|im_end|") if is_streaming else jsonify(
             {"type": "text", "response": {"text": result.message}}
         )
