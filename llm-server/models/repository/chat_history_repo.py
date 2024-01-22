@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import distinct
 from sqlalchemy.orm import class_mapper
 from langchain.schema import BaseMessage, AIMessage, HumanMessage
+from sqlalchemy import func
 
 Session = sessionmaker(bind=engine)
 
@@ -40,35 +41,33 @@ def create_chat_history(
 
     return chat_history
 
-
-def get_all_chat_history_by_session_id(
+def get_all_chat_history_by_session_id_with_total(
     session_id: str, limit: int = 20, offset: int = 0
-) -> List[ChatHistory]:
-    """Retrieves all chat history records for a given session ID, sorted by created_at in descending order (most recent first).
+) -> Tuple[List[ChatHistory], int]:
+    # Using a context manager to automatically close the session
+    with Session() as session:
+        # Get all chat history for the specified session
+        chat_history = (
+            session.query(ChatHistory)
+            .filter_by(session_id=session_id)
+            .order_by(ChatHistory.id.asc())
+            .limit(limit)
+            .offset(offset)
+            .all()
+        )
 
-    Args:
-      session_id: The ID of the session to retrieve chat history for.
-      limit: The maximum number of chat history records to retrieve.
-      offset: The offset at which to start retrieving chat history records.
+        # Get total number of messages for the specified session
+        total_messages = (
+            session.query(func.count(ChatHistory.id))
+            .filter_by(session_id=session_id)
+            .scalar()
+        )
 
-    Returns:
-      A list of ChatHistory objects, sorted by created_at in descending order.
-    """
-    session = Session()
-    chats = (
-        session.query(ChatHistory)
-        .filter_by(session_id=session_id)
-        .order_by(ChatHistory.id.desc())
-        .limit(limit)
-        .offset(offset)
-        .all()
-    )
-
-    return chats[::-1]
+    return chat_history[::-1], total_messages
 
 
 async def get_chat_message_as_llm_conversation(session_id: str) -> List[BaseMessage]:
-    chats = get_all_chat_history_by_session_id(session_id, 100)
+    chats, total_messages = get_all_chat_history_by_session_id_with_total(session_id, 100)
     conversations: List[BaseMessage] = []
     for chat in chats:
         if chat.from_user:
@@ -188,19 +187,27 @@ def get_chat_history_for_retrieval_chain(
 
 
 def get_unique_sessions_with_first_message_by_bot_id(
-    bot_id: str, limit: int = 20, offset: int = 0
-) -> List[Dict[str, object]]:
+    bot_id: str, limit: int = 20, page: int = 1
+) -> Tuple[List[Dict[str, object]], int]:
+    # Calculate offset based on the page number and limit
+    offset = (page - 1) * limit
+
     # Using a context manager to automatically close the session
     with Session() as session:
         # Use distinct to get unique session_ids
         unique_session_ids = (
             session.query(distinct(ChatHistory.session_id))
             .filter_by(chatbot_id=bot_id)
-            # fix the next one
-            # .order_by(ChatHistory.id.desc())
             .limit(limit)
             .offset(offset)
             .all()
+        )
+
+        # Get total number of unique sessions
+        total_sessions = (
+            session.query(func.count(distinct(ChatHistory.session_id)))
+            .filter_by(chatbot_id=bot_id)
+            .scalar()
         )
 
         result_list = []
@@ -231,7 +238,10 @@ def get_unique_sessions_with_first_message_by_bot_id(
 
             result_list.append(result_dict)
 
-    return result_list
+    # Calculate total pages
+    total_pages = (total_sessions + limit - 1) // limit
+
+    return result_list, total_pages
 
 
 def create_chat_histories(
