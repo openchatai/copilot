@@ -7,8 +7,9 @@ import { ChatMessageType, getConversationBySessionId } from "@/data/conversation
 import Loader from "@/components/ui/Loader";
 import { format } from 'timeago.js';
 import { EmptyBlock } from "@/components/domain/EmptyBlock";
-import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
 import { BaseCodeBlock } from "@/components/domain/CodeBlock";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { AlertCircle } from "lucide-react";
 
 function UserMessage({ message, created_at }: ChatMessageType) {
   return (
@@ -24,26 +25,41 @@ function UserMessage({ message, created_at }: ChatMessageType) {
     </div>
   );
 }
+// TO be removed
+function ReplaceSingleQuotes(json: string) {
+  return json.replace(/'/g, '"');
+}
+const parse = JSON.parse;
+const stringify = JSON.stringify;
+function patchJson(json: string) {
+  return parse(ReplaceSingleQuotes(json));
+}
 function CopilotMessage({ message, created_at, debug_json }: ChatMessageType) {
   return (
-    <HoverCard>
-      <div className="flex w-full flex-row items-start justify-start gap-2 relative">
-        <Avatar size="large" className="sticky top-0">
-          <AvatarFallback>C</AvatarFallback>
-        </Avatar>
-        <div className="flex items-start flex-col gap-1.5">
-          <HoverCardTrigger asChild>
-            <p className="w-fit max-w-sm rounded-lg bg-secondary px-4 py-3 text-sm text-accent-foreground select-none">
-              {message}
-            </p>
-          </HoverCardTrigger>
+    <div className="flex w-full flex-row items-start justify-start gap-2 relative">
+      <Avatar size="large" className="sticky top-0">
+        <AvatarFallback>C</AvatarFallback>
+      </Avatar>
+      <div className="flex items-start flex-col gap-1.5">
+        <p className="w-fit max-w-sm rounded-lg bg-secondary px-4 py-3 text-sm text-accent-foreground select-none">
+          {message}
+        </p>
+        <div>
+        </div>
+        <div className="flex items-center justify-between w-full gap-5">
           <span className="text-xs">{format(created_at)}</span>
+          <Popover>
+            <PopoverTrigger className="self-center">
+              <AlertCircle className="size-5" />
+            </PopoverTrigger>
+            <PopoverContent side="right" align="center" className="w-fit max-w-sm p-0 overflow-hidden">
+              <BaseCodeBlock code={stringify(patchJson(debug_json || '{}'), null, '\t')} language="javascript" />
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
-      <HoverCardContent animated={false} side="right" align="center" className="p-0 overflow-hidden">
-        <BaseCodeBlock code={debug_json || ''} language="javascript" />
-      </HoverCardContent>
-    </HoverCard>
+
+    </div>
   );
 }
 function ChatDivider({ content }: { content: string }) {

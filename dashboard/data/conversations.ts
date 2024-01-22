@@ -3,6 +3,7 @@ import { baseUrl } from "./base-url";
 const instance = axios.create({
   baseURL: baseUrl + "/backend/chat",
 });
+type DebugDataType = {}
 export type ChatMessageType = {
   id: string;
   chatbot_id: string;
