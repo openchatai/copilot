@@ -40,14 +40,17 @@ function CopilotMessage({ message, created_at, debug_json }: ChatMessageType) {
         </div>
         <div className="flex items-center justify-between w-full gap-5">
           <span className="text-xs">{format(created_at)}</span>
-          <Popover>
-            <PopoverTrigger className="self-center">
-              <AlertCircle className="size-5" />
-            </PopoverTrigger>
-            <PopoverContent side="right" align="center" className="w-fit max-w-sm p-0 overflow-hidden">
-              <BaseCodeBlock code={JSON.stringify(debug_json) || "{}"} language="javascript" />
-            </PopoverContent>
-          </Popover>
+          {
+            debug_json &&
+            <Popover>
+              <PopoverTrigger className="self-center">
+                <AlertCircle className="size-5" />
+              </PopoverTrigger>
+              <PopoverContent side="right" align="center" className="w-fit max-w-sm p-0 overflow-hidden">
+                <BaseCodeBlock code={JSON.stringify(debug_json) || "{}"} language="javascript" />
+              </PopoverContent>
+            </Popover>
+          }
         </div>
       </div>
 
