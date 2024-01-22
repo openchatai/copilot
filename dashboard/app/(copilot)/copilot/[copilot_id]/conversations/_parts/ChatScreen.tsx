@@ -25,15 +25,7 @@ function UserMessage({ message, created_at }: ChatMessageType) {
     </div>
   );
 }
-// TO be removed
-function ReplaceSingleQuotes(json: string) {
-  return json.replace(/'/g, '"');
-}
-const parse = JSON.parse;
-const stringify = JSON.stringify;
-function patchJson(json: string) {
-  return parse(ReplaceSingleQuotes(json));
-}
+
 function CopilotMessage({ message, created_at, debug_json }: ChatMessageType) {
   return (
     <div className="flex w-full flex-row items-start justify-start gap-2 relative">
@@ -53,7 +45,7 @@ function CopilotMessage({ message, created_at, debug_json }: ChatMessageType) {
               <AlertCircle className="size-5" />
             </PopoverTrigger>
             <PopoverContent side="right" align="center" className="w-fit max-w-sm p-0 overflow-hidden">
-              <BaseCodeBlock code={stringify(patchJson(debug_json || '{}'), null, '\t')} language="javascript" />
+              <BaseCodeBlock code={JSON.stringify(debug_json) || "{}"} language="javascript" />
             </PopoverContent>
           </Popover>
         </div>
