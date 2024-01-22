@@ -46,6 +46,17 @@ function ChatDivider({ content }: { content: string }) {
     </div>
   );
 }
+function LoadModeChatsDivider({
+  onClick
+}: { onClick: () => void }) {
+  return (
+    <div className="relative my-4 block h-px w-full bg-secondary">
+      <button className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-xs">
+        Load more
+      </button>
+    </div>
+  );
+}
 
 export function ChatScreen() {
   const activeId = useAtomValue(activeSessionId);
@@ -53,14 +64,14 @@ export function ChatScreen() {
     data: chat,
     isLoading
   } = useSWR(activeId, getConversationBySessionId)
-  
+
   return (
     <div className="flex-1 space-y-3 overflow-auto p-4 font-medium">
       {
         isLoading && <Loader className="h-full flex-center" />
       }
       {
-        chat ? chat?.map((c, i) => {
+        chat ? chat?.data.map((c, i) => {
           if (c.from_user) {
             return <UserMessage key={i} {...c} />
           } else if (!c.from_user) {
