@@ -3,12 +3,10 @@ from typing import Optional
 from typing import cast, Dict
 
 from flask import jsonify, Blueprint, request, Response, abort, Request
-from custom_types.response_dict import LLMResponse, ResponseDict
 
 from models.repository.chat_history_repo import (
-    get_all_chat_history_by_session_id,
+    get_all_chat_history_by_session_id_with_total,
     get_unique_sessions_with_first_message_by_bot_id,
-    create_chat_history,
     create_chat_histories,
 )
 from models.repository.copilot_repo import find_one_or_fail_by_token
@@ -48,10 +46,16 @@ def get_validated_data(request: Request) -> Optional[dict]:
 
 @chat_workflow.route("/sessions/<session_id>/chats", methods=["GET"])
 def get_session_chats(session_id: str) -> Response:
+    # Get limit and page from query parameters
     limit = int(request.args.get("limit", 20))
-    offset = int(request.args.get("offset", 0))
+    page = int(request.args.get("page", 1))
 
-    chats = get_all_chat_history_by_session_id(session_id, limit, offset)
+    # Calculate offset based on the page number and limit
+    offset = (page - 1) * limit
+
+    chats, total_messages = get_all_chat_history_by_session_id_with_total(
+        session_id, limit, offset
+    )
 
     chats_filtered = []
 
@@ -68,18 +72,30 @@ def get_session_chats(session_id: str) -> Response:
             }
         )
 
-    return jsonify(chats_filtered)
+    # Calculate total pages
+    total_pages = (total_messages + limit - 1) // limit
+
+    response_data = {"data": chats_filtered, "total_pages": total_pages}
+
+    return jsonify(response_data)
 
 
 @chat_workflow.route("/b/<bot_id>/chat_sessions", methods=["GET"])
-def get_chat_sessions(bot_id: str) -> list[dict[str, object]]:
-    limit = cast(int, request.args.get("limit", 20))
-    offset = cast(int, request.args.get("offset", 0))
-    chat_history_sessions = get_unique_sessions_with_first_message_by_bot_id(
-        bot_id, limit, offset
-    )
+def get_chat_sessions(bot_id: str):
+    # Get limit and page from query parameters
+    limit = int(request.args.get("limit", 20))
+    page = int(request.args.get("page", 1))
 
-    return chat_history_sessions
+    # Calculate offset based on the page number and limit
+    offset = (page - 1) * limit
+
+    # Fetch chat sessions based on the calculated offset and limit
+    (
+        chat_history_sessions,
+        total_pages,
+    ) = get_unique_sessions_with_first_message_by_bot_id(bot_id, limit, offset)
+
+    return {"data": chat_history_sessions, "total_pages": total_pages}
 
 
 @chat_workflow.route("/init", methods=["GET"])
@@ -89,7 +105,7 @@ def init_chat():
 
     history = []
     if session_id:
-        chats = get_all_chat_history_by_session_id(session_id, 200, 0)
+        chats, _ = get_all_chat_history_by_session_id_with_total(session_id, 200, 0)
         history = sqlalchemy_objs_to_json_array(chats) or []
 
     if not bot_token:

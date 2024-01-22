@@ -1,6 +1,6 @@
 "use client";
 import { useAtom } from "jotai";
-import { activeSessionId } from "./atoms";
+import { activeSessionId, conversationsPageNum } from "./atoms";
 import { cn } from "@/lib/utils";
 import useSWR from "swr";
 import { useCopilot } from "../../../_context/CopilotProvider";
@@ -9,6 +9,8 @@ import { format } from 'timeago.js';
 import _ from "lodash";
 import { EmptyBlock } from "@/components/domain/EmptyBlock";
 import Loader from "@/components/ui/Loader";
+import { SimplePagination } from "@/components/domain/SimplePagination";
+
 function Conversation(props: ConversationType) {
   const [activeid, setActiveId] = useAtom(activeSessionId);
   const isActive = activeid === props.session_id;
@@ -38,22 +40,38 @@ export function ListConversations() {
   const {
     id: copilotId,
   } = useCopilot();
+
+  const [
+    pageNum,
+    setConversationsPageNum,
+  ] = useAtom(conversationsPageNum);
+
   const {
     data: conversations,
     isLoading
-  } = useSWR(copilotId + "/conversations", async () => (await getSessionsByBotId(copilotId))?.data, {
+  } = useSWR(copilotId + "/conversations/" + pageNum, async () => (await getSessionsByBotId(copilotId, pageNum))?.data, {
     refreshInterval: 5000,
   })
+  const totalPages = conversations?.total_pages || 1;
+  const isNext = pageNum < totalPages;
   return (
     <div className="w-full flex-1 overflow-hidden">
       <ul className="h-full overflow-auto">
-        {isLoading ? <Loader /> :
+        {isLoading ? <Loader className="mx-auto p-4" /> :
           _.isEmpty(conversations) ? <EmptyBlock>
             No conversations yet
-          </EmptyBlock> : conversations?.map((c, i) => (
+          </EmptyBlock> : conversations.data.map((c, i) => (
             <Conversation {...c} key={i} />
           ))
         }
+        <div className="p-4">
+          <SimplePagination
+            isBack={pageNum > 1}
+            isNext={isNext}
+            onNext={() => setConversationsPageNum(pageNum + 1)}
+            onBack={() => setConversationsPageNum(pageNum - 1)}
+          />
+        </div>
       </ul>
     </div>
   );
