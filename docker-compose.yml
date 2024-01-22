@@ -23,12 +23,6 @@ services:
         condition: service_healthy
       qdrant:
         condition: service_started
-    # logging:
-    #   driver: awslogs
-    #   options: 
-    #     awslogs-group: opencopilot
-    #     awslogs-region: us-east-1
-    #     awslogs-stream: llm-server
 
   redis:
     image: redis:latest
@@ -48,12 +42,6 @@ services:
     image: codebanesr/workers:latest  # Add this line
     deploy:
       replicas: 1
-    # logging:
-    #   driver: awslogs
-    #   options: 
-    #     awslogs-group: opencopilot
-    #     awslogs-region: us-east-1
-    #     awslogs-stream: workers
       
     networks:
       - opencopilot-net
@@ -61,7 +49,7 @@ services:
       - shared_data:/app/shared_data
     env_file:
       - llm-server/.env
-    # worker will also check for some database tables, this is a hacky solution
+    
     command: sh -c "celery -A celery_app worker --loglevel=info"
     depends_on:
       mysql:

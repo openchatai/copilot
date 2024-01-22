@@ -3,8 +3,6 @@ from typing import Optional, Tuple
 from flask_socketio import emit
 
 from werkzeug.datastructures import Headers
-from requests.exceptions import MissingSchema
-from copilot_exceptions.api_call_failed_exception import APICallFailedException
 from entities.flow_entity import FlowDTO
 from extractors.convert_json_to_text import (
     convert_json_error_to_text,

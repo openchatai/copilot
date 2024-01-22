@@ -49,7 +49,15 @@ def handle_exception(error):
 
     # If it's not an HTTPException, it's a 500 Internal Server Error
     logger.error("Internal Server Error", error=error)
-    return jsonify({"error": "Internal Server Error", "message": "An unexpected error occurred on the server."}), 500
+    return (
+        jsonify(
+            {
+                "error": "Internal Server Error",
+                "message": "An unexpected error occurred on the server.",
+            }
+        ),
+        500,
+    )
 
 
 @socketio.on("send_chat")
@@ -62,12 +70,6 @@ def handle_send_chat(json_data):
     headers = request.headers
 
     bot_token = headers.environ.get("HTTP_X_BOT_TOKEN")
-
-    if not message or len(message) > 255:
-        socketio.emit(
-            session_id, {"error": "Invalid content, the size is larger than 255 char"}
-        )
-        return
 
     if not bot_token:
         socketio.emit(session_id, {"error": "Bot token is required"})
