@@ -23,10 +23,17 @@ depends_on: Union[str, Sequence[str], None] = None
 
 # Add two new boolean columns
 def upgrade():
-    op.add_column("chat_history", Column("api_called", Boolean, default=False))
-    op.add_column(
-        "chat_history", Column("knowledgebase_called", Boolean, default=False)
-    )
+    if not op.get_bind().execute(
+        sa.text("SHOW COLUMNS FROM chat_history LIKE 'api_called'")
+    ).fetchone():
+        op.add_column("chat_history", Column("api_called", Boolean, default=False))
+    
+    if not op.get_bind().execute(
+        sa.text("SHOW COLUMNS FROM chat_history LIKE 'knowledgebase_called'")
+    ).fetchone():
+        op.add_column(
+            "chat_history", Column("knowledgebase_called", Boolean, default=False)
+        )
 
 
 # Remove the two boolean columns
