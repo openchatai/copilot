@@ -133,7 +133,15 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
 
   }, [currentMessagePair, sessionId, socket, updateBotMessage]);
-
+  useEffect(() => {
+    console.log("session_id =>", sessionId)
+    socket.on(`${sessionId}_vote`, (content: string) => {
+      console.log({ content })
+    });
+    return () => {
+      socket.off(`${sessionId}_vote`);
+    };
+  }, [sessionId, socket])
   function reset() {
     setMessages([]);
   }

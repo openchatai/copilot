@@ -10,6 +10,7 @@ import { FailedMessage, useChat } from "@lib/contexts/Controller";
 import { getLast, isEmpty } from "@lib/utils/utils";
 import { useConfigData } from "@lib/contexts/ConfigData";
 import useTypeWriter from "@lib/hooks/useTypeWriter";
+import { Vote } from "./Vote";
 
 function BotIcon({ error }: { error?: boolean }) {
   return (
@@ -41,7 +42,9 @@ function UserIcon() {
     </Tooltip>
   );
 }
-
+function useVote() {
+  // 
+}
 export function BotTextMessage({
   message,
   timestamp,
@@ -76,13 +79,15 @@ export function BotTextMessage({
       </div>
       {isLast && (
         <div className="opencopilot-w-full opencopilot-ps-10 opencopilot-flex opencopilot-items-center opencopilot-justify-between">
-          <div>
-            {timestamp && (
-              <span className="opencopilot-text-xs opencopilot-m-0">
-                Bot · {format(timestamp)}
-              </span>
-            )}
-          </div>
+          {timestamp && (
+            <span className="opencopilot-text-xs opencopilot-m-0">
+              Bot · {format(timestamp)}
+            </span>
+          )}
+          <Vote
+            isDownvoted
+            isUpvoted
+          />
         </div>
       )}
     </div>
