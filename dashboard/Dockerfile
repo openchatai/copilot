@@ -6,6 +6,7 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 RUN corepack prepare pnpm@8.7.0 --activate
 FROM base AS deps
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
 # Add libc6-compat if necessary for your application
 RUN apk add --no-cache libc6-compat
@@ -21,6 +22,7 @@ RUN pnpm i --frozen-lockfile
 
 # Builder image
 FROM base AS builder
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 WORKDIR /app
 
