@@ -17,8 +17,7 @@ COPY package.json pnpm-lock.yaml* ./
 
 # Install dependencies
 # This layer will be cached unless package.json or pnpm-lock.yaml changes
-RUN pnpm i --frozen-lockfile
-
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 # Builder image
 FROM base AS builder
 

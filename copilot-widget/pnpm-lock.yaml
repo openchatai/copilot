@@ -39,7 +39,7 @@ devDependencies:
     version: 5.62.0(eslint@8.48.0)(typescript@5.2.2)
   '@vitejs/plugin-react':
     specifier: ^4.0.0
-    version: 4.0.4(vite@4.4.12)
+    version: 4.0.4(vite@4.5.2)
   autoprefixer:
     specifier: ^10.4.14
     version: 10.4.15(postcss@8.4.31)
@@ -107,14 +107,14 @@ devDependencies:
     specifier: ^5.0.2
     version: 5.2.2
   vite:
-    specifier: ^4.4.12
-    version: 4.4.12(@types/node@20.5.6)
+    specifier: ^4.5.2
+    version: 4.5.2(@types/node@20.5.6)
   vite-plugin-dts:
     specifier: ^3.6.4
-    version: 3.6.4(@types/node@20.5.6)(typescript@5.2.2)(vite@4.4.12)
+    version: 3.6.4(@types/node@20.5.6)(typescript@5.2.2)(vite@4.5.2)
   vite-tsconfig-paths:
     specifier: ^4.2.1
-    version: 4.2.1(typescript@5.2.2)(vite@4.4.12)
+    version: 4.2.1(typescript@5.2.2)(vite@4.5.2)
 
 packages:
 
@@ -1790,7 +1790,7 @@ packages:
       eslint-visitor-keys: 3.4.3
     dev: true
 
-  /@vitejs/plugin-react@4.0.4(vite@4.4.12):
+  /@vitejs/plugin-react@4.0.4(vite@4.5.2):
     resolution: {integrity: sha512-7wU921ABnNYkETiMaZy7XqpueMnpu5VxvVps13MjmCo+utBdD79sZzrApHawHtVX66cCJQQTXFcjH0y9dSUK8g==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
@@ -1800,7 +1800,7 @@ packages:
       '@babel/plugin-transform-react-jsx-self': 7.22.5(@babel/core@7.22.11)
       '@babel/plugin-transform-react-jsx-source': 7.22.5(@babel/core@7.22.11)
       react-refresh: 0.14.0
-      vite: 4.4.12(@types/node@20.5.6)
+      vite: 4.5.2(@types/node@20.5.6)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -6251,7 +6251,7 @@ packages:
       vfile-message: 3.1.4
     dev: true
 
-  /vite-plugin-dts@3.6.4(@types/node@20.5.6)(typescript@5.2.2)(vite@4.4.12):
+  /vite-plugin-dts@3.6.4(@types/node@20.5.6)(typescript@5.2.2)(vite@4.5.2):
     resolution: {integrity: sha512-yOVhUI/kQhtS6lCXRYYLv2UUf9bftcwQK9ROxCX2ul17poLQs02ctWX7+vXB8GPRzH8VCK3jebEFtPqqijXx6w==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
@@ -6267,7 +6267,7 @@ packages:
       debug: 4.3.4(supports-color@5.5.0)
       kolorist: 1.8.0
       typescript: 5.2.2
-      vite: 4.4.12(@types/node@20.5.6)
+      vite: 4.5.2(@types/node@20.5.6)
       vue-tsc: 1.8.25(typescript@5.2.2)
     transitivePeerDependencies:
       - '@types/node'
@@ -6275,7 +6275,7 @@ packages:
       - supports-color
     dev: true
 
-  /vite-tsconfig-paths@4.2.1(typescript@5.2.2)(vite@4.4.12):
+  /vite-tsconfig-paths@4.2.1(typescript@5.2.2)(vite@4.5.2):
     resolution: {integrity: sha512-GNUI6ZgPqT3oervkvzU+qtys83+75N/OuDaQl7HmOqFTb0pjZsuARrRipsyJhJ3enqV8beI1xhGbToR4o78nSQ==}
     peerDependencies:
       vite: '*'
@@ -6286,14 +6286,14 @@ packages:
       debug: 4.3.4(supports-color@5.5.0)
       globrex: 0.1.2
       tsconfck: 2.1.2(typescript@5.2.2)
-      vite: 4.4.12(@types/node@20.5.6)
+      vite: 4.5.2(@types/node@20.5.6)
     transitivePeerDependencies:
       - supports-color
       - typescript
     dev: true
 
-  /vite@4.4.12(@types/node@20.5.6):
-    resolution: {integrity: sha512-KtPlUbWfxzGVul8Nut8Gw2Qe8sBzWY+8QVc5SL8iRFnpnrcoCaNlzO40c1R6hPmcdTwIPEDkq0Y9+27a5tVbdQ==}
+  /vite@4.5.2(@types/node@20.5.6):
+    resolution: {integrity: sha512-tBCZBNSBbHQkaGyhGCDUGqeo2ph8Fstyp6FMSvTtsXeZSPpSMGlviAOav2hxVTqFcx8Hj/twtWKsMJXNY0xI8w==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
