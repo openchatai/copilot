@@ -279,37 +279,41 @@ def create_chat_histories(
     return chat_histories
 
 
-async def get_analytics(email: str):
+async def get_analytics(chatbot_id: str):
     with Session() as session:
         chat_histories = []
 
-        # Step 1: Get chatbot_ids associated with the given email
-        chatbot_ids = session.query(Chatbot.id).filter(Chatbot.email == email).all()
-
-        if chatbot_ids:
-            chatbot_ids = [chatbot_id[0] for chatbot_id in chatbot_ids]
-
-            # Step 2: Get analytics data in a single query
-            analytics_data = (
-                session.query(
-                    func.sum(func.cast(ChatHistory.api_called, Integer)).label("api_called_count"),
-                    func.sum(func.cast(ChatHistory.knowledgebase_called, Integer)).label("knowledgebase_called_count"),
-                    func.count().label("total"),
-                    func.sum(func.cast(
-                        ~ChatHistory.api_called & ~ChatHistory.knowledgebase_called, Integer)).label("other_count")
-                )
-                .filter(ChatHistory.chatbot_id.in_(chatbot_ids))
-                .one()
+        # Step 2: Get analytics data in a single query
+        analytics_data = (
+            session.query(
+                func.sum(func.cast(ChatHistory.api_called, Integer)).label(
+                    "api_called_count"
+                ),
+                func.sum(func.cast(ChatHistory.knowledgebase_called, Integer)).label(
+                    "knowledgebase_called_count"
+                ),
+                func.count().label("total"),
+                func.sum(
+                    func.cast(
+                        ~ChatHistory.api_called & ~ChatHistory.knowledgebase_called,
+                        Integer,
+                    )
+                ).label("other_count"),
             )
+            .filter(ChatHistory.chatbot_id == chatbot_id)
+            .one()
+        )
 
-            # Append the results to chat_histories
-            chat_histories.append(
-                {
-                    "api_called_count": analytics_data.api_called_count or 0,
-                    "knowledgebase_called_count": analytics_data.knowledgebase_called_count or 0,
-                    "total": analytics_data.total or 0,
-                    "other_count": analytics_data.other_count or 0,
-                }
-            )
+        # Append the results to chat_histories
+        chat_histories.append(
+            {
+                "api_called_count": int(analytics_data.api_called_count or 0),
+                "knowledgebase_called_count": int(
+                    analytics_data.knowledgebase_called_count or 0
+                ),
+                "total": int(analytics_data.total or 0),
+                "other_count": int(analytics_data.other_count or 0),
+            }
+        )
 
     return chat_histories
