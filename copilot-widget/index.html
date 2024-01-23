@@ -62,16 +62,20 @@
     </style>
     <script type="module" src="/src/main.tsx"></script>
     <div id="opencopilot-root"></div>
-
+    <script>
+      const token = "ofZTrhcaPVzK17oM";
+      const apiUrl = "http://localhost:8888/backend";
+      const socketUrl = "http://localhost:8888/";
+    </script>
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         initAiCoPilot({
           initialMessage: "Hi Sir", // optional
-          token: "FsQJM4nPZAAEKgqt", // required
+          token: token, // required
           triggerSelector: "#triggerSelector", // optional
           rootId: "opencopilot-root", // optional otherwise it will create a div with id opencopilot-root
-          apiUrl: "https://cloud.opencopilot.so/backend", // required
-          socketUrl: "https://cloud.opencopilot.so",
+          apiUrl: apiUrl, // required
+          socketUrl: socketUrl, // required
           defaultOpen: true, // optional
           containerProps: {}, // optional
           headers: {
@@ -91,11 +95,11 @@
       document.addEventListener("DOMContentLoaded", () => {
         initAiCoPilot({
           initialMessage: "Hi Sir", // optional
-          token: "TGtuQAhEtmQkGKqJ", // required
+          token: token, // required
           triggerSelector: "#triggerSelector", // optional
           rootId: "opencopilot-root-2", // optional otherwise it will create a div with id opencopilot-root
-          apiUrl: "https://cloud.opencopilot.so/backend", // required
-          socketUrl: "https://cloud.opencopilot.so",
+          apiUrl: apiUrl, // required
+          socketUrl: socketUrl,
           defaultOpen: true, // optional
           containerProps: {
             // optional
