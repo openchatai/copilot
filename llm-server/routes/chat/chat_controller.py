@@ -224,13 +224,7 @@ async def handle_chat_send_common(
         if result.error:
             logger.error("chat_conversation_error", message=result.error)
 
-        # elif result.error:
-        #     upsert_analytics_record(
-        #         chatbot_id=str(bot.id),
-        #         successful_operations=0,
-        #         total_operations=1,
-        #         logs=result.error,
-        #     )
+
         emit(session_id, "|im_end|") if is_streaming else jsonify(
             {"type": "text", "response": {"text": result.message}}
         )
