@@ -255,11 +255,16 @@ async def handle_chat_send_common(
         )
 
 
-@chat_workflow.route("/analytics", methods=["POST"])
+# curl -X POST http://localhost:5000/analytics -H "x_consumer_username: your_username"
+@chat_workflow.route("/analytics", methods=["GET"])
 async def get_analytics_by_email():
-    x_consumer_username = request.headers.get("x_consumer_username")
+    x_consumer_username = request.headers.get("x_consumer_username") or "guest"
     if not x_consumer_username:
-        return Response(response="x_consumer_username is required", status=400)
+        return Response(
+            response='{"error": "x_consumer_username is required"}',
+            status=400,
+            content_type="application/json",
+        )
 
     result = await get_analytics(x_consumer_username)
     return jsonify(result)
