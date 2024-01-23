@@ -211,6 +211,8 @@ async def handle_chat_send_common(
                     "session_id": session_id,
                     "from_user": False,
                     "message": result.message or result.error,
+                    "api_called": result.api_called,
+                    "knowledgebase_called": result.knowledgebase_called,
                     "debug_json": result.api_request_response.api_requests,
                 },
             ]

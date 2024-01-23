@@ -87,6 +87,8 @@ class ChainStrategy(ChatRequestHandler):
                 is_streaming=is_streaming,
                 session_id=session_id,
             )
+
+            response.api_called = True
             return response
         else:
             # it means that the user query is "informative" and can be answered using text only
@@ -102,4 +104,6 @@ class ChainStrategy(ChatRequestHandler):
                 is_streaming=is_streaming,
                 session_id=session_id,
             )
+
+            response.knowledgebase_called = True
             return response

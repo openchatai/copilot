@@ -57,4 +57,5 @@ async def run_flow(
         api_request_response=ApiRequestResult(api_request_data),
         error=output["error"],
         message=output["response"],
+        api_called=True,
     )

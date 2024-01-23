@@ -266,6 +266,8 @@ def create_chat_histories(
                 from_user=record["from_user"],
                 message=record["message"],
                 debug_json=record.get("debug_json"),
+                api_called=record.get("api_called"),
+                knowledgebase_called=record.get("knowledgebase_called"),
             )
 
             session.add(chat_history)
