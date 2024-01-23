@@ -8,6 +8,7 @@ from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id_with_total,
     get_unique_sessions_with_first_message_by_bot_id,
     create_chat_histories,
+    get_analytics,
 )
 from models.repository.copilot_repo import find_one_or_fail_by_token
 from routes.analytics.analytics_service import upsert_analytics_record
@@ -19,9 +20,7 @@ from routes.chat.implementation.tools_strategy import ToolStrategy
 from utils.get_logger import CustomLogger
 from utils.llm_consts import X_App_Name, chat_strategy, ChatStrategy
 from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
-from .. import root_service
 from flask_socketio import emit
-import asyncio
 
 logger = CustomLogger(module_name=__name__)
 
@@ -211,6 +210,8 @@ async def handle_chat_send_common(
                     "session_id": session_id,
                     "from_user": False,
                     "message": result.message or result.error,
+                    "api_called": result.api_called,
+                    "knowledgebase_called": result.knowledgebase_called,
                     "debug_json": result.api_request_response.api_requests,
                 },
             ]
@@ -252,3 +253,18 @@ async def handle_chat_send_common(
             ),
             500,
         )
+
+
+# curl -X POST http://localhost:5000/analytics -H "x_consumer_username: your_username"
+@chat_workflow.route("/analytics", methods=["GET"])
+async def get_analytics_by_email():
+    x_consumer_username = request.headers.get("x_consumer_username") or "guest"
+    if not x_consumer_username:
+        return Response(
+            response='{"error": "x_consumer_username is required"}',
+            status=400,
+            content_type="application/json",
+        )
+
+    result = await get_analytics(x_consumer_username)
+    return jsonify(result)

@@ -4,8 +4,8 @@ from sqlalchemy import Column, String, DateTime, Boolean, Integer, JSON
 
 from .database_setup import engine
 from .get_declarative_base import Base
-import json
 from dataclasses import dataclass
+
 
 @dataclass
 class ChatHistory(Base):
@@ -21,6 +21,8 @@ class ChatHistory(Base):
         DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
     )
     debug_json = Column(JSON, default={}, nullable=True)
+    api_called = Column(Boolean, default=False)
+    knowledgebase_called = Column(Boolean, default=False)
 
 
 Base.metadata.create_all(engine)

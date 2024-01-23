@@ -175,5 +175,8 @@ def run_informative_item(
 
     # return {"response": content, "error": None}
     return LLMResponse(
-        message=content, error=None, api_request_response=ApiRequestResult()
+        message=content,
+        error=None,
+        api_request_response=ApiRequestResult(),
+        knowledgebase_called=True,
     )
