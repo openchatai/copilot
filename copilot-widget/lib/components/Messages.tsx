@@ -43,7 +43,14 @@ function UserIcon() {
   );
 }
 function useVote() {
-  // 
+  const {
+    setLastMessageId,
+    lastMessageToVote
+  } = useChat();
+
+  return {
+
+  }
 }
 export function BotTextMessage({
   message,
@@ -56,6 +63,7 @@ export function BotTextMessage({
 }) {
   const { messages } = useChat();
   const isLast = getLast(messages)?.id === id;
+  console.log({ id });
   if (isEmpty(message)) return null;
   return (
     <div className="opencopilot-p-2 group opencopilot-w-full opencopilot-shrink-0">
@@ -85,8 +93,8 @@ export function BotTextMessage({
             </span>
           )}
           <Vote
-            isDownvoted
-            isUpvoted
+            isDownvoted={false}
+            isUpvoted={false}
           />
         </div>
       )}

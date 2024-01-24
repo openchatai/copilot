@@ -23,6 +23,8 @@ interface ChatContextData {
   loading: boolean;
   failedMessage: FailedMessage | null;
   reset: () => void;
+  setLastMessageId: (id: string | null) => void;
+  lastMessageToVote: string | null;
 }
 const [
   useChat,
@@ -37,6 +39,10 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const config = useConfigData();
   const { sessionId } = useSessionId(config.token);
   const [conversationInfo, setConversationInfo] = useState<string | null>(null);
+  const [lastMessageToVote, setLastMessageToVote] = useState<string | null>(null);
+  const setLastMessageId = useCallback((id: string | null) => {
+    setLastMessageToVote(id)
+  }, [])
   useEffect(() => {
     getInitialData(axiosInstance).then((data) => {
       setMessages(historyToMessages(data.history))
@@ -134,12 +140,15 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   }, [currentMessagePair, sessionId, socket, updateBotMessage]);
   useEffect(() => {
-    console.log("session_id =>", sessionId)
     socket.on(`${sessionId}_vote`, (content: string) => {
       console.log({ content })
+      if (content) {
+        setLastMessageToVote(content)
+      }
     });
     return () => {
       socket.off(`${sessionId}_vote`);
+      setLastMessageToVote(null)
     };
   }, [sessionId, socket])
   function reset() {
@@ -153,6 +162,8 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     loading,
     failedMessage,
     reset,
+    setLastMessageId,
+    lastMessageToVote
   };
 
   return (
