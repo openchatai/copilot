@@ -61,9 +61,8 @@ export function BotTextMessage({
   timestamp?: number | Date;
   id?: string | number;
 }) {
-  const { messages } = useChat();
+  const { messages, lastMessageToVote } = useChat();
   const isLast = getLast(messages)?.id === id;
-  console.log({ id });
   if (isEmpty(message)) return null;
   return (
     <div className="opencopilot-p-2 group opencopilot-w-full opencopilot-shrink-0">
@@ -86,16 +85,13 @@ export function BotTextMessage({
         </div>
       </div>
       {isLast && (
-        <div className="opencopilot-w-full opencopilot-ps-10 opencopilot-flex opencopilot-items-center opencopilot-justify-between">
-          {timestamp && (
-            <span className="opencopilot-text-xs opencopilot-m-0">
-              Bot · {format(timestamp)}
-            </span>
-          )}
-          <Vote
-            isDownvoted={false}
-            isUpvoted={false}
-          />
+        <div className="opencopilot-w-full opencopilot-ps-10 opencopilot-flex-nowrap opencopilot-flex opencopilot-items-center opencopilot-justify-between">
+          <span className="opencopilot-text-xs opencopilot-m-0">
+            Bot
+          </span>
+          {
+            lastMessageToVote && isLast && <Vote messageId={lastMessageToVote} />
+          }
         </div>
       )}
     </div>
