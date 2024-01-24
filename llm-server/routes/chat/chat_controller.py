@@ -224,13 +224,7 @@ async def handle_chat_send_common(
         if result.error:
             logger.error("chat_conversation_error", message=result.error)
 
-        # elif result.error:
-        #     upsert_analytics_record(
-        #         chatbot_id=str(bot.id),
-        #         successful_operations=0,
-        #         total_operations=1,
-        #         logs=result.error,
-        #     )
+
         emit(session_id, "|im_end|") if is_streaming else jsonify(
             {"type": "text", "response": {"text": result.message}}
         )
@@ -256,15 +250,7 @@ async def handle_chat_send_common(
 
 
 # curl -X POST http://localhost:5000/analytics -H "x_consumer_username: your_username"
-@chat_workflow.route("/analytics", methods=["GET"])
-async def get_analytics_by_email():
-    x_consumer_username = request.headers.get("x_consumer_username") or "guest"
-    if not x_consumer_username:
-        return Response(
-            response='{"error": "x_consumer_username is required"}',
-            status=400,
-            content_type="application/json",
-        )
-
-    result = await get_analytics(x_consumer_username)
+@chat_workflow.route("/analytics/<bot_id>", methods=["GET"])
+async def get_analytics_by_email(bot_id: str) -> Response:
+    result = await get_analytics(bot_id)
     return jsonify(result)
