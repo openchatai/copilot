@@ -3,7 +3,6 @@ import { SimpleCard } from '@/components/domain/simple-card'
 import { Stack } from '@/components/ui/Stack'
 import React from 'react'
 import { EChart } from '@kbox-labs/react-echarts'
-import { getAnalyticsData } from '@/data/copilot'
 
 type Props = {
     params: {
@@ -11,8 +10,6 @@ type Props = {
     }
 }
 export default async function AnalyticsPage(props: Props) {
-    const data = await getAnalyticsData(props.params.copilot_id);
-    console.log(data);
     return (
         <Stack direction='column' fluid className='h-full'>
             <HeaderShell>
