@@ -22,6 +22,12 @@ from utils.llm_consts import X_App_Name, chat_strategy, ChatStrategy
 from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
 from flask_socketio import emit
 
+from flask import request
+from pydub import AudioSegment
+import openai
+import uuid
+import os
+
 logger = CustomLogger(module_name=__name__)
 
 chat_workflow = Blueprint("chat", __name__)
@@ -224,7 +230,6 @@ async def handle_chat_send_common(
         if result.error:
             logger.error("chat_conversation_error", message=result.error)
 
-
         emit(session_id, "|im_end|") if is_streaming else jsonify(
             {"type": "text", "response": {"text": result.message}}
         )
@@ -249,8 +254,41 @@ async def handle_chat_send_common(
         )
 
 
-# curl -X POST http://localhost:5000/analytics -H "x_consumer_username: your_username"
 @chat_workflow.route("/analytics/<bot_id>", methods=["GET"])
 async def get_analytics_by_email(bot_id: str) -> Response:
     result = await get_analytics(bot_id)
     return jsonify(result)
+
+
+@chat_workflow.route("/transcribe", methods=["POST"])
+async def transcribe_audio():
+    # Check if the post request has the file part
+    if "file" not in request.files:
+        return jsonify({"error": "No file part in the request"}), 400
+
+    file = request.files["file"]
+
+    # If the user does not select a file, the browser submits an
+    # empty file without a filename.
+    if file.filename == "":
+        return jsonify({"error": "No selected file"}), 400
+
+    if not file.filename.endswith(".m4a"):
+        return jsonify({"error": "Invalid file type"}), 400
+
+    audio = AudioSegment.from_file(file)
+    if len(audio) > 20000:  # Audio length is more than 20 seconds
+        return jsonify({"error": "Audio file is too long"}), 400
+
+    # Generate a random file name
+    file_name = "/tmp/audio_" + str(uuid.uuid4()) + ".m4a"
+    file.save(file_name)
+
+    transcript = openai.audio.transcriptions.create(
+        model="whisper-1", file=file_name, response_format="text"
+    )
+
+    # Clean up the file
+    os.remove(file_name)
+
+    return jsonify(transcript.text)
