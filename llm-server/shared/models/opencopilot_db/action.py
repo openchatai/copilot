@@ -29,12 +29,6 @@ class Action(Base):
     deleted_at = Column(DateTime, nullable=True)
 
 
-class SuccessStatus(Enum):
-    SUCCESS = "success"
-    FAILURE = "failure"
-    NONE = None
-
-
 @dataclass
 class ActionCall(Base):
     __tablename__ = "action_calls"
@@ -44,7 +38,7 @@ class ActionCall(Base):
     session_id = Column(String(36), nullable=False)
     chatbot_id = Column(String(36), nullable=False)
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)
-    success = Column(Enum(SuccessStatus), nullable=True, default=None)
+    success = Column(String(36), nullable=True, default=None)
 
 
 Base.metadata.create_all(engine)

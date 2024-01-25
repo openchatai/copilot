@@ -2,6 +2,7 @@ import structlog
 import logging
 import sentry_sdk
 import os
+
 sentry_sdk.init(
     traces_sample_rate=1.0,
     profiles_sample_rate=1.0,
@@ -21,20 +22,19 @@ structlog.configure(
     cache_logger_on_first_use=True,
 )
 
+
 class CustomLogger:
     def __init__(self, module_name: str = __name__, level: int = logging.INFO):
         self.logger = structlog.get_logger(module_name)
         logging.basicConfig(level=level, format="%(message)s")
 
     def log(self, level, event, **kwargs):
-        self.logger.log(
-            level,
-            event=event,
-            **kwargs
-        )
-        
+        self.logger.log(level, event=event, **kwargs)
+
         # only enable this for prod environment
-        sentry_sdk.capture_message(event, level=level, scope=None) if dsn is not None else None
+        sentry_sdk.capture_message(
+            event, level=level, scope=None
+        ) if dsn is not None else None
 
     def info(self, event, **kwargs):
         self.log(logging.INFO, event, **kwargs)
