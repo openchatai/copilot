@@ -273,22 +273,18 @@ async def transcribe_audio():
     if file.filename == "":
         return jsonify({"error": "No selected file"}), 400
 
-    if not file.filename.endswith(".m4a"):
+    if not file.filename.endswith(".m4a") and not file.filename.endswith(".mp3"):
         return jsonify({"error": "Invalid file type"}), 400
-
-    audio = AudioSegment.from_file(file)
-    if len(audio) > 20000:  # Audio length is more than 20 seconds
-        return jsonify({"error": "Audio file is too long"}), 400
 
     # Generate a random file name
     file_name = "/tmp/audio_" + str(uuid.uuid4()) + ".m4a"
     file.save(file_name)
 
     transcript = openai.audio.transcriptions.create(
-        model="whisper-1", file=file_name, response_format="text"
+        model="whisper-1", file=open(file_name, "rb"), response_format="text"
     )
 
     # Clean up the file
     os.remove(file_name)
 
-    return jsonify(transcript.text)
+    return jsonify({"text": transcript})
