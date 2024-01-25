@@ -7,6 +7,7 @@ from dataclasses import dataclass
 
 @dataclass
 class ActionDTO(BaseModel):
+    id: str
     bot_id: str
     name: str
     api_endpoint: str
