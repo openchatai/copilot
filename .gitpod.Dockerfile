@@ -8,8 +8,7 @@ RUN curl -o Miniconda.sh -LO https://repo.anaconda.com/miniconda/Miniconda3-late
     rm Miniconda.sh
 
 # Install Fish shell
-RUN sudo apt-get update && \
-    sudo apt-get install -y fish
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 # Add Miniconda to PATH
 ENV PATH=$HOME/miniconda/bin:$PATH
