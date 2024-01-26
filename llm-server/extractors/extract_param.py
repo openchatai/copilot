@@ -4,11 +4,11 @@ from extractors.extract_json import extract_json_payload
 from utils.get_chat_model import get_chat_model
 from shared.utils.opencopilot_utils import get_llm
 from custom_types.t_json import JsonData
-from typing import Optional
+from typing import Optional, cast
 from langchain.schema import HumanMessage, SystemMessage
 from utils.get_logger import CustomLogger
 
-logger= CustomLogger(module_name=__name__)
+logger = CustomLogger(module_name=__name__)
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
@@ -29,7 +29,9 @@ async def gen_params_from_schema(
         HumanMessage(
             content="Based on the information provided, construct a valid parameter object to be used with python requests library. In cases where user input doesnot contain information for a query, DO NOT add that specific query parameter to the output. If a user doesn't provide a required parameter, use sensible defaults for required params, and leave optional params."
         ),
-        HumanMessage(content="Your output must be a valid json, without any commentary"),
+        HumanMessage(
+            content="Your output must be a valid json, without any commentary"
+        ),
     ]
     result = chat(messages)
     logger.info("[OpenCopilot] LLM Body Response: {}".format(result.content))
