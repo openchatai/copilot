@@ -1,7 +1,8 @@
 from flask_socketio import emit
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
+from routes.chat.followup_generator import generate_follow_up_questions
 from routes.chat.implementation.handler_interface import ChatRequestHandler
-from typing import Awaitable, Callable, Dict, Optional
+from typing import Dict, Optional
 import asyncio
 
 from custom_types.response_dict import LLMResponse
@@ -42,9 +43,12 @@ class ChainStrategy(ChatRequestHandler):
             get_relevant_flows(text, bot_id),
             get_chat_message_as_llm_conversation(session_id),
         ]
-
         results = await asyncio.gather(*tasks)
         knowledgebase, actions, flows, conversations_history = results
+
+        followup_question_list = await generate_follow_up_questions(
+            conversation_history=conversations_history, current_input=text
+        )
         top_documents = select_top_documents(actions + flows + knowledgebase)
 
         emit(
@@ -104,7 +108,7 @@ class ChainStrategy(ChatRequestHandler):
             emit(
                 f"{session_id}_info", "Running informative action... \n"
             ) if is_streaming else None
-            response = run_informative_item(
+            response: LLMResponse = run_informative_item(
                 informative_item=top_documents,
                 base_prompt=base_prompt,
                 text=text,
@@ -113,5 +117,6 @@ class ChainStrategy(ChatRequestHandler):
                 session_id=session_id,
             )
 
+            response.followup_question_list = followup_question_list
             response.knowledgebase_called = True
             return response
