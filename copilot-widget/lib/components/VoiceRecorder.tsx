@@ -1,9 +1,9 @@
-import { useAudioRecorder } from "react-audio-voice-recorder";
 import { Square, MicIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ToolTip";
 import { useAxiosInstance } from "@lib/contexts/axiosInstance";
 import now from "@lib/utils/timenow";
 import { useEffect } from "react";
+import useAudioRecorder from "@lib/hooks/useAudioRecord";
 
 export function VoiceRecorder({
   onSuccess,
