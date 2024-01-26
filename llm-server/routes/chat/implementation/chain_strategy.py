@@ -49,6 +49,11 @@ class ChainStrategy(ChatRequestHandler):
         followup_question_list = await generate_follow_up_questions(
             conversation_history=conversations_history, current_input=text
         )
+
+        emit(
+            f"{session_id}_follow_qns", followup_question_list.follow_up_questions
+        ) if is_streaming else None
+
         top_documents = select_top_documents(actions + flows + knowledgebase)
 
         emit(
