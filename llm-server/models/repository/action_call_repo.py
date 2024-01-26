@@ -1,15 +1,20 @@
 from typing import List
-from sqlalchemy.orm import Session
 from shared.models.opencopilot_db.action import Action, ActionCall
 from sqlalchemy import func
 
+from sqlalchemy.orm import sessionmaker
+from shared.models.opencopilot_db import engine
 
-def add_action_call(action_id: str, session_id: str, bot_id: str) -> Action:
+Session = sessionmaker(bind=engine)
+
+
+def add_action_call(operation_id: str, session_id: str, bot_id: str) -> Action:
     action_call = ActionCall(
-        action_id=action_id,
+        operation_id=operation_id,
         session_id=session_id,
-        bot_id=bot_id,
+        chatbot_id=bot_id,
     )
+
     with Session() as session:
         session.add(action_call)
         session.commit()
@@ -39,10 +44,10 @@ def count_action_id_for_session_id(session_id: str) -> int:
 def count_action_calls_grouped_by_action_id_for_bot_id(bot_id: str):
     with Session() as session:
         result = (
-            session.query(ActionCall.action_id, func.count(ActionCall.action_id))
-            .filter(ActionCall.bot_id == bot_id)
-            .group_by(ActionCall.action_id)
-            .order_by(func.count(ActionCall.action_id).desc())
+            session.query(ActionCall.operation_id, func.count(ActionCall.operation_id))
+            .filter(ActionCall.chatbot_id == bot_id)
+            .group_by(ActionCall.operation_id)
+            .order_by(func.count(ActionCall.chatbot_id).desc())
             .all()
         )
         return result

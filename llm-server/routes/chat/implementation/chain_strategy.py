@@ -91,10 +91,11 @@ class ChainStrategy(ChatRequestHandler):
 
             response.api_called = True
             add_action_call(
-                action_id=actionable_item.id,
+                operation_id=actionable_item["actions"][0].document.metadata.get(
+                    "operation_id", ""
+                ),
                 session_id=session_id,
                 bot_id=bot_id,
-                action_name=llm_predicted_operation_id.name,
             )
             return response
         else:

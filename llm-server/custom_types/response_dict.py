@@ -1,5 +1,4 @@
-from typing import NamedTuple, TypedDict, Optional, Dict, Any, List
-import requests
+from typing import TypedDict, Optional, Dict, List
 from dataclasses import dataclass, field
 
 
@@ -20,7 +19,7 @@ class LLMResponse:
     api_request_response: ApiRequestResult = ApiRequestResult()
     api_called: bool = False
     knowledgebase_called: bool = False
-    action_ids: List[str] = []
+    operation_ids: List[str] = field(default_factory=list)
 
     @classmethod
     def create_default(cls):

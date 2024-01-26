@@ -264,13 +264,13 @@ async def get_analytics_by_email(bot_id: str) -> Response:
     return jsonify(result)
 
 
-@chat_workflow.route("/sessions/count/<bot_id>", methods=["GET"])
-def session_counts_by_user(bot_id: str):
-    response = get_session_counts_by_user(bot_id)
-    return Response(response=response, status=200)  # type: ignore
+@chat_workflow.route("/sessions/count/<email>", methods=["GET"])
+def session_counts_by_user(email: str):
+    response = get_session_counts_by_user(email)
+    return jsonify(response)
 
 
 @chat_workflow.route("/actions/most_called/<bot_id>", methods=["GET"])
 def m_called_actions_by_bot(bot_id: str):
     response = most_called_actions_by_bot(bot_id)
-    return Response(response=response, status=200)  # type: ignore
+    return jsonify(response)

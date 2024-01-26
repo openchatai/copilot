@@ -120,11 +120,11 @@ async def run_actionable_item(
         )
 
         # @Todo convert to bulk
-        for action_id in output.action_ids:
+        for operation_id in output.operation_ids:
             add_action_call(
                 bot_id=bot_id,
                 session_id=session_id,
-                action_id=action_id,
+                operation_id=operation_id,
             )
 
     return output

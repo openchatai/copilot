@@ -34,7 +34,7 @@ class ActionCall(Base):
     __tablename__ = "action_calls"
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    action_id = Column(String(36), ForeignKey("actions.id"), nullable=False)
+    operation_id = Column(String(36), nullable=False)
     session_id = Column(String(36), nullable=False)
     chatbot_id = Column(String(36), nullable=False)
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)

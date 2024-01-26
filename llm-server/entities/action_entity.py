@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 @dataclass
 class ActionDTO(BaseModel):
-    id: str
+    id: Optional[str] = None
     bot_id: str
     name: str
     api_endpoint: str

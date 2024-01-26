@@ -11,6 +11,7 @@ from langchain.schema import BaseMessage, AIMessage, HumanMessage
 from sqlalchemy import func
 
 from shared.models.opencopilot_db.chatbot import Chatbot
+import json
 
 Session = sessionmaker(bind=engine)
 
@@ -339,10 +340,19 @@ def get_session_counts_by_user(user_email: str):
             .all()
         )
 
-        return result
+        json_result = []
+        # Convert result to JSON
+        for session_id, rest in result:
+            json_result.append({"session_id": session_id, "session_count": rest})
+
+        return json_result
 
 
 def most_called_actions_by_bot(bot_id: str):
-    return count_action_calls_grouped_by_action_id_for_bot_id(
-        bot_id
-    )  # Fix: Remove quotes around bot_id
+    rows = count_action_calls_grouped_by_action_id_for_bot_id(bot_id)
+
+    result = []
+    for operation_id, count in rows:
+        result.append({"operation_id": operation_id, "count": count})
+
+    return result
