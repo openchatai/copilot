@@ -51,7 +51,8 @@ class ChainStrategy(ChatRequestHandler):
         )
 
         emit(
-            f"{session_id}_follow_qns", followup_question_list.follow_up_questions
+            f"{session_id}_follow_qns",
+            followup_question_list.json(),
         ) if is_streaming else None
 
         top_documents = select_top_documents(actions + flows + knowledgebase)

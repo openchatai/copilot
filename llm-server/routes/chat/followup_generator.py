@@ -11,8 +11,8 @@ logger = CustomLogger(module_name=__name__)
 
 
 class FollowUpQuestion(BaseModel):
-    bot_message: str
-    operationIds: List[str]
+    label: str
+    value: str
 
 
 class FollowUpQuestionList(BaseModel):
@@ -40,20 +40,23 @@ def generate_conversation_string(conversation_history: List[BaseMessage]) -> str
 async def generate_follow_up_questions(
     conversation_history: List[BaseMessage], current_input: str
 ):
-    chat = get_chat_model("generate_follow_up_questions")
+    chat = get_chat_model()
     conversation_string = generate_conversation_string(conversation_history)
     messages = [
         SystemMessage(
-            content="You are an intelligent machine learning model that can generate follow-up questions based on user input history and the current input."
+            content="You are an intelligent machine learning model that can predict follow-up questions that the user may ask."
         ),
         HumanMessage(
-            content="""Given the history and current input below, generate a json that looks like the following : {
+            content="""Given the history and current input below, generate follow up responses that the user may ask as json array without any commentary. Following is the schema that you should follow to return your response: 
+            {
                 "follow_up_questions": [{
-                    "label": "follow-up question title",
-                    "value": "this will be a standalone follow-up question"
-                }, {
+                        "label": "Why is the sky blue?",
+                        "value": "Why is the sky blue during the day?"
+                    }, 
+                    {
                     ...
-                }]
+                    }
+                ]
             }"""
         ),
         HumanMessage(content="History: {}.".format(conversation_string)),
