@@ -1,17 +1,21 @@
 "use client";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
-import { type ReactNode, forwardRef } from "react";
+import { forwardRef, ComponentProps } from "react";
 import cn from "../utils/cn";
 
 const TooltipTrigger = TooltipPrimitive.Trigger;
+const TooltipRoot = TooltipPrimitive.Root;
 
-function Tooltip({ children }: { children: ReactNode }) {
-  return (
-    <TooltipPrimitive.Provider>
-      <TooltipPrimitive.Root>{children}</TooltipPrimitive.Root>
-    </TooltipPrimitive.Provider>
-  );
-}
+const Tooltip = forwardRef(
+  ({ children, ...rest }: ComponentProps<typeof TooltipRoot>, ref) => {
+    return (
+      <TooltipPrimitive.Provider>
+        <TooltipRoot {...rest}>{children}</TooltipRoot>
+      </TooltipPrimitive.Provider>
+    );
+  }
+);
+
 Tooltip.displayName = "ToolTip";
 const TooltipContent = forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
@@ -30,15 +34,7 @@ const TooltipContent = forwardRef<
     )}
     {...props}
   >
-    <>
-      {children}
-      <TooltipPrimitive.Arrow
-        className={cn(
-          "opencopilot-fill-current opencopilot-text-accent opencopilot-animate-in opencopilot-slide-in-from-top-1 opencopilot-ease-out data-[state=closed]:opencopilot-animate-out",
-          arrowClassName
-        )}
-      />
-    </>
+    {children}
   </TooltipPrimitive.Content>
 ));
 TooltipContent.displayName = TooltipPrimitive.Content.displayName;
