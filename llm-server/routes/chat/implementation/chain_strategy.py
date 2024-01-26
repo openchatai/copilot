@@ -1,9 +1,10 @@
 from flask_socketio import emit
 from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
+from routes.chat.followup_generator import generate_follow_up_questions
 from routes.chat.implementation.handler_interface import ChatRequestHandler
-from typing import Awaitable, Callable, Dict, Optional
+from typing import Dict, Optional
 import asyncio
-
+import threading
 from custom_types.response_dict import LLMResponse
 from routes.flow.utils.api_retrievers import (
     get_relevant_actions,
@@ -42,9 +43,9 @@ class ChainStrategy(ChatRequestHandler):
             get_relevant_flows(text, bot_id),
             get_chat_message_as_llm_conversation(session_id),
         ]
-
         results = await asyncio.gather(*tasks)
         knowledgebase, actions, flows, conversations_history = results
+
         top_documents = select_top_documents(actions + flows + knowledgebase)
 
         emit(
@@ -104,7 +105,7 @@ class ChainStrategy(ChatRequestHandler):
             emit(
                 f"{session_id}_info", "Running informative action... \n"
             ) if is_streaming else None
-            response = run_informative_item(
+            response = await run_informative_item(
                 informative_item=top_documents,
                 base_prompt=base_prompt,
                 text=text,
@@ -112,6 +113,16 @@ class ChainStrategy(ChatRequestHandler):
                 is_streaming=is_streaming,
                 session_id=session_id,
             )
+
+            # we only support follow_up question this in streaming mode
+            if is_streaming:
+                followup_question_list = await generate_follow_up_questions(
+                    conversations_history, response.message or "", current_input=text
+                )
+
+                print(followup_question_list.json())
+                if is_streaming:
+                    emit(f"{session_id}_follow_qns", followup_question_list.json())
 
             response.knowledgebase_called = True
             return response
