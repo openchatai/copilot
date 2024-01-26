@@ -38,7 +38,7 @@ def generate_conversation_string(conversation_history: List[BaseMessage]) -> str
 
 
 async def generate_follow_up_questions(
-    conversation_history: List[BaseMessage], current_input: str
+    conversation_history: List[BaseMessage], llm_response: str, current_input: str
 ):
     chat = get_chat_model()
     conversation_string = generate_conversation_string(conversation_history)
@@ -47,7 +47,7 @@ async def generate_follow_up_questions(
             content="You are an intelligent machine learning model that can predict follow-up questions that the user may ask."
         ),
         HumanMessage(
-            content="""Given the history and current input below, generate follow up responses that the user may ask as json array without any commentary. Following is the schema that you should follow to return your response: 
+            content="""Given the conversation history and last agent reply below, generate upto 3 follow up responses that the user may ask as json array without any commentary. Following is the schema that you should follow to return your response: 
             {
                 "follow_up_questions": [{
                         "label": "Why is the sky blue?",
@@ -61,6 +61,7 @@ async def generate_follow_up_questions(
         ),
         HumanMessage(content="History: {}.".format(conversation_string)),
         HumanMessage(content="Current Input: {}.".format(current_input)),
+        HumanMessage(content="Assistant response: {}.".format(llm_response)),
     ]
     result = await chat.ainvoke(messages)
     logger.info("[OpenCopilot] LLM Body Response: {}".format(result.content))

@@ -130,7 +130,7 @@ async def run_actionable_item(
     return output
 
 
-def run_informative_item(
+async def run_informative_item(
     informative_item: dict[str, List[DocumentSimilarityDTO]],
     base_prompt: str,
     text: str,

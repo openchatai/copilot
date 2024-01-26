@@ -1,8 +1,6 @@
 from typing import TypedDict, Optional, Dict, List
 from dataclasses import dataclass, field
 
-from routes.chat.followup_generator import FollowUpQuestion, FollowUpQuestionList
-
 
 class ResponseDict(TypedDict):
     response: Optional[str]
@@ -22,7 +20,7 @@ class LLMResponse:
     api_called: bool = False
     knowledgebase_called: bool = False
     operation_ids: List[str] = field(default_factory=list)
-    followup_question_list = FollowUpQuestionList(follow_up_questions=[])
+    # followup_question_list = FollowUpQuestionList(follow_up_questions=[])
 
     @classmethod
     def create_default(cls):
