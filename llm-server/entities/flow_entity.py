@@ -49,6 +49,15 @@ class FlowDTO(BaseModel):
         # including nested ActionDTO objects within each Block
         return self.dict()
 
+    def get_all_action_ids(self):
+        action_ids = []
+        for block in self.blocks:
+            if block.actions:
+                for action in block.actions:
+                    if action.id:
+                        action_ids.append(action.id)
+        return action_ids
+
 
 class PartialFlowDTO(BaseModel):
     bot_id: str

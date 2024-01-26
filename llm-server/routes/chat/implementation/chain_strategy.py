@@ -20,6 +20,7 @@ from routes.root_service import (
     run_informative_item,
 )
 from utils.llm_consts import VectorCollections
+from models.repository.action_call_repo import add_action_call
 
 
 class ChainStrategy(ChatRequestHandler):
@@ -89,6 +90,13 @@ class ChainStrategy(ChatRequestHandler):
             )
 
             response.api_called = True
+            add_action_call(
+                operation_id=actionable_item["actions"][0].document.metadata.get(
+                    "operation_id", ""
+                ),
+                session_id=session_id,
+                bot_id=bot_id,
+            )
             return response
         else:
             # it means that the user query is "informative" and can be answered using text only

@@ -7,6 +7,7 @@ from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
 from custom_types.response_dict import LLMResponse, ApiRequestResult
 from custom_types.run_workflow_input import ChatContext
 from entities.flow_entity import FlowDTO
+from models.repository.action_call_repo import add_action_call
 from models.repository.flow_repo import get_flow_by_id
 from routes.flow.utils import create_flow_from_operation_ids, run_flow
 
@@ -117,6 +118,14 @@ async def run_actionable_item(
             session_id=session_id,
             is_streaming=is_streaming,
         )
+
+        # @Todo convert to bulk
+        for operation_id in output.operation_ids:
+            add_action_call(
+                bot_id=bot_id,
+                session_id=session_id,
+                operation_id=operation_id,
+            )
 
     return output
 

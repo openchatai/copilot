@@ -1,5 +1,8 @@
 from datetime import datetime
 from typing import Optional, List, Dict, Union, Tuple
+from models.repository.action_call_repo import (
+    count_action_calls_grouped_by_action_id_for_bot_id,
+)
 from shared.models.opencopilot_db import ChatHistory, engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Integer, distinct
@@ -8,6 +11,7 @@ from langchain.schema import BaseMessage, AIMessage, HumanMessage
 from sqlalchemy import func
 
 from shared.models.opencopilot_db.chatbot import Chatbot
+import json
 
 Session = sessionmaker(bind=engine)
 
@@ -317,3 +321,38 @@ async def get_analytics(chatbot_id: str):
         )
 
     return chat_histories
+
+
+def get_session_counts_by_user(user_email: str):
+    with Session() as session:
+        bots = session.query(Chatbot.id).filter(Chatbot.email == user_email).all()
+        session.close()
+        bot_ids = [bot.id for bot in bots]
+        result = (
+            session.query(
+                ChatHistory.session_id,
+                func.count(ChatHistory.session_id).label("session_count"),
+            )
+            .filter(
+                ChatHistory.chatbot_id.in_(bot_ids)
+            )  # Fix: Replace bot_id with bot_ids
+            .group_by(ChatHistory.session_id)
+            .all()
+        )
+
+        json_result = []
+        # Convert result to JSON
+        for session_id, rest in result:
+            json_result.append({"session_id": session_id, "session_count": rest})
+
+        return json_result
+
+
+def most_called_actions_by_bot(bot_id: str):
+    rows = count_action_calls_grouped_by_action_id_for_bot_id(bot_id)
+
+    result = []
+    for operation_id, count in rows:
+        result.append({"operation_id": operation_id, "count": count})
+
+    return result

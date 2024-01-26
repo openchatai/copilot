@@ -10,6 +10,8 @@ from custom_types.run_workflow_input import ChatContext
 from entities.flow_entity import FlowDTO
 from routes.flow.utils import run_actions
 from utils.get_logger import CustomLogger
+from entities.flow_entity import Block
+from entities.flow_entity import Block
 
 logger = CustomLogger(module_name=__name__)
 
@@ -58,4 +60,5 @@ async def run_flow(
         error=output["error"],
         message=output["response"],
         api_called=True,
+        action_ids=flow.get_all_action_ids(),
     )

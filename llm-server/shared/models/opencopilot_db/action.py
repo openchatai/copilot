@@ -3,6 +3,10 @@ import uuid
 from shared.models.opencopilot_db.database_setup import Base, engine
 from sqlalchemy import Column, String, DateTime, JSON, Text
 from dataclasses import dataclass
+from sqlalchemy import ForeignKey
+from enum import Enum
+from sqlalchemy.orm import Session
+from typing import List
 
 
 @dataclass
@@ -23,6 +27,18 @@ class Action(Base):
         DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
     )
     deleted_at = Column(DateTime, nullable=True)
+
+
+@dataclass
+class ActionCall(Base):
+    __tablename__ = "action_calls"
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    operation_id = Column(String(36), nullable=False)
+    session_id = Column(String(36), nullable=False)
+    chatbot_id = Column(String(36), nullable=False)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    success = Column(String(36), nullable=True, default=None)
 
 
 Base.metadata.create_all(engine)

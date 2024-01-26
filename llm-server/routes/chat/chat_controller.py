@@ -6,9 +6,11 @@ from flask import jsonify, Blueprint, request, Response, abort, Request
 
 from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id_with_total,
+    get_session_counts_by_user,
     get_unique_sessions_with_first_message_by_bot_id,
     create_chat_histories,
     get_analytics,
+    most_called_actions_by_bot,
 )
 from models.repository.copilot_repo import find_one_or_fail_by_token
 from routes.analytics.analytics_service import upsert_analytics_record
@@ -259,6 +261,17 @@ async def get_analytics_by_email(bot_id: str) -> Response:
     result = await get_analytics(bot_id)
     return jsonify(result)
 
+
+@chat_workflow.route("/sessions/count/<email>", methods=["GET"])
+def session_counts_by_user(email: str):
+    response = get_session_counts_by_user(email)
+    return jsonify(response)
+
+
+@chat_workflow.route("/actions/most_called/<bot_id>", methods=["GET"])
+def m_called_actions_by_bot(bot_id: str):
+    response = most_called_actions_by_bot(bot_id)
+    return jsonify(response)
 
 @chat_workflow.route("/transcribe", methods=["POST"])
 async def transcribe_audio():
