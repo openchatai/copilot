@@ -150,3 +150,15 @@ svg {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+@keyframes text-blur-out {
+  0% {
+    filter: blur(0.01);
+  }
+  100% {
+    filter: blur(12px) opacity(0%);
+  }
+}
+
+.text-blur-out {
+  animation: text-blur-out 1.2s cubic-bezier(0.55, 0.085, 0.68, 0.53) both;
+}

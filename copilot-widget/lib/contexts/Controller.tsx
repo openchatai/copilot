@@ -23,6 +23,8 @@ interface ChatContextData {
   loading: boolean;
   failedMessage: FailedMessage | null;
   reset: () => void;
+  setLastMessageId: (id: number | null) => void;
+  lastMessageToVote: number | null;
 }
 const [
   useChat,
@@ -37,6 +39,10 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const config = useConfigData();
   const { sessionId } = useSessionId(config.token);
   const [conversationInfo, setConversationInfo] = useState<string | null>(null);
+  const [lastMessageToVote, setLastMessageToVote] = useState<number | null>(null);
+  const setLastMessageId = useCallback((id: number | null) => {
+    setLastMessageToVote(id)
+  }, [])
   useEffect(() => {
     getInitialData(axiosInstance).then((data) => {
       setMessages(historyToMessages(data.history))
@@ -94,7 +100,6 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   const updateBotMessage = useCallback((id: string, text: string) => {
     const botMessage = messages.find(m => m.id === id) as BotResponse
-    console.log({ botMessage })
     if (botMessage) {
       // append the text to the bot message
       const textt = botMessage.response.text + text
@@ -133,7 +138,18 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
 
   }, [currentMessagePair, sessionId, socket, updateBotMessage]);
-
+  useEffect(() => {
+    socket.on(`${sessionId}_vote`, (content) => {
+      console.log(`${sessionId}_vote ==>`, content)
+      if (content) {
+        setLastMessageToVote(content)
+      }
+    });
+    return () => {
+      socket.off(`${sessionId}_vote`);
+      setLastMessageToVote(null)
+    };
+  }, [sessionId, socket])
   function reset() {
     setMessages([]);
   }
@@ -145,6 +161,8 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     loading,
     failedMessage,
     reset,
+    setLastMessageId,
+    lastMessageToVote
   };
 
   return (

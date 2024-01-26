@@ -37,7 +37,16 @@ export function CopilotsContainer() {
         <Loading />
       </div>
     );
-
+    // when the server is down
+  if (copilots?.status && copilots.status.toString().startsWith('50')){
+    return (
+      <div className="flex-center py-4">
+        <p className="text-center text-gray-400">
+        we are facing high load at the moment, please give us some time
+        </p>
+      </div>
+    );
+  }
   return _.isEmpty($copilots) ? (
     <EmptyBlock>
       {_.isEmpty(query) ? (

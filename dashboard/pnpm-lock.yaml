@@ -8,9 +8,12 @@ dependencies:
   '@hookform/resolvers':
     specifier: ^3.3.1
     version: 3.3.2(react-hook-form@7.47.0)
+  '@kbox-labs/react-echarts':
+    specifier: ^1.0.3
+    version: 1.0.3(echarts@5.4.3)(react@18.2.0)
   '@openchatai/copilot-widget':
-    specifier: ^2.2.2
-    version: 2.2.2(react@18.2.0)
+    specifier: ^2.3.0
+    version: 2.3.0(react@18.2.0)
   '@radix-ui/react-accordion':
     specifier: ^1.1.2
     version: 1.1.2(@types/react-dom@18.2.13)(@types/react@18.2.28)(react-dom@18.2.0)(react@18.2.0)
@@ -92,6 +95,9 @@ dependencies:
   cmdk:
     specifier: ^0.2.0
     version: 0.2.0(@types/react@18.2.28)(react-dom@18.2.0)(react@18.2.0)
+  echarts:
+    specifier: ^5.4.3
+    version: 5.4.3
   framer-motion:
     specifier: ^10.16.16
     version: 10.16.16(react-dom@18.2.0)(react@18.2.0)
@@ -581,6 +587,16 @@ packages:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
 
+  /@kbox-labs/react-echarts@1.0.3(echarts@5.4.3)(react@18.2.0):
+    resolution: {integrity: sha512-cvgFFKhNsC3MKnKaaMO9t8EMb+ploNTXYx8KLvkxQxO0mTRLFaqHZyqpKj0THJ/ylGjMLxWcUYHEVwXvg48tEQ==}
+    peerDependencies:
+      echarts: ^5
+      react: ^18
+    dependencies:
+      echarts: 5.4.3
+      react: 18.2.0
+    dev: false
+
   /@next/env@14.0.4:
     resolution: {integrity: sha512-irQnbMLbUNQpP1wcE5NstJtbuA/69kRfzBrpAD7Gsn8zm/CY6YQYc3HQBz8QPxwISG26tIm5afvvVbu508oBeQ==}
     dev: false
@@ -690,8 +706,8 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.15.0
 
-  /@openchatai/copilot-widget@2.2.2(react@18.2.0):
-    resolution: {integrity: sha512-WOijGNtyG15J9yY6UP8vuodABlZxB/D0Psfmi1cL2x/mD2YEzR7lJZqg+On5KXerrzrKxcZA5ao1Fl1w4NEcjQ==}
+  /@openchatai/copilot-widget@2.3.0(react@18.2.0):
+    resolution: {integrity: sha512-Oxy79ZkqPQQwLHpVF9uUffbkBKQzTVVsXhAX1up5q3YQ2ALrMp5EnJPBbYa3v4xTIleh+rlKN9jlJaNWd3Oapw==}
     peerDependencies:
       react: ^18.x
     dependencies:
@@ -2982,6 +2998,13 @@ packages:
     dependencies:
       esutils: 2.0.3
     dev: true
+
+  /echarts@5.4.3:
+    resolution: {integrity: sha512-mYKxLxhzy6zyTi/FaEbJMOZU1ULGEQHaeIeuMR5L+JnJTpz+YR03mnnpBhbR4+UYJAgiXgpyTVLffPAjOTLkZA==}
+    dependencies:
+      tslib: 2.3.0
+      zrender: 5.4.4
+    dev: false
 
   /electron-to-chromium@1.4.554:
     resolution: {integrity: sha512-Q0umzPJjfBrrj8unkONTgbKQXzXRrH7sVV7D9ea2yBV3Oaogz991yhbpfvo2LMNkJItmruXTEzVpP9cp7vaIiQ==}
@@ -5423,6 +5446,10 @@ packages:
       strip-bom: 3.0.0
     dev: true
 
+  /tslib@2.3.0:
+    resolution: {integrity: sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==}
+    dev: false
+
   /tslib@2.6.2:
     resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
     dev: false
@@ -5684,6 +5711,12 @@ packages:
 
   /zod@3.22.4:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
+    dev: false
+
+  /zrender@5.4.4:
+    resolution: {integrity: sha512-0VxCNJ7AGOMCWeHVyTrGzUgrK4asT4ml9PEkeGirAkKNYXYzoPJCLvmyfdoOXcjTHPs10OZVMfD1Rwg16AZyYw==}
+    dependencies:
+      tslib: 2.3.0
     dev: false
 
   /zustand@4.4.6(@types/react@18.2.28)(immer@10.0.3)(react@18.2.0):
