@@ -1,11 +1,17 @@
 import { useAudioRecorder } from "react-audio-voice-recorder";
 import { Square, MicIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ToolTip";
+import { useAxiosInstance } from "@lib/contexts/axiosInstance";
+import now from "@lib/utils/timenow";
+import { useEffect } from "react";
+
 export function VoiceRecorder({
-  onStopRecording,
+  onSuccess,
 }: {
-  onStopRecording?: (blob: Blob) => void;
+  onSuccess?: (text: string) => void;
 }) {
+  const { axiosInstance } = useAxiosInstance();
+
   const {
     startRecording,
     stopRecording,
@@ -16,12 +22,27 @@ export function VoiceRecorder({
     noiseSuppression: true,
     echoCancellation: true,
   });
-  function handleClick() {
+  useEffect(() => {
+    async function transcribe() {
+      if (recordingBlob && !isRecording) {
+        const { data } = await axiosInstance.postForm<{ text: string }>(
+          "/chat/transcribe",
+          {
+            file: new File([recordingBlob], now() + ".mp3", {
+              type: "audio/mp3",
+            }),
+          }
+        );
+        if (data) {
+          onSuccess && onSuccess(data.text);
+        }
+      }
+    }
+    transcribe();
+  }, [recordingBlob]);
+  async function handleClick() {
     if (isRecording) {
       stopRecording();
-      if (recordingBlob) {
-        onStopRecording?.(recordingBlob);
-      }
     } else {
       startRecording();
     }
