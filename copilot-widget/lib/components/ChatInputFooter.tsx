@@ -1,8 +1,5 @@
 import TextareaAutosize from "react-textarea-autosize";
-import {
-  SendHorizonal,
-  Redo2,
-} from 'lucide-react'
+import { SendHorizonal, Redo2 } from "lucide-react";
 import { useChat } from "../contexts/Controller";
 import { useRef, useState } from "react";
 import { useInitialData } from "../contexts/InitialDataContext";
@@ -10,37 +7,38 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ToolTip";
 import { getId, isEmpty } from "@lib/utils/utils";
 import now from "@lib/utils/timenow";
 import { useDocumentDirection } from "@lib/hooks/useDocumentDirection";
+import { VoiceRecorder } from "./VoiceRecorder";
 function MessageSuggestions() {
   const { data } = useInitialData();
   const { messages, sendMessage } = useChat();
 
   return (
     <>
-      {
-        isEmpty(messages) && !isEmpty(data?.inital_questions) &&
-        (
-          <div className="opencopilot-flex no-scrollbar opencopilot-items-center opencopilot-flex-wrap opencopilot-justify-start opencopilot-gap-2 opencopilot-flex-1">
-            {data?.inital_questions?.map((q, index) => (
-              <button
-                className="opencopilot-text-sm opencopilot-font-medium opencopilot-whitespace-nowrap opencopilot-px-2.5 opencopilot-py-1.5 opencopilot-rounded-lg opencopilot-bg-accent opencopilot-text-primary"
-                key={index}
-                onClick={() => {
-                  sendMessage({
-                    from: "user",
-                    content: q,
-                    id: getId(),
-                    timestamp: now(),
-                  });
-                }}
-              >
-                {q}
-              </button>
-            ))}
-          </div>
-        )}
+      {isEmpty(messages) && !isEmpty(data?.inital_questions) && (
+        <div className="opencopilot-flex no-scrollbar opencopilot-items-center opencopilot-flex-wrap opencopilot-justify-start opencopilot-gap-2 opencopilot-flex-1">
+          {data?.inital_questions?.map((q, index) => (
+            <button
+              className="opencopilot-text-sm opencopilot-font-medium opencopilot-whitespace-nowrap opencopilot-px-2.5 opencopilot-py-1.5 opencopilot-rounded-lg opencopilot-bg-accent opencopilot-text-primary"
+              key={index}
+              onClick={() => {
+                sendMessage({
+                  from: "user",
+                  content: q,
+                  id: getId(),
+                  timestamp: now(),
+                });
+              }}
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+      )}
     </>
   );
 }
+// curl --location 'http://localhost:8888/backend/chat/transcribe' \
+// --form 'file=@"/Users/gharbat/Downloads/Neets.ai-example-us-female-2.mp3"'
 
 function ChatInputFooter() {
   const [input, setInput] = useState("");
@@ -48,9 +46,8 @@ function ChatInputFooter() {
   const { sendMessage, reset, messages } = useChat();
   const { loading } = useChat();
   const canSend = input.trim().length > 0;
-  const {
-    direction
-  } = useDocumentDirection();
+  const { direction } = useDocumentDirection();
+
   const handleTextareaChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
@@ -94,9 +91,10 @@ function ChatInputFooter() {
         </div>
         <div
           dir={direction}
-          className="opencopilot-flex opencopilot-items-center opencopilot-justify-center opencopilot-gap-2 opencopilot-h-fit opencopilot-px-2 opencopilot-text-lg">
+          className="opencopilot-flex opencopilot-items-center opencopilot-justify-center opencopilot-gap-2 opencopilot-h-fit opencopilot-px-2 opencopilot-text-lg"
+        >
           <Tooltip>
-            <TooltipTrigger asChild>
+            <TooltipTrigger asChild hidden>
               <button
                 onClick={reset}
                 className="opencopilot-text-xl disabled:opencopilot-opacity-40 disabled:opencopilot-pointer-events-none disabled:opencopilot-cursor-not-allowed opencopilot-text-[#5e5c5e] opencopilot-transition-all"
@@ -107,6 +105,7 @@ function ChatInputFooter() {
             </TooltipTrigger>
             <TooltipContent>reset chat</TooltipContent>
           </Tooltip>
+          <VoiceRecorder onSuccess={(text) => setInput(text)} />
           <button
             onClick={handleInputSubmit}
             className="opencopilot-text-xl disabled:opencopilot-opacity-40 disabled:opencopilot-pointer-events-none disabled:opencopilot-cursor-not-allowed opencopilot-text-[#5e5c5e] opencopilot-transition-all"

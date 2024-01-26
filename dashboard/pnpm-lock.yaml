@@ -12,8 +12,8 @@ dependencies:
     specifier: ^1.0.3
     version: 1.0.3(echarts@5.4.3)(react@18.2.0)
   '@openchatai/copilot-widget':
-    specifier: ^2.3.0
-    version: 2.3.0(react@18.2.0)
+    specifier: ^2.3.2
+    version: 2.3.2(react@18.2.0)
   '@radix-ui/react-accordion':
     specifier: ^1.1.2
     version: 1.1.2(@types/react-dom@18.2.13)(@types/react@18.2.28)(react-dom@18.2.0)(react@18.2.0)
@@ -706,8 +706,8 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.15.0
 
-  /@openchatai/copilot-widget@2.3.0(react@18.2.0):
-    resolution: {integrity: sha512-Oxy79ZkqPQQwLHpVF9uUffbkBKQzTVVsXhAX1up5q3YQ2ALrMp5EnJPBbYa3v4xTIleh+rlKN9jlJaNWd3Oapw==}
+  /@openchatai/copilot-widget@2.3.2(react@18.2.0):
+    resolution: {integrity: sha512-XBuCVPdVIfp7RZ/kswLYRpLA5fislaprCW/sURD/ncGpIDpN2Z6g0nmddqsMDbt0Q7sOh4lW3m5lKJInJj8dZw==}
     peerDependencies:
       react: ^18.x
     dependencies:
