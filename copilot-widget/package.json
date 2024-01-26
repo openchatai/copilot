@@ -75,6 +75,7 @@
     }
   },
   "dependencies": {
-    "lucide-react": "^0.298.0"
+    "lucide-react": "^0.298.0",
+    "react-audio-voice-recorder": "^2.2.0"
   }
 }
