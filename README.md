@@ -5,6 +5,8 @@
 | [![](https://dcbadge.vercel.app/api/server/yjEgCgvefr)](https://discord.gg/yjEgCgvefr)| [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/openchatai/opencopilot)
  
 
+> [!TIP]
+> If you are looking for a managed version of OpenCopilot, [check out the cloud version ](https://cloud.opencopilot.so/) - it's production-ready with our latest planning engine that can handle and understand complex user requests. 
 
 
 
@@ -120,8 +122,6 @@ Most of the time, the copilot can figure out what actions to execute when the us
 Less than <10 lines of codes to implement on your web app or desktop app
 
 <img width="1445" alt="image" src="https://github.com/openchatai/OpenCopilot/assets/32633162/d2ad2597-9de2-4177-b894-7ce92dfd1fcd">
-
-
 
 
 
