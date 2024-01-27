@@ -22,6 +22,7 @@ from routes.root_service import (
 )
 from utils.llm_consts import VectorCollections
 from models.repository.action_call_repo import add_action_call
+import threading
 
 
 class ChainStrategy(ChatRequestHandler):
@@ -115,14 +116,21 @@ class ChainStrategy(ChatRequestHandler):
             )
 
             # we only support follow_up question this in streaming mode
-            if is_streaming:
-                followup_question_list = await generate_follow_up_questions(
-                    conversations_history, response.message or "", current_input=text
+            def generate_follow_up_questions_background(
+                conversations_history, response_message, current_input
+            ):
+                followup_question_list = generate_follow_up_questions(
+                    conversations_history, response_message, current_input
                 )
-
                 print(followup_question_list.json())
                 if is_streaming:
                     emit(f"{session_id}_follow_qns", followup_question_list.json())
 
+            # Start the background job immediately
+            background_thread = threading.Thread(
+                target=generate_follow_up_questions_background,
+                args=(conversations_history, response.message or "", text),
+            )
+            background_thread.start()
             response.knowledgebase_called = True
             return response
