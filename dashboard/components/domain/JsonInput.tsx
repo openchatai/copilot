@@ -6,8 +6,8 @@ import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/mode-json";
 import "ace-builds/src-noconflict/theme-xcode";
 import { ComponentPropsWithoutRef, ElementRef, forwardRef } from "react";
-
-export const JsonInput = forwardRef<ElementRef<typeof AceEditor>, ComponentPropsWithoutRef<typeof AceEditor>>((props, ref) => <AceEditor
+import { cn } from "@/lib/utils";
+export const JsonInput = forwardRef<ElementRef<typeof AceEditor>, ComponentPropsWithoutRef<typeof AceEditor>>(({ className, ...props }, ref) => <AceEditor
     mode="json"
     theme="xcode"
     showGutter={false}
@@ -16,7 +16,7 @@ export const JsonInput = forwardRef<ElementRef<typeof AceEditor>, ComponentProps
     showPrintMargin={false}
     enableLiveAutocompletion
     enableBasicAutocompletion
-    className='resize-none border-border rounded max-w-full data-[valid=false]:!border-destructive border bg-background p-3 text-sm ring-offset-background transition-colors placeholder:text-muted-foreground focus-visible:border-primary focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50'
+    className={cn('resize-none border-border rounded max-w-full data-[valid=false]:!border-destructive border bg-background p-3 text-sm ring-offset-background transition-colors placeholder:text-muted-foreground focus-visible:border-primary focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50', className)}
     fontSize={14}
     ref={ref}
     {...props}

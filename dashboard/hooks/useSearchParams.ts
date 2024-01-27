@@ -4,14 +4,14 @@ class Params extends URLSearchParams {
     constructor(init?: string | URLSearchParams) {
         super(init);
     }
-    get(name: string): string | null {
+    get = (name: string): string | null => {
         return super.get(name);
     }
-    set(name: string, value: string) {
+    set = (name: string, value: string) => {
         super.set(name, value);
         return this
     }
-    delete(name: string) {
+    delete = (name: string) => {
         super.delete(name);
         return this
     }

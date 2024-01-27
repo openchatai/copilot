@@ -1,5 +1,5 @@
-import { Field, Form } from "@/components/ui/form";
-import { FieldPath, FieldValues, FormState, useForm } from "react-hook-form";
+import { Field, Form, isValidField } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -47,8 +47,8 @@ function transformAction(action: ActionType): ActionWithModifiedParameters {
             }
         })
     })
-    const body = toShema(action.body)
-    return _.merge(_.omit(action, ['parameters', 'headers', "body"]), { payload: { parameters, headers: action.headers, body } })
+    const request_body = toShema(action.body)
+    return _.merge(_.omit(action, ['parameters', 'headers', "body"]), { payload: { parameters, headers: action.headers, request_body } })
 }
 function actionToForm(action: ActionWithModifiedParameters): ActionType {
     const parameters: ActionType['parameters'] = [];
@@ -62,15 +62,6 @@ function actionToForm(action: ActionWithModifiedParameters): ActionType {
         })
     })
     return _.merge(_.omit(action, ['payload']), { parameters, headers: action.payload.headers })
-}
-function isValidField<
-    TValues extends FieldValues = FieldValues,
-    TName extends FieldPath<TValues> = FieldPath<TValues>
->(
-    formState: FormState<TValues>,
-    name: TName
-) {
-    return formState.errors?.[name] === undefined;
 }
 
 export function ActionForm({

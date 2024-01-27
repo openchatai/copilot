@@ -10,6 +10,7 @@ import {
   FieldPath,
   FieldValues,
   FormProvider,
+  FormState,
   useFormContext,
 } from "react-hook-form";
 import { cn } from "@/lib/utils";
@@ -212,6 +213,15 @@ function Field<
     )}
   />
 }
+function isValidField<
+  TValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TValues> = FieldPath<TValues>
+>(
+  formState: FormState<TValues>,
+  name: TName
+) {
+  return formState.errors?.[name] === undefined;
+}
 
 
 export {
@@ -223,5 +233,6 @@ export {
   FormDescription,
   FormMessage,
   FormField,
-  Field
+  Field,
+  isValidField
 };

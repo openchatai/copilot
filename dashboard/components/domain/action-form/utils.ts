@@ -10,7 +10,7 @@ function isSchama(json: any) {
     return true
 }
 
-export function toShema(json: any): JSONSchema3or4 {
-    const obj = JSON.parse(json)
+export function toShema(json?: string): JSONSchema3or4 {
+    const obj = JSON.parse(json || '{}')
     return !isSchama(obj) ? toJsonSchema(obj) : obj
 }
