@@ -77,11 +77,3 @@ export async function deleteVariableByKey(id: string, name: string) {
   return await instance.delete<{ message: string }>(`/${id}/variable/${name}`)
 }
 
-// analytics data 
-export async function getAnalyticsData(id: string) {
-  return (await instance.get<{
-    api_called_count: number;
-    knowledgebase_called_count:number;
-    other_count: number;
-  }[]>(`/${id}/analytics`)).data
-}
