@@ -37,7 +37,7 @@ def generate_conversation_string(conversation_history: List[BaseMessage]) -> str
     return conversation_str
 
 
-def generate_follow_up_questions(
+async def generate_follow_up_questions(
     conversation_history: List[BaseMessage], llm_response: str, current_input: str
 ):
     chat = get_chat_model()
@@ -63,7 +63,7 @@ def generate_follow_up_questions(
         HumanMessage(content="Current Input: {}.".format(current_input)),
         HumanMessage(content="Assistant response: {}.".format(llm_response)),
     ]
-    result = chat(messages)
+    result = await chat.ainvoke(messages)
     logger.info("[OpenCopilot] LLM Body Response: {}".format(result.content))
 
     # Assuming extract_follow_up_questions is a function to extract follow-up questions from the model's response
