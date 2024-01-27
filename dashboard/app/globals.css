@@ -76,9 +76,11 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   .primary-shadow {
     box-shadow:
       rgba(19, 33, 68, 0.08) 0px -1px 0px 1px inset,
@@ -94,19 +96,25 @@
   }
 
   .no-scrollbar {
-    -ms-overflow-style: none; /* Internet Explorer 10+ */
-    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;
+    /* Internet Explorer 10+ */
+    scrollbar-width: none;
+    /* Firefox */
   }
+
   .no-scrollbar::-webkit-scrollbar {
-    display: none; /* Safari and Chrome */
+    display: none;
+    /* Safari and Chrome */
   }
 }
+
 .loading-el {
   position: relative;
   overflow: hidden;
   pointer-events: none;
   color: transparent;
 }
+
 .loading-el::after {
   content: "";
   position: absolute;
@@ -125,43 +133,76 @@
   border-width: 3px;
   @apply h-5 w-5 animate-spin rounded-full border-primary border-t-transparent;
 }
+
 * {
   min-width: 0;
   min-height: 0;
 }
+
 /* select labels beside required inputs */
 .required-label::after {
   content: "*";
   color: hsl(var(--destructive));
   margin-left: 0.25rem;
 }
+
 .reset-input {
   @apply m-0 h-10 rounded-md border border-border bg-background bg-white px-3 py-2 text-sm shadow-sm ring-offset-accent transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus:outline-none focus-visible:border-primary focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[valid=false]:!border-destructive;
 }
+
 .copilot__container:not(:hover) .copilot .box {
   @apply bg-secondary/70;
 }
+
 .copilot__container:is(:hover) .copilot .box {
   @apply bg-secondary;
 }
+
 .copilot__container:is(:hover) .copilot .box:hover {
   @apply bg-accent;
 }
+
 /* adding animation (opacity) */
 @keyframes blink-animation {
   0% {
     opacity: 0;
   }
+
   50% {
     opacity: 1;
   }
+
   70% {
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }
 }
+
 .blink {
   animation: blink-animation 1s steps(5, start) both;
+}
+
+.cross-dots-bg {
+  background:
+    radial-gradient(black 3px, transparent 4px),
+    radial-gradient(black 3px, transparent 4px),
+    linear-gradient(#fff 4px, transparent 0),
+    linear-gradient(45deg, transparent 74px, transparent 75px, #a4a4a4 75px, #a4a4a4 76px, transparent 77px, transparent 109px),
+    linear-gradient(-45deg, transparent 75px, transparent 76px, #a4a4a4 76px, #a4a4a4 77px, transparent 78px, transparent 109px),
+    #fff;
+  background-size: 109px 109px, 109px 109px, 100% 6px, 109px 109px, 109px 109px;
+  background-position: 54px 55px, 0px 0px, 0px 0px, 0px 0px, 0px 0px;
+}
+
+.diagonal-stripes {
+  --stripe-width: 10px;
+  --spacing: calc(var(--stripe-width) * 5);
+  --stripe-color: rgba(0, 0, 0, 0.2);
+  --stripe-background: transparent;
+  background-image: linear-gradient(45deg, var(--stripe-color) 25%, transparent 25%, transparent 50%, var(--stripe-color) 50%, var(--stripe-color) 75%, transparent 75%, transparent);
+  background-size: var(--spacing) var(--spacing);
+  background-color: var(--stripe-background);
 }
