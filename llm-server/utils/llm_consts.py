@@ -78,3 +78,7 @@ def get_mysql_uri():
 
 chat_strategy = os.getenv("CHAT_STRATEGY", ChatStrategy.chain)
 max_pages_to_crawl = int(os.getenv("MAX_PAGES_TO_CRAWL", "15"))
+
+enable_followup_questions = (
+    True if os.getenv("ENABLE_FOLLOWUP_QUESTIONS", "YES") == "YES" else False
+)
