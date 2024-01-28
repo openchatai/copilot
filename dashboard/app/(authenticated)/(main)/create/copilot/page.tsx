@@ -11,10 +11,10 @@ import Loader from "@/components/ui/Loader";
 import {
   CreateCopilotProvider,
   useCreateCopilot,
-} from "./_parts/CreateCopilotProvider";
+} from "./CreateCopilotProvider";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { SetCopilotName } from "./_parts/SetCopilotNameStep";
-import { DefineActionsStep } from "./_parts/DefineActionsStep";
+import { SetCopilotName } from "./SetCopilotNameStep";
+import { DefineActionsStep } from "./DefineActionsStep";
 import { motion } from "framer-motion";
 
 function Header() {
