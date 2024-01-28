@@ -1,10 +1,17 @@
 'use client';
-import React from 'react'
-import { Dialog, DialogCancel, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import React, { useState } from 'react'
+import { Dialog, DialogCancel, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { GetActionsFromSwagger } from '@/components/domain/SwaggerUpload';
 import { Upload, ZapIcon } from 'lucide-react';
-export function SwaggerUpload() {
+import { useSwaggerAdd } from '@/hooks/useAddSwagger';
+import _ from 'lodash';
+import { Tooltip } from '@/components/domain/Tooltip';
+
+export function SwaggerUpload({ copilotId }: { copilotId: string }) {
+    const [state, addSwagger] = useSwaggerAdd({ copilotId })
+    const [swaggerFiles, setSwaggerFiles] = useState<File[]>([]);
+    const isEmpty = _.isEmpty(swaggerFiles)
     return (
         <Dialog>
             <DialogContent>
@@ -14,9 +21,19 @@ export function SwaggerUpload() {
                         Get actions from a swagger file
                     </DialogTitle>
                 </DialogHeader>
-                <GetActionsFromSwagger />
+                <GetActionsFromSwagger swaggerFiles={swaggerFiles} onChange={setSwaggerFiles} />
                 <DialogFooter>
-                    <Button>
+                    <Button disabled={isEmpty} loading={state.loading} onClick={async () => {
+                        const swag = swaggerFiles.at(0);
+                        if (swag) {
+                            addSwagger({
+                                swagger: swag,
+                                onSuccess(data) {
+                                    setSwaggerFiles([])
+                                },
+                            })
+                        }
+                    }}>
                         Upload
                         <Upload className='size-4 ms-2' />
                     </Button>
@@ -27,12 +44,14 @@ export function SwaggerUpload() {
                     </DialogCancel>
                 </DialogFooter>
             </DialogContent>
-            <DialogTrigger asChild>
-                <Button variant='outline'>
-                    <Upload className='size-4 me-1' />
-                    Upload
-                </Button>
-            </DialogTrigger>
+            <Tooltip content="Upload swagger file and extract the actions out from it ">
+                <DialogTrigger asChild>
+                    <Button variant='outline'>
+                        <Upload className='size-4 me-1' />
+                        Upload
+                    </Button>
+                </DialogTrigger>
+            </Tooltip>
         </Dialog>
     )
 }

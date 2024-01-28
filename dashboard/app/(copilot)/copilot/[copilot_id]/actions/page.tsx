@@ -32,7 +32,7 @@ export default function ActionsPage({ params }: Props) {
                 </div>
                 <div className='space-x-2'>
                     <Button onClick={() => setActionFormState(true)} variant='default'>Create</Button>
-                    <SwaggerUpload />
+                    <SwaggerUpload copilotId={params.copilot_id}/>
                 </div>
             </HeaderShell>
             <AddActionDrawer />
