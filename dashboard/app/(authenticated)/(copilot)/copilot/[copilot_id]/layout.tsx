@@ -22,7 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { CopilotProvider } from "../_context/CopilotProvider";
+import { CopilotProvider } from "../CopilotProvider";
 import { Link } from "@/lib/router-events";
 import { Logo } from "@/components/domain/Logo";
 import { SearchBtn } from "../../_parts/SearchBtn";

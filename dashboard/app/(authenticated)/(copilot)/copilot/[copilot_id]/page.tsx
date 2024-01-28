@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Wand2, Inspect, Search } from "lucide-react";
 import { Link } from "@/lib/router-events";
 import React from "react";
-import { useCopilot } from "../_context/CopilotProvider";
+import { useCopilot } from "../CopilotProvider";
 import dynamic from "next/dynamic";
 import { useSearchModal } from "@/app/search-modal-atom";
 

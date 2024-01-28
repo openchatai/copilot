@@ -21,9 +21,9 @@ import { createFlowByBotId } from "@/data/new_flows";
 import { useAsyncFn } from "react-use";
 import { atom, useAtom } from "jotai";
 import { useRouter } from "@/lib/router-events";
-import { useCopilot } from "@/app/(copilot)/copilot/_context/CopilotProvider";
 import { revalidateWorkflows } from "./WorkflowsTable";
 import { toast } from "sonner";
+import { useCopilot } from "../../../../CopilotProvider";
 
 const formSchema = z.object({
   name: z.string().min(2, {

@@ -8,13 +8,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAsyncFn } from 'react-use';
 import { createDynamicFlowsByBotId } from '@/data/new_flows';
 import { z } from 'zod';
-import { useCopilot } from '@/app/(copilot)/copilot/_context/CopilotProvider';
 import { useController } from './Controller';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Sparkles } from "lucide-react";
 import { toast } from 'sonner';
+import { useCopilot } from '@/app/(authenticated)/(copilot)/copilot/CopilotProvider';
 
 const schema = z.object({
     prompt: z.string().min(20)

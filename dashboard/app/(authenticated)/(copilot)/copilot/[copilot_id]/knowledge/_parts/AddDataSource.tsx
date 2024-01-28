@@ -22,7 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Plus, RefreshCw, Trash } from "lucide-react";
 import { ingestDataSources, uploadFile } from "@/data/knowledge";
-import { useCopilot } from "../../../_context/CopilotProvider";
+import { useCopilot } from "../../../CopilotProvider";
 import _ from "lodash";
 import useSWR from "swr";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";

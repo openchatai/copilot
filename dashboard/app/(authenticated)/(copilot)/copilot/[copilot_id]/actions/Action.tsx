@@ -8,7 +8,7 @@ import { Stack } from "@/components/ui/Stack";
 import { ActionForm } from "@/components/domain/action-form/ActionForm";
 import { ActionWithModifiedParametersResponse } from "@/data/actions";
 import { useDeleteAction, useUpdateAction } from "@/hooks/useActions";
-import { useCopilot } from "../../_context/CopilotProvider";
+import { useCopilot } from "../../CopilotProvider";
 
 export function Action({ getValue, original }: Row<ActionWithModifiedParametersResponse>) {
     const {

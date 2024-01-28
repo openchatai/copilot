@@ -1,6 +1,6 @@
-import { SubNavLink } from "@/app/(copilot)/_parts/SubNavLink";
-import { BrainCircuit, Settings2, Variable } from "lucide-react";
+import { BrainCircuit, Settings2 } from "lucide-react";
 import React from "react";
+import { SubNavLink } from "../../../_parts/SubNavLink";
 
 type Props = {
   children: React.ReactNode;

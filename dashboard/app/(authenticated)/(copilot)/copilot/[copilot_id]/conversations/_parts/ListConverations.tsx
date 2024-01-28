@@ -3,7 +3,7 @@ import { useAtom } from "jotai";
 import { activeSessionId, conversationsPageNum } from "./atoms";
 import { cn } from "@/lib/utils";
 import useSWR from "swr";
-import { useCopilot } from "../../../_context/CopilotProvider";
+import { useCopilot } from "../../../CopilotProvider";
 import { ConversationType, getSessionsByBotId } from "@/data/conversations";
 import { format } from 'timeago.js';
 import _ from "lodash";

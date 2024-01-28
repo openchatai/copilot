@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { HeaderShell } from "@/components/domain/HeaderShell";
-import { useCopilot } from "../../_context/CopilotProvider";
+import { useCopilot } from "../../CopilotProvider";
 import {
   AlertDialog,
   AlertDialogCancel,

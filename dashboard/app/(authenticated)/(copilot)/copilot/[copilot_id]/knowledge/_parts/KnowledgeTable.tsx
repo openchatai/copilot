@@ -35,7 +35,7 @@ import { searchQueryAtom } from "./searchAtom";
 import { EmptyBlock } from "@/components/domain/EmptyBlock";
 import useSWR from "swr";
 import { Datasource, getDataSourcesByBotId } from "@/data/knowledge";
-import { useCopilot } from "../../../_context/CopilotProvider";
+import { useCopilot } from "../../../CopilotProvider";
 import { Link } from "@/lib/router-events";
 import { format } from 'timeago.js'
 import { DataTablePagination } from "@/components/ui/TablePagination";

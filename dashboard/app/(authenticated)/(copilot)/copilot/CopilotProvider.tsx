@@ -1,11 +1,11 @@
 "use client";
-import Loading from "@/app/(main)/loading";
 import { CopilotType, getCopilot } from "@/data/copilot";
 import { createSafeContext } from "@/lib/createSafeContext";
 import { useParams } from "next/navigation";
 import React from "react";
 import useSwr, { mutate } from "swr";
-import { CopilotNotFound } from "../../_parts/CopilotNotFound";
+import { CopilotNotFound } from "../_parts/CopilotNotFound";
+import Loader from "@/components/ui/Loader";
 
 const revalidateCopilot = (copilotId: string) => mutate(copilotId);
 
@@ -19,7 +19,7 @@ function CopilotProvider({ children }: { children: React.ReactNode }) {
   if (isLoading) {
     return (
       <div className="flex-center h-full">
-        <Loading />
+        <Loader />
       </div>
     );
   }

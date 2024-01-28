@@ -7,9 +7,9 @@ import {
 import { Link } from "@/lib/router-events";
 import { Logo } from "@/components/domain/Logo";
 import { Tooltip } from "@/components/domain/Tooltip";
-import { CopilotLayoutNavLink } from "@/app/(copilot)/_parts/CopilotNavLink";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { CopilotLayoutNavLink } from "../../(copilot)/_parts/CopilotNavLink";
 
 export default function Aside() {
   return (

@@ -9,7 +9,7 @@ import { PlusCircle } from 'lucide-react';
 import { useAsyncFn } from 'react-use';
 import { VariableType, createVariable } from '@/data/copilot';
 import _ from 'lodash';
-import { useCopilot } from '../../_context/CopilotProvider';
+import { useCopilot } from '../../CopilotProvider';
 import { toast } from 'sonner';
 
 type Props = {

@@ -1,10 +1,10 @@
-import { SubNavLink } from "@/app/(copilot)/_parts/SubNavLink";
 import { HeaderShell } from "@/components/domain/HeaderShell";
 import { Library, Link2 } from "lucide-react";
 import React from "react";
 import { SearchBox } from "./_parts/SearchBox";
 import { AddDataSource } from "./_parts/AddDataSource";
 import { Link } from "@/lib/router-events";
+import { SubNavLink } from "../../../_parts/SubNavLink";
 type Props = {
   children: React.ReactNode;
   params: {

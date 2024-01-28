@@ -8,7 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { contexts } from "./_parts/data/contexts";
 import { TextDisplay } from "@/components/headless/TextDisplay";
 import { updateCopilot } from "@/data/copilot";
-import { revalidateCopilot, useCopilot } from "../../../_context/CopilotProvider";
+import { revalidateCopilot, useCopilot } from "../../../CopilotProvider";
 import { toast } from "sonner";
 
 export default function CopilotContextSettingsPage() {
