@@ -3,8 +3,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
 import { Workflow } from 'lucide-react'
 import React from 'react'
-import CreateWorkflowForm from './_parts/CreateWorkflowForm'
-import WorkflowsTable from './_parts/WorkflowsTable'
+import CreateWorkflowForm from './CreateWorkflowForm'
+import WorkflowsTable from './WorkflowsTable'
 
 type Props = {
     params: {

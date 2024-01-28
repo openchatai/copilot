@@ -7,7 +7,7 @@ import useSWR, { mutate } from 'swr';
 import { getFlowsByBotId } from '@/data/new_flows';
 import _ from 'lodash';
 import { EmptyBlock } from '@/components/domain/EmptyBlock';
-import { useCopilot } from '../../../../CopilotProvider';
+import { useCopilot } from '../../../CopilotProvider';
 export const revalidateWorkflows = (copilot_id: string) => mutate(copilot_id + '/workflows')
 
 function WorkflowsTable() {
