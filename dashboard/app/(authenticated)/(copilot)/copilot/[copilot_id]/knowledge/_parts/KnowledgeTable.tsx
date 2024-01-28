@@ -34,19 +34,12 @@ import { useAtomValue } from "jotai";
 import { searchQueryAtom } from "./searchAtom";
 import { EmptyBlock } from "@/components/domain/EmptyBlock";
 import useSWR from "swr";
-import { Datasource, getDataSourcesByBotId } from "@/data/knowledge";
+import { DataSources, getDataSourcesByBotId } from "@/data/knowledge";
 import { useCopilot } from "../../../CopilotProvider";
 import { Link } from "@/lib/router-events";
 import { format } from 'timeago.js'
 import { DataTablePagination } from "@/components/ui/TablePagination";
-export type DataSources = {
-  id: string;
-  name: string;
-  type: string;
-  status: Datasource['status'];
-  date: Date | number | string;
-  source: string;
-};
+
 const columns: ColumnDef<DataSources>[] = [
   {
     id: "select",
@@ -135,36 +128,7 @@ export function KnowledgeTable() {
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
   const {
     data: dataSources,
-  } = useSWR<DataSources[]>(copilotId + '/data_sources', async () => {
-    const resp = await getDataSourcesByBotId(copilotId);
-    const data: DataSources[] = [];
-    if (resp.data.web_sources) {
-      resp.data.web_sources.forEach((item) => {
-        data.push({
-          id: item.id,
-          name: item.source,
-          type: "URL",
-          status: item.status,
-          date: item.updated_at,
-          source: item.source,
-        });
-      });
-    }
-    if (resp.data.pdf_sources) {
-      resp.data.pdf_sources.forEach((item) => {
-        data.push({
-          id: item.id,
-          name: item.source,
-          type: "File",
-          status: item.status,
-          date: item.updated_at,
-          source: item.source,
-        });
-      });
-    }
-
-    return data
-  }, {
+  } = useSWR<DataSources[]>(copilotId + '/data_sources', async () => getDataSourcesByBotId(copilotId), {
     refreshInterval: 1000 * 10,
   })
   const table = useReactTable({
@@ -209,7 +173,7 @@ export function KnowledgeTable() {
   const selection = table?.getSelectedRowModel();
   return (
     <HoverCard open={!_.isEmpty(selection.rows)}>
-      <Table wrapperClassName="rounded-none">
+      <Table wrapperClassName="rounded-none border-b-0">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
@@ -267,7 +231,7 @@ export function KnowledgeTable() {
           </TableBody>
         </HoverCardTrigger>
       </Table>
-      <div className="p-4">
+      <div className="sticky bottom-0 w-full inset-x-0 container flex items-center justify-between bg-white/80 border-t backdrop-blur-sm h-header">
         <DataTablePagination table={table} />
       </div>
       <HoverCardContent
