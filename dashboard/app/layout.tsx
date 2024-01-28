@@ -3,7 +3,6 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Tv2 } from "lucide-react";
 import { IS_DEV } from "@/lib/consts";
-import { SearchModal } from "./(main)/_parts/SearchModal";
 import React from "react";
 import { SWRProvider } from "./swr-provider";
 import { Toaster } from "@/components/ui/sonner"
@@ -49,9 +48,6 @@ export default function RootLayout({
                 </p>
               </div>
             </div>
-
-            {/* search modal */}
-            <SearchModal />
             {/* Toaster */}
             <Toaster />
             <TopLoader

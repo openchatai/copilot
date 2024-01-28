@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetClose, SheetFooter } from "@/components/ui/sheet";
 import { atom, useAtom } from "jotai";
 import { ActionForm, ActionWithModifiedParameters } from "../action-form/ActionForm";
-import { useCopilot } from "@/app/(copilot)/copilot/_context/CopilotProvider";
 import { useCreateAction } from "@/hooks/useActions";
+import { useCopilot } from "@/app/(authenticated)/(copilot)/copilot/CopilotProvider";
 
 const addActionFormState = atom(false);
 export const useActionFormState = () => useAtom(addActionFormState);
