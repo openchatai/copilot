@@ -1,4 +1,8 @@
-import { Context } from "../ContextSelector";
+export interface Context {
+  id: string;
+  name: string;
+  content: string;
+}
 
 export const contexts: Context[] = [
   {
