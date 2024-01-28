@@ -8,8 +8,8 @@ import { syncWorkflowById as $syncWorkflowById, getFlowById } from '@/data/new_f
 import useSWR from 'swr'
 import { getActionsByBotId } from '@/data/actions'
 import _, { uniqueId } from 'lodash'
-import { useCopilot } from '@/app/(copilot)/copilot/_context/CopilotProvider'
 import { toast } from 'sonner'
+import { useCopilot } from '../../../../CopilotProvider'
 
 type Props = {
     children: React.ReactNode;
