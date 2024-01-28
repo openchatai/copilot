@@ -1,11 +1,12 @@
 'use client';
 import { HeaderShell } from '@/components/domain/HeaderShell'
-import { RouteIcon, Zap } from 'lucide-react';
+import { Zap } from 'lucide-react';
 import { ActionsDataGrid } from './ActionsDataGrid';
 import { Suspense } from 'react';
 import { Stack } from '@/components/ui/Stack';
 import { Button } from '@/components/ui/button';
 import { AddActionDrawer, useActionFormState } from '@/components/domain/new-flows-editor/addActionDrawer';
+import { SwaggerUpload } from './SwaggerUpload';
 
 type Props = {
     params: {
@@ -29,8 +30,9 @@ export default function ActionsPage({ params }: Props) {
                     <Zap size={24} />
                     <h1 className='text-lg font-semibold'>Actions</h1>
                 </div>
-                <div>
+                <div className='space-x-2'>
                     <Button onClick={() => setActionFormState(true)} variant='default'>Create</Button>
+                    <SwaggerUpload copilotId={params.copilot_id}/>
                 </div>
             </HeaderShell>
             <AddActionDrawer />

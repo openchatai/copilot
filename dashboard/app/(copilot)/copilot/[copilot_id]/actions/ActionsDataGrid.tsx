@@ -83,7 +83,7 @@ export function ActionsDataGrid({ copilot_id }: { copilot_id: string }) {
             </Stack>
             <div className="grid gap-4 grid-cols-12 mt-5">
                 {_.isEmpty(grid.getRowModel().rows) ?
-                    <EmptyBlock>
+                    <EmptyBlock className="col-span-full">
                         <h1 className="text-lg font-semibold">No actions found</h1>
                         <p className="text-sm text-gray-500">Create a new action to get started</p>
                     </EmptyBlock>
