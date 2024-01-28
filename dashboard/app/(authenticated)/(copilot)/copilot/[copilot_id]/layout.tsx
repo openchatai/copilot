@@ -11,7 +11,7 @@ import {
   MessagesSquare,
   Settings,
   Workflow,
-  SquareCode, Codesandbox, Route, Zap, PieChart
+  SquareCode, Codesandbox, Zap, PieChart
 } from "lucide-react";
 import React from "react";
 import { CopilotLayoutNavLink } from "../../_parts/CopilotNavLink";
@@ -87,7 +87,7 @@ export default function CopilotLayout({ children, params }: Props) {
           </div>
         </div>
         <div className="mx-auto pb-5 flex flex-col items-center gap-2">
-          <Separator className="mb-5" />
+          <Separator />
           <SearchBtn />
           <DropdownMenu modal={false}>
             <TooltipProvider>
@@ -95,11 +95,11 @@ export default function CopilotLayout({ children, params }: Props) {
                 <TooltipTrigger asChild>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      size="icon"
+                      size="fit"
                       variant="ghost"
-                      className="text-accent-foreground/50 transition-colors hover:text-primary"
+                      className="text-accent-foreground/50 rounded-full p-2.5 transition-colors hover:text-primary"
                     >
-                      <AlertCircle className="h-5 w-5" />
+                      <AlertCircle className="size-4" />
                     </Button>
                   </DropdownMenuTrigger>
                 </TooltipTrigger>

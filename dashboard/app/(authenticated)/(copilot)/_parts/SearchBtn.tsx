@@ -9,11 +9,11 @@ export function SearchBtn() {
     return (
         <Button
             size='fit'
-            variant='secondary'
+            variant='ghost'
             className='rounded-full p-2.5'
             onClick={() => setOpen(true)}
         >
-            <Search className="h-4 w-4" />
+            <Search className="size-4" />
         </Button>
     )
 }
