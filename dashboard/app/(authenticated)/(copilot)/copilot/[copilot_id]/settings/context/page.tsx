@@ -5,11 +5,11 @@ import { HeaderShell } from "@/components/domain/HeaderShell";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { contexts } from "./_parts/data/contexts";
 import { TextDisplay } from "@/components/headless/TextDisplay";
 import { updateCopilot } from "@/data/copilot";
 import { revalidateCopilot, useCopilot } from "../../../CopilotProvider";
 import { toast } from "sonner";
+import { contexts } from "./data";
 
 export default function CopilotContextSettingsPage() {
   const { id: copilotId, name: copilotName, prompt_message } = useCopilot();
