@@ -206,3 +206,24 @@
   background-size: var(--spacing) var(--spacing);
   background-color: var(--stripe-background);
 }
+
+
+@keyframes reflection-eff {
+  0% {
+    transform: translateY(-250px);
+  }
+
+  100% {
+    transform: translateY(250px);
+  }
+}
+.running-shadow-over-element::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  width: 250%;
+  height: 20px;
+  rotate: 45deg;
+  animation:reflection-eff infinite 2s linear alternate;
+  @apply bg-white/10;
+}
