@@ -10,8 +10,8 @@ datasource_workflow = Blueprint("datasource", __name__)
 
 @datasource_workflow.route("/b/<bot_id>", methods=["GET"])
 def get_data_sources(bot_id: str) -> Response:
-    limit = request.args.get("limit", 20)
-    offset = request.args.get("offset", 0)
+    limit = int(request.args.get("limit", 20))
+    offset = int(request.args.get("offset", 0))
 
     pdf_datasources = get_all_pdf_datasource_by_bot_id(bot_id, limit, offset)
 

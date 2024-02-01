@@ -4,6 +4,17 @@ import uuid
 from sqlalchemy import Column, String, DateTime, Boolean, Text, JSON
 
 from shared.models.opencopilot_db.database_setup import Base, engine
+from sqlalchemy import Integer
+
+
+class ChatbotSettings(Base):
+    __tablename__ = "chatbot_settings"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    max_pages_to_crawl = Column(Integer, default=10)
+
+    # ForeignKey relationship to reference chatbots table
+    chatbot_id = Column(String(36))
 
 
 class Chatbot(Base):

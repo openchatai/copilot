@@ -1,0 +1,232 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Telegram Bot API - Reduced",
+    "description": "Swagger/OpenAPI schema for selected Telegram Bot API functionalities.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.telegram.org/bot6438154723:AAGwMgQFM9UXM8TFmeYFq9voY1Sw0dQlKy8",
+      "description": "Main Telegram API server"
+    }
+  ],
+  "paths": {
+    "/setWebhook": {
+      "post": {
+        "description": "Use this method to specify a URL and receive incoming updates via an outgoing webhook.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "HTTPS URL to send updates to."
+                  }
+                },
+                "required": [
+                  "url"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A generic response from API methods",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "result": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/deleteWebhook": {
+      "post": {
+        "description": "Use this method to remove webhook integration.",
+        "responses": {
+          "200": {
+            "description": "A generic response from API methods",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "result": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/getUpdates": {
+      "post": {
+        "description": "Use this method to get updates from Telegram server.",
+        "responses": {
+          "200": {
+            "description": "Response for the getUpdates method",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "result": {
+                      "type": "array",
+                      "items": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sendMessage": {
+      "post": {
+        "description": "Use this method to send messages.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "chat_id": {
+                    "type": "integer",
+                    "description": "Unique identifier for the target chat or username of the target channel."
+                  },
+                  "text": {
+                    "type": "string",
+                    "description": "Text of the message to be sent."
+                  }
+                },
+                "required": [
+                  "chat_id",
+                  "text"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A generic response from API methods",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "result": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SetWebhookParameters": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "HTTPS URL to send updates to."
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "SendMessageParameters": {
+        "type": "object",
+        "properties": {
+          "chat_id": {
+            "type": "integer",
+            "description": "Unique identifier for the target chat or username of the target channel."
+          },
+          "text": {
+            "type": "string",
+            "description": "Text of the message to be sent."
+          }
+        },
+        "required": [
+          "chat_id",
+          "text"
+        ]
+      }
+    },
+    "responses": {
+      "DefaultResponse": {
+        "description": "A generic response from API methods",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetUpdatesResponse": {
+        "description": "Response for the getUpdates method",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "type": "array",
+                  "items": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

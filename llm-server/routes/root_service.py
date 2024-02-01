@@ -21,8 +21,6 @@ from flask_socketio import emit
 
 logger = CustomLogger(module_name=__name__)
 
-shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
-
 # Define constants for error messages
 BASE_PROMPT_REQUIRED = "base_prompt is required"
 TEXT_REQUIRED = "text is required"

@@ -22,3 +22,4 @@ yarn-error.log
 .dmypy.*
 
 test.html
+.aider*
