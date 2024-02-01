@@ -1,5 +1,5 @@
 import { useWidgetState } from "../contexts/WidgetState";
-import { X } from "lucide-react";
+import { AlertTriangle, X } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -7,41 +7,45 @@ import {
   DialogHeader,
   DialogTrigger,
 } from "./Dialog";
-import { useInitialData } from "@lib/contexts/InitialDataContext";
+import { Button } from "./Button";
+import { useInitialData } from "@lib/hooks/useInitialData";
 
 export default function ChatHeader() {
   const [, , SetState] = useWidgetState();
-  const {
-    data
-  } = useInitialData();
+  const { data } = useInitialData();
   return (
-    <header className="opencopilot-fade-in-top opencopilot-p-3 opencopilot-border-b opencopilot-border-b-black/10 opencopilot-w-full">
-      <div className="opencopilot-w-full opencopilot-flex opencopilot-items-center opencopilot-justify-between">
-        <h1 className="opencopilot-font-semibold opencopilot-text-sm">
+    <header className="p-3 border-b border-b-black/10 w-full">
+      <div className=" w-full flex items-center justify-between">
+        <h1 className="font-semibold text-sm">
           {data?.bot_name || "opencopilot"}
         </h1>
-        <div className="opencopilot-flex opencopilot-items-center opencopilot-gap-3">
+        <div className=" flex items-center gap-3">
           <Dialog>
             <DialogTrigger>
               <X size={20} />
             </DialogTrigger>
             <DialogContent>
-              <DialogHeader className="opencopilot-mx-auto">Are you sure?</DialogHeader>
-              <div className="opencopilot-space-y-1.5">
-                <DialogClose
-                  onClick={() => {
-                    // Close the widget after 500ms, IDK why but it solves the focus trap issue
-                    setTimeout(() => {
+              <DialogHeader>
+                <div className="mx-auto flex flex-col items-center justify-center">
+                  <span className="text-rose-500">
+                    <AlertTriangle className="size-10" />
+                  </span>
+                  <h2>are you sure?</h2>
+                </div>
+              </DialogHeader>
+              <div className="flex flex-row items-center justify-center gap-2">
+                <Button asChild variant="destructive" className="font-semibold">
+                  <DialogClose
+                    onClick={() => {
                       SetState(false);
-                    }, 100);
-                  }}
-                  className="opencopilot-block opencopilot-w-full opencopilot-px-2 opencopilot-text-white opencopilot-py-1 opencopilot-rounded-md !opencopilot-bg-rose-500"
-                >
-                  <span>Exit</span>
-                </DialogClose>
-                <DialogClose className="opencopilot-block opencopilot-w-full opencopilot-px-2 opencopilot-py-1 opencopilot-rounded-md opencopilot-text-black">
-                  <span>Cancel</span>
-                </DialogClose>
+                    }}
+                  >
+                    Yes, exit
+                  </DialogClose>
+                </Button>
+                <Button asChild variant="secondary" className="font-semibold">
+                  <DialogClose>No, Cancel</DialogClose>
+                </Button>
               </div>
             </DialogContent>
           </Dialog>

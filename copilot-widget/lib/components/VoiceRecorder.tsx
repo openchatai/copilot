@@ -56,12 +56,12 @@ export function VoiceRecorder({
       <TooltipTrigger asChild>
         <button
           onClick={handleClick}
-          className="opencopilot-flex opencopilot-items-center opencopilot-justify-center opencopilot-shrink-0 opencopilot-bg-emerald-500 opencopilot-rounded-full opencopilot-size-6 [&>svg]:opencopilot-size-4"
+          className="flex items-center justify-center shrink-0 bg-emerald-500 rounded-full size-6 [&>svg]:size-4"
         >
           {isRecording ? (
-            <Square strokeLinecap="round" className="opencopilot-text-accent" />
+            <Square strokeLinecap="round" className="text-accent" />
           ) : (
-            <MicIcon strokeLinecap="round" className="opencopilot-text-white" />
+            <MicIcon strokeLinecap="round" className="text-white" />
           )}
         </button>
       </TooltipTrigger>

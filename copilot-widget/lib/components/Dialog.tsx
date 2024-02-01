@@ -1,102 +1,137 @@
-"use client";
-
-import * as React from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { createSafeContext } from "@lib/contexts/create-safe-context";
 import cn from "@lib/utils/cn";
-const Dialog = DialogPrimitive.Root;
-const DialogClose = DialogPrimitive.Close;
-const DialogTrigger = DialogPrimitive.Trigger;
+import {
+  ElementRef,
+  ComponentPropsWithoutRef,
+  forwardRef,
+  useState,
+} from "react";
 
-const DialogPortal = DialogPrimitive.Portal;
+type DialogProps = {
+  open?: boolean;
+  children: React.ReactNode;
+  onOpenChange?: (open: boolean) => void;
+};
 
-const DialogOverlay = DialogPrimitive.Overlay;
+const [useDialog, DialogProvider] = createSafeContext<{
+  open: boolean;
+  set: (open: boolean) => void;
+}>();
 
-const DialogContent = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <DialogOverlay className="opencopilot-absolute opencopilot-inset-0 opencopilot-z-50 opencopilot-bg-black/50 opencopilot-backdrop-blur-sm data-[state=open]:opencopilot-animate-in data-[state=closed]:opencopilot-animate-out data-[state=closed]:opencopilot-fade-out-0 data-[state=open]:opencopilot-fade-in-0">
-    <DialogPrimitive.Content
-      ref={ref}
+function Dialog({ children, ...props }: DialogProps) {
+  const [open, setOpen] = useState(props.open || false);
+  function set(to: boolean) {
+    setOpen(to);
+    props.onOpenChange?.(to);
+  }
+  return <DialogProvider value={{ open, set }}>{children}</DialogProvider>;
+}
+
+const DialogTrigger = forwardRef<
+  ElementRef<"button">,
+  ComponentPropsWithoutRef<"button">
+>(({ className, onClick, ...props }, _ref) => {
+  const { set, open } = useDialog();
+  return (
+    <button
+      data-state={open ? "open" : "closed"}
+      onClick={(ev) => {
+        onClick?.(ev);
+        set(true);
+      }}
+      className={cn("", className)}
+      ref={_ref}
+      {...props}
+    />
+  );
+});
+DialogTrigger.displayName = "DialogTrigger";
+
+const DialogOverlay = forwardRef<
+  ElementRef<"div">,
+  ComponentPropsWithoutRef<"div">
+>(({ className, ...props }, ref) => {
+  const { open } = useDialog();
+  return (
+    <div
+      {...props}
+      data-state={open ? "open" : "closed"}
       className={cn(
-        "opencopilot-rounded-t-lg opencopilot-z-[100] opencopilot-absolute opencopilot-bottom-0 opencopilot-duration-300 opencopilot-w-full opencopilot-grid opencopilot-max-w-lg opencopilot-bg-white opencopilot-gap-4 opencopilot-shadow-lg opencopilot-p-6 opencopilot-animate-in data-[state=closed]:opencopilot-animate-out data-[state=closed]:opencopilot-fade-out-0 data-[state=open]:opencopilot-fade-in-0 data-[state=closed]:slide-out-to-bottom data-[state=open]:opencopilot-slide-in-from-bottom",
+        "absolute flex items-center justify-center overflow-hidden inset-0 z-50 bg-black/50 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         className
       )}
+      ref={ref}
+    />
+  );
+});
+DialogOverlay.displayName = "DialogOverlay";
+
+const DialogContent = forwardRef<
+  ElementRef<"div">,
+  ComponentPropsWithoutRef<"div">
+>(({ className, ...props }, ref) => {
+  const { open } = useDialog();
+  return (
+    open && (
+      <DialogOverlay>
+        <div
+          {...props}
+          data-state={open ? "open" : "closed"}
+          className={cn(
+            "rounded-lg z-[100] w-full grid max-w-[70%] min-w-fit bg-white gap-2 shadow-lg p-4 animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+            className
+          )}
+          ref={ref}
+        />
+      </DialogOverlay>
+    )
+  );
+});
+DialogContent.displayName = "DialogContent";
+
+const DialogClose = forwardRef<
+  ElementRef<"button">,
+  ComponentPropsWithoutRef<"button">
+>(({ className, onClick, ...props }, ref) => {
+  const { set } = useDialog();
+  return (
+    <button
       {...props}
-    >
-      {children}
-    </DialogPrimitive.Content>
-  </DialogOverlay>
-));
-DialogContent.displayName = DialogPrimitive.Content.displayName;
+      onClick={(ev) => {
+        onClick?.(ev);
+        set(false);
+      }}
+      className={cn("", className)}
+      ref={ref}
+    />
+  );
+});
+DialogClose.displayName = "DialogClose";
 
-const DialogHeader = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn(
-      "opencopilot-flex opencopilot-flex-col opencopilot-space-y-1.5 opencopilot-text-center sm:opencopilot-text-left",
-      className
-    )}
-    {...props}
-  />
-);
+const DialogHeader = forwardRef<
+  ElementRef<"div">,
+  ComponentPropsWithoutRef<"div">
+>(({ className, ...props }, ref) => {
+  const { open } = useDialog();
+  return (
+    <div
+      {...props}
+      data-state={open ? "open" : "closed"}
+      className={cn(
+        "flex flex-col space-y-1.5 text-center sm:text-left",
+        className
+      )}
+      ref={ref}
+    />
+  );
+});
 DialogHeader.displayName = "DialogHeader";
-
-const DialogFooter = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn(
-      "opencopilot-flex opencopilot-flex-col-reverse sm:opencopilot-flex-row sm:opencopilot-justify-end sm:opencopilot-space-x-2",
-      className
-    )}
-    {...props}
-  />
-);
-DialogFooter.displayName = "DialogFooter";
-
-const DialogTitle = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Title>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Title
-    ref={ref}
-    className={cn(
-      "opencopilot-text-lg opencopilot-font-semibold opencopilot-leading-none opencopilot-tracking-tight",
-      className
-    )}
-    {...props}
-  />
-));
-DialogTitle.displayName = DialogPrimitive.Title.displayName;
-
-const DialogDescription = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Description>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Description
-    ref={ref}
-    className={cn(
-      "opencopilot-text-sm opencopilot-text-muted-foreground",
-      className
-    )}
-    {...props}
-  />
-));
-DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
 export {
   Dialog,
-  DialogPortal,
-  DialogOverlay,
   DialogTrigger,
+  DialogOverlay,
   DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
   DialogClose,
+  DialogHeader,
 };

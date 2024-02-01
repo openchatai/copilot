@@ -7,9 +7,6 @@ import io from 'socket.io-client';
 import { useSessionId } from "@lib/hooks/useSessionId";
 import { BotResponse, UserMessage } from "@lib/types/messageTypes";
 import { createSafeContext } from "./create-safe-context";
-import { getInitialData } from "@lib/data/chat";
-import { historyToMessages } from "@lib/utils/historyToMessages";
-import { useAxiosInstance } from "./axiosInstance";
 
 export type FailedMessage = {
   message: Message;
@@ -33,7 +30,6 @@ const [
 
 
 const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { axiosInstance } = useAxiosInstance();
   const [currentMessagePair, setCurrentMessagePair] = useState<{ user: string; bot: string } | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const config = useConfigData();
@@ -43,12 +39,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const setLastMessageId = useCallback((id: number | null) => {
     setLastMessageToVote(id)
   }, [])
-  useEffect(() => {
-    getInitialData(axiosInstance).then((data) => {
-      setMessages(historyToMessages(data.history))
-    })
-  }, [axiosInstance]);
-
+  
   const socket = useMemo(() => io(config.socketUrl, {
     extraHeaders: {
       "X-Bot-Token": config.token,
