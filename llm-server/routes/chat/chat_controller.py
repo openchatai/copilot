@@ -232,9 +232,7 @@ async def handle_chat_send_common(
         if result.error:
             logger.error("chat_conversation_error", message=result.error)
 
-        emit(session_id, "|im_end|") if is_streaming else jsonify(
-            {"type": "text", "response": {"text": result.message}}
-        )
+        return jsonify({"type": "text", "response": {"text": result.message}})
     except Exception as e:
         logger.error(
             "An exception occurred",
@@ -272,6 +270,7 @@ def session_counts_by_user(email: str):
 def m_called_actions_by_bot(bot_id: str):
     response = most_called_actions_by_bot(bot_id)
     return jsonify(response)
+
 
 @chat_workflow.route("/transcribe", methods=["POST"])
 async def transcribe_audio():

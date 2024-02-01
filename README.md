@@ -1,10 +1,12 @@
-
+<a href="https://www.producthunt.com/posts/opencopilot-v2?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-opencopilot&#0045;v2" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=437173&theme=light" alt="OpenCopilot&#0032;v2 - Siri&#0044;&#0032;but&#0032;for&#0032;your&#0032;product | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
 | Get 1:1 support, Join the community (NEW!!) | 1 Click install | 
 |:-:|:-:|
 | [![](https://dcbadge.vercel.app/api/server/yjEgCgvefr)](https://discord.gg/yjEgCgvefr)| [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/openchatai/opencopilot)
  
 
+> [!TIP]
+> If you are looking for a managed version of OpenCopilot, [check out the cloud version ](https://cloud.opencopilot.so/) - it's production-ready with our latest planning engine that can handle and understand complex user requests. 
 
 
 
@@ -120,8 +122,6 @@ Most of the time, the copilot can figure out what actions to execute when the us
 Less than <10 lines of codes to implement on your web app or desktop app
 
 <img width="1445" alt="image" src="https://github.com/openchatai/OpenCopilot/assets/32633162/d2ad2597-9de2-4177-b894-7ce92dfd1fcd">
-
-
 
 
 

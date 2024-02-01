@@ -1,17 +1,21 @@
 "use client";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
-import { type ReactNode, forwardRef } from "react";
+import { forwardRef, ComponentProps } from "react";
 import cn from "../utils/cn";
 
 const TooltipTrigger = TooltipPrimitive.Trigger;
+const TooltipRoot = TooltipPrimitive.Root;
 
-function Tooltip({ children }: { children: ReactNode }) {
-  return (
-    <TooltipPrimitive.Provider>
-      <TooltipPrimitive.Root>{children}</TooltipPrimitive.Root>
-    </TooltipPrimitive.Provider>
-  );
-}
+const Tooltip = forwardRef(
+  ({ children, ...rest }: ComponentProps<typeof TooltipRoot>, ref) => {
+    return (
+      <TooltipPrimitive.Provider>
+        <TooltipRoot {...rest}>{children}</TooltipRoot>
+      </TooltipPrimitive.Provider>
+    );
+  }
+);
+
 Tooltip.displayName = "ToolTip";
 const TooltipContent = forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
@@ -24,21 +28,13 @@ const TooltipContent = forwardRef<
     sideOffset={sideOffset}
     dir="auto"
     className={cn(
-      "opencopilot-text-white opencopilot-rounded-md opencopilot-font-medium opencopilot-px-2 opencopilot-bg-black opencopilot-z-[50000] opencopilot-py-1 opencopilot-overflow-hidden opencopilot-shadow opencopilot-min-w-fit opencopilot-max-w-[15rem] opencopilot-p-1 opencopilot-text-xs",
-      "opencopilot-animate-in opencopilot-fade-in-0 opencopilot-slide-in-from-bottom-5 data-[state=closed]:animate-out data-[state=closed]:opencopilot-slide-in-from-top-0",
+      "text-white rounded-md font-medium px-2 bg-black z-[50000] py-1 overflow-hidden shadow min-w-fit max-w-[15rem] p-1 text-xs",
+      "animate-in  fade-in-0 slide-in-from-bottom-5 data-[state=closed]:animate-out data-[state=closed]:slide-in-from-top-0",
       className
     )}
     {...props}
   >
-    <>
-      {children}
-      <TooltipPrimitive.Arrow
-        className={cn(
-          "opencopilot-fill-current opencopilot-text-accent opencopilot-animate-in opencopilot-slide-in-from-top-1 opencopilot-ease-out data-[state=closed]:opencopilot-animate-out",
-          arrowClassName
-        )}
-      />
-    </>
+    {children}
   </TooltipPrimitive.Content>
 ));
 TooltipContent.displayName = TooltipPrimitive.Content.displayName;

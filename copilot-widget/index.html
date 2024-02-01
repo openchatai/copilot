@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en" dir="rtl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -61,11 +61,23 @@
       }
     </style>
     <script type="module" src="/src/main.tsx"></script>
+    <div class="some-class">some text here, this is a sample text</div>
+    <style>
+      .some-class {
+        background-color: #fff;
+        padding: 5px;
+        border-radius: 5px;
+        color: black;
+        position: fixed;
+        bottom: 10px;
+        right: 20px;
+      }
+    </style>
     <div id="opencopilot-root"></div>
     <script>
-      const token = "KIxFQavTJYV8aCXa";
-      const apiUrl = "http://localhost:8888/backend";
-      const socketUrl = "http://localhost:8888";
+      const token = "wDsimYsE6ac3ZV3o";
+      const apiUrl = "https://api.opencopilot.so/backend";
+      const socketUrl = "https://api.opencopilot.so";
     </script>
     <script>
       document.addEventListener("DOMContentLoaded", () => {
@@ -80,7 +92,7 @@
           containerProps: {}, // optional
           headers: {
             // optional
-            Authorization: "Bearer BQAlIe479yo16aXf",
+            // Authorization: "Bearer BQAlIe479yo16aXf",
           },
           user: {
             // optional

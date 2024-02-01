@@ -15,7 +15,7 @@ import _ from 'lodash';
 import { ActionWithModifiedParametersResponse } from '@/data/actions';
 import { MagicAction } from './MagicAction';
 import { SwaggerDnd } from './SwaggerDnd';
-import { useCopilot } from '@/app/(copilot)/copilot/_context/CopilotProvider';
+import { useCopilot } from '@/app/(authenticated)/(copilot)/copilot/CopilotProvider';
 
 const nodeTypes = {
     actionBlock

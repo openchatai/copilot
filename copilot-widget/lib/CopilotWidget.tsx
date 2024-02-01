@@ -5,7 +5,6 @@ import ChatScreenWithSfxs from "./screens/ChatScreen";
 import { IS_SERVER } from "./utils/is_server";
 
 function useTrigger(selector?: string, toggle?: () => void) {
-
   const trigger = useRef<HTMLElement | null>(
     !selector ? null : IS_SERVER ? null : document.querySelector(selector)
   ).current;
@@ -31,21 +30,17 @@ export function CopilotWidget({
   triggerSelector: string;
 }) {
   const [open, toggle] = useWidgetState();
-  useTrigger(triggerSelector, toggle)
+  useTrigger(triggerSelector, toggle);
   return (
     <div
       data-open={open}
       className={cn(
-        "opencopilot-w-full opencopilot-overflow-hidden opencopilot-h-full sm:opencopilot-rounded-xl opencopilot-bg-white opencopilot-shadow",
-        "opencopilot-opacity-0 opencopilot-transition-opacity opencopilot-ease",
-        open &&
-        "opencopilot-opacity-100 opencopilot-animate-in opencopilot-fade-in",
-        !open &&
-        "opencopilot-hidden opencopilot-animate-out opencopilot-fade-out"
+        "w-full overflow-hidden pointer-events-auto h-full rounded-lg bg-white shadow relative",
+        "opacity-0 transition-opacity ease",
+        open ? "opacity-100 animate-in fade-in" : "hidden animate-out fade-out"
       )}
     >
       <ChatScreenWithSfxs />
     </div>
-
   );
 }

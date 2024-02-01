@@ -7,6 +7,7 @@ import {
   rose,
   current,
   emerald,
+  gray,
 } from "tailwindcss/colors";
 const config: Config = {
   content: [
@@ -14,7 +15,6 @@ const config: Config = {
     "./index.html",
     "./lib/**/*.{tsx,ts,html}",
   ],
-  prefix: "opencopilot-",
   theme: {
     colors: {
       primary: "var(--opencopilot-primary-clr)",
@@ -25,6 +25,7 @@ const config: Config = {
       rose,
       current,
       emerald,
+      gray,
     },
   },
   plugins: [
