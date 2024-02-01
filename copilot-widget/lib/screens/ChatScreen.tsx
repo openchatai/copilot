@@ -28,13 +28,13 @@ function ChatScreen() {
   }, [messages, setPos]);
 
   return (
-    <div className="opencopilot-w-full opencopilot-flex opencopilot-h-full opencopilot-flex-col opencopilot-items-start opencopilot-relative">
+    <div className="w-full flex h-full flex-col items-start relative">
       <ChatHeader />
       <main
         ref={scrollElementRef}
-        className="opencopilot-flex-1 opencopilot-w-full opencopilot-overflow-x-hidden opencopilot-shrink-0 opencopilot-overflow-auto opencopilot-scrollbar-thin opencopilot-scroll-smooth"
+        className="flex-1 w-full overflow-x-hidden shrink-0 overflow-auto scrollbar-thin scroll-smooth"
       >
-        <div className="opencopilot-flex opencopilot-h-fit opencopilot-mt-auto opencopilot-flex-col opencopilot-py-2 opencopilot-max-h-full opencopilot-items-center opencopilot-gap-1 last:fade-in-right">
+        <div className="flex h-fit mt-auto flex-col py-2 max-h-full items-center gap-1 last:fade-in-right">
           {
             // If there are initial messages, show them
             initialMessage && <BotTextMessage message={initialMessage} />
