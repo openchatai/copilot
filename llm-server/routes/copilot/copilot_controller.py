@@ -143,9 +143,13 @@ def update_global_variables(copilot_id):
         # Handle other exceptions
         return jsonify({"error": "An error occurred", "details": str(e)}), 500
 
-@copilot.route("/<string:copilot_id>/variable/<string:variable_key>", methods=["DELETE"])
-def delete_global_variable(copilot_id:str, variable_key:str):
+
+@copilot.route(
+    "/<string:copilot_id>/variable/<string:variable_key>", methods=["DELETE"]
+)
+def delete_global_variable(copilot_id: str, variable_key: str):
     return delete_copilot_global_key(copilot_id=copilot_id, variable_key=variable_key)
+
 
 @copilot.route("/<string:copilot_id>/variables", methods=["GET"])
 def get_global_variables(copilot_id):

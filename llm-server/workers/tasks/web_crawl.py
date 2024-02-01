@@ -2,11 +2,11 @@ from typing import Optional
 from urllib.parse import urlparse, urljoin
 import requests
 from celery import shared_task
-from bs4 import BeautifulSoup
+
 import traceback
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from abc import ABC, abstractmethod
+
 from shared.utils.opencopilot_utils.init_vector_store import init_vector_store
 from shared.utils.opencopilot_utils.interfaces import StoreOptions
 from shared.models.opencopilot_db.website_data_sources import (
@@ -16,12 +16,12 @@ from shared.models.opencopilot_db.website_data_sources import (
 )
 from utils.llm_consts import max_pages_to_crawl
 from models.repository.copilot_settings import ChatbotSettingCRUD
+from workers.tasks.url_parsers import ParserFactory
 
 from workers.utils.remove_escape_sequences import remove_escape_sequences
 from utils.get_logger import CustomLogger
-import io
-import json
-from PyPDF2 import PdfReader
+
+from bs4 import BeautifulSoup
 
 logger = CustomLogger(__name__)
 
@@ -69,25 +69,9 @@ def get_links(url: str) -> list:
 
 def scrape_url(url: str) -> Optional[str]:
     try:
-        # Send a GET request to the URL
+        parser = ParserFactory.get_parser(url)
         response = requests.get(url)
-
-        # Check if the request was successful (status code 200)
-        if response.status_code == 200:
-            # Determine the content type
-            content_type = response.headers.get("Content-Type", "")
-
-            # Get the appropriate parser for the content type
-            parser = ParserFactory.get_parser(content_type)
-
-            # Parse the content
-            return parser.parse(response.text)
-        else:
-            # Log an error message if the request was not successful
-            logger.error(
-                f"Failed to retrieve content. Status code: {response.status_code}"
-            )
-            return None
+        return parser.parse(response.content)
     except ValueError as e:
         # Log an error message if no parser is available for the content type
         logger.error(str(e))
@@ -207,59 +191,3 @@ def resume_failed_website_scrape(website_data_source_id: str):
     url = website_data_source.url
 
     scrape_website(url, website_data_source.bot_id, max_pages_to_crawl)
-
-
-class ContentParser(ABC):
-    @abstractmethod
-    def parse(self, content):
-        pass
-
-
-class TextContentParser(ContentParser):
-    def parse(self, content):
-        soup = BeautifulSoup(content, "lxml")
-        text_content = " ".join(
-            [
-                p.text.strip()
-                for p in soup.find_all(["p", "h1", "h2", "h3", "h4", "h5", "h6"])
-            ]
-        )
-        return text_content
-
-
-class JsonContentParser(ContentParser):
-    def parse(self, content):
-        try:
-            json_data = json.loads(content)
-            # Convert JSON object to a string representation
-            return json.dumps(json_data, indent=2)
-        except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse JSON content: {e}")
-            return None
-
-
-class PDFContentParser(ContentParser):
-    def parse(self, content):
-        try:
-            with io.BytesIO(content) as pdf_file:
-                reader = PdfReader(pdf_file)
-                text_content = ""
-                for page in reader.pages:
-                    text_content += page.extract_text() + "\n"
-                return text_content
-        except Exception as e:
-            logger.error(f"Failed to parse PDF content: {e}")
-            return None
-
-
-class ParserFactory:
-    @staticmethod
-    def get_parser(content_type: str) -> ContentParser:
-        if "text" in content_type or "html":
-            return TextContentParser()
-        elif "application/json" in content_type:
-            return JsonContentParser()
-        elif "application/pdf" in content_type:
-            return PDFContentParser()
-        # Add more parsers as needed for different content types
-        raise ValueError(f"No parser available for content type: {content_type}")
