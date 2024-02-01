@@ -59,3 +59,13 @@ def get_website_data_source_by_id(website_data_source_id: str):
     ).get()
 
     return website_data_source
+
+
+def count_crawled_pages(bot_id: str) -> int:
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    # Count the number of website data sources with the given bot id
+    count = session.query(WebsiteDataSource).filter_by(chatbot_id=bot_id).count()
+
+    return count

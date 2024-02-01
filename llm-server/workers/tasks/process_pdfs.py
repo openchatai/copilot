@@ -2,7 +2,7 @@ import re
 from celery import shared_task
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-from langchain.document_loaders import PyPDFium2Loader
+from langchain.document_loaders import PyPDFLoader
 from shared.models.opencopilot_db.pdf_data_sources import (
     insert_pdf_data_source,
     update_pdf_data_source_status,
@@ -27,7 +27,7 @@ def process_pdf(file_name: str, bot_id: str):
     try:
         logger.info("Pdf task picked up", file_name=file_name, bot_id=bot_id)
         insert_pdf_data_source(chatbot_id=bot_id, file_name=file_name, status="PENDING")
-        loader = PyPDFium2Loader(get_file_path(file_name))
+        loader = PyPDFLoader(get_file_path(file_name))
         raw_docs = loader.load()
 
         # clean text
