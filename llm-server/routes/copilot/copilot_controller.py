@@ -1,4 +1,3 @@
-from copy import deepcopy
 import os
 from http import HTTPStatus
 
