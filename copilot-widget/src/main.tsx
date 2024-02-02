@@ -16,7 +16,12 @@ declare global {
  * @param rootId The id of the root element for more control, you don't need to use this unless you want more control over the widget
  * @description Initialize the widget
  */
-function initAiCoPilot({ triggerSelector, containerProps, rootId, ...options }: Options & { rootId?: string }) {
+function initAiCoPilot({
+  triggerSelector,
+  containerProps,
+  rootId,
+  ...options
+}: Options & { rootId?: string }) {
   const container = composeRoot(rootId ?? defaultRootId, rootId === undefined);
   createRoot(container).render(
     <Root
@@ -25,7 +30,7 @@ function initAiCoPilot({ triggerSelector, containerProps, rootId, ...options }: 
       }}
       containerProps={containerProps}
     >
-      <CopilotWidget triggerSelector={triggerSelector} />
+      <CopilotWidget triggerSelector={triggerSelector} __isEmbedded />
     </Root>
   );
 }
