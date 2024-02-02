@@ -30,12 +30,14 @@ const TRIGGER_RIGHT = "20px";
 
 export function CopilotWidget({
   triggerSelector,
+  __isEmbedded,
 }: {
-  triggerSelector: string;
+  triggerSelector?: string;
+  __isEmbedded?: boolean;
 }) {
   const [open, toggle] = useWidgetState();
   useTrigger(triggerSelector, toggle);
-  const SHOULD_RENDER_IN_THE_RIGHT_CORNER = !triggerSelector;
+  const SHOULD_RENDER_IN_THE_RIGHT_CORNER = !triggerSelector && __isEmbedded;
   return (
     <>
       <div
