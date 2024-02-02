@@ -83,7 +83,7 @@ class ParserFactory:
 
 def identify_content_type(url):
     try:
-        response = requests.get(url)
+        response = requests.head(url)
         response.raise_for_status()  # Raise an exception for HTTP errors
     except requests.exceptions.RequestException as e:
         print(f"Error fetching the content: {e}")
@@ -91,6 +91,8 @@ def identify_content_type(url):
 
     # Check the Content-Type header
     content_type = response.headers.get("Content-Type", "")
+
+    print(f"Content-Type: {content_type}")
 
     # Identify whether it's a PDF, HTML, or Text
     if "pdf" in content_type.lower():

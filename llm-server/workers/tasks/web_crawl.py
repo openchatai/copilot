@@ -32,10 +32,6 @@ def get_links(url: str) -> list:
     # Send a GET request to the URL
     response = requests.get(url)
 
-    # do not crawl pages that are not text
-    if not is_text_content(response):
-        return []
-
     # Check if the request was successful (status code 200)
     if response.status_code == 200:
         # Parse the HTML content using BeautifulSoup
@@ -71,16 +67,12 @@ def scrape_url(url: str) -> Optional[str]:
     try:
         parser = ParserFactory.get_parser(url)
         response = requests.get(url)
+
         return parser.parse(response.content)
     except ValueError as e:
         # Log an error message if no parser is available for the content type
         logger.error(str(e))
         return None
-
-
-def is_text_content(response):
-    # Check if the content type is text-based (you can customize this based on your needs)
-    return response.headers.get("Content-Type", "").startswith("text")
 
 
 def scrape_website(url: str, bot_id: str, max_pages: int) -> int:
