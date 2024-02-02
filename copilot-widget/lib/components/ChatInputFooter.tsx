@@ -1,13 +1,20 @@
 import TextareaAutosize from "react-textarea-autosize";
-import { SendHorizonal, Redo2 } from "lucide-react";
+import { SendHorizonal, AlertTriangle, RotateCcw } from "lucide-react";
 import { useChat } from "../contexts/Controller";
 import { useRef, useState } from "react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ToolTip";
 import { getId, isEmpty } from "@lib/utils/utils";
 import now from "@lib/utils/timenow";
 import { useDocumentDirection } from "@lib/hooks/useDocumentDirection";
 import { VoiceRecorder } from "./VoiceRecorder";
 import { useInitialData } from "@lib/hooks/useInitialData";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTrigger,
+} from "./Dialog";
+import { Button } from "./Button";
 
 function MessageSuggestions() {
   const { data } = useInitialData();
@@ -38,13 +45,44 @@ function MessageSuggestions() {
     </>
   );
 }
-// curl --location 'http://localhost:8888/backend/chat/transcribe' \
-// --form 'file=@"/Users/gharbat/Downloads/Neets.ai-example-us-female-2.mp3"'
-
+function ResetButtonWithConfirmation() {
+  const { reset } = useChat();
+  const [open, setOpen] = useState(false);
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger>
+        <RotateCcw size={20} />
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <div className="mx-auto flex flex-col items-center justify-center">
+            <span className="text-rose-500">
+              <AlertTriangle className="size-10" />
+            </span>
+            <h2>are you sure?</h2>
+          </div>
+        </DialogHeader>
+        <div className="flex flex-row items-center justify-center gap-2">
+          <Button
+            asChild
+            variant="destructive"
+            className="font-semibold"
+            onClick={reset}
+          >
+            <DialogClose>Yes, reset</DialogClose>
+          </Button>
+          <Button asChild variant="secondary" className="font-semibold">
+            <DialogClose>No, Cancel</DialogClose>
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 function ChatInputFooter() {
   const [input, setInput] = useState("");
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const { sendMessage, reset, messages } = useChat();
+  const { sendMessage } = useChat();
   const { loading } = useChat();
   const canSend = input.trim().length > 0;
   const { direction } = useDocumentDirection();
@@ -68,14 +106,15 @@ function ChatInputFooter() {
     }
   }
   return (
-    <footer className=" p-2  flex  w-full  flex-col  gap-2">
+    <footer className="p-2 flex w-full flex-col gap-2">
       <MessageSuggestions />
       <div className="w-full flex items-center ring-[#334155]/60 transition-colors justify-between ring-1 overflow-hidden focus-within:ring-primary gap-2 bg-accent p-2 rounded-2xl">
-        <div className=" flex-1">
+        <div className="flex-1">
           <TextareaAutosize
             dir="auto"
             ref={textAreaRef}
             autoFocus={true}
+            placeholder="_"
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
@@ -87,25 +126,14 @@ function ChatInputFooter() {
             rows={1}
             value={input}
             onChange={handleTextareaChange}
-            className=" w-full  resize-none  bg-transparent focus-visible:outline-none border-none focus:outline-none focus:border-none scrollbar-thin leading-tight whitespace-pre-wrap py-1.5 px-4 placeholder:align-middle overflow-auto outline-none text-accent2 text-[14px] placeholder:text-xs font-normal"
+            className=" w-full resize-none bg-transparent focus-visible:outline-none border-none focus:outline-none focus:border-none scrollbar-thin leading-tight whitespace-pre-wrap py-1.5 px-4 placeholder:align-middle overflow-auto outline-none text-accent2 text-[14px] placeholder:text-xs font-normal"
           />
         </div>
         <div
           dir={direction}
-          className="flex items-center  justify-center  gap-2  h-fit  px-2  text-lg"
+          className="flex items-center justify-center gap-2 h-fit px-2 text-lg"
         >
-          <Tooltip>
-            <TooltipTrigger asChild hidden>
-              <button
-                onClick={reset}
-                className=" text-xl disabled: opacity-40 disabled: pointer-events-none disabled: cursor-not-allowed  text-[#5e5c5e]  transition-all"
-                disabled={!(messages.length > 0)}
-              >
-                <Redo2 className="rtl: rotate-180" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>reset chat</TooltipContent>
-          </Tooltip>
+          <ResetButtonWithConfirmation />
           <VoiceRecorder onSuccess={(text) => setInput(text)} />
           <button
             onClick={handleInputSubmit}
