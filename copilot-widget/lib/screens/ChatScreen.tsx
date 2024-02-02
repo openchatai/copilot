@@ -65,7 +65,9 @@ function ChatScreen() {
               }
             }}
           />
-          {loading && conversationInfo && <BotMessageLoading displayText={conversationInfo} />}
+          {loading && conversationInfo && (
+            <BotMessageLoading displayText={conversationInfo} />
+          )}
           {failedMessage && <BotMessageError message={failedMessage} />}
         </div>
       </main>
@@ -74,7 +76,7 @@ function ChatScreen() {
   );
 }
 
-export default function ChatScreenWithSfxs() {
+export default function Widget() {
   return (
     <ChatProvider>
       <ChatScreen />

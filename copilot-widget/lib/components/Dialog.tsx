@@ -5,7 +5,9 @@ import {
   ComponentPropsWithoutRef,
   forwardRef,
   useState,
+  ReactNode,
 } from "react";
+import { Button } from "./Button";
 
 type DialogProps = {
   open?: boolean;
@@ -78,7 +80,7 @@ const DialogContent = forwardRef<
           {...props}
           data-state={open ? "open" : "closed"}
           className={cn(
-            "rounded-lg z-[100] w-full grid max-w-[70%] min-w-fit bg-white gap-2 shadow-lg p-4 animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+            "rounded-lg z-[100] w-full grid max-w-[70%] min-w-fit bg-white gap-2 shadow-lg p-4 animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom-3",
             className
           )}
           ref={ref}
