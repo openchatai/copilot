@@ -14,6 +14,7 @@ from routes.uploads.upload_controller import upload_controller
 from shared.models.opencopilot_db import create_database_schema
 from utils.config import Config
 from routes.chat.chat_dto import ChatInput
+from werkzeug.exceptions import HTTPException
 
 from flask_socketio import SocketIO
 from utils.get_logger import CustomLogger
@@ -34,7 +35,6 @@ app.register_blueprint(copilot, url_prefix="/backend/copilot")
 app.register_blueprint(upload_controller, url_prefix="/backend/uploads")
 app.register_blueprint(datasource_workflow, url_prefix="/backend/data_sources")
 app.register_blueprint(action, url_prefix="/backend/actions")
-from werkzeug.exceptions import HTTPException
 
 app.config.from_object(Config)
 
