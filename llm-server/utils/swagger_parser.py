@@ -18,15 +18,15 @@ logger = CustomLogger(__name__)
 
 class Endpoint:
     def __init__(
-            self,
-            operation_id,
-            endpoint_type,
-            name,
-            description,
-            request_body,
-            parameters,
-            response,
-            path,
+        self,
+        operation_id,
+        endpoint_type,
+        name,
+        description,
+        request_body,
+        parameters,
+        response,
+        path,
     ):
         self.operation_id = operation_id
         self.type = endpoint_type
@@ -233,9 +233,24 @@ class SwaggerParser:
                 # Process the payload to resolve any $ref references
                 processed_payload = self.process_payload(payload)
 
+                name = method_data.get(
+                    "operation_id",
+                    method_data.get(
+                        "name",
+                        method_data.get("summary", method_data.get("description")),
+                    ),
+                )
+                if name is None:
+                    logger.error(
+                        "operation_id_not_found",
+                        bot_id=bot_id,
+                        path=path,
+                        method=method,
+                    )
+
                 action_dto = ActionDTO(
                     api_endpoint=base_uri + path,
-                    name=method_data.get("name", method_data.get("summary", method_data.get('description'))),
+                    name=name,
                     description=method_data.get("description"),
                     request_type=method.upper(),
                     payload=processed_payload,
@@ -263,8 +278,8 @@ class SwaggerParser:
 
         for path, path_item in api_data["paths"].items():
             for http_verb, http_details in path_item.items():
-                summary = http_details.get("summary") or ""
-                description = http_details.get("description") or ""
+                summary = http_details.get("summary", "")
+                description = http_details.get("description", "")
                 # inconsistent tag behaviour..
                 # tags = (
                 #     ", ".join([t["name"] for t in http_details.get("tags", [])])

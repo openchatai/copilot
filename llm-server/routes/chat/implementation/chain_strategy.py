@@ -49,9 +49,11 @@ class ChainStrategy(ChatRequestHandler):
 
         top_documents = select_top_documents(actions + flows + knowledgebase)
 
-        emit(
-            f"{session_id}_info", "Checking if actionable ... \n"
-        ) if is_streaming else None
+        (
+            emit(f"{session_id}_info", "Checking if actionable ... \n")
+            if is_streaming
+            else None
+        )
         next_step = get_next_response_type(
             user_message=text,
             session_id=session_id,
@@ -59,10 +61,14 @@ class ChainStrategy(ChatRequestHandler):
             top_documents=top_documents,
         )
 
-        emit(
-            f"{session_id}_info",
-            f"Is next step actionable: {next_step.actionable}... \n",
-        ) if is_streaming else None
+        (
+            emit(
+                f"{session_id}_info",
+                f"Is next step actionable: {next_step.actionable}... \n",
+            )
+            if is_streaming
+            else None
+        )
         if next_step.actionable and next_step.api:
             # if the LLM given operationID is actually exist, then use it, otherwise fallback to the highest vector space document
             llm_predicted_operation_id = (
@@ -78,9 +84,11 @@ class ChainStrategy(ChatRequestHandler):
                     [VectorCollections.actions, VectorCollections.flows],
                 )
             # now run it
-            emit(
-                f"{session_id}_info", "Executing the actionable item... \n"
-            ) if is_streaming else None
+            (
+                emit(f"{session_id}_info", "Executing the actionable item... \n")
+                if is_streaming
+                else None
+            )
             response = await run_actionable_item(
                 bot_id=bot_id,
                 actionable_item=actionable_item,
@@ -92,20 +100,26 @@ class ChainStrategy(ChatRequestHandler):
             )
 
             response.api_called = True
-            add_action_call(
-                operation_id=actionable_item["actions"][0].document.metadata.get(
-                    "operation_id", ""
-                ),
-                session_id=session_id,
-                bot_id=bot_id,
-            )
+            if (
+                actionable_item
+                and "actions" in actionable_item
+                and actionable_item["actions"]
+            ):
+                action = actionable_item["actions"][0]
+                operation_id = action.document.metadata.get("operation_id", "")
+                add_action_call(
+                    operation_id=operation_id, session_id=session_id, bot_id=bot_id
+                )
             return response
+
         else:
             # it means that the user query is "informative" and can be answered using text only
             # get the top knowledgeable documents (if any)
-            emit(
-                f"{session_id}_info", "Running informative action... \n"
-            ) if is_streaming else None
+            (
+                emit(f"{session_id}_info", "Running informative action... \n")
+                if is_streaming
+                else None
+            )
             response = await run_informative_item(
                 informative_item=top_documents,
                 base_prompt=base_prompt,

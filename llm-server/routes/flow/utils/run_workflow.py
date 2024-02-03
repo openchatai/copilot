@@ -60,5 +60,5 @@ async def run_flow(
         error=output["error"],
         message=output["response"],
         api_called=True,
-        action_ids=flow.get_all_action_ids(),
+        operation_ids=flow.get_all_action_ids(),
     )
