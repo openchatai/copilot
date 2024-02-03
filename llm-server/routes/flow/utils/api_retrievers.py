@@ -31,7 +31,7 @@ score_thresholds: Dict[str, float] = {
 
 
 async def get_relevant_documents(
-    text: str, bot_id: str, collection_name: str
+    text: str, bot_id: str, collection_name: str, limit=4
 ) -> List[DocumentSimilarityDTO]:
     try:
         embedding = get_embeddings()
@@ -49,7 +49,7 @@ async def get_relevant_documents(
             ),
             query_vector=query_vector,
             with_payload=True,
-            limit=4,
+            limit=limit,
             search_params=models.SearchParams(hnsw_ef=128, exact=False),
             score_threshold=score_thresholds.get(collection_name, 0.0),
         )
@@ -86,7 +86,9 @@ async def get_relevant_documents(
 
 
 async def get_relevant_actions(text: str, bot_id: str) -> List[DocumentSimilarityDTO]:
-    return await get_relevant_documents(text, bot_id, VectorCollections.actions)
+    return await get_relevant_documents(
+        text, bot_id, VectorCollections.actions, limit=7
+    )
 
 
 async def get_relevant_flows(text: str, bot_id: str) -> List[DocumentSimilarityDTO]:
