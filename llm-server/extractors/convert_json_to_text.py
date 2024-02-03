@@ -67,6 +67,32 @@ def convert_json_error_to_text(error: str, is_streaming: bool, session_id: str) 
     return cast(str, result)
 
 
+def create_readable_error(
+    user_input: str, error: str, is_streaming: bool, session_id: str
+) -> str:
+    # Define a system message requesting the LLM to explain the API error in user-friendly language
+    system_message = SystemMessage(
+        content="""As an AI chat assistant, your role involves transforming schema error messages into easily understandable language for humans. 
+    - Prompt the user to correct the values causing the schema errors.
+    - Clearly explain to users what is wrong with the values causing the errors.
+    - Be very concise, group all required errors in one sentence, validation errors should be shown separately. 
+    - Tell the user we can continue with their request once the correct information has been supplied
+    
+    You will be given the user input and the errors associated with the json schema
+    """
+    )
+
+    messages: List[HumanMessage] = []
+    messages.append(HumanMessage(content=f"Here is the user input: \n\n{user_input}"))
+    messages.append(HumanMessage(content=f"Here are the error: \n\n{error}"))
+
+    result = stream_messages(
+        system_message, messages, is_streaming, session_id, "create_readable_error"
+    )
+
+    return cast(str, result)
+
+
 def stream_messages(
     system_message: SystemMessage,
     messages: List[HumanMessage],

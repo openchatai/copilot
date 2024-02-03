@@ -52,7 +52,9 @@ async def run_actions(
                 )
                 api_request_data[operation_id] = api_payload.__dict__
 
-                api_response = make_api_request(headers=headers, **api_payload.__dict__)
+                api_response = await make_api_request(
+                    headers=headers, **api_payload.__dict__
+                )
 
                 """ 
                 if a custom transformer function is defined for this operationId use that, otherwise forward it to the llm,

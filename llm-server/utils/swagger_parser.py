@@ -3,6 +3,7 @@ from collections import defaultdict
 from typing import DefaultDict, Dict, Any, cast
 from typing import List
 from urllib.parse import urlparse
+import re
 
 from langchain.schema import HumanMessage, SystemMessage
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -99,10 +100,26 @@ class SwaggerParser:
 
         for path, path_data in paths.items():
             for method, method_data in path_data.items():
+                logger.info("method_data", method_data=method_data)
+                if not method_data.get("operationId") and not method_data.get(
+                    "summary"
+                ):
+                    logger.error(
+                        "operation_id_not_found",
+                        path=path,
+                        method=method,
+                    )
+
+                    raise ValueError(
+                        "operationId and summary not present, one of them must be present."
+                    )
+
                 endpoint = Endpoint(
                     operation_id=method_data.get("operationId"),
                     endpoint_type=method.upper(),
-                    name=method_data.get("summary"),
+                    name=method_data.get(
+                        method_data.get("operationId"), method_data.get("summary")
+                    ),
                     description=method_data.get("description"),
                     request_body=method_data.get("requestBody"),
                     parameters=method_data.get("parameters"),
@@ -234,7 +251,7 @@ class SwaggerParser:
                 processed_payload = self.process_payload(payload)
 
                 name = method_data.get(
-                    "operation_id",
+                    "operationId",
                     method_data.get(
                         "name",
                         method_data.get("summary", method_data.get("description")),
@@ -251,7 +268,8 @@ class SwaggerParser:
                 action_dto = ActionDTO(
                     api_endpoint=base_uri + path,
                     name=name,
-                    description=method_data.get("description"),
+                    description=method_data.get("description")
+                    or method_data.get("summary"),
                     request_type=method.upper(),
                     payload=processed_payload,
                     bot_id=bot_id,
@@ -276,6 +294,8 @@ class SwaggerParser:
 
         relative_paths: DefaultDict[str, Dict[str, Any]] = defaultdict(dict)
 
+        # @todo: the case where parameters are common for all paths is a valid way of defining apis, and we are not handling it
+        # check postman collection in _swaggers folder
         for path, path_item in api_data["paths"].items():
             for http_verb, http_details in path_item.items():
                 summary = http_details.get("summary", "")
@@ -333,3 +353,13 @@ class SwaggerParser:
 
         except Exception as error:
             logger.error("swagger_parsing_failed", bot_id=bot_id, error=error)
+
+    def remove_special_chars_and_numbers(self, text):
+        # Define the pattern for special characters and digits
+        # Here, we are using a pattern that matches any character that is not a letter or whitespace
+        pattern = re.compile("[^a-zA-Z\s]")
+
+        # Replace these characters with an empty string
+        cleaned_text = re.sub(pattern, "", text)
+
+        return cleaned_text
