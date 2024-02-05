@@ -57,7 +57,7 @@ def get_all_chat_history_by_session_id_with_total(
         chat_history = (
             session.query(ChatHistory)
             .filter_by(session_id=session_id)
-            .order_by(ChatHistory.id.asc())
+            .order_by(ChatHistory.id.desc())
             .limit(limit)
             .offset(offset)
             .all()
@@ -74,9 +74,7 @@ def get_all_chat_history_by_session_id_with_total(
 
 
 async def get_chat_message_as_llm_conversation(session_id: str) -> List[BaseMessage]:
-    chats, total_messages = get_all_chat_history_by_session_id_with_total(
-        session_id, 100
-    )
+    chats, _ = get_all_chat_history_by_session_id_with_total(session_id, 100)
     conversations: List[BaseMessage] = []
     for chat in chats:
         if chat.from_user:

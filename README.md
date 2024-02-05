@@ -138,5 +138,5 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 
 - Learn how OpenCopilot codebase works and how you can contribute using Onbaord AI's tool: [learnthisrepo.com/opencopilot](https://learnthisrepo.com/opencopilot)
 - This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind are welcome!
-- We love hearing from you! Got any cool ideas or requests? We're all ears! So, if you have something in mind, give us a shout! 
+
 
