@@ -49,7 +49,7 @@ async def run_flow(
             "An exception occurred",
             bot_id=bot_id,
             payload=json.dumps(payload_data),
-            error=str(e),
+            error=e,
         )
 
     output = {"response": result if not error else "", "error": error}

@@ -137,7 +137,7 @@ def create_copilot(
             logger.error(
                 "An exception occurred",
                 app="OPENCOPILOT",
-                error=str(e),
+                error=e,
                 incident="swagger",
             )
             raise e
@@ -266,7 +266,7 @@ def store_copilot_global_variables(copilot_id: str, new_variables: dict):
             logger.error(
                 "An exception occurred",
                 app="OPENCOPILOT",
-                error=str(e),
+                error=e,
                 incident="update_global_variables",
             )
 
@@ -331,7 +331,7 @@ def update_copilot(
         logger.error(
             "An exception occurred",
             app="OPENCOPILOT",
-            error=str(e),
+            error=e,
             incident="update_copilot",
         )
     finally:

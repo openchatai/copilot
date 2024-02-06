@@ -92,7 +92,7 @@ async def make_api_request(
     except aiohttp.ClientError as e:
         logger.error(
             "API request failed",
-            e=str(e),
+            error=e,
             headers=headers,
             url=url,
             params=path_params,
