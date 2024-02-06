@@ -1,6 +1,6 @@
+import os
 import logging
 import sentry_sdk
-import os
 
 sentry_sdk.init(
     traces_sample_rate=1.0,
@@ -25,7 +25,7 @@ class CustomLogger:
             if dsn is not None and error is not None:
                 sentry_sdk.capture_exception(error)
             elif dsn is not None:
-                sentry_sdk.capture_event(event, level=level, scope=scope)
+                sentry_sdk.capture_message(event, level=level, scope=scope)
 
             scope.clear()
 
@@ -37,8 +37,8 @@ class CustomLogger:
     def warn(self, event, **kwargs):
         self.log(logging.WARNING, event, error=None, **kwargs)
 
-    def error(self, event, error=None, **kwargs):
-        self.log(logging.ERROR, event, error=error, **kwargs)
+    def error(self, event, error=Exception("custom_error"), **kwargs):
+        self.log(logging.ERROR, event, error, **kwargs)
 
     def debug(self, event, **kwargs):
-        self.log(logging.DEBUG, event, None, **kwargs)
+        self.log(logging.DEBUG, event, error=None, **kwargs)
