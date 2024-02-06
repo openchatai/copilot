@@ -1,5 +1,5 @@
 from flask import Request
-import os, re
+import os
 
 from typing import TypedDict
 from functools import lru_cache
@@ -18,6 +18,7 @@ def get_username_from_request(request: Request):
 SYSTEM_MESSAGE_PROMPT = "system_message_prompt"
 SUMMARIZATION_PROMPT = "summarization_prompt"
 X_App_Name = "X-App-Name"
+SHARED_FOLDER = os.getenv("SHARED_FOLDER", "/app/shared_data")
 
 
 class VsThresholds(TypedDict):

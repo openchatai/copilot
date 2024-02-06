@@ -15,12 +15,11 @@ from shared.models.opencopilot_db.chatbot import Chatbot
 from utils.get_logger import CustomLogger
 from utils.llm_consts import VectorCollections, initialize_qdrant_client
 from utils.swagger_parser import SwaggerParser
+from utils.llm_consts import SHARED_FOLDER
 
 # Initialize Qdrant Client and other global variables
 client = initialize_qdrant_client()
 logger = CustomLogger(module_name=__name__)
-
-shared_folder = os.getenv("SHARED_FOLDER", "/app/shared_data/")
 
 
 @shared_task
@@ -78,7 +77,7 @@ def process_swagger_file(chatbot: Chatbot):
     swagger_url = str(chatbot.swagger_url)
     try:
         if not is_valid_url(swagger_url):
-            swagger_url = os.path.join(shared_folder, swagger_url)
+            swagger_url = os.path.join(SHARED_FOLDER, swagger_url)
 
         with open(swagger_url) as f:
             f_content = f.read()

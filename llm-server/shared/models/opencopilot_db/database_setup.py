@@ -2,9 +2,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.pool import QueuePool
 from sqlalchemy.ext.declarative import declarative_base  # Import declarative_base
 from utils.llm_consts import get_mysql_uri
-from dotenv import load_dotenv
-
-load_dotenv()
 
 # Replace these values with your MySQL server details
 db_url = get_mysql_uri()
