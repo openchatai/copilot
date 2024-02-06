@@ -179,6 +179,14 @@ async def handle_chat_send_common(
     if not bot_token:
         return Response(response="bot token is required", status=400)
 
+    logger.error(
+        "chat/send",
+        error=Exception("Something went wrong"),
+        bot_token=bot_token,
+        x_message=message,
+        session_id=session_id,
+    )
+
     try:
         bot = find_one_or_fail_by_token(bot_token)
         base_prompt = bot.prompt_message
@@ -237,7 +245,7 @@ async def handle_chat_send_common(
         logger.error(
             "An exception occurred",
             incident="chat/send",
-            error=str(e),
+            error=e,
             bot_token=bot_token,
         )
         emit(session_id, str(e))

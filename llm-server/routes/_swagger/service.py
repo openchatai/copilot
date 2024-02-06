@@ -46,7 +46,9 @@ def save_swagger_paths_to_qdrant(swagger_doc: ResolvingParser, bot_id: str):
                 except KeyError as e:
                     # Handle the specific key error, log, or take necessary action
                     logger.error(
-                        f"KeyError in processing document: {str(e)}", bot_id=bot_id
+                        f"KeyError in processing document: {str(e)}",
+                        bot_id=bot_id,
+                        error=e,
                     )
 
         point_ids = vector_store.add_documents(documents)

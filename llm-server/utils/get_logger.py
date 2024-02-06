@@ -1,4 +1,3 @@
-import structlog
 import logging
 import sentry_sdk
 import os
@@ -9,41 +8,37 @@ sentry_sdk.init(
 )
 
 dsn = os.getenv("SENTRY_DSN")
-structlog.configure(
-    processors=[
-        structlog.processors.add_log_level,
-        structlog.processors.StackInfoRenderer(),
-        structlog.dev.set_exc_info,
-        structlog.processors.TimeStamper(fmt="iso"),
-        structlog.processors.dict_tracebacks,
-        structlog.processors.JSONRenderer(),
-    ],
-    logger_factory=structlog.stdlib.LoggerFactory(),
-    cache_logger_on_first_use=True,
-)
+
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 
 class CustomLogger:
     def __init__(self, module_name: str = __name__, level: int = logging.INFO):
-        self.logger = structlog.get_logger(module_name)
-        logging.basicConfig(level=level, format="%(message)s")
+        self.logger = logging.getLogger(module_name)
+        self.logger.setLevel(level)
 
-    def log(self, level, event, **kwargs):
-        self.logger.log(level, event=event, **kwargs)
+    def log(self, level, event, error=None, **kwargs):
+        with sentry_sdk.configure_scope() as scope:
+            exc_info = kwargs.pop("exc_info", None)
+            scope.set_extra("extra_info", kwargs)
+            # Log to Sentry if configured
+            if dsn is not None and error is not None:
+                sentry_sdk.capture_exception(error)
+            elif dsn is not None:
+                sentry_sdk.capture_event(event, level=level, scope=scope)
 
-        # only enable this for prod environment
-        sentry_sdk.capture_message(
-            event, level=level, scope=None
-        ) if dsn is not None else None
+            scope.clear()
+
+        self.logger.log(level, event, exc_info=exc_info, extra=kwargs)
 
     def info(self, event, **kwargs):
-        self.log(logging.INFO, event, **kwargs)
+        self.log(logging.INFO, event, error=None, **kwargs)
 
     def warn(self, event, **kwargs):
-        self.log(logging.WARNING, event, **kwargs)
+        self.log(logging.WARNING, event, error=None, **kwargs)
 
-    def error(self, event, **kwargs):
-        self.log(logging.ERROR, event, exc_info=True, **kwargs)
+    def error(self, event, error=None, **kwargs):
+        self.log(logging.ERROR, event, error=error, **kwargs)
 
     def debug(self, event, **kwargs):
-        self.log(logging.DEBUG, event, **kwargs)
+        self.log(logging.DEBUG, event, None, **kwargs)

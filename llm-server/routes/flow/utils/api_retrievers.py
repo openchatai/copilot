@@ -80,7 +80,7 @@ async def get_relevant_documents(
             incident=f"get_relevant_{collection_name}",
             bot_id=bot_id,
             payload=text,
-            error=str(e),
+            error=e,
         )
         return []
 
