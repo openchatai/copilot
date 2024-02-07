@@ -6,6 +6,7 @@ import WidgetState from "./contexts/WidgetState";
 import { AxiosProvider } from "./contexts/axiosInstance";
 import root from "react-shadow";
 import css from "../styles/index.css?inline";
+import { LanguageProvider } from "./contexts/LocalesProvider";
 
 const cssColors = {
   "--opencopilot-primary-clr": "hsl(200 18% 46%)",
@@ -33,9 +34,11 @@ function Root({ children, options, containerProps }: RootProps) {
       }}
     >
       <ConfigDataProvider data={options}>
-        <WidgetState>
-          <AxiosProvider>{children}</AxiosProvider>
-        </WidgetState>
+        <LanguageProvider>
+          <WidgetState>
+            <AxiosProvider>{children}</AxiosProvider>
+          </WidgetState>
+        </LanguageProvider>
       </ConfigDataProvider>
       <style>{css}</style>
     </root.div>
