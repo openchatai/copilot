@@ -1,9 +1,9 @@
-import { Locale } from './types';
+import { Locale } from "./types";
 
 const enLocale: Locale = {
-    greeting: 'Hello',
-    farewell: 'Goodbye',
-    // Add more strings as needed
+  ok: "Ok",
+  agree: "Agree",
+  cancel: "Cancel",
 };
 
 export default enLocale;

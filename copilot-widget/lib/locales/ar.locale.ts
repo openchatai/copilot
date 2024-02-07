@@ -1,9 +1,9 @@
-import { Locale } from './types';
+import { Locale } from "./types";
 
 const arLocale: Locale = {
-    greeting: 'مرحبا',
-    farewell: 'وداعا',
-    // Add more strings as needed
+  ok: "حسنا",
+  agree: "موافق",
+  cancel: "إلغاء",
 };
 
 export default arLocale;
