@@ -4,6 +4,7 @@ import { useAxiosInstance } from "@lib/contexts/axiosInstance";
 import now from "@lib/utils/timenow";
 import { useEffect } from "react";
 import useAudioRecorder from "@lib/hooks/useAudioRecord";
+import { useLang } from "@lib/contexts/LocalesProvider";
 
 export function VoiceRecorder({
   onSuccess,
@@ -11,7 +12,7 @@ export function VoiceRecorder({
   onSuccess?: (text: string) => void;
 }) {
   const { axiosInstance } = useAxiosInstance();
-
+  const { get } = useLang();
   const {
     startRecording,
     stopRecording,
@@ -51,7 +52,7 @@ export function VoiceRecorder({
   return (
     <Tooltip open={isRecording}>
       <TooltipContent sideOffset={5} side="top">
-        Recording {recordingTime}s
+        {get("recording")} {recordingTime}s
       </TooltipContent>
       <TooltipTrigger asChild>
         <button
