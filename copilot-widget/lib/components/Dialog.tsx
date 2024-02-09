@@ -5,9 +5,7 @@ import {
   ComponentPropsWithoutRef,
   forwardRef,
   useState,
-  ReactNode,
 } from "react";
-import { Button } from "./Button";
 
 type DialogProps = {
   open?: boolean;

@@ -15,6 +15,7 @@ import {
   DialogTrigger,
 } from "./Dialog";
 import { Button } from "./Button";
+import { useLang } from "@lib/contexts/LocalesProvider";
 
 function MessageSuggestions() {
   const { data } = useInitialData();
@@ -48,6 +49,7 @@ function MessageSuggestions() {
 function ResetButtonWithConfirmation() {
   const { reset } = useChat();
   const [open, setOpen] = useState(false);
+  const { get } = useLang();
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
@@ -59,7 +61,7 @@ function ResetButtonWithConfirmation() {
             <span className="text-rose-500">
               <AlertTriangle className="size-10" />
             </span>
-            <h2>are you sure?</h2>
+            <h2>{get("are-you-sure")}</h2>
           </div>
         </DialogHeader>
         <div className="flex flex-row items-center justify-center gap-2">
@@ -69,10 +71,10 @@ function ResetButtonWithConfirmation() {
             className="font-semibold"
             onClick={reset}
           >
-            <DialogClose>Yes, reset</DialogClose>
+            <DialogClose>{get("yes-reset")}</DialogClose>
           </Button>
           <Button asChild variant="secondary" className="font-semibold">
-            <DialogClose>No, Cancel</DialogClose>
+            <DialogClose>{get("no-cancel")}</DialogClose>
           </Button>
         </div>
       </DialogContent>

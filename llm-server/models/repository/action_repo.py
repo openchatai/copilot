@@ -43,7 +43,7 @@ def create_actions(chatbot_id: str, data: List[ActionDTO]) -> List[dict]:
             return actions
         except Exception as e:
             session.rollback()
-            logger.error("An exception occurred", error=str(e))
+            logger.error("An exception occurred", error=e)
             raise
 
 
@@ -71,7 +71,7 @@ def create_action(chatbot_id: str, data: ActionDTO) -> dict:
             return new_action
         except Exception as e:
             session.rollback()
-            logger.error("An exception occurred", error=str(e))
+            logger.error("An exception occurred", error=e)
             raise
 
 
@@ -99,7 +99,7 @@ def update_action(action_id: str, data: ActionDTO) -> Action:
             return action
         except Exception as e:
             session.rollback()
-            logger.error("An exception occurred", error=str(e))
+            logger.error("An exception occurred", error=e)
             raise
 
 

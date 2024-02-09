@@ -1,4 +1,9 @@
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 from celery import Celery
 from shared.models.opencopilot_db import create_database_schema
 

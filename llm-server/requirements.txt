@@ -28,13 +28,13 @@ click-didyoumean==0.3.0
 click-plugins==1.1.1
 click-repl==0.3.0
 coloredlogs==15.0.1
-cryptography==41.0.7
+cryptography==42.0.0
 dataclasses-json==0.6.2
 Deprecated==1.2.14
 distro==1.9.0
 dnspython==2.4.2
 exceptiongroup==1.1.3
-fastapi==0.104.1
+fastapi==0.109.1
 filelock==3.13.1
 Flask==3.0.0
 Flask-Cors==4.0.0
@@ -119,6 +119,7 @@ pydub==0.25.1
 pymongo==4.5.0
 PyMySQL==1.1.0
 PyPDF2==3.0.1
+pypdf==4.0.1
 PyPika==0.48.9
 PySocks==1.7.1
 python-dateutil==2.8.2

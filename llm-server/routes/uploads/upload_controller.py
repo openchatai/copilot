@@ -8,10 +8,10 @@ from flask import Blueprint, Response, request
 from werkzeug.utils import secure_filename
 
 from routes.uploads.celery_service import celery
+from utils.llm_consts import SHARED_FOLDER
 
 upload = Blueprint("upload", __name__)
 
-SHARED_FOLDER = os.getenv("SHARED_FOLDER", "/app/shared_data/")
 os.makedirs(SHARED_FOLDER, exist_ok=True)
 
 upload_controller = Blueprint("uploads", __name__)
@@ -55,9 +55,7 @@ def upload_file() -> Response:
 
     # Generate a unique filename
     unique_filename = generate_unique_filename(file.filename)
-    file_path = os.path.join(
-        os.getenv("SHARED_FOLDER", "/app/shared_data/"), unique_filename
-    )
+    file_path = os.path.join(SHARED_FOLDER, unique_filename)
 
     try:
         # Save the file to the shared folder
@@ -103,10 +101,13 @@ def start_file_ingestion() -> Response:
                 )
             elif filename.lower().endswith(".md"):
                 celery.send_task(
-                    "workers.tasks.process_markdown.process_markdown", args=[filename, bot_id]
+                    "workers.tasks.process_markdown.process_markdown",
+                    args=[filename, bot_id],
                 )
             elif validators.url(filename):
-                celery.send_task("workers.tasks.web_crawl.web_crawl", args=[filename, bot_id])
+                celery.send_task(
+                    "workers.tasks.web_crawl.web_crawl", args=[filename, bot_id]
+                )
             else:
                 print(f"Received: {filename}, is neither a pdf nor a url. ")
 
@@ -136,7 +137,8 @@ def retry_failed_web_crawl():
         if request.json:
             website_data_source_id = request.json["website_data_source_id"]
             celery.send_task(
-                "workers.web_crawl.resume_failed_website_scrape", args=[website_data_source_id]
+                "workers.web_crawl.resume_failed_website_scrape",
+                args=[website_data_source_id],
             )
 
         return Response(

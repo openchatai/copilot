@@ -138,10 +138,10 @@ export function BotMessageError({ message }: { message?: FailedMessage }) {
     every: 0.001,
   });
   return (
-    <div className=" clear-both  shrink-0  w-full  p-2">
-      <div className=" flex  items-center  gap-3  w-full">
+    <div className="clear-both shrink-0 w-full p-2">
+      <div className=" flex items-center gap-3 w-full">
         <BotIcon error />
-        <div className=" text-rose-500  text-sm">{displayText}</div>
+        <div className=" text-rose-500 text-sm">{displayText}</div>
       </div>
     </div>
   );

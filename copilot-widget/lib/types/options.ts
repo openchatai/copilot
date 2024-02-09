@@ -1,3 +1,5 @@
+import type { LangType } from "@lib/locales";
+
 export type Options = {
   token: string;
   headers?: Record<string, string>;
@@ -6,6 +8,7 @@ export type Options = {
   apiUrl: string;
   socketUrl: string;
   defaultOpen?: boolean;
+  lang?: LangType;
   containerProps?: React.DetailedHTMLProps<
     React.HTMLAttributes<HTMLDivElement>,
     HTMLDivElement
