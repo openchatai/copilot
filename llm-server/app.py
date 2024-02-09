@@ -18,6 +18,7 @@ from werkzeug.exceptions import HTTPException
 
 from flask_socketio import SocketIO
 from utils.get_logger import CustomLogger
+from instrumentation.telemetry import setup_telemetry
 
 logger = CustomLogger(__name__)
 
@@ -79,6 +80,7 @@ def handle_send_chat(json_data):
 
 
 init_qdrant_collections()
+setup_telemetry(app)
 
 if __name__ == "__main__":
     socketio.run(
