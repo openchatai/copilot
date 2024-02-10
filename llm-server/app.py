@@ -9,6 +9,7 @@ from routes.chat.chat_controller import chat_workflow, send_chat_stream
 from routes.copilot.copilot_controller import copilot
 from routes.data_source.data_source_controller import datasource_workflow
 from routes.flow.flow_controller import flow
+from routes.typing.powerup_controller import powerup
 
 from routes.uploads.upload_controller import upload_controller
 from shared.models.opencopilot_db import create_database_schema
@@ -16,8 +17,13 @@ from utils.config import Config
 from routes.chat.chat_dto import ChatInput
 from werkzeug.exceptions import HTTPException
 
+from routes.chat.chat_dto import ChatInput
 from flask_socketio import SocketIO
 from utils.get_logger import CustomLogger
+from utils.vector_store_setup import init_qdrant_collections
+from routes.search.search_controller import search_workflow
+
+from flask_cors import CORS
 
 logger = CustomLogger(__name__)
 
@@ -26,6 +32,7 @@ load_dotenv()
 create_database_schema()
 
 app = Flask(__name__)
+CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 app.url_map.strict_slashes = False
@@ -35,6 +42,8 @@ app.register_blueprint(copilot, url_prefix="/backend/copilot")
 app.register_blueprint(upload_controller, url_prefix="/backend/uploads")
 app.register_blueprint(datasource_workflow, url_prefix="/backend/data_sources")
 app.register_blueprint(action, url_prefix="/backend/actions")
+app.register_blueprint(powerup, url_prefix="/backend/powerup")
+app.register_blueprint(search_workflow, url_prefix="/backend/search")
 
 app.config.from_object(Config)
 

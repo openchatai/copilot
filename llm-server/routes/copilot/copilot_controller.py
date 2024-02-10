@@ -16,6 +16,7 @@ from models.repository.copilot_repo import (
     update_copilot,
     store_copilot_global_variables,
 )
+from models.repository.powerup_repo import create_powerups_bulk
 from routes._swagger.reindex_service import migrate_actions
 from utils.get_logger import CustomLogger
 
@@ -41,6 +42,30 @@ def create_new_copilot():
         ),
         website=request.form.get("website", "https://example.com"),
     )
+
+    # Define the system prompts for the three powerups
+    powerup_apps = [
+        {
+            "chatbot_id": chatbot.get("id"),
+            "base_prompt": "You are an AI assistant that excels at correcting grammar mistakes. Please improve the following text while maintaining the original meaning:",
+            "name": "Text Corrector",
+            "description": "Corrects grammar mistakes in a given text while maintaining the original meaning.",
+        },
+        {
+            "chatbot_id": chatbot.get("id"),
+            "base_prompt": "You are an AI that predicts the next word in a sequence of text. Given the text below, predict the most likely next word:",
+            "name": "Next Word Predictor",
+            "description": "Predicts the next word in a sequence of text.",
+        },
+        {
+            "chatbot_id": chatbot.get("id"),
+            "base_prompt": "You are an AI that rephrases sentences to enhance clarity and style. Please rephrase the following sentence:",
+            "name": "Sentence Rephraser",
+            "description": "Rephrases sentences to enhance clarity and style.",
+        },
+    ]
+
+    create_powerups_bulk(powerup_apps)
     return jsonify(chatbot)
 
 
