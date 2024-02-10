@@ -60,7 +60,7 @@ export default function CreateCopilotIndexPage() {
         </CardContent>
         <CardFooter className="border-t bg-secondary py-2">
           <Button className="ms-auto" asChild>
-            <Link href="/create/next">Next</Link>
+            <Link href="/create/setname">Next</Link>
           </Button>
         </CardFooter>
       </Card>
