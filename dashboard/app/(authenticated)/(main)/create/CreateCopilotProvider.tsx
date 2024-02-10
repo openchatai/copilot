@@ -3,6 +3,7 @@ import { createSafeContext } from "@/lib/createSafeContext";
 import React from "react";
 import { CardTypes } from "./data";
 import { produce } from "immer";
+import { CopilotType } from "@/data/copilot";
 
 const [SafeProvider, useCreateCopilot] = createSafeContext<{
   state: State;
@@ -11,6 +12,8 @@ const [SafeProvider, useCreateCopilot] = createSafeContext<{
 // actions type
 type State = {
   selectedTemplate: CardTypes | null;
+  copilot_name: string;
+  createdCopilot: null | CopilotType;
 };
 
 type Actions =
@@ -20,6 +23,14 @@ type Actions =
     }
   | {
       type: "RESET_TEMPLATE";
+    }
+  | {
+      type: "CHANGE_NAME";
+      payload: string;
+    }
+  | {
+      type: "SET_COPILOT";
+      payload: CopilotType;
     };
 
 function reducerFunction(state: State, action: Actions) {
@@ -31,6 +42,12 @@ function reducerFunction(state: State, action: Actions) {
       case "RESET_TEMPLATE":
         draft.selectedTemplate = null;
         break;
+      case "CHANGE_NAME":
+        draft.copilot_name = action.payload;
+        break;
+      case "SET_COPILOT":
+        draft.createdCopilot = action.payload;
+        break;
       default:
         break;
     }
@@ -39,7 +56,9 @@ function reducerFunction(state: State, action: Actions) {
 
 function CreateCopilotProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = React.useReducer(reducerFunction, {
-    selectedTemplate: null,
+    selectedTemplate: "copilot",
+    copilot_name: "",
+    createdCopilot: null,
   });
 
   return (
