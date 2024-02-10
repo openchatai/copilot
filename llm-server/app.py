@@ -17,10 +17,8 @@ from utils.config import Config
 from routes.chat.chat_dto import ChatInput
 from werkzeug.exceptions import HTTPException
 
-from routes.chat.chat_dto import ChatInput
 from flask_socketio import SocketIO
 from utils.get_logger import CustomLogger
-from utils.vector_store_setup import init_qdrant_collections
 from routes.search.search_controller import search_workflow
 
 from flask_cors import CORS
