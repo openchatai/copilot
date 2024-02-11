@@ -237,12 +237,6 @@ async def handle_chat_send_common(
             )
             create_chat_histories(str(bot.id), chat_records)
 
-        logger.error(
-            "An exception occurred",
-            incident="chat/send",
-            bot_token=bot_token,
-        )
-
         if result.error:
             logger.error("chat_conversation_error", message=result.error)
 

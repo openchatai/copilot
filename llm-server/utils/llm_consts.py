@@ -106,3 +106,4 @@ max_pages_to_crawl = int(os.getenv("MAX_PAGES_TO_CRAWL", "15"))
 enable_followup_questions = (
     True if os.getenv("ENABLE_FOLLOWUP_QUESTIONS", "NO") == "YES" else False
 )
+ENABLE_EXTERNAL_API_LOGGING = os.getenv("ENABLE_EXTERNAL_API_LOGGING", "YES") == "YES"
