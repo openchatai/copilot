@@ -139,4 +139,8 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 - Learn how OpenCopilot codebase works and how you can contribute using Onbaord AI's tool: [learnthisrepo.com/opencopilot](https://learnthisrepo.com/opencopilot)
 - This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind are welcome!
 
+## Analytics
+
+This product collects anonymous usage data to help improve your experience. You can opt-out by setting `ENABLE_EXTERNAL_API_LOGGING=no` in your environment variables.
+
 
