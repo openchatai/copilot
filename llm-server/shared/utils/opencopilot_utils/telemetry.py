@@ -14,7 +14,21 @@ def sanitize_path(path: str) -> str:
     return re.sub(r"<[^>]*>", "{}", path)
 
 
+def log_opensource_telemetry_data(json_data: dict):
+    if ENABLE_EXTERNAL_API_LOGGING:
+        try:
+            response = requests.post(
+                "https://api.opencopilot.so/backend/api_calls/log", json=json_data
+            )
+            response.raise_for_status()
+        except requests.RequestException as e:
+            logger.error("OPENSOURCE_TELEMETRY_DATA_FAILURE", error=e)
+    else:
+        return True
+
+
 def log_api_call(response):
+    # this is not necessary, but it's a good practice to check if the API logging is enabled before running regex
     if ENABLE_EXTERNAL_API_LOGGING:
         path = sanitize_path(request.path)
         path_params = json.dumps(request.view_args)
@@ -26,10 +40,6 @@ def log_api_call(response):
             "path_params": path_params,
             "method": request.method,
         }
-        try:
-            requests.post(
-                "https://api.opencopilot.so/backend/api_calls/log", json=json_data
-            )
-        except requests.RequestException as e:
-            logger.error("OPENSOURCE_TELEMETRY_DATA_FAILURE", error=e)
+
+        log_opensource_telemetry_data(json_data)
     return response

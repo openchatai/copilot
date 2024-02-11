@@ -42,5 +42,4 @@ def search_vector_store(chatbot_id: str):
     keyword = request.args.get("keyword", "")
     results = get_all_results(chatbot_id, keyword)
 
-    results = []
     return jsonify(results), 201

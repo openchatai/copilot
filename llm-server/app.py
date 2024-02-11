@@ -1,5 +1,5 @@
 import asyncio
-
+import requests
 from dotenv import load_dotenv
 from flask import Flask, request
 from flask import jsonify
@@ -12,7 +12,10 @@ from routes.data_source.data_source_controller import datasource_workflow
 from routes.flow.flow_controller import flow
 from routes.typing.powerup_controller import powerup
 from routes.api_call.api_call_controller import api_call_controller
-from shared.utils.opencopilot_utils.telemetry import log_api_call
+from shared.utils.opencopilot_utils.telemetry import (
+    log_api_call,
+    log_opensource_telemetry_data,
+)
 
 from routes.uploads.upload_controller import upload_controller
 
@@ -89,11 +92,20 @@ def handle_send_chat(json_data):
 
     bot_token = headers.environ.get("HTTP_X_BOT_TOKEN")
 
+    json_data = {
+        "url": request.base_url,
+        "path": "/socketio/",
+        "query_params": "{}",
+        "path_params": "{}",
+        "method": "wss",
+    }
+
     if not bot_token:
         socketio.emit(session_id, {"error": "Bot token is required"})
         return
 
     asyncio.run(send_chat_stream(message, bot_token, session_id, headers_from_json))
+    log_opensource_telemetry_data(json_data)
 
 
 init_qdrant_collections()
