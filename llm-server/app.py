@@ -1,6 +1,4 @@
 import asyncio
-import re
-import json
 
 from dotenv import load_dotenv
 from flask import Flask, request
@@ -14,6 +12,7 @@ from routes.data_source.data_source_controller import datasource_workflow
 from routes.flow.flow_controller import flow
 from routes.typing.powerup_controller import powerup
 from routes.api_call.api_call_controller import api_call_controller
+from shared.utils.opencopilot_utils.telemetry import log_api_call
 
 from routes.uploads.upload_controller import upload_controller
 
@@ -26,11 +25,8 @@ from werkzeug.exceptions import HTTPException
 from flask_socketio import SocketIO
 from utils.get_logger import CustomLogger
 from routes.search.search_controller import search_workflow
-import requests
-from utils.llm_consts import ENABLE_EXTERNAL_API_LOGGING
 
 from flask_cors import CORS
-from models.repository.api_call_repository import APICallRepository
 from shared.models.opencopilot_db.database_setup import engine
 from sqlalchemy.orm import sessionmaker
 
@@ -41,36 +37,9 @@ logger = CustomLogger(__name__)
 load_dotenv()
 
 create_database_schema()
-
 app = Flask(__name__)
 CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
-
-
-def sanitize_path(path: str) -> str:
-    return re.sub(r"<[^>]*>", "{}", path)
-
-
-def log_api_call(response):
-    if ENABLE_EXTERNAL_API_LOGGING:
-        path = sanitize_path(request.path)
-        path_params = json.dumps(request.view_args)
-        query_params = json.dumps(request.args)
-        json_data = {
-            "url": request.base_url,
-            "path": path,
-            "query_params": query_params,
-            "path_params": path_params,
-            "method": request.method,
-        }
-        try:
-            requests.post(
-                "https://api.opencopilot.so/backend/api_calls/log", json=json_data
-            )
-        except requests.RequestException as e:
-            logger.error(f"Failed to log API call to external service: {e}")
-    return response
-
 
 app.after_request(log_api_call)
 

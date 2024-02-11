@@ -2,6 +2,9 @@ from flask import Blueprint, request, jsonify
 from models.repository.api_call_repository import APICallRepository
 from sqlalchemy.orm import sessionmaker
 from shared.models.opencopilot_db.database_setup import engine
+from utils.get_logger import CustomLogger
+
+logger = CustomLogger(__name__)
 
 api_call_controller = Blueprint("api_call_controller", __name__)
 SessionLocal = sessionmaker(bind=engine)
