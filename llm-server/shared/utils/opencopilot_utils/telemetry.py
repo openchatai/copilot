@@ -9,6 +9,8 @@ logger = CustomLogger(__name__)
 
 
 def sanitize_path(path: str) -> str:
+    if len(path) > 2048:
+        path = path[:2048]  # Truncate the string to 2048 characters
     return re.sub(r"<[^>]*>", "{}", path)
 
 
