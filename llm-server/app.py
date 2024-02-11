@@ -1,4 +1,7 @@
 import asyncio
+import re
+import json
+
 from dotenv import load_dotenv
 from flask import Flask, request
 from flask import jsonify
@@ -10,9 +13,12 @@ from routes.copilot.copilot_controller import copilot
 from routes.data_source.data_source_controller import datasource_workflow
 from routes.flow.flow_controller import flow
 from routes.typing.powerup_controller import powerup
+from routes.api_call.api_call_controller import api_call_controller
 
 from routes.uploads.upload_controller import upload_controller
-from shared.models.opencopilot_db import create_database_schema
+
+# from shared.models.opencopilot_db import create_database_schema
+from shared.models.opencopilot_db.database_setup import create_database_schema
 from utils.config import Config
 from routes.chat.chat_dto import ChatInput
 from werkzeug.exceptions import HTTPException
@@ -22,6 +28,11 @@ from utils.get_logger import CustomLogger
 from routes.search.search_controller import search_workflow
 
 from flask_cors import CORS
+from models.repository.api_call_repository import APICallRepository
+from shared.models.opencopilot_db.database_setup import engine
+from sqlalchemy.orm import sessionmaker
+
+SessionLocal = sessionmaker(bind=engine)
 
 logger = CustomLogger(__name__)
 
@@ -33,11 +44,29 @@ app = Flask(__name__)
 CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+
+def sanitize_path(path: str) -> str:
+    return re.sub(r"<[^>]*>", "{}", path)
+
+
+def log_api_call(response):
+    db_session = SessionLocal()
+    repository = APICallRepository(db_session)
+    path = sanitize_path(request.path)
+    path_params = json.dumps(request.view_args)
+    query_params = json.dumps(request.args)
+
+    db_session.close()
+
+
+app.after_request(log_api_call)
+
 app.url_map.strict_slashes = False
 app.register_blueprint(flow, url_prefix="/backend/flows")
 app.register_blueprint(chat_workflow, url_prefix="/backend/chat")
 app.register_blueprint(copilot, url_prefix="/backend/copilot")
 app.register_blueprint(upload_controller, url_prefix="/backend/uploads")
+app.register_blueprint(api_call_controller, url_prefix="/backend/api_calls")
 app.register_blueprint(datasource_workflow, url_prefix="/backend/data_sources")
 app.register_blueprint(action, url_prefix="/backend/actions")
 app.register_blueprint(powerup, url_prefix="/backend/powerup")
