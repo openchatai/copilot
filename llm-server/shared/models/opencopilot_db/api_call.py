@@ -9,7 +9,8 @@ class APICall(Base):
     __tablename__ = "api_calls"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    endpoint = Column(String(255), nullable=False)
+    url = Column(String(255), nullable=False)
+    path = Column(String(255), nullable=False)
     method = Column(String(10), nullable=False)
     path_params = Column(String(255), nullable=True)
     query_params = Column(String(255), nullable=True)

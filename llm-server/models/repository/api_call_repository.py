@@ -9,13 +9,15 @@ class APICallRepository:
 
     def log_api_call(
         self,
-        endpoint: str,
+        url: str,
+        path: str,
         method: str,
         path_params: str = "",
         query_params: str = "",
     ):
         api_call = APICall(
-            endpoint=endpoint,
+            url=url,
+            path=path,
             method=method,
             path_params=path_params,
             query_params=query_params,
