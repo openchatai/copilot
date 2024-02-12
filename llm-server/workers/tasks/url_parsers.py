@@ -1,6 +1,7 @@
 import io
 import json
-from PyPDF2 import PdfFileReader, PdfReader
+from typing import List, Union
+from PyPDF2 import PdfReader
 from enum import Enum
 
 from abc import ABC, abstractmethod
@@ -13,37 +14,65 @@ import requests
 logger = CustomLogger(__name__)
 
 
+class LinkInformation:
+    def __init__(self, href: str, link_text: str, target_text: str):
+        self.href = href
+        self.link_text = link_text
+        self.target_text = target_text
+
+    def __repr__(self):
+        return f"LinkInformation(Href: {self.href}, Link Text: {self.link_text}, Target Text: {self.target_text})"
+
+
 class ContentParser(ABC):
     @abstractmethod
-    def parse(self, content):
+    def parse(self, content) -> List[LinkInformation]:
         pass
 
 
 class TextContentParser(ContentParser):
-    def parse(self, content):
+    def parse(self, content) -> List[LinkInformation]:
         soup = BeautifulSoup(content, "lxml")
-        text_content = " ".join(
-            [
-                p.text.strip()
-                for p in soup.find_all(["p", "h1", "h2", "h3", "h4", "h5", "h6"])
-            ]
-        )
-        return text_content
+        links = soup.find_all("a")
+
+        results = []
+        for link in links:
+            href = link.get("href")
+            if href and (href.startswith("#") or href.startswith("./#")):
+                id_to_search = href[1:] if href.startswith("#") else href[3:]
+                target = soup.find(id=id_to_search)
+                if target:
+                    results.append(
+                        LinkInformation(href, link.text.strip(), target.text.strip())
+                    )
+
+        # if no on-page links detected, collect info for all links
+        if not results:
+            text_content = " ".join(
+                [
+                    p.text.strip()
+                    for p in soup.find_all(["p", "h1", "h2", "h3", "h4", "h5", "h6"])
+                ]
+            )
+
+            results.append(LinkInformation("", "", text_content))
+        return results
 
 
 class JsonContentParser(ContentParser):
-    def parse(self, content):
+    def parse(self, content) -> Union[LinkInformation, None]:
         try:
             json_data = json.loads(content)
             # Convert JSON object to a string representation
-            return json.dumps(json_data, indent=2)
+            json_string = json.dumps(json_data, indent=2)
+            return LinkInformation(href="", link_text="", target_text=json_string)
         except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse JSON content: {e}")
+            print(f"Failed to parse JSON content: {e}")
             return None
 
 
 class PDFContentParser(ContentParser):
-    def parse(self, content):
+    def parse(self, content) -> Union[LinkInformation, None]:
         try:
             pdf_file = PdfReader(io.BytesIO(content))
             text = ""
@@ -52,9 +81,9 @@ class PDFContentParser(ContentParser):
                 page = pdf_file.pages[page_num]
                 text += page.extract_text()
 
-            return text
+            return LinkInformation(href="", link_text="", target_text=text)
         except Exception as e:
-            logger.error(f"Failed to parse PDF content: {e}")
+            print(f"Failed to parse PDF content: {e}")
             return None
 
 
