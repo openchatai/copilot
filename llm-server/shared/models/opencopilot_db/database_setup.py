@@ -16,9 +16,15 @@ def connection_creator():
 Base = declarative_base()
 
 # Create an SQLAlchemy engine with the connection pool
-engine = create_engine(db_url, poolclass=QueuePool, pool_logging_name="worker_pool")
+engine = create_engine(
+    db_url,
+    poolclass=QueuePool,
+    pool_logging_name="worker_pool",
+    pool_pre_ping=True,
+    pool_recycle=280,
+)
 
-pool = QueuePool(creator=connection_creator, pool_size=20)
+pool = QueuePool(creator=connection_creator, pool_size=100)
 
 
 def create_database_schema():
