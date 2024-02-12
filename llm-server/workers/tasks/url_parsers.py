@@ -48,12 +48,14 @@ class TextContentParser(ContentParser):
 
         # if no on-page links detected, collect info for all links
         if not results:
-            results = [
-                LinkInformation(link.get("href"), link.text.strip(), "")
-                for link in links
-                if link.get("href")
-            ]
+            text_content = " ".join(
+                [
+                    p.text.strip()
+                    for p in soup.find_all(["p", "h1", "h2", "h3", "h4", "h5", "h6"])
+                ]
+            )
 
+            results.append(LinkInformation("", "", text_content))
         return results
 
 
