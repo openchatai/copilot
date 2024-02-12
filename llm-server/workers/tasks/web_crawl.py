@@ -1,4 +1,3 @@
-from typing import Optional
 from urllib.parse import urlparse, urljoin
 import requests
 from celery import shared_task
@@ -63,7 +62,7 @@ def get_links(url: str) -> list:
         return []
 
 
-def scrape_url(url: str) -> Optional[str]:
+def scrape_url(url: str):
     try:
         parser = ParserFactory.get_parser(url)
         response = requests.get(url)
@@ -111,34 +110,40 @@ def scrape_website(url: str, bot_id: str, max_pages: int) -> int:
             ):
                 continue
 
-            text_content = scrape_url(current_url)
+            contents = scrape_url(current_url)
 
-            # Check if scraping was successful
-            if text_content:
-                # Process the scraped content as needed
-                text_content = remove_escape_sequences(text_content)
-                text_splitter = RecursiveCharacterTextSplitter(
-                    chunk_size=1000, chunk_overlap=200, length_function=len
-                )
-                docs = text_splitter.create_documents([text_content])
-                init_vector_store(
-                    docs,
-                    StoreOptions(
-                        namespace="knowledgebase",
-                        metadata={"bot_id": bot_id, "link": current_url},
-                    ),
-                )
-                create_website_data_source(
-                    chatbot_id=bot_id, url=current_url, status="SUCCESS"
-                )
+            for content in contents or []:
+                # Check if scraping was successful
+                if content is not None:
+                    # Process the scraped content as needed
+                    target_text = remove_escape_sequences(content.target_text)
+                    text_splitter = RecursiveCharacterTextSplitter(
+                        chunk_size=1000, chunk_overlap=200, length_function=len
+                    )
+                    docs = text_splitter.create_documents([target_text])
+                    init_vector_store(
+                        docs,
+                        StoreOptions(
+                            namespace="knowledgebase",
+                            metadata={
+                                "bot_id": bot_id,
+                                "link": current_url,
+                                "title": content.link_text,
+                                "scroll_id": content.href,
+                            },
+                        ),
+                    )
+                    create_website_data_source(
+                        chatbot_id=bot_id, url=current_url, status="SUCCESS"
+                    )
 
-                total_pages_scraped += 1
+                    total_pages_scraped += 1
 
-                # Get links on the current page
-                links = get_links(current_url)
+                    # Get links on the current page
+                    links = get_links(current_url)
 
-                # Add new links to the queue
-                queue.extend(links)
+                    # Add new links to the queue
+                    queue.extend(links)
 
         except Exception as e:
             logger.error(f"Error scraping {current_url}: {e}")
@@ -163,7 +168,7 @@ def web_crawl(url, bot_id: str):
         logger.info(f"chatbot_settings: {setting.max_pages_to_crawl}")
         create_website_data_source(chatbot_id=bot_id, status="PENDING", url=url)
 
-        scrape_website(url, bot_id, setting.max_pages_to_crawl or max_pages_to_crawl)
+        scrape_website(url, bot_id, setting.max_pages_to_crawl or max_pages_to_crawl)  # type: ignore
     except Exception as e:
         traceback.print_exc()
 
