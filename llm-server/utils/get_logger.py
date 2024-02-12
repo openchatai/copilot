@@ -1,10 +1,12 @@
 import os
 import logging
 import sentry_sdk
+from sentry_sdk.integrations.celery import CeleryIntegration
 
 sentry_sdk.init(
     traces_sample_rate=1.0,
     profiles_sample_rate=1.0,
+    integrations=[CeleryIntegration(propagate_traces=True)],
 )
 
 dsn = os.getenv("SENTRY_DSN")
