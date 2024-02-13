@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "clean": "rm -rf ./dist ./dist-embed",
-    "build:embed": "pnpm clean && tsc && vite build",
+    "build:embed": "tsc && vite build",
     "build:lib": "vite build -c vite.lib.config.ts",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
