@@ -7,6 +7,8 @@ import { AxiosProvider } from "./contexts/axiosInstance";
 import root from "react-shadow";
 import css from "../styles/index.css?inline";
 import { LanguageProvider } from "./contexts/LocalesProvider";
+import { get } from "./utils/pkg";
+const version = get("version");
 
 const cssColors = {
   "--opencopilot-primary-clr": "hsl(200 18% 46%)",
@@ -25,6 +27,7 @@ function Root({ children, options, containerProps }: RootProps) {
   return (
     <root.div
       {...containerProp}
+      data-version={version}
       style={{
         width: "100%",
         height: "100%",
