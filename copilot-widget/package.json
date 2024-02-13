@@ -5,13 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "clean": "rm -rf ./dist",
+    "clean": "rm -rf ./dist ./dist-embed",
     "build:embed": "pnpm clean && tsc && vite build",
     "build:lib": "vite build -c vite.lib.config.ts",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "release": "release-it",
-    "prepublishOnly": "pnpm clean && pnpm build:lib",
+    "prepublishOnly": "pnpm clean && pnpm build:lib && pnpm build:embed",
     "update-dashboard-pilot": "pnpm build:embed && mv ./dist/assets/*.js ../dashboard/public/pilot.js"
   },
   "peerDependencies": {
@@ -58,7 +58,8 @@
     "vite-tsconfig-paths": "^4.3.1"
   },
   "files": [
-    "dist"
+    "dist",
+    "dist-embed"
   ],
   "bugs": {
     "url": "https://github.com/openchatai/OpenCopilot/issues"
