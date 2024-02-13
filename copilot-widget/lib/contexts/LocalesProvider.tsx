@@ -13,8 +13,8 @@ function LanguageProvider({ children }: { children: React.ReactNode }) {
   return (
     <SafeLanguageProvider
       value={{
-        get: (key: string) => getStr(key, config.lang ?? "en"),
-        lang: config.lang ?? "en",
+        get: (key: string) => getStr(key, config.language ?? "en"),
+        lang: config.language ?? "en",
       }}
     >
       {children}
