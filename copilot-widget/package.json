@@ -12,7 +12,7 @@
     "preview": "vite preview",
     "release": "release-it",
     "prepublishOnly": "pnpm clean && pnpm build:lib && pnpm build:embed",
-    "update-dashboard-pilot": "pnpm build:embed && mv ./dist/assets/*.js ../dashboard/public/pilot.js"
+    "update-dashboard-pilot": "pnpm build:embed && mv ./dist-embed/*.js ../dashboard/public/pilot.js"
   },
   "peerDependencies": {
     "react": "^18.x"
