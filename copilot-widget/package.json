@@ -1,18 +1,18 @@
 {
   "name": "@openchatai/copilot-widget",
   "private": false,
-  "version": "2.5.0",
+  "version": "2.5.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "clean": "rm -rf ./dist",
-    "build:embed": "pnpm clean && tsc && vite build",
+    "clean": "rm -rf ./dist ./dist-embed",
+    "build:embed": "tsc && vite build",
     "build:lib": "vite build -c vite.lib.config.ts",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "release": "release-it",
-    "prepublishOnly": "pnpm clean && pnpm build:lib",
-    "update-dashboard-pilot": "pnpm build:embed && mv ./dist/assets/*.js ../dashboard/public/pilot.js"
+    "prepublishOnly": "pnpm clean && pnpm build:lib && pnpm build:embed",
+    "update-dashboard-pilot": "pnpm build:embed && mv ./dist-embed/*.js ../dashboard/public/pilot.js"
   },
   "peerDependencies": {
     "react": "^18.x"
@@ -58,7 +58,8 @@
     "vite-tsconfig-paths": "^4.3.1"
   },
   "files": [
-    "dist"
+    "dist",
+    "dist-embed"
   ],
   "bugs": {
     "url": "https://github.com/openchatai/OpenCopilot/issues"

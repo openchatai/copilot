@@ -8,7 +8,7 @@ export type Options = {
   apiUrl: string;
   socketUrl: string;
   defaultOpen?: boolean;
-  lang?: LangType;
+  language?: LangType;
   containerProps?: React.DetailedHTMLProps<
     React.HTMLAttributes<HTMLDivElement>,
     HTMLDivElement

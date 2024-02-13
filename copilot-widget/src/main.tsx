@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
-import { Options } from "@lib/types";
-import Root from "@lib/Root";
-import { CopilotWidget } from "@lib/CopilotWidget";
+import { Options } from "../lib/types";
+import Root from "../lib/Root";
+import { CopilotWidget } from "../lib/CopilotWidget";
 import { composeRoot } from "./utils";
 
 const defaultRootId = "opencopilot-root";
