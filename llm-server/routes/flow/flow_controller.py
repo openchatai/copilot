@@ -17,6 +17,7 @@ from presenters.flow_presenters import flow_to_dict, flow_variable_to_dict
 from routes.flow import flow_vector_service
 from routes.flow.utils.dynamic_flow_builder import build_dynamic_flow
 from utils.get_logger import CustomLogger
+from routes.flow.flow_vector_service import delete_flow as delete_flow_from_vector_store
 
 logger = CustomLogger("flow")
 flow = Blueprint("flow", __name__)
