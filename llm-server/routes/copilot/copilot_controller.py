@@ -84,13 +84,16 @@ def get_copilot(copilot_id):
 
 
 @copilot.route("/<string:copilot_id>", methods=["DELETE"])
-def delete_bot(copilot_id):
+def delete_bot(user, copilot_id):
     session = SessionLocal()
     try:
         # Find the bot
         bot = find_or_fail_by_bot_id(copilot_id)
 
-        # Delete the bot using the session
+        if user.id != int(bot.user_id):
+            return jsonify({"error": "That does not seem right."}), 403
+
+        # This should be soft delete but for now, we are doing hard delete
         session.delete(bot)
         session.commit()
         return jsonify({"success": "chatbot_deleted"}), 200
