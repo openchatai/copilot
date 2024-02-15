@@ -1,0 +1,14 @@
+---
+title: "Styling the widget"
+description: "few notes on how to style the widget."
+---
+The widget is styled using tailwindcss.
+so it is hard to overwrite the styles of let's say the basic elements such as buttons, inputs, etc.
+but when it comes to placing the widget we provided an easy way to manage this via `containerProps` prop(if you are using the standalone) or option if you are using the pre-built script.
+
+## The Default Widget Container Styles
+the widget is fluid by default and it will take the full width of the parent container.
+
+## containerProps
+`containerProps` is an object that you can pass to the widget to style the container of the widget.
+it can accept any valid html attributes such as `className`, `id`, `style`, etc.
