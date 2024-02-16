@@ -49,9 +49,9 @@
     {
       "group": "Copilot widget",
       "pages": [
-        "widget/embed"
-      ],
-      "icon": "chat"
+        "widget/embed",
+        "widget/styling"
+      ]
     },
     {
       "group": "Managing copilots via API",
