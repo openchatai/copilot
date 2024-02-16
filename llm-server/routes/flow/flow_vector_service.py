@@ -47,11 +47,13 @@ def create_flow(flow: FlowDTO):
     documents: List[Document] = []
 
     document = Document(page_content=flow.description + " " + flow.name)
-    document.metadata.update({
-        "bot_id": str(flow.bot_id),
-        "flow_id": str(flow.id),
-        "operation_id": flow.operation_id
-    })
+    document.metadata.update(
+        {
+            "bot_id": str(flow.bot_id),
+            "flow_id": str(flow.id),
+            "operation_id": flow.operation_id,
+        }
+    )
 
     documents.append(document)
 

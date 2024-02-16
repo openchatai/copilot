@@ -157,3 +157,20 @@ def add_or_update_variable_in_flow(
             session.add(variable)
         session.commit()
         return variable
+
+
+def delete_flow(flow_id: str) -> bool:
+    """
+    Deletes a flow record from the database.
+    Args:
+        flow_id: The ID of the flow to delete.
+    Returns:
+        True if the flow was deleted, False otherwise.
+    """
+    with Session() as session:
+        flow = session.query(Flow).filter(Flow.id == flow_id).first()
+        if flow:
+            session.delete(flow)
+            session.commit()
+            return True
+        return False

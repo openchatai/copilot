@@ -11,11 +11,13 @@ from models.repository.flow_repo import (
     get_variables_for_flow,
     add_or_update_variable_in_flow,
     update_flow,
+    delete_flow as delete_flow_from_db,
 )
 from presenters.flow_presenters import flow_to_dict, flow_variable_to_dict
 from routes.flow import flow_vector_service
 from routes.flow.utils.dynamic_flow_builder import build_dynamic_flow
 from utils.get_logger import CustomLogger
+from routes.flow.flow_vector_service import delete_flow as delete_flow_from_vector_store
 
 logger = CustomLogger("flow")
 flow = Blueprint("flow", __name__)
@@ -249,3 +251,31 @@ def add_variables_to_flow_api(flow_id: str):
             ),
             500,
         )
+
+
+@flow.route("/<flow_id>", methods=["DELETE"])
+def delete_flow_api(flow_id: str):
+    try:
+        # Attempt to delete the flow from the database
+        if delete_flow_from_db(flow_id):
+            # Attempt to delete the flow from the vector store
+            point_id = flow_vector_service.get_flow_point_id_by_flow_id(flow_id)
+            if point_id:
+                delete_flow_from_vector_store(point_id)
+                return (
+                    jsonify({"success": True, "message": "Flow deleted successfully."}),
+                    200,
+                )
+            else:
+                return (
+                    jsonify({"success": False, "message": "Flow vector not found."}),
+                    404,
+                )
+        else:
+            return (
+                jsonify({"success": False, "message": "Flow not found in database."}),
+                404,
+            )
+    except Exception as e:
+        logger.error("Failed to delete flow", payload=e)
+        return jsonify({"error": "Failed to delete flow."}), 500

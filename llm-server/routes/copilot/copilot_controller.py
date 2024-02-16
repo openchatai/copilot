@@ -90,7 +90,7 @@ def delete_bot(copilot_id):
         # Find the bot
         bot = find_or_fail_by_bot_id(copilot_id)
 
-        # Delete the bot using the session
+        # This should be soft delete but for now, we are doing hard delete
         session.delete(bot)
         session.commit()
         return jsonify({"success": "chatbot_deleted"}), 200
