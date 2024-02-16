@@ -278,4 +278,4 @@ def delete_flow_api(flow_id: str):
             )
     except Exception as e:
         logger.error("Failed to delete flow", payload=e)
-        return jsonify({"error": "Failed to delete flow. {}".format(str(e))}), 500
+        return jsonify({"error": "Failed to delete flow."}), 500
