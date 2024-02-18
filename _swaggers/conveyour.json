@@ -1,0 +1,587 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "OpenCopilot API",
+    "description": "API endpoints for interacting with the OpenCopilot service",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://opencopilot.conveyour.com"
+    }
+  ],
+  "paths": {
+    "/api/contacts": {
+      "get": {
+        "summary": "List Contacts",
+        "operationId": "listContacts",
+        "description": "Lists all contacts.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "sort[name]",
+            "in": "query",
+            "description": "Sort contacts by name",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "description": "Filter contacts by archived",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "description": "Response format",
+            "schema": {
+              "type": "string",
+              "default": "v2"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Contact",
+        "operationId": "createContact",
+        "description": "Creates a new contact.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "first_name": {
+                    "type": "string"
+                  },
+                  "last_name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "mobile": {
+                    "type": "string"
+                  },
+                  "alerts": {
+                    "type": "string"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "last_reply": {
+                    "type": "string"
+                  },
+                  "company": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "unsubscribed_from": {
+                    "type": "string"
+                  },
+                  "created_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "cvfdbfv": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/contacts/{contactId}": {
+      "put": {
+        "summary": "Update Contact",
+        "operationId": "updateContact",
+        "description": "Updates an existing contact.",
+        "parameters": [
+          {
+            "name": "contactId",
+            "in": "path",
+            "description": "ID of the contact to update",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "<contact_id_here>": {
+                    "type": "object",
+                    "properties": {
+                      "<prop_1>": {
+                        "type": "string"
+                      },
+                      "<prop_2>": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/snippets/folders/{folderid}": {
+      "delete": {
+        "summary": "Delete Snippet Folder",
+        "parameters": [
+          {
+            "name": "folderid",
+            "in": "path",
+            "description": "ID of the folder to be deleted",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful deletion",
+            "content": {
+              "application/json": {}
+            }
+          }
+        }
+      }
+    },
+    "/api/snippets/folders": {
+      "get": {
+        "summary": "Get Snippet Folders",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {}
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Folder",
+        "operationId": "createFolder",
+        "description": "Creates a new folder for snippets. Snippets are just saved replies. Make sure that a folder with same name doesnot exist by calling the api to get folders for snippets first.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "contact_conditions_type": {
+                    "type": "string"
+                  },
+                  "contact_conditions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "field": {
+                          "type": "object",
+                          "properties": {
+                            "bucket_id": {
+                              "type": "integer"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "label": {
+                              "type": "string"
+                            },
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "string",
+                                "email",
+                                "bool",
+                                "list",
+                                "time",
+                                "relation"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "bucket_id",
+                            "name",
+                            "label",
+                            "type"
+                          ]
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/snippets": {
+      "post": {
+        "summary": "Add Snippet to Folder",
+        "operationId": "addSnippet",
+        "description": "Adds a new snippet to a folder. If the folder id is not clear or was not provided, please show the user the list of folders with name and id of the folders. Proceed with it, once you have confirmation.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string"
+                  },
+                  "deletable": {
+                    "type": "boolean"
+                  },
+                  "editable": {
+                    "type": "boolean"
+                  },
+                  "folder_id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "notes": {
+                    "type": "string"
+                  },
+                  "shortcut": {
+                    "type": "string"
+                  },
+                  "text_content": {
+                    "type": "string"
+                  },
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/fields": {
+      "get": {
+        "summary": "Get Fields",
+        "operationId": "getFields",
+        "description": "Retrieves all fields.",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "summary": "Add Field",
+        "operationId": "addField",
+        "description": "Adds a new field dynamically. You must first call the list fields api. Then choose the bucket_id as the id of object with title contact info.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "bucket_id": {
+                    "type": "integer"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "string",
+                      "email",
+                      "bool",
+                      "list",
+                      "time",
+                      "relation"
+                    ]
+                  }
+                },
+                "required": [
+                  "bucket_id",
+                  "name",
+                  "label",
+                  "type"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/fields/{fieldId}": {
+      "delete": {
+        "operationId": "deleteFieldById",
+        "description": "Delete a field by ID. If the user tells you to delete a field, try to find the id of the field by first calling list fields, then figure out the id",
+        "parameters": [
+          {
+            "name": "fieldId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the field to be deleted"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful deletion"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Contact": {
+        "type": "object",
+        "properties": {
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "mobile": {
+            "type": "string"
+          },
+          "alerts": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "last_reply": {
+            "type": "string"
+          },
+          "company": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "unsubscribed_from": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cvfdbfv": {
+            "type": "string"
+          }
+        }
+      },
+      "Folder": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "contact_conditions_type": {
+            "type": "string"
+          },
+          "contact_conditions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "object",
+                  "properties": {
+                    "bucket_id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "string",
+                        "email",
+                        "bool",
+                        "list",
+                        "time",
+                        "relation"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "bucket_id",
+                    "name",
+                    "label",
+                    "type"
+                  ]
+                },
+                "value": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "Snippet": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "deletable": {
+            "type": "boolean"
+          },
+          "editable": {
+            "type": "boolean"
+          },
+          "folder_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "shortcut": {
+            "type": "string"
+          },
+          "text_content": {
+            "type": "string"
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Field": {
+        "type": "object",
+        "properties": {
+          "bucket_id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "string",
+              "email",
+              "bool",
+              "list",
+              "time",
+              "relation"
+            ]
+          }
+        },
+        "required": [
+          "bucket_id",
+          "name",
+          "label",
+          "type"
+        ]
+      }
+    }
+  }
+}

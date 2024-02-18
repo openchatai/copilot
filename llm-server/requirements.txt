@@ -70,7 +70,6 @@ jsonschema==4.19.2
 jsonschema-path==0.3.1
 jsonschema-specifications==2023.7.1
 kombu==5.3.4
-kubernetes==28.1.0
 langchain==0.1.5
 langchain-core==0.0.6
 langsmith==0.0.63
@@ -170,4 +169,4 @@ wrapt==1.16.0
 wsproto==1.2.0
 yarl==1.9.4
 zipp==3.17.0
-aioredis
+aioredis==2.0.1

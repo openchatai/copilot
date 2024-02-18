@@ -10,7 +10,6 @@ from bs4 import BeautifulSoup
 from utils.get_logger import CustomLogger
 import requests
 
-
 logger = CustomLogger(__name__)
 
 
@@ -108,7 +107,6 @@ class ParserFactory:
             raise ValueError(f"No parser available for content type: {content_type}")
         # Add more parsers as needed for different content types
         raise ValueError(f"No parser available for content type: {content_type}")
-
 
 def identify_content_type(url):
     try:

@@ -3,7 +3,6 @@ from typing import Iterable
 from urllib.parse import urlparse
 
 from celery import shared_task
-from qdrant_client import QdrantClient
 
 from models.repository.action_repo import (
     create_action,
@@ -13,9 +12,10 @@ from models.repository.copilot_repo import get_total_chatbots, get_chatbots_batc
 from routes.action import action_vector_service
 from shared.models.opencopilot_db.chatbot import Chatbot
 from utils.get_logger import CustomLogger
-from utils.llm_consts import VectorCollections, initialize_qdrant_client
+from utils.llm_consts import initialize_qdrant_client
 from utils.swagger_parser import SwaggerParser
 from utils.llm_consts import SHARED_FOLDER
+import requests
 
 # Initialize Qdrant Client and other global variables
 client = initialize_qdrant_client()
@@ -68,19 +68,24 @@ def is_valid_url(url: str) -> bool:
 
 def process_swagger_file(chatbot: Chatbot):
     """
-    Process the Swagger file of a chatbot, logs metadata such as number of actions.
+    Process the Swagger file of a chatbot, logs metadata such as the number of actions.
     Prevents duplicating actions if they already exist.
 
     :param chatbot: A Chatbot object.
     """
     bot_id = str(chatbot.id)
     swagger_url = str(chatbot.swagger_url)
-    try:
-        if not is_valid_url(swagger_url):
-            swagger_url = os.path.join(SHARED_FOLDER, swagger_url)
 
-        with open(swagger_url) as f:
-            f_content = f.read()
+    try:
+        if is_valid_url(swagger_url):
+            # If the provided URL is valid, fetch the content using requests
+            response = requests.get(swagger_url)
+            f_content = response.text
+        else:
+            # If it's not a URL, assume it's a local file path
+            swagger_url = os.path.join(SHARED_FOLDER, swagger_url)
+            with open(swagger_url) as f:
+                f_content = f.read()
 
         swagger_parser = SwaggerParser(f_content)
         swagger_parser.ingest_swagger_summary(bot_id)
@@ -99,7 +104,10 @@ def process_swagger_file(chatbot: Chatbot):
 
     except Exception as e:
         logger.error(
-            f"Error processing Swagger file {e}", bot_id=bot_id, swagger_url=swagger_url
+            "swagger_parsing_failed",
+            bot_id=bot_id,
+            swagger_url=swagger_url,
+            error=e
         )
 
 

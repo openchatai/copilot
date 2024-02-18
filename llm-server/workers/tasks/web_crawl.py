@@ -1,11 +1,11 @@
+from typing import Optional
 from urllib.parse import urlparse, urljoin
-import requests
 from celery import shared_task
 
 import traceback
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-
+from abc import ABC, abstractmethod
 from shared.utils.opencopilot_utils.init_vector_store import init_vector_store
 from shared.utils.opencopilot_utils.interfaces import StoreOptions
 from shared.models.opencopilot_db.website_data_sources import (
@@ -13,68 +13,74 @@ from shared.models.opencopilot_db.website_data_sources import (
     create_website_data_source,
     get_website_data_source_by_id,
 )
-from utils.llm_consts import max_pages_to_crawl
+from utils.llm_consts import WEB_CRAWL_STRATEGY, max_pages_to_crawl
 from models.repository.copilot_settings import ChatbotSettingCRUD
 from workers.tasks.url_parsers import ParserFactory
 
 from workers.utils.remove_escape_sequences import remove_escape_sequences
 from utils.get_logger import CustomLogger
-
+import io
+import json
+from PyPDF2 import PdfReader
+from workers.tasks.web_scraping_strategy import get_scraper
 from bs4 import BeautifulSoup
 
 logger = CustomLogger(__name__)
 
 
-def get_links(url: str) -> list:
+def get_links(url: str, strategy: str) -> list:
     if url.endswith((".jpg", ".jpeg", ".png", ".gif", ".bmp", ".mp4", ".avi", ".mkv")):
         return []
-    # Send a GET request to the URL
-    response = requests.get(url)
 
-    # Check if the request was successful (status code 200)
-    if response.status_code == 200:
-        # Parse the HTML content using BeautifulSoup
-        soup = BeautifulSoup(response.text, "lxml")
+    scraper = get_scraper(strategy)
+    html = scraper.extract_data(url)
 
-        # Extract all links on the page
+    if html:
+        soup = BeautifulSoup(html, "lxml")
+        base_url = urlparse(url).scheme + "://" + urlparse(url).hostname
         links = [a.get("href") for a in soup.find_all("a", href=True)]
 
-        # Filter out relative links and create absolute URLs
-        absolute_links = [urljoin(url, link) for link in links if urlparse(link).scheme]
+        # Only apply urljoin if the link isn't already an http or https
+        absolute_links = [
+            urljoin(base_url, link) if not link.startswith("http") else link
+            for link in links
+        ]
 
-        # Filter out links with a different host or subdomain
         same_host_links = [
             link
             for link in absolute_links
             if urlparse(link).hostname == urlparse(url).hostname
         ]
 
-        # Remove trailing '/' from each link using urlparse
         same_host_links = [
             urlparse(link)._replace(path=urlparse(link).path.rstrip("/")).geturl()
             for link in same_host_links
         ]
-
         return same_host_links
     else:
-        # Print an error message if the request was not successful
-        print(f"Failed to retrieve content. Status code: {response.status_code}")
+        print("Failed to retrieve content.")
         return []
 
 
-def scrape_url(url: str):
+def scrape_url(url: str, strategy: Optional[str]) -> Optional[str]:
     try:
-        parser = ParserFactory.get_parser(url)
-        response = requests.get(url)
+        # for external sources always use text content parser, because we don't know the content type
+        if strategy != "requests":
+            parser = TextContentParser()
+        else:
+            parser = ParserFactory.get_parser(url)
 
-        return parser.parse(response.content)
+        scraper = get_scraper(strategy)
+        response = scraper.extract_data(url)
+
+        return parser.parse(response)
     except ValueError as e:
         # Log an error message if no parser is available for the content type
         logger.error(str(e))
         return None
 
 
-def scrape_website(url: str, bot_id: str, max_pages: int) -> int:
+def scrape_website(url: str, bot_id: str, max_pages: int, strategy: str) -> int:
     """Scrapes a website in breadth-first order, following all of the linked pages.
 
     Args:
@@ -88,7 +94,7 @@ def scrape_website(url: str, bot_id: str, max_pages: int) -> int:
     if total_pages_scraped > max_pages:
         logger.warn(
             "web_crawl_max_pages_reached",
-            f"Reached max pages to crawl for chatbot {bot_id}. Stopping crawl.",
+            info=f"Reached max pages to crawl for chatbot {bot_id}. Stopping crawl.",
         )
 
     visited_urls = set()
@@ -187,4 +193,49 @@ def resume_failed_website_scrape(website_data_source_id: str):
     # Get the URL of the website to scrape.
     url = website_data_source.url
 
-    scrape_website(url, website_data_source.bot_id, max_pages_to_crawl)
+    scrape_website(
+        url, website_data_source.bot_id, max_pages_to_crawl, WEB_CRAWL_STRATEGY
+    )
+
+
+class ContentParser(ABC):
+    @abstractmethod
+    def parse(self, content):
+        pass
+
+
+class TextContentParser(ContentParser):
+    def parse(self, content):
+        soup = BeautifulSoup(content, "lxml")
+        text_content = " ".join(
+            [
+                p.text.strip()
+                for p in soup.find_all(["p", "h1", "h2", "h3", "h4", "h5", "h6"])
+            ]
+        )
+        return text_content
+
+
+class JsonContentParser(ContentParser):
+    def parse(self, content):
+        try:
+            json_data = json.loads(content)
+            # Convert JSON object to a string representation
+            return json.dumps(json_data, indent=2)
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse JSON content: {e}")
+            return None
+
+
+class PDFContentParser(ContentParser):
+    def parse(self, content):
+        try:
+            with io.BytesIO(content) as pdf_file:
+                reader = PdfReader(pdf_file)
+                text_content = ""
+                for page in reader.pages:
+                    text_content += page.extract_text() + "\n"
+                return text_content
+        except Exception as e:
+            logger.error(f"Failed to parse PDF content: {e}")
+            return None
