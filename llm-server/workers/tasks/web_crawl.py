@@ -28,7 +28,7 @@ from bs4 import BeautifulSoup
 logger = CustomLogger(__name__)
 
 
-def get_links(url: str, strategy: str) -> list:
+def get_links(url: str, strategy=WEB_CRAWL_STRATEGY) -> list:
     if url.endswith((".jpg", ".jpeg", ".png", ".gif", ".bmp", ".mp4", ".avi", ".mkv")):
         return []
 
@@ -62,7 +62,7 @@ def get_links(url: str, strategy: str) -> list:
         return []
 
 
-def scrape_url(url: str, strategy: Optional[str]) -> Optional[str]:
+def scrape_url(url: str, strategy=WEB_CRAWL_STRATEGY) -> Optional[str]:
     try:
         # for external sources always use text content parser, because we don't know the content type
         if strategy != "requests":
@@ -196,9 +196,7 @@ def resume_failed_website_scrape(website_data_source_id: str):
     # Get the URL of the website to scrape.
     url = website_data_source.url
 
-    scrape_website(
-        url, website_data_source.bot_id, max_pages_to_crawl, WEB_CRAWL_STRATEGY
-    )
+    scrape_website(url, website_data_source.bot_id, max_pages_to_crawl)
 
 
 class ContentParser(ABC):
