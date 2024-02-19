@@ -80,7 +80,7 @@ def scrape_url(url: str, strategy: Optional[str]) -> Optional[str]:
         return None
 
 
-def scrape_website(url: str, bot_id: str, max_pages: int, strategy: str) -> int:
+def scrape_website(url: str, bot_id: str, max_pages: int) -> int:
     """Scrapes a website in breadth-first order, following all of the linked pages.
 
     Args:
@@ -174,8 +174,11 @@ def web_crawl(url, bot_id: str):
         logger.info(f"chatbot_settings: {setting.max_pages_to_crawl}")
         create_website_data_source(chatbot_id=bot_id, status="PENDING", url=url)
 
-        scrape_website(url, bot_id, setting.max_pages_to_crawl or max_pages_to_crawl)  # type: ignore
+        scrape_website(url, bot_id, setting.max_pages_to_crawl or max_pages_to_crawl)
     except Exception as e:
+        logger.error(
+            "WEB_SCRAPING_FAILED", info=f"Failed to scrape website {url}.", error=e
+        )
         traceback.print_exc()
 
 
