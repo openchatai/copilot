@@ -109,6 +109,19 @@ Available Targets:
   help               - Display this help message
 ```
 
+## Crawling Web Pages
+
+By default, when passing in a URL to create a new DataSource for a Copilot, 15 pages will be indexed. The configuration for this is located in the `opencopilot/llm-server/utils/llm_consts.py` file:
+
+```python
+max_pages_to_crawl = int(os.getenv("MAX_PAGES_TO_CRAWL", "15"))
+```
+
+To increase the max pages to crawl, you can change the configuration file. However, this will create uncommitted changes in your working copy which you will need to stash in order to `git pull` for future updates. Another way to increase the max pages to crawl is to set an environment variable:
+
+```bash
+export MAX_PAGES_TO_CRAWL="50"
+```
 -----
 
 Complete list of links:
