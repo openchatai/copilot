@@ -144,3 +144,12 @@ async def get_regex_for_dynamic_params(url: str) -> str:
     await cache_result(redis_key, result.urn, ttl=7200)
 
     return result.urn
+
+
+async def cache_result(key: str, value: str, ttl: int):
+    await redis_client.setex(key, ttl, value)
+
+
+async def get_cached_result(key: str) -> str:
+    cached_result = await redis_client.get(key)
+    return cached_result
