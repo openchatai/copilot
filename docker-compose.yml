@@ -15,9 +15,8 @@ services:
       - opencopilot-net
     env_file:
       - llm-server/.env
-    ports:
-      - 8002:8002
-      - 5678:5678
+    deploy:
+      replicas: 3 # Increased number of replicas
     depends_on:
       mysql:
         condition: service_healthy
