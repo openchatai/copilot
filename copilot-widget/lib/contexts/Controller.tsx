@@ -60,7 +60,6 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       }),
     [config, sessionId]
   );
-  console.log(socket)
 
   useEffect(() => {
     if (isOpen) {
