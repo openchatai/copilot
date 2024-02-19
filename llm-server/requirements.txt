@@ -86,7 +86,7 @@ multidict==6.0.4
 mypy-extensions==1.0.0
 numpy==1.26.1
 oauthlib==3.2.2
-onnxruntime==1.16.1
+onnxruntime==1.17.0
 openai==1.10.0
 openapi-schema-validator==0.6.2
 openapi-spec-validator==0.7.1
