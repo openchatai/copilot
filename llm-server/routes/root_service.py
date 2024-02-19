@@ -1,5 +1,3 @@
-import asyncio
-import os
 from typing import Dict, Optional, List, cast
 
 from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
@@ -17,7 +15,7 @@ from routes.flow.utils.document_similarity_dto import (
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
 from utils.llm_consts import VectorCollections
-from flask_socketio import emit
+from flask_sse import sse
 
 logger = CustomLogger(module_name=__name__)
 
@@ -169,15 +167,18 @@ async def run_informative_item(
         )
     )
 
-    emit(
-        f"{session_id}_info", "Distilling the information received...\n"
-    ) if is_streaming else None
+    (
+        sse.publish(f"{session_id}_info", "Distilling the information received...\n")
+        if is_streaming
+        else None
+    )
     messages.append(HumanMessage(content=text))
 
     # convert to astream
     content = ""
     for chunk in chat.stream(messages):
-        emit(session_id, chunk.content) if is_streaming else None
+        if is_streaming:
+            sse.publish({"message": chunk.content}, type=session_id)
         content += str(chunk.content)
 
     # return {"response": content, "error": None}

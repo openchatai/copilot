@@ -22,10 +22,9 @@ from routes.chat.implementation.tools_strategy import ToolStrategy
 from utils.get_logger import CustomLogger
 from utils.llm_consts import X_App_Name, chat_strategy, ChatStrategy
 from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
-from flask_socketio import emit
+from flask_sse import sse
 
 from flask import request
-from pydub import AudioSegment
 import openai
 import uuid
 import os
@@ -248,7 +247,7 @@ async def handle_chat_send_common(
             error=e,
             bot_token=bot_token,
         )
-        emit(session_id, str(e))
+        sse.publish({"message": str(e)}, type=session_id)
         return (
             jsonify(
                 {

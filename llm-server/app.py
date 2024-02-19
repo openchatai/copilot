@@ -1,5 +1,6 @@
 import asyncio
-import requests
+import gunicorn
+import multiprocessing
 from dotenv import load_dotenv
 from flask import Flask, request
 from flask import jsonify
@@ -25,7 +26,8 @@ from utils.config import Config
 from routes.chat.chat_dto import ChatInput
 from werkzeug.exceptions import HTTPException
 
-from flask_socketio import SocketIO
+from flask_sse import sse
+
 from utils.get_logger import CustomLogger
 from routes.search.search_controller import search_workflow
 
@@ -42,7 +44,7 @@ load_dotenv()
 create_database_schema()
 app = Flask(__name__)
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*")
+app.register_blueprint(sse, url_prefix="/stream")
 
 app.after_request(log_api_call)
 
@@ -81,8 +83,9 @@ def handle_exception(error):
     )
 
 
-@socketio.on("send_chat")
-def handle_send_chat(json_data):
+@app.route("/send_chat", methods=["POST"])
+def handle_send_chat():
+    json_data = request.get_json()
     input_data = ChatInput(**json_data)
     message = input_data.content
     session_id = input_data.session_id
@@ -101,7 +104,7 @@ def handle_send_chat(json_data):
     }
 
     if not bot_token:
-        socketio.emit(session_id, {"error": "Bot token is required"})
+        sse.publish({"error": "Bot token is required"}, type=session_id)
         return
 
     asyncio.run(send_chat_stream(message, bot_token, session_id, headers_from_json))
@@ -109,8 +112,3 @@ def handle_send_chat(json_data):
 
 
 init_qdrant_collections()
-
-if __name__ == "__main__":
-    socketio.run(
-        app, host="0.0.0.0", port=8002, debug=True, use_reloader=True, log_output=False
-    )
