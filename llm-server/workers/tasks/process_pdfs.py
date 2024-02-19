@@ -24,9 +24,9 @@ kb_vector_store = get_vector_store(StoreOptions("knowledgebase"))
 @shared_task
 def process_pdf(file_name: str, bot_id: str):
     try:
-        logger.info(
-            "Pdf task picked up filename: {}, bot_id: {}".format(file_name, bot_id)
-        )
+        # logger.info(
+        #     "Pdf task picked up filename: {}, bot_id: {}".format(file_name, bot_id)
+        # )
         insert_pdf_data_source(chatbot_id=bot_id, file_name=file_name, status="PENDING")
         loader = PyPDFLoader(get_file_path(file_name))
         raw_docs = loader.load()
@@ -51,7 +51,7 @@ def process_pdf(file_name: str, bot_id: str):
             chatbot_id=bot_id, file_name=file_name, status="COMPLETED"
         )
     except Exception as e:
-        print(f"Error processing {file_name}:", e)
+        logger.error("PDF_CRAWL_ERROR", error=e)
         update_pdf_data_source_status(
             chatbot_id=bot_id, file_name=file_name, status="FAILED"
         )

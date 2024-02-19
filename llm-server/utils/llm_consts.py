@@ -1,11 +1,11 @@
 from flask import Request
 import os
+import redis
 
 from typing import TypedDict
 from functools import lru_cache
 
 from qdrant_client import QdrantClient
-from urllib.parse import urlparse
 
 X_CONSUMER_USERNAME = "X-CONSUMER-USERNAME"
 EXPERIMENTAL_FEATURES_ENABLED = os.getenv("EXPERIMENTAL_FEATURES_ENABLED", "NO")
@@ -106,4 +106,17 @@ max_pages_to_crawl = int(os.getenv("MAX_PAGES_TO_CRAWL", "15"))
 enable_followup_questions = (
     True if os.getenv("ENABLE_FOLLOWUP_QUESTIONS", "NO") == "YES" else False
 )
+
+SCRAPINGBEE_API_KEY = os.getenv("SCRAPINGBEE_API_KEY", "")
+WEB_CRAWL_STRATEGY = os.getenv("WEB_CRAWL_STRATEGY", "requests")
 ENABLE_EXTERNAL_API_LOGGING = os.getenv("ENABLE_EXTERNAL_API_LOGGING", "YES") == "YES"
+
+SESSION_KEY_FORMAT = "session_x_{}"
+CACHE_EXPIRATION = 60 * 60 * 24  # 24 hours
+
+
+redis_client = redis.Redis.from_url(
+    url=os.getenv("REDIS_URL", ""), decode_responses=True
+)
+
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "YOURSUPERSECRETKEY")
