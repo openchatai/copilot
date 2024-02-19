@@ -116,7 +116,7 @@ CACHE_EXPIRATION = 60 * 60 * 24  # 24 hours
 
 
 redis_client = redis.Redis.from_url(
-    url=os.getenv("REDIS_URL", ""), decode_responses=True
+    url=os.getenv("REDIS_URL", "redis://redis:6379/2"), decode_responses=True
 )
 
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "YOURSUPERSECRETKEY")
