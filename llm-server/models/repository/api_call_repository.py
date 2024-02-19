@@ -1,14 +1,13 @@
-from sqlalchemy.orm import Session
-
 from shared.models.opencopilot_db.api_call import APICall
+from models.repository.utils import db_session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class APICallRepository:
-    def __init__(self, db_session: Session):
-        self.db_session = db_session
-
-    def log_api_call(
+    @db_session
+    async def log_api_call(
         self,
+        session: AsyncSession,
         url: str,
         path: str,
         method: str,
@@ -22,5 +21,5 @@ class APICallRepository:
             path_params=path_params,
             query_params=query_params,
         )
-        self.db_session.add(api_call)
-        self.db_session.commit()
+        session.add(api_call)
+        await session.commit()

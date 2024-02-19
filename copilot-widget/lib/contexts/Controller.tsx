@@ -28,6 +28,31 @@ const [
   ChatSafeProvider,
 ] = createSafeContext<ChatContextData>();
 
+const useIdle = (idleTimeout: number): boolean => {
+  const [isIdle, setIsIdle] = useState(false);
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+
+    const handleActivity = () => {
+      clearTimeout(timeout);
+      setIsIdle(false);
+      timeout = setTimeout(() => setIsIdle(true), idleTimeout);
+    };
+
+    window.addEventListener('mousemove', handleActivity);
+    window.addEventListener('keydown', handleActivity);
+    
+    handleActivity();
+
+    return () => {
+      window.removeEventListener('mousemove', handleActivity);
+      window.removeEventListener('keydown', handleActivity);
+    };
+  }, [idleTimeout]);
+
+  return isIdle;
+};
 
 const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentMessagePair, setCurrentMessagePair] = useState<{ user: string; bot: string } | null>(null);
@@ -40,12 +65,16 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     setLastMessageToVote(id)
   }, [])
   
-  const socket = useMemo(() => io(config.socketUrl, {
-    extraHeaders: {
-      "X-Bot-Token": config.token,
-      "X-Session-Id": sessionId,
-    },
-  }), [config, sessionId]);
+  const isIdle = useIdle(5 * 60 * 1000);
+  const socket = useMemo(() => {
+    if (isIdle) return null;
+    return io(config.socketUrl, {
+      extraHeaders: {
+        "X-Bot-Token": config.token,
+        "X-Session-Id": sessionId,
+      },
+    });
+  }, [config, sessionId, isIdle]);
 
   const [failedMessage, setError] = useState<FailedMessage | null>(null);
   const loading = currentMessagePair !== null;
@@ -62,7 +91,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       session_id: sessionId,
       headers: config.headers ?? {},
     }
-    socket.emit('send_chat', userMessage);
+    socket?.emit('send_chat', userMessage);
 
     setCurrentMessagePair({
       user: userMessageId,
@@ -100,12 +129,12 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   }, [messages])
 
   useEffect(() => {
-    socket.on(`${sessionId}_info`, (msg: string) => {
+    socket?.on(`${sessionId}_info`, (msg: string) => {
       setConversationInfo(msg)
     })
 
     return () => {
-      socket.off(`${sessionId}_info`);
+      socket?.off(`${sessionId}_info`);
     };
   }, [sessionId, socket]);
 
@@ -113,7 +142,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const current = currentMessagePair
     // the content is the message.content from the server
     try {
-      socket.on(sessionId, (content: string) => {
+      socket?.on(sessionId, (content: string) => {
         if (current) {
           if (content === "|im_end|") {
             setCurrentMessagePair(null)
@@ -123,21 +152,21 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
           updateBotMessage(current.bot, content)
         }
       });
-      return () => { socket.off(sessionId) }
+      return () => { socket?.off(sessionId) }
     } catch (error) {
       setConversationInfo(null)
     }
 
   }, [currentMessagePair, sessionId, socket, updateBotMessage]);
   useEffect(() => {
-    socket.on(`${sessionId}_vote`, (content) => {
+    socket?.on(`${sessionId}_vote`, (content) => {
       console.log(`${sessionId}_vote ==>`, content)
       if (content) {
         setLastMessageToVote(content)
       }
     });
     return () => {
-      socket.off(`${sessionId}_vote`);
+      socket?.off(`${sessionId}_vote`);
       setLastMessageToVote(null)
     };
   }, [sessionId, socket])
