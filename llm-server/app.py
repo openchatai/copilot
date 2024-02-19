@@ -87,10 +87,9 @@ def handle_send_chat(json_data):
     message = input_data.content
     session_id = input_data.session_id
     headers_from_json = input_data.headers
-
-    headers = request.headers
-
-    bot_token = headers.environ.get("HTTP_X_BOT_TOKEN")
+    # headers = request.headers
+    bot_token = input_data.bot_token
+    # bot_token = headers.environ.get("HTTP_X_BOT_TOKEN")
 
     json_data = {
         "url": request.base_url,
@@ -100,9 +99,9 @@ def handle_send_chat(json_data):
         "method": "wss",
     }
 
-    if not bot_token:
-        socketio.emit(session_id, {"error": "Bot token is required"})
-        return
+    # if not bot_token:
+    #     socketio.emit(session_id, {"error": "Bot token is required"})
+    #     return
 
     asyncio.run(send_chat_stream(message, bot_token, session_id, headers_from_json))
     log_opensource_telemetry_data(json_data)
