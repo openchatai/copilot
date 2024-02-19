@@ -1,18 +1,16 @@
-from flask import jsonify, Blueprint, request, Response
+from fastapi import APIRouter, HTTPException, Depends
+from typing import List
 
 from models.repository.datasource_repo import (
     get_all_pdf_datasource_by_bot_id,
     get_all_website_datasource_by_bot_id,
 )
 
-datasource_workflow = Blueprint("datasource", __name__)
+datasource_router = APIRouter()
 
 
-@datasource_workflow.route("/b/<bot_id>", methods=["GET"])
-def get_data_sources(bot_id: str) -> Response:
-    limit = int(request.args.get("limit", 20))
-    offset = int(request.args.get("offset", 0))
-
+@datasource_router.get("/b/{bot_id}")
+def get_data_sources(bot_id: str, limit: int = 20, offset: int = 0) -> dict:
     pdf_datasources = get_all_pdf_datasource_by_bot_id(bot_id, limit, offset)
 
     pdf_sources = []
@@ -41,4 +39,4 @@ def get_data_sources(bot_id: str) -> Response:
                 "updated_at": wds.updated_at,
             }
         )
-    return jsonify({"pdf_sources": pdf_sources, "web_sources": web_sources})
+    return {"pdf_sources": pdf_sources, "web_sources": web_sources}

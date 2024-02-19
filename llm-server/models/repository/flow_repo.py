@@ -1,30 +1,18 @@
-import json
-from typing import Optional, Type, Any
-
-from shared.models.opencopilot_db import engine
-from sqlalchemy.orm import sessionmaker
-
+from typing import Type
+from sqlalchemy import select
+from shared.models.opencopilot_db import async_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlalchemy import and_
 from entities.flow_entity import FlowDTO
 from shared.models.opencopilot_db.flow import Flow
 from shared.models.opencopilot_db.flow_variables import FlowVariable
 
-Session = sessionmaker(bind=engine)
+async_session = async_sessionmaker(async_engine, expire_on_commit=False)
 
 
-def create_flow(flow_dto: FlowDTO) -> Flow:
-    """
-    Creates a new flow record in the database.
-
-    Args:
-        flow_dto: An instance of FlowDTO containing all necessary data.
-
-    Returns:
-        The newly created Flow object.
-    """
+async def create_flow(flow_dto: FlowDTO) -> Flow:
     blocks_json = [block.model_dump() for block in flow_dto.blocks]
-
-    with Session() as session:
-        # Create a new Flow instance using data from the DTO
+    async with async_session() as session:
         new_flow = Flow(
             chatbot_id=flow_dto.bot_id,
             name=flow_dto.name,
@@ -35,82 +23,52 @@ def create_flow(flow_dto: FlowDTO) -> Flow:
         )
 
         session.add(new_flow)
-        session.commit()
-        session.refresh(
-            new_flow
-        )  # Refresh the instance to load any unloaded attributes
+        await session.commit()
+        await session.refresh(new_flow)
         return new_flow
 
 
-def update_flow(flow_id: str, flow_dto: FlowDTO) -> Type[Flow]:
-    """
-    Updates an existing flow record in the database.
-
-    Args:
-        flow_dto:
-        flow_id: The ID of the flow to update.
-
-    Returns:
-        The updated Flow object, or None if not found.
-    """
+async def update_flow(flow_id: str, flow_dto: FlowDTO) -> Type[Flow]:
     blocks_json = [block.model_dump() for block in flow_dto.blocks]
+    async with async_session() as session:
+        flow = (await session.scalars(select(Flow).where(Flow.id == flow_id))).first()
+        if not flow:
+            raise Exception("Flow not found")
 
-    with Session() as session:
-        flow = session.query(Flow).filter(Flow.id == flow_id).first()
-        if flow:
-            flow.name = flow_dto.name
-            flow.payload = blocks_json
-            flow.description = flow_dto.description
-            session.commit()
-            session.refresh(flow)
-            return flow
-        return None
+        flow.name = flow_dto.name
+        flow.payload = blocks_json
+        flow.description = flow_dto.description
+        await session.commit()
+        await session.refresh(flow)
+        return flow
 
 
-def get_all_flows_for_bot(bot_id: str) -> list[Type[Flow]]:
-    """
-    Retrieves all flows for a given bot from the database.
+async def get_all_flows_for_bot(bot_id: str):
+    async with async_session() as session:
+        flows = (
+            await session.scalars(select(Flow).where(Flow.chatbot_id == bot_id))
+        ).all()
 
-    Args:
-        bot_id: The ID of the bot.
-
-    Returns:
-        A list of Flow objects.
-    """
-    with Session() as session:
-        flows = session.query(Flow).filter(Flow.chatbot_id == bot_id).all()
         return flows
 
 
-def get_flow_by_id(flow_id: str) -> Optional[Flow]:
-    """
-    Retrieves a specific flow by its ID from the database.
-
-    Args:
-        flow_id: The ID of the flow.
-
-    Returns:
-        The Flow object if found, otherwise None.
-    """
-    with Session() as session:
-        return session.query(Flow).filter(Flow.id == str(flow_id)).first()
+async def get_flow_by_id(flow_id: str):
+    async with async_session() as session:
+        return (
+            await session.scalars(select(Flow).where(Flow.id == str(flow_id)))
+        ).first()
 
 
-def get_variables_for_flow(flow_id: str) -> list[Type[FlowVariable]]:
-    """
-    Retrieves all variables for a specific flow from the database.
-
-    Args:
-        flow_id: The ID of the flow.
-
-    Returns:
-        A list of FlowVariable objects.
-    """
-    with Session() as session:
-        return session.query(FlowVariable).filter(FlowVariable.flow_id == flow_id).all()
+async def get_variables_for_flow(flow_id: str):
+    async with async_session() as session:
+        return (
+            await session.scalars(
+                select(FlowVariable).where(FlowVariable.flow_id == flow_id)
+            )
+        ).all()
 
 
-def add_or_update_variable_in_flow(
+async def add_or_update_variable_in_flow(
     bot_id: str,
     flow_id: str,
     name: str,
@@ -118,31 +76,18 @@ def add_or_update_variable_in_flow(
     runtime_override_key: str = None,
     runtime_override_action_id: str = None,
 ) -> FlowVariable:
-    """
-    Adds a new variable to a flow or updates it if it already exists.
-
-    Args:
-        bot_id:
-        runtime_override_key:
-        runtime_override_action_id:
-        flow_id: The ID of the flow.
-        name: The name of the variable.
-        value: The value of the variable.
-
-    Returns:
-        The updated or newly created FlowVariable object.
-    """
-    with Session() as session:
-        variable = (
-            session.query(FlowVariable)
-            .filter_by(
-                bot_id=bot_id,
-                flow_id=flow_id,
-                name=name,
-                runtime_override_action_id=runtime_override_action_id,
-                runtime_override_key=runtime_override_key,
+    async with async_session() as session:
+        variable = await session.scalar(
+            select(FlowVariable).where(
+                and_(
+                    FlowVariable.bot_id == bot_id,
+                    FlowVariable.flow_id == flow_id,
+                    FlowVariable.name == name,
+                    FlowVariable.runtime_override_action_id
+                    == runtime_override_action_id,
+                    FlowVariable.runtime_override_key == runtime_override_key,
+                )
             )
-            .first()
         )
         if variable:
             variable.value = value
@@ -155,22 +100,15 @@ def add_or_update_variable_in_flow(
                 runtime_override_key=runtime_override_key,
             )
             session.add(variable)
-        session.commit()
+        await session.commit()
         return variable
 
 
-def delete_flow(flow_id: str) -> bool:
-    """
-    Deletes a flow record from the database.
-    Args:
-        flow_id: The ID of the flow to delete.
-    Returns:
-        True if the flow was deleted, False otherwise.
-    """
-    with Session() as session:
-        flow = session.query(Flow).filter(Flow.id == flow_id).first()
+async def delete_flow(flow_id: str) -> bool:
+    async with async_session() as session:
+        flow = (await session.scalars(select(Flow).where(Flow.id == flow_id))).first()
         if flow:
-            session.delete(flow)
-            session.commit()
+            await session.delete(flow)
+            await session.commit()
             return True
         return False

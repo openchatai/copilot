@@ -2,7 +2,6 @@ from typing import Any, Dict, NamedTuple
 import json
 import aiohttp
 from copilot_exceptions.api_call_failed_exception import APICallFailedException
-from custom_types.response_dict import ApiRequestResult
 
 from utils.get_logger import CustomLogger
 

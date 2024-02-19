@@ -146,19 +146,6 @@ def create_copilot(
 
 
 def find_one_or_fail_by_id(bot_id: str) -> Chatbot:
-    """
-    Finds a Chatbot instance by its ID. Raises an exception if the Chatbot is not found.
-
-    Args:
-        bot_id (str): The unique identifier of the Chatbot.
-
-    Returns:
-        Chatbot: The found Chatbot instance.
-
-    Raises:
-        ValueError: If no Chatbot is found with the provided ID.
-        Exception: If any other exception occurs during the database operation.
-    """
     session: Session = SessionLocal()
     try:
         bot = session.query(Chatbot).filter(Chatbot.id == str(bot_id)).one()
@@ -173,19 +160,6 @@ def find_one_or_fail_by_id(bot_id: str) -> Chatbot:
 
 
 def find_one_or_fail_by_token(bot_token: str) -> Chatbot:
-    """
-    Finds a Chatbot instance by its ID. Raises an exception if the Chatbot is not found.
-
-    Args:
-        bot_token: The unique identifier of the Chatbot.
-
-    Returns:
-        Chatbot: The found Chatbot instance.
-
-    Raises:
-        ValueError: If no Chatbot is found with the provided ID.
-        Exception: If any other exception occurs during the database operation.
-    """
     session: Session = SessionLocal()
     try:
         bot = session.query(Chatbot).filter(Chatbot.token == str(bot_token)).one()

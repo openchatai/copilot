@@ -1,7 +1,8 @@
 import uuid
 
-from flask import Blueprint, jsonify, request
-
+from fastapi import APIRouter, Body, Response, HTTPException
+from pydantic import BaseModel
+from typing import Optional, List, Any
 from entities.flow_entity import FlowDTO
 from models.repository.copilot_repo import find_one_or_fail_by_id
 from models.repository.flow_repo import (
@@ -20,19 +21,30 @@ from utils.get_logger import CustomLogger
 from routes.flow.flow_vector_service import delete_flow as delete_flow_from_vector_store
 
 logger = CustomLogger("flow")
-flow = Blueprint("flow", __name__)
+flow_router = APIRouter()
 
 
-@flow.route("/dynamic/bot/<bot_id>", methods=["POST"])
-async def build_flow_from_text(bot_id: str):
-    data = request.get_json()
+class Data(BaseModel):
+    text: Optional[str] = None
+    name: Optional[str] = None
+    description: Optional[str] = None
+    variables: Optional[List[Any]] = None
+    blocks: Optional[List[Any]] = None
+    status: Optional[str] = None
+    value: Optional[Any] = None
+    runtime_override_key: Optional[str] = None
+    runtime_override_action_id: Optional[str] = None
+    chatbot_id: Optional[str] = None
 
-    response = await build_dynamic_flow(data.get("text"), bot_id)
-    return jsonify(response)
+
+@flow_router.post("/dynamic/bot/{bot_id}")
+async def build_flow_from_text(data: Data, bot_id: str):
+    response = await build_dynamic_flow(data.text, bot_id)
+    return response
 
 
-@flow.route("/bot/<bot_id>", methods=["GET"])
-def get_all_flows_api(bot_id: str):
+@flow_router.get("/bot/{bot_id}")
+async def get_all_flows_api(bot_id: str):
     """
     API endpoint to retrieve all flows for a given bot.
 
@@ -43,239 +55,163 @@ def get_all_flows_api(bot_id: str):
         A Flask response object with a list of Flow objects as dictionaries.
     """
     try:
-        flows = get_all_flows_for_bot(bot_id)
-        flows_dict = [
-            flow_to_dict(flow) for flow in flows
-        ]  # Assuming flow_to_dict is a function to convert Flow objects to dictionaries
-        return jsonify(flows_dict), 200
+        flows = await get_all_flows_for_bot(bot_id)
+        flows_dict = [flow_to_dict(flow) for flow in flows]
+        return flows_dict, 200
     except Exception as e:
-        # Log the exception here
         print(f"Error retrieving flows for bot ID {bot_id}: {e}")
-        # Return an error response
-        return jsonify({"error": "Failed to retrieve flows"}), 500
+        raise HTTPException(
+            status_code=500, detail={"error": "Failed to retrieve flows"}
+        )
 
 
-@flow.route("/bot/<bot_id>", methods=["POST"])
-def create_flow_api(bot_id: str):
-    """
-    API endpoint to create a new flow record.
-
-    Args:
-        bot_id: The ID of the chatbot associated with the flow.
-
-    Returns:
-        A Flask response object with the newly created Flow object as a dictionary.
-    """
+@flow_router.post("/bot/{bot_id}")
+async def create_flow_api(data: Data, bot_id: str):
     try:
-        data = request.get_json()
         if not data:
-            return jsonify({"error": "No data provided"}), 400
+            raise HTTPException(status_code=400, detail={"error": "No data provided"})
 
-        # Inject bot_id into each ActionDTO within the blocks (because the DTO expect it)
-        for block in data.get("blocks", []):
+        for block in data.blocks or []:
             for action in block.get("actions", []):
                 action["bot_id"] = bot_id
 
-        # Validate data using FlowDTO with Pydantic
         try:
             flow_dto = FlowDTO(
                 bot_id=bot_id,
-                name=data.get("name"),
-                description=data.get("description"),
-                variables=data.get("variables", []),
-                blocks=data.get("blocks", []),
+                name=data.name,
+                description=data.description,
+                variables=data.variables or [],
+                blocks=data.blocks or [],
                 id=str(uuid.uuid4()),
             )
         except Exception as e:
-            return jsonify({"error": str(e)}), 400
+            raise HTTPException(status_code=400, detail={"error": str(e)})
 
-        # Assuming create_flow is a function to save the flow to DB
-        flow = create_flow(flow_dto)
+        flow = await create_flow(flow_dto)
         flow_vector_service.create_flow(flow_dto)
-        return jsonify(flow_to_dict(flow)), 201
+        return flow_to_dict(flow), 201
 
     except Exception as e:
         print(f"Error creating flow: {e}")
         logger.error("Failed to create flow", payload=e)
-        return jsonify({"error": "Failed to create flow. {}".format(str(e))}), 500
-
-
-@flow.route("/<flow_id>", methods=["PUT"])
-def update_flow_api(flow_id: str):
-    """
-    API endpoint to update an existing flow record.
-
-    Args:
-        flow_id: The ID of the flow to be updated.
-
-    Returns:
-        A Flask response object with the updated Flow object as a dictionary.
-    """
-    try:
-        # Extract and validate incoming data
-        data = request.get_json()
-        if not data:
-            return jsonify({"error": "No data provided"}), 400
-
-        # Extract individual fields from data
-        name = data.get("name")
-        description = data.get("description")
-        status = data.get("status")
-        variables = data.get("variables", [])
-        blocks = data.get("blocks", [])
-
-        flow = get_flow_by_id(flow_id)
-        for block in data.get("blocks", []):
-            for action in block.get("actions", []):
-                action["bot_id"] = flow.chatbot_id
-
-        # Validate data using FlowDTO
-        try:
-            flow_dto = FlowDTO(
-                id=flow_id,  # Convert string to UUID
-                bot_id=flow.chatbot_id,  # Extract chatbot_id if it's provided or necessary
-                name=name,
-                status=status,
-                variables=variables,
-                blocks=blocks,
-                description=description,
-            )
-        except Exception as e:
-            return jsonify({"error": str(e)}), 400
-
-        # Assuming update_flow is a function to update the flow in the DB
-        updated_flow = update_flow(flow_id, flow_dto)
-        # todo: if description/name changed -> reflect on the vectore db
-        if updated_flow:
-            return jsonify(flow_to_dict(updated_flow)), 200
-        else:
-            return jsonify({"error": "Flow not found"}), 404
-    except Exception as e:
-        print(f"Error updating flow: {e}")
-        return jsonify({"error": "Failed to update flow. {}".format(str(e))}), 500
-
-
-@flow.route("/<flow_id>", methods=["GET"])
-def get_flow_by_id_api(flow_id: str):
-    """
-    API endpoint to retrieve a specific flow by its ID.
-
-    Args:
-        flow_id: The ID of the flow.
-
-    Returns:
-        A Flask response object with the Flow object as a dictionary.
-    """
-    try:
-        flow = get_flow_by_id(flow_id)
-        if flow:
-            return jsonify(flow_to_dict(flow)), 200
-        else:
-            return jsonify({"error": "Flow not found"}), 404
-    except Exception as e:
-        # Log the exception here
-        print(f"Error retrieving flow with ID {flow_id}: {e}")
-        # Return an error response
-        return jsonify({"error": "Failed to retrieve flow {}".format(str(e))}), 500
-
-
-@flow.route("/<flow_id>/variables", methods=["GET"])
-def get_flow_variables_api(flow_id: str):
-    """
-    API endpoint to retrieve variables associated with a specific flow.
-
-    Args:
-        flow_id: The ID of the flow.
-
-    Returns:
-        A Flask response object with a list of FlowVariable objects as dictionaries.
-    """
-    try:
-        flow_variables = get_variables_for_flow(flow_id)
-        variables_dict = [
-            flow_variable_to_dict(variable) for variable in flow_variables
-        ]  # Assuming flow_variable_to_dict is defined
-        return jsonify(variables_dict), 200
-    except Exception as e:
-        # Log the exception here
-        print(f"Error retrieving flow variables for flow ID {flow_id}: {e}")
-        # Return an error response
-        return (
-            jsonify({"error": "Failed to retrieve flow variables {}".format(str(e))}),
-            500,
+        raise HTTPException(
+            status_code=500, detail={"error": f"Failed to create flow. {e}"}
         )
 
 
-@flow.route("/<flow_id>/variables", methods=["POST", "PUT"])
-def add_variables_to_flow_api(flow_id: str):
-    """
-    API endpoint to add or update variables in a specific flow.
-
-    Args:
-        flow_id: The ID of the flow.
-
-    Returns:
-        A Flask response object with the updated or newly created FlowVariable object as a dictionary.
-    """
+@flow_router.put("/{flow_id}")
+async def update_flow_api(data: Data, flow_id: str):
     try:
-        data = request.get_json()
-        name = data.get("name")
-        value = data.get("value")
-        runtime_override_key = data.get("runtime_override_key", None)
-        runtime_override_action_id = data.get("runtime_override_action_id", None)
-        copilot_id = data.get("chatbot_id")
+        if not data:
+            raise HTTPException(status_code=400, detail={"error": "No data provided"})
+
+        flow = await get_flow_by_id(flow_id)
+        for block in data.blocks or []:
+            for action in block.get("actions", []):
+                action["bot_id"] = flow.chatbot_id
+
+        try:
+            flow_dto = FlowDTO(
+                id=flow_id,  # Convert string to UUID
+                bot_id=flow.chatbot_id,
+                name=data.name,
+                status=data.status,
+                variables=data.variables or [],
+                blocks=data.blocks or [],
+                description=data.description,
+            )
+        except Exception as e:
+            raise HTTPException(status_code=400, detail={"error": str(e)})
+
+        updated_flow = update_flow(flow_id, flow_dto)
+        if updated_flow:
+            return flow_to_dict(updated_flow), 200
+        else:
+            raise HTTPException(status_code=404, detail={"error": "Flow not found"})
+    except Exception as e:
+        print(f"Error updating flow: {e}")
+        raise HTTPException(
+            status_code=500, detail={"error": f"Failed to update flow. {e}"}
+        )
+
+
+@flow_router.get("/{flow_id}")
+async def get_flow_by_id_api(flow_id: str):
+    try:
+        flow = await get_flow_by_id(flow_id)
+        if flow:
+            return flow_to_dict(flow), 200
+        else:
+            raise HTTPException(status_code=404, detail={"error": "Flow not found"})
+    except Exception as e:
+        print(f"Error retrieving flow with ID {flow_id}: {e}")
+        raise HTTPException(
+            status_code=500, detail={"error": f"Failed to retrieve flow {e}"}
+        )
+
+
+@flow_router.get("/{flow_id}/variables")
+async def get_flow_variables_api(flow_id: str):
+    try:
+        flow_variables = await get_variables_for_flow(flow_id)
+        variables_dict = [
+            flow_variable_to_dict(variable) for variable in flow_variables
+        ]
+        return variables_dict, 200
+    except Exception as e:
+        print(f"Error retrieving flow variables for flow ID {flow_id}: {e}")
+        raise HTTPException(
+            status_code=500, detail={"error": f"Failed to retrieve flow variables {e}"}
+        )
+
+
+@flow_router.post("/{flow_id}/variables")
+@flow_router.put("/{flow_id}/variables")
+async def add_variables_to_flow_api(data: Data, flow_id: str):
+    try:
+        copilot_id = data.chatbot_id
         bot = find_one_or_fail_by_id(copilot_id)
 
-        if not name or value is None:
-            return jsonify({"error": "Missing required fields"}), 400
+        if not data.name or data.value is None:
+            raise HTTPException(
+                status_code=400, detail={"error": "Missing required fields"}
+            )
 
         variable = add_or_update_variable_in_flow(
             bot.id,
             flow_id,
-            name,
-            value,
-            runtime_override_key,
-            runtime_override_action_id,
+            data.name,
+            data.value,
+            data.runtime_override_key,
+            data.runtime_override_action_id,
         )
-        return (
-            jsonify({"status": "success", "data": flow_variable_to_dict(variable)}),
-            201,
-        )
+        return {"status": "success", "data": flow_variable_to_dict(variable)}, 201
     except Exception as e:
-        # Log the exception here
         print(f"Error adding/updating variable in flow: {e}")
-        # Return an error response
-        return (
-            jsonify(
-                {"error": "Failed to add/update variable in flow {}".format(str(e))}
-            ),
-            500,
+        raise HTTPException(
+            status_code=500,
+            detail={"error": f"Failed to add/update variable in flow {e}"},
         )
 
 
-@flow.route("/<flow_id>", methods=["DELETE"])
+@flow_router.delete("/{flow_id}")
 def delete_flow_api(flow_id: str):
     try:
-        # Attempt to delete the flow from the database
         if delete_flow_from_db(flow_id):
-            # Attempt to delete the flow from the vector store
             point_id = flow_vector_service.get_flow_point_id_by_flow_id(flow_id)
             if point_id:
                 delete_flow_from_vector_store(point_id)
-                return (
-                    jsonify({"success": True, "message": "Flow deleted successfully."}),
-                    200,
-                )
+                return {"success": True, "message": "Flow deleted successfully."}, 200
             else:
-                return (
-                    jsonify({"success": False, "message": "Flow vector not found."}),
-                    404,
+                raise HTTPException(
+                    status_code=404,
+                    detail={"success": False, "message": "Flow vector not found."},
                 )
         else:
-            return (
-                jsonify({"success": False, "message": "Flow not found in database."}),
-                404,
+            raise HTTPException(
+                status_code=404,
+                detail={"success": False, "message": "Flow not found in database."},
             )
     except Exception as e:
         logger.error("Failed to delete flow", payload=e)
-        return jsonify({"error": "Failed to delete flow."}), 500
+        raise HTTPException(status_code=500, detail={"error": "Failed to delete flow."})

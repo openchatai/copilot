@@ -1,114 +1,57 @@
-import asyncio
-import gunicorn
-import multiprocessing
-from dotenv import load_dotenv
-from flask import Flask, request
-from flask import jsonify
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 from utils.vector_store_setup import init_qdrant_collections
-
-from routes.action.action_controller import action
-from routes.chat.chat_controller import chat_workflow, send_chat_stream
-from routes.copilot.copilot_controller import copilot
-from routes.data_source.data_source_controller import datasource_workflow
-from routes.flow.flow_controller import flow
-from routes.typing.powerup_controller import powerup
-from routes.api_call.api_call_controller import api_call_controller
-from shared.utils.opencopilot_utils.telemetry import (
-    log_api_call,
-    log_opensource_telemetry_data,
-)
-
-from routes.uploads.upload_controller import upload_controller
-
-# from shared.models.opencopilot_db import create_database_schema
 from shared.models.opencopilot_db.database_setup import create_database_schema
-from utils.config import Config
-from routes.chat.chat_dto import ChatInput
-from werkzeug.exceptions import HTTPException
-
-from flask_sse import sse
-
+from routes.flow.flow_controller import flow_router
+from routes.action.action_controller import action_router
+from routes.chat.chat_controller import chat_router
+from routes.copilot.copilot_controller import copilot_router
+from routes.uploads.upload_controller import upload_router
+from routes.api_call.api_call_controller import api_call_router
+from routes.data_source.data_source_controller import datasource_router
+from routes.search.search_controller import search_router
+from routes.typing.powerup_controller import powerup_router
 from utils.get_logger import CustomLogger
-from routes.search.search_controller import search_workflow
 
-from flask_cors import CORS
-from shared.models.opencopilot_db.database_setup import engine
-from sqlalchemy.orm import sessionmaker
-
-SessionLocal = sessionmaker(bind=engine)
+init_qdrant_collections()
 
 logger = CustomLogger(__name__)
 
-load_dotenv()
-
 create_database_schema()
-app = Flask(__name__)
-CORS(app)
-app.register_blueprint(sse, url_prefix="/stream")
+app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-app.after_request(log_api_call)
-
-app.url_map.strict_slashes = False
-app.register_blueprint(flow, url_prefix="/backend/flows")
-app.register_blueprint(chat_workflow, url_prefix="/backend/chat")
-app.register_blueprint(copilot, url_prefix="/backend/copilot")
-app.register_blueprint(upload_controller, url_prefix="/backend/uploads")
-app.register_blueprint(api_call_controller, url_prefix="/backend/api_calls")
-app.register_blueprint(datasource_workflow, url_prefix="/backend/data_sources")
-app.register_blueprint(action, url_prefix="/backend/actions")
-app.register_blueprint(powerup, url_prefix="/backend/powerup")
-app.register_blueprint(search_workflow, url_prefix="/backend/search")
-
-app.config.from_object(Config)
+# Register your routers here
+app.include_router(flow_router, prefix="/backend/flows", tags=["flows"])
+app.include_router(chat_router, prefix="/backend/chat", tags=["chat"])
+app.include_router(copilot_router, prefix="/backend/copilot", tags=["copilot"])
+app.include_router(upload_router, prefix="/backend/uploads", tags=["uploads"])
+app.include_router(api_call_router, prefix="/backend/api_calls", tags=["api_calls"])
+app.include_router(
+    datasource_router, prefix="/backend/data_sources", tags=["data_sources"]
+)
+app.include_router(action_router, prefix="/backend/actions", tags=["actions"])
+app.include_router(powerup_router, prefix="/backend/powerup", tags=["powerup"])
+app.include_router(search_router, prefix="/backend/search", tags=["search"])
 
 
-@app.errorhandler(Exception)
-def handle_exception(error):
-    # If the exception is an HTTPException (includes 4XX and 5XX errors)
-    if isinstance(error, HTTPException):
-        # Log the error or perform any other necessary actions
-        logger.error("HTTP Error", error=error)
-        return jsonify({"error": error.name, "message": error.description}), error.code
-
-    # If it's not an HTTPException, it's a 500 Internal Server Error
-    logger.error("Internal Server Error", error=error)
-    return (
-        jsonify(
-            {
-                "error": "Internal Server Error",
-                "message": "An unexpected error occurred on the server.",
-            }
-        ),
-        500,
+@app.exception_handler(Exception)
+async def exception_handler(request: Request, exc: Exception):
+    if isinstance(exc, HTTPException):
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"detail": exc.detail},
+        )
+    logger.error("Unhandled server error", exc_info=exc)
+    return JSONResponse(
+        status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "Internal Server Error"},
     )
-
-
-@app.route("/send_chat", methods=["POST"])
-def handle_send_chat():
-    json_data = request.get_json()
-    input_data = ChatInput(**json_data)
-    message = input_data.content
-    session_id = input_data.session_id
-    headers_from_json = input_data.headers
-
-    headers = request.headers
-
-    bot_token = headers.environ.get("HTTP_X_BOT_TOKEN")
-
-    json_data = {
-        "url": request.base_url,
-        "path": "/socketio/",
-        "query_params": "{}",
-        "path_params": "{}",
-        "method": "wss",
-    }
-
-    if not bot_token:
-        sse.publish({"error": "Bot token is required"}, type=session_id)
-        return
-
-    asyncio.run(send_chat_stream(message, bot_token, session_id, headers_from_json))
-    log_opensource_telemetry_data(json_data)
-
-
-init_qdrant_collections()

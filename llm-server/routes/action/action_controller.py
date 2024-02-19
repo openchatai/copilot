@@ -1,5 +1,6 @@
-from flask import Blueprint, jsonify, request
+from fastapi import FastAPI, File, UploadFile, HTTPException
 from werkzeug.utils import secure_filename
+from starlette.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND, HTTP_400_BAD_REQUEST
 
 from entities.action_entity import ActionDTO
 from models.repository.action_repo import (
@@ -15,111 +16,90 @@ from routes.action import action_vector_service
 from utils.get_logger import CustomLogger
 from utils.swagger_parser import SwaggerParser
 
-action = Blueprint("action", __name__)
+from fastapi import APIRouter
+
+action_router = APIRouter()
 
 logger = CustomLogger("action")
 
 
-@action.route("/bot/<string:chatbot_id>", methods=["GET"])
-def get_actions(chatbot_id):
+@action_router.get("/bot/{chatbot_id}")
+async def get_actions(chatbot_id: str):
     actions = list_all_actions(chatbot_id)
-    return jsonify([action_to_dict(action) for action in actions])
+    return [action_to_dict(action) for action in actions]
 
 
-@action.route("/bot/<string:chatbot_id>/import-from-swagger", methods=["PUT"])
-def import_actions_from_swagger_file(chatbot_id):
-    # Check if the request has the file part
-    if "file" not in request.files:
-        return jsonify({"error": "No file part in the request"}), 400
-
-    file = request.files["file"]
-
-    # If the user does not select a file, the browser submits an
-    # empty file without a filename.
-    if file.filename == "":
-        return jsonify({"error": "No file part in the request"}), 400
-
-    if file:
-        filename = secure_filename(file.filename)
-        swagger_content = file.read()
-
-        # Parse Swagger file
-        try:
-            swagger_parser = SwaggerParser(swagger_content)
-            swagger_parser.ingest_swagger_summary(chatbot_id)
-            actions = swagger_parser.get_all_actions(chatbot_id)
-        except Exception as e:
-            logger.error("Failed to parse Swagger file", error=e, bot_id=chatbot_id)
-            return (
-                jsonify(
-                    {
-                        "message": f"Failed to parse Swagger file: {str(e)}",
-                        "is_error": True,
-                    }
-                ),
-                400,
-            )
-
-        is_error = False
-        # Store actions in the database
-        try:
-            create_actions(chatbot_id, actions)
-            action_vector_service.create_actions(actions)
-        except Exception as e:
-            logger.error(
-                str(e),
-                message="Something failed while parsing swagger file",
-                bot_id=chatbot_id,
-            )
-
-        return (
-            jsonify(
-                {
-                    "message": f"Successfully imported actions from {filename}",
-                    "is_error": is_error,
-                }
-            ),
-            201,
+@action_router.put("/bot/{chatbot_id}/import-from-swagger")
+async def import_actions_from_swagger_file(
+    chatbot_id: str, file: UploadFile = File(None)
+):
+    if not file:
+        raise HTTPException(
+            HTTP_400_BAD_REQUEST, {"error": "No file part in the request"}
         )
 
-    return jsonify({"error": "Invalid swagger file"}), 400
+    filename = secure_filename(file.filename)
+    swagger_content = await file.read()
+
+    try:
+        swagger_parser = SwaggerParser(swagger_content)
+        swagger_parser.ingest_swagger_summary(chatbot_id)
+        actions = swagger_parser.get_all_actions(chatbot_id)
+    except Exception as e:
+        logger.error("Failed to parse Swagger file", error=e, bot_id=chatbot_id)
+        raise HTTPException(
+            HTTP_400_BAD_REQUEST,
+            {
+                "message": f"Failed to parse Swagger file: {str(e)}",
+                "is_error": True,
+            },
+        )
+
+    is_error = False
+
+    try:
+        create_actions(chatbot_id, actions)
+        action_vector_service.create_actions(actions)
+    except Exception as e:
+        logger.error(
+            str(e),
+            message="Something failed while parsing swagger file",
+            bot_id=chatbot_id,
+        )
+
+    return {
+        "message": f"Successfully imported actions from {filename}",
+        "is_error": is_error,
+    }, HTTP_201_CREATED
 
 
-@action.route("/bot/<string:chatbot_id>", methods=["POST"])
-def add_action(chatbot_id):
-    action_dto = ActionDTO(bot_id=chatbot_id, **request.get_json())
-
-    # Todo make sure either both or non go in
-    saved_action = create_action(chatbot_id, action_dto)
-    action_vector_service.create_action(action_dto)
-
-    return jsonify(action_to_dict(saved_action)), 201
+@action_router.post("/bot/{chatbot_id}")
+async def add_action(chatbot_id: str, action_dto: ActionDTO):
+    saved_action = create_action(chatbot_id, action_dto.dict())
+    action_vector_service.create_action(action_dto.dict())
+    return action_to_dict(saved_action), HTTP_201_CREATED
 
 
-@action.route("/bot/<string:chatbot_id>/action/<string:action_id>", methods=["PATCH"])
-def update_single_action(chatbot_id: str, action_id: str):
-    action_dto = ActionDTO(bot_id=chatbot_id, **request.get_json())
-
-    # Todo make sure either both or non go in
-    saved_action = update_action(action_id, action_dto)
-    action_vector_service.update_action_by_operation_id(action_dto)
-
-    return jsonify(saved_action), 201
+@action_router.patch("/bot/{chatbot_id}/action/{action_id}")
+async def update_single_action(chatbot_id: str, action_id: str, action_dto: ActionDTO):
+    saved_action = update_action(action_id, action_dto.dict())
+    action_vector_service.update_action_by_operation_id(action_dto.dict())
+    return saved_action, HTTP_201_CREATED
 
 
-@action.route("/<string:action_id>", methods=["GET"])
-def get_action(action_id):
+@action_router.get("/{action_id}")
+async def get_action(action_id: str):
     action = find_action_by_id(action_id)
     if action is None:
-        return jsonify({"error": "Action not found"}), 404
-    return jsonify(action_to_dict(action))
+        raise HTTPException(HTTP_404_NOT_FOUND, {"error": "Action not found"})
+    return action_to_dict(action)
 
 
-@action.route("/<string:action_id>", methods=["DELETE"])
-def delete_action(action_id):
+@action_router.delete("/{action_id}")
+async def delete_action(action_id: str):
     action = find_action_by_id(action_id)
     if action is None:
-        return jsonify({"error": "Action not found"}), 404
+        raise HTTPException(HTTP_404_NOT_FOUND, {"error": "Action not found"})
 
     action_vector_service.delete_action_by_operation_id(
         bot_id=str(action.bot_id), operation_id=str(action.operation_id)
@@ -127,4 +107,4 @@ def delete_action(action_id):
     delete_action_by_id(
         operation_id=str(action.operation_id), bot_id=str(action.bot_id)
     )
-    return jsonify({"message": "Action deleted successfully"}), 200
+    return {"message": "Action deleted successfully"}, HTTP_201_CREATED

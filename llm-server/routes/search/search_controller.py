@@ -1,10 +1,12 @@
-from flask import Blueprint, jsonify, request
+from fastapi import APIRouter, Request
 from shared.utils.opencopilot_utils.get_embeddings import get_embeddings
 from utils.get_logger import CustomLogger
 from utils.llm_consts import VectorCollections, initialize_qdrant_client
 from qdrant_client import models  # Add this line
+from typing import List
+from fastapi.responses import JSONResponse
 
-search_workflow = Blueprint("search", __name__)
+search_router = APIRouter()
 
 logger = CustomLogger(__name__)
 client = initialize_qdrant_client()
@@ -37,9 +39,9 @@ def get_all_results(chatbot_id: str, keyword: str, limit: int = 10, offset: int 
     return results
 
 
-@search_workflow.route("/<chatbot_id>", methods=["GET"])
-def search_vector_store(chatbot_id: str):
-    keyword = request.args.get("keyword", "")
+@search_router.get("/{chatbot_id}", response_model=List[str])
+async def search_vector_store(request: Request, chatbot_id: str):
+    keyword = request.query_params.get("keyword", "")
     results = get_all_results(chatbot_id, keyword)
 
-    return jsonify(results), 201
+    return JSONResponse(content=results, status_code=201)

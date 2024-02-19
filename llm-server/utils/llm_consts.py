@@ -1,3 +1,4 @@
+from fastapi import HTTPException, Header
 from flask import Request
 import os
 import redis
@@ -6,9 +7,18 @@ from typing import TypedDict
 from functools import lru_cache
 
 from qdrant_client import QdrantClient
+from dotenv import load_dotenv
+
+load_dotenv()
 
 X_CONSUMER_USERNAME = "X-CONSUMER-USERNAME"
 EXPERIMENTAL_FEATURES_ENABLED = os.getenv("EXPERIMENTAL_FEATURES_ENABLED", "NO")
+
+
+def get_bot_token(x_bot_token: str = Header(None)):
+    if x_bot_token is None:
+        raise HTTPException(status_code=400, detail="X-Bot-Token header not found")
+    return x_bot_token
 
 
 def get_username_from_request(request: Request):
