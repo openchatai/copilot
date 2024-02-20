@@ -1,13 +1,14 @@
 from models.repository.action_call_repo import ActionCallRepository
-from models.repository.action_call_repo import APICallRepository
+from models.repository.api_call_repository import APICallRepository
 
 from models.repository.chat_history_repo import ChatHistoryRepo
 from models.repository.datasource_repo import DataSourceRepository
 from models.repository.copilot_repo import CopilotRepository
-from models.repository.action_repo import ActioncallRepository
+from models.repository.action_repo import ActionRepository
 from models.repository.flow_repo import FlowRepository
 from models.repository.powerup_repo import PowerUpRepository
 from models.repository.utils import session_manager
+from shared.models.opencopilot_db.database_setup import get_db_session
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession

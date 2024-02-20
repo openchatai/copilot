@@ -45,15 +45,3 @@ class ActionCallRepository:
             return await session.scalars(
                 func.count(Action.id).where(Action.session_id == session_id)
             )
-
-    async def count_action_calls_grouped_by_action_id_for_bot_id(self, bot_id: str):
-        async with session_manager(self.session) as session:
-            result = (
-                await session.scalars(
-                    select(ActionCall.operation_id)
-                    .where(ActionCall.chatbot_id == bot_id)
-                    .group_by(ActionCall.operation_id)
-                    .order_by(func.count(ActionCall.chatbot_id).desc())
-                )
-            ).all()
-            return result

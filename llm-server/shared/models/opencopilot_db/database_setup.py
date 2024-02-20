@@ -4,6 +4,8 @@ from sqlalchemy.pool import QueuePool
 from sqlalchemy.ext.declarative import declarative_base  # Import declarative_base
 from utils.llm_consts import get_mysql_uri
 from dotenv import load_dotenv
+from sqlalchemy.ext.asyncio import async_sessionmaker
+
 
 load_dotenv()
 # Replace these values with your MySQL server details
@@ -30,3 +32,11 @@ async_engine = create_async_engine(
 
 def create_database_schema():
     Base.metadata.create_all(async_engine)
+
+
+async_session = async_sessionmaker(async_engine, expire_on_commit=False)
+
+
+async def get_db_session():
+    async with async_session() as session:
+        yield session

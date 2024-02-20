@@ -1,19 +1,19 @@
-from http import HTTPStatus
 from typing import Optional, Dict
 
-from fastapi import FastAPI, APIRouter, Depends, File, UploadFile, HTTPException, Path
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Query,
+    UploadFile,
+    HTTPException,
+)
 from fastapi.responses import JSONResponse
 from starlette.requests import Request
 
-from models.repository.chat_history_repo import (
-    get_all_chat_history_by_session_id_with_total,
-    get_session_counts_by_user,
-    get_unique_sessions_with_first_message_by_bot_id,
-    create_chat_histories,
-    get_analytics,
-    most_called_actions_by_bot,
-)
-from models.repository.copilot_repo import find_one_or_fail_by_token
+from models.repository.chat_history_repo import ChatHistoryRepo
+from models.repository.copilot_repo import CopilotRepository
+from models.di import get_chat_history_repository, get_copilot_repository
 from routes.analytics.analytics_service import upsert_analytics_record
 from routes.chat.chat_dto import ChatInput
 from routes.chat.implementation.chain_strategy import ChainStrategy
@@ -51,13 +51,18 @@ async def get_validated_data(request: Request) -> Optional[dict]:
 
 @chat_router.get("/sessions/{session_id}/chats")
 async def get_session_chats(
-    session_id: str, limit: Optional[int] = 20, page: Optional[int] = 1
+    session_id: str,
+    limit=20,
+    page=1,
+    chat_history_repo: ChatHistoryRepo = Depends(get_chat_history_repository),
 ):
     # Calculate offset based on the page number and limit
     offset = (page - 1) * limit
 
-    chats, total_messages = get_all_chat_history_by_session_id_with_total(
-        session_id, limit, offset
+    chats, total_messages = (
+        await chat_history_repo.get_all_chat_history_by_session_id_with_total(
+            session_id, limit, offset
+        )
     )
 
     chats_filtered = [
@@ -82,30 +87,41 @@ async def get_session_chats(
 
 
 @chat_router.get("/b/{bot_id}/chat_sessions")
-async def get_chat_sessions(bot_id: str):
-    # Fetch limit from query parameters
-    limit = int(request.query_params.get("limit", 20))
-    page = int(request.query_params.get("page", 1))
-
+async def get_chat_sessions(
+    bot_id: str,
+    limit: int = Query(20, ge=1),
+    page: int = Query(1, ge=1),
+    chat_history_repo: ChatHistoryRepo = Depends(get_chat_history_repository),
+):
     # Calculate offset based on the page number and limit
     offset = (page - 1) * limit
 
     (
         chat_history_sessions,
         total_pages,
-    ) = get_unique_sessions_with_first_message_by_bot_id(bot_id, limit, offset)
+    ) = await chat_history_repo.get_unique_sessions_with_first_message_by_bot_id(
+        bot_id, limit, offset
+    )
 
     return {"data": chat_history_sessions, "total_pages": total_pages}
 
 
 @chat_router.get("/init")
-async def init_chat(request: Request):
+async def init_chat(
+    request: Request,
+    chat_history_repo: ChatHistoryRepo = Depends(get_chat_history_repository),
+    copilot_repo: CopilotRepository = Depends(get_copilot_repository),
+):
     bot_token = request.headers.get("X-Bot-Token")
     session_id = request.headers.get("X-Session-Id")
 
     history = []
     if session_id:
-        chats, _ = get_all_chat_history_by_session_id_with_total(session_id, 200, 0)
+        chats, _ = (
+            await chat_history_repo.get_all_chat_history_by_session_id_with_total(
+                session_id, 200, 0
+            )
+        )
         history = sqlalchemy_objs_to_json_array(chats) or []
 
     if not bot_token:
@@ -120,7 +136,7 @@ async def init_chat(request: Request):
         )
 
     try:
-        bot = find_one_or_fail_by_token(bot_token)
+        bot = await copilot_repo.find_one_or_fail_by_token(bot_token)
         # Replace 'faq' and 'initialQuestions' with actual logic or data as needed.
         return {
             "bot_name": bot.name,
@@ -150,6 +166,8 @@ async def handle_chat_send_common(
     session_id: str,
     headers_from_json: Dict[str, str],
     is_streaming: bool,
+    chat_history_repo: ChatHistoryRepo = Depends(get_chat_history_repository),
+    copilot_repo: CopilotRepository = Depends(get_copilot_repository),
 ):
     app_name = headers_from_json.pop(X_App_Name, None)
     if not message:
@@ -167,7 +185,7 @@ async def handle_chat_send_common(
     )
 
     try:
-        bot = find_one_or_fail_by_token(bot_token)
+        bot = await copilot_repo.find_one_or_fail_by_token(bot_token)
         base_prompt = bot.prompt_message
 
         strategy: ChatRequestHandler = ChainStrategy()
@@ -213,7 +231,7 @@ async def handle_chat_send_common(
             upsert_analytics_record(
                 chatbot_id=str(bot.id), successful_operations=1, total_operations=1
             )
-            create_chat_histories(str(bot.id), chat_records)
+            await chat_history_repo.create_chat_histories(str(bot.id), chat_records)
 
         if result.error:
             logger.error("chat_conversation_error", message=result.error)
@@ -233,20 +251,30 @@ async def handle_chat_send_common(
 
 
 @chat_router.get("/analytics/{bot_id}")
-async def get_analytics_by_email(bot_id: str):
-    result = await get_analytics(bot_id)
+async def get_analytics_by_email(
+    bot_id: str,
+    chat_history_repo: ChatHistoryRepo = Depends(get_chat_history_repository),
+    copilot_repo: CopilotRepository = Depends(get_copilot_repository),
+):
+    result = await chat_history_repo.get_analytics(bot_id)
     return result
 
 
 @chat_router.get("/sessions/count/{email}")
-def session_counts_by_user(email: str):
-    response = get_session_counts_by_user(email.email)
+async def session_counts_by_user(
+    email: str,
+    chat_history_repo: ChatHistoryRepo = Depends(get_chat_history_repository),
+):
+    response = await chat_history_repo.get_session_counts_by_user(email)
     return response
 
 
 @chat_router.get("/actions/most_called/{bot_id}")
-def m_called_actions_by_bot(bot_id: str):
-    response = most_called_actions_by_bot(bot_id)
+async def m_called_actions_by_bot(
+    bot_id: str,
+    chat_history_repo: ChatHistoryRepo = Depends(get_chat_history_repository),
+):
+    response = await chat_history_repo.most_called_actions_by_bot(bot_id)
     return response
 
 
