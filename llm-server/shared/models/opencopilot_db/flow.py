@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from shared.models.opencopilot_db.database_setup import Base, engine
+from shared.models.opencopilot_db.database_setup import Base
 from sqlalchemy import Column, String, DateTime, JSON, Text
 
 
@@ -22,4 +22,4 @@ class Flow(Base):
     deleted_at = Column(DateTime, nullable=True)
 
 
-Base.metadata.create_all(engine)
+# Base.metadata.create_all(engine)

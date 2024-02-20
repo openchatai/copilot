@@ -99,7 +99,7 @@ def get_mysql_uri():
         port = "3306"  # Default MySQL port if not specified
 
     # Creating pymysql format string
-    pymysql_uri = f"mysql+pymysql://{username}:{password}@{host}:{port}/{database}"
+    pymysql_uri = f"mysql+aiomysql://{username}:{password}@{host}:{port}/{database}"
 
     return pymysql_uri
 

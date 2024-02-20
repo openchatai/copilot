@@ -5,8 +5,9 @@ from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
 from custom_types.response_dict import LLMResponse, ApiRequestResult
 from custom_types.run_workflow_input import ChatContext
 from entities.flow_entity import FlowDTO
-from models.repository.action_call_repo import add_action_call
-from models.repository.flow_repo import get_flow_by_id
+
+# from models.repository.action_call_repo import add_action_call
+# from models.repository.flow_repo import get_flow_by_id
 from routes.flow.utils import create_flow_from_operation_ids, run_flow
 
 from routes.flow.utils.document_similarity_dto import (
@@ -16,6 +17,7 @@ from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
 from utils.llm_consts import VectorCollections
 from flask_sse import sse
+from routes.flow.utils import create_flow_from_operation_ids
 
 logger = CustomLogger(module_name=__name__)
 
@@ -83,7 +85,7 @@ async def run_actionable_item(
             str, action.document.metadata.get("operation_id")
         )  # this variable now holds Qdrant vector document, which is the Action metadata
 
-        _flow = create_flow_from_operation_ids(
+        _flow = await create_flow_from_operation_ids(
             operation_ids=[operation_id], bot_id=bot_id
         )
     elif flows is not None:
@@ -92,18 +94,18 @@ async def run_actionable_item(
             flow_with_relevance_score.document
         )  # this variable now holds Qdrant vector document, which is the flow metadata
         flow_id = cast(str, flow.metadata.get("flow_id"))
-        flow_model = get_flow_by_id(flow_id)
+        # flow_model = get_flow_by_id(flow_id)
 
-        if flow_model:
-            _flow = FlowDTO(
-                id=flow_model.id,
-                bot_id=bot_id,
-                flow_id=flow_model.id,
-                name=flow_model.name,
-                description=flow_model.description,
-                blocks=flow_model.payload,
-                variables=[],
-            )
+        # if flow_model:
+        #     _flow = FlowDTO(
+        #         id=flow_model.id,
+        #         bot_id=bot_id,
+        #         flow_id=flow_model.id,
+        #         name=flow_model.name,
+        #         description=flow_model.description,
+        #         blocks=flow_model.payload,
+        #         variables=[],
+        #     )
 
     if _flow is not None:
         output = await run_flow(
@@ -116,12 +118,12 @@ async def run_actionable_item(
         )
 
         # @Todo convert to bulk
-        for operation_id in output.operation_ids:
-            add_action_call(
-                bot_id=bot_id,
-                session_id=session_id,
-                operation_id=operation_id,
-            )
+        # for operation_id in output.operation_ids:
+        #     add_action_call(
+        #         bot_id=bot_id,
+        #         session_id=session_id,
+        #         operation_id=operation_id,
+        #     )
 
     return output
 

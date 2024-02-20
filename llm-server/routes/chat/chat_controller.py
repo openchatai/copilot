@@ -14,7 +14,6 @@ from starlette.requests import Request
 from models.repository.chat_history_repo import ChatHistoryRepo
 from models.repository.copilot_repo import CopilotRepository
 from models.di import get_chat_history_repository, get_copilot_repository
-from routes.analytics.analytics_service import upsert_analytics_record
 from routes.chat.chat_dto import ChatInput
 from routes.chat.implementation.chain_strategy import ChainStrategy
 from routes.chat.implementation.functions_strategy import FunctionStrategy
@@ -27,7 +26,6 @@ from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
 import openai
 import uuid
 import os
-from pydantic import BaseModel
 
 logger = CustomLogger(module_name=__name__)
 
@@ -228,9 +226,9 @@ async def handle_chat_send_common(
                 },
             ]
 
-            upsert_analytics_record(
-                chatbot_id=str(bot.id), successful_operations=1, total_operations=1
-            )
+            # upsert_analytics_record(
+            #     chatbot_id=str(bot.id), successful_operations=1, total_operations=1
+            # )
             await chat_history_repo.create_chat_histories(str(bot.id), chat_records)
 
         if result.error:

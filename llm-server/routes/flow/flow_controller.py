@@ -1,24 +1,17 @@
 import uuid
 
-from fastapi import APIRouter, Body, Response, HTTPException
+from fastapi import APIRouter, Body, Depends, Response, HTTPException
 from pydantic import BaseModel
 from typing import Optional, List, Any
 from entities.flow_entity import FlowDTO
-from models.repository.copilot_repo import find_one_or_fail_by_id
-from models.repository.flow_repo import (
-    create_flow,
-    get_all_flows_for_bot,
-    get_flow_by_id,
-    get_variables_for_flow,
-    add_or_update_variable_in_flow,
-    update_flow,
-    delete_flow as delete_flow_from_db,
-)
+from models.repository.copilot_repo import CopilotRepository
+from models.repository.flow_repo import FlowRepository
 from presenters.flow_presenters import flow_to_dict, flow_variable_to_dict
 from routes.flow import flow_vector_service
 from routes.flow.utils.dynamic_flow_builder import build_dynamic_flow
 from utils.get_logger import CustomLogger
 from routes.flow.flow_vector_service import delete_flow as delete_flow_from_vector_store
+from models.di import get_flow_repository, get_copilot_repository
 
 logger = CustomLogger("flow")
 flow_router = APIRouter()
@@ -44,16 +37,9 @@ async def build_flow_from_text(data: Data, bot_id: str):
 
 
 @flow_router.get("/bot/{bot_id}")
-async def get_all_flows_api(bot_id: str):
-    """
-    API endpoint to retrieve all flows for a given bot.
-
-    Args:
-        bot_id: The ID of the bot.
-
-    Returns:
-        A Flask response object with a list of Flow objects as dictionaries.
-    """
+async def get_all_flows_api(
+    bot_id: str
+):
     try:
         flows = await get_all_flows_for_bot(bot_id)
         flows_dict = [flow_to_dict(flow) for flow in flows]
@@ -66,7 +52,9 @@ async def get_all_flows_api(bot_id: str):
 
 
 @flow_router.post("/bot/{bot_id}")
-async def create_flow_api(data: Data, bot_id: str):
+async def create_flow_api(
+    data: Data, bot_id: str, flow_repo: FlowRepository = Depends(get_flow_repository)
+):
     try:
         if not data:
             raise HTTPException(status_code=400, detail={"error": "No data provided"})
@@ -87,7 +75,7 @@ async def create_flow_api(data: Data, bot_id: str):
         except Exception as e:
             raise HTTPException(status_code=400, detail={"error": str(e)})
 
-        flow = await create_flow(flow_dto)
+        flow = await flow_repo.create_flow(flow_dto)
         flow_vector_service.create_flow(flow_dto)
         return flow_to_dict(flow), 201
 
@@ -100,12 +88,14 @@ async def create_flow_api(data: Data, bot_id: str):
 
 
 @flow_router.put("/{flow_id}")
-async def update_flow_api(data: Data, flow_id: str):
+async def update_flow_api(
+    data: Data, flow_id: str, flow_repo: FlowRepository = Depends(get_flow_repository)
+):
     try:
         if not data:
             raise HTTPException(status_code=400, detail={"error": "No data provided"})
 
-        flow = await get_flow_by_id(flow_id)
+        flow = await flow_repo.get_flow_by_id(flow_id)
         for block in data.blocks or []:
             for action in block.get("actions", []):
                 action["bot_id"] = flow.chatbot_id
@@ -123,7 +113,7 @@ async def update_flow_api(data: Data, flow_id: str):
         except Exception as e:
             raise HTTPException(status_code=400, detail={"error": str(e)})
 
-        updated_flow = update_flow(flow_id, flow_dto)
+        updated_flow = await flow_repo.update_flow(flow_id, flow_dto)
         if updated_flow:
             return flow_to_dict(updated_flow), 200
         else:
@@ -136,9 +126,11 @@ async def update_flow_api(data: Data, flow_id: str):
 
 
 @flow_router.get("/{flow_id}")
-async def get_flow_by_id_api(flow_id: str):
+async def get_flow_by_id_api(
+    flow_id: str, flow_repo: FlowRepository = Depends(get_flow_repository)
+):
     try:
-        flow = await get_flow_by_id(flow_id)
+        flow = await flow_repo.get_flow_by_id(flow_id)
         if flow:
             return flow_to_dict(flow), 200
         else:
@@ -151,9 +143,11 @@ async def get_flow_by_id_api(flow_id: str):
 
 
 @flow_router.get("/{flow_id}/variables")
-async def get_flow_variables_api(flow_id: str):
+async def get_flow_variables_api(
+    flow_id: str, flow_repo: FlowRepository = Depends(get_flow_repository)
+):
     try:
-        flow_variables = await get_variables_for_flow(flow_id)
+        flow_variables = await flow_repo.get_variables_for_flow(flow_id)
         variables_dict = [
             flow_variable_to_dict(variable) for variable in flow_variables
         ]
@@ -167,17 +161,22 @@ async def get_flow_variables_api(flow_id: str):
 
 @flow_router.post("/{flow_id}/variables")
 @flow_router.put("/{flow_id}/variables")
-async def add_variables_to_flow_api(data: Data, flow_id: str):
+async def add_variables_to_flow_api(
+    data: Data,
+    flow_id: str,
+    flow_repo: FlowRepository = Depends(get_flow_repository),
+    copilot_repo: CopilotRepository = Depends(get_copilot_repository),
+):
     try:
         copilot_id = data.chatbot_id
-        bot = find_one_or_fail_by_id(copilot_id)
+        bot = await copilot_repo.find_one_or_fail_by_id(copilot_id)
 
         if not data.name or data.value is None:
             raise HTTPException(
                 status_code=400, detail={"error": "Missing required fields"}
             )
 
-        variable = add_or_update_variable_in_flow(
+        variable = flow_repo.add_or_update_variable_in_flow(
             bot.id,
             flow_id,
             data.name,
@@ -195,9 +194,13 @@ async def add_variables_to_flow_api(data: Data, flow_id: str):
 
 
 @flow_router.delete("/{flow_id}")
-def delete_flow_api(flow_id: str):
+async def delete_flow_api(
+    flow_id: str, flow_repo: FlowRepository = Depends(get_flow_repository)
+):
     try:
-        if delete_flow_from_db(flow_id):
+        is_deleted = await flow_repo.delete_flow(flow_id)
+        if is_deleted:
+            # @todo, convert to async
             point_id = flow_vector_service.get_flow_point_id_by_flow_id(flow_id)
             if point_id:
                 delete_flow_from_vector_store(point_id)

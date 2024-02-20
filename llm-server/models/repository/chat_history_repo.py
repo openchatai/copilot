@@ -8,6 +8,7 @@ from models.repository.utils import session_manager
 from shared.models.opencopilot_db.chatbot import Chatbot
 from shared.models.opencopilot_db.action import ActionCall
 from sqlalchemy.orm import class_mapper
+from langchain.schema import BaseMessage, AIMessage, HumanMessage
 
 
 class ChatHistoryRepo:
@@ -269,3 +270,19 @@ class ChatHistoryRepo:
             await session.refresh(chat_history)
 
         return chat_histories
+
+    async def get_chat_message_as_llm_conversation(
+        self,
+        session_id: str,
+    ) -> List[BaseMessage]:
+        chats, _ = await self.get_all_chat_history_by_session_id_with_total(
+            session_id, 100
+        )
+        conversations: List[BaseMessage] = []
+        for chat in chats:
+            if chat.from_user:
+                conversations.append(HumanMessage(content=str(chat.message)))
+            else:
+                conversations.append(AIMessage(content=str(chat.message)))
+
+        return conversations

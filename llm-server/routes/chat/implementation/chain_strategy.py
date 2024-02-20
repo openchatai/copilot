@@ -1,5 +1,5 @@
 from flask_socketio import emit
-from models.repository.chat_history_repo import get_chat_message_as_llm_conversation
+from models.repository.chat_history_repo import ChatHistoryRepo
 from routes.chat.followup_generator import generate_follow_up_questions
 from routes.chat.implementation.handler_interface import ChatRequestHandler
 from typing import Dict, Optional
@@ -21,8 +21,10 @@ from routes.root_service import (
     run_informative_item,
 )
 from utils.llm_consts import VectorCollections
-from models.repository.action_call_repo import add_action_call
+from models.repository.action_call_repo import ActionCallRepository
 from utils.llm_consts import enable_followup_questions
+
+from models.di import get_chat_history_repository, get_action_call_repository
 
 
 class ChainStrategy(ChatRequestHandler):
@@ -37,12 +39,13 @@ class ChainStrategy(ChatRequestHandler):
         is_streaming: bool,
     ) -> LLMResponse:
         check_required_fields(base_prompt, text)
-
+        chat_history_repo = get_chat_history_repository()
+        action_call_repo = get_action_call_repository()
         tasks = [
             get_relevant_knowledgebase(text, bot_id),
             get_relevant_actions(text, bot_id),
             get_relevant_flows(text, bot_id),
-            get_chat_message_as_llm_conversation(session_id),
+            chat_history_repo.get_chat_message_as_llm_conversation(session_id),
         ]
         results = await asyncio.gather(*tasks)
         knowledgebase, actions, flows, conversations_history = results
@@ -107,7 +110,9 @@ class ChainStrategy(ChatRequestHandler):
             ):
                 action = actionable_item["actions"][0]
                 operation_id = action.document.metadata.get("operation_id", "")
-                add_action_call(
+
+                # this should be done via di
+                await action_call_repo.add_action_call(
                     operation_id=operation_id, session_id=session_id, bot_id=bot_id
                 )
             return response

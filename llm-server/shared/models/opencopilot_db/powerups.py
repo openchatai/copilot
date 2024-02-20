@@ -1,5 +1,5 @@
 from sqlalchemy import Boolean, Column, String, Text
-from shared.models.opencopilot_db.database_setup import Base, async_engine
+from shared.models.opencopilot_db.database_setup import Base
 
 from sqlalchemy import Integer
 
@@ -16,4 +16,4 @@ class PowerUp(Base):
     path = Column(String(255), nullable=True)
 
 
-Base.metadata.create_all(async_engine)
+# Base.metadata.create_all(async_engine)

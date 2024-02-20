@@ -2,6 +2,7 @@ import datetime
 from shared.models.opencopilot_db.database_setup import async_engine, Base
 from sqlalchemy import Column, String, DateTime, Boolean, Integer, JSON
 
+
 class ChatHistory(Base):
     __tablename__ = "chat_history"
 
@@ -19,4 +20,4 @@ class ChatHistory(Base):
     knowledgebase_called = Column(Boolean, default=False)
 
 
-Base.metadata.create_all(async_engine)
+# Base.metadata.create_all(async_engine)

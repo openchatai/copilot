@@ -1,9 +1,6 @@
 import datetime
-import json
 import uuid
 from typing import Iterable, List, Optional, Any
-from flask import jsonify
-from sqlalchemy import exc
 from sqlalchemy.ext.asyncio import AsyncSession
 from copy import deepcopy
 from shared.models.opencopilot_db.chatbot import Chatbot
@@ -136,3 +133,20 @@ class CopilotRepository:
                 chatbot.website = website
             chatbot.updated_at = datetime.datetime.utcnow()
             await session.commit()
+
+    async def delete_copilot_global_key(self, copilot_id: str, variable_key: str):
+        async with session_manager(self.session) as session:
+            stmt = select(Chatbot).where(Chatbot.id == copilot_id)
+            result = await session.execute(stmt)
+            copilot = result.scalars().first()
+            if not copilot:
+                raise ValueError(f"No Chatbot found with id: {copilot_id}")
+
+            vars_dict = deepcopy(dict(copilot.global_variables))
+
+            if variable_key in vars_dict:
+                del vars_dict[variable_key]
+                copilot.global_variables = vars_dict
+                session.add(copilot)
+                await session.commit()
+                await session.refresh(copilot)

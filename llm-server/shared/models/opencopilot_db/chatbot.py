@@ -3,7 +3,7 @@ import uuid
 
 from sqlalchemy import Column, String, DateTime, Boolean, Text, JSON
 
-from shared.models.opencopilot_db.database_setup import Base, engine
+from shared.models.opencopilot_db.database_setup import Base
 from sqlalchemy import Integer
 
 
@@ -47,4 +47,4 @@ class Chatbot(Base):
     )
 
 
-Base.metadata.create_all(engine)
+# Base.metadata.create_all(engine)

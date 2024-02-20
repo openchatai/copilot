@@ -1,45 +1,36 @@
 import os
 from typing import Optional
-from fastapi import APIRouter, FastAPI, HTTPException, Body
-from sqlalchemy.exc import SQLAlchemyError
-
+from fastapi import APIRouter, Depends, HTTPException, Body, Header
 from enums.initial_prompt import ChatBotInitialPromptEnum
-from models.repository.copilot_repo import (
-    delete_copilot_global_key,
-    list_all_with_filter,
-    find_or_fail_by_bot_id,
-    find_one_or_fail_by_id,
-    create_copilot,
-    chatbot_to_dict,
-    SessionLocal,
-    update_copilot,
-    store_copilot_global_variables,
-)
-from models.repository.powerup_repo import create_powerups_bulk
+from models.repository.copilot_repo import CopilotRepository
+from models.di import get_copilot_repository, get_powerup_repository
+from models.repository.powerup_repo import PowerUpRepository
 from routes._swagger.reindex_service import migrate_actions
 from utils.get_logger import CustomLogger
 
 logger = CustomLogger(module_name=__name__)
 copilot_router = APIRouter()
 
-UPLOAD_FOLDER = "shared_data"
-
 
 @copilot_router.get("/")
-def index():
-    chatbots = list_all_with_filter()
-    return [chatbot_to_dict(chatbot) for chatbot in chatbots]
+async def index(
+    copilot_repo: CopilotRepository = Depends(get_copilot_repository),
+):
+    chatbots = await copilot_repo.list_all_with_filter()
+    return [chatbot for chatbot in chatbots]
 
 
 @copilot_router.post("/")
-def create_new_copilot(
+async def create_new_copilot(
     name: Optional[str] = Body("My First Copilot"),
     prompt_message: Optional[str] = Body(
         ChatBotInitialPromptEnum.AI_COPILOT_INITIAL_PROMPT
     ),
     website: Optional[str] = Body("https://example.com"),
+    powerup_repo: PowerUpRepository = Depends(get_powerup_repository),
+    copilot_repo: CopilotRepository = Depends(get_copilot_repository),
 ):
-    chatbot = create_copilot(
+    chatbot = await copilot_repo.create_copilot(
         name=name,
         swagger_url="remove.this.filed.after.migration",
         prompt_message=prompt_message,
@@ -67,100 +58,94 @@ def create_new_copilot(
         },
     ]
 
-    create_powerups_bulk(powerup_apps)
+    await powerup_repo.create_powerups_bulk(powerup_apps)
     return chatbot
 
 
 @copilot_router.get("/{copilot_id}")
-def get_copilot(copilot_id):
+async def get_copilot(
+    copilot_id, copilot_repo: CopilotRepository = Depends(get_copilot_repository)
+):
     try:
-        bot = find_one_or_fail_by_id(copilot_id)
+        bot = await copilot_repo.find_one_or_fail_by_id(copilot_id)
     except ValueError:
         raise HTTPException(status_code=404, detail="chatbot_not_found")
-    except SQLAlchemyError as e:
-        raise HTTPException(
-            status_code=500, detail={"error": "Database error", "details": str(e)}
-        )
 
-    return {"chatbot": chatbot_to_dict(bot)}
+    return {"chatbot": bot}
 
 
 @copilot_router.delete("/{copilot_id}")
-def delete_bot(copilot_id):
-    session = SessionLocal()
+async def delete_bot(
+    copilot_id, copilot_repo: CopilotRepository = Depends(get_copilot_repository)
+):
     try:
-        bot = find_or_fail_by_bot_id(copilot_id)
-        session.delete(bot)
-        session.commit()
+        await copilot_repo.find_or_fail_by_bot_id(copilot_id)
         return {"success": "chatbot_deleted"}
     except ValueError:
         raise HTTPException(status_code=404, detail="chatbot_not_found")
-    except SQLAlchemyError as e:
-        session.rollback()
-        raise HTTPException(
-            status_code=500, detail={"error": "Database error", "details": str(e)}
-        )
-    finally:
-        session.close()
 
 
 @copilot_router.post("/{copilot_id}")
 @copilot_router.put("/{copilot_id}")
 @copilot_router.patch("/{copilot_id}")
-def general_settings_update(copilot_id, data: dict = Body(...)):
-    try:
-        find_one_or_fail_by_id(copilot_id)
-        logger.info(
-            "Updating Copilot",
-            incident="update_copilot",
-            data=data,
-            bot_id=copilot_id,
-        )
-        updated_copilot = update_copilot(
-            copilot_id=copilot_id,
-            name=data.get("name"),
-            prompt_message=data.get("prompt_message"),
-            swagger_url=data.get("swagger_url"),
-            enhanced_privacy=data.get("enhanced_privacy"),
-            smart_sync=data.get("smart_sync"),
-            website=data.get("website"),
-        )
-        return {"chatbot": updated_copilot}
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:
-        raise HTTPException(
-            status_code=500, detail={"error": "An error occurred", "details": str(e)}
-        )
+async def general_settings_update(
+    copilot_id,
+    data: dict = Body(...),
+    copilot_repo: CopilotRepository = Depends(get_copilot_repository),
+):
+    await copilot_repo.find_one_or_fail_by_id(copilot_id)
+    logger.info(
+        "Updating Copilot",
+        incident="update_copilot",
+        data=data,
+        bot_id=copilot_id,
+    )
+    updated_copilot = await copilot_repo.update_copilot(
+        copilot_id=copilot_id,
+        name=data.get("name"),
+        prompt_message=data.get("prompt_message"),
+        swagger_url=data.get("swagger_url"),
+        enhanced_privacy=data.get("enhanced_privacy"),
+        smart_sync=data.get("smart_sync"),
+        website=data.get("website"),
+    )
+    return {"chatbot": updated_copilot}
 
 
 @copilot_router.post("/{copilot_id}/variables")
 @copilot_router.put("/{copilot_id}/variables")
 @copilot_router.patch("/{copilot_id}/variables")
-def update_global_variables(copilot_id: str, new_variables: dict = Body(...)):
-    try:
-        find_one_or_fail_by_id(copilot_id)
-        store_copilot_global_variables(
-            copilot_id=copilot_id, new_variables=new_variables
-        )
-        return {"message": "JSON data stored successfully"}
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:
-        raise HTTPException(
-            status_code=500, detail={"error": "An error occurred", "details": str(e)}
-        )
+async def update_global_variables(
+    copilot_id: str,
+    new_variables: dict = Body(...),
+    copilot_repo: CopilotRepository = Depends(get_copilot_repository),
+):
+
+    await copilot_repo.find_one_or_fail_by_id(copilot_id)
+    await copilot_repo.store_copilot_global_variables(
+        copilot_id=copilot_id, new_variables=new_variables
+    )
+    return {"message": "JSON data stored successfully"}
 
 
 @copilot_router.delete("/{copilot_id}/variable/{variable_key}")
-def delete_global_variable(copilot_id: str, variable_key: str):
-    return delete_copilot_global_key(copilot_id=copilot_id, variable_key=variable_key)
+async def delete_global_variable(
+    copilot_id: str,
+    variable_key: str,
+    copilot_repo: CopilotRepository = Depends(get_copilot_repository),
+):
+    return await copilot_repo.delete_copilot_global_key(
+        copilot_id=copilot_id, variable_key=variable_key
+    )
 
 
 @copilot_router.get("/{copilot_id}/variables")
-def get_global_variables(copilot_id):
+async def get_global_variables(
+    copilot_id,
+    copilot_repo: CopilotRepository = Depends(get_copilot_repository),
+):
     try:
-        chatbot = find_one_or_fail_by_id(copilot_id)
+        chatbot = await copilot_repo.find_one_or_fail_by_id(copilot_id)
         return chatbot.global_variables, 200
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -170,14 +155,15 @@ def get_global_variables(copilot_id):
         )
 
 
-@copilot_router.post("/migrate/actions")
-def migrate():
-    auth_header = request.headers.get("Authorization")
-    if auth_header:
-        token = auth_header.split(" ")[1]
-
+def get_token(authorization: str = Header(None)):
+    if authorization:
+        token = authorization.split(" ")[1]
         if token == os.getenv("BASIC_AUTH_KEY"):
-            migrate_actions()
-            return {"message": "job started"}
-
+            return token
     raise HTTPException(status_code=511, detail="Authorization Failed!")
+
+
+@copilot_router.post("/migrate/actions")
+def migrate(token: str = Depends(get_token)):
+    migrate_actions()
+    return {"message": "job started"}

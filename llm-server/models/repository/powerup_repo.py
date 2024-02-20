@@ -3,6 +3,18 @@ from shared.models.opencopilot_db.powerups import PowerUp
 from sqlalchemy import select
 from models.repository.utils import session_manager
 from sqlalchemy.ext.asyncio import AsyncSession
+from utils.llm_consts import redis_client
+from utils.get_chat_model import get_chat_model
+import urllib.parse
+from langchain.schema import HumanMessage, SystemMessage
+from langchain.output_parsers import PydanticOutputParser
+from langchain.pydantic_v1 import BaseModel, Field
+
+
+class Result(BaseModel):
+    urn: str = Field(
+        description="url after replacing dynamic parameters with empty brackets"
+    )
 
 
 class PowerUpRepository:
@@ -64,3 +76,59 @@ class PowerUpRepository:
                 await session.commit()
                 return True
             return False
+
+    def parse_url_result(self, input: str) -> Result:
+        parser = PydanticOutputParser(pydantic_object=Result)
+        return parser.parse(input)
+
+    async def cache_result(self, key: str, value: str, ttl: int):
+        await redis_client.setex(key, ttl, value)
+
+    async def get_cached_result(self, key: str) -> str:
+        cached_result = await redis_client.get(key)
+        return cached_result
+
+    async def get_regex_for_dynamic_params(self, url: str) -> str:
+        redis_key = f"url_cache:{url}"
+        cached_result = await self.get_cached_result(redis_key)
+
+        if cached_result:
+            return cached_result
+
+        chat_model = get_chat_model()
+        messages = []
+        url_parts = urllib.parse.urlparse(url)
+        url_without_query = urllib.parse.urlunparse(
+            (
+                url_parts.scheme,
+                url_parts.netloc,
+                url_parts.path,
+                url_parts.params,
+                "",
+                url_parts.fragment,
+            )
+        )
+
+        system_message = SystemMessage(
+            content="You are an ai assistant that can carefully analyze the given url"
+        )
+
+        messages.append(system_message)
+        messages.append(
+            HumanMessage(
+                content="""Given a url, you need to replace the dynamic param with empty brackets. You will return a json in the following format
+            {
+                "urn": "string"
+            }                         
+        """
+            )
+        )
+
+        messages.append(HumanMessage(content=f"Here is the url: {url_without_query}"))
+        content = chat_model(messages).content
+        result = self.parse_url_result(content)
+
+        # Cache the result with a TTL of 2 hours
+        await self.cache_result(redis_key, result.urn, ttl=7200)
+
+        return result.urn

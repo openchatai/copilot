@@ -29,11 +29,6 @@ async_engine = create_async_engine(
     pool_recycle=280,
 )
 
-
-def create_database_schema():
-    Base.metadata.create_all(async_engine)
-
-
 async_session = async_sessionmaker(async_engine, expire_on_commit=False)
 
 

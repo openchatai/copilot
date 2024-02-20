@@ -17,4 +17,4 @@ class WebsiteDataSource(BaseModel):
     error: Optional[str] = Field(default=None, alias="error")
 
 
-Base.metadata.create_all(async_engine)
+# Base.metadata.create_all(async_engine)

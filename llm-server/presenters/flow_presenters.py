@@ -1,10 +1,7 @@
-from shared.models.opencopilot_db import engine
 from sqlalchemy.orm import sessionmaker
 
 from shared.models.opencopilot_db.flow import Flow
 from shared.models.opencopilot_db.flow_variables import FlowVariable
-
-Session = sessionmaker(bind=engine)
 
 
 def flow_to_dict(flow: Flow):
@@ -17,19 +14,15 @@ def flow_to_dict(flow: Flow):
     Returns:
         A dictionary representation of the Flow, including its variables.
     """
-    with Session() as session:
-        # Query for variables associated with the flow
-        # variables = session.query(FlowVariable).filter(FlowVariable.flow_id == flow.id).all()
-        # variables_dict = [flow_variable_to_dict(variable) for variable in variables]
 
-        return {
-            "flow_id": flow.id.hex() if isinstance(flow.id, bytes) else flow.id,
-            "name": flow.name,
-            "blocks": flow.payload,
-            "description": flow.description,
-            "last_saved_at": flow.updated_at.isoformat() if flow.updated_at else None,
-            # "variables": variables_dict  # Including nested variables
-        }
+    return {
+        "flow_id": flow.id.hex() if isinstance(flow.id, bytes) else flow.id,
+        "name": flow.name,
+        "blocks": flow.payload,
+        "description": flow.description,
+        "last_saved_at": flow.updated_at.isoformat() if flow.updated_at else None,
+        # "variables": variables_dict  # Including nested variables
+    }
 
 
 def flow_to_simplified_dict(flow: Flow):

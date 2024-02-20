@@ -1,16 +1,12 @@
-from fastapi import APIRouter, FastAPI, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional
 from shared.models.opencopilot_db.powerups import PowerUp
-from models.repository.powerup_repo import (
-    create_powerup,
-    get_all_powerups,
-    get_regex_for_dynamic_params,
-    update_powerup,
-    delete_powerup,
-)
+from fastapi import Depends
+from models.repository.powerup_repo import PowerUpRepository
 from utils.get_chat_model import get_chat_model
 from langchain.schema import HumanMessage, SystemMessage
+from models.di import get_powerup_repository
 
 powerup_router = APIRouter()
 
@@ -24,24 +20,36 @@ class PowerUpData(BaseModel):
 
 
 @powerup_router.post("/")
-def create_powerup_endpoint(powerup_data: PowerUpData):
+async def create_powerup_endpoint(
+    powerup_data: PowerUpData,
+    powerup_repo: PowerUpRepository = Depends(get_powerup_repository),
+):
     if powerup_data.path is not None:
-        powerup_data.path = get_regex_for_dynamic_params(powerup_data.path)
-    powerup = create_powerup(powerup_data.dict())
+        powerup_data.path = await powerup_repo.get_regex_for_dynamic_params(
+            powerup_data.path
+        )
+    powerup = await powerup_repo.create_powerup(powerup_data.dict())
     return {"powerup": powerup.status_code == 201}
 
 
 @powerup_router.get("/")
-def get_all_powerups_endpoint(path: Optional[str] = None):
+async def get_all_powerups_endpoint(
+    path: Optional[str] = None,
+    powerup_repo: PowerUpRepository = Depends(get_powerup_repository),
+):
     if path is not None:
-        path = get_regex_for_dynamic_params(path)
-    powerups = get_all_powerups(path)
+        path = await powerup_repo.get_regex_for_dynamic_params(path)
+    powerups = await powerup_repo.get_all_powerups(path)
     return {"powerups": powerups}
 
 
 @powerup_router.put("/{powerup_id}")
-def update_powerup_endpoint(powerup_id: int, powerup_data: PowerUpData):
-    powerup = update_powerup(powerup_id, powerup_data.dict())
+async def update_powerup_endpoint(
+    powerup_id: int,
+    powerup_data: PowerUpData,
+    powerup_repo: PowerUpRepository = Depends(get_powerup_repository),
+):
+    powerup = await powerup_repo.update_powerup(powerup_id, powerup_data.dict())
     if powerup:
         return {"powerup": powerup}
     else:
@@ -49,8 +57,11 @@ def update_powerup_endpoint(powerup_id: int, powerup_data: PowerUpData):
 
 
 @powerup_router.delete("/{powerup_id}")
-def delete_powerup_endpoint(powerup_id: int):
-    success = delete_powerup(powerup_id)
+async def delete_powerup_endpoint(
+    powerup_id: int,
+    powerup_repo: PowerUpRepository = Depends(get_powerup_repository),
+):
+    success = await powerup_repo.delete_powerup(powerup_id)
     if success:
         return {"message": "PowerUp deleted successfully"}
     else:

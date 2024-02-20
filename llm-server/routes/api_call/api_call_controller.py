@@ -1,15 +1,11 @@
-from fastapi import APIRouter, FastAPI, HTTPException, Body, Depends
+from fastapi import APIRouter, HTTPException, Body, Depends
 from models.repository.api_call_repository import APICallRepository
-from sqlalchemy.orm import sessionmaker
-from shared.models.opencopilot_db.database_setup import engine
 from utils.get_logger import CustomLogger
-from sqlalchemy.orm import Session
 from pydantic import BaseModel
+from models.di import get_api_call_repository
 
 logger = CustomLogger(__name__)
 api_call_router = APIRouter()
-
-SessionLocal = sessionmaker(bind=engine)
 
 
 class ApiCallEntry(BaseModel):
@@ -19,10 +15,11 @@ class ApiCallEntry(BaseModel):
     path_params: str
     method: str
 
+
 @api_call_router.post("/log")
-def log_api_call(
+async def log_api_call(
     api_call_entry: ApiCallEntry = Body(...),
-    db_session: Session = Depends(get_db_session),
+    api_call_repo: APICallRepository = Depends(get_api_call_repository),
 ):
     if not all(
         [
@@ -35,8 +32,7 @@ def log_api_call(
     ):
         raise HTTPException(status_code=400, detail="Missing required parameters")
 
-    repository = APICallRepository(db_session)
-    repository.log_api_call(
+    await api_call_repo.log_api_call(
         api_call_entry.url,
         api_call_entry.path,
         api_call_entry.method,

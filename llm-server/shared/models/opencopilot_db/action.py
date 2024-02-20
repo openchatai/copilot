@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from shared.models.opencopilot_db.database_setup import Base, engine
+from shared.models.opencopilot_db.database_setup import Base
 from sqlalchemy import Column, String, DateTime, JSON, Text
 from dataclasses import dataclass
 from sqlalchemy import ForeignKey
@@ -41,4 +41,4 @@ class ActionCall(Base):
     success = Column(String(36), nullable=True, default=None)
 
 
-Base.metadata.create_all(engine)
+# Base.metadata.create_all(engine)
