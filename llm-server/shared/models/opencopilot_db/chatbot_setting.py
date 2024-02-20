@@ -1,19 +1,21 @@
-import uuid
+from datetime import datetime
+from typing import Optional
+from shared.models.opencopilot_db.database_setup import async_engine, Base
+from pydantic import BaseModel
 
-from shared.models.opencopilot_db.database_setup import Base, engine
-from sqlalchemy import Column, String, DateTime, BINARY
-import datetime
-
-
-class ChatbotSetting(Base):
-    __tablename__ = 'chatbot_settings'
-
-    id = Column(BINARY(16), primary_key=True, default=lambda: uuid.uuid4().bytes)
-    chatbot_id = Column(BINARY(16))
-    name = Column(String(255))
-    value = Column(String(255))
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+from uuid import UUID
 
 
-Base.metadata.create_all(engine)
+class ChatbotSettingBase(BaseModel):
+    id: UUID
+    chatbot_id: Optional[UUID] = None
+    name: Optional[str] = None
+    value: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+Base.metadata.create_all(async_engine)

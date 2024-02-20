@@ -1,19 +1,26 @@
-from typing import Any, Callable
-from shared.models.opencopilot_db import async_engine
-from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession
+from contextlib import asynccontextmanager
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import sessionmaker, Session
 
-async_session = async_sessionmaker(async_engine, expire_on_commit=False)
+@asynccontextmanager
+async def session_manager(session: AsyncSession):
+    try:
+        yield session
+    except SQLAlchemyError as e:
+        print(str(e))  # log the error here
+        raise
+    finally:
+        await session.close()
 
 
-def db_session(coro: Callable[..., Any]) -> Callable[..., Any]:
-    async def wrapper(*args, **kwargs):
-        try:
-            async with async_session() as session:
-                return await coro(session, *args, **kwargs)
-        except (
-            Exception
-        ) as e:  # SQLAlchemyError or whatever exception you want to catch
-            print(f"An error occurred: {str(e)}")
-            return None
+async_session_maker = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
-    return wrapper
+
+# Dependency
+async def get_db_session() -> Generator:
+    session = async_session_maker()
+    try:
+        yield session
+    finally:
+        await session.close()

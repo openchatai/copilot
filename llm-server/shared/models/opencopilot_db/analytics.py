@@ -1,19 +1,17 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from .get_declarative_base import Base
-from .database_setup import engine
-from .chatbot import Chatbot
-class Analytics(Base):
-    __tablename__ = 'analytics'
+from shared.models.opencopilot_db.database_setup import async_engine, Base
 
-    chatbot_id = Column(String(36), primary_key=True)
-    successful_operations = Column(Integer)
-    total_operations = Column(Integer)
-    logs= Column(String(4096), nullable=True)
+from pydantic import BaseModel
+from typing import Optional
 
-    def __init__(self, chatbot_id, successful_operations, total_operations, logs=None):
-        self.chatbot_id = chatbot_id
-        self.successful_operations = successful_operations
-        self.total_operations = total_operations
-        self.logs = logs
-        
-Base.metadata.create_all(engine)
+
+class AnalyticsBase(BaseModel):
+    chatbot_id: str
+    successful_operations: int
+    total_operations: int
+    logs: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+
+
+Base.metadata.create_all(async_engine)

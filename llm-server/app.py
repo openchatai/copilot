@@ -5,7 +5,7 @@ from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 from utils.vector_store_setup import init_qdrant_collections
 from shared.models.opencopilot_db.database_setup import create_database_schema
 from routes.flow.flow_controller import flow_router
-from routes.action.action_controller import action_router
+from routes.action.action_controller import router
 from routes.chat.chat_controller import chat_router
 from routes.copilot.copilot_controller import copilot_router
 from routes.uploads.upload_controller import upload_router

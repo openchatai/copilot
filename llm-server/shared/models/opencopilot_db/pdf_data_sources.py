@@ -1,41 +1,41 @@
-from sqlalchemy.orm import sessionmaker
 from shared.models.opencopilot_db.pdf_data_source_model import PdfDataSource
-from shared.models.opencopilot_db.database_setup import engine
-from typing import List
-
-# Create a session to interact with the database
-Session = sessionmaker(bind=engine)
 
 
-def insert_pdf_data_source(chatbot_id: str, file_name: str, status: str):
-    with Session() as session:
-        pdf_data_source = PdfDataSource(
-            chatbot_id=chatbot_id, file_name=file_name, status=status
-        )
-        session.add(pdf_data_source)
-        session.commit()
+class PdfDataSourceRepository:
+    def __init__(self, session: AsyncSession):
+        self.session = session
 
-
-def update_pdf_data_source_status(chatbot_id: str, file_name: str, status: str):
-    with Session() as session:
-        pdf_data_source = (
-            session.query(PdfDataSource)
-            .filter_by(chatbot_id=chatbot_id, file_name=file_name)
-            .first()
-        )
-        if pdf_data_source is None:
-            raise ValueError(
-                "PDF data source with chatbot ID {} and file name {} does not exist".format(
-                    chatbot_id, file_name
-                )
+    async def insert_pdf_data_source(
+        self, chatbot_id: str, file_name: str, status: str
+    ):
+        async with session_manager(self.session) as session:
+            pdf_data_source = PdfDataSource(
+                chatbot_id=chatbot_id, file_name=file_name, status=status
             )
+            session.add(pdf_data_source)
+            await session.commit()
 
-        pdf_data_source.status = status
+    async def update_pdf_data_source_status(
+        self, chatbot_id: str, file_name: str, status: str
+    ):
+        async with session_manager(self.session) as session:
+            pdf_data_source = (
+                await session.query(PdfDataSource)
+                .filter_by(chatbot_id=chatbot_id, file_name=file_name)
+                .first()
+            )
+            if pdf_data_source is None:
+                raise ValueError(
+                    "PDF data source with chatbot ID {} and file name {} does not exist".format(
+                        chatbot_id, file_name
+                    )
+                )
 
-        session.commit()
+            pdf_data_source.status = status
+            await session.commit()
 
-
-def query_all_pdf_data_sources():
-    with Session() as session:
-        pdf_data_sources = session.query(PdfDataSource).all()
-    return pdf_data_sources
+    async def query_all_pdf_data_sources(
+        self,
+    ):
+        async with session_manager(self.session) as session:
+            return await session.query(PdfDataSource).all()

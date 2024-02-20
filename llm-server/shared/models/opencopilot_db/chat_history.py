@@ -1,28 +1,23 @@
-import datetime
-
-from sqlalchemy import Column, String, DateTime, Boolean, Integer, JSON
-
-from .database_setup import engine
-from .get_declarative_base import Base
-from dataclasses import dataclass
+from datetime import datetime
+from typing import Optional, Dict
+from shared.models.opencopilot_db.database_setup import async_engine, Base
+from pydantic import BaseModel
 
 
-@dataclass
-class ChatHistory(Base):
-    __tablename__ = "chat_history"
+class ChatHistoryBase(BaseModel):
+    id: int
+    chatbot_id: Optional[str] = None
+    session_id: Optional[str] = None
+    from_user: bool = False
+    message: str
+    created_at: datetime
+    updated_at: datetime
+    debug_json: Optional[Dict] = {}
+    api_called: bool = False
+    knowledgebase_called: bool = False
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    chatbot_id = Column(String(36), nullable=True)
-    session_id = Column(String(255), nullable=True)
-    from_user = Column(Boolean, default=False)
-    message = Column(String(8192))
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    updated_at = Column(
-        DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
-    )
-    debug_json = Column(JSON, default={}, nullable=True)
-    api_called = Column(Boolean, default=False)
-    knowledgebase_called = Column(Boolean, default=False)
+    class Config:
+        orm_mode = True
 
 
-Base.metadata.create_all(engine)
+Base.metadata.create_all(async_engine)

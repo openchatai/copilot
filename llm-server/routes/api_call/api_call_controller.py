@@ -19,15 +19,6 @@ class ApiCallEntry(BaseModel):
     path_params: str
     method: str
 
-
-def get_db_session():
-    db_session = SessionLocal()
-    try:
-        yield db_session
-    finally:
-        db_session.close()
-
-
 @api_call_router.post("/log")
 def log_api_call(
     api_call_entry: ApiCallEntry = Body(...),

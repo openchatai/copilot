@@ -1,139 +1,105 @@
-import uuid
-from typing import Optional, List
+from fastapi import Depends, File, UploadFile, HTTPException
+from werkzeug.utils import secure_filename
+from starlette.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND, HTTP_400_BAD_REQUEST
 
-from sqlalchemy import select
-from shared.models.opencopilot_db import async_engine
-from sqlalchemy.ext.asyncio import async_sessionmaker
 from entities.action_entity import ActionDTO
-from shared.models.opencopilot_db.action import Action
-from models.repository.utils import db_session
-from sqlalchemy.ext.asyncio import AsyncSession
+from models.di import get_action_repository
+from models.repository.action_repo import ActionRepository
+from routes.action import action_vector_service
+from utils.get_logger import CustomLogger
+from utils.swagger_parser import SwaggerParser
 
-async_session = async_sessionmaker(async_engine, expire_on_commit=False)
+from fastapi import APIRouter
+
+action_router = APIRouter()
+
+logger = CustomLogger("action")
 
 
-@db_session
-async def create_actions(
-    session: AsyncSession, chatbot_id: str, data: List[ActionDTO]
-) -> List[Action]:
-    actions = []
-    for dto in data:
-        new_action = Action(
-            id=str(uuid.uuid4()),
+@action_router.get("/bot/{chatbot_id}")
+async def get_actions(
+    chatbot_id: str, action_repo: ActionRepository = Depends(get_action_repository)
+):
+    actions = await action_repo.list_all_actions(chatbot_id)
+    return [action_to_dict(action) for action in actions]
+
+
+@action_router.put("/bot/{chatbot_id}/import-from-swagger")
+async def import_actions_from_swagger_file(
+    chatbot_id: str, file: UploadFile = File(None)
+):
+    if not file:
+        raise HTTPException(
+            HTTP_400_BAD_REQUEST, {"error": "No file part in the request"}
+        )
+
+    filename = secure_filename(file.filename)
+    swagger_content = await file.read()
+
+    try:
+        swagger_parser = SwaggerParser(swagger_content)
+        swagger_parser.ingest_swagger_summary(chatbot_id)
+        actions = swagger_parser.get_all_actions(chatbot_id)
+    except Exception as e:
+        logger.error("Failed to parse Swagger file", error=e, bot_id=chatbot_id)
+        raise HTTPException(
+            HTTP_400_BAD_REQUEST,
+            {
+                "message": f"Failed to parse Swagger file: {str(e)}",
+                "is_error": True,
+            },
+        )
+
+    is_error = False
+
+    try:
+        create_actions(chatbot_id, actions)
+        action_vector_service.create_actions(actions)
+    except Exception as e:
+        logger.error(
+            str(e),
+            message="Something failed while parsing swagger file",
             bot_id=chatbot_id,
-            name=dto.name,
-            description=dto.description,
-            operation_id=dto.operation_id,
-            api_endpoint=dto.api_endpoint,
-            request_type=dto.request_type,
-            payload=dto.payload,
         )
-        actions.append(new_action)
 
-    session.add_all(actions)
-    await session.commit()
-    return actions
-
-
-@db_session
-async def create_action(
-    session: AsyncSession, chatbot_id: str, data: ActionDTO
-) -> Action:
-    new_action = Action(
-        id=str(uuid.uuid4()),
-        bot_id=chatbot_id,
-        name=data.name,
-        description=data.description,
-        operation_id=data.operation_id,
-        api_endpoint=data.api_endpoint,
-        request_type=data.request_type,
-        payload=data.payload,
-    )
-    session.add(new_action)
-    await session.commit()
-    return new_action
+    return {
+        "message": f"Successfully imported actions from {filename}",
+        "is_error": is_error,
+    }, HTTP_201_CREATED
 
 
-@db_session
-async def update_action(session: AsyncSession, action_id: str, data: ActionDTO):
-    action = (
-        await session.scalars(select(Action).where(Action.id == action_id))
-    ).first()
+@action_router.post("/bot/{chatbot_id}")
+async def add_action(chatbot_id: str, action_dto: ActionDTO):
+    saved_action = create_action(chatbot_id, action_dto.dict())
+    action_vector_service.create_action(action_dto)
+    return action_to_dict(saved_action), HTTP_201_CREATED
+
+
+@action_router.patch("/bot/{chatbot_id}/action/{action_id}")
+async def update_single_action(chatbot_id: str, action_id: str, action_dto: ActionDTO):
+    saved_action = update_action(action_id, action_dto)
+    action_vector_service.update_action_by_operation_id(action_dto)
+    return saved_action, HTTP_201_CREATED
+
+
+@action_router.get("/{action_id}")
+async def get_action(action_id: str):
+    action = find_action_by_id(action_id)
     if action is None:
-        raise Exception("Action not found")
-    # Update fields
-    action.name = data.name
-    action.description = data.description
-    action.operation_id = data.operation_id
-    action.base_uri = data.api_endpoint
-    action.request_type = data.request_type
-    action.payload = data.payload
-    await session.commit()
-    return action
+        raise HTTPException(HTTP_404_NOT_FOUND, {"error": "Action not found"})
+    return action_to_dict(action)
 
 
-@db_session
-async def list_all_actions(session: AsyncSession, chatbot_id: Optional[str] = None):
-    query = select(Action)
-    if chatbot_id is not None:
-        query = query.where(Action.bot_id == chatbot_id)
-    return (await session.scalars(query)).all()
+@action_router.delete("/{action_id}")
+async def delete_action(action_id: str):
+    action = find_action_by_id(action_id)
+    if action is None:
+        raise HTTPException(HTTP_404_NOT_FOUND, {"error": "Action not found"})
 
-
-@db_session
-async def find_action_by_operation_id(
-    session: AsyncSession, operation_id: str
-) -> Optional[Action]:
-    action = (
-        await session.scalars(select(Action).where(Action.operation_id == operation_id))
-    ).first()
-    return action
-
-
-@db_session
-async def list_all_operation_ids_by_bot_id(
-    session: AsyncSession, chatbot_id: Optional[str] = None
-) -> List[str]:
-    query = select(Action.operation_id)  # Query only the operation_id column
-    if chatbot_id is not None:
-        query = query.where(Action.bot_id == chatbot_id)
-    results = (await session.scalars(query)).all()  # This will be a list of tuples
-    # Extract operation_id from each tuple, filter out None and empty strings
-    operation_ids = [op_id for op_id in results if op_id]
-    return operation_ids
-
-
-@db_session
-async def find_action_by_id(session: AsyncSession, action_id: str) -> Optional[Action]:
-    return (await session.scalars(select(Action).where(Action.id == action_id))).first()
-
-
-@db_session
-async def find_action_by_method_id_and_bot_id(
-    session: AsyncSession, operation_id: str, bot_id: str
-) -> Optional[Action]:
-    action = (
-        await session.scalars(
-            select(Action).where(
-                Action.operation_id == operation_id, Action.bot_id == bot_id
-            )
-        )
-    ).first()
-    return action
-
-
-@db_session
-async def delete_action_by_id(session: AsyncSession, operation_id: str, bot_id: str):
-    action = (
-        await session.scalars(
-            select(Action).where(
-                Action.operation_id == operation_id, Action.bot_id == bot_id
-            )
-        )
-    ).first()
-    if action is not None:
-        await session.delete(action)
-        await session.commit()
-        return {"message": "Action deleted successfully"}
-    else:
-        return {"error": "Action not found"}, 404
+    action_vector_service.delete_action_by_operation_id(
+        bot_id=str(action.bot_id), operation_id=str(action.operation_id)
+    )
+    delete_action_by_id(
+        operation_id=str(action.operation_id), bot_id=str(action.bot_id)
+    )
+    return {"message": "Action deleted successfully"}, HTTP_201_CREATED
