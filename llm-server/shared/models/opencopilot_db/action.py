@@ -3,13 +3,8 @@ import uuid
 from shared.models.opencopilot_db.database_setup import Base
 from sqlalchemy import Column, String, DateTime, JSON, Text
 from dataclasses import dataclass
-from sqlalchemy import ForeignKey
-from enum import Enum
-from sqlalchemy.orm import Session
-from typing import List
 
 
-@dataclass
 class Action(Base):
     __tablename__ = "actions"
 
@@ -27,6 +22,22 @@ class Action(Base):
         DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
     )
     deleted_at = Column(DateTime, nullable=True)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "bot_id": self.bot_id,
+            "name": self.name,
+            "description": self.description,
+            "api_endpoint": self.api_endpoint,
+            "operation_id": self.operation_id,
+            "request_type": self.request_type,
+            "payload": self.payload,
+            "status": self.status,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
+            "deleted_at": self.deleted_at.isoformat() if self.deleted_at else None,
+        }
 
 
 @dataclass

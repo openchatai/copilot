@@ -1,20 +1,19 @@
+from sqlalchemy import Column, String, DateTime
 from datetime import datetime
-import uuid
-
-from shared.models.opencopilot_db.database_setup import Base, async_engine
-
-from typing import Optional
-from pydantic import BaseModel, Field
+from uuid import uuid4
+from shared.models.opencopilot_db.database_setup import Base
 
 
-class WebsiteDataSource(BaseModel):
-    id: str = Field(default=str(uuid.uuid4()), alias="id")
-    chatbot_id: str = Field(default=None, alias="chatbot_id")
-    created_at: Optional[datetime] = Field(default=datetime.utcnow, alias="created_at")
-    updated_at: Optional[datetime] = Field(default=datetime.utcnow, alias="updated_at")
-    status: str = Field(default="PENDING", alias="status")
-    url: str = Field(default=None, alias="url")
-    error: Optional[str] = Field(default=None, alias="error")
+class WebsiteDataSource(Base):
+    __tablename__ = "website_data_sources"
+
+    id = Column(String(36), primary_key=True, default=uuid4)
+    chatbot_id = Column(String(255), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=True)
+    updated_at = Column(DateTime, onupdate=datetime.utcnow, nullable=True)
+    status = Column(String(255), default="PENDING")
+    url = Column(String(255), nullable=False)
+    error = Column(String(1024))
 
 
 # Base.metadata.create_all(async_engine)

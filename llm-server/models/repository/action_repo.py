@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from typing import Optional, List
+from typing import Optional, List, cast
 from entities.action_entity import ActionDTO
 from shared.models.opencopilot_db.action import Action
 from utils.get_logger import CustomLogger
@@ -98,7 +98,9 @@ class ActionRepository:
             query = select(Action)
             if chatbot_id is not None:
                 query = query.filter(Action.bot_id == chatbot_id)
-            return (await session.execute(query)).all()
+            results = (await session.execute(query)).scalars().all()
+            actions = [row.to_dict() for row in results]
+            return actions
 
     async def find_action_by_operation_id(self, operation_id: str) -> Optional[Action]:
         async with session_manager(self.session) as session:
@@ -147,3 +149,11 @@ class ActionRepository:
                 return {"message": "Action deleted successfully"}
             else:
                 return {"error": "Action not found"}, 404
+
+
+
+have you not watched it before ? https://youtu.be/JgWJUKzgvR4
+it feels like i have never watched this before
+
+
+https://youtu.be/DJHOLErF8nA

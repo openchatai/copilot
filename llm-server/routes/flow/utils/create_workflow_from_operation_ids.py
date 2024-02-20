@@ -2,13 +2,13 @@ from typing import List
 
 from entities.action_entity import ActionDTO
 from entities.flow_entity import FlowDTO, Block
-from models.di import get_api_call_repository
+from models.di import get_action_repository
 
 
 async def create_flow_from_operation_ids(
     operation_ids: List[str], bot_id: str
 ) -> FlowDTO:
-    api_call_repo = get_api_call_repository()
+    action_repo = get_action_repository()
     flow = FlowDTO(
         blocks=[], bot_id=bot_id, description="", id="", name="", variables=[]
     )
@@ -22,7 +22,7 @@ async def create_flow_from_operation_ids(
         block = Block(
             actions=[], name="", next_on_fail=None, next_on_success=None, order=0
         )
-        operation = await find_action_by_method_id_and_bot_id(
+        operation = await action_repo.find_action_by_method_id_and_bot_id(
             operation_id=operation_id, bot_id=bot_id
         )
         action = ActionDTO(

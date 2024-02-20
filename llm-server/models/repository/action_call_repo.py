@@ -22,7 +22,7 @@ class ActionCallRepository:
             await session.commit()
             return action_call
 
-    async def get_action_call_by_id(self, action_id: str) -> Action:
+    async def get_action_call_by_id(self, action_id: str):
         async with session_manager(self.session) as session:
             return (
                 await session.scalars(select(Action).where(Action.id == action_id))

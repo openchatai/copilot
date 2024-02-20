@@ -11,29 +11,37 @@ class DataSourceRepository:
     async def get_all_pdf_datasource_by_bot_id(
         self, bot_id: str, limit: int = 20, offset: int = 0
     ):
-        async with session_manager(self.session) as session:
+        async with self.session as session:
             datasources = (
-                await session.scalars(
-                    select(PdfDataSource)
-                    .where(PdfDataSource.chatbot_id == bot_id)
-                    .order_by(PdfDataSource.created_at.desc())
-                    .limit(limit)
-                    .offset(offset)
+                (
+                    await session.execute(
+                        select(PdfDataSource)
+                        .where(PdfDataSource.chatbot_id == bot_id)
+                        .order_by(PdfDataSource.created_at.desc())
+                        .limit(limit)
+                        .offset(offset)
+                    )
                 )
-            ).all()
-            return datasources
+                .scalars()
+                .all()
+            )
+        return datasources
 
     async def get_all_website_datasource_by_bot_id(
         self, bot_id: str, limit: int = 20, offset: int = 0
     ):
-        async with session_manager(self.session) as session:
+        async with self.session as session:
             datasources = (
-                await session.scalars(
-                    select(WebsiteDataSource)
-                    .where(WebsiteDataSource.chatbot_id == bot_id)
-                    .order_by(WebsiteDataSource.created_at.desc())
-                    .limit(limit)
-                    .offset(offset)
+                (
+                    await session.execute(
+                        select(WebsiteDataSource)
+                        .where(WebsiteDataSource.chatbot_id == bot_id)
+                        .order_by(WebsiteDataSource.created_at.desc())
+                        .limit(limit)
+                        .offset(offset)
+                    )
                 )
-            ).all()
-            return datasources
+                .scalars()
+                .all()
+            )
+        return datasources
