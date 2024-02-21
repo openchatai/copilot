@@ -8,8 +8,8 @@ from functools import lru_cache
 
 class WebScraperStrategy(ABC):
     @abstractmethod
-    def extract_data(self, url):
-        pass
+    def extract_data(self, url) -> requests.Response:
+        return ""
 
 
 class RequestsWebScraperStrategy(WebScraperStrategy):

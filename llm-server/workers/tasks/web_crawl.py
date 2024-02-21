@@ -1,11 +1,10 @@
-from typing import Optional
 from urllib.parse import urlparse, urljoin
 from celery import shared_task
 
 import traceback
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from abc import ABC, abstractmethod
+from routes.search.search_service import add_cmdbar_data, Item
 from shared.utils.opencopilot_utils.init_vector_store import init_vector_store
 from shared.utils.opencopilot_utils.interfaces import StoreOptions
 from shared.models.opencopilot_db.website_data_sources import (
@@ -15,13 +14,10 @@ from shared.models.opencopilot_db.website_data_sources import (
 )
 from utils.llm_consts import WEB_CRAWL_STRATEGY, max_pages_to_crawl
 from models.repository.copilot_settings import ChatbotSettingCRUD
-from workers.tasks.url_parsers import ParserFactory
+from workers.tasks.url_parsers import ParserFactory, TextContentParser
 
 from workers.utils.remove_escape_sequences import remove_escape_sequences
 from utils.get_logger import CustomLogger
-import io
-import json
-from PyPDF2 import PdfReader
 from workers.tasks.web_scraping_strategy import get_scraper
 from bs4 import BeautifulSoup
 
@@ -62,7 +58,7 @@ def get_links(url: str, strategy=WEB_CRAWL_STRATEGY) -> list:
         return []
 
 
-def scrape_url(url: str, strategy=WEB_CRAWL_STRATEGY) -> Optional[str]:
+def scrape_url(url: str, strategy=WEB_CRAWL_STRATEGY):
     try:
         # for external sources always use text content parser, because we don't know the content type
         if strategy != "requests":
@@ -73,6 +69,10 @@ def scrape_url(url: str, strategy=WEB_CRAWL_STRATEGY) -> Optional[str]:
         scraper = get_scraper(strategy)
         response = scraper.extract_data(url)
 
+        headings = parser.find_all_headings_and_highlights(response)
+        items = [Item(title=head[0], description=head[1]) for head in headings]
+
+        add_cmdbar_data(items, {"url": url})
         return parser.parse(response)
     except ValueError as e:
         # Log an error message if no parser is available for the content type
@@ -197,46 +197,3 @@ def resume_failed_website_scrape(website_data_source_id: str):
     url = website_data_source.url
 
     scrape_website(url, website_data_source.bot_id, max_pages_to_crawl)
-
-
-class ContentParser(ABC):
-    @abstractmethod
-    def parse(self, content):
-        pass
-
-
-class TextContentParser(ContentParser):
-    def parse(self, content):
-        soup = BeautifulSoup(content, "lxml")
-        text_content = " ".join(
-            [
-                p.text.strip()
-                for p in soup.find_all(["p", "h1", "h2", "h3", "h4", "h5", "h6"])
-            ]
-        )
-        return text_content
-
-
-class JsonContentParser(ContentParser):
-    def parse(self, content):
-        try:
-            json_data = json.loads(content)
-            # Convert JSON object to a string representation
-            return json.dumps(json_data, indent=2)
-        except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse JSON content: {e}")
-            return None
-
-
-class PDFContentParser(ContentParser):
-    def parse(self, content):
-        try:
-            with io.BytesIO(content) as pdf_file:
-                reader = PdfReader(pdf_file)
-                text_content = ""
-                for page in reader.pages:
-                    text_content += page.extract_text() + "\n"
-                return text_content
-        except Exception as e:
-            logger.error(f"Failed to parse PDF content: {e}")
-            return None

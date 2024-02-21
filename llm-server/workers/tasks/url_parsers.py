@@ -1,12 +1,11 @@
 import io
 import json
-from typing import List, Union
+from typing import List, Optional, Tuple, Union
 from PyPDF2 import PdfReader
 from enum import Enum
 
 from abc import ABC, abstractmethod
 from bs4 import BeautifulSoup
-
 from utils.get_logger import CustomLogger
 import requests
 
@@ -26,6 +25,12 @@ class LinkInformation:
 class ContentParser(ABC):
     @abstractmethod
     def parse(self, content) -> List[LinkInformation]:
+        pass
+
+    @abstractmethod
+    def find_all_headings_and_highlights(
+        self, content: requests.Response
+    ) -> List[Tuple[str, Optional[str]]]:
         pass
 
 
@@ -57,6 +62,30 @@ class TextContentParser(ContentParser):
             results.append(LinkInformation("", "", text_content))
         return results
 
+    def find_all_headings_and_highlights(self, response: requests.Response):
+        """Finds all h-tags and their corresponding highlights from an HTML response.
+
+        Args:
+            response: A requests response object containing HTML content.
+
+        Returns:
+            A list of tuples, where each tuple contains:
+                - heading (str): The text of an h-tag.
+                - highlight (str): The text content of the element following the h-tag.
+        """
+
+        soup = BeautifulSoup(response.content, "html.parser")
+
+        headings_and_highlights: List[Tuple[str, Optional[str]]] = []
+        for heading in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6"]):
+            highlight_element = heading.next_sibling
+            highlight = (
+                highlight_element.get_text(strip=True) if highlight_element else None
+            )
+            headings_and_highlights.append((heading.text, highlight))
+
+        return headings_and_highlights
+
 
 class JsonContentParser(ContentParser):
     def parse(self, content) -> Union[LinkInformation, None]:
@@ -68,6 +97,9 @@ class JsonContentParser(ContentParser):
         except json.JSONDecodeError as e:
             print(f"Failed to parse JSON content: {e}")
             return None
+
+    def find_all_headings_and_highlights(self, content: str):
+        raise NotImplementedError()
 
 
 class PDFContentParser(ContentParser):
@@ -84,6 +116,9 @@ class PDFContentParser(ContentParser):
         except Exception as e:
             print(f"Failed to parse PDF content: {e}")
             return None
+
+    def find_all_headings_and_highlights(self, content: str):
+        raise NotImplementedError()
 
 
 class ContentType(Enum):
@@ -107,6 +142,7 @@ class ParserFactory:
             raise ValueError(f"No parser available for content type: {content_type}")
         # Add more parsers as needed for different content types
         raise ValueError(f"No parser available for content type: {content_type}")
+
 
 def identify_content_type(url):
     try:

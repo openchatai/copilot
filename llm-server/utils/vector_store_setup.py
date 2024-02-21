@@ -24,6 +24,19 @@ def try_create_collection(name: str, vectors_config: models.VectorParams):
         print(f"{name} collection already exists, ignoring")
 
 
+# quick fix, connect to the try_create_collection function
+def try_create_neural_search_collection():
+    client.recreate_collection(
+        collection_name="neural_search",
+        vectors_config={
+            "title": models.VectorParams(size=1536, distance=models.Distance.COSINE),
+            "description": models.VectorParams(
+                size=1536, distance=models.Distance.COSINE
+            ),
+        },
+    )
+
+
 vector_params = models.VectorParams(size=vector_size, distance=models.Distance.COSINE)
 
 
@@ -31,3 +44,5 @@ def init_qdrant_collections():
     try_create_collection(VectorCollections.knowledgebase, vector_params)
     try_create_collection(VectorCollections.actions, vector_params)
     try_create_collection(VectorCollections.flows, vector_params)
+    try_create_collection(VectorCollections.flows, vector_params)
+    try_create_neural_search_collection()

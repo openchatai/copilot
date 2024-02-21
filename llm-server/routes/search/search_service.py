@@ -1,37 +1,27 @@
+from shared.utils.opencopilot_utils.get_embeddings import get_embeddings
 from utils.llm_consts import initialize_qdrant_client
 from qdrant_client import models
-from typing import List
+from typing import Dict, List, Optional
 
 client = initialize_qdrant_client()
-
-
-# Function to generate embeddings (replace with your actual model)
-def generate_embedding(text: str):
-    # Placeholder for your embedding model
-    return []
+embedding = get_embeddings()
 
 
 # Data structure (you might want to define a custom class/dataclass)
 class Item:
     title: str
-    description: str
+    description: Optional[str]
 
-
-# Create (or recreate) collection with multiple vector fields
-client.recreate_collection(
-    collection_name="neural_search",
-    vectors_config={
-        "title": models.VectorParams(size=1536, distance=models.Distance.COSINE),
-        "description": models.VectorParams(size=1536, distance=models.Distance.COSINE),
-    },
-)
+    def __init__(self, title: str, description: Optional[str]) -> None:
+        self.title = title
+        self.description = description
 
 
 # Function to add vectors to Qdrant
-def add_to_qdrant(data: List[Item]) -> None:
+def add_cmdbar_data(data: List[Item], metadata: Dict[str, str]) -> None:
     for item in data:
-        title_embedding = generate_embedding(item.title)
-        description_embedding = generate_embedding(item.description)
+        title_embedding = embedding.embed_query(item.title)
+        description_embedding = embedding.embed_query(item.description or "")
 
         client.upsert(
             collection_name="neural_search",
@@ -55,7 +45,7 @@ def add_to_qdrant(data: List[Item]) -> None:
 def weighted_search(
     query: str, title_weight: float = 0.7, description_weight: float = 0.3
 ) -> List[models.ScoredPoint]:
-    query_embedding = generate_embedding(query)
+    query_embedding = embedding.embed_query(query)
 
     # Search title and descriptions
     title_results = client.search(
