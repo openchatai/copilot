@@ -12,8 +12,8 @@ dependencies:
     specifier: ^1.0.3
     version: 1.0.3(echarts@5.4.3)(react@18.2.0)
   '@openchatai/copilot-widget':
-    specifier: ^2.5.3
-    version: 2.5.3(react@18.2.0)
+    specifier: ^2.5.4
+    version: 2.5.4(react@18.2.0)
   '@radix-ui/react-accordion':
     specifier: ^1.1.2
     version: 1.1.2(@types/react-dom@18.2.13)(@types/react@18.2.28)(react-dom@18.2.0)(react@18.2.0)
@@ -95,9 +95,6 @@ dependencies:
   cmdk:
     specifier: ^0.2.0
     version: 0.2.0(@types/react@18.2.28)(react-dom@18.2.0)(react@18.2.0)
-  copilot-widget:
-    specifier: ^2.5.3
-    version: 2.5.3(react@18.2.0)
   echarts:
     specifier: ^5.4.3
     version: 5.4.3
@@ -709,8 +706,8 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.15.0
 
-  /@openchatai/copilot-widget@2.5.3(react@18.2.0):
-    resolution: {integrity: sha512-pgPAGlIXZgNP7iSNs3jkkz+rq/E7zuUnqBwhYteS1lDjms2QrOIDtwmOyDxeLBYDZGg/YQvfaG8xl4gzNTk6/g==}
+  /@openchatai/copilot-widget@2.5.4(react@18.2.0):
+    resolution: {integrity: sha512-ZW7RDsMbSX/f50ZTQj0GMzD3+vA8LxcGAH0wuEDEmkvgFdJ/BNtZGtXV4yonPZ38ePcxehE7zeHHHUSRxE9YUw==}
     peerDependencies:
       react: ^18.x
     dependencies:
@@ -2786,15 +2783,6 @@ packages:
 
   /concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
-
-  /copilot-widget@2.5.3(react@18.2.0):
-    resolution: {integrity: sha512-Jf0bWyPF/l+1cAG+50h3x8mCSuM99+Ijcf+4v7NM7e/CdSgT7N7hFhB19Zo2OsDY5Xgr3VlJmIzZJgCvrGQveQ==}
-    peerDependencies:
-      react: ^18.x
-    dependencies:
-      lucide-react: 0.298.0(react@18.2.0)
-      react: 18.2.0
-    dev: false
 
   /copy-to-clipboard@3.3.3:
     resolution: {integrity: sha512-2KV8NhB5JqC3ky0r9PMCAZKbUHSwtEo4CwCs0KXgruG43gX5PMqDEBbVU4OUzw2MuAWUfsuFmWvEKG5QRfSnJA==}
