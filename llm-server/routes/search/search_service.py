@@ -1,7 +1,10 @@
+import uuid
 from shared.utils.opencopilot_utils.get_embeddings import get_embeddings
-from utils.llm_consts import initialize_qdrant_client
+from utils.llm_consts import VectorCollections, initialize_qdrant_client
 from qdrant_client import models
 from typing import Dict, List, Optional
+import operator
+from copy import deepcopy
 
 client = initialize_qdrant_client()
 embedding = get_embeddings()
@@ -18,27 +21,42 @@ class Item:
 
 
 # Function to add vectors to Qdrant
-def add_cmdbar_data(data: List[Item], metadata: Dict[str, str]) -> None:
-    for item in data:
-        title_embedding = embedding.embed_query(item.title)
-        description_embedding = embedding.embed_query(item.description or "")
+def add_cmdbar_data(items: List[Item], metadata: Dict[str, str]) -> None:
+    points = []  # Batch of points to insert
 
-        client.upsert(
-            collection_name="neural_search",
-            points=[
-                models.PointStruct(
-                    id=1,
-                    payload={
-                        "title": item.title,
-                        "description": item.description,
-                    },
-                    vector={
-                        "description": title_embedding,
-                        "title": description_embedding,
-                    },
-                ),
-            ],
+    titles = list(map(operator.attrgetter("title"), items))
+    descriptions = list(map(operator.attrgetter("description"), items))
+
+    # this logic has to be removed, currently we are only using the html title....
+    title_embedding = None
+    if titles[0] == titles[1] == titles[2] == titles[3]:
+        e = embedding.embed_query(titles[0])
+        title_embeddings = [e for _ in range(len(titles))]
+
+    else:
+        title_embeddings = embedding.embed_documents(titles)
+
+    description_embeddings = embedding.embed_documents(descriptions)
+    for index, item in enumerate(items):
+        title_embedding = title_embeddings[index]
+        description_embedding = description_embeddings[index]
+        _metadata = deepcopy(metadata)
+        _metadata["title"] = item.title
+        _metadata["description"] = item.description or ""
+
+        points.append(
+            models.PointStruct(
+                id=uuid.uuid4().hex,  # Placeholder - See explanation below
+                payload={"metadata": _metadata},
+                vector={
+                    "description": title_embedding,
+                    "title": description_embedding,
+                },
+            )
         )
+
+    # Perform a single batch insert
+    client.upsert(collection_name=VectorCollections.neural_search, points=points)
 
 
 # Function to search with weights
@@ -49,14 +67,14 @@ def weighted_search(
 
     # Search title and descriptions
     title_results = client.search(
-        collection_name="neural_search",
+        collection_name=VectorCollections.neural_search,
         query_vector=models.NamedVector(name="title", vector=query_embedding),
         with_payload=True,
         with_vector=False,
     )
 
     description_results = client.search(
-        collection_name="neural_search",
+        collection_name=VectorCollections.neural_search,
         query_vector=models.NamedVector(name="description", vector=query_embedding),
         with_payload=True,
         with_vector=False,

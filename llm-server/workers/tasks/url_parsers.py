@@ -5,7 +5,7 @@ from PyPDF2 import PdfReader
 from enum import Enum
 
 from abc import ABC, abstractmethod
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from utils.get_logger import CustomLogger
 import requests
 
@@ -24,18 +24,20 @@ class LinkInformation:
 
 class ContentParser(ABC):
     @abstractmethod
-    def parse(self, content) -> List[LinkInformation]:
+    def get_url_fragments(self, content) -> List[LinkInformation]:
         pass
 
     @abstractmethod
-    def find_all_headings_and_highlights(
-        self, content: requests.Response
-    ) -> List[Tuple[str, Optional[str]]]:
+    def parse_text_content(self, content) -> str:
+        pass
+
+    @abstractmethod
+    def find_all_headings_and_highlights(self, content: str) -> Tuple[str, List[str]]:
         pass
 
 
 class TextContentParser(ContentParser):
-    def parse(self, content) -> List[LinkInformation]:
+    def get_url_fragments(self, content) -> List[LinkInformation]:
         soup = BeautifulSoup(content, "lxml")
         links = soup.find_all("a")
 
@@ -62,33 +64,25 @@ class TextContentParser(ContentParser):
             results.append(LinkInformation("", "", text_content))
         return results
 
-    def find_all_headings_and_highlights(self, response: requests.Response):
-        """Finds all h-tags and their corresponding highlights from an HTML response.
-
-        Args:
-            response: A requests response object containing HTML content.
-
-        Returns:
-            A list of tuples, where each tuple contains:
-                - heading (str): The text of an h-tag.
-                - highlight (str): The text content of the element following the h-tag.
-        """
-
-        soup = BeautifulSoup(response.content, "html.parser")
-
-        headings_and_highlights: List[Tuple[str, Optional[str]]] = []
+    # for now i am returning only the headings and the page title. We will enhance this later to also have highlights
+    def find_all_headings_and_highlights(self, content: str):
+        soup = BeautifulSoup(content, "lxml")
+        title_tag = soup.title
+        title = ""
+        if title_tag is not None:
+            title = title_tag.get_text(strip=True)
+        headings = []
         for heading in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6"]):
-            highlight_element = heading.next_sibling
-            highlight = (
-                highlight_element.get_text(strip=True) if highlight_element else None
-            )
-            headings_and_highlights.append((heading.text, highlight))
+            headings.append(heading.get_text(strip=True))
+        return title, headings
 
-        return headings_and_highlights
+    def parse_text_content(self, content) -> str:
+        text = BeautifulSoup(content, "lxml").get_text()
+        return text
 
 
 class JsonContentParser(ContentParser):
-    def parse(self, content) -> Union[LinkInformation, None]:
+    def get_url_fragments(self, content) -> Union[LinkInformation, None]:
         try:
             json_data = json.loads(content)
             # Convert JSON object to a string representation
@@ -101,9 +95,14 @@ class JsonContentParser(ContentParser):
     def find_all_headings_and_highlights(self, content: str):
         raise NotImplementedError()
 
+    @abstractmethod
+    def parse_text_content(self, content) -> str:
+        result = self.get_url_fragments(content)
+        return result.target_text if result else ""
+
 
 class PDFContentParser(ContentParser):
-    def parse(self, content) -> Union[LinkInformation, None]:
+    def get_url_fragments(self, content) -> Union[LinkInformation, None]:
         try:
             pdf_file = PdfReader(io.BytesIO(content))
             text = ""
@@ -119,6 +118,11 @@ class PDFContentParser(ContentParser):
 
     def find_all_headings_and_highlights(self, content: str):
         raise NotImplementedError()
+
+    def parse_text_content(self, content) -> str:
+        result = self.get_url_fragments(content)
+
+        return result.target_text if result else ""
 
 
 class ContentType(Enum):
