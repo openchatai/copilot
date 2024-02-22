@@ -88,7 +88,7 @@ def update_action(action_id: str, data: ActionDTO) -> Action:
         action.name = data.name
         action.description = data.description
         action.operation_id = data.operation_id
-        action.base_uri = data.api_endpoint
+        action.api_endpoint = data.api_endpoint
         action.request_type = data.request_type
         action.payload = data.payload
         action.updated_at = datetime.datetime.utcnow()
