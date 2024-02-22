@@ -32,7 +32,9 @@ class ContentParser(ABC):
         pass
 
     @abstractmethod
-    def find_all_headings_and_highlights(self, content: str) -> Tuple[str, List[str]]:
+    def find_all_headings_and_highlights(
+        self, content: str
+    ) -> Tuple[str, List[Tuple[str, str]]]:
         pass
 
 
@@ -65,15 +67,26 @@ class TextContentParser(ContentParser):
         return results
 
     # for now i am returning only the headings and the page title. We will enhance this later to also have highlights
-    def find_all_headings_and_highlights(self, content: str):
+    def find_all_headings_and_highlights(
+        self, content: str
+    ) -> Tuple[str, List[Tuple[str, str]]]:
         soup = BeautifulSoup(content, "lxml")
         title_tag = soup.title
         title = ""
         if title_tag is not None:
             title = title_tag.get_text(strip=True)
-        headings = []
+
+        headings: List[Tuple[str, str]] = []
+
         for heading in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6"]):
-            headings.append(heading.get_text(strip=True))
+            heading_text = heading.get_text(strip=True)
+
+            # Check if the heading or one of its children has an 'id' attribute
+            id_tag = heading.find(attrs={"id": True})
+            if id_tag:
+                heading_id = id_tag["id"]
+                headings.append((heading_text, heading_id))
+
         return title, headings
 
     def parse_text_content(self, content) -> str:

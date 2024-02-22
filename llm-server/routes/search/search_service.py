@@ -13,11 +13,13 @@ embedding = get_embeddings()
 # Data structure (you might want to define a custom class/dataclass)
 class Item:
     title: str
-    description: Optional[str]
+    heading_text: str
+    heading_id: str
 
-    def __init__(self, title: str, description: Optional[str]) -> None:
+    def __init__(self, title: str, heading_text: str, heading_id: str):
         self.title = title
-        self.description = description
+        self.heading_text = heading_text
+        self.heading_id = heading_id
 
 
 # Function to add vectors to Qdrant
@@ -25,24 +27,25 @@ def add_cmdbar_data(items: List[Item], metadata: Dict[str, str]) -> None:
     points = []  # Batch of points to insert
 
     titles = list(map(operator.attrgetter("title"), items))
-    descriptions = list(map(operator.attrgetter("description"), items))
+    headings = list(map(operator.attrgetter("heading_text"), items))
 
     # this logic has to be removed, currently we are only using the html title....
     title_embedding = None
-    if titles[0] == titles[1] == titles[2] == titles[3]:
+    if len(titles) > 3 and (titles[0] == titles[1] == titles[2] == titles[3]):
         e = embedding.embed_query(titles[0])
         title_embeddings = [e for _ in range(len(titles))]
 
     else:
         title_embeddings = embedding.embed_documents(titles)
 
-    description_embeddings = embedding.embed_documents(descriptions)
+    description_embeddings = embedding.embed_documents(headings)
     for index, item in enumerate(items):
         title_embedding = title_embeddings[index]
         description_embedding = description_embeddings[index]
         _metadata = deepcopy(metadata)
         _metadata["title"] = item.title
-        _metadata["description"] = item.description or ""
+        _metadata["description"] = item.heading_text or ""
+        _metadata["heading_id"] = item.heading_id or ""
 
         points.append(
             models.PointStruct(

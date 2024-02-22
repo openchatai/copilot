@@ -68,7 +68,10 @@ def scrape_url(url: str, bot_id: str):
         content = scraper.extract_data(url)
 
         title, headings = parser.find_all_headings_and_highlights(content)
-        items = [Item(title=title, description=head) for head in headings]
+        items = [
+            Item(title=title, heading_text=heading_text, heading_id=heading_id)
+            for heading_text, heading_id in headings
+        ]
 
         add_cmdbar_data(items, {"url": url, "bot_id": bot_id})
         return parser.parse_text_content(content)
@@ -152,7 +155,7 @@ def scrape_website(url: str, bot_id: str, max_pages: int) -> int:
     return total_pages_scraped
 
 
-@shared_task
+@shared_task(enable_trace=True)
 def web_crawl(url, bot_id: str):
     try:
         # setting = ChatbotSettings.get_chatbot_setting(bot_id)
