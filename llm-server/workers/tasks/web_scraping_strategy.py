@@ -8,8 +8,8 @@ from functools import lru_cache
 
 class WebScraperStrategy(ABC):
     @abstractmethod
-    def extract_data(self, url):
-        pass
+    def extract_data(self, url) -> str:
+        return ""
 
 
 class RequestsWebScraperStrategy(WebScraperStrategy):
@@ -37,7 +37,7 @@ class ScrapingBeeWebScraperStrategy(WebScraperStrategy):
                 "render_js": True,
             },
         )
-        return response.content
+        return response.text
 
 
 @lru_cache(maxsize=1)

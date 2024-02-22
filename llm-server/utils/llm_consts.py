@@ -40,6 +40,7 @@ class VectorCollections:
     flows = "flows"
     actions = "actions"
     knowledgebase = "knowledgebase"
+    neural_search = "neural_search"
 
 
 class ChatStrategy:

@@ -111,7 +111,9 @@ The available tools:
     messages.extend(chat_history[-6:])
     messages.append(HumanMessage(content=current_message))
     messages.append(
-        HumanMessage(content="Return the corresponding json for the last user input")
+        HumanMessage(
+            content="Return the corresponding json for the last user input, without any commentary."
+        )
     )
 
     content = cast(str, chat(messages=messages).content)

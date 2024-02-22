@@ -52,7 +52,7 @@ async def generate_api_payload(
         body_schema=body_schema,
     )
 
-    if api_info.path_params["properties"]:
+    if api_info.path_params:
         api_info.path_params = await gen_params_from_schema(
             json.dumps(api_info.path_params, separators=(",", ":")),
             text,
@@ -60,7 +60,7 @@ async def generate_api_payload(
             current_state,
         )
 
-    if api_info.query_params["properties"]:
+    if api_info.query_params:
         api_info.query_params = await gen_params_from_schema(
             json.dumps(api_info.query_params, separators=(",", ":")),
             text,
