@@ -1,5 +1,5 @@
 {
-  "name": "@openchatai/copilot-widget",
+  "name": "copilot-widget",
   "private": false,
   "version": "2.5.3",
   "type": "module",

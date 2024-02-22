@@ -3,7 +3,7 @@ import { baseUrl } from '@/data/base-url';
 import {
     CopilotWidget,
     Root
-} from '@openchatai/copilot-widget';
+} from 'copilot-widget';
 import { ErrorBoundary } from "react-error-boundary";
 export default function Widget({
     token

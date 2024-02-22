@@ -99,7 +99,6 @@ def add_action(chatbot_id):
 @action.route("/bot/<string:chatbot_id>/action/<string:action_id>", methods=["PATCH"])
 def update_single_action(chatbot_id: str, action_id: str):
     action_dto = ActionDTO(bot_id=chatbot_id, **request.get_json())
-
     # Todo make sure either both or non go in
     saved_action = update_action(action_id, action_dto)
     action_vector_service.update_action_by_operation_id(action_dto)
