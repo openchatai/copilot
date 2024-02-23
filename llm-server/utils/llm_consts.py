@@ -121,3 +121,5 @@ redis_client = redis.Redis.from_url(
 )
 
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "YOURSUPERSECRETKEY")
+
+ENABLE_NEURAL_SEARCH = os.getenv("ENABLE_NEURAL_SEARCH", "NO") == "YES"

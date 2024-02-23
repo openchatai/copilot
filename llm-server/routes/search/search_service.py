@@ -5,6 +5,7 @@ from qdrant_client import models
 from typing import Dict, List, Optional
 import operator
 from copy import deepcopy
+from utils.llm_consts import ENABLE_NEURAL_SEARCH
 
 client = initialize_qdrant_client()
 embedding = get_embeddings()

@@ -66,21 +66,7 @@ def get_cmdbar_data(chatbot_id: str):
             request_data.description_weight,
         )
         return (
-            jsonify(
-                [
-                    (
-                        sp.model_dump()
-                        .get("payload", {})
-                        .get("metadata", {})
-                        .get("title"),
-                        sp.model_dump()
-                        .get("payload", {})
-                        .get("metadata", {})
-                        .get("description"),
-                    )
-                    for sp in scored_points
-                ]
-            ),
+            jsonify([sp.model_dump() for sp in scored_points]),
             200,
         )
 
