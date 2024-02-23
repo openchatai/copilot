@@ -70,24 +70,22 @@ class TextContentParser(ContentParser):
     def find_all_headings_and_highlights(
         self, content: str
     ) -> Tuple[str, List[Tuple[str, str]]]:
+
         soup = BeautifulSoup(content, "lxml")
-        title_tag = soup.title
-        title = ""
-        if title_tag is not None:
-            title = title_tag.get_text(strip=True)
-
-        headings: List[Tuple[str, str]] = []
-
-        for heading in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6"]):
-            heading_text = heading.get_text(strip=True)
-
-            # Check if the heading or one of its children has an 'id' attribute
-            id_tag = heading.find(attrs={"id": True})
-            if id_tag:
-                heading_id = id_tag["id"]
-                headings.append((heading_text, heading_id))
-
-        return title, headings
+        title = soup.title.text if soup.title else ""
+        elements_with_id = soup.find_all(id=True)
+        links = soup.find_all("a")
+        pairs = []
+        for element in elements_with_id:
+            id_ = element.get("id")
+            if id_:  # A simple check if the id exists
+                corresponding_links = [
+                    link for link in links if link.get("href") == "#" + id_
+                ]  # Removed "./#" prefix
+                if corresponding_links:
+                    for link in corresponding_links:
+                        pairs.append((element.get_text(strip=True), id_))
+        return title, pairs
 
     def parse_text_content(self, content) -> str:
         text = BeautifulSoup(content, "lxml").get_text()
