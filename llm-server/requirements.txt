@@ -171,3 +171,4 @@ yarl==1.9.4
 zipp==3.17.0
 aioredis==2.0.1
 scrapingbee==2.0.1
+fuzzywuzzy==0.18.0

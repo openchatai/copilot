@@ -81,7 +81,7 @@ class TextContentParser(ContentParser):
             if id_:  # A simple check if the id exists
                 corresponding_links = [
                     link for link in links if link.get("href") == "#" + id_
-                ]  # Removed "./#" prefix
+                ]
                 if corresponding_links:
                     for link in corresponding_links:
                         pairs.append((element.get_text(strip=True), id_))
