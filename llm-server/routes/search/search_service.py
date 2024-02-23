@@ -1,7 +1,7 @@
 import uuid
 import json
 import os
-from fuzzywuzzy import fuzz
+from rapidfuzz import fuzz
 from shared.utils.opencopilot_utils.get_embeddings import get_embeddings
 from utils.llm_consts import VectorCollections, initialize_qdrant_client
 from qdrant_client import models
@@ -871,7 +871,7 @@ def fuzzy_search(query: str) -> List[models.ScoredPoint]:
         ):
             # Compute similarity score
             title = point["payload"]["metadata"]["title"]
-            score = fuzz.ratio(title.lower(), query.lower()) / 100
+            score = fuzz.ratio(title.lower(), query.lower(), score_cutoff=0.2) / 100
 
             point["payload"]["metadata"]["description"] = point["payload"]["metadata"][
                 "description"
