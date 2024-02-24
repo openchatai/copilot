@@ -73,7 +73,8 @@ def scrape_url(url: str, bot_id: str):
             for heading_text, heading_id in headings
         ]
 
-        add_cmdbar_data(items, {"url": url, "bot_id": bot_id})
+        if len(items) > 0:
+            add_cmdbar_data(items, {"url": url, "bot_id": bot_id})
         return parser.parse_text_content(content)
     except ValueError as e:
         # Log an error message if no parser is available for the content type
@@ -140,11 +141,8 @@ def scrape_website(url: str, bot_id: str, max_pages: int) -> int:
                     chatbot_id=bot_id, url=current_url, status="SUCCESS"
                 )
 
-                # Get links on the current page
-                links = get_links(current_url)
-
-                # Add new links to the queue
-                queue.extend(links)
+            links = get_links(current_url)
+            queue.extend(links)
 
         except Exception as e:
             logger.error("WEB_SCRAPE_ERROR", error=e)
