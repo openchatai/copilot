@@ -38,20 +38,30 @@ class ChatHistoryRepo:
     ):
         async with session_manager(self.session) as session:
             chat_history = (
-                await session.execute(
-                    select(ChatHistory)
-                    .filter_by(session_id=session_id)
-                    .order_by(ChatHistory.id.desc())
-                    .limit(limit)
-                    .offset(offset)
+                (
+                    await session.execute(
+                        select(ChatHistory)
+                        .filter_by(session_id=session_id)
+                        .order_by(ChatHistory.id.desc())
+                        .limit(limit)
+                        .offset(offset)
+                    )
                 )
-            ).all()
+                .scalars()
+                .all()
+            )
 
             total_messages = (
-                await session.execute(
-                    select(func.count(ChatHistory.id)).filter_by(session_id=session_id)
+                (
+                    await session.execute(
+                        select(func.count(ChatHistory.id)).filter_by(
+                            session_id=session_id
+                        )
+                    )
                 )
-            ).all()
+                .scalars()
+                .all()
+            )
 
             return chat_history, total_messages
 

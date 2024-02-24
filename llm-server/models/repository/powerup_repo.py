@@ -21,14 +21,12 @@ class PowerUpRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create_powerups_bulk(
-        self, powerup_data_list: List[dict]
-    ) -> List[PowerUp]:
+    async def create_powerups_bulk(self, powerup_data_list: List[dict]):
         async with self.session as session:
             powerup_objects = [PowerUp(**data) for data in powerup_data_list]
             session.add_all(powerup_objects)
             await session.commit()
-            await session.refresh(powerup_objects)
+            # await session.refresh(powerup_objects)
             return powerup_objects
 
     async def create_powerup(self, powerup_data: dict) -> PowerUp:

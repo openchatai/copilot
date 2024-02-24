@@ -5,6 +5,8 @@ from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
 from custom_types.response_dict import LLMResponse, ApiRequestResult
 from custom_types.run_workflow_input import ChatContext
 from entities.flow_entity import FlowDTO
+from sse_starlette.sse import EventSourceResponse
+from routes.chat.implementation.utils import emit
 
 # from models.repository.action_call_repo import add_action_call
 # from models.repository.flow_repo import get_flow_by_id
@@ -16,7 +18,6 @@ from routes.flow.utils.document_similarity_dto import (
 from utils.get_chat_model import get_chat_model
 from utils.get_logger import CustomLogger
 from utils.llm_consts import VectorCollections
-from flask_sse import sse
 from routes.flow.utils import create_flow_from_operation_ids
 
 logger = CustomLogger(module_name=__name__)
@@ -170,7 +171,7 @@ async def run_informative_item(
     )
 
     (
-        sse.publish(f"{session_id}_info", "Distilling the information received...\n")
+        await emit(f"{session_id}_info", "Distilling the information received...\n")
         if is_streaming
         else None
     )
@@ -180,7 +181,7 @@ async def run_informative_item(
     content = ""
     for chunk in chat.stream(messages):
         if is_streaming:
-            sse.publish({"message": chunk.content}, type=session_id)
+            await emit(session_id, chunk.content)
         content += str(chunk.content)
 
     # return {"response": content, "error": None}

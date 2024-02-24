@@ -5,3 +5,4 @@ class ChatInput(BaseModel):
     content: str
     session_id: str = Field(..., alias="session_id")
     headers: dict = {}
+    token: str = Field(..., alias="token")

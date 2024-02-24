@@ -7,7 +7,6 @@ from models.repository.copilot_repo import CopilotRepository
 from models.repository.action_repo import ActionRepository
 from models.repository.flow_repo import FlowRepository
 from models.repository.powerup_repo import PowerUpRepository
-from models.repository.utils import session_manager
 from shared.models.opencopilot_db.database_setup import get_db_session
 
 from fastapi import Depends
@@ -15,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 
 def get_api_call_repository(
-    session: AsyncSession = Depends(session_manager),
+    session: AsyncSession = Depends(get_db_session),
 ):
     return APICallRepository(session)
 

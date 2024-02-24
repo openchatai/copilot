@@ -3,6 +3,8 @@ from typing import Awaitable, Dict, Optional
 from custom_types.response_dict import LLMResponse
 from asyncio import Future
 
+from models.repository.chat_history_repo import ChatHistoryRepo
+
 
 class ChatRequestHandler(ABC):
     @abstractmethod
@@ -15,5 +17,6 @@ class ChatRequestHandler(ABC):
         headers: Dict[str, str],
         app: Optional[str],
         is_streaming: bool,
+        chat_history_repo: ChatHistoryRepo,
     ) -> LLMResponse:
         pass

@@ -46,5 +46,23 @@ class Chatbot(Base):
         ),
     )
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "email": self.email,
+            "token": self.token,
+            "website": self.website,
+            "status": self.status,
+            "prompt_message": self.prompt_message,
+            "swagger_url": self.swagger_url,
+            "enhanced_privacy": self.enhanced_privacy,
+            "smart_sync": self.smart_sync,
+            "global_variables": self.global_variables,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+            "deleted_at": self.deleted_at,
+        }
+
 
 # Base.metadata.create_all(engine)

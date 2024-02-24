@@ -1,6 +1,6 @@
 import os
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, Body, Header
+from fastapi import APIRouter, Depends, Form, HTTPException, Body, Header
 from enums.initial_prompt import ChatBotInitialPromptEnum
 from models.repository.copilot_repo import CopilotRepository
 from models.di import get_copilot_repository, get_powerup_repository
@@ -22,11 +22,11 @@ async def index(
 
 @copilot_router.post("/")
 async def create_new_copilot(
-    name: Optional[str] = Body("My First Copilot"),
-    prompt_message: Optional[str] = Body(
+    name: Optional[str] = Form("My First Copilot"),
+    prompt_message: Optional[str] = Form(
         ChatBotInitialPromptEnum.AI_COPILOT_INITIAL_PROMPT
     ),
-    website: Optional[str] = Body("https://example.com"),
+    website: Optional[str] = Form("https://example.com"),
     powerup_repo: PowerUpRepository = Depends(get_powerup_repository),
     copilot_repo: CopilotRepository = Depends(get_copilot_repository),
 ):
@@ -39,19 +39,19 @@ async def create_new_copilot(
 
     powerup_apps = [
         {
-            "chatbot_id": chatbot.get("id"),
+            "chatbot_id": chatbot.id,
             "base_prompt": "You are an AI assistant that excels at correcting grammar mistakes. Please improve the following text while maintaining the original meaning:",
             "name": "Text Corrector",
             "description": "Corrects grammar mistakes in a given text while maintaining the original meaning.",
         },
         {
-            "chatbot_id": chatbot.get("id"),
+            "chatbot_id": chatbot.id,
             "base_prompt": "You are an AI that predicts the next word in a sequence of text. Given the text below, predict the most likely next word:",
             "name": "Next Word Predictor",
             "description": "Predicts the next word in a sequence of text.",
         },
         {
-            "chatbot_id": chatbot.get("id"),
+            "chatbot_id": chatbot.id,
             "base_prompt": "You are an AI that rephrases sentences to enhance clarity and style. Please rephrase the following sentence:",
             "name": "Sentence Rephraser",
             "description": "Rephrases sentences to enhance clarity and style.",
@@ -59,7 +59,7 @@ async def create_new_copilot(
     ]
 
     await powerup_repo.create_powerups_bulk(powerup_apps)
-    return chatbot
+    return chatbot.to_dict()
 
 
 @copilot_router.get("/{copilot_id}")

@@ -1,4 +1,4 @@
-from flask_socketio import emit
+from models.repository.action_call_repo import ActionCallRepository
 from models.repository.chat_history_repo import ChatHistoryRepo
 from routes.chat.followup_generator import generate_follow_up_questions
 from routes.chat.implementation.handler_interface import ChatRequestHandler
@@ -21,10 +21,8 @@ from routes.root_service import (
     run_informative_item,
 )
 from utils.llm_consts import VectorCollections
-from models.repository.action_call_repo import ActionCallRepository
 from utils.llm_consts import enable_followup_questions
-
-from models.di import get_chat_history_repository, get_action_call_repository
+from routes.chat.implementation.utils import emit
 
 
 class ChainStrategy(ChatRequestHandler):
@@ -37,10 +35,10 @@ class ChainStrategy(ChatRequestHandler):
         headers: Dict[str, str],
         app: Optional[str],
         is_streaming: bool,
+        chat_history_repo: ChatHistoryRepo,
+        action_call_repo: ActionCallRepository,
     ) -> LLMResponse:
         check_required_fields(base_prompt, text)
-        chat_history_repo = get_chat_history_repository()
-        action_call_repo = get_action_call_repository()
         tasks = [
             get_relevant_knowledgebase(text, bot_id),
             get_relevant_actions(text, bot_id),
@@ -53,10 +51,11 @@ class ChainStrategy(ChatRequestHandler):
         top_documents = select_top_documents(actions + flows + knowledgebase)
 
         (
-            emit(f"{session_id}_info", "Checking if actionable ... \n")
+            await emit(f"{session_id}_info", "Checking if actionable ... \n")
             if is_streaming
             else None
         )
+
         next_step = get_next_response_type(
             user_message=text,
             session_id=session_id,
@@ -65,7 +64,7 @@ class ChainStrategy(ChatRequestHandler):
         )
 
         (
-            emit(
+            await emit(
                 f"{session_id}_info",
                 f"Is next step actionable: {next_step.actionable}... \n",
             )
@@ -88,7 +87,7 @@ class ChainStrategy(ChatRequestHandler):
                 )
             # now run it
             (
-                emit(f"{session_id}_info", "Executing the actionable item... \n")
+                await emit(f"{session_id}_info", "Executing the actionable item... \n")
                 if is_streaming
                 else None
             )
@@ -121,7 +120,7 @@ class ChainStrategy(ChatRequestHandler):
             # it means that the user query is "informative" and can be answered using text only
             # get the top knowledgeable documents (if any)
             (
-                emit(f"{session_id}_info", "Running informative action... \n")
+                await emit(f"{session_id}_info", "Running informative action... \n")
                 if is_streaming
                 else None
             )
@@ -134,7 +133,7 @@ class ChainStrategy(ChatRequestHandler):
                 session_id=session_id,
             )
 
-            emit(session_id, "|im_end|") if is_streaming else None
+            await emit(session_id, "|im_end|") if is_streaming else None
 
             # we only support follow_up question this in streaming mode
 
@@ -143,6 +142,8 @@ class ChainStrategy(ChatRequestHandler):
                     conversations_history, response.message or "", text
                 )
                 if is_streaming:
-                    emit(f"{session_id}_follow_qns", followup_question_list.json())
+                    await emit(
+                        f"{session_id}_follow_qns", followup_question_list.json()
+                    )
             response.knowledgebase_called = True
             return response

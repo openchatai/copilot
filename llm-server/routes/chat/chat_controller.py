@@ -10,10 +10,15 @@ from fastapi import (
 )
 from fastapi.responses import JSONResponse
 from starlette.requests import Request
+from models.repository.action_call_repo import ActionCallRepository
 
 from models.repository.chat_history_repo import ChatHistoryRepo
 from models.repository.copilot_repo import CopilotRepository
-from models.di import get_chat_history_repository, get_copilot_repository
+from models.di import (
+    get_action_call_repository,
+    get_chat_history_repository,
+    get_copilot_repository,
+)
 from routes.chat.chat_dto import ChatInput
 from routes.chat.implementation.chain_strategy import ChainStrategy
 from routes.chat.implementation.functions_strategy import FunctionStrategy
@@ -148,13 +153,25 @@ async def init_chat(
 
 
 @chat_router.post("/send")
-async def send_chat(chat_input: ChatInput, bot_token: str = Depends(get_bot_token)):
+async def send_chat(
+    chat_input: ChatInput,
+    chat_history_repo: ChatHistoryRepo = Depends(get_chat_history_repository),
+    copilot_repo: CopilotRepository = Depends(get_copilot_repository),
+    action_call_repo: ActionCallRepository = Depends(get_action_call_repository),
+):
     message = chat_input.content
     session_id = chat_input.session_id
     headers_from_json = chat_input.headers or {}
+    token = chat_input.token
 
     return await handle_chat_send_common(
-        message, bot_token, session_id, headers_from_json, is_streaming=False
+        message,
+        token,
+        session_id,
+        headers_from_json,
+        is_streaming=True,
+        chat_history_repo=chat_history_repo,
+        copilot_repo=copilot_repo,
     )
 
 
@@ -164,8 +181,9 @@ async def handle_chat_send_common(
     session_id: str,
     headers_from_json: Dict[str, str],
     is_streaming: bool,
-    chat_history_repo: ChatHistoryRepo = Depends(get_chat_history_repository),
-    copilot_repo: CopilotRepository = Depends(get_copilot_repository),
+    chat_history_repo: ChatHistoryRepo,
+    copilot_repo: CopilotRepository,
+    action_call_repo=ActionCallRepository,
 ):
     app_name = headers_from_json.pop(X_App_Name, None)
     if not message:
@@ -203,6 +221,8 @@ async def handle_chat_send_common(
             headers_from_json,
             app_name,
             is_streaming,
+            chat_history_repo,
+            action_call_repo,
         )
 
         if (
@@ -236,6 +256,9 @@ async def handle_chat_send_common(
 
         return {"type": "text", "response": {"text": result.message}}
     except Exception as e:
+        import traceback
+
+        traceback.print_exc()
         logger.error(
             "An exception occurred",
             incident="chat/send",
