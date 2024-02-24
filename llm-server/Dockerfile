@@ -1,17 +1,21 @@
-# Common stage
-FROM python:3.9-slim AS common
+# Use an official Python runtime as a parent image
+FROM python:3.11-slim as production
+
+# Set the working directory to /app
 WORKDIR /app
-COPY requirements.txt /app/
-RUN pip install -r requirements.txt
-COPY . /app/
 
-# Development stage
-FROM common AS development
-EXPOSE 8002
-RUN pip install debugpy
-CMD ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", "--wait-for-client", "-m", "flask", "run", "--host=0.0.0.0", "--port=8002", "--reload"]
+# Add current directory files to worker dir in Docker
+ADD . /app
 
-# Production stage
-FROM common AS production
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update && apt-get -y install build-essential libssl-dev 
+
+RUN pip install uwsgi
+RUN pip install gevent
+
 EXPOSE 8002
-CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--port=8002", "--reload"]
+
+RUN uwsgi --help
+# Run uwsgi when the container launches
+CMD ["uwsgi", "--http", ":8002", "--gevent", "1000", "--http-websockets", "--master", "--wsgi-file", "app.py", "--callable", "app"]

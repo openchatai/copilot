@@ -1,6 +1,8 @@
 import asyncio
 import requests
 from dotenv import load_dotenv
+
+load_dotenv()
 from flask import Flask, request
 from flask import jsonify
 from utils.vector_store_setup import init_qdrant_collections
@@ -37,12 +39,10 @@ SessionLocal = sessionmaker(bind=engine)
 
 logger = CustomLogger(__name__)
 
-load_dotenv()
-
 create_database_schema()
 app = Flask(__name__)
 # CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="gevent_uwsgi")
 
 app.after_request(log_api_call)
 
@@ -108,8 +108,3 @@ def handle_send_chat(json_data):
 
 
 init_qdrant_collections()
-
-if __name__ == "__main__":
-    socketio.run(
-        app, host="0.0.0.0", port=8002, debug=True, use_reloader=True, log_output=False
-    )
