@@ -4,6 +4,7 @@ from utils.get_logger import CustomLogger
 from utils.llm_consts import VectorCollections, initialize_qdrant_client
 from qdrant_client import models  # Add this line
 from routes.search.search_service import weighted_search
+from routes.search.meilisearch_service import search_with_filters
 from pydantic import BaseModel
 
 search_workflow = Blueprint("search", __name__)
@@ -51,6 +52,14 @@ class WeightedSearchRequest(BaseModel):
     query: str
     title_weight: float = 0.7
     description_weight: float = 0.3
+
+
+@search_workflow.route("/fastsearch/<chatbot_id>", methods=["GET"])
+def fast_search(chatbot_id: str):
+    query = request.args.get("query", "")
+    result = search_with_filters(query, chatbot_id)
+
+    return jsonify(result, 200)
 
 
 @search_workflow.route("/cmd_bar/<chatbot_id>", methods=["POST"])

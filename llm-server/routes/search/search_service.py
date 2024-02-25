@@ -6,21 +6,19 @@ from typing import Dict, List, Optional
 import operator
 from copy import deepcopy
 from utils.llm_consts import ENABLE_NEURAL_SEARCH
+from pydantic import BaseModel
 
 client = initialize_qdrant_client()
 embedding = get_embeddings()
 
 
 # Data structure (you might want to define a custom class/dataclass)
-class Item:
+class Item(BaseModel):
+    id: str
     title: str
     heading_text: str
     heading_id: str
-
-    def __init__(self, title: str, heading_text: str, heading_id: str):
-        self.title = title
-        self.heading_text = heading_text
-        self.heading_id = heading_id
+    chatbot_id: str
 
 
 # Function to add vectors to Qdrant

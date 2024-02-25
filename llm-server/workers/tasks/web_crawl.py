@@ -3,7 +3,7 @@ from urllib.parse import urlparse, urljoin
 from celery import shared_task
 
 import traceback
-
+import uuid
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from routes.search.search_service import add_cmdbar_data, Item
 from shared.utils.opencopilot_utils.init_vector_store import init_vector_store
@@ -21,6 +21,7 @@ from workers.utils.remove_escape_sequences import remove_escape_sequences
 from utils.get_logger import CustomLogger
 from workers.tasks.web_scraping_strategy import get_scraper
 from bs4 import BeautifulSoup
+from routes.search.meilisearch_service import add_item_to_index
 
 logger = CustomLogger(__name__)
 
@@ -69,12 +70,19 @@ def scrape_url(url: str, bot_id: str):
 
         title, headings = parser.find_all_headings_and_highlights(content)
         items = [
-            Item(title=title, heading_text=heading_text, heading_id=heading_id)
+            Item(
+                id=uuid.uuid4().hex,
+                title=title,
+                heading_text=heading_text,
+                heading_id=heading_id,
+                chatbot_id=bot_id,
+            )
             for heading_text, heading_id in headings
         ]
 
         if len(items) > 0:
-            add_cmdbar_data(items, {"url": url, "bot_id": bot_id})
+            # add_cmdbar_data(items, {"url": url, "bot_id": bot_id})
+            add_item_to_index(items)
         return parser.parse_text_content(content)
     except ValueError as e:
         # Log an error message if no parser is available for the content type

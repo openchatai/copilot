@@ -16,7 +16,7 @@ class ApiRequestResult:
 class LLMResponse:
     message: Optional[str] = None
     error: Optional[str] = None
-    api_request_response: ApiRequestResult = ApiRequestResult()
+    api_request_response: ApiRequestResult = field(default_factory=ApiRequestResult)
     api_called: bool = False
     knowledgebase_called: bool = False
     operation_ids: List[str] = field(default_factory=list)
