@@ -76,6 +76,7 @@ def scrape_url(url: str, bot_id: str):
                 heading_text=heading_text,
                 heading_id=heading_id,
                 chatbot_id=bot_id,
+                url=url,
             )
             for heading_text, heading_id in headings
         ]

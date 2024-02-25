@@ -19,6 +19,7 @@ class Item(BaseModel):
     heading_text: str
     heading_id: str
     chatbot_id: str
+    url: str
 
 
 # Function to add vectors to Qdrant
