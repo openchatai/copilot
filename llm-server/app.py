@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from flask import Flask, request
 from flask import jsonify
 from utils.vector_store_setup import init_qdrant_collections
-
+import traceback
 from routes.action.action_controller import action
 from routes.chat.chat_controller import chat_workflow, send_chat_stream
 from routes.copilot.copilot_controller import copilot
@@ -68,8 +68,7 @@ def handle_exception(error):
         logger.error("HTTP Error", error=error)
         return jsonify({"error": error.name, "message": error.description}), error.code
 
-    # If it's not an HTTPException, it's a 500 Internal Server Error
-    logger.error("Internal Server Error", error=error)
+    traceback.print_exc()
     return (
         jsonify(
             {

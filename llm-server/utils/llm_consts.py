@@ -6,6 +6,7 @@ from typing import TypedDict
 from functools import lru_cache
 
 from qdrant_client import QdrantClient
+from meilisearch import Client
 
 X_CONSUMER_USERNAME = "X-CONSUMER-USERNAME"
 EXPERIMENTAL_FEATURES_ENABLED = os.getenv("EXPERIMENTAL_FEATURES_ENABLED", "NO")
@@ -123,3 +124,7 @@ redis_client = redis.Redis.from_url(
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "YOURSUPERSECRETKEY")
 
 ENABLE_NEURAL_SEARCH = os.getenv("ENABLE_NEURAL_SEARCH", "NO") == "YES"
+meilisearch_client = Client(
+    os.getenv("MEILISEARCH_URL", "https://ms-8774628e94cc-7605.sfo.meilisearch.io"),
+    os.getenv("MEILISEARCH_MASTER_KEY", "18a0ec67975fcae91982d8e5b5ae89ec2a298823"),
+)
