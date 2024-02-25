@@ -38,7 +38,7 @@ def search_with_filters(
 
     # Perform the search with filters, limit, and offset
     search_params = {
-        "filters": {"chatbot_id": chatbot_id},
+        "filter": [f"chatbot_id={chatbot_id}"],
         "limit": limit,
         "offset": offset,
     }

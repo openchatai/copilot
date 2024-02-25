@@ -57,6 +57,7 @@ class WeightedSearchRequest(BaseModel):
 @search_workflow.route("/fastsearch/<chatbot_id>", methods=["GET"])
 def fast_search(chatbot_id: str):
     query = request.args.get("query", "")
+    print(chatbot_id)
     result = search_with_filters(query, chatbot_id)
 
     return jsonify(result, 200)
