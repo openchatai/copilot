@@ -56,7 +56,7 @@ def get_links(url: str, strategy=WEB_CRAWL_STRATEGY) -> Set[str]:
         return set()
 
 
-def scrape_url(url: str, bot_id: str):
+def scrape_url(url: str, token: str):
     try:
         strategy = WEB_CRAWL_STRATEGY
         # for external sources always use text content parser, because we don't know the content type
@@ -75,7 +75,7 @@ def scrape_url(url: str, bot_id: str):
                 title=title,
                 heading_text=heading_text,
                 heading_id=heading_id,
-                chatbot_id=bot_id,
+                token=token,
                 url=url,
             )
             for heading_text, heading_id in headings
@@ -91,7 +91,7 @@ def scrape_url(url: str, bot_id: str):
         return None
 
 
-def scrape_website(url: str, bot_id: str, max_pages: int) -> int:
+def scrape_website(url: str, bot_id: str, max_pages: int, token: str) -> int:
     """Scrapes a website in breadth-first order, following all of the linked pages.
 
     Args:
@@ -127,7 +127,7 @@ def scrape_website(url: str, bot_id: str, max_pages: int) -> int:
             ):
                 continue
 
-            content = scrape_url(current_url, bot_id=bot_id)
+            content = scrape_url(current_url, token=token)
 
             total_pages_scraped += 1
             visited_urls.add(current_url)
@@ -163,7 +163,7 @@ def scrape_website(url: str, bot_id: str, max_pages: int) -> int:
 
 
 @shared_task(enable_trace=True)
-def web_crawl(url, bot_id: str):
+def web_crawl(url, bot_id: str, token: str):
     try:
         # setting = ChatbotSettings.get_chatbot_setting(bot_id)
         setting = ChatbotSettingCRUD.get_chatbot_setting(bot_id)
@@ -176,7 +176,9 @@ def web_crawl(url, bot_id: str):
         logger.info(f"chatbot_settings: {setting.max_pages_to_crawl}")
         create_website_data_source(chatbot_id=bot_id, status="PENDING", url=url)
 
-        scrape_website(url, bot_id, setting.max_pages_to_crawl or max_pages_to_crawl)
+        scrape_website(
+            url, bot_id, setting.max_pages_to_crawl or max_pages_to_crawl, token
+        )
     except Exception as e:
         logger.error(
             "WEB_SCRAPING_FAILED", info=f"Failed to scrape website {url}.", error=e

@@ -23,14 +23,14 @@ def create_index_with_settings():
 def update_index_settings():
     index = meilisearch_client.index(INDEX_NAME)
     index.update_searchable_attributes(["title", "heading_text"])
-    index.update_filterable_attributes(["chatbot_id"])
+    index.update_filterable_attributes(["chatbot_id", "token"])
 
     return index
 
 
 def search_with_filters(
     query: str,
-    chatbot_id: str,
+    token: str,
     limit: int = 10,
     offset: int = 0,
 ):
@@ -38,7 +38,7 @@ def search_with_filters(
 
     # Perform the search with filters, limit, and offset
     search_params = {
-        "filter": [f"chatbot_id={chatbot_id}"],
+        "filter": [f"token={token}"],
         "limit": limit,
         "offset": offset,
     }

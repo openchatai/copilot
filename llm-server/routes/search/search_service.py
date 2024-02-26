@@ -18,7 +18,7 @@ class Item(BaseModel):
     title: str
     heading_text: str
     heading_id: str
-    chatbot_id: str
+    token: str
     url: str
 
 
