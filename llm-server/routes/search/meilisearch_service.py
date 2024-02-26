@@ -30,7 +30,7 @@ def update_index_settings():
 
 def search_with_filters(
     query: str,
-    chatbot_id: str,
+    token: str,
     limit: int = 10,
     offset: int = 0,
 ):
@@ -38,7 +38,7 @@ def search_with_filters(
 
     # Perform the search with filters, limit, and offset
     search_params = {
-        "filter": [f"chatbot_id={chatbot_id}"],
+        "filter": [f"token={token}"],
         "limit": limit,
         "offset": offset,
     }
