@@ -73,7 +73,7 @@ def get_chatbots_batch(offset: int, batch_size: int) -> Iterable[Chatbot]:
         session.close()
 
 
-def find_or_fail_by_bot_id(bot_id: bytes) -> Optional[Chatbot]:
+def find_or_fail_by_bot_id(bot_id: bytes) -> Chatbot:
     session: Session = SessionLocal()
     try:
         bot: Chatbot = session.query(Chatbot).filter(Chatbot.id == bot_id).one()
@@ -81,7 +81,7 @@ def find_or_fail_by_bot_id(bot_id: bytes) -> Optional[Chatbot]:
     except exc.NoResultFound:
         raise ValueError(f"No Chatbot found with id: {bot_id}")
     except Exception as e:
-        print(f"Error occurred: {e}")
+        raise ValueError(f"No Chatbot found with id: {bot_id}")
     finally:
         session.close()
 

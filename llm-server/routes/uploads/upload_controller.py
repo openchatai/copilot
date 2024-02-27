@@ -6,6 +6,7 @@ from typing import Optional
 import validators
 from flask import Blueprint, Response, request
 from werkzeug.utils import secure_filename
+from models.repository.copilot_repo import find_or_fail_by_bot_id
 
 from routes.uploads.celery_service import celery
 from utils.llm_consts import SHARED_FOLDER
@@ -85,6 +86,7 @@ def start_file_ingestion() -> Response:
     try:
         data = json.loads(request.data)
         bot_id = data.get("bot_id")
+        bot_token = str(find_or_fail_by_bot_id(bot_id).token)
         filenames = data.get("filenames")
 
         if not bot_id:
@@ -106,7 +108,8 @@ def start_file_ingestion() -> Response:
                 )
             elif validators.url(filename):
                 celery.send_task(
-                    "workers.tasks.web_crawl.web_crawl", args=[filename, bot_id]
+                    "workers.tasks.web_crawl.web_crawl",
+                    args=[filename, bot_id, bot_token],
                 )
             else:
                 print(f"Received: {filename}, is neither a pdf nor a url. ")
