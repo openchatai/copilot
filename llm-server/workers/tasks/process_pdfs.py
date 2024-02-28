@@ -51,11 +51,9 @@ def download_s3_file(bucket_name, s3_key):
 @shared_task
 def process_pdf(file_name: str, bot_id: str):
     try:
-        # logger.info(
-        #     "Pdf task picked up filename: {}, bot_id: {}".format(file_name, bot_id)
-        # )
-        insert_pdf_data_source(chatbot_id=bot_id, file_name=file_name, status="PENDING")
         file_path, is_s3 = determine_file_storage_path(file_name)
+        # storing file path because the file can be in local or s3
+        insert_pdf_data_source(chatbot_id=bot_id, file_name=file_path, status="PENDING")
 
         if is_s3:
             # Extract bucket name and key from the S3 URL
@@ -88,12 +86,12 @@ def process_pdf(file_name: str, bot_id: str):
 
         kb_vector_store.add_documents(docs)
         update_pdf_data_source_status(
-            chatbot_id=bot_id, file_name=file_name, status="COMPLETED"
+            chatbot_id=bot_id, file_name=file_path, status="COMPLETED"
         )
     except Exception as e:
         traceback.print_exc()
         update_pdf_data_source_status(
-            chatbot_id=bot_id, file_name=file_name, status="FAILED"
+            chatbot_id=bot_id, file_name=file_path, status="FAILED"
         )
 
 
