@@ -1,15 +1,15 @@
 import json
 import os
 import secrets
+import traceback
 from typing import Optional
-
-import validators
-from flask import Blueprint, Response, request
+from flask import request, Response, Blueprint
 from werkzeug.utils import secure_filename
+from utils.llm_consts import SHARED_FOLDER, STORAGE_TYPE, S3_BUCKET_NAME
 from models.repository.copilot_repo import find_or_fail_by_bot_id
-
 from routes.uploads.celery_service import celery
-from utils.llm_consts import SHARED_FOLDER
+import boto3
+import validators
 
 upload = Blueprint("upload", __name__)
 
@@ -56,17 +56,32 @@ def upload_file() -> Response:
 
     # Generate a unique filename
     unique_filename = generate_unique_filename(file.filename)
-    file_path = os.path.join(SHARED_FOLDER, unique_filename)
 
-    try:
-        # Save the file to the shared folder
-        file.save(file_path)
-    except Exception as e:
-        return Response(
-            response=json.dumps({"error": f"Failed to save file: {str(e)}"}),
-            status=500,
-            mimetype="application/json",
-        )
+    if STORAGE_TYPE == "s3":
+        # AWS S3 storage
+        s3_bucket_name = S3_BUCKET_NAME
+        s3_client = boto3.client("s3")
+        try:
+            s3_client.upload_fileobj(file, s3_bucket_name, unique_filename)
+        except Exception as e:
+            return Response(
+                response=json.dumps({"error": "Failed to save file to S3"}),
+                status=500,
+                mimetype="application/json",
+            )
+        file_path = f"s3://{s3_bucket_name}/{unique_filename}"
+    else:
+        # Local storage
+        file_path = os.path.join(SHARED_FOLDER, unique_filename)
+        try:
+            file.save(file_path)
+        except Exception as e:
+            traceback.print_exc()
+            return Response(
+                response=json.dumps({"error": "Failed to save file"}),
+                status=500,
+                mimetype="application/json",
+            )
 
     return Response(
         response=json.dumps(
