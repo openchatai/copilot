@@ -1,7 +1,6 @@
 import os
 from celery import shared_task
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-
 from langchain.document_loaders import PyPDFLoader
 from shared.models.opencopilot_db.pdf_data_sources import (
     insert_pdf_data_source,
@@ -10,10 +9,11 @@ from shared.models.opencopilot_db.pdf_data_sources import (
 from shared.utils.opencopilot_utils import (
     get_embeddings,
     StoreOptions,
+    get_vector_store,
 )
-from shared.utils.opencopilot_utils import get_vector_store
 from utils.get_logger import CustomLogger
 from workers.utils.remove_escape_sequences import remove_escape_sequences
+from utils.llm_consts import STORAGE_TYPE, S3_BUCKET_NAME, SHARED_FOLDER
 
 logger = CustomLogger(module_name=__name__)
 
@@ -21,20 +21,16 @@ embeddings = get_embeddings()
 kb_vector_store = get_vector_store(StoreOptions("knowledgebase"))
 
 
-def determine_file_storage_path(file_name):
-    storage_type = os.getenv(
-        "STORAGE_TYPE", "local"
-    )  # Default to local storage if not specified
-    if storage_type == "s3":
+def determine_file_storage_path(file_name: str) -> str:
+    if STORAGE_TYPE == "s3":
         # AWS S3 storage
-        s3_bucket_name = os.getenv("S3_BUCKET_NAME")
+        s3_bucket_name = S3_BUCKET_NAME
         if not s3_bucket_name:
             raise ValueError("S3_BUCKET_NAME environment variable is not set.")
         return f"s3://{s3_bucket_name}/{file_name}"
     else:
         # Local storage
-        shared_folder = os.getenv("SHARED_FOLDER", "path/to/your/shared/folder")
-        return os.path.join(shared_folder, file_name)
+        return os.path.join(SHARED_FOLDER, file_name)
 
 
 @shared_task
