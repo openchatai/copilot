@@ -1,6 +1,7 @@
 import json
 import os
 import secrets
+import traceback
 from typing import Optional
 from flask import request, Response, Blueprint
 from werkzeug.utils import secure_filename
@@ -64,7 +65,7 @@ def upload_file() -> Response:
             s3_client.upload_fileobj(file, s3_bucket_name, unique_filename)
         except Exception as e:
             return Response(
-                response=json.dumps({"error": f"Failed to save file to S3: {str(e)}"}),
+                response=json.dumps({"error": "Failed to save file to S3"}),
                 status=500,
                 mimetype="application/json",
             )
@@ -75,8 +76,9 @@ def upload_file() -> Response:
         try:
             file.save(file_path)
         except Exception as e:
+            traceback.print_exc()
             return Response(
-                response=json.dumps({"error": f"Failed to save file: {str(e)}"}),
+                response=json.dumps({"error": "Failed to save file"}),
                 status=500,
                 mimetype="application/json",
             )
