@@ -28,7 +28,7 @@ click-didyoumean==0.3.0
 click-plugins==1.1.1
 click-repl==0.3.0
 coloredlogs==15.0.1
-cryptography==42.0.4
+cryptography==42.0.5
 dataclasses-json==0.6.2
 Deprecated==1.2.14
 distro==1.9.0
