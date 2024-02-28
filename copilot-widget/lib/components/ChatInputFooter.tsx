@@ -139,7 +139,7 @@ function ChatInputFooter() {
           <VoiceRecorder onSuccess={(text) => setInput(text)} />
           <button
             onClick={handleInputSubmit}
-            className="text-xl disabled:opacity-40 disabled: pointer-events-none disabled: cursor-not-allowed  text-[#5e5c5e]  transition-all"
+            className="text-xl disabled:opacity-40 disabled:pointer-events-none disabled:cursor-not-allowed text-[#5e5c5e] transition-all"
             disabled={loading || !canSend}
           >
             <SendHorizonal className="rtl:rotate-180" />
