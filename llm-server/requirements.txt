@@ -172,3 +172,4 @@ zipp==3.17.0
 aioredis==2.0.1
 scrapingbee==2.0.1
 meilisearch==0.30.0
+boto3==1.34.51

@@ -1,3 +1,4 @@
+import os
 from celery import shared_task
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
@@ -9,7 +10,6 @@ from shared.models.opencopilot_db.pdf_data_sources import (
 from shared.utils.opencopilot_utils import (
     get_embeddings,
     StoreOptions,
-    get_file_path,
 )
 from shared.utils.opencopilot_utils import get_vector_store
 from utils.get_logger import CustomLogger
@@ -21,6 +21,22 @@ embeddings = get_embeddings()
 kb_vector_store = get_vector_store(StoreOptions("knowledgebase"))
 
 
+def determine_file_storage_path(file_name):
+    storage_type = os.getenv(
+        "STORAGE_TYPE", "local"
+    )  # Default to local storage if not specified
+    if storage_type == "s3":
+        # AWS S3 storage
+        s3_bucket_name = os.getenv("S3_BUCKET_NAME")
+        if not s3_bucket_name:
+            raise ValueError("S3_BUCKET_NAME environment variable is not set.")
+        return f"s3://{s3_bucket_name}/{file_name}"
+    else:
+        # Local storage
+        shared_folder = os.getenv("SHARED_FOLDER", "path/to/your/shared/folder")
+        return os.path.join(shared_folder, file_name)
+
+
 @shared_task
 def process_pdf(file_name: str, bot_id: str):
     try:
@@ -28,7 +44,7 @@ def process_pdf(file_name: str, bot_id: str):
         #     "Pdf task picked up filename: {}, bot_id: {}".format(file_name, bot_id)
         # )
         insert_pdf_data_source(chatbot_id=bot_id, file_name=file_name, status="PENDING")
-        loader = PyPDFLoader(get_file_path(file_name))
+        loader = PyPDFLoader(determine_file_storage_path(file_name))
         raw_docs = loader.load()
 
         # clean text
