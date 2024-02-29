@@ -102,8 +102,6 @@ VECTOR_SIZE=4096
 ```
 
 
-
-
 ## File Storage Configuration
 
 The following environment variables are used to configure the file storage for the application:
