@@ -100,3 +100,18 @@ EMBEDDING_PROVIDER=openchat
 LOCAL_IP=http://host.docker.internal
 VECTOR_SIZE=4096
 ```
+
+
+
+
+## File Storage Configuration
+
+The following environment variables are used to configure the file storage for the application:
+
+- `STORAGE_TYPE`: Specifies the type of file storage to be used. Currently, the supported options are `s3` and `local`. Set this variable to `s3` if you want to use Amazon S3 for file storage, or set it to `local` if you want to use the local file system.
+
+- `AWS_ACCESS_KEY_ID` (required if `STORAGE_TYPE` is set to `s3`): Specifies the access key ID for the AWS account that has access to the S3 bucket. This key is used to authenticate requests made to the S3 service.
+
+- `AWS_SECRET_ACCESS_KEY` (required if `STORAGE_TYPE` is set to `s3`): Specifies the secret access key for the AWS account that has access to the S3 bucket. This key is used to authenticate requests made to the S3 service.
+
+Make sure to provide the appropriate values for these environment variables based on your desired file storage configuration.
