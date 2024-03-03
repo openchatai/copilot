@@ -2,12 +2,12 @@ import { useEffect, useRef } from "react";
 import { useWidgetState } from "./contexts/WidgetState";
 import cn from "./utils/cn";
 import ChatScreen from "./screens/ChatScreen";
-import { IsServer } from "./utils/isServer.ts";
+import { isServer } from "./utils/isServer.ts";
 import { MessageCircle } from "lucide-react";
 
 function useTrigger(selector?: string, toggle?: () => void) {
   const trigger = useRef<HTMLElement | null>(
-    !selector ? null : IsServer ? null : document.querySelector(selector)
+    !selector ? null : isServer ? null : document.querySelector(selector)
   ).current;
 
   useEffect(() => {
@@ -15,7 +15,7 @@ function useTrigger(selector?: string, toggle?: () => void) {
       return;
     }
 
-    if (trigger && !IsServer) {
+    if (trigger && !isServer) {
       trigger.addEventListener("click", () => toggle?.());
       return () => trigger.removeEventListener("click", () => toggle?.());
     } else {

@@ -1,1 +1,1 @@
-export const IsServer = typeof window === "undefined";
+export const isServer = typeof window === "undefined";
