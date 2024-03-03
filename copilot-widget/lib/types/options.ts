@@ -9,11 +9,17 @@ export type Options = {
   socketUrl: string;
   defaultOpen?: boolean;
   language?: LangType;
+  warnBeforeClose?: boolean;
   containerProps?: React.DetailedHTMLProps<
     React.HTMLAttributes<HTMLDivElement>,
     HTMLDivElement
   >;
   user?: {
     name?: string;
+    avatarUrl?: string;
+  };
+  bot?: {
+    name?: string;
+    avatarUrl?: string;
   };
 };

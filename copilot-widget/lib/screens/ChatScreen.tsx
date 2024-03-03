@@ -10,7 +10,7 @@ import useScrollToPercentage from "../hooks/useScrollTo";
 import ChatInputFooter from "../components/ChatInputFooter";
 import { ChatProvider, useChat } from "../contexts/Controller";
 import { useConfigData } from "../contexts/ConfigData";
-import { Map } from "../utils/Map";
+import { Map } from "../utils/map";
 
 function ChatScreen() {
   const scrollElementRef = useRef(null);
@@ -18,6 +18,7 @@ function ChatScreen() {
   const { messages, loading, failedMessage, conversationInfo } = useChat();
   const config = useConfigData();
   const initialMessage = config?.initialMessage;
+
   useEffect(() => {
     setPos(0, 100);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -43,16 +44,15 @@ function ChatScreen() {
             fallback={<hr />}
             data={messages}
             render={(message, index) => {
-              if (message.from === "bot") {
-                if (message.type === "text")
-                  return (
-                    <BotTextMessage
-                      timestamp={message.timestamp}
-                      id={message.id}
-                      key={index}
-                      message={message.response.text}
-                    />
-                  );
+              if (message.from === "bot" && message.type === "text") {
+                return (
+                  <BotTextMessage
+                    timestamp={message.timestamp}
+                    id={message.id}
+                    key={index}
+                    message={message.response.text}
+                  />
+                );
               } else if (message.from === "user") {
                 return (
                   <UserMessage
@@ -68,7 +68,7 @@ function ChatScreen() {
           {loading && conversationInfo && (
             <BotMessageLoading displayText={conversationInfo} />
           )}
-          {failedMessage && <BotMessageError message={failedMessage} />}
+          {failedMessage && <BotMessageError />}
         </div>
       </main>
       <ChatInputFooter />

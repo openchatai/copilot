@@ -1,6 +1,6 @@
-import { Locale } from "./types";
+import { TranslatableMessages } from "./types";
 
-const arLocale: Locale = {
+export const arLocale: TranslatableMessages = {
   ok: "حسنا",
   agree: "موافق",
   cancel: "إلغاء",
@@ -11,5 +11,3 @@ const arLocale: Locale = {
   recording: "تسجيل",
   "thank-you": "شكرا",
 };
-
-export default arLocale;
