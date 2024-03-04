@@ -9,6 +9,7 @@ import css from "../styles/index.css?inline";
 import { LanguageProvider } from "./contexts/LocalesProvider";
 import { get } from "./utils/pkg";
 import { SocketProvider } from "./contexts/SocketProvider";
+import { MessageHandlerProvider } from "./contexts/statefulMessageHandler";
 const version = get("version");
 
 const cssColors = {
@@ -44,7 +45,9 @@ function Root({ children, options, containerProps }: RootProps) {
         <LanguageProvider>
           <WidgetState>
             <SocketProvider>
-              <AxiosProvider>{children}</AxiosProvider>
+              <MessageHandlerProvider>
+                <AxiosProvider>{children}</AxiosProvider>
+              </MessageHandlerProvider>
             </SocketProvider>
           </WidgetState>
         </LanguageProvider>
