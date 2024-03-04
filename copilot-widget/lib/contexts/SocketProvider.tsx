@@ -1,9 +1,9 @@
 import { Socket } from "socket.io-client";
-import { createSafeContext } from "./create-safe-context";
 import { ReactNode, useMemo } from "react";
 import { createSocketClient } from "@lib/utils/createSocket";
 import { useConfigData } from "./ConfigData";
 import { useSessionId } from "@lib/hooks/useSessionId";
+import { createSafeContext } from "./createSafeContext";
 
 type SocketContextData = {
   __socket: Socket;
