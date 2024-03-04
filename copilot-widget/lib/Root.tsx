@@ -15,6 +15,7 @@ const cssColors = {
   "--opencopilot-primary-clr": "hsl(200 18% 46%)",
   "--opencopilot-accent-clr": "hsl(300, 7%, 97%)",
 };
+
 type RootProps = {
   children: React.ReactNode;
   options: ConfigDataContextType;
@@ -23,8 +24,10 @@ type RootProps = {
     HTMLDivElement
   >;
 };
+
 function Root({ children, options, containerProps }: RootProps) {
   const { style, ...containerProp } = containerProps || {};
+
   return (
     <root.div
       {...containerProp}
