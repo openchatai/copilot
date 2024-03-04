@@ -1,3 +1,6 @@
+[![Launch YC: OpenCopilot - Make the user journey 10 times better and faster](https://www.ycombinator.com/launches/KXl-opencopilot-make-the-user-journey-10-times-better-and-faster/upvote_embed.svg)](https://www.ycombinator.com/launches/KXl-opencopilot-make-the-user-journey-10-times-better-and-faster)
+
+
 
 | Get 1:1 support, Join the community (NEW!!) | 1 Click install | 
 |:-:|:-:|

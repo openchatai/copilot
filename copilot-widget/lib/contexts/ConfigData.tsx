@@ -1,17 +1,14 @@
 import type { Options } from "@lib/types";
 import type { ReactNode } from "react";
-import { createSafeContext } from "./create-safe-context";
+import { createSafeContext } from "./createSafeContext";
 
 export type ConfigDataContextType = Omit<
   Options,
-  'containerProps' | 'triggerSelector'
+  "containerProps" | "triggerSelector"
 >;
 
-const [
-  useConfigData,
-  ConfigDataSafeProvider,
-
-] = createSafeContext<ConfigDataContextType>();
+const [useConfigData, ConfigDataSafeProvider] =
+  createSafeContext<ConfigDataContextType>();
 
 export default function ConfigDataProvider({
   children,
@@ -21,11 +18,9 @@ export default function ConfigDataProvider({
   children: ReactNode;
 }) {
   return (
-    <ConfigDataSafeProvider value={data}>
-      {children}
-    </ConfigDataSafeProvider>
+    <ConfigDataSafeProvider value={data}>{children}</ConfigDataSafeProvider>
   );
 }
 
-// eslint-disable-next-line react-refresh/only-export-components 
-export { useConfigData }
+// eslint-disable-next-line react-refresh/only-export-components
+export { useConfigData };

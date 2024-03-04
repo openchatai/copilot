@@ -3,7 +3,7 @@ import { SendHorizonal, AlertTriangle, RotateCcw } from "lucide-react";
 import { useChat } from "../contexts/Controller";
 import { useRef, useState } from "react";
 import { getId, isEmpty } from "@lib/utils/utils";
-import now from "@lib/utils/timenow";
+import { now } from "@lib/utils/time";
 import { useDocumentDirection } from "@lib/hooks/useDocumentDirection";
 import { VoiceRecorder } from "./VoiceRecorder";
 import { useInitialData } from "@lib/hooks/useInitialData";
