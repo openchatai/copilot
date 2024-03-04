@@ -64,6 +64,12 @@
       ]
     },
     {
+      "group": "Chat API",
+      "pages": [
+        "api-reference/endpoint/chat-init"
+      ]
+    },
+    {
       "group": "Resources",
       "pages": [
         "resources/ci-cd-actions"
