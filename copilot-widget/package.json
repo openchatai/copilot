@@ -79,6 +79,7 @@
     }
   },
   "dependencies": {
+    "immer": "^10.0.3",
     "lucide-react": "^0.298.0"
   }
 }
