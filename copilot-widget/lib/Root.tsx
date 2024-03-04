@@ -8,6 +8,7 @@ import root from "react-shadow";
 import css from "../styles/index.css?inline";
 import { LanguageProvider } from "./contexts/LocalesProvider";
 import { get } from "./utils/pkg";
+import { SocketProvider } from "./contexts/SocketProvider";
 const version = get("version");
 
 const cssColors = {
@@ -39,7 +40,9 @@ function Root({ children, options, containerProps }: RootProps) {
       <ConfigDataProvider data={options}>
         <LanguageProvider>
           <WidgetState>
-            <AxiosProvider>{children}</AxiosProvider>
+            <SocketProvider>
+              <AxiosProvider>{children}</AxiosProvider>
+            </SocketProvider>
           </WidgetState>
         </LanguageProvider>
       </ConfigDataProvider>
