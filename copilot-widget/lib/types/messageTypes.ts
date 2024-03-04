@@ -9,7 +9,6 @@ export type BotResponse = {
     text: string;
   };
 };
-
 export type UserMessage = {
   id: string | number;
   timestamp: TS;
