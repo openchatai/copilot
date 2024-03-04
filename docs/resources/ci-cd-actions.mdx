@@ -22,7 +22,7 @@ update_copilot_actions:
         echo "Swagger file has changed. Updating Copilot actions..."
         
         # Delete all actions from Copilot using environment variables for ID and token
-        curl --location --request DELETE "https://api.opencopilot.so/backend/copilot/$COPILOT_ID" \
+        curl --location --request DELETE "https://api.opencopilot.so/backend/actions/bot/$COPILOT_ID" \
         --header 'Accept: application/json' \
         --header "Authorization: Bearer $AUTH_TOKEN"
         
