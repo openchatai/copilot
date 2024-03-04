@@ -4,12 +4,12 @@ import remarkGfm from "remark-gfm";
 import { UserIcon } from "lucide-react";
 import cn from "../utils/cn";
 import { formatTimeFromTimestamp } from "../utils/time";
-import { useChat } from "@lib/contexts/Controller";
 import { getLast, isEmpty } from "@lib/utils/utils";
 import { useConfigData } from "@lib/contexts/ConfigData";
 import useTypeWriter from "@lib/hooks/useTypeWriter";
 import { Vote } from "./Vote";
 import { Grid } from "react-loader-spinner";
+import { useChatState } from "@lib/contexts/statefulMessageHandler";
 
 function BotIcon({ error }: { error?: boolean }) {
   const config = useConfigData();
@@ -73,8 +73,8 @@ export function BotTextMessage({
   timestamp?: number | Date;
   id?: string | number;
 }) {
-  const { messages, lastMessageToVote } = useChat();
-  const isLast = getLast(messages)?.id === id;
+  const { messages, lastServerMessageId } = useChatState();
+  const isLast = getLast(messages.filter((m) => m.from === "bot"))?.id === id;
   const config = useConfigData();
 
   if (isEmpty(message)) return null;
@@ -100,7 +100,9 @@ export function BotTextMessage({
       {isLast && (
         <div className="w-full ps-10 flex-nowrap flex items-center justify-between">
           <span className="text-xs m-0">{config?.bot?.name ?? "Bot"}</span>
-          {lastMessageToVote && <Vote messageId={lastMessageToVote} />}
+          {lastServerMessageId && (
+            <Vote messageId={parseInt(lastServerMessageId)} />
+          )}
         </div>
       )}
     </div>

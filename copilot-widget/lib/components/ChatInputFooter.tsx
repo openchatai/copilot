@@ -1,9 +1,7 @@
 import TextareaAutosize from "react-textarea-autosize";
 import { SendHorizonal, AlertTriangle, RotateCcw } from "lucide-react";
-import { useChat } from "../contexts/Controller";
 import { useRef, useState } from "react";
-import { getId, isEmpty } from "@lib/utils/utils";
-import { now } from "@lib/utils/time";
+import { isEmpty } from "@lib/utils/utils";
 import { useDocumentDirection } from "@lib/hooks/useDocumentDirection";
 import { VoiceRecorder } from "./VoiceRecorder";
 import { useInitialData } from "@lib/hooks/useInitialData";
@@ -16,11 +14,16 @@ import {
 } from "./Dialog";
 import { Button } from "./Button";
 import { useLang } from "@lib/contexts/LocalesProvider";
+import {
+  useChatState,
+  useMessageHandler,
+  useSendMessage,
+} from "@lib/contexts/statefulMessageHandler";
 
 function MessageSuggestions() {
   const { data } = useInitialData();
-  const { messages, sendMessage } = useChat();
-
+  const { messages } = useChatState();
+  const { send } = useSendMessage();
   return (
     <>
       {isEmpty(messages) && !isEmpty(data?.initial_questions) && (
@@ -30,12 +33,7 @@ function MessageSuggestions() {
               className="text-sm font-medium whitespace-nowrap px-2.5 py-1.5 rounded-lg bg-accent text-primary"
               key={index}
               onClick={() => {
-                sendMessage({
-                  from: "user",
-                  content: q,
-                  id: getId(),
-                  timestamp: now(),
-                });
+                send(q);
               }}
             >
               {q}
@@ -47,7 +45,7 @@ function MessageSuggestions() {
   );
 }
 function ResetButtonWithConfirmation() {
-  const { reset } = useChat();
+  const { __handler: mh } = useMessageHandler();
   const [open, setOpen] = useState(false);
   const { get } = useLang();
   return (
@@ -69,7 +67,7 @@ function ResetButtonWithConfirmation() {
             asChild
             variant="destructive"
             className="font-semibold"
-            onClick={reset}
+            onClick={mh.reset}
           >
             <DialogClose>{get("yes-reset")}</DialogClose>
           </Button>
@@ -84,8 +82,7 @@ function ResetButtonWithConfirmation() {
 function ChatInputFooter() {
   const [input, setInput] = useState("");
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const { sendMessage } = useChat();
-  const { loading } = useChat();
+  const { send } = useSendMessage();
   const canSend = input.trim().length > 0;
   const { direction } = useDocumentDirection();
 
@@ -99,12 +96,7 @@ function ChatInputFooter() {
   function handleInputSubmit() {
     if (input.trim().length > 0) {
       setInput("");
-      sendMessage({
-        from: "user",
-        content: input,
-        id: getId(),
-        timestamp: now(),
-      });
+      send(input);
     }
   }
   return (
@@ -123,7 +115,6 @@ function ChatInputFooter() {
                 handleInputSubmit();
               }
             }}
-            disabled={loading}
             maxRows={4}
             rows={1}
             value={input}
@@ -140,7 +131,6 @@ function ChatInputFooter() {
           <button
             onClick={handleInputSubmit}
             className="text-xl disabled:opacity-40 disabled:pointer-events-none disabled:cursor-not-allowed text-[#5e5c5e] transition-all"
-            disabled={loading || !canSend}
           >
             <SendHorizonal className="rtl:rotate-180" />
           </button>
