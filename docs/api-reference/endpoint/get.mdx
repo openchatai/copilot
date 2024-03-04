@@ -1,6 +1,6 @@
 ---
 title: "Get All Copilots"
-api: "GET http://example.com/backend/api/copilots"
+api: "GET https://cloud.opencopilot.so/backend/copilot"
 description: "Get a list of all copilots in the database."
 ---
 
@@ -68,8 +68,9 @@ Array of JSON objects
 <RequestExample>
 
 ```bash Example Request
-curl --location --request GET 'http://example.com/backend/api/copilots' \
---header 'Accept: application/json'
+curl --location --request GET 'https://api.opencopilot.so/backend/copilot/' \
+--header 'Accept: application/json' \
+--header 'Authorization : Bearer YOU_API_KEY'
 ```
 
 </RequestExample>
