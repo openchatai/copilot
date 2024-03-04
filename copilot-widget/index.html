@@ -63,9 +63,9 @@
     <div id="opencopilot-root"></div>
 
     <script>
-      const token = "NtITS4Z07ZrdctTN";
-      const apiUrl = "http://localhost:8888/backend";
-      const socketUrl = "http://localhost:8888";
+      const token = "D3BCYwikexJ0hF1Z";
+      const apiUrl = "https://api.opencopilot.so/backend";
+      const socketUrl = "https://api.opencopilot.so";
       const sharedConfig = {
         initialMessage: "Welcome back! How can I help you today?", // optional
         token: token, // required
@@ -78,13 +78,17 @@
           // optional
           // Authorization: "Bearer BQAlIe479yo16aXf",
         },
+        queryParams: {
+          // optional
+          // passing extra query params to the backend along with every user message.
+        },
         bot: {
           name: "AI Bot",
         },
         user: {
           // optional
           name: "John Doe",
-          avatarUrl: "https://i.pravatar.cc/150?u=fake@pravatar.com"
+          avatarUrl: "https://i.pravatar.cc/150?u=fake@pravatar.com",
         },
       };
 
