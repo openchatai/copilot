@@ -79,6 +79,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const userMessage: UserMessage & {
       session_id: string;
       headers: Record<string, string>;
+      query_params: Record<string, string>;
       bot_token: string;
     } = {
       timestamp: now(),
@@ -87,6 +88,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       from: "user",
       session_id: sessionId,
       headers: config.headers ?? {},
+      query_params: config?.queryParams ?? {},
       bot_token: config.token,
     };
     socket.emit("send_chat", userMessage);
