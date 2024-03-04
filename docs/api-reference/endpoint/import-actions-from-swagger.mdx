@@ -1,7 +1,7 @@
 ---
-title: "Delete a Copilot"
-api: "DELETE https://api.opencopilot.so/backend/copilot/:id"
-description: "Delete single copilot by ID "
+title: "Import actions"
+api: "PUT https://api.opencopilot.so/backend/actions/bot/:id/import-from-swagger"
+description: "Import actions from a Swagger file to a copilot by ID"
 ---
 
 ### Body
@@ -20,18 +20,20 @@ description: "Delete single copilot by ID "
   Bearer YOUR_TOKEN
 </ParamField>
 
+
 ### Response
 
-<ResponseField name="success" type="string">
+<ResponseField name="message" type="string">
   Indicates whether the call was successful.
 </ResponseField>
 
 <RequestExample>
 
 ```bash Example Request
-curl --location --request DELETE 'https://api.opencopilot.so/backend/copilot/:id' \
+curl --location --request PUT 'https://api.opencopilot.so/backend/actions/bot/:id/import-from-swagger' \
 --header 'Accept: application/json' \
---header 'Authorization : Bearer YOUR_TOKEN'
+--header 'Authorization : Bearer YOUR_TOKEN' \
+--form 'file=@"/Users/gharbat/Desktop/swagger.json"'
 ```
 
 </RequestExample>
@@ -40,7 +42,7 @@ curl --location --request DELETE 'https://api.opencopilot.so/backend/copilot/:id
 
 ```json Response
 {
-    "success": "chatbot_deleted"
+    "message": "Successfully imported actions from swagger.json"
 }
 ```
 
