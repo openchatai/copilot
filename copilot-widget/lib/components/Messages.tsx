@@ -11,7 +11,7 @@ import { Vote } from "./Vote";
 import { Grid } from "react-loader-spinner";
 import { useChatState } from "@lib/contexts/statefulMessageHandler";
 
-function BotIcon({ error }: { error?: boolean }) {
+export function BotIcon({ error }: { error?: boolean }) {
   const config = useConfigData();
 
   return (
@@ -64,7 +64,35 @@ function User() {
     </Tooltip>
   );
 }
+export function BotMessageWrapper({
+  children,
+  id,
+}: {
+  children: React.ReactNode;
+  id: string | number;
+}) {
+  const { messages, lastServerMessageId } = useChatState();
+  const isLast = getLast(messages.filter((m) => m.from === "bot"))?.id === id;
+  const config = useConfigData();
 
+  return (
+    <div className="p-2 group w-full shrink-0">
+      <div className="flex items-start gap-3 w-full text-start" dir="auto">
+        <BotIcon />
+        <div className="flex-1">{children}</div>
+      </div>
+
+      {isLast && (
+        <div className="w-full ps-10 flex-nowrap flex items-center justify-between">
+          <span className="text-xs m-0">{config?.bot?.name ?? "Bot"}</span>
+          {lastServerMessageId && (
+            <Vote messageId={parseInt(lastServerMessageId)} />
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 export function BotTextMessage({
   message,
   id,
