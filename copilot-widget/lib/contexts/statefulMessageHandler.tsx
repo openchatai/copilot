@@ -40,7 +40,7 @@ function MessageHandlerProvider(props: { children: React.ReactNode }) {
 
 function useChatState() {
   const { __handler } = useMessageHandler();
-  return useSyncExternalStore(__handler.listen, __handler.getSnapshot);
+  return useSyncExternalStore(__handler.subscribe, __handler.getSnapshot);
 }
 
 function useSendMessage() {
@@ -49,7 +49,7 @@ function useSendMessage() {
   const socket = useSocket();
 
   function send(content: string) {
-    __handler.handleMessage(
+    __handler.handleTextMessage(
       {
         headers: headers ?? {},
         content,
