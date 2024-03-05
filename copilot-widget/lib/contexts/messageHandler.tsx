@@ -1,5 +1,6 @@
 import { produce } from "immer";
 import { Socket } from "socket.io-client";
+import { ComponentRegistery } from "./componentRegistery";
 
 export type UserMessageType = {
   from: "user";
@@ -20,7 +21,13 @@ export type BotMessageType = {
   isFailed?: boolean;
   isLoading?: boolean;
 };
+
 export type MessageType = UserMessageType | BotMessageType;
+
+export type ComponentType<DT> = {
+  key: string;
+  data?: DT;
+};
 
 export type State = {
   currentUserMessage: null | UserMessageType;
@@ -28,23 +35,21 @@ export type State = {
   lastServerMessageId: null | string;
   messages: MessageType[];
   clientState: Record<string, unknown>; // @for future use
-  components: Record<string, unknown>; // @for future use
-  submittedForms: Record<string, unknown>; // @for future use
 };
-type Listener<T> = (s: T) => void;
 
+type Listener<T = State> = (value: T) => void;
+type UpdaterFunction<T = State> = (oldValue: T) => T;
 export class ChatController {
   sessionId: string | null = null;
-  listeners = new Set<Listener<State>>();
+  listeners = new Set<Listener>();
+  components = new ComponentRegistery({});
 
   private state: State = {
     currentUserMessage: null,
     conversationInfo: null,
     lastServerMessageId: null,
     messages: [],
-    clientState: {}, // @for future use
-    components: {}, // @for future use
-    submittedForms: {}, // @for future use
+    clientState: {},
   };
 
   constructor(sessionId: string) {
@@ -54,18 +59,19 @@ export class ChatController {
     this.sessionId = sessionId;
   }
 
-  listen = (fn: Listener<State>) => {
-    this.listeners.add(fn);
-    return () => {
-      this.listeners.delete(fn);
-    };
+  notify = () => {
+    this.listeners.forEach((l) => l(this.state));
   };
 
-  notify = () => {
-    for (const listener of this.listeners) {
-      console.log("notifying");
-      listener(this.state);
-    }
+  unSubscribe = (listener: Listener) => {
+    this.listeners.delete(listener);
+  };
+
+  subscribe = (listener: Listener) => {
+    this.listeners.add(listener);
+    return () => {
+      this.unSubscribe(listener);
+    };
   };
 
   getSnapshot = () => {
@@ -73,13 +79,12 @@ export class ChatController {
   };
 
   reset() {
-    this.imm((draft) => {
+    this.setValueImmer((draft) => {
       draft.messages = [];
       draft.currentUserMessage = null;
       draft.conversationInfo = null;
       draft.lastServerMessageId = null;
     });
-    this.notify();
   }
 
   genId = (len = 7) => {
@@ -101,22 +106,31 @@ export class ChatController {
     );
   };
 
-  protected imm(func: (draft: State) => void) {
-    produce(this.state, func);
-  }
+  setValue = (newValue: State | UpdaterFunction) => {
+    if (typeof newValue === "function") {
+      this.state = (newValue as UpdaterFunction)(this.state);
+    } else {
+      this.state = newValue;
+    }
+    this.notify();
+  };
+
+  setValueImmer = (updater: (draft: State) => void) => {
+    this.setValue(produce(this.state, updater));
+  };
 
   select = <KT extends keyof State>(key: KT) => {
     return this.state[key];
   };
 
   setConversationInfo = (info: string) => {
-    this.imm((draft) => {
+    this.setValueImmer((draft) => {
       draft.conversationInfo = info;
     });
   };
 
   settle = (idFor: string) => {
-    this.imm((draft) => {
+    this.setValueImmer((draft) => {
       draft.currentUserMessage = null;
       const botMessage = draft.messages.find(
         (m) => m.from === "bot" && m.responseFor === idFor
@@ -125,11 +139,10 @@ export class ChatController {
         botMessage.isLoading = false;
       }
     });
-    this.notify();
   };
 
   createEmptyLoadingBotMessage = (messageFor: string) => {
-    this.imm((draft) => {
+    this.setValueImmer((draft) => {
       draft.messages.push({
         from: "bot",
         message: "",
@@ -139,17 +152,15 @@ export class ChatController {
         id: this.genId(),
       });
     });
-    this.notify();
   };
 
   setLastServerMessageId = (id: string | null) => {
-    this.imm((draft) => {
+    this.setValueImmer((draft) => {
       draft.lastServerMessageId = id;
     });
-    this.notify();
   };
 
-  handleMessage = (
+  handleTextMessage = (
     message: Omit<UserMessageType, "from" | "id" | "timestamp" | "session_id">,
     socket: Socket
   ) => {
@@ -167,14 +178,13 @@ export class ChatController {
       timestamp: this.getTimeStamp(),
     };
 
-    this.imm((draft) => {
+    this.setValueImmer((draft) => {
       draft.messages.push(userMessage);
       draft.currentUserMessage = userMessage;
     });
 
     socket.emit("send_chat", userMessage);
     this.createEmptyLoadingBotMessage(userMessage.id);
-    this.notify();
   };
 
   appendToCurrentBotMessage = (message: string) => {
@@ -185,7 +195,7 @@ export class ChatController {
       return;
     }
 
-    this.imm((draft) => {
+    this.setValueImmer((draft) => {
       const userMessage = draft.messages.find(
         (m) => m.from === "user" && m.id === curretUserMessage?.id
       ) as UserMessageType;
@@ -200,7 +210,6 @@ export class ChatController {
         }
       }
     });
-    this.notify();
   };
   // socket handlers impl.
   socketChatInfoHandler = (socket: Socket) => {
