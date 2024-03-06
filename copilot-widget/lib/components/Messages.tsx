@@ -17,7 +17,7 @@ export function BotIcon({ error }: { error?: boolean }) {
   return (
     <img
       className={cn(
-        "h-7 w-7 rounded-lg shrink-0 object-cover aspect-square hover:shadow",
+        "h-7 w-7 rounded-lg shrink-0 object-cover aspect-square",
         error && "border border-rose-500 shadow-none"
       )}
       src={
@@ -35,7 +35,7 @@ function UserAvatar() {
   if (config?.user?.avatarUrl) {
     return (
       <img
-        className="h-7 w-7 rounded-lg shrink-0 object-cover aspect-square hover:shadow"
+        className="h-7 w-7 rounded-lg shrink-0 object-cover aspect-square"
         src={config.user.avatarUrl}
       />
     );

@@ -40,7 +40,9 @@ export default function ChatScreen() {
             data={messages}
             render={(message, index) => {
               if (message.from === "bot") {
-                return <BotTextMessage message={message.message} />;
+                return (
+                  <BotTextMessage message={message.props?.message ?? ""} />
+                );
               } else if (message.from === "user") {
                 return (
                   <UserMessage

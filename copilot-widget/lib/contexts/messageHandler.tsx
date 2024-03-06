@@ -14,12 +14,12 @@ export type UserMessageType = {
 
 export type BotMessageType = {
   from: "bot";
+  type: string;
   id: string;
-  message: string;
+  props?: Record<string, unknown>;
   timestamp: string;
   responseFor: string; // id of the user message
   isFailed?: boolean;
-  isLoading?: boolean;
 };
 
 export type MessageType = UserMessageType | BotMessageType;
@@ -100,10 +100,7 @@ export class ChatController {
   };
 
   isLoading = () => {
-    return (
-      this.state.messages.find((m) => m.from === "bot" && m.isLoading) !==
-      undefined
-    );
+    return this.state.currentUserMessage !== null;
   };
 
   setValue = (newValue: State | UpdaterFunction) => {
@@ -129,28 +126,9 @@ export class ChatController {
     });
   };
 
-  settle = (idFor: string) => {
+  settle = () => {
     this.setValueImmer((draft) => {
       draft.currentUserMessage = null;
-      const botMessage = draft.messages.find(
-        (m) => m.from === "bot" && m.responseFor === idFor
-      ) as BotMessageType;
-      if (botMessage) {
-        botMessage.isLoading = false;
-      }
-    });
-  };
-
-  createEmptyLoadingBotMessage = (messageFor: string) => {
-    this.setValueImmer((draft) => {
-      draft.messages.push({
-        from: "bot",
-        message: "",
-        timestamp: this.getTimeStamp(),
-        responseFor: messageFor,
-        isLoading: true,
-        id: this.genId(),
-      });
     });
   };
 
@@ -165,9 +143,8 @@ export class ChatController {
     socket: Socket
   ) => {
     const sessionId = this.sessionId;
-    if (!sessionId) {
-      return;
-    }
+    if (!sessionId) return;
+
     this.setLastServerMessageId(null);
     const id = this.genId();
     const userMessage: UserMessageType = {
@@ -184,32 +161,59 @@ export class ChatController {
     });
 
     socket.emit("send_chat", userMessage);
-    this.createEmptyLoadingBotMessage(userMessage.id);
   };
 
+  // Called for every character recived from the bot
   appendToCurrentBotMessage = (message: string) => {
-    const curretUserMessage = this.state.currentUserMessage;
+    const currentUserMessage = this.state.currentUserMessage;
 
-    if (message === "|im_end|") {
-      curretUserMessage && this.settle(curretUserMessage.id);
+    if (!currentUserMessage) {
       return;
     }
 
-    this.setValueImmer((draft) => {
-      const userMessage = draft.messages.find(
-        (m) => m.from === "user" && m.id === curretUserMessage?.id
-      ) as UserMessageType;
-
-      if (userMessage) {
-        const botMessage = draft.messages.find(
-          (m) => m.from === "bot" && m.responseFor === userMessage.id
+    // Append the message content to the existing botmessage.type=TEXT or create a new one
+    const botMessage = this.select("messages").find(
+      (msg) => msg.id === currentUserMessage.id
+    ) as BotMessageType;
+    if (botMessage) {
+      this.setValueImmer((draft) => {
+        const d = draft.messages.find(
+          (msg) =>
+            msg.id === currentUserMessage.id &&
+            msg.from === "bot" &&
+            msg.type === "TEXT"
         ) as BotMessageType;
-
-        if (botMessage) {
-          botMessage.message += message;
+        if (d) {
+          d.props = {
+            message: (d.props?.message || "") + message,
+          };
+        } else {
+          draft.messages.push({
+            from: "bot",
+            id: currentUserMessage.id,
+            type: "TEXT",
+            responseFor: currentUserMessage.id,
+            timestamp: this.getTimeStamp(),
+            props: {
+              message: message,
+            },
+          });
         }
-      }
-    });
+      });
+    } else {
+      this.setValueImmer((draft) => {
+        draft.messages.push({
+          from: "bot",
+          id: currentUserMessage.id,
+          type: "TEXT",
+          responseFor: currentUserMessage.id,
+          timestamp: this.getTimeStamp(),
+          props: {
+            content: message,
+          },
+        });
+      });
+    }
   };
   // socket handlers impl.
   socketChatInfoHandler = (socket: Socket) => {
@@ -248,7 +252,12 @@ export class ChatController {
       return;
     }
     const appendToCurrentBotMessage = this.appendToCurrentBotMessage;
+    const settle = this.settle;
     function handle(content: string) {
+      if (content === "|im_end|") {
+        settle();
+        return;
+      }
       appendToCurrentBotMessage(content);
     }
 
