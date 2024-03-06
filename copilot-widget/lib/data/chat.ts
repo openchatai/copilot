@@ -27,6 +27,7 @@ export function createAxiosInstance({
   });
   return instance;
 }
+
 type HistoryMessage = {
   chatbot_id: string;
   created_at: string;
@@ -64,6 +65,7 @@ export function historyToMessages(history?: HistoryMessage[]): Message[] {
   }
   return $messages;
 }
+
 export async function getInitialData(instance: AxiosInstance) {
   const { data } = await instance.get<{
     bot_name: string;

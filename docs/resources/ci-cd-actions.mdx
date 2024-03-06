@@ -1,0 +1,45 @@
+---
+title: "CI/CD Actions"
+description: "Learn how to use the copilot's CI/CD actions to automate your workflow"
+icon: "timeline"
+---
+
+
+You can use the following **GitLab CI/CD** actions to automate your workflow:
+- Whenever there is a chnage on the swagger file, the copilot actions will be updated automatically.
+- Make sure to replace the environment variables (`$COPILOT_ID`, `$AUTH_TOKEN`) with your own values.
+- If you want access to our API, please check this [link](/api-notes).
+
+```yaml
+stages:
+  - update_copilot
+
+update_copilot_actions:
+  stage: update_copilot
+  script:
+    - >
+      if git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA | grep -q "swagger.json"; then
+        echo "Swagger file has changed. Updating Copilot actions..."
+        
+        # Delete all actions from Copilot using environment variables for ID and token
+        curl --location --request DELETE "https://api.opencopilot.so/backend/actions/bot/$COPILOT_ID" \
+        --header 'Accept: application/json' \
+        --header "Authorization: Bearer $AUTH_TOKEN"
+        
+        # Wait a bit for the delete action to propagate
+        sleep 5
+        
+        # Import actions from the updated Swagger file using environment variables
+        curl --location --request PUT "https://api.opencopilot.so/backend/actions/bot/$COPILOT_ID/import-from-swagger" \
+        --header 'Accept: application/json' \
+        --header "Authorization: Bearer $AUTH_TOKEN" \
+        --form 'file=@"./swagger.json"'
+        
+        echo "Copilot actions updated."
+      else
+        echo "Swagger file not changed. No action needed."
+      fi
+  only:
+    - main # or any other branch you prefer
+  image: curlimages/curl:latest # Use an image with curl installed
+```

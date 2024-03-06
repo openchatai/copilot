@@ -1,4 +1,4 @@
-import { createSafeContext } from "@lib/contexts/create-safe-context";
+import { createSafeContext } from "@lib/contexts/createSafeContext";
 import cn from "@lib/utils/cn";
 import {
   ElementRef,
@@ -71,6 +71,7 @@ const DialogContent = forwardRef<
   ComponentPropsWithoutRef<"div">
 >(({ className, ...props }, ref) => {
   const { open } = useDialog();
+
   return (
     open && (
       <DialogOverlay>
@@ -113,6 +114,7 @@ const DialogHeader = forwardRef<
   ComponentPropsWithoutRef<"div">
 >(({ className, ...props }, ref) => {
   const { open } = useDialog();
+
   return (
     <div
       {...props}

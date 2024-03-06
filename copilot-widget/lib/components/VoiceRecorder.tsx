@@ -1,7 +1,7 @@
-import { Square, MicIcon } from "lucide-react";
+import { MicIcon, Square } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ToolTip";
 import { useAxiosInstance } from "@lib/contexts/axiosInstance";
-import now from "@lib/utils/timenow";
+import { now } from "@lib/utils/time";
 import { useEffect } from "react";
 import useAudioRecorder from "@lib/hooks/useAudioRecord";
 import { useLang } from "@lib/contexts/LocalesProvider";

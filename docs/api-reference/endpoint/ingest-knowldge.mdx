@@ -1,0 +1,48 @@
+---
+title: "Ingest Knowledge (alpha)"
+api: "POST https://api.opencopilot.so/backend/knowledge/:bot_id"
+description: "Ingest knowledge into the copilot."
+---
+
+<Warning>
+**Important**: This endpoint is in alpha and may change in the future. please report any issues or feedback to the [issue tracker](https://github.com/openchatai/OpenCopilot/issues/new/choose).
+</Warning>
+
+<Warning>
+**Important**: this endpoint only supports URLs, if you have a local file that you want to ingest, you can upload it to a cloud storage service and provide the URL to the file.
+</Warning>
+
+
+# Ingest Knowledge
+Knowledge is any information that the copilot can use to answer questions. as for now, the copilot can ingest knowledge in the following formats:
+
+- Website: when you provide a URL, the copilot will scrape the content of the website recursively and ingest the content into its knowledge base, you can also provide a list of URLs to scrape.
+- Files: you can provide a list of files to ingest, the copilot will ingest the content of the files into its knowledge base, currently, the copilot supports the following file types:
+  - PDF
+  - Markdown
+
+
+
+<RequestExample>
+
+```bash Example Request
+curl --location 'http://localhost:8888/backend/knowldgebase/:bot_id' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Content-Type: application/json' \
+  --data '{
+      "sources": ["https://en.wikipedia.org/wiki/Huffman_coding", "https://example.com/file.pdf"]
+  }'
+```
+</RequestExample>
+
+<ResponseExample>
+
+```json Response
+[
+    {
+       "message": "Knowledge has been queued for ingestion"
+    }
+]
+```
+
+</ResponseExample>

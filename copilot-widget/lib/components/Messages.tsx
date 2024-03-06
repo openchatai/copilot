@@ -1,10 +1,10 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ToolTip";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { User } from "lucide-react";
+import { UserIcon } from "lucide-react";
 import cn from "../utils/cn";
-import formatTimeFromTimestamp from "../utils/formatTime";
-import { FailedMessage, useChat } from "@lib/contexts/Controller";
+import { formatTimeFromTimestamp } from "../utils/time";
+import { useChat } from "@lib/contexts/Controller";
 import { getLast, isEmpty } from "@lib/utils/utils";
 import { useConfigData } from "@lib/contexts/ConfigData";
 import useTypeWriter from "@lib/hooks/useTypeWriter";
@@ -12,31 +12,54 @@ import { Vote } from "./Vote";
 import { Grid } from "react-loader-spinner";
 
 function BotIcon({ error }: { error?: boolean }) {
+  const config = useConfigData();
+
   return (
     <img
       className={cn(
         "h-7 w-7 rounded-lg shrink-0 object-cover aspect-square hover:shadow",
         error && "border border-rose-500 shadow-none"
       )}
-      src="https://cdn.dribbble.com/users/281679/screenshots/14897126/media/f52c47307ac2daa0c727b1840c41d5ab.png?compress=1&resize=1600x1200&vertical=center"
-      alt="bot's avatar"
+      src={
+        config?.bot?.avatarUrl ||
+        "https://cdn.dribbble.com/users/281679/screenshots/14897126/media/f52c47307ac2daa0c727b1840c41d5ab.png?compress=1&resize=1600x1200&vertical=center"
+      }
+      alt={`${config?.bot?.name ?? "Bot"}'s avatar`}
     />
   );
 }
 
-function UserIcon() {
+function UserAvatar() {
   const config = useConfigData();
+
+  if (config?.user?.avatarUrl) {
+    return (
+      <img
+        className="h-7 w-7 rounded-lg shrink-0 object-cover aspect-square hover:shadow"
+        src={config.user.avatarUrl}
+      />
+    );
+  }
+
+  return (
+    <div className="rounded-lg shrink-0 bg-accent h-7 w-7 object-cover aspect-square border border-primary flex items-center justify-center">
+      <span className="text-xl text-primary fill-current">
+        <UserIcon />
+      </span>
+    </div>
+  );
+}
+
+function User() {
+  const config = useConfigData();
+
   return (
     <Tooltip>
       <TooltipContent hidden={!config?.user} side="top" align="center">
         {config?.user?.name}
       </TooltipContent>
       <TooltipTrigger asChild>
-        <div className="rounded-lg shrink-0 bg-accent h-7 w-7 object-cover aspect-square border border-primary flex items-center justify-center">
-          <span className="text-xl text-primary fill-current">
-            <User />
-          </span>
-        </div>
+        <UserAvatar />
       </TooltipTrigger>
     </Tooltip>
   );
@@ -52,7 +75,10 @@ export function BotTextMessage({
 }) {
   const { messages, lastMessageToVote } = useChat();
   const isLast = getLast(messages)?.id === id;
+  const config = useConfigData();
+
   if (isEmpty(message)) return null;
+
   return (
     <div className="p-2 group w-full shrink-0">
       <div className="flex items-start gap-3 w-full text-start" dir="auto">
@@ -70,12 +96,11 @@ export function BotTextMessage({
           </div>
         </div>
       </div>
+
       {isLast && (
         <div className="w-full ps-10 flex-nowrap flex items-center justify-between">
-          <span className="text-xs m-0">Bot</span>
-          {lastMessageToVote && isLast && (
-            <Vote messageId={lastMessageToVote} />
-          )}
+          <span className="text-xs m-0">{config?.bot?.name ?? "Bot"}</span>
+          {lastMessageToVote && <Vote messageId={lastMessageToVote} />}
         </div>
       )}
     </div>
@@ -95,7 +120,7 @@ export function UserMessage({
       dir="auto"
       className="w-full overflow-x-auto shrink-0 max-w-full last-of-type:mb-10 bg-accent p-2 flex gap-3 items-center"
     >
-      <UserIcon />
+      <User />
       <div>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -132,16 +157,17 @@ export function BotMessageLoading({ displayText }: { displayText: string }) {
   );
 }
 
-export function BotMessageError({ message }: { message?: FailedMessage }) {
+export function BotMessageError() {
   const { displayText } = useTypeWriter({
     text: "Error sending the message.",
     every: 0.001,
   });
+
   return (
     <div className="clear-both shrink-0 w-full p-2">
-      <div className=" flex items-center gap-3 w-full">
+      <div className="flex items-center gap-3 w-full">
         <BotIcon error />
-        <div className=" text-rose-500 text-sm">{displayText}</div>
+        <div className="text-rose-500 text-sm">{displayText}</div>
       </div>
     </div>
   );

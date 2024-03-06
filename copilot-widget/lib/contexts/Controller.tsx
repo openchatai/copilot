@@ -5,14 +5,14 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import now from "../utils/timenow";
+import { now } from "../utils/time";
 import { useConfigData } from "./ConfigData";
 import { Message } from "@lib/types";
 import { getId } from "@lib/utils/utils";
 import io from "socket.io-client";
 import { useSessionId } from "@lib/hooks/useSessionId";
 import { BotResponse, UserMessage } from "@lib/types/messageTypes";
-import { createSafeContext } from "./create-safe-context";
+import { createSafeContext } from "./createSafeContext";
 import { useWidgetState } from "./WidgetState";
 
 export type FailedMessage = {
@@ -79,6 +79,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const userMessage: UserMessage & {
       session_id: string;
       headers: Record<string, string>;
+      query_params: Record<string, string>;
       bot_token: string;
     } = {
       timestamp: now(),
@@ -87,7 +88,8 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       from: "user",
       session_id: sessionId,
       headers: config.headers ?? {},
-      bot_token: config.token
+      query_params: config?.queryParams ?? {},
+      bot_token: config.token,
     };
     socket.emit("send_chat", userMessage);
 
