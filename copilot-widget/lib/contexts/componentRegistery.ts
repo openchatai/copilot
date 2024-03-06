@@ -1,3 +1,4 @@
+import { Fallback } from "@lib/@components/Fallback.component";
 import { Text } from "@lib/@components/Text.component";
 import React from "react";
 
@@ -18,13 +19,22 @@ export class ComponentRegistery {
       key: "TEXT",
       component: Text,
     },
-  ];
+    {
+      key: "FALLBACK",
+      component: Fallback,
+    },
+  ] as const;
 
   constructor(opts: OptionsType) {
     const { components } = opts;
 
     if (components) {
       components.forEach((c) => this.register(c));
+    }
+    if (this.components.length === 0) {
+      throw new Error("No components registered");
+    } else if (!this.get("FALLBACK")) {
+      throw new Error("No fallback component registered");
     }
   }
 
@@ -43,5 +53,10 @@ export class ComponentRegistery {
     const c = this.components.find((c) => c.key === key);
     if (c) return c;
     return null;
+  }
+
+  getOrFallback(key?: string) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return key ? this.get(key) || this.get("FALLBACK")! : this.get("FALLBACK")!;
   }
 }
