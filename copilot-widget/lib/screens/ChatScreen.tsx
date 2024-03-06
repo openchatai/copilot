@@ -39,11 +39,12 @@ export default function ChatScreen() {
             initialMessage && <BotTextMessage message={initialMessage} />
           }
           <Map
-            fallback={<hr />}
             data={messages}
             render={(message, index) => {
               if (message.from === "bot") {
-                const Component = __components.get(message.type)?.component;
+                const Component = __components.getOrFallback(
+                  message.type
+                )?.component;
                 return <Component {...message.props} />;
               } else if (message.from === "user") {
                 return (
