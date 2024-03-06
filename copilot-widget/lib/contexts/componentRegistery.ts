@@ -40,6 +40,8 @@ export class ComponentRegistery {
   }
 
   get(key: string) {
-    return this.components.find((c) => c.key === key);
+    const c = this.components.find((c) => c.key === key);
+    if (c) return c;
+    return null;
   }
 }

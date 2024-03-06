@@ -5,7 +5,10 @@ import useScrollToPercentage from "../hooks/useScrollTo";
 import ChatInputFooter from "../components/ChatInputFooter";
 import { useConfigData } from "../contexts/ConfigData";
 import { Map } from "../utils/map";
-import { useChatState } from "@lib/contexts/statefulMessageHandler";
+import {
+  useChatState,
+  useMessageHandler,
+} from "@lib/contexts/statefulMessageHandler";
 
 export default function ChatScreen() {
   const scrollElementRef = useRef(null);
@@ -13,7 +16,7 @@ export default function ChatScreen() {
   const { messages } = useChatState();
   const config = useConfigData();
   const initialMessage = config?.initialMessage;
-  console.log(messages);
+  const { __components } = useMessageHandler();
   useEffect(() => {
     setPos(0, 100);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -40,9 +43,8 @@ export default function ChatScreen() {
             data={messages}
             render={(message, index) => {
               if (message.from === "bot") {
-                return (
-                  <BotTextMessage message={message.props?.message ?? ""} />
-                );
+                const Component = __components.get(message.type)?.component;
+                return <Component {...message.props} />;
               } else if (message.from === "user") {
                 return (
                   <UserMessage
