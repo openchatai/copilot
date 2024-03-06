@@ -1,3 +1,4 @@
+import { ComponentType } from "@lib/contexts/componentRegistery";
 import type { LangType } from "@lib/locales";
 
 export type Options = {
@@ -14,6 +15,7 @@ export type Options = {
     React.HTMLAttributes<HTMLDivElement>,
     HTMLDivElement
   >;
+  components?: ComponentType[];
   user?: {
     name?: string;
     avatarUrl?: string;

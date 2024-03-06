@@ -42,7 +42,7 @@ type UpdaterFunction<T = State> = (oldValue: T) => T;
 export class ChatController {
   sessionId: string | null = null;
   listeners = new Set<Listener>();
-  components = new ComponentRegistery({});
+  components: ComponentRegistery | undefined;
 
   private state: State = {
     currentUserMessage: null,
@@ -52,11 +52,12 @@ export class ChatController {
     clientState: {},
   };
 
-  constructor(sessionId: string) {
+  constructor(sessionId: string, components?: ComponentRegistery) {
     if (!sessionId) {
       throw new Error("sessionId is not set");
     }
     this.sessionId = sessionId;
+    this.components = components;
   }
 
   notify = () => {

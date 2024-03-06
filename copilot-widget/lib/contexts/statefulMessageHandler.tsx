@@ -1,19 +1,25 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useEffect, useMemo, useSyncExternalStore } from "react";
 import { ChatController } from "./messageHandler";
 import { createSafeContext } from "./createSafeContext";
 import { useSessionId } from "@lib/hooks/useSessionId";
 import { useConfigData } from "./ConfigData";
 import { useSocket } from "./SocketProvider";
+import { ComponentRegistery } from "./componentRegistery";
 
 const [useMessageHandler, MessageHandlerSafeProvider] = createSafeContext<{
   __handler: ChatController;
+  __components: ComponentRegistery;
 }>();
 
 function MessageHandlerProvider(props: { children: React.ReactNode }) {
-  const { token } = useConfigData();
+  const { token, components } = useConfigData();
   const { sessionId } = useSessionId(token);
   const { __socket } = useSocket();
-
+  const __components = useMemo(
+    () => new ComponentRegistery({ components }),
+    [components]
+  );
   const handler = useMemo(() => new ChatController(sessionId), [sessionId]);
 
   useEffect(() => {
@@ -32,6 +38,7 @@ function MessageHandlerProvider(props: { children: React.ReactNode }) {
     <MessageHandlerSafeProvider
       value={{
         __handler: handler,
+        __components,
       }}
       {...props}
     />
@@ -63,7 +70,7 @@ function useSendMessage() {
     send,
   };
 }
-// eslint-disable-next-line react-refresh/only-export-components
+
 export {
   useMessageHandler,
   MessageHandlerProvider,

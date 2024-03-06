@@ -29,9 +29,14 @@ export class ComponentRegistery {
   }
 
   register(com: ComponentType) {
-    const c = this.components.find((f) => f.key === com.key);
-    if (c) return;
-    this.components.push(com);
+    // Replace the key if already exists
+    const index = this.components.findIndex((c) => c.key === com.key);
+    if (index !== -1) {
+      this.components[index] = com;
+    } else {
+      this.components.push(com);
+    }
+    return this;
   }
 
   get(key: string) {
