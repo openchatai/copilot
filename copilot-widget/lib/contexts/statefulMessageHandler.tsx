@@ -20,13 +20,7 @@ function MessageHandlerProvider(props: { children: React.ReactNode }) {
     () => new ComponentRegistery({ components }),
     [components]
   );
-  const handler = useMemo(() => new ChatController(sessionId, [{
-    id: "0",
-    from:"bot",
-    responseFor:"12",
-    timestamp: new Date().toISOString(),
-    type: "FORM_COMPONENT",
-  }]), [sessionId]);
+  const handler = useMemo(() => new ChatController(sessionId), [sessionId]);
 
   useEffect(() => {
     return handler.socketChatInfoHandler(__socket);

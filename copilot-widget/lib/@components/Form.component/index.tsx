@@ -3,7 +3,7 @@ import validator from "@rjsf/validator-ajv8";
 import Form from "./rjfs";
 
 type Props = {
-  id: string | number;
+  id: string;
   schema: any;
   submitUrl: string;
   method?: "POST" | "GET";
