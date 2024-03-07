@@ -124,10 +124,14 @@ redis_client = redis.Redis.from_url(
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "YOURSUPERSECRETKEY")
 
 ENABLE_NEURAL_SEARCH = os.getenv("ENABLE_NEURAL_SEARCH", "NO") == "YES"
+
+USE_MEILISEARCH = os.getenv("USE_MEILISEARCH", "False") == "True"
+
 meilisearch_client = Client(
     os.getenv("MEILISEARCH_URL", "https://ms-8774628e94cc-7605.sfo.meilisearch.io"),
     os.getenv("MEILISEARCH_MASTER_KEY", "18a0ec67975fcae91982d8e5b5ae89ec2a298823"),
 )
+
 STORAGE_TYPE = os.getenv("STORAGE_TYPE", "local")
 S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME", "opencopilot-pdf-upload")
 MYSQL_URI = os.getenv("MYSQL_URI", "mysql://dbuser:dbpass@mysql:3306/opencopilot")
