@@ -1,3 +1,4 @@
+import cn from "@lib/utils/cn";
 import {
   canExpand,
   descriptionId,
@@ -8,12 +9,12 @@ import {
   RJSFSchema,
   StrictRJSFSchema,
   titleId,
-} from "@rjsf/utils"
+} from "@rjsf/utils";
 
 export default function ObjectFieldTemplate<
   T = any,
   S extends StrictRJSFSchema = RJSFSchema,
-  F extends FormContextType = any,
+  F extends FormContextType = any
 >({
   description,
   title,
@@ -28,22 +29,22 @@ export default function ObjectFieldTemplate<
   readonly,
   registry,
 }: ObjectFieldTemplateProps<T, S, F>) {
-  const uiOptions = getUiOptions<T, S, F>(uiSchema)
+  const uiOptions = getUiOptions<T, S, F>(uiSchema);
   const TitleFieldTemplate = getTemplate<"TitleFieldTemplate", T, S, F>(
     "TitleFieldTemplate",
     registry,
-    uiOptions,
-  )
+    uiOptions
+  );
   const DescriptionFieldTemplate = getTemplate<
     "DescriptionFieldTemplate",
     T,
     S,
     F
-  >("DescriptionFieldTemplate", registry, uiOptions)
+  >("DescriptionFieldTemplate", registry, uiOptions);
   // Button templates are not overridden in the uiSchema
   const {
     ButtonTemplates: { AddButton },
-  } = registry.templates
+  } = registry.templates;
 
   return (
     <>
@@ -70,14 +71,14 @@ export default function ObjectFieldTemplate<
         {properties.map((element: any, index: number) => (
           <div
             key={index}
-            className={`${element.hidden ? "hidden" : ""} mb-2.5 flex`}
+            className={cn(element.hidden && "hidden", "mb-0.5 flex")}
           >
             <div className="w-full"> {element.content}</div>
           </div>
         ))}
         {canExpand(schema, uiSchema, formData) ? (
           <div className="flex">
-            <div className="ml-auto w-1/4 py-4">
+            <div className="ml-auto w-1/4 py-2">
               <AddButton
                 onClick={onAddClick(schema)}
                 disabled={disabled || readonly}
@@ -90,5 +91,5 @@ export default function ObjectFieldTemplate<
         ) : null}
       </div>
     </>
-  )
+  );
 }

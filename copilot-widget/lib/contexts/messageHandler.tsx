@@ -56,12 +56,19 @@ export class ChatController {
     clientState: {},
   };
 
-  constructor(sessionId: string, components?: ComponentRegistery) {
+  constructor(
+    sessionId: string,
+    messages: MessageType[] = [],
+    components?: ComponentRegistery
+  ) {
     if (!sessionId) {
       throw new Error("sessionId is not set");
     }
     this.sessionId = sessionId;
     this.components = components;
+    this.setValueImmer((draft) => {
+      draft.messages = messages;
+    });
   }
 
   notify = () => {

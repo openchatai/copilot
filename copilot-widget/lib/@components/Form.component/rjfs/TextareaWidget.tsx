@@ -42,7 +42,7 @@ export default function TextareaWidget<
   return (
     <div className="flex">
       <textarea
-        className="w-full border bg-background px-3 py-2"
+        className="w-full border bg-background p-1"
         id={id}
         name={id}
         placeholder={placeholder}
@@ -51,7 +51,7 @@ export default function TextareaWidget<
         value={value}
         required={required}
         autoFocus={autofocus}
-        rows={options.rows || 5}
+        rows={options.rows || 2}
         onChange={_onChange}
         onBlur={_onBlur}
         onFocus={_onFocus}

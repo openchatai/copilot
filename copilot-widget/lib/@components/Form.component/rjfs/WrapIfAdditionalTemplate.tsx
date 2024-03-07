@@ -60,6 +60,7 @@ export default function WrapIfAdditionalTemplate<
           disabled={disabled || readonly}
           id={keyId}
           name={keyId}
+          placeholder={translateString(TranslatableString.KeyLabel)}
           onBlur={!readonly ? handleBlur : undefined}
           type="text"
           className="mt-1 w-full border p-2 shadow-sm"

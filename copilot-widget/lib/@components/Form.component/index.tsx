@@ -4,18 +4,26 @@ import Form from "./rjfs";
 
 type Props = {
   id: string | number;
+  schema: any;
+  submitUrl: string;
+  method?: "POST" | "GET";
 };
 /**
  * The Basic Form component
  */
 export function FormComponent(props: Props) {
-  const { id } = props;
+  const { id, schema, submitUrl, method } = props;
   return (
     <BotMessageWrapper id={id}>
       <div className="space-y-2 flex-1">
-        <div className=" w-fit">
-          <div dir="auto">
-            <Form schema={{}} validator={validator} />
+        <div className="w-full">
+          <div dir="auto" className="bg-accent w-full rounded-lg p-2">
+            <Form
+              action={submitUrl}
+              method={method ?? "POST"}
+              schema={schema}
+              validator={validator}
+            />
           </div>
         </div>
       </div>

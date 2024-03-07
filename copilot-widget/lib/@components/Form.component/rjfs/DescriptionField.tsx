@@ -13,7 +13,7 @@ export default function DescriptionField<
   if (description) {
     return (
       <div>
-        <div id={id} className="mb-4">
+        <div id={id} className="mb-1 text-xs">
           {description}
         </div>
       </div>

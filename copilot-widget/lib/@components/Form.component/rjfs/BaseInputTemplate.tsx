@@ -1,3 +1,4 @@
+import cn from "@lib/utils/cn";
 import {
   ariaDescribedByIds,
   BaseInputTemplateProps,
@@ -6,13 +7,13 @@ import {
   getInputProps,
   RJSFSchema,
   StrictRJSFSchema,
-} from "@rjsf/utils"
-import { ChangeEvent, FocusEvent } from "react"
+} from "@rjsf/utils";
+import { ChangeEvent, FocusEvent } from "react";
 
 export default function BaseInputTemplate<
   T = any,
   S extends StrictRJSFSchema = RJSFSchema,
-  F extends FormContextType = any,
+  F extends FormContextType = any
 >({
   id,
   placeholder,
@@ -35,18 +36,13 @@ export default function BaseInputTemplate<
   const inputProps = {
     ...extraProps,
     ...getInputProps<T, S, F>(schema, type, options),
-  }
+  };
   const _onChange = ({ target: { value } }: ChangeEvent<HTMLInputElement>) =>
-    onChange(value === "" ? options.emptyValue : value)
+    onChange(value === "" ? options.emptyValue : value);
   const _onBlur = ({ target: { value } }: FocusEvent<HTMLInputElement>) =>
-    onBlur(id, value)
+    onBlur(id, value);
   const _onFocus = ({ target: { value } }: FocusEvent<HTMLInputElement>) =>
-    onFocus(id, value)
-
-  const inputClass = `
-    border rounded-lg p-2 focus:border-primary focus:outline-none w-full bg-background
-    ${rawErrors.length > 0 ? "border-red-500" : "border-muted-foreground"}
-  `
+    onFocus(id, value);
 
   return (
     <>
@@ -59,7 +55,10 @@ export default function BaseInputTemplate<
         required={required}
         disabled={disabled}
         readOnly={readonly}
-        className={inputClass}
+        className={cn(
+          "border rounded-md text-sm p-2 focus:border-primary focus:outline-none w-full bg-background",
+          rawErrors.length > 0 ? "border-red-500" : "border-muted-foreground"
+        )}
         list={schema.examples ? examplesId<T>(id) : undefined}
         {...inputProps}
         value={value || value === 0 ? value : ""}
@@ -75,13 +74,13 @@ export default function BaseInputTemplate<
             .concat(
               schema.default && !schema.examples.includes(schema.default)
                 ? ([schema.default] as string[])
-                : [],
+                : []
             )
             .map((example: any) => {
-              return <option key={example} value={example} />
+              return <option key={example} value={example} />;
             })}
         </datalist>
       ) : null}
     </>
-  )
+  );
 }
