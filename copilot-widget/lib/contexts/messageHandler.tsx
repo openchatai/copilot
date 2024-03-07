@@ -41,6 +41,10 @@ type Listener<T = State> = (value: T) => void;
 type UpdaterFunction<T = State> = (oldValue: T) => T;
 export class ChatController {
   sessionId: string | null = null;
+  // sometimes the im_end message is not received from the bot, so we have to set a timeout to end the current message
+  // this is the timeout id
+  private timeoutId: NodeJS.Timeout | null = null;
+  private timeoutDuration = 10000; // 10 seconds
   listeners = new Set<Listener>();
   components: ComponentRegistery | undefined;
 
@@ -252,20 +256,54 @@ export class ChatController {
     if (!sessionId) {
       return;
     }
-    const appendToCurrentBotMessage = this.appendToCurrentBotMessage;
     const settle = this.settle;
-    function handle(content: string) {
+    const handle = (content: string) => {
       if (content === "|im_end|") {
         settle();
         return;
       }
-      appendToCurrentBotMessage(content);
-    }
+      
+      this.startTimeout(() => {
+        settle();
+      });
+
+      this.appendToCurrentBotMessage(content);
+    };
 
     socket.on(sessionId, handle);
 
     return () => {
       socket.off(sessionId, handle);
     };
+  };
+
+  socketVisualizeHandler = (socket: Socket) => {
+    const sessionId = this.sessionId;
+    if (!sessionId) {
+      return;
+    }
+    function handle(msg: string) {
+      //
+    }
+
+    socket.on(`${sessionId}_vote`, handle);
+
+    return () => {
+      socket.off(`${sessionId}_vote`, handle);
+    };
+  };
+
+  private startTimeout = (callback: () => void) => {
+    this.timeoutId = setTimeout(() => {
+      callback();
+      this.timeoutId = null;
+    }, this.timeoutDuration);
+  };
+
+  private clearTimeout = () => {
+    if (this.timeoutId !== null) {
+      clearTimeout(this.timeoutId);
+      this.timeoutId = null;
+    }
   };
 }
