@@ -79,6 +79,9 @@
     }
   },
   "dependencies": {
+    "@rjsf/core": "^5.17.1",
+    "@rjsf/utils": "^5.17.1",
+    "@rjsf/validator-ajv8": "^5.17.1",
     "immer": "^10.0.3",
     "lucide-react": "^0.298.0"
   }

@@ -262,7 +262,7 @@ export class ChatController {
         settle();
         return;
       }
-      
+
       this.startTimeout(() => {
         settle();
       });
@@ -298,12 +298,5 @@ export class ChatController {
       callback();
       this.timeoutId = null;
     }, this.timeoutDuration);
-  };
-
-  private clearTimeout = () => {
-    if (this.timeoutId !== null) {
-      clearTimeout(this.timeoutId);
-      this.timeoutId = null;
-    }
   };
 }
