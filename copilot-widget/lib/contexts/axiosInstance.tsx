@@ -3,20 +3,18 @@ import { ReactNode, useMemo } from "react";
 import { useConfigData } from "./ConfigData";
 import { useSessionId } from "@lib/hooks/useSessionId";
 import { createAxiosInstance } from "@lib/data/chat";
-import { createSafeContext } from "./create-safe-context";
+import { createSafeContext } from "./createSafeContext";
 
 interface AxiosInstanceProps {
   axiosInstance: AxiosInstance;
 }
 
-const [
-  useAxiosInstance,
-  AxiosSafeProvider,
-] = createSafeContext<AxiosInstanceProps>();
+const [useAxiosInstance, AxiosSafeProvider] =
+  createSafeContext<AxiosInstanceProps>();
 
 function AxiosProvider({ children }: { children: ReactNode }) {
   const config = useConfigData();
-  const { sessionId } = useSessionId(config?.token || 'defaultToken');
+  const { sessionId } = useSessionId(config?.token || "defaultToken");
   const axiosInstance: AxiosInstance = useMemo(() => {
     return createAxiosInstance({
       botToken: config?.token,
@@ -26,9 +24,7 @@ function AxiosProvider({ children }: { children: ReactNode }) {
   }, [config, sessionId]);
 
   return (
-    <AxiosSafeProvider value={{ axiosInstance }}>
-      {children}
-    </AxiosSafeProvider>
+    <AxiosSafeProvider value={{ axiosInstance }}>{children}</AxiosSafeProvider>
   );
 }
 

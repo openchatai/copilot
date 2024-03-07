@@ -1,9 +1,11 @@
-import enLocale from "./en.locale";
-import arLocale from "./ar.locale";
+import { enLocale } from "./en.locale";
+import { arLocale } from "./ar.locale";
+import { nlLocale } from "./nl.locale.ts";
 
 const locales = {
   en: enLocale,
   ar: arLocale,
+  nl: nlLocale,
 };
 export type LangType = keyof typeof locales;
 

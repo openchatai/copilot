@@ -6,6 +6,7 @@ from typing import TypedDict
 from functools import lru_cache
 
 from qdrant_client import QdrantClient
+from meilisearch import Client
 
 X_CONSUMER_USERNAME = "X-CONSUMER-USERNAME"
 EXPERIMENTAL_FEATURES_ENABLED = os.getenv("EXPERIMENTAL_FEATURES_ENABLED", "NO")
@@ -40,6 +41,7 @@ class VectorCollections:
     flows = "flows"
     actions = "actions"
     knowledgebase = "knowledgebase"
+    neural_search = "neural_search"
 
 
 class ChatStrategy:
@@ -116,7 +118,22 @@ CACHE_EXPIRATION = 60 * 60 * 24  # 24 hours
 
 
 redis_client = redis.Redis.from_url(
-    url=os.getenv("REDIS_URL", ""), decode_responses=True
+    url=os.getenv("REDIS_URL", "redis://redis:6379/2"), decode_responses=True
 )
 
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "YOURSUPERSECRETKEY")
+
+ENABLE_NEURAL_SEARCH = os.getenv("ENABLE_NEURAL_SEARCH", "NO") == "YES"
+
+USE_MEILISEARCH = os.getenv("USE_MEILISEARCH", "False") == "True"
+
+meilisearch_client = Client(
+    os.getenv("MEILISEARCH_URL", "https://ms-8774628e94cc-7605.sfo.meilisearch.io"),
+    os.getenv("MEILISEARCH_MASTER_KEY", "18a0ec67975fcae91982d8e5b5ae89ec2a298823"),
+)
+
+STORAGE_TYPE = os.getenv("STORAGE_TYPE", "local")
+S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME", "opencopilot-pdf-upload")
+MYSQL_URI = os.getenv("MYSQL_URI", "mysql://dbuser:dbpass@mysql:3306/opencopilot")
+REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/2")
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "YOURSUPERSECRETKEY")

@@ -2,19 +2,20 @@ import { useEffect, useRef } from "react";
 import { useWidgetState } from "./contexts/WidgetState";
 import cn from "./utils/cn";
 import ChatScreen from "./screens/ChatScreen";
-import { IS_SERVER } from "./utils/is_server";
+import { isServer } from "./utils/isServer.ts";
 import { MessageCircle } from "lucide-react";
 
 function useTrigger(selector?: string, toggle?: () => void) {
   const trigger = useRef<HTMLElement | null>(
-    !selector ? null : IS_SERVER ? null : document.querySelector(selector)
+    !selector ? null : isServer ? null : document.querySelector(selector)
   ).current;
 
   useEffect(() => {
     if (!selector) {
       return;
     }
-    if (trigger && !IS_SERVER) {
+
+    if (trigger && !isServer) {
       trigger.addEventListener("click", () => toggle?.());
       return () => trigger.removeEventListener("click", () => toggle?.());
     } else {
@@ -25,8 +26,8 @@ function useTrigger(selector?: string, toggle?: () => void) {
   }, [selector, toggle, trigger]);
 }
 
-const TRIGGER_BOTTOM = "20px";
-const TRIGGER_RIGHT = "20px";
+const OFFSET_BOTTOM = "20px";
+const OFFSET_RIGHT = "20px";
 
 export function CopilotWidget({
   triggerSelector,
@@ -38,6 +39,7 @@ export function CopilotWidget({
   const [open, toggle] = useWidgetState();
   useTrigger(triggerSelector, toggle);
   const SHOULD_RENDER_IN_THE_RIGHT_CORNER = !triggerSelector && __isEmbedded;
+
   return (
     <>
       <div
@@ -52,13 +54,13 @@ export function CopilotWidget({
         )}
         style={{
           right: SHOULD_RENDER_IN_THE_RIGHT_CORNER
-            ? `calc(${TRIGGER_RIGHT})`
+            ? `calc(${OFFSET_RIGHT})`
             : undefined,
           bottom: SHOULD_RENDER_IN_THE_RIGHT_CORNER
-            ? `calc(${TRIGGER_BOTTOM} + 60px)`
+            ? `calc(${OFFSET_BOTTOM} + 60px)`
             : undefined,
           height: SHOULD_RENDER_IN_THE_RIGHT_CORNER
-            ? `calc(95% - ${TRIGGER_BOTTOM} - 100px)`
+            ? `calc(95% - ${OFFSET_BOTTOM} - 100px)`
             : "100%",
         }}
       >
@@ -69,8 +71,8 @@ export function CopilotWidget({
         <div
           className="fixed z-50 pointer-events-auto transition-all ease-in-out duration-300"
           style={{
-            bottom: TRIGGER_BOTTOM,
-            right: TRIGGER_RIGHT,
+            bottom: OFFSET_BOTTOM,
+            right: OFFSET_RIGHT,
           }}
         >
           <button

@@ -7,7 +7,7 @@ import urllib.parse
 from langchain.schema import HumanMessage, SystemMessage
 from langchain.pydantic_v1 import BaseModel, Field
 from langchain.output_parsers import PydanticOutputParser
-import aioredis
+from utils.llm_consts import redis_client
 
 SessionLocal = sessionmaker(bind=engine)
 
@@ -123,16 +123,9 @@ async def get_regex_for_dynamic_params(url: str) -> str:
 
 
 async def cache_result(key: str, value: str, ttl: int):
-    redis = await aioredis.create_redis_pool("redis://localhost")
-    await redis.setex(key, ttl, value)
-    redis.close()
-    await redis.wait_closed()
+    await redis_client.setex(key, ttl, value)
 
 
 async def get_cached_result(key: str) -> str:
-    redis = await aioredis.create_redis_pool("redis://localhost")
-    cached_result = await redis.get(key)
-    redis.close()
-    await redis.wait_closed()
-
-    return cached_result.decode() if cached_result else None
+    cached_result = await redis_client.get(key)
+    return cached_result

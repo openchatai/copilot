@@ -4,5 +4,8 @@ import useSWR from "swr";
 
 export function useInitialData() {
   const { axiosInstance } = useAxiosInstance();
-  return useSWR("initialData", () => getInitialData(axiosInstance));
+  return useSWR("initialData", () => getInitialData(axiosInstance), {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+  });
 }

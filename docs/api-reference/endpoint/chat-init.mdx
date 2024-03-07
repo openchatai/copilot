@@ -1,0 +1,55 @@
+---
+title: "Initiate chat"
+api: "GET https://api.opencopilot.so/backend/chat/init"
+description: "This endpoint will initiate a chat with your copilot, it will the copilot name, metdata, and other info."
+---
+
+### Body
+
+
+<ParamField header="X-Bot-Token" type="string">
+    Your copilot uniuqe token, can be obtained from the dashboard or from `get` copilot endpoint
+</ParamField>
+
+<ParamField header="X-Session-Id" type="string">
+   The session id, you can generate a new session id for each chat, or use the same session id for the same chat
+</ParamField>
+
+### Response
+
+<ResponseField name="type" type="string">
+  The copilot response type, currently it only support `text`
+</ResponseField>
+
+<ResponseField name="response" type="object">
+  copilot information
+  <Expandable title="properties">
+    <ResponseField name="text" type="string">
+      The copilot response, formatted in Markdown by default
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+
+<RequestExample>
+
+```bash Example Request
+curl --location 'https://api.opencopilot.so/backend/chat/init' \
+  --header 'X-Bot-Token: BOT_TOKEN' \
+  --header 'X-Session-Id: SESSION_ID' \
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Response
+{
+    "type": "text",
+    "response": [
+        "text" "The copilot response!"
+    ]
+}
+```
+
+</ResponseExample>

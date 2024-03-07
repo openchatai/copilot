@@ -1,3 +1,3 @@
-export type Locale = {
+export type TranslatableMessages = {
     [key: string]: string;
 };

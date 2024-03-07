@@ -1,12 +1,11 @@
 import io
 import json
-from typing import List, Union
+from typing import List, Optional, Tuple, Union
 from PyPDF2 import PdfReader
 from enum import Enum
 
 from abc import ABC, abstractmethod
-from bs4 import BeautifulSoup
-
+from bs4 import BeautifulSoup, Tag
 from utils.get_logger import CustomLogger
 import requests
 
@@ -25,12 +24,22 @@ class LinkInformation:
 
 class ContentParser(ABC):
     @abstractmethod
-    def parse(self, content) -> List[LinkInformation]:
+    def get_url_fragments(self, content) -> List[LinkInformation]:
+        pass
+
+    @abstractmethod
+    def parse_text_content(self, content) -> str:
+        pass
+
+    @abstractmethod
+    def find_all_headings_and_highlights(
+        self, content: str
+    ) -> Tuple[str, List[Tuple[str, str]]]:
         pass
 
 
 class TextContentParser(ContentParser):
-    def parse(self, content) -> List[LinkInformation]:
+    def get_url_fragments(self, content) -> List[LinkInformation]:
         soup = BeautifulSoup(content, "lxml")
         links = soup.find_all("a")
 
@@ -57,9 +66,34 @@ class TextContentParser(ContentParser):
             results.append(LinkInformation("", "", text_content))
         return results
 
+    # for now i am returning only the headings and the page title. We will enhance this later to also have highlights
+    def find_all_headings_and_highlights(
+        self, content: str
+    ) -> Tuple[str, List[Tuple[str, str]]]:
+
+        soup = BeautifulSoup(content, "lxml")
+        title = soup.title.text if soup.title else ""
+        elements_with_id = soup.find_all(id=True)
+        links = soup.find_all("a")
+        pairs = []
+        for element in elements_with_id:
+            id_ = element.get("id")
+            if id_:  # A simple check if the id exists
+                corresponding_links = [
+                    link for link in links if link.get("href") == "#" + id_
+                ]  # Removed "./#" prefix
+                if corresponding_links:
+                    for link in corresponding_links:
+                        pairs.append((element.get_text(strip=True), id_))
+        return title, pairs
+
+    def parse_text_content(self, content) -> str:
+        text = BeautifulSoup(content, "lxml").get_text()
+        return text
+
 
 class JsonContentParser(ContentParser):
-    def parse(self, content) -> Union[LinkInformation, None]:
+    def get_url_fragments(self, content) -> Union[LinkInformation, None]:
         try:
             json_data = json.loads(content)
             # Convert JSON object to a string representation
@@ -69,9 +103,17 @@ class JsonContentParser(ContentParser):
             print(f"Failed to parse JSON content: {e}")
             return None
 
+    def find_all_headings_and_highlights(self, content: str):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def parse_text_content(self, content) -> str:
+        result = self.get_url_fragments(content)
+        return result.target_text if result else ""
+
 
 class PDFContentParser(ContentParser):
-    def parse(self, content) -> Union[LinkInformation, None]:
+    def get_url_fragments(self, content) -> Union[LinkInformation, None]:
         try:
             pdf_file = PdfReader(io.BytesIO(content))
             text = ""
@@ -84,6 +126,14 @@ class PDFContentParser(ContentParser):
         except Exception as e:
             print(f"Failed to parse PDF content: {e}")
             return None
+
+    def find_all_headings_and_highlights(self, content: str):
+        raise NotImplementedError()
+
+    def parse_text_content(self, content) -> str:
+        result = self.get_url_fragments(content)
+
+        return result.target_text if result else ""
 
 
 class ContentType(Enum):
@@ -107,6 +157,7 @@ class ParserFactory:
             raise ValueError(f"No parser available for content type: {content_type}")
         # Add more parsers as needed for different content types
         raise ValueError(f"No parser available for content type: {content_type}")
+
 
 def identify_content_type(url):
     try:

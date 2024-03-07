@@ -3,7 +3,7 @@ import { SendHorizonal, AlertTriangle, RotateCcw } from "lucide-react";
 import { useChat } from "../contexts/Controller";
 import { useRef, useState } from "react";
 import { getId, isEmpty } from "@lib/utils/utils";
-import now from "@lib/utils/timenow";
+import { now } from "@lib/utils/time";
 import { useDocumentDirection } from "@lib/hooks/useDocumentDirection";
 import { VoiceRecorder } from "./VoiceRecorder";
 import { useInitialData } from "@lib/hooks/useInitialData";
@@ -139,7 +139,7 @@ function ChatInputFooter() {
           <VoiceRecorder onSuccess={(text) => setInput(text)} />
           <button
             onClick={handleInputSubmit}
-            className="text-xl disabled:opacity-40 disabled: pointer-events-none disabled: cursor-not-allowed  text-[#5e5c5e]  transition-all"
+            className="text-xl disabled:opacity-40 disabled:pointer-events-none disabled:cursor-not-allowed text-[#5e5c5e] transition-all"
             disabled={loading || !canSend}
           >
             <SendHorizonal className="rtl:rotate-180" />

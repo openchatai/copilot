@@ -14,7 +14,9 @@ LOCAL_IP = os.getenv("LOCAL_IP", "host.docker.internal")
 
 @lru_cache(maxsize=1)
 def get_embeddings():
-    embedding_provider = os.environ.get("EMBEDDING_PROVIDER", EmbeddingProvider.OPENAI.value)
+    embedding_provider = os.environ.get(
+        "EMBEDDING_PROVIDER", EmbeddingProvider.OPENAI.value
+    )
 
     if embedding_provider == EmbeddingProvider.azure.value:
         deployment = os.environ.get("AZURE_OPENAI_EMBEDDING_MODEL_NAME")
@@ -23,9 +25,9 @@ def get_embeddings():
         return OpenAIEmbeddings(
             deployment=deployment,
             client=client,
-            chunk_size=8,
+            chunk_size=1000,
         )
-    
+
     elif embedding_provider == EmbeddingProvider.openchat.value:
         logger.info("Got ollama embedding provider", provider=embedding_provider)
         return OllamaEmbeddings(base_url=f"{LOCAL_IP}:11434", model="openchat")

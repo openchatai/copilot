@@ -1,5 +1,5 @@
 import { type LangType, getStr } from "@lib/locales";
-import { createSafeContext } from "./create-safe-context";
+import { createSafeContext } from "./createSafeContext";
 import { useConfigData } from "./ConfigData";
 
 const [useLang, SafeLanguageProvider] = createSafeContext<{

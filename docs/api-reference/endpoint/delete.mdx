@@ -1,6 +1,6 @@
 ---
 title: "Delete a Copilot"
-api: "DELETE http://example.com/backend/api/copilot/:id"
+api: "DELETE https://api.opencopilot.so/backend/copilot/:id"
 description: "Delete single copilot by ID "
 ---
 
@@ -8,6 +8,16 @@ description: "Delete single copilot by ID "
 
 <ParamField path="id" type="string">
   The uuid of the copilot
+</ParamField>
+
+### Headers
+
+<ParamField path="header" name="Accept" type="string">
+  application/json
+</ParamField>
+
+<ParamField path="header" name="Authorization" type="string">
+  Bearer YOUR_TOKEN
 </ParamField>
 
 ### Response
@@ -19,7 +29,9 @@ description: "Delete single copilot by ID "
 <RequestExample>
 
 ```bash Example Request
-curl --location --request DELETE 'http://example.com/backend/api/copilot/:id'
+curl --location --request DELETE 'https://api.opencopilot.so/backend/copilot/:id' \
+--header 'Accept: application/json' \
+--header 'Authorization : Bearer YOUR_TOKEN'
 ```
 
 </RequestExample>

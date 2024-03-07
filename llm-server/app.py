@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from flask import Flask, request
 from flask import jsonify
 from utils.vector_store_setup import init_qdrant_collections
-
+import traceback
 from routes.action.action_controller import action
 from routes.chat.chat_controller import chat_workflow, send_chat_stream
 from routes.copilot.copilot_controller import copilot
@@ -41,7 +41,7 @@ load_dotenv()
 
 create_database_schema()
 app = Flask(__name__)
-CORS(app)
+# CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 app.after_request(log_api_call)
@@ -68,8 +68,7 @@ def handle_exception(error):
         logger.error("HTTP Error", error=error)
         return jsonify({"error": error.name, "message": error.description}), error.code
 
-    # If it's not an HTTPException, it's a 500 Internal Server Error
-    logger.error("Internal Server Error", error=error)
+    traceback.print_exc()
     return (
         jsonify(
             {
@@ -87,10 +86,9 @@ def handle_send_chat(json_data):
     message = input_data.content
     session_id = input_data.session_id
     headers_from_json = input_data.headers
-
-    headers = request.headers
-
-    bot_token = headers.environ.get("HTTP_X_BOT_TOKEN")
+    # headers = request.headers
+    bot_token = input_data.bot_token
+    # bot_token = headers.environ.get("HTTP_X_BOT_TOKEN")
 
     json_data = {
         "url": request.base_url,
@@ -100,9 +98,9 @@ def handle_send_chat(json_data):
         "method": "wss",
     }
 
-    if not bot_token:
-        socketio.emit(session_id, {"error": "Bot token is required"})
-        return
+    # if not bot_token:
+    #     socketio.emit(session_id, {"error": "Bot token is required"})
+    #     return
 
     asyncio.run(send_chat_stream(message, bot_token, session_id, headers_from_json))
     log_opensource_telemetry_data(json_data)
