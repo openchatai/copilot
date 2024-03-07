@@ -1,5 +1,5 @@
 import ChatHeader from "../components/ChatHeader";
-import { useEffect, useRef } from "react";
+import { ComponentType, useEffect, useRef } from "react";
 import { BotTextMessage, UserMessage } from "../components/Messages";
 import useScrollToPercentage from "../hooks/useScrollTo";
 import ChatInputFooter from "../components/ChatInputFooter";
@@ -42,10 +42,9 @@ export default function ChatScreen() {
             data={messages}
             render={(message, index) => {
               if (message.from === "bot") {
-                const Component = __components.getOrFallback(
-                  message.type
-                )?.component;
-                return <Component {...message.props} />;
+                const Component = __components.getOrFallback(message.type)
+                  ?.component as ComponentType;
+                return <Component {...message.props} key={index} />;
               } else if (message.from === "user") {
                 return (
                   <UserMessage
