@@ -34,6 +34,10 @@ function MessageHandlerProvider(props: { children: React.ReactNode }) {
     return handler.socketMessageRespHandler(__socket);
   }, [__socket, handler]);
 
+  useEffect(() => {
+    return handler.socketUiHandler(__socket);
+  }, [__socket, handler]);
+
   return (
     <MessageHandlerSafeProvider
       value={{

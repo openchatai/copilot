@@ -8,12 +8,12 @@ type Props = {
  * The Basic Text component
  */
 export function Fallback(props: Props) {
-  const { data, id } = props;
+  const { id, ...data } = props;
   return (
     <BotMessageWrapper id={id}>
       <div className="space-y-2 flex-1">
-        <div className=" w-fit">
-          <div dir="auto">{JSON.stringify(data, null, 2)}</div>
+        <div className="w-full max-w-full overflow-auto">
+          <code dir="auto" className="text-xs leading-tight">{JSON.stringify(data, null, 1)}</code>
         </div>
       </div>
     </BotMessageWrapper>

@@ -30,7 +30,7 @@ function MessageSuggestions() {
         <div className="flex no-scrollbar  items-center flex-wrap justify-start gap-2 flex-1">
           {data?.initial_questions?.map((q, index) => (
             <button
-              className="text-sm font-medium whitespace-nowrap px-2.5 py-1.5 rounded-lg bg-accent text-primary"
+              className="text-xs font-medium whitespace-nowrap px-2 py-1 rounded-lg bg-accent text-primary"
               key={index}
               onClick={() => {
                 send(q);

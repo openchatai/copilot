@@ -284,19 +284,78 @@ export class ChatController {
     };
   };
 
-  socketVisualizeHandler = (socket: Socket) => {
+  socketUiHandler = (socket: Socket) => {
     const sessionId = this.sessionId;
     if (!sessionId) {
       return;
     }
-    function handle(msg: string) {
-      //
-    }
 
-    socket.on(`${sessionId}_vote`, handle);
+    type ResponseObject =
+      | {
+          type: "ui_form";
+          message_id: string; // => the user's message id
+          action: {
+            name: string;
+            description: string;
+            operation_id: string;
+            request_type: string;
+            payload: {
+              parameters: {
+                in: string;
+                name: string;
+                schema: {
+                  type: string;
+                };
+                required: boolean;
+                description: string;
+                value: string;
+              }[];
+              request_body: Record<string, unknown>;
+            };
+          };
+        }
+      | {
+          type: "ui_component";
+          message_id: string; // => the user's message id
+          request_response: Record<string, unknown>;
+          name: string;
+        };
+    const handle = (msg: string) => {
+      const parsedResponse = JSON.parse(msg) as ResponseObject;
+      this.setValueImmer((draft) => {
+        let message: BotMessageType | null = null;
+        if (parsedResponse.type === "ui_form") {
+          message = {
+            from: "bot",
+            type: "FORM",
+            id: this.genId(),
+            responseFor: parsedResponse.message_id,
+            timestamp: this.getTimeStamp(),
+            props: {
+              action: parsedResponse.action,
+            },
+          };
+        } else if (parsedResponse.type === "ui_component") {
+          // handle component
+          message = {
+            from: "bot",
+            type: parsedResponse.name,
+            id: this.genId(),
+            responseFor: parsedResponse.message_id,
+            timestamp: this.getTimeStamp(),
+            props: parsedResponse.request_response ?? {},
+          };
+        }
+        if (message) {
+          draft.messages.push(message);
+        }
+      });
+    };
+
+    socket.on(`${sessionId}_ui`, handle);
 
     return () => {
-      socket.off(`${sessionId}_vote`, handle);
+      socket.off(`${sessionId}_ui`, handle);
     };
   };
 
