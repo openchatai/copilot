@@ -30,7 +30,7 @@ export default function ChatScreen() {
   useEffect(() => {
     setPos(0, 100);
   }, [messages, setPos]);
-
+  const LoadingComponent = __components.getOrFallback("LOADING")?.component;
   return (
     <div className="w-full flex h-full flex-col items-start relative">
       <ChatHeader />
@@ -68,6 +68,7 @@ export default function ChatScreen() {
               }
             }}
           />
+          <LoadingComponent />
         </div>
       </main>
       <ChatInputFooter />

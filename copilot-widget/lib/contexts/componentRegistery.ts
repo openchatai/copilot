@@ -1,5 +1,6 @@
 import { Fallback } from "@lib/@components/Fallback.component";
 import { FormComponent } from "@lib/@components/Form.component";
+import { Loading } from "@lib/@components/Loading.component";
 import { Text } from "@lib/@components/Text.component";
 import React from "react";
 
@@ -27,6 +28,10 @@ export class ComponentRegistery {
     {
       key: "FORM_COMPONENT",
       component: FormComponent,
+    },
+    {
+      key: "LOADING",
+      component: Loading,
     },
   ] as const;
 

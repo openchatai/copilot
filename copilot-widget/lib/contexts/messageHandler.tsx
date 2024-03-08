@@ -264,15 +264,18 @@ export class ChatController {
     if (!sessionId) {
       return;
     }
-    const settle = this.settle;
     const handle = (content: string) => {
       if (content === "|im_end|") {
-        settle();
+        this.settle();
         return;
       }
+      // once we get response
+      this.setValueImmer((draft) => {
+        draft.conversationInfo = "streaming......"
+      });
 
       this.startTimeout(() => {
-        settle();
+        this.settle();
       });
 
       this.appendToCurrentBotMessage(content);
