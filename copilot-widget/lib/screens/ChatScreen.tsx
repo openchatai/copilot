@@ -1,6 +1,10 @@
 import ChatHeader from "../components/ChatHeader";
 import { ComponentType, useEffect, useRef } from "react";
-import { BotTextMessage, UserMessage } from "../components/Messages";
+import {
+  BotMessageWrapper,
+  BotTextMessage,
+  UserMessage,
+} from "../components/Messages";
 import useScrollToPercentage from "../hooks/useScrollTo";
 import ChatInputFooter from "../components/ChatInputFooter";
 import { useConfigData } from "../contexts/ConfigData";
@@ -9,6 +13,7 @@ import {
   useChatState,
   useMessageHandler,
 } from "@lib/contexts/statefulMessageHandler";
+import { BotMessageType } from "@lib/contexts/messageHandler";
 
 export default function ChatScreen() {
   const scrollElementRef = useRef(null);
@@ -43,8 +48,15 @@ export default function ChatScreen() {
             render={(message, index) => {
               if (message.from === "bot") {
                 const Component = __components.getOrFallback(message.type)
-                  ?.component as ComponentType;
-                return <Component {...message.props} key={index} />;
+                  ?.component as ComponentType<{
+                  data: BotMessageType["data"];
+                  id: string;
+                }>;
+                return (
+                  <BotMessageWrapper id={message.id} key={index}>
+                    <Component data={message.data} id={message.id} />
+                  </BotMessageWrapper>
+                );
               } else if (message.from === "user") {
                 return (
                   <UserMessage

@@ -16,7 +16,7 @@ export type BotMessageType = {
   from: "bot";
   type: string;
   id: string;
-  props?: Record<string, unknown>;
+  data?: Record<string, unknown>;
   timestamp: string;
   responseFor: string; // id of the user message
   isFailed?: boolean;
@@ -141,6 +141,7 @@ export class ChatController {
   settle = () => {
     this.setValueImmer((draft) => {
       draft.currentUserMessage = null;
+      draft.conversationInfo = null;
     });
   };
 
@@ -196,8 +197,8 @@ export class ChatController {
             msg.type === "TEXT"
         ) as BotMessageType;
         if (d) {
-          d.props = {
-            message: (d.props?.message || "") + message,
+          d.data = {
+            message: (d.data?.message || "") + message,
           };
         } else {
           draft.messages.push({
@@ -206,7 +207,7 @@ export class ChatController {
             type: "TEXT",
             responseFor: currentUserMessage.id,
             timestamp: this.getTimeStamp(),
-            props: {
+            data: {
               message: message,
             },
           });
@@ -220,7 +221,7 @@ export class ChatController {
           type: "TEXT",
           responseFor: currentUserMessage.id,
           timestamp: this.getTimeStamp(),
-          props: {
+          data: {
             content: message,
           },
         });
@@ -331,7 +332,7 @@ export class ChatController {
             id: this.genId(),
             responseFor: parsedResponse.message_id,
             timestamp: this.getTimeStamp(),
-            props: {
+            data: {
               action: parsedResponse.action,
             },
           };
@@ -343,7 +344,7 @@ export class ChatController {
             id: this.genId(),
             responseFor: parsedResponse.message_id,
             timestamp: this.getTimeStamp(),
-            props: parsedResponse.request_response ?? {},
+            data: parsedResponse.request_response ?? {},
           };
         }
         if (message) {
