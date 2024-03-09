@@ -1,6 +1,6 @@
 import TextareaAutosize from "react-textarea-autosize";
 import { SendHorizonal, AlertTriangle, RotateCcw } from "lucide-react";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { isEmpty } from "@lib/utils/utils";
 import { useDocumentDirection } from "@lib/hooks/useDocumentDirection";
 import { VoiceRecorder } from "./VoiceRecorder";
@@ -15,10 +15,13 @@ import {
 import { Button } from "./Button";
 import { useLang } from "@lib/contexts/LocalesProvider";
 import {
+  useChatLoading,
   useChatState,
   useMessageHandler,
   useSendMessage,
 } from "@lib/contexts/statefulMessageHandler";
+import { useSocket } from "@lib/contexts/SocketProvider";
+import cn from "@lib/utils/cn";
 
 function MessageSuggestions() {
   const { data } = useInitialData();
@@ -79,13 +82,27 @@ function ResetButtonWithConfirmation() {
     </Dialog>
   );
 }
+
+function useCanSend({ input }: { input: string }) {
+  const isLoading = useChatLoading();
+  const { state } = useSocket();
+  const canSend =
+    input.trim().length > 0 && !isLoading && state.state === "connected";
+
+  const cantSendReason = useMemo(() => {
+    if (isLoading) return "loading";
+    if (state.state !== "connected") return "disconnected";
+    return "empty";
+  }, [isLoading, state.state]) as "loading" | "disconnected" | "empty";
+
+  return { canSend, cantSendReason };
+}
 function ChatInputFooter() {
   const [input, setInput] = useState("");
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const { send } = useSendMessage();
-  const canSend = input.trim().length > 0;
   const { direction } = useDocumentDirection();
-
+  const { canSend } = useCanSend({ input });
   const handleTextareaChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
@@ -94,7 +111,7 @@ function ChatInputFooter() {
   };
 
   function handleInputSubmit() {
-    if (input.trim().length > 0) {
+    if (canSend) {
       setInput("");
       send(input);
     }
@@ -102,13 +119,16 @@ function ChatInputFooter() {
   return (
     <footer className="p-2 flex w-full flex-col gap-2">
       <MessageSuggestions />
-      <div className="w-full flex items-center ring-[#334155]/60 transition-colors justify-between ring-1 overflow-hidden focus-within:ring-primary gap-2 bg-accent p-2 rounded-2xl">
+      <div
+        className={cn(
+          "w-full flex items-center transition-colors focus-within:ring-primary ring-[#334155]/60 justify-between ring-1 overflow-hidden gap-2 bg-accent p-2 rounded-2xl"
+        )}
+      >
         <div className="flex-1">
           <TextareaAutosize
             dir="auto"
             ref={textAreaRef}
             autoFocus={true}
-            placeholder="_"
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
@@ -130,7 +150,11 @@ function ChatInputFooter() {
           <VoiceRecorder onSuccess={(text) => setInput(text)} />
           <button
             onClick={handleInputSubmit}
-            className="text-xl disabled:opacity-40 disabled:pointer-events-none disabled:cursor-not-allowed text-[#5e5c5e] transition-all"
+            disabled={!canSend}
+            className={cn(
+              "text-lg disabled:pointer-events-none disabled:cursor-not-allowed transition-all",
+              !canSend ? "text-rose-500" : " text-[#5e5c5e]"
+            )}
           >
             <SendHorizonal className="rtl:rotate-180" />
           </button>

@@ -43,11 +43,11 @@ export class ChatController {
   sessionId: string | null = null;
   // sometimes the im_end message is not received from the bot, so we have to set a timeout to end the current message
   // this is the timeout id
-  private timeoutId: NodeJS.Timeout | null = null;
+  private timeout: NodeJS.Timeout | null = null;
   private timeoutDuration = 1000 * 3; // 10 seconds
   listeners = new Set<Listener>();
   components: ComponentRegistery | undefined;
-
+  
   private state: State = {
     currentUserMessage: null,
     conversationInfo: null,
@@ -364,9 +364,9 @@ export class ChatController {
   };
 
   private startTimeout = (callback: () => void) => {
-    this.timeoutId = setTimeout(() => {
+    this.timeout = setTimeout(() => {
       callback();
-      this.timeoutId = null;
+      this.timeout = null;
     }, this.timeoutDuration);
   };
 }

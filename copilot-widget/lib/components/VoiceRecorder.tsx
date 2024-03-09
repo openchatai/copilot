@@ -5,11 +5,14 @@ import { now } from "@lib/utils/time";
 import { useEffect } from "react";
 import useAudioRecorder from "@lib/hooks/useAudioRecord";
 import { useLang } from "@lib/contexts/LocalesProvider";
+import cn from "@lib/utils/cn";
 
 export function VoiceRecorder({
   onSuccess,
+  disabled,
 }: {
   onSuccess?: (text: string) => void;
+  disabled?: boolean;
 }) {
   const { axiosInstance } = useAxiosInstance();
   const { get } = useLang();
@@ -57,7 +60,10 @@ export function VoiceRecorder({
       <TooltipTrigger asChild>
         <button
           onClick={handleClick}
-          className="flex items-center justify-center shrink-0 bg-emerald-500 rounded-full size-6 [&>svg]:size-4"
+          className={cn(
+            "flex items-center justify-center shrink-0 rounded-full size-6 [&>svg]:size-4",
+            disabled ? "bg-rose-500" : "bg-emerald-500"
+          )}
         >
           {isRecording ? (
             <Square strokeLinecap="round" className="text-accent" />

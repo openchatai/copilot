@@ -54,6 +54,11 @@ function useChatState() {
   return useSyncExternalStore(__handler.subscribe, __handler.getSnapshot);
 }
 
+function useChatLoading() {
+  const { __handler } = useMessageHandler();
+  return useSyncExternalStore(__handler.subscribe, __handler.isLoading);
+}
+
 function useSendMessage() {
   const { __handler } = useMessageHandler();
   const { headers, token } = useConfigData();
@@ -80,4 +85,5 @@ export {
   MessageHandlerProvider,
   useChatState,
   useSendMessage,
+  useChatLoading,
 };
