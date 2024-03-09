@@ -1,0 +1,26 @@
+stages:
+  - deploy
+
+update-copilot-actions:
+  stage: deploy
+  when: manual
+  script:
+    - >
+      echo "Updating Copilot actions..."
+
+      # Delete all actions from Copilot using environment variables for ID and token
+      curl -f --location --request DELETE "https://api.opencopilot.so/backend/actions/bot/$COPILOT_ID" \
+      --header 'Accept: application/json' \
+      --header "Authorization: Bearer $AUTH_TOKEN"
+
+      # Wait a bit for the delete action to propagate
+      sleep 5
+
+      # Import actions from the updated Swagger file using environment variables
+      curl -f --location --request PUT "https://api.opencopilot.so/backend/actions/bot/$COPILOT_ID/import-from-swagger" \
+      --header 'Accept: application/json' \
+      --header "Authorization: Bearer $AUTH_TOKEN" \
+      --form 'file=@"./swagger.json"'
+
+      echo "Copilot actions updated."
+  image: curlimages/curl:latest # Use an image with curl installed
