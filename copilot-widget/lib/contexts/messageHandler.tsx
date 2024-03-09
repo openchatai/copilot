@@ -44,7 +44,7 @@ export class ChatController {
   // sometimes the im_end message is not received from the bot, so we have to set a timeout to end the current message
   // this is the timeout id
   private timeoutId: NodeJS.Timeout | null = null;
-  private timeoutDuration = 10000; // 10 seconds
+  private timeoutDuration = 1000 * 3; // 10 seconds
   listeners = new Set<Listener>();
   components: ComponentRegistery | undefined;
 
@@ -271,7 +271,7 @@ export class ChatController {
       }
       // once we get response
       this.setValueImmer((draft) => {
-        draft.conversationInfo = "streaming......"
+        draft.conversationInfo = "streaming......";
       });
 
       this.startTimeout(() => {

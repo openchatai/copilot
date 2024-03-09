@@ -12,7 +12,7 @@ export function createSocketClient({
   sessionId,
 }: ConfigType) {
   return io(socketUrl, {
-    autoConnect: true,
+    autoConnect: false,
     transports: ["websocket"],
     extraHeaders: {
       "X-Bot-Token": token,

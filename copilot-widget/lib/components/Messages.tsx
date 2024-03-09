@@ -1,4 +1,3 @@
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ToolTip";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { UserIcon } from "lucide-react";
@@ -7,9 +6,9 @@ import { formatTimeFromTimestamp } from "../utils/time";
 import { getLast, isEmpty } from "@lib/utils/utils";
 import { useConfigData } from "@lib/contexts/ConfigData";
 import useTypeWriter from "@lib/hooks/useTypeWriter";
-import { Vote } from "./Vote";
 import { Grid } from "react-loader-spinner";
 import { useChatState } from "@lib/contexts/statefulMessageHandler";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ToolTip";
 
 export function BotIcon({ error }: { error?: boolean }) {
   const config = useConfigData();
@@ -56,7 +55,7 @@ function User() {
   return (
     <Tooltip>
       <TooltipContent hidden={!config?.user} side="top" align="center">
-        {config?.user?.name}
+        <span>{config?.user?.name}</span>
       </TooltipContent>
       <TooltipTrigger asChild>
         <UserAvatar />
@@ -64,6 +63,7 @@ function User() {
     </Tooltip>
   );
 }
+
 export function BotMessageWrapper({
   children,
   id,
@@ -71,23 +71,22 @@ export function BotMessageWrapper({
   children: React.ReactNode;
   id: string | number;
 }) {
-  const { messages, lastServerMessageId } = useChatState();
+  const { messages } = useChatState();
   const isLast = getLast(messages.filter((m) => m.from === "bot"))?.id === id;
   const config = useConfigData();
 
   return (
     <div className="p-2 group w-full shrink-0">
-      <div className="flex items-start gap-3 w-full text-start" dir="auto">
-        <BotIcon />
+      <div className="flex items-center gap-3 w-full" dir="auto">
+        <span className="mt-auto">
+          <BotIcon />
+        </span>
         <div className="flex-1">{children}</div>
       </div>
 
       {isLast && (
         <div className="w-full ps-10 flex-nowrap flex items-center justify-between">
           <span className="text-xs m-0">{config?.bot?.name ?? "Bot"}</span>
-          {lastServerMessageId && (
-            <Vote messageId={parseInt(lastServerMessageId)} />
-          )}
         </div>
       )}
     </div>
@@ -116,7 +115,7 @@ export function BotTextMessage({
             <div dir="auto">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
-                className="prose prose-slate font-medium text-sm prose-sm prose-h1:font-medium prose-h2:font-normal prose-headings:my-1 max-w-full"
+                className="prose prose-slate font-medium text-sm prose-sm prose-p:text-start prose-h1:font-medium prose-h2:font-normal prose-headings:my-1 max-w-full"
               >
                 {message}
               </ReactMarkdown>
@@ -128,9 +127,6 @@ export function BotTextMessage({
       {isLast && (
         <div className="w-full ps-10 flex-nowrap flex items-center justify-between">
           <span className="text-xs m-0">{config?.bot?.name ?? "Bot"}</span>
-          {lastServerMessageId && (
-            <Vote messageId={parseInt(lastServerMessageId)} />
-          )}
         </div>
       )}
     </div>
@@ -152,16 +148,10 @@ export function UserMessage({
     >
       <User />
       <div>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <p className="prose prose-slate font-medium text-sm prose-sm">
-              {content}
-            </p>
-          </TooltipTrigger>
-          <TooltipContent>
-            <span>{timestamp && formatTimeFromTimestamp(timestamp)}</span>
-          </TooltipContent>
-        </Tooltip>
+        <p className="prose prose-slate font-medium text-sm prose-sm">
+          {content}
+        </p>
+        <span>{timestamp && formatTimeFromTimestamp(timestamp)}</span>
       </div>
     </div>
   );
