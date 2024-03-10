@@ -10,6 +10,7 @@ export type Options = {
   apiUrl: string;
   socketUrl: string;
   defaultOpen?: boolean;
+  debug?: boolean;
   language?: LangType;
   warnBeforeClose?: boolean;
   containerProps?: React.DetailedHTMLProps<

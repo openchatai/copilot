@@ -22,6 +22,7 @@ export default function ChatScreen() {
   const config = useConfigData();
   const initialMessage = config?.initialMessage;
   const { __components } = useMessageHandler();
+
   useEffect(() => {
     setPos(0, 100);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -30,7 +31,9 @@ export default function ChatScreen() {
   useEffect(() => {
     setPos(0, 100);
   }, [messages.length, setPos]);
-  const LoadingComponent = __components.getOrFallback("LOADING")?.component;
+
+  const LoadingComponent = __components.getComponent("LOADING", config.debug);
+
   return (
     <div className="w-full flex h-full flex-col items-start relative">
       <ChatHeader />
@@ -47,11 +50,18 @@ export default function ChatScreen() {
             data={messages}
             render={(message, index) => {
               if (message.from === "bot") {
-                const Component = __components.getOrFallback(message.type)
-                  ?.component as ComponentType<{
+                const component = __components.getComponent(
+                  message.type,
+                  config.debug
+                );
+                if (!component) {
+                  return null;
+                }
+                const Component = component as ComponentType<{
                   data: BotMessageType["data"];
                   id: string;
                 }>;
+
                 return (
                   <BotMessageWrapper id={message.id} key={index}>
                     <Component
@@ -72,7 +82,7 @@ export default function ChatScreen() {
               }
             }}
           />
-          <LoadingComponent />
+          {LoadingComponent && <LoadingComponent />}
         </div>
       </main>
       <ChatInputFooter />

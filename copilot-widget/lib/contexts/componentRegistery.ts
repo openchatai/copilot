@@ -63,14 +63,20 @@ export class ComponentRegistery {
     return this;
   }
 
-  get(key: string) {
+  private get(key: string) {
     const c = this.components.find((c) => c.key === key);
     if (c) return c;
     return null;
   }
 
-  getOrFallback(key?: string) {
+  private getOrFallback(key?: string) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return key ? this.get(key) || this.get("FALLBACK")! : this.get("FALLBACK")!;
+  }
+  public getComponent(key: string, getFallback?: boolean) {
+    if (getFallback) {
+      return this.getOrFallback(key).component;
+    }
+    return this.get(key)?.component;
   }
 }
