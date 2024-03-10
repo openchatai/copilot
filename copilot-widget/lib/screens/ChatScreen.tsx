@@ -29,7 +29,7 @@ export default function ChatScreen() {
 
   useEffect(() => {
     setPos(0, 100);
-  }, [messages, setPos]);
+  }, [messages.length, setPos]);
   const LoadingComponent = __components.getOrFallback("LOADING")?.component;
   return (
     <div className="w-full flex h-full flex-col items-start relative">

@@ -66,9 +66,9 @@ export function VoiceRecorder({
           )}
         >
           {isRecording ? (
-            <Square strokeLinecap="round" className="text-accent" />
+            <Square strokeLinecap="round" className="text-accent size-[1em]" />
           ) : (
-            <MicIcon strokeLinecap="round" className="text-white" />
+            <MicIcon strokeLinecap="round" className="text-white size-[1em]" />
           )}
         </button>
       </TooltipTrigger>

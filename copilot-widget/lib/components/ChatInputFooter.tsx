@@ -54,7 +54,7 @@ function ResetButtonWithConfirmation() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
-        <RotateCcw size={20} />
+        <RotateCcw className="size-[1em]"/>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -144,7 +144,7 @@ function ChatInputFooter() {
         </div>
         <div
           dir={direction}
-          className="flex items-center justify-center gap-2 h-fit px-2 text-lg"
+          className="flex items-center justify-center gap-2 h-fit px-2 text-base"
         >
           <ResetButtonWithConfirmation />
           <VoiceRecorder onSuccess={(text) => setInput(text)} />
@@ -152,11 +152,11 @@ function ChatInputFooter() {
             onClick={handleInputSubmit}
             disabled={!canSend}
             className={cn(
-              "text-lg disabled:pointer-events-none disabled:cursor-not-allowed transition-all",
+              "disabled:pointer-events-none disabled:cursor-not-allowed transition-all",
               !canSend ? "text-rose-500" : " text-[#5e5c5e]"
             )}
           >
-            <SendHorizonal className="rtl:rotate-180" />
+            <SendHorizonal className="rtl:rotate-180 size-[1em]" />
           </button>
         </div>
       </div>
