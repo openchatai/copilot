@@ -1,13 +1,17 @@
+import React from "react";
 import { Fallback } from "@lib/@components/Fallback.component";
 import { FormComponent } from "@lib/@components/Form.component";
 import { Loading } from "@lib/@components/Loading.component";
 import { Text } from "@lib/@components/Text.component";
-import React from "react";
+import type { BotMessageType } from "./messageHandler";
+
+export type ComponentProps<TData> = BotMessageType<TData>;
 
 export type ComponentType = {
   key: string;
   component: React.ElementType;
 };
+
 type OptionsType = {
   components?: ComponentType[];
 };

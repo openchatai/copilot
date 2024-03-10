@@ -54,7 +54,11 @@ export default function ChatScreen() {
                 }>;
                 return (
                   <BotMessageWrapper id={message.id} key={index}>
-                    <Component data={message.data} id={message.id} />
+                    <Component
+                      {...message}
+                      data={message.data ?? {}}
+                      id={message.id}
+                    />
                   </BotMessageWrapper>
                 );
               } else if (message.from === "user") {

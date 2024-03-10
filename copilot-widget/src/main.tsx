@@ -13,6 +13,8 @@ declare global {
     initAiCoPilot: typeof initAiCoPilot;
   }
 }
+
+// This is an Example Component
 function C_get_current_business_managers_api_lists_businessmanagers_get({
   data,
 }: {

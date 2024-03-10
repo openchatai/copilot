@@ -1,14 +1,13 @@
 import validator from "@rjsf/validator-ajv8";
 import Form from "./rjfs";
+import type { ComponentProps } from "../../contexts/componentRegistery";
 
-type Props = {
-  id: string;
-  data: {
-    schema: any;
-    submitUrl: string;
-    method?: "POST" | "GET";
-  };
-};
+type Props = ComponentProps<{
+  schema: any;
+  submitUrl: string;
+  method?: "POST" | "GET";
+}>;
+
 /**
  * The Basic Form component
  */

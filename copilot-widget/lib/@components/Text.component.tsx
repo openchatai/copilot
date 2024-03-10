@@ -1,21 +1,16 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import type { ComponentProps } from "../contexts/componentRegistery";
 
-type Props = {
-  data: {
-    message: string;
-  };
-  id: string;
-};
+type Props = ComponentProps<{
+  message: string;
+}>;
 
 /**
  * The Basic Text component
  */
-export function Text(props: Props) {
-  const {
-    data: { message },
-    id,
-  } = props;
+export function Text({ id, data }: Props) {
+  const { message } = data;
 
   return (
     <div className="space-y-2 flex-1">

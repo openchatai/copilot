@@ -12,11 +12,11 @@ export type UserMessageType = {
   bot_token: string;
 };
 
-export type BotMessageType = {
+export type BotMessageType<TData = Record<string, unknown>> = {
   from: "bot";
   type: string;
   id: string;
-  data?: Record<string, unknown>;
+  data: TData;
   timestamp: string;
   responseFor: string; // id of the user message
   isFailed?: boolean;
@@ -47,7 +47,7 @@ export class ChatController {
   private timeoutDuration = 1000 * 3; // 10 seconds
   listeners = new Set<Listener>();
   components: ComponentRegistery | undefined;
-  
+
   private state: State = {
     currentUserMessage: null,
     conversationInfo: null,
