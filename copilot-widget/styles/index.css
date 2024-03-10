@@ -3,10 +3,7 @@
 @tailwind base;
 
 svg {
-  width: 1em;
-  height: 1em;
   vector-effect: non-scaling-stroke;
-  stroke-width: 1.5;
 }
 
 @keyframes fade-in-bottom {

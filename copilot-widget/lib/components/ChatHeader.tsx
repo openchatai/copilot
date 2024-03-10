@@ -54,7 +54,7 @@ function DisconnedtedAlert() {
   if (state.state === "disconnected") {
     return (
       <div className="bg-rose-200 p-1 px-2 text-rose-500 flex items-start gap-2">
-        <AlertTriangle className="text-xl text-rose-800" />
+        <AlertTriangle className="text-xl size-[1em] text-rose-800" />
         <span>
           The connection to the server has been lost. Please wait while we try
           to reconnect.
@@ -70,7 +70,7 @@ function ConnectingAlert() {
   if (state.state === "retrying") {
     return (
       <div className="bg-yellow-200 p-1 px-2 text-yellow-500 flex items-start gap-2">
-        <CircleDashed className="text-xl text-yellow-800" />
+        <CircleDashed className="text-xl size-[1em] animate-spin text-yellow-800" />
         <span>
           We are trying to reconnect to the server. Please wait a moment.
         </span>

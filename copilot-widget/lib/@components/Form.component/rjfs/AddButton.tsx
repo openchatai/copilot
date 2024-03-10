@@ -20,7 +20,7 @@ export default function AddButton<
       className={`ml-1 grid justify-items-center bg-blue-500 px-4 py-2 text-base font-normal text-white hover:bg-blue-700 ${props.className}`}
       title={translateString(TranslatableString.AddItemButton)}
     >
-      <PlusIcon />
+      <PlusIcon className="size-5"/>
     </button>
   );
 }
