@@ -2,7 +2,7 @@ import ChatHeader from "../components/ChatHeader";
 import { ComponentType, useEffect, useRef } from "react";
 import {
   BotMessageWrapper,
-  BotTextMessage,
+  BotInitialMessage,
   UserMessage,
 } from "../components/Messages";
 import useScrollToPercentage from "../hooks/useScrollTo";
@@ -43,8 +43,8 @@ export default function ChatScreen() {
       >
         <div className="flex h-fit mt-auto flex-col py-2 max-h-full items-center gap-1 last:fade-in-right">
           {
-            // If there are initial messages, show them
-            initialMessage && <BotTextMessage message={initialMessage} />
+            // If there are initial message, show it.
+            initialMessage && <BotInitialMessage message={initialMessage} />
           }
           <Map
             data={messages}

@@ -39,7 +39,6 @@
     "prettier": "^2.8.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-loader-spinner": "^5.4.5",
     "react-markdown": "^8.0.7",
     "react-shadow": "^20.4.0",
     "react-textarea-autosize": "^8.5.3",
