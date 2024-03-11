@@ -90,14 +90,14 @@ export class ChatController {
     return this.state;
   };
 
-  reset() {
+  reset = () => {
     this.setValueImmer((draft) => {
       draft.messages = [];
       draft.currentUserMessage = null;
       draft.conversationInfo = null;
       draft.lastServerMessageId = null;
     });
-  }
+  };
 
   genId = (len = 7) => {
     return Math.random().toString(36).substring(len);
@@ -264,15 +264,17 @@ export class ChatController {
     if (!sessionId) {
       return;
     }
+
     const handle = (content: string) => {
+      if (this.select("conversationInfo")) {
+        this.setValueImmer((d) => {
+          d.conversationInfo = null;
+        });
+      }
       if (content === "|im_end|") {
         this.settle();
         return;
       }
-      // once we get response
-      this.setValueImmer((draft) => {
-        draft.conversationInfo = "streaming......";
-      });
 
       this.startTimeout(() => {
         this.settle();
