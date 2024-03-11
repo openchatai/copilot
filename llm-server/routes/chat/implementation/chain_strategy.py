@@ -20,6 +20,7 @@ from routes.root_service import (
     run_actionable_item,
     run_informative_item,
 )
+from shared.models.opencopilot_db.chatbot import Chatbot
 from utils.llm_consts import VectorCollections
 from models.repository.action_call_repo import add_action_call
 from utils.llm_consts import enable_followup_questions
@@ -31,7 +32,7 @@ class ChainStrategy(ChatRequestHandler):
         text: str,
         session_id: str,
         base_prompt: str,
-        bot_id: str,
+        bot: Chatbot,
         headers: Dict[str, str],
         app: Optional[str],
         is_streaming: bool,
@@ -39,9 +40,9 @@ class ChainStrategy(ChatRequestHandler):
         check_required_fields(base_prompt, text)
 
         tasks = [
-            get_relevant_knowledgebase(text, bot_id),
-            get_relevant_actions(text, bot_id),
-            get_relevant_flows(text, bot_id),
+            get_relevant_knowledgebase(text, str(bot.id)),
+            get_relevant_actions(text, str(bot.id)),
+            get_relevant_flows(text, str(bot.id)),
             get_chat_message_as_llm_conversation(session_id),
         ]
         results = await asyncio.gather(*tasks)
@@ -90,7 +91,7 @@ class ChainStrategy(ChatRequestHandler):
                 else None
             )
             response = await run_actionable_item(
-                bot_id=bot_id,
+                bot_id=str(bot.id),
                 actionable_item=actionable_item,
                 app=app,
                 headers=headers,
@@ -108,7 +109,7 @@ class ChainStrategy(ChatRequestHandler):
                 action = actionable_item["actions"][0]
                 operation_id = action.document.metadata.get("operation_id", "")
                 add_action_call(
-                    operation_id=operation_id, session_id=session_id, bot_id=bot_id
+                    operation_id=operation_id, session_id=session_id, bot_id=str(bot.id)
                 )
             return response
 
@@ -135,7 +136,11 @@ class ChainStrategy(ChatRequestHandler):
 
             if enable_followup_questions:
                 followup_question_list = await generate_follow_up_questions(
-                    conversations_history, response.message or "", text
+                    conversations_history,
+                    response.message or "",
+                    text,
+                    actions=actions,
+                    knowledgebase=knowledgebase,
                 )
                 if is_streaming:
                     emit(f"{session_id}_follow_qns", followup_question_list.json())

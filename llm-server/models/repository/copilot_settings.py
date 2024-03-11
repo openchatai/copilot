@@ -1,18 +1,20 @@
 from sqlalchemy.orm import sessionmaker
 
 from shared.models.opencopilot_db.chatbot import ChatbotSettings, engine
-from utils.get_logger import CustomLogger
 
 # Create a Session factory
 SessionLocal = sessionmaker(bind=engine)
-logger = CustomLogger(module_name=__name__)
 
 
 class ChatbotSettingCRUD:
     @staticmethod
     def get_chatbot_setting(id: int):
         with SessionLocal() as db:
-            return db.query(ChatbotSettings).filter(ChatbotSettings.id == id).first()
+            return (
+                db.query(ChatbotSettings)
+                .filter(ChatbotSettings.chatbot_id == id)
+                .first()
+            )
 
     @staticmethod
     def get_chatbot_settings(skip: int = 0, limit: int = 100):

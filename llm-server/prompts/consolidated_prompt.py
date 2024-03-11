@@ -27,6 +27,8 @@ async def get_consolidate_question(
         HumanMessage(
             content="""Given a conversation history, replace occurrences of references like "it," "they," etc. in the latest input with their actual values. Remember, you are not supposed to answer the user question, merely enhance the latest user input
 
+
+Examples: 
 Conversation history:
 ---
 User: Can you recommend a good restaurant nearby?
@@ -47,7 +49,18 @@ Output: "What does the Italian place on Main Street serve?"
     )
     messages.append(HumanMessage(content=f"{user_input}"))
 
-    chat = get_chat_model()
+    messages.extend(_ms)
+    messages.append(
+        HumanMessage(
+            content=f"""Give me the standalone input without any commentary and without quotes after adding the relevant context from past conversations
+            <user-input>
+                {user_input}
+            </user-input>
+    """
+        )
+    )
+
+    chat = get_chat_model("get_consolidate_question")
     result = await chat.ainvoke(messages)
 
     return cast(str, result.content)

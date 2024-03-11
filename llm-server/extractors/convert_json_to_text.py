@@ -5,12 +5,9 @@ from typing import Dict, Any, cast, List, Union
 from langchain.schema import HumanMessage, SystemMessage, BaseMessage
 
 from utils.get_chat_model import get_chat_model
-from utils.get_logger import CustomLogger
 from flask_socketio import emit
-from entities.action_entity import ActionDTO
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
-logger = CustomLogger(module_name=__name__)
 
 
 def convert_json_to_text(
@@ -93,6 +90,25 @@ def create_readable_error(
     return cast(str, result)
 
 
+def create_readable_fill_the_form_message(
+    user_input: str
+) -> str:
+    system_message = SystemMessage(
+        content="""As an AI chat assistant, your role involves requesting from the user to fill the form, you will be only called when the user request require some information to be filled.
+        prompt the user to fill the form so you can continue with their request
+        For example, you can say "Please fill the form so I can continue with your request XXX, make sure to fill all the required fields" but tylor the message to the user input and request
+        make sure it's less than 70 words
+    """
+    )
+
+    messages: List[HumanMessage] = []
+    messages.append(HumanMessage(content=f"Here is the user input: \n\n{user_input}"))
+    
+    # todo @shanur please help me to return ok message
+
+
+
+
 def stream_messages(
     system_message: SystemMessage,
     messages: List[HumanMessage],
@@ -100,7 +116,7 @@ def stream_messages(
     session_id: str,
     tag: str,
 ) -> str:
-    chat = get_chat_model()
+    chat = get_chat_model(tag)
 
     all_messages: List[BaseMessage] = []
     all_messages.append(system_message)

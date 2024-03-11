@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zid Copilot Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+      * {
+          font-family: 'Rubik', sans-serif !important;
+          font-weight: 400;
+      }
+      body {
+          background: linear-gradient(135deg, #6e8efb, #a777e3);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          margin: 0;
+          direction: rtl;
+      }
+
+      #triggerSelector {
+          background-color: #ffffff;
+          border: none;
+          border-radius: 50px;
+          color: #6e8efb;
+          padding: 15px 30px;
+          text-transform: uppercase;
+          cursor: pointer;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          transition: background-color 0.3s, color 0.3s;
+      }
+
+      #triggerSelector:hover {
+          background-color: #a777e3;
+          color: white;
+      }
+  </style>
+</head>
+<body>
+<button id="triggerSelector">
+  سطار
+</button>
+<script src="https://cloud.opencopilot.so/pilot.js"></script>
+<script>
+  const options = {
+    apiUrl: "https://api.opencopilot.so/backend",
+    initialMessage: "حياك الله، معك سطَار من زد، انا مساعدك الآلي، عندي القدرة على عرض وتفسير مبيعات متجرك، تقديم نصائح بالتجارة الألكترونية، الإجابة على استفساراتك المتعلقة بإستخدام زد والمزيد!",
+    token: "FsQJM4nPZAAEKgqt",
+    triggerSelector: "#triggerSelector",
+    socketUrl: "https://api.opencopilot.so",
+      defaultOpen: true,
+    headers: {
+    },
+    user: {
+      name: "Default User"
+    },
+
+    direction: "rtl",
+
+    containerProps: {
+
+      style: {
+        width: "435px",
+        position: "fixed",
+        bottom: "0",
+        right: "0",
+        zIndex: "9999",
+        className: "your class name",
+        fontFamily: "Rubik",
+
+      }
+    }
+  };
+  window.addEventListener("DOMContentLoaded", () => initAiCoPilot(options));
+</script>
+</body>
+</html>

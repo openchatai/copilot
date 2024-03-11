@@ -15,11 +15,11 @@ from models.repository.flow_repo import (
 )
 from presenters.flow_presenters import flow_to_dict, flow_variable_to_dict
 from routes.flow import flow_vector_service
-from routes.flow.utils.dynamic_flow_builder import build_dynamic_flow
-from utils.get_logger import CustomLogger
 from routes.flow.flow_vector_service import delete_flow as delete_flow_from_vector_store
+from routes.flow.utils.dynamic_flow_builder import build_dynamic_flow
+from utils.get_logger import SilentException
 
-logger = CustomLogger("flow")
+
 flow = Blueprint("flow", __name__)
 
 
@@ -96,7 +96,7 @@ def create_flow_api(bot_id: str):
 
     except Exception as e:
         print(f"Error creating flow: {e}")
-        logger.error("Failed to create flow", payload=e)
+        SilentException.capture_exception(e)
         return jsonify({"error": "Failed to create flow. {}".format(str(e))}), 500
 
 
@@ -277,5 +277,5 @@ def delete_flow_api(flow_id: str):
                 404,
             )
     except Exception as e:
-        logger.error("Failed to delete flow", payload=e)
-        return jsonify({"error": "Failed to delete flow."}), 500
+        SilentException.capture_exception(e)
+        return jsonify({"error": "Failed to delete flow. {}".format(str(e))}), 500

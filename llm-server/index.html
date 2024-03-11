@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glowing Sun with Heat Waves</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; background: #000; }
+    </style>
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+    let scene, camera, renderer, sun, stars;
+    let mouseX = 0, mouseY = 0;
+    let lastMouseTime = Date.now();
+
+    function init() {
+        scene = new THREE.Scene();
+
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        renderer = new THREE.WebGLRenderer({antialias: true});
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Sun with Shader Material for Glowing Effect
+        const geometry = new THREE.SphereGeometry(1, 32, 32);
+        const material = new THREE.ShaderMaterial({
+            uniforms: {
+                time: { type: "f", value: 0 }
+            },
+            vertexShader: `
+                uniform float time;
+                varying vec3 vNormal;
+                void main() {
+                    vNormal = normal;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform float time;
+                varying vec3 vNormal;
+                void main() {
+                    float intensity = pow(0.5 + 0.5 * sin(dot(vNormal, vec3(0, 0, 1)) * 10.0 + time), 2.0);
+                    gl_FragColor = vec4(1.0, 0.5, 0.0, 1.0) * intensity;
+                }
+            `,
+            wireframe: false
+        });
+        sun = new THREE.Mesh(geometry, material);
+        scene.add(sun);
+
+        // Stars
+        stars = createStars(10000); // Number of stars
+        scene.add(stars);
+
+        camera.position.z = 5;
+
+        document.addEventListener('mousemove', onDocumentMouseMove, false);
+
+        animate();
+    }
+
+    function createStars(count) {
+        const geometry = new THREE.SphereGeometry(0.05, 24, 24);
+        const material = new THREE.MeshBasicMaterial({color: 0xffffff});
+        const stars = new THREE.Group();
+
+        for (let i = 0; i < count; i++) {
+            const star = new THREE.Mesh(geometry, material);
+            const [x, y, z] = Array(3).fill().map(() => THREE.MathUtils.randFloatSpread(100));
+            star.position.set(x, y, z);
+            stars.add(star);
+        }
+
+        return stars;
+    }
+
+    function onDocumentMouseMove(event) {
+        mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+        mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        lastMouseTime = Date.now();
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+
+        const currentTime = Date.now() * 0.001;
+        sun.material.uniforms.time.value = currentTime;
+
+        stars.rotation.x += 0.0005;
+        stars.rotation.y += 0.0005;
+
+        renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    });
+
+    init();
+</script>
+</body>
+</html>
