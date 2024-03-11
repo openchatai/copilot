@@ -8,6 +8,7 @@ import {
   current,
   emerald,
   gray,
+  yellow,
 } from "tailwindcss/colors";
 const config: Config = {
   content: [
@@ -26,6 +27,7 @@ const config: Config = {
       current,
       emerald,
       gray,
+      yellow,
     },
   },
   plugins: [

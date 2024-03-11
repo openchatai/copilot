@@ -22,7 +22,7 @@ const TooltipContent = forwardRef<
   React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content> & {
     arrowClassName?: string;
   }
->(({ className, children, sideOffset = 0, arrowClassName, ...props }, ref) => (
+>(({ className, children, sideOffset = 0, ...props }, ref) => (
   <TooltipPrimitive.Content
     ref={ref}
     sideOffset={sideOffset}
