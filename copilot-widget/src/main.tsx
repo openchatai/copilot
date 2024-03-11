@@ -1,11 +1,13 @@
 import { createRoot } from "react-dom/client";
-import { Options } from "../lib/types";
+import type { Options as BaseOptions } from "../lib/types";
 import Root from "../lib/Root";
 import { CopilotWidget } from "../lib/CopilotWidget";
 import { composeRoot } from "./utils";
 
 const defaultRootId = "opencopilot-root";
-
+interface Options extends Omit<BaseOptions, "components"> {
+  rootId?: string;
+}
 declare global {
   interface Window {
     initAiCoPilot: typeof initAiCoPilot;
@@ -21,7 +23,7 @@ function initAiCoPilot({
   containerProps,
   rootId,
   ...options
-}: Options & { rootId?: string }) {
+}: Options) {
   const container = composeRoot(rootId ?? defaultRootId, rootId === undefined);
   createRoot(container).render(
     <Root

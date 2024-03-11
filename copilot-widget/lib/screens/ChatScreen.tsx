@@ -1,23 +1,27 @@
 import ChatHeader from "../components/ChatHeader";
-import { useEffect, useRef } from "react";
+import { ComponentType, useEffect, useRef } from "react";
 import {
-  BotMessageError,
-  BotMessageLoading,
-  BotTextMessage,
+  BotMessageWrapper,
+  BotInitialMessage,
   UserMessage,
 } from "../components/Messages";
 import useScrollToPercentage from "../hooks/useScrollTo";
 import ChatInputFooter from "../components/ChatInputFooter";
-import { ChatProvider, useChat } from "../contexts/Controller";
 import { useConfigData } from "../contexts/ConfigData";
 import { Map } from "../utils/map";
+import {
+  useChatState,
+  useMessageHandler,
+} from "@lib/contexts/statefulMessageHandler";
+import { BotMessageType } from "@lib/contexts/messageHandler";
 
-function ChatScreen() {
+export default function ChatScreen() {
   const scrollElementRef = useRef(null);
   const [setPos] = useScrollToPercentage(scrollElementRef);
-  const { messages, loading, failedMessage, conversationInfo } = useChat();
+  const { messages } = useChatState();
   const config = useConfigData();
   const initialMessage = config?.initialMessage;
+  const { __components } = useMessageHandler();
 
   useEffect(() => {
     setPos(0, 100);
@@ -26,60 +30,63 @@ function ChatScreen() {
 
   useEffect(() => {
     setPos(0, 100);
-  }, [messages, setPos]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages.length]);
+
+  const LoadingComponent = __components.getComponent("LOADING", config.debug);
 
   return (
     <div className="w-full flex h-full flex-col items-start relative">
       <ChatHeader />
       <main
         ref={scrollElementRef}
-        className="flex-1 w-full overflow-x-hidden shrink-0 overflow-auto scrollbar-thin scroll-smooth"
+        className="flex-1 w-full flex flex-col overflow-x-hidden shrink-0 relative overflow-auto scrollbar-thin scroll-smooth"
       >
-        <div className="flex h-fit mt-auto flex-col py-2 max-h-full items-center gap-1 last:fade-in-right">
+        <div className="flex flex-1 w-full min-h-fit mt-auto flex-col py-2 max-h-full items-center gap-1 last:fade-in-right">
           {
-            // If there are initial messages, show them
-            initialMessage && <BotTextMessage message={initialMessage} />
+            // If there are initial message, show it.
+            initialMessage && <BotInitialMessage message={initialMessage} />
           }
           <Map
-            fallback={<hr />}
             data={messages}
             render={(message, index) => {
-              if (message.from === "bot" && message.type === "text") {
+              if (message.from === "bot") {
+                const component = __components.getComponent(
+                  message.type,
+                  config.debug
+                );
+                if (!component) {
+                  return null;
+                }
+                const Component = component as ComponentType<{
+                  data: BotMessageType["data"];
+                  id: string;
+                }>;
+
                 return (
-                  <BotTextMessage
-                    timestamp={message.timestamp}
-                    id={message.id}
-                    key={index}
-                    message={message.response.text}
-                  />
+                  <BotMessageWrapper id={message.id} key={index}>
+                    <Component
+                      {...message}
+                      data={message.data ?? {}}
+                      id={message.id}
+                    />
+                  </BotMessageWrapper>
                 );
               } else if (message.from === "user") {
                 return (
                   <UserMessage
                     key={index}
                     id={message.id}
-                    timestamp={message.timestamp}
                     content={message.content}
                   />
                 );
               }
             }}
           />
-          {loading && conversationInfo && (
-            <BotMessageLoading displayText={conversationInfo} />
-          )}
-          {failedMessage && <BotMessageError />}
+          {LoadingComponent && <LoadingComponent />}
         </div>
       </main>
       <ChatInputFooter />
     </div>
-  );
-}
-
-export default function Widget() {
-  return (
-    <ChatProvider>
-      <ChatScreen />
-    </ChatProvider>
   );
 }

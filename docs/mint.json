@@ -50,7 +50,8 @@
       "group": "Copilot widget",
       "pages": [
         "widget/embed",
-        "widget/styling"
+        "widget/styling",
+        "widget/gen-ui"
       ]
     },
     {
@@ -58,9 +59,20 @@
       "pages": [
         "api-notes",
         "api-reference/endpoint/get",
-        "api-reference/endpoint/delete",
+        "api-reference/endpoint/delete"
+      ]
+    },
+    {
+      "group": "Actions",
+      "pages": [
         "api-reference/endpoint/delete-all-actions",
         "api-reference/endpoint/import-actions-from-swagger"
+      ]
+    },
+    {
+      "group": "Knowledge Base",
+      "pages": [
+        "api-reference/endpoint/ingest-knowldge"
       ]
     },
     {

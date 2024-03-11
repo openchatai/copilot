@@ -1,9 +1,7 @@
 import TextareaAutosize from "react-textarea-autosize";
 import { SendHorizonal, AlertTriangle, RotateCcw } from "lucide-react";
-import { useChat } from "../contexts/Controller";
-import { useRef, useState } from "react";
-import { getId, isEmpty } from "@lib/utils/utils";
-import { now } from "@lib/utils/time";
+import { useMemo, useRef, useState } from "react";
+import { isEmpty } from "@lib/utils/utils";
 import { useDocumentDirection } from "@lib/hooks/useDocumentDirection";
 import { VoiceRecorder } from "./VoiceRecorder";
 import { useInitialData } from "@lib/hooks/useInitialData";
@@ -16,26 +14,29 @@ import {
 } from "./Dialog";
 import { Button } from "./Button";
 import { useLang } from "@lib/contexts/LocalesProvider";
+import {
+  useChatLoading,
+  useChatState,
+  useMessageHandler,
+  useSendMessage,
+} from "@lib/contexts/statefulMessageHandler";
+import { useSocket } from "@lib/contexts/SocketProvider";
+import cn from "@lib/utils/cn";
 
 function MessageSuggestions() {
   const { data } = useInitialData();
-  const { messages, sendMessage } = useChat();
-
+  const { messages } = useChatState();
+  const { send } = useSendMessage();
   return (
     <>
       {isEmpty(messages) && !isEmpty(data?.initial_questions) && (
         <div className="flex no-scrollbar  items-center flex-wrap justify-start gap-2 flex-1">
           {data?.initial_questions?.map((q, index) => (
             <button
-              className="text-sm font-medium whitespace-nowrap px-2.5 py-1.5 rounded-lg bg-accent text-primary"
+              className="text-xs font-medium whitespace-nowrap px-2 py-1 rounded-lg bg-accent text-primary"
               key={index}
               onClick={() => {
-                sendMessage({
-                  from: "user",
-                  content: q,
-                  id: getId(),
-                  timestamp: now(),
-                });
+                send(q);
               }}
             >
               {q}
@@ -47,13 +48,13 @@ function MessageSuggestions() {
   );
 }
 function ResetButtonWithConfirmation() {
-  const { reset } = useChat();
+  const { __handler: mh } = useMessageHandler();
   const [open, setOpen] = useState(false);
   const { get } = useLang();
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
-        <RotateCcw size={20} />
+        <RotateCcw className="size-[1em]"/>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -69,7 +70,7 @@ function ResetButtonWithConfirmation() {
             asChild
             variant="destructive"
             className="font-semibold"
-            onClick={reset}
+            onClick={mh.reset}
           >
             <DialogClose>{get("yes-reset")}</DialogClose>
           </Button>
@@ -81,14 +82,27 @@ function ResetButtonWithConfirmation() {
     </Dialog>
   );
 }
+
+function useCanSend({ input }: { input: string }) {
+  const isLoading = useChatLoading();
+  const { state } = useSocket();
+  const canSend =
+    input.trim().length > 0 && !isLoading && state.state === "connected";
+
+  const cantSendReason = useMemo(() => {
+    if (isLoading) return "loading";
+    if (state.state !== "connected") return "disconnected";
+    return "empty";
+  }, [isLoading, state.state]) as "loading" | "disconnected" | "empty";
+
+  return { canSend, cantSendReason };
+}
 function ChatInputFooter() {
   const [input, setInput] = useState("");
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const { sendMessage } = useChat();
-  const { loading } = useChat();
-  const canSend = input.trim().length > 0;
+  const { send } = useSendMessage();
   const { direction } = useDocumentDirection();
-
+  const { canSend } = useCanSend({ input });
   const handleTextareaChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
@@ -97,33 +111,30 @@ function ChatInputFooter() {
   };
 
   function handleInputSubmit() {
-    if (input.trim().length > 0) {
+    if (canSend) {
       setInput("");
-      sendMessage({
-        from: "user",
-        content: input,
-        id: getId(),
-        timestamp: now(),
-      });
+      send(input);
     }
   }
   return (
     <footer className="p-2 flex w-full flex-col gap-2">
       <MessageSuggestions />
-      <div className="w-full flex items-center ring-[#334155]/60 transition-colors justify-between ring-1 overflow-hidden focus-within:ring-primary gap-2 bg-accent p-2 rounded-2xl">
+      <div
+        className={cn(
+          "w-full flex items-center transition-colors focus-within:ring-primary ring-[#334155]/60 justify-between ring-1 overflow-hidden gap-2 bg-accent p-2 rounded-2xl"
+        )}
+      >
         <div className="flex-1">
           <TextareaAutosize
             dir="auto"
             ref={textAreaRef}
             autoFocus={true}
-            placeholder="_"
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
                 handleInputSubmit();
               }
             }}
-            disabled={loading}
             maxRows={4}
             rows={1}
             value={input}
@@ -133,16 +144,19 @@ function ChatInputFooter() {
         </div>
         <div
           dir={direction}
-          className="flex items-center justify-center gap-2 h-fit px-2 text-lg"
+          className="flex items-center justify-center gap-2 h-fit px-2 text-base"
         >
           <ResetButtonWithConfirmation />
           <VoiceRecorder onSuccess={(text) => setInput(text)} />
           <button
             onClick={handleInputSubmit}
-            className="text-xl disabled:opacity-40 disabled:pointer-events-none disabled:cursor-not-allowed text-[#5e5c5e] transition-all"
-            disabled={loading || !canSend}
+            disabled={!canSend}
+            className={cn(
+              "disabled:pointer-events-none disabled:cursor-not-allowed transition-all",
+              !canSend ? "text-rose-500" : " text-[#5e5c5e]"
+            )}
           >
-            <SendHorizonal className="rtl:rotate-180" />
+            <SendHorizonal className="rtl:rotate-180 size-[1em]" />
           </button>
         </div>
       </div>

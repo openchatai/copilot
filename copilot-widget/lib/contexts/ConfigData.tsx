@@ -18,7 +18,14 @@ export default function ConfigDataProvider({
   children: ReactNode;
 }) {
   return (
-    <ConfigDataSafeProvider value={data}>{children}</ConfigDataSafeProvider>
+    <ConfigDataSafeProvider
+      value={{
+        debug: data.debug ?? false,
+        ...data,
+      }}
+    >
+      {children}
+    </ConfigDataSafeProvider>
   );
 }
 
