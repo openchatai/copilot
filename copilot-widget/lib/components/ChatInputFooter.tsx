@@ -150,6 +150,7 @@ function ChatInputFooter() {
           <VoiceRecorder onSuccess={(text) => setInput(text)} />
           <button
             onClick={handleInputSubmit}
+            id="send_chat_button"
             disabled={!canSend}
             className={cn(
               "disabled:pointer-events-none disabled:cursor-not-allowed transition-all",

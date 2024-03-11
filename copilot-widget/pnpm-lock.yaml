@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@openchatai/copilot-widget':
+    specifier: ^2.8.1
+    version: 2.8.1(react@18.2.0)
   '@rjsf/core':
     specifier: ^5.17.1
     version: 5.17.1(@rjsf/utils@5.17.1)(react@18.2.0)
@@ -879,6 +882,19 @@ packages:
     dependencies:
       '@octokit/openapi-types': 19.1.0
     dev: true
+
+  /@openchatai/copilot-widget@2.8.1(react@18.2.0):
+    resolution: {integrity: sha512-SHjwfW1bK80Dv/RkaH9Hgg0NfRSacfznw1dp1u5At4Xja1bxtuIqWeFlfoyc8FKVBmk14xkRNO9tNhlKxXwb9Q==}
+    peerDependencies:
+      react: ^18.x
+    dependencies:
+      '@rjsf/core': 5.17.1(@rjsf/utils@5.17.1)(react@18.2.0)
+      '@rjsf/utils': 5.17.1(react@18.2.0)
+      '@rjsf/validator-ajv8': 5.17.1(@rjsf/utils@5.17.1)
+      immer: 10.0.3
+      lucide-react: 0.298.0(react@18.2.0)
+      react: 18.2.0
+    dev: false
 
   /@pkgjs/parseargs@0.11.0:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
