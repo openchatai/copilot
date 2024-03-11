@@ -30,7 +30,8 @@ export default function ChatScreen() {
 
   useEffect(() => {
     setPos(0, 100);
-  }, [messages.length, setPos]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages.length]);
 
   const LoadingComponent = __components.getComponent("LOADING", config.debug);
 
@@ -39,9 +40,9 @@ export default function ChatScreen() {
       <ChatHeader />
       <main
         ref={scrollElementRef}
-        className="flex-1 w-full overflow-x-hidden shrink-0 overflow-auto scrollbar-thin scroll-smooth"
+        className="flex-1 w-full flex flex-col overflow-x-hidden shrink-0 relative overflow-auto scrollbar-thin scroll-smooth"
       >
-        <div className="flex h-fit mt-auto flex-col py-2 max-h-full items-center gap-1 last:fade-in-right">
+        <div className="flex flex-1 w-full min-h-fit mt-auto flex-col py-2 max-h-full items-center gap-1 last:fade-in-right">
           {
             // If there are initial message, show it.
             initialMessage && <BotInitialMessage message={initialMessage} />
