@@ -22,12 +22,9 @@ class RequestsWebScraperStrategy(WebScraperStrategy):
 
 
 class ScrapingBeeWebScraperStrategy(WebScraperStrategy):
-    def __init__(self):
-        self._apikey = SCRAPINGBEE_API_KEY
-
     def extract_data(self, url):
         """Extract data from a website using ScrapingBee API"""
-        client = ScrapingBeeClient()
+        client = ScrapingBeeClient(SCRAPINGBEE_API_KEY)
         response = client.get(
             url,
             {
@@ -44,6 +41,7 @@ class ScrapingBeeWebScraperStrategy(WebScraperStrategy):
 def get_scraper(strategy: str) -> WebScraperStrategy:
     scraper_cls = None
     if strategy == "scrapingbee" and SCRAPINGBEE_API_KEY is not None:
+        print("Using ScrapingBee")
         scraper_cls = ScrapingBeeWebScraperStrategy
     if not scraper_cls:
         scraper_cls = RequestsWebScraperStrategy

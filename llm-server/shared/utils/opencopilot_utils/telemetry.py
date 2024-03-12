@@ -3,9 +3,8 @@ import json
 import requests
 from utils.llm_consts import ENABLE_EXTERNAL_API_LOGGING
 from flask import request
-from utils.get_logger import CustomLogger
+from utils.get_logger import SilentException
 
-logger = CustomLogger(__name__)
 
 
 def sanitize_path(path: str) -> str:
@@ -22,7 +21,7 @@ def log_opensource_telemetry_data(json_data: dict):
             )
             response.raise_for_status()
         except requests.RequestException as e:
-            logger.error("OPENSOURCE_TELEMETRY_DATA_FAILURE", error=e)
+            SilentException.capture_exception(e)
     else:
         return True
 

@@ -15,11 +15,9 @@ from routes.flow.utils.document_similarity_dto import (
     DocumentSimilarityDTO,
 )
 from utils.get_chat_model import get_chat_model
-from utils.get_logger import CustomLogger
 from utils.llm_consts import VectorCollections
 from flask_socketio import emit
 
-logger = CustomLogger(module_name=__name__)
 
 # Define constants for error messages
 BASE_PROMPT_REQUIRED = "base_prompt is required"
@@ -28,8 +26,6 @@ SWAGGER_URL_REQUIRED = "swagger_url is required"
 FAILED_TO_FETCH_SWAGGER_CONTENT = "Failed to fetch Swagger content"
 FILE_NOT_FOUND = "File not found"
 FAILED_TO_CALL_API_ENDPOINT = "Failed to call or map API endpoint"
-
-chat = get_chat_model()
 
 
 def is_the_llm_predicted_operation_id_actually_true(
@@ -137,9 +133,15 @@ async def run_informative_item(
     session_id: str,
 ) -> LLMResponse:
     # so we got all context, let's ask:
-
+    chat = get_chat_model("run_informative_item")
     context = []
     for vector_result in informative_item.get(VectorCollections.knowledgebase) or []:
+        context.append(
+            vector_result.document.page_content
+            + f" metadata: {vector_result.document.metadata}"
+        )
+
+    for vector_result in (informative_item.get(VectorCollections.actions) or [])[:2]:
         context.append(
             vector_result.document.page_content
             + f" metadata: {vector_result.document.metadata}"

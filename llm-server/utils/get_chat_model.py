@@ -2,6 +2,7 @@ import os
 from functools import lru_cache
 
 from langchain.chat_models import ChatOllama, ChatAnthropic
+
 from langchain.chat_models import ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
 
@@ -28,12 +29,18 @@ const chat = new ChatOpenAI({
 """
 
 
-@lru_cache(maxsize=1)
-def get_chat_model() -> BaseChatModel:
+@lru_cache(maxsize=20)
+def get_chat_model(tag: str = "no_tag") -> BaseChatModel:
     if model_name == CHAT_MODELS.gpt_3_5_turbo:
-        model = ChatOpenAI(model=CHAT_MODELS.gpt_3_5_turbo, temperature=0)
+        model = ChatOpenAI(
+            model=CHAT_MODELS.gpt_3_5_turbo,
+            temperature=0,
+        )
     elif model_name == CHAT_MODELS.gpt_4_32k:
-        model = ChatOpenAI(temperature=0, model=CHAT_MODELS.gpt_4_32k)
+        model = ChatOpenAI(
+            temperature=0,
+            model=CHAT_MODELS.gpt_4_32k,
+        )
     elif model_name == CHAT_MODELS.gpt_4_1106_preview:
         model = ChatOpenAI(
             temperature=0,

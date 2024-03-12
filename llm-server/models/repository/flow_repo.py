@@ -1,4 +1,3 @@
-import json
 from typing import Optional, Type, Any
 
 from shared.models.opencopilot_db import engine
@@ -7,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from entities.flow_entity import FlowDTO
 from shared.models.opencopilot_db.flow import Flow
 from shared.models.opencopilot_db.flow_variables import FlowVariable
+from shared.models.opencopilot_db.chatbot import Chatbot
 
 Session = sessionmaker(bind=engine)
 
@@ -159,11 +159,29 @@ def add_or_update_variable_in_flow(
         return variable
 
 
+
+def get_owned_flow(flow_id: str, user_id: str) -> Optional[Flow]:
+    with Session() as session:
+        owned_flow = (
+            session.query(Flow)
+            .join(Chatbot, Flow.chatbot_id == Chatbot.id)
+            .filter(Flow.id == flow_id, Chatbot.user_id == user_id)
+            .first()
+        )
+        
+        
+        session.commit()
+        
+        
+        return owned_flow
+    
 def delete_flow(flow_id: str) -> bool:
     """
     Deletes a flow record from the database.
+
     Args:
         flow_id: The ID of the flow to delete.
+
     Returns:
         True if the flow was deleted, False otherwise.
     """

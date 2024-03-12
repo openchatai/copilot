@@ -1,23 +1,41 @@
 from flask import Blueprint, jsonify, request
-from werkzeug.utils import secure_filename
+
 
 from entities.action_entity import ActionDTO
 from models.repository.action_repo import (
+    delete_all_actions,
     list_all_actions,
     action_to_dict,
-    create_actions,
     create_action,
     find_action_by_id,
     update_action,
     delete_action_by_id,
 )
 from routes.action import action_vector_service
-from utils.get_logger import CustomLogger
-from utils.swagger_parser import SwaggerParser
+
 
 action = Blueprint("action", __name__)
 
-logger = CustomLogger("action")
+
+@action.route("/bot/<string:chatbot_id>", methods=["DELETE"])
+def delete_actions(chatbot_id):
+    try:
+        delete_all_actions(chatbot_id)
+        action_vector_service.delete_all_ctions(chatbot_id)
+        return jsonify({"message": "All actions deleted successfully"}), 200
+    except Exception as e:
+        raise e
+
+
+@action.route("/bot/<string:chatbot_id>", methods=["POST"])
+def add_action(chatbot_id):
+    action_dto = ActionDTO(bot_id=chatbot_id, **request.get_json())
+
+    # Todo make sure either both or non go in
+    saved_action = create_action(chatbot_id, action_dto)
+    action_vector_service.create_action(action_dto)
+
+    return jsonify(action_to_dict(saved_action)), 201
 
 
 @action.route("/bot/<string:chatbot_id>", methods=["GET"])
@@ -40,42 +58,12 @@ def import_actions_from_swagger_file(chatbot_id):
         return jsonify({"error": "No file part in the request"}), 400
 
     if file:
-        filename = secure_filename(file.filename)
         swagger_content = file.read()
-
-        # Parse Swagger file
-        try:
-            swagger_parser = SwaggerParser(swagger_content)
-            swagger_parser.ingest_swagger_summary(chatbot_id)
-            actions = swagger_parser.get_all_actions(chatbot_id)
-        except Exception as e:
-            logger.error("Failed to parse Swagger file", error=e, bot_id=chatbot_id)
-            return (
-                jsonify(
-                    {
-                        "message": f"Failed to parse Swagger file: {str(e)}",
-                        "is_error": True,
-                    }
-                ),
-                400,
-            )
-
-        is_error = False
-        # Store actions in the database
-        try:
-            create_actions(chatbot_id, actions)
-            action_vector_service.create_actions(actions)
-        except Exception as e:
-            logger.error(
-                str(e),
-                message="Something failed while parsing swagger file",
-                bot_id=chatbot_id,
-            )
-
+        is_error = action_vector_service.read_swagger_files(swagger_content, chatbot_id)
         return (
             jsonify(
                 {
-                    "message": f"Successfully imported actions from {filename}",
+                    "message": f"Successfully imported actions from {file.filename}",
                     "is_error": is_error,
                 }
             ),
@@ -83,17 +71,6 @@ def import_actions_from_swagger_file(chatbot_id):
         )
 
     return jsonify({"error": "Invalid swagger file"}), 400
-
-
-@action.route("/bot/<string:chatbot_id>", methods=["POST"])
-def add_action(chatbot_id):
-    action_dto = ActionDTO(bot_id=chatbot_id, **request.get_json())
-
-    # Todo make sure either both or non go in
-    saved_action = create_action(chatbot_id, action_dto)
-    action_vector_service.create_action(action_dto)
-
-    return jsonify(action_to_dict(saved_action)), 201
 
 
 @action.route("/bot/<string:chatbot_id>/action/<string:action_id>", methods=["PATCH"])

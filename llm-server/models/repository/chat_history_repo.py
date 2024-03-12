@@ -5,7 +5,7 @@ from models.repository.action_call_repo import (
 )
 from shared.models.opencopilot_db import ChatHistory, engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import Integer, distinct
+from sqlalchemy import Integer, distinct, desc
 from sqlalchemy.orm import class_mapper
 from langchain.schema import BaseMessage, AIMessage, HumanMessage
 from sqlalchemy import func
@@ -169,7 +169,7 @@ def get_chat_history_for_retrieval_chain(
         query = (
             session.query(ChatHistory)
             .filter(ChatHistory.session_id == session_id)
-            .order_by(ChatHistory.created_at.desc())
+            .order_by(ChatHistory.created_at.asc())
         )
 
         if limit:
@@ -199,9 +199,21 @@ def get_unique_sessions_with_first_message_by_bot_id(
     # Using a context manager to automatically close the session
     with Session() as session:
         # Use distinct to get unique session_ids
+        subquery = (
+            session.query(
+                ChatHistory.session_id, func.min(ChatHistory.id).label("min_id")
+            )
+            .filter(ChatHistory.chatbot_id == bot_id)
+            .group_by(
+                ChatHistory.session_id
+            )  # grouping by 'session_id' to find their first occurrence
+            .subquery()
+        )
+
+        # Query to get unique 'session_id's sorted by their first occurrence
         unique_session_ids = (
-            session.query(distinct(ChatHistory.session_id))
-            .filter_by(chatbot_id=bot_id)
+            session.query(subquery.c.session_id)
+            .order_by(subquery.c.min_id.desc())
             .limit(limit)
             .offset(offset)
             .all()
@@ -221,7 +233,7 @@ def get_unique_sessions_with_first_message_by_bot_id(
             first_message = (
                 session.query(ChatHistory)
                 .filter_by(chatbot_id=bot_id, session_id=session_id[0])
-                .order_by(ChatHistory.id.asc())
+                .order_by(ChatHistory.id.desc())
                 .first()
             )
 
@@ -277,11 +289,12 @@ def create_chat_histories(
             session.add(chat_history)
             chat_histories.append(chat_history)
         session.commit()
+        session.refresh(chat_history)
 
     return chat_histories
 
 
-async def get_analytics(chatbot_id: str):
+def get_analytics(chatbot_id: str):
     with Session() as session:
         chat_histories = []
 

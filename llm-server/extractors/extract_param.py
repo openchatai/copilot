@@ -6,9 +6,7 @@ from shared.utils.opencopilot_utils import get_llm
 from custom_types.t_json import JsonData
 from typing import Optional, cast
 from langchain.schema import HumanMessage, SystemMessage
-from utils.get_logger import CustomLogger
 
-logger = CustomLogger(module_name=__name__)
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
@@ -17,7 +15,7 @@ llm = get_llm()
 async def gen_params_from_schema(
     param_schema: str, text: str, prev_resp: str, current_state: Optional[str]
 ) -> Optional[JsonData]:
-    chat = get_chat_model()
+    chat = get_chat_model("gen_params_from_schema")
     messages = [
         SystemMessage(
             content="You are an intelligent machine learning model that can produce REST API's params / query params in json format, given the json schema, user input, data from previous api calls, and current application state."
@@ -34,7 +32,5 @@ async def gen_params_from_schema(
         ),
     ]
     result = chat(messages)
-    logger.info("[OpenCopilot] LLM Body Response: {}".format(result.content))
     d: Optional[JsonData] = extract_json_payload(result.content)
-    logger.info("Parsed params from schema", text=text, params=d)
     return d

@@ -4,7 +4,6 @@ from pydantic import BaseModel
 from .utils import generate_operation_id_from_name
 from dataclasses import dataclass
 
-
 @dataclass
 class ActionDTO(BaseModel):
     id: Optional[str] = None
