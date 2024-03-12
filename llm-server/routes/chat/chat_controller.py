@@ -389,7 +389,7 @@ async def vote(message_id: str):
         send_slack_vote(is_upvote=True, message=message_id)
 
     except Exception as e:
-        return jsonify({"error": "An error occurred", "details": str(e)}), 500
+        return jsonify({"error": "An error occurred"}), 500
     return jsonify({"message": "Vote added successfully"}), 200
 
 

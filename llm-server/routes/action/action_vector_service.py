@@ -12,9 +12,7 @@ from shared.utils.opencopilot_utils import get_vector_store
 from shared.utils.opencopilot_utils.interfaces import StoreOptions
 from utils.llm_consts import initialize_qdrant_client, VectorCollections
 from utils.get_logger import SilentException
-from models.repository.action_repo import (
-    create_actions as action_repo_create_action
-)
+from models.repository.action_repo import create_actions as action_repo_create_action
 
 client = initialize_qdrant_client()
 
@@ -51,7 +49,7 @@ def create_action(action: ActionDTO):
     name = str(action.name) if action.name else ""
 
     document = Document(page_content=description + " " + name)
-    
+
     document.metadata.update(action.model_dump())
 
     documents.append(document)
@@ -89,6 +87,7 @@ def get_all_actions(chatbot_id: str, limit: int = 20, offset: int = 0) -> List[P
 
     return actions
 
+
 def delete_all_ctions(chatbot_id: str):
     result = client.delete(
         collection_name=VectorCollections.actions,
@@ -105,6 +104,7 @@ def delete_all_ctions(chatbot_id: str):
     )
 
     return result
+
 
 def update_action_by_operation_id(action: ActionDTO):
     documents: List[Document] = []
@@ -167,7 +167,7 @@ def read_swagger_files(swagger_content: str, chatbot_id: str):
         return (
             jsonify(
                 {
-                    "message": f"Failed to parse Swagger file: {str(e)}",
+                    "message": "Failed to parse Swagger file",
                     "is_error": True,
                 }
             ),
