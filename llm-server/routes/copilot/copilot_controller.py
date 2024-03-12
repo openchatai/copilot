@@ -21,7 +21,6 @@ from shared.models.opencopilot_db.chatbot import Chatbot
 from routes._swagger.reindex_service import migrate_actions
 from utils.get_logger import SilentException
 from workers.notification_proxy import (
-    send_slack_notification,
     send_copilot_created_follow_up_email,
 )
 
@@ -75,7 +74,6 @@ def create_new_copilot(user):
 
     try:
         send_copilot_created_follow_up_email(user.email)
-        send_slack_notification("🥳 New copilot is created -> {}".format(user.email))
     except Exception as e:
         SilentException.capture_exception(e)
 

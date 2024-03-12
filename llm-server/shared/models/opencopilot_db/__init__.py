@@ -4,7 +4,6 @@ from .database_setup import engine
 from .pdf_data_source_model import PdfDataSource
 from .website_data_source import WebsiteDataSource
 from .subscription import Subscription
-from .user import User
 from .chat_intents import ChatIntents
 from .flow import Flow
 from .chat_votes import ChatVote

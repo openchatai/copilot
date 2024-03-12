@@ -12,7 +12,7 @@ from shared.models.opencopilot_db.website_data_sources import (
     count_crawled_pages,
     create_website_data_source,
 )
-from utils.llm_consts import WEB_CRAWL_STRATEGY, get_org_settings_for_domain
+from utils.llm_consts import WEB_CRAWL_STRATEGY, max_pages_to_crawl
 from models.repository.copilot_settings import ChatbotSettingCRUD
 from workers.tasks.url_parsers import ParserFactory, TextContentParser
 
@@ -23,7 +23,6 @@ from bs4 import BeautifulSoup
 # from routes.search.meilisearch_service import add_item_to_index
 from utils.get_logger import SilentException
 from models.repository.copilot_repo import find_one_or_fail_by_id
-from models.repository.user_repo import find_user_by_id
 
 
 def get_links(url: str, strategy: str) -> Set[str]:
@@ -151,15 +150,15 @@ def web_crawl(url, bot_id: str, token: str):
         setting = ChatbotSettingCRUD.get_chatbot_setting(bot_id)
         if setting is None:
             chatbot = find_one_or_fail_by_id(bot_id)  # type: ignore
-            user = find_user_by_id(int(chatbot.user_id))  # type: ignore
-            domain = user.email.split("@")[-1] if "@" in chatbot.email else ""
+            # user = find_user_by_id(int(chatbot.user_id))  # type: ignore
+            # domain = user.email.split("@")[-1] if "@" in chatbot.email else ""
 
-            org_settings = get_org_settings_for_domain(domain)
-            max_pages_to_crawl = org_settings.get_crawl_limit()
-            web_crawl_strategy = org_settings.get_web_crawl_strategy()
+            # org_settings = get_org_settings_for_domain(domain)
+            # max_pages_to_crawl = org_settings.get_crawl_limit()
+            # web_crawl_strategy = org_settings.get_web_crawl_strategy()
 
             # print(f"Found org settings for domain {domain}: {org_settings}")
-            logging.info(f"Found org settings for domain {domain}: {org_settings}")
+            # logging.info(f"Found org settings for domain {domain}: {org_settings}")
             setting = ChatbotSettingCRUD.create_chatbot_setting(
                 max_pages_to_crawl=max_pages_to_crawl, chatbot_id=bot_id
             )

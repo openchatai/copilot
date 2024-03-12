@@ -35,7 +35,6 @@ from utils.get_logger import SilentException
 
 from langchain.schema import HumanMessage, SystemMessage
 
-from workers.notification_proxy import send_slack_heart_beat, send_slack_vote
 import openai
 import uuid
 import os
@@ -188,7 +187,6 @@ async def send_chat_stream(
     extra_params: Dict[str, str],
     incoming_message_id: str = None,
 ):
-    send_slack_heart_beat()
     await handle_chat_send_common(
         message=message,
         bot_token=bot_token,
@@ -381,12 +379,10 @@ async def vote(message_id: str):
                 message_id=message_id,
                 is_upvote=False,
             )
-            send_slack_vote(is_upvote=False, message=message_id)
             return jsonify({"message": "Vote deleted successfully"}), 200
         upvote_or_down_vote_message(
             chatbot_id=bot.id, message_id=message_id, is_upvote=True
         )
-        send_slack_vote(is_upvote=True, message=message_id)
 
     except Exception as e:
         return jsonify({"error": "An error occurred"}), 500
