@@ -44,7 +44,7 @@ export class ChatController {
   // sometimes the im_end message is not received from the bot, so we have to set a timeout to end the current message
   // this is the timeout id
   private timeout: NodeJS.Timeout | null = null;
-  private timeoutDuration = 1000 * 3; // 10 seconds
+  private timeoutDuration = 1000 * 3;
   listeners = new Set<Listener>();
   components: ComponentRegistery | undefined;
 
@@ -266,14 +266,15 @@ export class ChatController {
     }
 
     const handle = (content: string) => {
+      if (content === "|im_end|") {
+        this.settle();
+        return;
+      }
+
       if (this.select("conversationInfo")) {
         this.setValueImmer((d) => {
           d.conversationInfo = null;
         });
-      }
-      if (content === "|im_end|") {
-        this.settle();
-        return;
       }
 
       this.startTimeout(() => {
@@ -366,9 +367,12 @@ export class ChatController {
   };
 
   private startTimeout = (callback: () => void) => {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
     this.timeout = setTimeout(() => {
-      callback();
       this.timeout = null;
+      callback();
     }, this.timeoutDuration);
   };
 }
