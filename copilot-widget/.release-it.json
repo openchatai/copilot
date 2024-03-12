@@ -1,7 +1,7 @@
 {
     "github": {
         "requireBranch": "main",
-        "release": true,
+        "release": false,
         "push": true,
         "commitMessage": "chore: release ${version}",
         "hooks": {
