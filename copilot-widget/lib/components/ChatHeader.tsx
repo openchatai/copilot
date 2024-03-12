@@ -13,8 +13,7 @@ import { useLang } from "@lib/contexts/LocalesProvider";
 import { useConfigData } from "@lib/contexts/ConfigData.tsx";
 import { useSocket } from "@lib/contexts/SocketProvider";
 
-function WarnBeforeCloseDialog() {
-  const [, , SetState] = useWidgetState();
+function WarnBeforeCloseDialog({ onClose }: { onClose: () => void }) {
   const { get } = useLang();
 
   return (
@@ -33,13 +32,7 @@ function WarnBeforeCloseDialog() {
         </DialogHeader>
         <div className="flex flex-row items-center justify-center gap-2">
           <Button asChild variant="destructive" className="font-semibold">
-            <DialogClose
-              onClick={() => {
-                SetState(false);
-              }}
-            >
-              {get("yes-exit")}
-            </DialogClose>
+            <DialogClose onClick={onClose}>{get("yes-exit")}</DialogClose>
           </Button>
           <Button asChild variant="secondary" className="font-semibold">
             <DialogClose>{get("no-cancel")}</DialogClose>
@@ -84,6 +77,15 @@ export default function ChatHeader() {
   const [, , SetState] = useWidgetState();
   const { data } = useInitialData();
   const config = useConfigData();
+
+  const onClose = () => {
+    SetState(false);
+
+    if (config.onClose !== undefined) {
+      config.onClose();
+    }
+  };
+
   return (
     <header className="border-b border-b-black/10 w-full">
       <div className="p-2 w-full flex items-center justify-between">
@@ -92,11 +94,11 @@ export default function ChatHeader() {
         </h1>
         <div className="flex items-center gap-3">
           {config?.warnBeforeClose === false ? (
-            <button onClick={() => SetState(false)}>
+            <button onClick={onClose}>
               <X size={20} />
             </button>
           ) : (
-            <WarnBeforeCloseDialog />
+            <WarnBeforeCloseDialog onClose={onClose} />
           )}
         </div>
       </div>
