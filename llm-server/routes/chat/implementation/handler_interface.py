@@ -4,6 +4,7 @@ from custom_types.response_dict import LLMResponse
 from asyncio import Future
 from shared.models.opencopilot_db.chatbot import Chatbot
 
+
 class ChatRequestHandler(ABC):
     @abstractmethod
     async def handle_request(

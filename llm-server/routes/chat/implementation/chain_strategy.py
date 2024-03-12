@@ -34,8 +34,10 @@ class ChainStrategy(ChatRequestHandler):
         base_prompt: str,
         bot: Chatbot,
         headers: Dict[str, str],
-        app: Optional[str],
-        is_streaming: bool,
+        extra_params: Dict[str, str] = {},
+        app: Optional[str] = "",
+        is_streaming: bool = True,
+        incoming_message_id="ABC123",
     ) -> LLMResponse:
         check_required_fields(base_prompt, text)
 
