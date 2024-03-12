@@ -10,6 +10,7 @@ export type UserMessageType = {
   session_id: string;
   headers: Record<string, string>;
   bot_token: string;
+  query_params: Record<string, string>;
 };
 
 export type BotMessageType<TData = Record<string, unknown>> = {
