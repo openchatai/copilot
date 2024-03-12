@@ -61,13 +61,14 @@ function useChatLoading() {
 
 function useSendMessage() {
   const { __handler } = useMessageHandler();
-  const { headers, token } = useConfigData();
+  const { headers, token, queryParams } = useConfigData();
   const socket = useSocket();
 
   function send(content: string) {
     __handler.handleTextMessage(
       {
         headers: headers ?? {},
+        query_params: queryParams ?? {},
         content,
         bot_token: token,
       },
