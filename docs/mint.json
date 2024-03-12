@@ -51,7 +51,7 @@
       "pages": [
         "widget/embed",
         "widget/styling",
-        "widget/gen-ui"
+        "widget/not-gen-ui"
       ]
     },
     {
