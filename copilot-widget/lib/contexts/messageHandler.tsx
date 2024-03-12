@@ -38,13 +38,16 @@ export type State = {
 };
 
 type Listener<T = State> = (value: T) => void;
+
 type UpdaterFunction<T = State> = (oldValue: T) => T;
+
+// sometimes the im_end message is not received from the bot, so we have to set a timeout to end the current message
+// this is the timeout
+let timeout: NodeJS.Timeout | null = null;
+const timeoutDuration = 1000 * 3;
+
 export class ChatController {
   sessionId: string | null = null;
-  // sometimes the im_end message is not received from the bot, so we have to set a timeout to end the current message
-  // this is the timeout id
-  private timeout: NodeJS.Timeout | null = null;
-  private timeoutDuration = 1000 * 3; // 10 seconds
   listeners = new Set<Listener>();
   components: ComponentRegistery | undefined;
 
@@ -266,14 +269,15 @@ export class ChatController {
     }
 
     const handle = (content: string) => {
+      if (content === "|im_end|") {
+        this.settle();
+        return;
+      }
+
       if (this.select("conversationInfo")) {
         this.setValueImmer((d) => {
           d.conversationInfo = null;
         });
-      }
-      if (content === "|im_end|") {
-        this.settle();
-        return;
       }
 
       this.startTimeout(() => {
@@ -366,9 +370,17 @@ export class ChatController {
   };
 
   private startTimeout = (callback: () => void) => {
-    this.timeout = setTimeout(() => {
+    this.clearTimeout();
+    timeout = setTimeout(() => {
       callback();
-      this.timeout = null;
-    }, this.timeoutDuration);
+      timeout = null;
+    }, timeoutDuration);
+  };
+
+  private clearTimeout = () => {
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = null;
+    }
   };
 }
