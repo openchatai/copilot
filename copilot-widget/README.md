@@ -43,6 +43,9 @@ It's a simple React application that can be used in any webpage as a widget. To 
          }, // @optional: user object – this info will be used in the chat
          containerProps: {}, // @optional: `HTMLProps`
          warnBeforeClose: true, // @optional: Set to false if you don't want to warn the user before closing the chat
+         onClose: () => {
+            console.log('Closing chat window.');
+         } // @optional: Callback before closing the chat
        });
      };
    </script>

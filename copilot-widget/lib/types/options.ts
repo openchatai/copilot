@@ -13,6 +13,7 @@ export type Options = {
   debug?: boolean;
   language?: LangType;
   warnBeforeClose?: boolean;
+  onClose?: () => void;
   containerProps?: React.DetailedHTMLProps<
     React.HTMLAttributes<HTMLDivElement>,
     HTMLDivElement
