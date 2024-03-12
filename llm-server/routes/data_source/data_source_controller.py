@@ -28,9 +28,9 @@ def delete_knowldge_base_item(bot_id: str):
     try:
         qdrant_delete_knowledgebase_item_by_link_and_bot_id(link, bot_id)
         delete_knowldge_base_item_from_db(item_id)
-        return jsonify({"message": "Item deleted successfully."})
+        return jsonify({"message": "Item deleted successfully."}), 200
     except Exception as e:
-        return jsonify({"message": f"Failed to delete item. {e}"}), 400
+        return jsonify({"message": "Failed to delete item"}), 400
 
 
 @datasource_workflow.route("/b/<bot_id>", methods=["GET"])

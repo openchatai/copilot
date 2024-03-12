@@ -31,12 +31,8 @@ UPLOAD_FOLDER = "shared_data"
 
 
 @copilot.route("/", methods=["GET"])
-def index(user):
-    if user is None:
-        return jsonify({"error": "That does not seem right."}), 403
-
-    filter_criteria = Chatbot.user_id == user.id
-    chatbots = list_all_with_filter(filter_criteria=filter_criteria)
+def index():
+    chatbots = list_all_with_filter()
     return jsonify([chatbot_to_dict(chatbot) for chatbot in chatbots])
 
 

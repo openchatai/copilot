@@ -278,4 +278,4 @@ def delete_flow_api(flow_id: str):
             )
     except Exception as e:
         SilentException.capture_exception(e)
-        return jsonify({"error": "Failed to delete flow. {}".format(str(e))}), 500
+        return jsonify({"error": "Failed to delete flow."}), 500

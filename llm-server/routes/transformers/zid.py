@@ -21,8 +21,8 @@ def make_request_zid(url, data, params={}):
     url = f'{url}?_token={params.get("_token")}&lang=ar'
 
     headers = {
-        'Cookie': 'session=f9c5da58-578c-4b27-8a96-73b1bcb34d5d',
-        'Content-Type': 'application/json',
+        "Cookie": "session=f9c5da58-578c-4b27-8a96-73b1bcb34d5d",
+        "Content-Type": "application/json",
     }
 
     data = json.dumps(data)
@@ -38,15 +38,19 @@ def make_request_zid(url, data, params={}):
     except Exception as e:
         SilentException.capture_exception(e)
         return {
-            "error": "Error in making request to Zid analytics service, please inform the user that the service is currently unavailable, {}".format(str(e)),
+            "error": "Error in making request to Zid analytics service, please inform the user that the service is currently unavailable, {}".format(
+                str(e)
+            ),
         }
 
 
 def transform_and_minimize_response_zid(data):
     # if simplified_data is empty, return the original data
     if not data:
-        return {"error": "No data available at the moment, becuase the service is currently unavailable"}
-    
+        return {
+            "error": "No data available at the moment, becuase the service is currently unavailable"
+        }
+
     return data
 
 
@@ -55,20 +59,18 @@ def aggregate_data_zid():
     body = request.json
     headers = request.headers
     token = headers.get("token")
-    
-    
 
     urls = [
         "https://web.zid.sa/_analytics/api/orders",
         "https://web.zid.sa/_analytics/api/marketing",
-        'https://web.zid.sa/_analytics/api/marketing_cart_sales',
-        'https://web.zid.sa/_analytics/api/marketing_abandoned_carts',
+        "https://web.zid.sa/_analytics/api/marketing_cart_sales",
+        "https://web.zid.sa/_analytics/api/marketing_abandoned_carts",
         "https://web.zid.sa/_analytics/api/marketing_top_cities",
         "https://web.zid.sa/_analytics/api/marketing_top_customers",
         "https://web.zid.sa/_analytics/api/marketing_top_products",
         "https://web.zid.sa/_analytics/api/products",
     ]
-    
+
     with ThreadPoolExecutor() as executor:
         futures = [
             executor.submit(
@@ -130,7 +132,7 @@ def aggregate_data_gameball():
                 400,
             )
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Failed while aggregating gameball data"}), 500
 
 
 def make_request_gameball(curl_params):
