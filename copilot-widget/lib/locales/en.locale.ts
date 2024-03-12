@@ -1,13 +1,13 @@
 import { TranslatableMessages } from "./types";
 
 export const enLocale: TranslatableMessages = {
-  ok: "Ok",
+  ok: "OK",
   agree: "Agree",
   cancel: "Cancel",
-  "yes-exit": "Yes, exit",
-  "yes-reset": "Yes, reset",
-  "no-cancel": "No, cancel",
+  "yes-exit": "Exit",
+  "yes-reset": "Reset",
+  "no-cancel": "Cancel",
   "are-you-sure": "Are you sure?",
-  recording: "Recording",
-  "thank-you": "Thank you",
+  recording: "Recording...",
+  "thank-you": "Thanks!",
 };

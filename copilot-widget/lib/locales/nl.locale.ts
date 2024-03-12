@@ -1,11 +1,11 @@
 import { TranslatableMessages } from "./types";
 
 export const nlLocale: TranslatableMessages = {
-  ok: "Ok",
+  ok: "OK",
   agree: "Akkoord",
   cancel: "Annuleren",
   "yes-exit": "Beëindigen",
-  "yes-reset": "Reset chat",
+  "yes-reset": "Reset",
   "no-cancel": "Annuleren",
   "are-you-sure": "Wil je de chat beëindigen?",
   recording: "Aan het opnemen...",
