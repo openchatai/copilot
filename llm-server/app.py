@@ -139,21 +139,6 @@ def handle_send_chat(json_data):
     log_opensource_telemetry_data(json_data)
 
 
-@app.route("/backend/demo/guild_quality")
-def home():
-    return render_template("index.html")
-
-
-@app.route("/backend/demo/zid")
-def zid():
-    return render_template("zid.html")
-
-
-@app.route("/backend/demo/justpaid")
-def justpaid():
-    return render_template("justpaid.html")
-
-
 init_qdrant_collections()
 
 if __name__ == "__main__":

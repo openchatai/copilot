@@ -141,7 +141,7 @@ JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "YOURSUPERSECRETKEY")
 
 # org level access control
 class OrgSettings:
-    def __init__(self, strategy: str, crawl_limit: int, gen_ui = False):
+    def __init__(self, strategy: str, crawl_limit: int, gen_ui=False):
         self.strategy = strategy
         self.crawl_limit = crawl_limit
         self.gen_ui = gen_ui
@@ -154,15 +154,3 @@ class OrgSettings:
 
     def should_gen_ui(self):
         return self.gen_ui
-
-OrgSettingsDict = Dict[str, OrgSettings]
-org_settings: OrgSettingsDict = {
-    "mollie.com": OrgSettings(strategy="scrapingbee", crawl_limit=500, gen_ui=True),
-    "zid.sa": OrgSettings(strategy="scrapingbee", crawl_limit=100),
-    "opencopilot.so": OrgSettings(strategy="scrapingbee", crawl_limit=10),
-}
-
-
-def get_org_settings_for_domain(domain: str) -> OrgSettings:
-    DEFAULT_ORG_SETTINGS = OrgSettings(strategy="requests", crawl_limit=15, gen_ui=False)
-    return org_settings.get(domain, DEFAULT_ORG_SETTINGS)
