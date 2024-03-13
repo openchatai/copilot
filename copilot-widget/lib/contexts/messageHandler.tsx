@@ -29,6 +29,10 @@ export type ComponentType<DT> = {
   key: string;
   data?: DT;
 };
+export type HandoffPayloadType = {
+  summery: string;
+  sentiment: "happy" | "angry" | "neutral";
+}; // sometimes it will be an empty object
 
 export type State = {
   currentUserMessage: null | UserMessageType;
@@ -180,6 +184,21 @@ export class ChatController {
     socket.emit("send_chat", userMessage);
   };
 
+  internalHandleHandoff = (payload: HandoffPayloadType) => {
+    // handle handoff
+    const id = this.genId();
+    this.setValueImmer((draft) => {
+      const message = {
+        from: "bot",
+        type: "HANDOFF",
+        id: id,
+        responseFor: id,
+        timestamp: this.getTimeStamp(),
+        data: payload,
+      } as BotMessageType<HandoffPayloadType>;
+      draft.messages.push(message);
+    });
+  };
   // Called for every character recived from the bot
   appendToCurrentBotMessage = (message: string) => {
     const currentUserMessage = this.state.currentUserMessage;
@@ -367,6 +386,28 @@ export class ChatController {
 
     return () => {
       socket.off(`${sessionId}_ui`, handle);
+    };
+  };
+
+  socketHandoffHandler = (
+    socket: Socket,
+    externalCallback: (payload: HandoffPayloadType) => void
+  ) => {
+    const sessionId = this.sessionId;
+    if (!sessionId) {
+      return;
+    }
+
+    const handle = (msg: string) => {
+      const parsedResponse = JSON.parse(msg) as HandoffPayloadType;
+      externalCallback(parsedResponse);
+      this.internalHandleHandoff(parsedResponse);
+    };
+
+    socket.on(`${sessionId}_handoff`, handle);
+
+    return () => {
+      socket.off(`${sessionId}_handoff`, handle);
     };
   };
 
