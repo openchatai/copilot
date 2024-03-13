@@ -27,9 +27,6 @@ from routes.chat.chat_dto import ChatInput
 from flask_socketio import SocketIO
 from utils.get_logger import SilentException
 from routes.search.search_controller import search_workflow
-from routes.transformers.zid import (
-    transformers_workflow,
-)  # todo move the trans. to it's own file
 
 from flask_cors import CORS
 from shared.models.opencopilot_db.database_setup import engine
@@ -67,7 +64,7 @@ app.register_blueprint(datasource_workflow, url_prefix="/backend/data_sources")
 
 app.register_blueprint(action, url_prefix="/backend/actions")
 app.register_blueprint(powerup, url_prefix="/backend/powerup")
-app.register_blueprint(transformers_workflow, url_prefix="/backend/transformers")
+# app.register_blueprint(transformers_workflow, url_prefix="/backend/transformers")
 app.register_blueprint(search_workflow, url_prefix="/backend/search")
 
 app.config.from_object(Config)
