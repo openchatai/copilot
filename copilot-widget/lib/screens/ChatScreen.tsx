@@ -43,10 +43,7 @@ export default function ChatScreen() {
         className="flex-1 w-full flex flex-col overflow-x-hidden shrink-0 relative overflow-auto scrollbar-thin scroll-smooth"
       >
         <div className="flex flex-1 w-full min-h-fit mt-auto flex-col py-2 max-h-full items-center gap-1 last:fade-in-right">
-          {
-            // If there are initial messages, show them.
-            initialMessage && <BotInitialMessage message={initialMessage} />
-          }
+          {initialMessage && <BotInitialMessage message={initialMessage} />}
           <Map
             data={messages}
             render={(message, index) => {
