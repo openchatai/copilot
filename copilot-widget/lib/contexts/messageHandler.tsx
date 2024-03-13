@@ -391,7 +391,7 @@ export class ChatController {
 
   socketHandoffHandler = (
     socket: Socket,
-    externalCallback: (payload: HandoffPayloadType) => void
+    externalCallback?: (payload: HandoffPayloadType) => void
   ) => {
     const sessionId = this.sessionId;
     if (!sessionId) {
@@ -400,7 +400,7 @@ export class ChatController {
 
     const handle = (msg: string) => {
       const parsedResponse = JSON.parse(msg) as HandoffPayloadType;
-      externalCallback(parsedResponse);
+      externalCallback?.(parsedResponse);
       this.internalHandleHandoff(parsedResponse);
     };
 

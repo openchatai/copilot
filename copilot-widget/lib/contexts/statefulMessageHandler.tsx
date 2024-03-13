@@ -13,13 +13,15 @@ const [useMessageHandler, MessageHandlerSafeProvider] = createSafeContext<{
 }>();
 
 function MessageHandlerProvider(props: { children: React.ReactNode }) {
-  const { token, components } = useConfigData();
+  const { token, components, onHandoff } = useConfigData();
   const { sessionId } = useSessionId(token);
   const { __socket } = useSocket();
+
   const __components = useMemo(
     () => new ComponentRegistery({ components }),
     [components]
   );
+
   const handler = useMemo(() => new ChatController(sessionId), [sessionId]);
 
   useEffect(() => {
@@ -37,6 +39,10 @@ function MessageHandlerProvider(props: { children: React.ReactNode }) {
   useEffect(() => {
     return handler.socketUiHandler(__socket);
   }, [__socket, handler]);
+
+  useEffect(() => {
+    return handler.socketHandoffHandler(__socket, onHandoff);
+  }, [__socket, handler, onHandoff]);
 
   return (
     <MessageHandlerSafeProvider

@@ -1,4 +1,5 @@
 import { ComponentType } from "@lib/contexts/componentRegistery";
+import { HandoffPayloadType } from "@lib/contexts/messageHandler";
 import type { LangType } from "@lib/locales";
 
 export type Options = {
@@ -14,6 +15,7 @@ export type Options = {
   language?: LangType;
   warnBeforeClose?: boolean;
   onClose?: () => void;
+  onHandoff?: (handout: HandoffPayloadType) => void;
   containerProps?: React.DetailedHTMLProps<
     React.HTMLAttributes<HTMLDivElement>,
     HTMLDivElement
