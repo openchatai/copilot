@@ -47,3 +47,13 @@ Once this system action is installed on your copilot, a `handoff` event could ha
           },
         ],
   ```
+
+## What does the `handoff` event payload look like?
+The `handoff` event payload will contain the following information:
+
+```json
+{
+  "summery": "full summery of the conversation, it can be used by the human agent to understand the context of the conversation faster",
+  "sentiment": "neutral|angry|happy",
+}
+```
