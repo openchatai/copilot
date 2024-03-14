@@ -1,0 +1,18 @@
+{
+    "meta": {
+        "current_page": 1,
+        "from": 1,
+        "last_page": 17,
+        "links": [
+            {
+                "url": null,
+                "label": "&laquo; Previous",
+                "active": false
+            }
+        ],
+        "path": "https://sandbox.www.guildquality.com/company-api/v3/surveys",
+        "per_page": 50,
+        "to": 50,
+        "total": 842
+    }
+}

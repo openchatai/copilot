@@ -1,20 +1,19 @@
 import os
 from typing import Dict, Any
 from typing import List
-
+from flask import jsonify
+from werkzeug.utils import secure_filename
+from utils.swagger_parser import SwaggerParser
 from langchain.docstore.document import Document
 from qdrant_client import models
-from shared.utils.opencopilot_utils.get_embeddings import get_embeddings
 
 from entities.action_entity import ActionDTO
 from shared.utils.opencopilot_utils import get_vector_store
 from shared.utils.opencopilot_utils.interfaces import StoreOptions
 from utils.llm_consts import initialize_qdrant_client, VectorCollections
+from utils.get_logger import SilentException
+from models.repository.action_repo import create_actions as action_repo_create_action
 
-from utils.get_logger import CustomLogger
-
-
-logger = CustomLogger(__name__)
 client = initialize_qdrant_client()
 
 actions_collection = get_vector_store(StoreOptions("actions"))
@@ -89,6 +88,24 @@ def get_all_actions(chatbot_id: str, limit: int = 20, offset: int = 0) -> List[P
     return actions
 
 
+def delete_all_ctions(chatbot_id: str):
+    result = client.delete(
+        collection_name=VectorCollections.actions,
+        points_selector=models.FilterSelector(
+            filter=models.Filter(
+                must=[
+                    models.FieldCondition(
+                        key="metadata.bot_id",
+                        match=models.MatchValue(value=chatbot_id),
+                    ),
+                ],
+            )
+        ),
+    )
+
+    return result
+
+
 def update_action_by_operation_id(action: ActionDTO):
     documents: List[Document] = []
 
@@ -101,11 +118,10 @@ def update_action_by_operation_id(action: ActionDTO):
 
     documents.append(document)
 
-    result = delete_action_by_operation_id(
+    delete_action_by_operation_id(
         bot_id=str(action.bot_id), operation_id=str(action.operation_id)
     )
 
-    logger.info("qdrant_point_delete", result=result)
     return create_action(action)
 
 
@@ -138,3 +154,31 @@ def delete_action_by_operation_id(bot_id: str, operation_id: str):
     )
 
     return result
+
+
+def read_swagger_files(swagger_content: str, chatbot_id: str):
+    try:
+        swagger_parser = SwaggerParser(swagger_content)
+        swagger_parser.ingest_swagger_summary(chatbot_id)
+        actions = swagger_parser.get_all_actions(chatbot_id)
+    except Exception as e:
+        SilentException.capture_exception(e)
+
+        return (
+            jsonify(
+                {
+                    "message": "Failed to parse Swagger file",
+                    "is_error": True,
+                }
+            ),
+            400,
+        )
+
+    is_error = False
+    # Store actions in the database
+    try:
+        action_repo_create_action(chatbot_id, actions)
+        create_actions(actions)
+        return is_error
+    except Exception as e:
+        raise e

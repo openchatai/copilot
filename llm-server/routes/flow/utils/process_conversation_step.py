@@ -10,12 +10,7 @@ from custom_types.actionable_or_not_type import (
 )
 from routes.flow.utils.document_similarity_dto import DocumentSimilarityDTO
 from utils.get_chat_model import get_chat_model
-from utils.get_logger import CustomLogger
 from utils.llm_consts import VectorCollections
-
-logger = CustomLogger(module_name=__name__)
-chat = get_chat_model()
-
 
 def is_it_informative_or_actionable(
     chat_history: List[BaseMessage],
@@ -35,6 +30,7 @@ def is_it_informative_or_actionable(
     Returns:
 
     """
+    chat = get_chat_model("is_it_informative_or_actionable")
 
     if (
         len(available_documents) == 1
@@ -104,7 +100,6 @@ The available tools:
     """
     )
 
-    # logger.info("cool", payload=actionable_tools)
     messages: List[BaseMessage] = [
         SystemMessage(content=prompt),
     ]
@@ -117,19 +112,12 @@ The available tools:
     )
 
     content = cast(str, chat(messages=messages).content)
-
-    logger.info("informative_or_actionable_payload", str_content=content)
     parsed_json = parse_informative_or_actionable_response(content)
 
     response = parse_actionable_or_not_response(
         json_dict={"actionable": parsed_json.needs_api == "yes", "api": parsed_json.api}
     )
 
-    logger.info(
-        "Actionable or not response",
-        payload=parsed_json,
-        final_result=response.actionable,
-    )
     return response
 
 

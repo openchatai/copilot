@@ -7,10 +7,6 @@ from typing import List
 from langchain.output_parsers import PydanticOutputParser
 from langchain.pydantic_v1 import BaseModel
 from typing import cast
-from utils.get_logger import CustomLogger
-
-
-logger = CustomLogger(__name__)
 
 
 class DynamicBuilder(BaseModel):
@@ -27,7 +23,7 @@ def parse_json(content: str):
 
 async def build_dynamic_flow(text: str, bot_id: str):
     docs = await get_relevant_actions(text=text, bot_id=bot_id)
-    chat = get_chat_model()
+    chat = get_chat_model("build_dynamic_flow")
 
     messages: List[BaseMessage] = []
 

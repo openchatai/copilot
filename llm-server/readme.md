@@ -75,7 +75,6 @@ To install required packages, execute `pip install -r requirements.txt` from the
 2. Launch debug mode with F5.
 
 ### **Docker Debugging**
-
 With Docker and Docker Compose installed, perform the following tasks:
 
 1. In the Makefile, set `TARGET=development`.

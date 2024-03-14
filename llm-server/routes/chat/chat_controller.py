@@ -1,9 +1,7 @@
 from http import HTTPStatus
-from typing import Optional
-from typing import cast, Dict
-
+from typing import Optional, cast, Dict
+import json
 from flask import jsonify, Blueprint, request, Response, abort, Request
-
 from models.repository.chat_history_repo import (
     get_all_chat_history_by_session_id_with_total,
     get_session_counts_by_user,
@@ -12,25 +10,35 @@ from models.repository.chat_history_repo import (
     get_analytics,
     most_called_actions_by_bot,
 )
+from models.repository.chat_intent_repo import (
+    create_chat_intent,
+    get_chat_intent_by_session_id,
+)
 from models.repository.copilot_repo import find_one_or_fail_by_token
 from routes.analytics.analytics_service import upsert_analytics_record
 from routes.chat.chat_dto import ChatInput
+from routes.chat.helpers import parse_json_intent
 from routes.chat.implementation.chain_strategy import ChainStrategy
 from routes.chat.implementation.functions_strategy import FunctionStrategy
 from routes.chat.implementation.handler_interface import ChatRequestHandler
 from routes.chat.implementation.tools_strategy import ToolStrategy
-from utils.get_logger import CustomLogger
 from utils.llm_consts import X_App_Name, chat_strategy, ChatStrategy
 from utils.sqlalchemy_objs_to_json_array import sqlalchemy_objs_to_json_array
+from utils.get_chat_model import get_chat_model
 from flask_socketio import emit
 
-from flask import request
-from pydub import AudioSegment
+from models.repository.chat_vote_repo import (
+    upvote_or_down_vote_message,
+)
+from utils.get_logger import SilentException
+
+
+from langchain.schema import HumanMessage, SystemMessage
+
 import openai
 import uuid
 import os
-
-logger = CustomLogger(module_name=__name__)
+from werkzeug.exceptions import BadRequest
 
 chat_workflow = Blueprint("chat", __name__)
 
@@ -102,7 +110,7 @@ def get_chat_sessions(bot_id: str):
         total_pages,
     ) = get_unique_sessions_with_first_message_by_bot_id(bot_id, limit, offset)
 
-    return {"data": chat_history_sessions, "total_pages": total_pages}
+    return jsonify({"data": chat_history_sessions, "total_pages": total_pages}), 200
 
 
 @chat_workflow.route("/init", methods=["GET"])
@@ -129,12 +137,41 @@ def init_chat():
     try:
         bot = find_one_or_fail_by_token(bot_token)
         # Replace 'faq' and 'initialQuestions' with actual logic or data as needed.
+
+        if (
+            bot.token == "FsQJM4nPZAAEKgqt"
+        ):  # todo @shanur let's make this dynamic, for now this is Zid demo
+
+            # Initial list of questions
+            initial_questions = [
+                "ماذا يمكنك مساعدتي؟",
+                "ملخص مبيعات للشهر الماضي",
+                "جدول لمقارنة مبيعات الاسبوع الحالي والاسبوع الماضي",
+                "كيف ارفع حجم السلة؟",
+                "ما هي الفئات الأكثر مبيعاً هذا الشهر؟",
+                "كيف يمكننا تحسين معدلات الاحتفاظ بالعملاء؟",
+                "ما هي خدمة تمويل زد؟",
+                "ساعدني في كتابة وصف لمنتجي",
+            ]
+
+        elif bot.website == "https://www.education.govt.nz":
+            initial_questions = [
+                "Get 2 Current Business Managers",
+                "Get Current 3 Data Mangers",
+                "Get Current 4 Principals",
+                "Get Current 5 Test Administrators",
+                "Get Current 3 Superintendents",
+                "Get Current Orgs",
+            ]
+        else:
+            initial_questions = []
+
         return jsonify(
             {
                 "bot_name": bot.name,
                 "logo": "logo",
                 "faq": [],  # Replace with actual FAQ data
-                "inital_questions": [],
+                "initial_questions": initial_questions,
                 "history": history,
             }
         )
@@ -143,10 +180,21 @@ def init_chat():
 
 
 async def send_chat_stream(
-    message: str, bot_token: str, session_id: str, headers_from_json: Dict[str, str]
+    message: str,
+    bot_token: str,
+    session_id: str,
+    headers_from_json: Dict[str, str],
+    extra_params: Dict[str, str],
+    incoming_message_id: str = None,
 ):
     await handle_chat_send_common(
-        message, bot_token, session_id, headers_from_json, is_streaming=True
+        message=message,
+        bot_token=bot_token,
+        session_id=session_id,
+        headers_from_json=headers_from_json,
+        extra_params=extra_params,
+        is_streaming=True,
+        incoming_message_id=incoming_message_id,
     )
 
 
@@ -156,12 +204,53 @@ async def send_chat():
 
     input_data = ChatInput(**json_data)
     message = input_data.content
+    incoming_message_id = (
+        input_data.id or None
+    )  # this is the message id from the client (assigned by the client)
     session_id = input_data.session_id
     headers_from_json = input_data.headers or {}
-
     bot_token = request.headers.get("X-Bot-Token")
+    extra_params = json_data.get("extra_params", {})
+
+    if bot_token == "FsQJM4nPZAAEKgqt":
+        # check if the message containt the word "salla", سلة, or سله
+        if (
+            "سلة" in message
+            or "سله" in message
+            or "salla" in message
+            or "Salla" in message
+        ):
+            # then replace it with "منافس"
+            message = (
+                message.replace("سلة", "")
+                .replace("سله", "")
+                .replace("salla", "")
+                .replace("Salla", "")
+            )
+
     return await handle_chat_send_common(
-        message, bot_token, session_id, headers_from_json, is_streaming=False
+        message,
+        bot_token,
+        session_id,
+        headers_from_json,
+        extra_params,
+        is_streaming=False,
+        incoming_message_id=incoming_message_id,
+    )
+
+
+@chat_workflow.route("/webhook/<bot_token>/s/<session_id>", methods=["POST"])
+async def webhook_chat(bot_token: str, session_id: str):
+    headers_from_json = {}
+    json_data = request.get_json()
+
+    return await handle_chat_send_common(
+        json.dumps(json_data),
+        bot_token,
+        session_id,
+        headers_from_json,
+        is_streaming=False,
+        extra_params={},
     )
 
 
@@ -170,22 +259,18 @@ async def handle_chat_send_common(
     bot_token: Optional[str],
     session_id: str,
     headers_from_json: Dict[str, str],
+    extra_params: Dict[str, str],
     is_streaming: bool,
+    incoming_message_id: str = None,
 ):
     app_name = headers_from_json.pop(X_App_Name, None)
+    emit(f"{session_id}_info", "⌛⏳⌛⏳⌛⏳⌛")
+
     if not message:
         abort(400, description="Content cannot be null")
 
     if not bot_token:
         return Response(response="bot token is required", status=400)
-
-    logger.error(
-        "chat/send",
-        error=Exception("Something went wrong"),
-        bot_token=bot_token,
-        x_message=message,
-        session_id=session_id,
-    )
 
     try:
         bot = find_one_or_fail_by_token(bot_token)
@@ -204,10 +289,12 @@ async def handle_chat_send_common(
             message,
             session_id,
             str(base_prompt),
-            str(bot.id),
+            bot,
             headers_from_json,
+            extra_params,
             app_name,
             is_streaming,
+            incoming_message_id,
         )
 
         # if the llm replied correctly
@@ -235,19 +322,31 @@ async def handle_chat_send_common(
             upsert_analytics_record(
                 chatbot_id=str(bot.id), successful_operations=1, total_operations=1
             )
-            create_chat_histories(str(bot.id), chat_records)
+            chat_histories = create_chat_histories(str(bot.id), chat_records)
 
-        if result.error:
-            logger.error("chat_conversation_error", message=result.error)
+        (
+            emit(session_id, "|im_end|")
+            if is_streaming
+            else jsonify({"type": "text", "response": {"text": result.message}})
+        )
+
+        # Return the bot response message id to the client to be used for voting
+        if chat_histories and len(chat_histories) > 1:
+            emit(f"{session_id}_vote", chat_histories[1].id) if is_streaming else None
 
         return jsonify({"type": "text", "response": {"text": result.message}})
-    except Exception as e:
-        logger.error(
-            "An exception occurred",
-            incident="chat/send",
-            error=e,
-            bot_token=bot_token,
+    except BadRequest as e:
+        return (
+            jsonify(
+                {
+                    "type": "text",
+                    "response": {"text": f"Bad Request: {e.description}"},
+                }
+            ),
+            400,
         )
+    except Exception as e:
+        SilentException.capture_exception(e)
         emit(session_id, str(e))
         return (
             jsonify(
@@ -262,9 +361,101 @@ async def handle_chat_send_common(
         )
 
 
+@chat_workflow.route("/vote/<message_id>", methods=["POST", "DELETE"])
+async def vote(message_id: str):
+    bot_token = request.headers.get("X-Bot-Token")
+
+    if not message_id:
+        return jsonify({"error": "Message ID is required"}), 400
+
+    if not bot_token:
+        return Response(response="Invalid bot token prodived", status=400)
+
+    try:
+        bot = find_one_or_fail_by_token(bot_token)
+        if request.method == "DELETE":
+            upvote_or_down_vote_message(
+                chatbot_id=bot.id,
+                message_id=message_id,
+                is_upvote=False,
+            )
+            return jsonify({"message": "Vote deleted successfully"}), 200
+        upvote_or_down_vote_message(
+            chatbot_id=bot.id, message_id=message_id, is_upvote=True
+        )
+
+    except Exception as e:
+        return jsonify({"error": "An error occurred"}), 500
+    return jsonify({"message": "Vote added successfully"}), 200
+
+
+# @Todo convert to chathistory, use a larger model 32k and add trim history, then start caching these conversation intents
+@chat_workflow.route("/intents/<session_id>", methods=["GET"])
+async def get_conversation_intent(session_id: str):
+    histories, _ = get_all_chat_history_by_session_id_with_total(session_id=session_id)
+    chat = get_chat_model("get_conversation_intent")
+
+    # caching
+    content = get_chat_intent_by_session_id(session_id=session_id)
+    if content:
+        return jsonify(content.intents)
+
+    messages = []
+
+    messages.append(
+        SystemMessage(
+            content="You are a ai assistant capable of understanding intents from user input"
+        )
+    )
+    messages.append(
+        HumanMessage(
+            content="""Given a list of user questions, analyze each question and identify its intent. Each user question is represented as a text string.
+
+Your task is to generate intents for each user question. Each intent should include the 'intent_type' (the identified intent) and 'confidence' (a confidence score for the identification). The output should be in JSON format. You need to dynamically generate the intent types in these user questions. Limit intent types to atmost 4
+
+JSON Format Example:
+{
+  "intents": [
+    {"intent_type": "prices", "confidence": 0.9},
+    {"intent_type": "onboarding", "confidence": 0.8},
+    ...etc
+  ]
+}
+"""
+        )
+    )
+
+    # Filter messages sent by the user and add them to the list
+    user_messages = []
+    for history in histories:
+        if bool(history.from_user):
+            user_messages.append(HumanMessage(content=str(history.message)))
+    messages.extend(user_messages)
+
+    # Invoke the large language model
+    result = await chat.ainvoke(messages)
+    content = parse_json_intent(cast(str, result.content))
+
+    create_chat_intent(session_id=session_id, intents=content.dict())
+
+    return jsonify(content.dict())
+
+
+@chat_workflow.route("/submit/<bot_id>", methods=["POST"])
+async def submit_ui_form(bot_id: str):
+    request = await request.json()
+    operation_id = request.get("operation_id")
+
+    payload = request.get("payload")
+
+    # make api call
+
+    return jsonify({"message": "Form submitted successfully"}), 200
+
+
 @chat_workflow.route("/analytics/<bot_id>", methods=["GET"])
-async def get_analytics_by_email(bot_id: str) -> Response:
-    result = await get_analytics(bot_id)
+def get_analytics_by_email(bot_id: str) -> Response:
+    result = get_analytics(bot_id)
     return jsonify(result)
 
 
