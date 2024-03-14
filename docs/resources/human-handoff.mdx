@@ -1,0 +1,37 @@
+---
+title: "Human handoff"
+description: "Learn how to the copilot can handoff the conversation to a human agent."
+---
+
+Currently, human handoff is in beta and only available for a few customers. If you are interested in using this feature, please contact us at mo@opencopilot.so, and we will be happy to help you.
+
+
+## What is this?
+One of the most important features of the Copilot is the ability to handoff the conversation to a human agent. This is useful when the Copilot is unable to understand the user's request or when the user requests to speak to a human agent, we reialzed that most of the time angry customers are looking for a human agent to talk to and solve their problems.
+
+
+## How does it work?
+
+Once this system action is installed on your copilot, a `handoff` event could happen in 2 ways:
+
+- When the user explicitly asks to talk to a human agent.
+- When the copilot is unable to understand the user's request or felt that the user is angry and dissatisfied.
+
+## How to detect `handoff` event?
+
+Once the copilot detects a `handoff` event, it will send a `{session_id}_handoff` socket event to the client with the following payload:
+
+```json
+{
+  "summary": "Full summary of the conversation, to help the human agent understand the context of the conversation quickly.",
+  "sentiment": "happy|neutral|angry"
+}
+```
+
+Also, you can define a custom callback function to handle the `handoff` event on the client side. Here is an example of how to do that:
+
+```javascript
+```
+
+In this callback, you can do whatever you want, like showing a button to the user to request a human agent, or send a notification to the human agent to take over the conversation, or transfer the conversation to a human agent automatically.
+

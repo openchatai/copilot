@@ -55,6 +55,12 @@
       ]
     },
     {
+      "group": "System actions",
+      "pages": [
+        "resources/human-handoff"
+      ]
+    },
+    {
       "group": "Managing copilots via API",
       "pages": [
         "api-notes",
