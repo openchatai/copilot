@@ -71,16 +71,6 @@ def create_new_copilot():
     ]
 
     create_powerups_bulk(powerup_apps)
-
-    try:
-        send_copilot_created_follow_up_email(user.email)
-    except Exception as e:
-        import traceback
-
-        traceback.print_exc()
-
-        SilentException.capture_exception(e)
-
     return jsonify(chatbot)
 
 
