@@ -6,10 +6,8 @@ from enum import Enum
 
 from abc import ABC, abstractmethod
 from bs4 import BeautifulSoup, Tag
-from utils.get_logger import CustomLogger
 import requests
 
-logger = CustomLogger(__name__)
 
 
 class LinkInformation:

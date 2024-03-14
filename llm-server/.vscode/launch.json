@@ -2,23 +2,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: Flask",
-            "type": "debugpy",
+            "name": "Python: Flask",
+            "type": "python",
             "request": "launch",
             "module": "flask",
             "env": {
                 "FLASK_APP": "app.py",
+                "FLASK_ENV": "development",
                 "FLASK_DEBUG": "1"
             },
             "args": [
                 "run",
                 "--no-debugger",
-                "--reload",
-                "--host=0.0.0.0",
+                "--no-reload",
                 "--port=8002"
             ],
-            "jinja": true,
-            "justMyCode": true
+            "jinja": true
         },
         {
             "name": "Python: Celery Workers",
@@ -37,7 +36,8 @@
                 "DISABLE_SPRING": "true"
             },
             "console": "integratedTerminal",
-            "envFile": "${workspaceFolder}/.env"
+            "envFile": "${workspaceFolder}/.env",
+            "python": "/Users/shanurrahman/anaconda3/envs/local/bin/python"
         }
     ]
 }

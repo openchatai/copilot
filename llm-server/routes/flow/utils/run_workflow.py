@@ -9,11 +9,7 @@ from custom_types.response_dict import ApiRequestResult, LLMResponse
 from custom_types.run_workflow_input import ChatContext
 from entities.flow_entity import FlowDTO
 from routes.flow.utils import run_actions
-from utils.get_logger import CustomLogger
-from entities.flow_entity import Block
-from entities.flow_entity import Block
-
-logger = CustomLogger(module_name=__name__)
+from utils.get_logger import SilentException
 
 
 async def run_flow(
@@ -44,13 +40,7 @@ async def run_flow(
             "headers": dict(headers),
             "app": app,
         }
-
-        logger.error(
-            "An exception occurred",
-            bot_id=bot_id,
-            payload=json.dumps(payload_data),
-            error=e,
-        )
+        SilentException.capture_exception(e, payload_data)
 
     output = {"response": result if not error else "", "error": error}
 

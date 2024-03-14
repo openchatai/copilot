@@ -7,9 +7,6 @@ from shared.utils.opencopilot_utils import get_llm
 
 from typing import Any, Optional
 import importlib
-from utils.get_logger import CustomLogger
-
-logger = CustomLogger(module_name=__name__)
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = get_llm()
@@ -22,7 +19,7 @@ async def gen_body_from_schema(
     app: Optional[str],
     current_state: Optional[str],
 ) -> Any:
-    chat = get_chat_model()
+    chat = get_chat_model("gen_body_from_schema")
     api_generation_prompt = None
     if app:
         module_name = f"integrations.custom_prompts.{app}"
@@ -50,9 +47,6 @@ async def gen_body_from_schema(
 
     result = chat(messages)
 
-    logger.info("LLM Body Response", content=result.content, text=text, app=app)
-
     d: Any = extract_json_payload(result.content)
-    logger.info("Parsed the json payload", payload=d, app=app, api_generation_prompt=api_generation_prompt)
-
+    
     return d

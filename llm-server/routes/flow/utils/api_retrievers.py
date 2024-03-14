@@ -8,13 +8,10 @@ from routes.flow.utils.document_similarity_dto import DocumentSimilarityDTO
 from shared.utils.opencopilot_utils import StoreOptions
 from shared.utils.opencopilot_utils.get_embeddings import get_embeddings
 from shared.utils.opencopilot_utils.get_vector_store import get_vector_store
-from utils.get_chat_model import get_chat_model
-from utils.get_logger import CustomLogger
 from utils.llm_consts import vs_thresholds, VectorCollections, initialize_qdrant_client
+from utils.get_logger import SilentException
 
 client = initialize_qdrant_client()
-logger = CustomLogger(module_name=__name__)
-chat = get_chat_model()
 
 stores = {
     "knowledgebase": get_vector_store(StoreOptions("knowledgebase")),
@@ -75,13 +72,7 @@ async def get_relevant_documents(
         return documents_with_similarity
 
     except Exception as e:
-        logger.error(
-            f"Error occurred while getting relevant {collection_name} summaries",
-            incident=f"get_relevant_{collection_name}",
-            bot_id=bot_id,
-            payload=text,
-            error=e,
-        )
+        SilentException.capture_exception(e)
         return []
 
 

@@ -4,10 +4,9 @@ from typing import List, cast
 from langchain.schema import HumanMessage, SystemMessage, BaseMessage
 
 from utils import get_chat_model
-from utils.get_logger import CustomLogger
-from dataclasses import dataclass
-
-logger = CustomLogger(module_name=__name__)
+from routes.flow.utils.document_similarity_dto import (
+    DocumentSimilarityDTO,
+)
 
 
 class FollowUpQuestion(BaseModel):
@@ -38,13 +37,33 @@ def generate_conversation_string(conversation_history: List[BaseMessage]) -> str
 
 
 async def generate_follow_up_questions(
-    conversation_history: List[BaseMessage], llm_response: str, current_input: str
+    conversation_history: List[BaseMessage],
+    llm_response: str,
+    current_input: str,
+    actions: List[DocumentSimilarityDTO],
+    knowledgebase: List[DocumentSimilarityDTO],
 ):
-    chat = get_chat_model()
+    chat = get_chat_model("generate_follow_up_questions")
     conversation_string = generate_conversation_string(conversation_history)
+    content = ""
+    for action in actions:
+        content = content + action.document.page_content + "\n"
+
+    for kb in knowledgebase:
+        content = content + kb.document.page_content + "\n"
+
     messages = [
         SystemMessage(
             content="You are an intelligent machine learning model that can predict follow-up questions that the user may ask."
+        ),
+        HumanMessage(
+            content=f"The followup questions you generate should correspond to the question asked by the user and your capabilities. Your capabilities are as follows: {content}"
+        ),
+        HumanMessage(
+            content=f"The followup questions you generate should correspond to the question asked by the user and your capabilities. Your capabilities are as follows: {content}"
+        ),
+        HumanMessage(
+            content="Limit your response to 4 follow-up questions based on most similar content to knowledgebase and actions."
         ),
         HumanMessage(
             content="""Given the conversation history and last agent reply below, generate upto 3 follow up responses that the user may ask as json array without any commentary. Following is the schema that you should follow to return your response: 
@@ -64,9 +83,8 @@ async def generate_follow_up_questions(
         HumanMessage(content="Assistant response: {}.".format(llm_response)),
     ]
     result = await chat.ainvoke(messages)
-    logger.info("[OpenCopilot] LLM Body Response: {}".format(result.content))
 
     # Assuming extract_follow_up_questions is a function to extract follow-up questions from the model's response
-    followup = extract_follow_up_questions(cast(str, result.content))
+    followups = extract_follow_up_questions(cast(str, result.content))
 
-    return followup
+    return followups

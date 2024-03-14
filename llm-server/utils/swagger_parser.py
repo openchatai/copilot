@@ -12,9 +12,7 @@ from entities.action_entity import ActionDTO
 from shared.utils.opencopilot_utils.init_vector_store import init_vector_store
 from shared.utils.opencopilot_utils.interfaces import StoreOptions
 from utils.get_chat_model import get_chat_model
-from utils.get_logger import CustomLogger
-
-logger = CustomLogger(__name__)
+from utils.get_logger import SilentException
 
 
 class Endpoint:
@@ -100,16 +98,9 @@ class SwaggerParser:
 
         for path, path_data in paths.items():
             for method, method_data in path_data.items():
-                logger.info("method_data", method_data=method_data)
                 if not method_data.get("operationId") and not method_data.get(
                     "summary"
                 ):
-                    logger.error(
-                        "operation_id_not_found",
-                        path=path,
-                        method=method,
-                    )
-
                     raise ValueError(
                         "operationId and summary not present, one of them must be present."
                     )
@@ -256,14 +247,7 @@ class SwaggerParser:
                         "name",
                         method_data.get("summary", method_data.get("description")),
                     ),
-                )
-                if name is None:
-                    logger.error(
-                        "operation_id_not_found",
-                        bot_id=bot_id,
-                        path=path,
-                        method=method,
-                    )
+                )                    
 
                 action_dto = ActionDTO(
                     api_endpoint=base_uri + path,
@@ -300,12 +284,7 @@ class SwaggerParser:
             for http_verb, http_details in path_item.items():
                 summary = http_details.get("summary", "")
                 description = http_details.get("description", "")
-                # inconsistent tag behaviour..
-                # tags = (
-                #     ", ".join([t["name"] for t in http_details.get("tags", [])])
-                #     if http_details.get("tags", [])
-                #     else ""
-                # )
+
                 key = f"{path}"
                 relative_paths[key]["summary"] = summary
                 relative_paths[key]["description"] = description
@@ -329,7 +308,7 @@ class SwaggerParser:
                 for endpoint, meta in endpoints.items():
                     response += f"\nSummary: {meta['summary']}\nDescription: {meta['description']}"
 
-            chat = get_chat_model()
+            chat = get_chat_model("ingest_swagger_summary")
             messages = [
                 SystemMessage(
                     content="You are an assistant that can take some text and generate a correct summary of capabilities of a bot that is equipped with these api endpoints. The summary should begin with - As an ai assistant i have the following capabilities. Keep the summary concise, try to summarize in 3 sentences or less"
@@ -352,7 +331,7 @@ class SwaggerParser:
             )
 
         except Exception as error:
-            logger.error("swagger_parsing_failed", bot_id=bot_id, error=error)
+           SilentException.capture_exception(error)
 
     def remove_special_chars_and_numbers(self, text):
         # Define the pattern for special characters and digits

@@ -14,37 +14,11 @@ from shared.utils.opencopilot_utils import (
     StoreOptions,
     get_vector_store,
 )
-from utils.get_logger import CustomLogger
 from workers.utils.remove_escape_sequences import remove_escape_sequences
-from utils.llm_consts import STORAGE_TYPE, S3_BUCKET_NAME, SHARED_FOLDER
-
-logger = CustomLogger(module_name=__name__)
+from workers.tasks.bot_utils import determine_file_storage_path, download_s3_file
 
 embeddings = get_embeddings()
 kb_vector_store = get_vector_store(StoreOptions("knowledgebase"))
-
-
-def determine_file_storage_path(file_name):
-    storage_type = os.getenv(
-        "STORAGE_TYPE", "local"
-    )  # Default to local storage if not specified
-    if storage_type == "s3":
-        if not S3_BUCKET_NAME:
-            raise ValueError("S3_BUCKET_NAME environment variable is not set.")
-        file_path = f"s3://{S3_BUCKET_NAME}/{file_name}"
-        is_s3 = True
-    else:
-        file_path = os.path.join(SHARED_FOLDER, file_name)
-        is_s3 = False
-    return file_path, is_s3
-
-
-def download_s3_file(bucket_name, s3_key):
-    s3 = boto3.client("s3")
-    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-        s3.download_file(bucket_name, s3_key, temp_file.name)
-        return temp_file.name
-
 
 @shared_task
 def process_pdf(file_name: str, bot_id: str):
@@ -69,9 +43,7 @@ def process_pdf(file_name: str, bot_id: str):
 
         # clean text
         for doc in raw_docs:
-            logger.info("before_cleanup", page_content=doc.page_content)
             doc.page_content = remove_escape_sequences(doc.page_content)
-            logger.info("after_cleanup", page_content=doc.page_content)
 
         # clean the data received from pdf document before passing it
         text_splitter = RecursiveCharacterTextSplitter(
@@ -81,6 +53,7 @@ def process_pdf(file_name: str, bot_id: str):
 
         for doc in docs:
             doc.metadata["bot_id"] = bot_id
+            doc.metadata["link"] = file_path
 
         kb_vector_store.add_documents(docs)
         update_pdf_data_source_status(

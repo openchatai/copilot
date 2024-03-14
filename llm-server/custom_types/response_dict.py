@@ -1,4 +1,4 @@
-from typing import TypedDict, Optional, Dict, List
+from typing import TypedDict, Optional, Dict, List, Any
 from dataclasses import dataclass, field
 
 
@@ -9,7 +9,7 @@ class ResponseDict(TypedDict):
 
 @dataclass
 class ApiRequestResult:
-    api_requests: Dict[str, str] = field(default_factory=dict)
+    api_requests: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass

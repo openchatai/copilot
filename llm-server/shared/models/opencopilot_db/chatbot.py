@@ -2,8 +2,8 @@ import datetime
 import uuid
 
 from sqlalchemy import Column, String, DateTime, Boolean, Text, JSON
-
 from shared.models.opencopilot_db.database_setup import Base, engine
+
 from sqlalchemy import Integer
 
 
@@ -16,13 +16,13 @@ class ChatbotSettings(Base):
     # ForeignKey relationship to reference chatbots table
     chatbot_id = Column(String(36))
 
-
 class Chatbot(Base):
     __tablename__ = "chatbots"
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String(255))
     email = Column(String(255), nullable=True, default="guest")
+    user_id = Column(String(36), nullable=True)
     token = Column(String(255))
     website = Column(String(255), nullable=True)
     status = Column(String(255), default="draft")
@@ -31,12 +31,13 @@ class Chatbot(Base):
     enhanced_privacy = Column(Boolean, default=False)
     smart_sync = Column(Boolean, default=False)
     global_variables = Column(JSON, default={}, nullable=True)
+    language = Column(String(255), nullable=True, default="en")
+    type = Column(String(255), default="copilot", nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(
         DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
     )
     deleted_at = Column(DateTime, nullable=True)
-
     summary_prompt = Column(
         Text,
         default=(
@@ -45,6 +46,5 @@ class Chatbot(Base):
             "Format the summary in Markdown for clarity and readability."
         ),
     )
-
 
 Base.metadata.create_all(engine)
