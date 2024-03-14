@@ -11,6 +11,7 @@ from shared.utils.opencopilot_utils.interfaces import StoreOptions
 from shared.models.opencopilot_db.website_data_sources import (
     count_crawled_pages,
     create_website_data_source,
+    upsert_website_status,
 )
 from utils.llm_consts import WEB_CRAWL_STRATEGY, max_pages_to_crawl
 from models.repository.copilot_settings import ChatbotSettingCRUD
@@ -89,7 +90,7 @@ def scrape_website(
 
     # Use a queue for breadth-first scraping
     queue = [url]
-
+    current_url = url
     while queue and total_pages_scraped < max_pages:
         current_url = queue.pop(0)
 
@@ -118,6 +119,7 @@ def scrape_website(
                     chunk_size=1000, chunk_overlap=200, length_function=len
                 )
                 docs = text_splitter.create_documents([target_text])
+                logging.debug(f"Scraped content: {docs}")
                 init_vector_store(
                     docs,
                     StoreOptions(
@@ -133,6 +135,10 @@ def scrape_website(
             queue.extend(links)
 
         except Exception as e:
+            upsert_website_status(bot_id, current_url, "FAILED")
+            import traceback
+
+            traceback.print_exc()
             SilentException.capture_exception(
                 e, url=current_url, bot_id=bot_id, token=token
             )
@@ -149,16 +155,6 @@ def web_crawl(url, bot_id: str, token: str):
         web_crawl_strategy = WEB_CRAWL_STRATEGY
         setting = ChatbotSettingCRUD.get_chatbot_setting(bot_id)
         if setting is None:
-            chatbot = find_one_or_fail_by_id(bot_id)  # type: ignore
-            # user = find_user_by_id(int(chatbot.user_id))  # type: ignore
-            # domain = user.email.split("@")[-1] if "@" in chatbot.email else ""
-
-            # org_settings = get_org_settings_for_domain(domain)
-            # max_pages_to_crawl = org_settings.get_crawl_limit()
-            # web_crawl_strategy = org_settings.get_web_crawl_strategy()
-
-            # print(f"Found org settings for domain {domain}: {org_settings}")
-            # logging.info(f"Found org settings for domain {domain}: {org_settings}")
             setting = ChatbotSettingCRUD.create_chatbot_setting(
                 max_pages_to_crawl=max_pages_to_crawl, chatbot_id=bot_id
             )

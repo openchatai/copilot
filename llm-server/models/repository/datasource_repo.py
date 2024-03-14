@@ -25,6 +25,7 @@ def get_all_pdf_datasource_by_bot_id(
 
     return datasources
 
+
 def qdrant_delete_knowledgebase_item_by_link_and_bot_id(link: str, bot_id: str):
     result = client.delete(
         collection_name=VectorCollections.knowledgebase,
@@ -38,13 +39,14 @@ def qdrant_delete_knowledgebase_item_by_link_and_bot_id(link: str, bot_id: str):
                     models.FieldCondition(
                         key="metadata.bot_id",
                         match=models.MatchValue(value=bot_id),
-                    ),  
+                    ),
                 ],
             )
         ),
     )
 
     return result
+
 
 def get_all_website_datasource_by_bot_id(
     bot_id: str, limit: int = 20, offset: int = 0
@@ -63,19 +65,7 @@ def get_all_website_datasource_by_bot_id(
 
 
 def delete_knowldge_base_item_from_db(item_id: str) -> None:
-    """
-    Delete a knowledge base item from the database.
-
-    This function deletes a knowledge base item from the database, 
-    regardless of whether it is a PDF or web item.
-
-    Args:
-        item_id (str): The ID of the item to delete.
-        session (Session): The SQLAlchemy session to use for the deletion.
-
-    Returns:
-        None
-    """
-    session = Session()
-    # just delete the item from the database by id, no matter if it is a pdf or web item
-    session.query(PdfDataSource).filter_by(id=item_id).delete()
+    with Session() as session:
+        session.query(PdfDataSource).filter_by(id=item_id).delete()
+        session.query(WebsiteDataSource).filter_by(id=item_id).delete()
+        session.commit()
