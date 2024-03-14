@@ -36,9 +36,9 @@ def index():
 
 
 @copilot.route("/", methods=["POST"])
-def create_new_copilot(user):
+def create_new_copilot():
     chatbot = create_copilot(
-        user_id=user.id,
+        user_id="guest",
         name=request.form.get("name", "My First Copilot"),
         swagger_url="remove.this.filed.after.migration",
         prompt_message=request.form.get(
@@ -75,6 +75,10 @@ def create_new_copilot(user):
     try:
         send_copilot_created_follow_up_email(user.email)
     except Exception as e:
+        import traceback
+
+        traceback.print_exc()
+
         SilentException.capture_exception(e)
 
     return jsonify(chatbot)

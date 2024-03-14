@@ -90,7 +90,7 @@ def scrape_website(
 
     # Use a queue for breadth-first scraping
     queue = [url]
-
+    current_url = url
     while queue and total_pages_scraped < max_pages:
         current_url = queue.pop(0)
 
@@ -119,6 +119,7 @@ def scrape_website(
                     chunk_size=1000, chunk_overlap=200, length_function=len
                 )
                 docs = text_splitter.create_documents([target_text])
+                logging.debug(f"Scraped content: {docs}")
                 init_vector_store(
                     docs,
                     StoreOptions(
@@ -135,6 +136,9 @@ def scrape_website(
 
         except Exception as e:
             upsert_website_status(bot_id, current_url, "FAILED")
+            import traceback
+
+            traceback.print_exc()
             SilentException.capture_exception(
                 e, url=current_url, bot_id=bot_id, token=token
             )

@@ -12,13 +12,9 @@ from models.repository.copilot_repo import get_total_chatbots, get_chatbots_batc
 from routes.action import action_vector_service
 from shared.models.opencopilot_db.chatbot import Chatbot
 from utils.get_logger import SilentException
-from utils.llm_consts import initialize_qdrant_client
 from utils.swagger_parser import SwaggerParser
 from utils.llm_consts import SHARED_FOLDER
 import requests
-
-# Initialize Qdrant Client and other global variables
-client = initialize_qdrant_client()
 
 
 @shared_task
