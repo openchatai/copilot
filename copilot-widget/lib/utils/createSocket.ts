@@ -6,17 +6,18 @@ interface ConfigType {
   sessionId: string;
 }
 
-let socket: Socket | null = null;
+const sockets = new Map<string, Socket>();
 
 export function createSocketClient({
   socketUrl,
   token,
   sessionId,
 }: ConfigType) {
+  const socket = sockets.get(sessionId + token);
   if (socket) {
     return socket;
   }
-  socket = io(socketUrl, {
+  const newSocket = io(socketUrl, {
     autoConnect: false,
     transports: ["websocket"],
     extraHeaders: {
@@ -24,5 +25,6 @@ export function createSocketClient({
       "X-Session-Id": sessionId,
     },
   });
-  return socket;
+  sockets.set(sessionId + token, newSocket);
+  return newSocket;
 }
