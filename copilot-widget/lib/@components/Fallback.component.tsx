@@ -3,7 +3,7 @@ import type { ComponentProps } from "../contexts/componentRegistery";
 type Props = ComponentProps<unknown>;
 
 /**
- * The Basic Text component
+ * The Basic Fallback component (Rendered when Debug is True and the component key is not found)
  */
 export function Fallback(props: Props) {
   return (
