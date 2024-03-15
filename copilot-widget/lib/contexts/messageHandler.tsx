@@ -11,7 +11,39 @@ export type UserMessageType = {
   headers: Record<string, string>;
   bot_token: string;
   query_params: Record<string, string>;
+  language?: string;
 };
+
+function unsafe__decodeJSON<T extends Record<string, any>>(
+  jsonString: string
+): T | null {
+  try {
+    const parsed = JSON.parse(jsonString);
+    if (typeof parsed === "object" && parsed !== null) {
+      // Recursively parse nested JSON strings or arrays
+      Object.keys(parsed).forEach((key) => {
+        const value = parsed[key];
+        if (typeof value === "string") {
+          if (
+            typeof value === "string" &&
+            ((value.startsWith("{") && value.endsWith("}")) ||
+              (value.startsWith("[") && value.endsWith("]")))
+          ) {
+            try {
+              parsed[key] = JSON.parse(value);
+            } catch (e) {
+              // Ignore errors for invalid JSON strings
+            }
+          }
+        }
+      });
+      return parsed as T;
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
 
 export type BotMessageType<TData = Record<string, unknown>> = {
   from: "bot";
@@ -351,7 +383,7 @@ export class ChatController {
           name: string;
         };
     const handle = (msg: string) => {
-      const parsedResponse = JSON.parse(msg) as ResponseObject;
+      const parsedResponse = unsafe__decodeJSON(msg) as ResponseObject;
       this.setValueImmer((draft) => {
         let message: BotMessageType | null = null;
         if (parsedResponse.type === "ui_form") {
