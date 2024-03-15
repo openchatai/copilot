@@ -19,19 +19,41 @@ Once this system action is installed on your copilot, a `handoff` event could ha
 
 ## How to detect `handoff` event?
 
-Once the copilot detects a `handoff` event, it will send a `{session_id}_handoff` socket event to the client with the following payload:
+**You can detect and handle the `handoff` event in two ways:**
+
+- **Option 1:** By using `onHandoff` callback function:
+
+  This function will give you the flexibility to handle the `handoff` event in your own way, common case is to direct the user to some sort of ticketing system or a live chat system.
+
+  ```javascript
+    // add this in the chat widget options object
+    onHandoff(handoffPayload) {
+            console.log("Handoff", handoffPayload);
+    }
+  ```
+
+- **Option 2:** By using <a href="/widget/not-gen-ui">"respond with UI"</a> feature:
+
+  You can use the "respond with UI" feature to handle the `handoff` event by rendering a custom UI to the user. for example, you can render a from to collect the user's contact information and the nature of the problem.
+
+  ```javascript
+    // add this in the chat widget options object
+    components: [
+          {
+            key: "HANDOFF", // static
+            component: (props: ComponentProps<HandoffPayloadType>) => {
+              return props.data.summery;
+            },
+          },
+        ],
+  ```
+
+## What does the `handoff` event payload look like?
+The `handoff` event payload will contain the following information:
 
 ```json
 {
-  "summary": "Full summary of the conversation, to help the human agent understand the context of the conversation quickly.",
-  "sentiment": "happy|neutral|angry"
+  "summery": "full summery of the conversation, it can be used by the human agent to understand the context of the conversation faster",
+  "sentiment": "neutral|angry|happy",
 }
 ```
-
-Also, you can define a custom callback function to handle the `handoff` event on the client side. Here is an example of how to do that:
-
-```javascript
-```
-
-In this callback, you can do whatever you want, like showing a button to the user to request a human agent, or send a notification to the human agent to take over the conversation, or transfer the conversation to a human agent automatically.
-
