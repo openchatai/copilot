@@ -1,4 +1,4 @@
-import { io } from "socket.io-client";
+import { Socket, io } from "socket.io-client";
 
 interface ConfigType {
   socketUrl: string;
@@ -6,12 +6,17 @@ interface ConfigType {
   sessionId: string;
 }
 
+let socket: Socket | null = null;
+
 export function createSocketClient({
   socketUrl,
   token,
   sessionId,
 }: ConfigType) {
-  return io(socketUrl, {
+  if (socket) {
+    return socket;
+  }
+  socket = io(socketUrl, {
     autoConnect: false,
     transports: ["websocket"],
     extraHeaders: {
@@ -19,4 +24,5 @@ export function createSocketClient({
       "X-Session-Id": sessionId,
     },
   });
+  return socket;
 }
