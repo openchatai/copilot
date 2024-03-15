@@ -63,7 +63,7 @@
     <div id="opencopilot-root"></div>
 
     <script>
-      const token = "D3BCYwikexJ0hF1Z";
+      const token = "9Mq2t3kepm1F5Akr";
       const apiUrl = "https://api.opencopilot.so/backend";
       const socketUrl = "https://api.opencopilot.so";
       const sharedConfig = {
@@ -74,13 +74,16 @@
         defaultOpen: true, // optional
         language: "en", // optional
         warnBeforeClose: true,
+        debug: true,
         headers: {
           // optional
           // Authorization: "Bearer BQAlIe479yo16aXf",
+          Cookie: `SESSIONID_MYM=pbljd8rnim9pt46d652olit663;`,
         },
         queryParams: {
           // optional
           // passing extra query params to the backend along with every user message.
+        organizationId: 'org_7658431',
         },
         bot: {
           name: "AI Bot",

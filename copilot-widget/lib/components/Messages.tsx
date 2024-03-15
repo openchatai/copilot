@@ -4,7 +4,6 @@ import { formatTimeFromTimestamp } from "../utils/time";
 import { getLast, isEmpty } from "@lib/utils/utils";
 import { useConfigData } from "@lib/contexts/ConfigData";
 import { useChatState } from "@lib/contexts/statefulMessageHandler";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ToolTip";
 
 export function BotIcon({ error }: { error?: boolean }) {
   const config = useConfigData();
@@ -48,16 +47,7 @@ function UserAvatar() {
 function User() {
   const config = useConfigData();
 
-  return (
-    <Tooltip>
-      <TooltipContent hidden={!config?.user} side="top" align="center">
-        <span>{config?.user?.name}</span>
-      </TooltipContent>
-      <TooltipTrigger asChild>
-        <UserAvatar />
-      </TooltipTrigger>
-    </Tooltip>
-  );
+  return <UserAvatar />;
 }
 
 export function BotMessageWrapper({

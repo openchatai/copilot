@@ -1,3 +1,4 @@
+export { BotMessageWrapper } from "./components/Messages";
 export { default as Root } from "./Root";
 export { CopilotWidget } from "./CopilotWidget";
 export type {

@@ -1,5 +1,5 @@
 import { useWidgetState } from "../contexts/WidgetState";
-import { AlertTriangle, CircleDashed, X } from "lucide-react";
+import { AlertTriangle, X } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -11,7 +11,6 @@ import { Button } from "./Button";
 import { useInitialData } from "@lib/hooks/useInitialData";
 import { useLang } from "@lib/contexts/LocalesProvider";
 import { useConfigData } from "@lib/contexts/ConfigData.tsx";
-import { useSocket } from "@lib/contexts/SocketProvider";
 
 function WarnBeforeCloseDialog({ onClose }: { onClose: () => void }) {
   const { get } = useLang();
@@ -42,41 +41,12 @@ function WarnBeforeCloseDialog({ onClose }: { onClose: () => void }) {
     </Dialog>
   );
 }
-function DisconnedtedAlert() {
-  const { state } = useSocket();
-  if (state.state === "disconnected") {
-    return (
-      <div className="bg-rose-200 p-1 px-2 text-rose-500 flex items-start gap-2">
-        <AlertTriangle className="text-xl size-[1em] text-rose-800" />
-        <span>
-          The connection to the server has been lost. Please wait while we try
-          to reconnect.
-        </span>
-      </div>
-    );
-  }
-  return null;
-}
-
-function ConnectingAlert() {
-  const { state } = useSocket();
-  if (state.state === "retrying") {
-    return (
-      <div className="bg-yellow-200 p-1 px-2 text-yellow-500 flex items-start gap-2">
-        <CircleDashed className="text-xl size-[1em] animate-spin text-yellow-800" />
-        <span>
-          We are trying to reconnect to the server. Please wait a moment.
-        </span>
-      </div>
-    );
-  }
-  return null;
-}
 
 export default function ChatHeader() {
   const [, , SetState] = useWidgetState();
   const { data } = useInitialData();
   const config = useConfigData();
+  const debug = config.debug ?? false;
 
   const onClose = () => {
     SetState(false);
@@ -89,9 +59,12 @@ export default function ChatHeader() {
   return (
     <header className="border-b border-b-black/10 w-full">
       <div className="p-2 w-full flex items-center justify-between">
-        <h1 className="font-semibold text-sm">
-          {data?.bot_name || "OpenCopilot"}
-        </h1>
+        <div className="flex items-center gap-2">
+          <h1 className="font-semibold text-sm">
+            {data?.bot_name || "OpenCopilot"}
+          </h1>
+          {debug && <span className="py-0.5 px-1 bg-primary font-semibold text-[10px] rounded-lg text-white">DEBUG</span>}
+        </div>
         <div className="flex items-center gap-3">
           {config?.warnBeforeClose === false ? (
             <button onClick={onClose}>
@@ -101,10 +74,6 @@ export default function ChatHeader() {
             <WarnBeforeCloseDialog onClose={onClose} />
           )}
         </div>
-      </div>
-      <div className="alerts w-full text-xs">
-        <DisconnedtedAlert />
-        <ConnectingAlert />
       </div>
     </header>
   );

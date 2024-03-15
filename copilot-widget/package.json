@@ -1,7 +1,7 @@
 {
   "name": "@openchatai/copilot-widget",
   "private": false,
-  "version": "2.8.6",
+  "version": "2.8.7",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -20,7 +20,6 @@
   "devDependencies": {
     "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/react-slot": "^1.0.2",
-    "@radix-ui/react-tooltip": "^1.0.7",
     "@tailwindcss/typography": "^0.5.10",
     "@types/node": "^20.11.14",
     "@types/react": "^18.2.48",
@@ -44,7 +43,7 @@
     "react-textarea-autosize": "^8.5.3",
     "release-it": "^17.1.1",
     "remark-gfm": "^3.0.1",
-    "socket.io-client": "^4.7.4",
+    "socket.io-client": "^4.7.5",
     "swr": "^2.2.4",
     "tailwind-merge": "^1.14.0",
     "tailwind-scrollbar": "^3.0.5",
