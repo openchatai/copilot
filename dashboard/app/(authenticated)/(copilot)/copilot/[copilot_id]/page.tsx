@@ -47,7 +47,7 @@ function InstallationSection() {
           </p>
           <CodeBlock
             code={`
-<script src="${baseUrl}/pilot.js"></script>
+            <script src="https://unpkg.com/@openchatai/copilot-widget@latest/dist-embed/pilot.js"></script>
 <script> 
       const options = {
         apiUrl: "${baseUrl}/backend", 
