@@ -20,7 +20,6 @@
   "devDependencies": {
     "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/react-slot": "^1.0.2",
-    "@radix-ui/react-tooltip": "^1.0.7",
     "@tailwindcss/typography": "^0.5.10",
     "@types/node": "^20.11.14",
     "@types/react": "^18.2.48",
