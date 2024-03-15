@@ -18,8 +18,6 @@ services:
     ports:
       - 8002
       - 5678
-    deploy:
-      replicas: 3 
     depends_on:
       mysql:
         condition: service_healthy
