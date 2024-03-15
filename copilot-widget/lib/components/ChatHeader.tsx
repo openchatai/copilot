@@ -63,7 +63,7 @@ export default function ChatHeader() {
           <h1 className="font-semibold text-sm">
             {data?.bot_name || "OpenCopilot"}
           </h1>
-          {debug && <span className="py-0.5 px-1 bg-primary font-medium text-[10px] rounded-lg text-white">DEBUG</span>}
+          {debug && <span className="py-0.5 px-1 bg-primary font-semibold text-[10px] rounded-lg text-white">DEBUG</span>}
         </div>
         <div className="flex items-center gap-3">
           {config?.warnBeforeClose === false ? (

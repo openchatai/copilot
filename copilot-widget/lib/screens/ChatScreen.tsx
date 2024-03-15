@@ -61,6 +61,7 @@ export default function ChatScreen() {
                     {...message}
                     data={message.data ?? {}}
                     id={message.id}
+                    key={index}
                   />
                 );
               } else if (message.from === "user") {
