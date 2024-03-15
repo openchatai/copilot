@@ -1,9 +1,11 @@
 import React from "react";
+import type { BotMessageType } from "./messageHandler";
+
 import { Fallback } from "@lib/@components/Fallback.component";
 import { FormComponent } from "@lib/@components/Form.component";
 import { Loading } from "@lib/@components/Loading.component";
 import { Text } from "@lib/@components/Text.component";
-import type { BotMessageType } from "./messageHandler";
+import { HandoffComponentRenderer } from "@lib/@components/Handoff.component";
 
 export type ComponentProps<TData> = BotMessageType<TData>;
 
@@ -15,6 +17,7 @@ export type ComponentType = {
 type OptionsType = {
   components?: ComponentType[];
 };
+
 /**
  * this a singleton  class helps me to easily control the components present/available in the widget.
  * it also manges the various types of components to be added along the way.
@@ -36,6 +39,10 @@ export class ComponentRegistery {
     {
       key: "LOADING",
       component: Loading,
+    },
+    {
+      key: "HANDOFF",
+      component: HandoffComponentRenderer,
     },
   ] as const;
 
