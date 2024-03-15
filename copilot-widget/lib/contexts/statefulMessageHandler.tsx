@@ -6,6 +6,7 @@ import { useSessionId } from "@lib/hooks/useSessionId";
 import { useConfigData } from "./ConfigData";
 import { useSocket } from "./SocketProvider";
 import { ComponentRegistery } from "./componentRegistery";
+import { useLang } from "..";
 
 const [useMessageHandler, MessageHandlerSafeProvider] = createSafeContext<{
   __handler: ChatController;
@@ -68,6 +69,7 @@ function useChatLoading() {
 function useSendMessage() {
   const { __handler } = useMessageHandler();
   const { headers, token, queryParams } = useConfigData();
+  const { lang } = useLang();
   const socket = useSocket();
 
   function send(content: string) {
@@ -77,6 +79,7 @@ function useSendMessage() {
         query_params: queryParams ?? {},
         content,
         bot_token: token,
+        language: lang,
       },
       socket.__socket
     );
