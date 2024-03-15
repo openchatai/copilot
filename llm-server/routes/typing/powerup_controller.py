@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+
 from shared.models.opencopilot_db.powerups import PowerUp
 from models.repository.powerup_repo import (
     create_powerup,
@@ -90,7 +91,7 @@ def powerup_instruct():
 
     chat_model = get_chat_model()
     system_message = SystemMessage(
-        content="You are an ai assistant that helps people with their writing."
+        content="You are an grammarly. Do not add any commentary and do not explain your outputs, just fix any issues. If there are no issues, return the input as is."
     )
     instruction_message = HumanMessage(content=instruction)
     input_data_message = HumanMessage(content=input_data)

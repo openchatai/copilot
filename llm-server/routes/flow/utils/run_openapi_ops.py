@@ -12,11 +12,9 @@ from integrations.load_json_config import load_json_config
 from integrations.transformers.transformer import transform_response
 from routes.flow.api_info import ApiInfo
 from routes.flow.generate_openapi_payload import generate_api_payload
-from utils.get_logger import CustomLogger
+from utils.get_logger import SilentException
 from utils.make_api_call import make_api_request
 from utils.process_app_state import process_state
-
-logger = CustomLogger(module_name=__name__)
 
 
 async def run_actions(
@@ -63,21 +61,8 @@ async def run_actions(
 
                 partial_json = load_json_config(app, operation_id)
                 if not partial_json:
-                    logger.warn(
-                        "Config map is not defined for this operationId",
-                        incident="config_map_undefined",
-                        operation_id=operation_id,
-                        app=app,
-                    )
                     apis_calls_history[operation_id] = api_response["response"]
                 else:
-                    logger.info(
-                        "API Response",
-                        incident="log_api_response",
-                        api_response=api_response["response"],
-                        json_config_used=partial_json,
-                        next_action="summarize_with_partial_json",
-                    )
                     api_json = json.loads(api_response["response"])
                     apis_calls_history[operation_id] = json.dumps(
                         transform_response(
@@ -86,15 +71,7 @@ async def run_actions(
                     )
 
             except Exception as e:
-                logger.error(
-                    "Error occurred during workflow check in store",
-                    incident="check_workflow_in_store",
-                    bot_id=bot_id,
-                    text=text,
-                    headers=headers,
-                    app=app,
-                    error=e,
-                )
+                SilentException.capture_exception(e)
 
                 formatted_error = convert_json_error_to_text(
                     str(e), is_streaming, session_id
@@ -116,6 +93,6 @@ async def run_actions(
         error_message = (
             f"{str(e)}: {api_payload.endpoint}" if api_payload is not None else ""
         )
-        logger.error("OpenAI exception", bot_id=bot_id, error=e)
+        SilentException.capture_exception(e)
         emit(session_id, error_message) if is_streaming else None
         return error_message, api_request_data

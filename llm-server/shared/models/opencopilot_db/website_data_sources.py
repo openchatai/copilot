@@ -11,37 +11,32 @@ Session = sessionmaker(bind=engine)
 def create_website_data_source(chatbot_id: str, url: str, status: str):
     Session = sessionmaker(bind=engine)
     session = Session()
-    website_data_source = WebsiteDataSource(
-        chatbot_id=chatbot_id, url=url, status=status
+
+    # Attempt to find an existing WebsiteDataSource entry by URL
+    existing_website_data_source = (
+        session.query(WebsiteDataSource).filter_by(url=url).first()
     )
-    session.add(website_data_source)
-    session.commit()
-    return website_data_source
 
-
-def upsert_website_data_source(
-    chatbot_id: str, url: str, status: str, error: Optional[str] = None
-):
-    Session = sessionmaker(bind=engine)
-    session = Session()
-
-    # Check if the record with the given URL exists
-    website_data_source = session.query(WebsiteDataSource).filter_by(url=url).first()
-
-    if website_data_source is None:
-        # If the record doesn't exist, insert a new one
-        website_data_source = WebsiteDataSource(
-            url=url, status=status, error=error, chatbot_id=chatbot_id
-        )
-        session.add(website_data_source)
+    if existing_website_data_source:
+        # If found, update the existing entry
+        existing_website_data_source.chatbot_id = chatbot_id
+        existing_website_data_source.status = status
     else:
-        # If the record exists, update the status (and error if applicable)
-        website_data_source.status = status
-        if error is not None:
-            website_data_source.error = error
+        # If not found, create a new WebsiteDataSource object and add it to the session
+        new_website_data_source = WebsiteDataSource(
+            chatbot_id=chatbot_id, url=url, status=status
+        )
+        session.add(new_website_data_source)
 
+    # Commit the session to apply the changes
     session.commit()
-    return website_data_source
+
+    # Return the updated or newly created WebsiteDataSource object
+    return (
+        existing_website_data_source
+        if existing_website_data_source
+        else new_website_data_source
+    )
 
 
 def get_website_data_source_by_id(website_data_source_id: str):
@@ -69,3 +64,22 @@ def count_crawled_pages(bot_id: str) -> int:
     count = session.query(WebsiteDataSource).filter_by(chatbot_id=bot_id).count()
 
     return count
+
+
+def upsert_website_status(chatbot_id, url: str, status: str):
+    session = Session()
+    website_datasource = (
+        session.query(WebsiteDataSource)
+        .filter_by(chatbot_id=chatbot_id, url=url)
+        .first()
+    )
+    if website_datasource:
+        website_datasource.status = status
+        session.commit()
+    else:
+        website_datasource = WebsiteDataSource(
+            chatbot_id=chatbot_id, url=url, status=status
+        )
+        session.add(website_datasource)
+        session.commit()
+    return website_datasource

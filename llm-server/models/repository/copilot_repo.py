@@ -1,5 +1,4 @@
 import datetime
-import json
 import uuid
 from typing import Iterable, List, Optional, Any
 from flask import jsonify
@@ -10,11 +9,10 @@ from sqlalchemy.orm import sessionmaker, Session
 from copy import deepcopy
 from shared.models.opencopilot_db.chatbot import Chatbot, engine
 from utils.base import generate_random_token
-from utils.get_logger import CustomLogger
+from werkzeug.exceptions import NotFound
 
 # Create a Session factory
 SessionLocal = sessionmaker(bind=engine)
-logger = CustomLogger(module_name=__name__)
 
 
 def list_all_with_filter(filter_criteria: Optional[Any] = None) -> List[Chatbot]:
@@ -37,18 +35,16 @@ def list_all_with_filter(filter_criteria: Optional[Any] = None) -> List[Chatbot]
 
         chatbots = list_all_with_filter(Chatbot.name == 'desired_name')
     """
-    session: Session = SessionLocal()
-    try:
-        query = session.query(Chatbot)
-        if filter_criteria is not None:
-            query = query.filter(filter_criteria)
-        results: List[Chatbot] = query.all()
-        return results
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        raise
-    finally:
-        session.close()
+    with SessionLocal() as session:
+        try:
+            query = session.query(Chatbot)
+            if filter_criteria is not None:
+                query = query.filter(filter_criteria)
+            results: List[Chatbot] = query.all()
+            return results
+        except Exception as e:
+            print(f"Error occurred: {e}")
+            raise
 
 
 def get_total_chatbots() -> int:
@@ -73,15 +69,15 @@ def get_chatbots_batch(offset: int, batch_size: int) -> Iterable[Chatbot]:
         session.close()
 
 
-def find_or_fail_by_bot_id(bot_id: bytes) -> Optional[Chatbot]:
+def find_or_fail_by_bot_id(bot_id: bytes) -> Chatbot:
     session: Session = SessionLocal()
     try:
         bot: Chatbot = session.query(Chatbot).filter(Chatbot.id == bot_id).one()
         return bot
     except exc.NoResultFound:
-        raise ValueError(f"No Chatbot found with id: {bot_id}")
+        raise NotFound(description=f"No Chatbot found with token: {bot_id}")
     except Exception as e:
-        print(f"Error occurred: {e}")
+        raise NotFound(description=f"No Chatbot found with token: {bot_id}")
     finally:
         session.close()
 
@@ -90,8 +86,10 @@ def create_copilot(
     name: str,
     prompt_message: str,
     swagger_url: str,
+    user_id: str,
     enhanced_privacy: bool = False,
     smart_sync: bool = False,
+    type: str = "copilot",
     website: Optional[str] = None,
 ):
     """
@@ -123,8 +121,10 @@ def create_copilot(
             swagger_url=swagger_url,
             enhanced_privacy=enhanced_privacy,
             smart_sync=smart_sync,
+            type=type,
             created_at=datetime.datetime.utcnow(),
             updated_at=datetime.datetime.utcnow(),
+            user_id=user_id,
         )
 
         try:
@@ -134,12 +134,6 @@ def create_copilot(
             return chatbot_to_dict(new_chatbot)
         except Exception as e:
             session.rollback()
-            logger.error(
-                "An exception occurred",
-                app="OPENCOPILOT",
-                error=e,
-                incident="swagger",
-            )
             raise e
         finally:
             session.close()
@@ -164,7 +158,7 @@ def find_one_or_fail_by_id(bot_id: str) -> Chatbot:
         bot = session.query(Chatbot).filter(Chatbot.id == str(bot_id)).one()
         return bot
     except exc.NoResultFound:
-        raise ValueError(f"No Chatbot found with id: {bot_id}")
+        raise NotFound(description=f"No Chatbot found with id: {bot_id}")
     except Exception as e:
         session.rollback()
         raise e
@@ -191,7 +185,7 @@ def find_one_or_fail_by_token(bot_token: str) -> Chatbot:
         bot = session.query(Chatbot).filter(Chatbot.token == str(bot_token)).one()
         return bot
     except exc.NoResultFound:
-        raise ValueError(f"No Chatbot found with token: {bot_token}")
+        raise NotFound(description=f"No Chatbot found with token: {bot_token}")
     except Exception as e:
         session.rollback()
         raise e
@@ -213,6 +207,7 @@ def chatbot_to_dict(chatbot: Chatbot):
         "prompt_message": chatbot.prompt_message,
         "enhanced_privacy": chatbot.enhanced_privacy,
         "smart_sync": chatbot.smart_sync,
+        "type": chatbot.type if chatbot.type else "copilot",
         "created_at": chatbot.created_at.isoformat() if chatbot.created_at else None,
         # Converts datetime to ISO format string
         "updated_at": chatbot.updated_at.isoformat() if chatbot.updated_at else None,
@@ -237,7 +232,7 @@ def delete_copilot_global_key(copilot_id: str, variable_key: str):
                 session.refresh(copilot)
         except Exception:
             session.rollback()
-            raise ValueError(f"No Chatbot found with id: {copilot_id}")
+            raise NotFound(description=f"No Chatbot found with token: {copilot_id}")
     return jsonify({"message": "JSON data stored successfully"})
 
 
@@ -260,15 +255,10 @@ def store_copilot_global_variables(copilot_id: str, new_variables: dict):
             return existing_variables
         except exc.NoResultFound:
             session.rollback()
-            raise ValueError(f"No Chatbot found with id: {copilot_id}")
+            raise NotFound(description=f"No Chatbot found with token: {copilot_id}")
         except Exception as e:
             session.rollback()
-            logger.error(
-                "An exception occurred",
-                app="OPENCOPILOT",
-                error=e,
-                incident="update_global_variables",
-            )
+            raise e
 
 
 def update_copilot(
@@ -325,14 +315,22 @@ def update_copilot(
         return chatbot_to_dict(chatbot)
     except exc.NoResultFound:
         session.rollback()
-        raise ValueError(f"No Chatbot found with id: {copilot_id}")
+        raise NotFound(description=f"No Chatbot found with token: {copilot_id}")
+
     except Exception as e:
         session.rollback()
-        logger.error(
-            "An exception occurred",
-            app="OPENCOPILOT",
-            error=e,
-            incident="update_copilot",
-        )
+        raise e
     finally:
         session.close()
+
+
+
+def find_copilot_by_id_and_user_id(copilot_id: str, user_id: str):
+    with SessionLocal() as session:
+        try:
+            chatbot = session.query(Chatbot).filter(Chatbot.id == copilot_id, Chatbot.user_id == user_id).one()
+            return chatbot
+        except exc.NoResultFound:
+            raise NotFound(description=f"No Chatbot found with token: {copilot_id}")
+        except Exception as e:
+            raise e

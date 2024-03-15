@@ -1,31 +1,32 @@
 from typing import Set
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urljoin
 from celery import shared_task
 
-import traceback
-
+import logging
+import uuid
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from routes.search.search_service import add_cmdbar_data, Item
+from routes.search.search_service import Item
 from shared.utils.opencopilot_utils.init_vector_store import init_vector_store
 from shared.utils.opencopilot_utils.interfaces import StoreOptions
 from shared.models.opencopilot_db.website_data_sources import (
     count_crawled_pages,
     create_website_data_source,
-    get_website_data_source_by_id,
+    upsert_website_status,
 )
 from utils.llm_consts import WEB_CRAWL_STRATEGY, max_pages_to_crawl
 from models.repository.copilot_settings import ChatbotSettingCRUD
 from workers.tasks.url_parsers import ParserFactory, TextContentParser
 
 from workers.utils.remove_escape_sequences import remove_escape_sequences
-from utils.get_logger import CustomLogger
 from workers.tasks.web_scraping_strategy import get_scraper
 from bs4 import BeautifulSoup
 
-logger = CustomLogger(__name__)
+# from routes.search.meilisearch_service import add_item_to_index
+from utils.get_logger import SilentException
+from models.repository.copilot_repo import find_one_or_fail_by_id
 
 
-def get_links(url: str, strategy=WEB_CRAWL_STRATEGY) -> Set[str]:
+def get_links(url: str, strategy: str) -> Set[str]:
     if url.endswith((".jpg", ".jpeg", ".png", ".gif", ".bmp", ".mp4", ".avi", ".mkv")):
         return set()
 
@@ -55,54 +56,41 @@ def get_links(url: str, strategy=WEB_CRAWL_STRATEGY) -> Set[str]:
         return set()
 
 
-def scrape_url(url: str, bot_id: str):
+def scrape_url(url: str, token: str, web_crawl_strategy: str):
     try:
-        strategy = WEB_CRAWL_STRATEGY
         # for external sources always use text content parser, because we don't know the content type
-        if strategy != "requests":
+        if web_crawl_strategy != "requests":
             parser = TextContentParser()
         else:
             parser = ParserFactory.get_parser(url)
 
-        scraper = get_scraper(strategy)
+        logging.info(f"Scraping URL: {url}")
+        scraper = get_scraper(web_crawl_strategy)
         content = scraper.extract_data(url)
 
-        title, headings = parser.find_all_headings_and_highlights(content)
-        items = [
-            Item(title=title, heading_text=heading_text, heading_id=heading_id)
-            for heading_text, heading_id in headings
-        ]
-
-        add_cmdbar_data(items, {"url": url, "bot_id": bot_id})
-        return parser.parse_text_content(content)
+        content = parser.parse_text_content(content)
+        return content
     except ValueError as e:
         # Log an error message if no parser is available for the content type
-        logger.error("SCRAPE_URL_FN", error=e)
+
         return None
 
 
-def scrape_website(url: str, bot_id: str, max_pages: int) -> int:
-    """Scrapes a website in breadth-first order, following all of the linked pages.
-
-    Args:
-      url: The URL of the website to scrape.
-      max_pages: The maximum number of pages to scrape.
-
-    Returns:
-      The total number of scraped pages.
-    """
+def scrape_website(
+    url: str, bot_id: str, max_pages: int, token: str, web_crawl_strategy: str
+) -> int:
     total_pages_scraped = count_crawled_pages(bot_id)
     if total_pages_scraped > max_pages:
-        logger.warn(
-            "web_crawl_max_pages_reached",
-            info=f"Reached max pages to crawl for chatbot {bot_id}. Stopping crawl.",
+        logging.info(f"Exceeded the maximum number of pages to scrape: {max_pages}.")
+        SilentException.capture_exception(
+            ValueError(f"Exceeded the maximum number of pages to scrape: {max_pages}.")
         )
 
     visited_urls: Set[str] = set()
 
     # Use a queue for breadth-first scraping
     queue = [url]
-
+    current_url = url
     while queue and total_pages_scraped < max_pages:
         current_url = queue.pop(0)
 
@@ -117,7 +105,9 @@ def scrape_website(url: str, bot_id: str, max_pages: int) -> int:
             ):
                 continue
 
-            content = scrape_url(current_url, bot_id=bot_id)
+            content = scrape_url(
+                current_url, token=token, web_crawl_strategy=web_crawl_strategy
+            )
 
             total_pages_scraped += 1
             visited_urls.add(current_url)
@@ -129,6 +119,7 @@ def scrape_website(url: str, bot_id: str, max_pages: int) -> int:
                     chunk_size=1000, chunk_overlap=200, length_function=len
                 )
                 docs = text_splitter.create_documents([target_text])
+                logging.debug(f"Scraped content: {docs}")
                 init_vector_store(
                     docs,
                     StoreOptions(
@@ -140,14 +131,17 @@ def scrape_website(url: str, bot_id: str, max_pages: int) -> int:
                     chatbot_id=bot_id, url=current_url, status="SUCCESS"
                 )
 
-                # Get links on the current page
-                links = get_links(current_url)
-
-                # Add new links to the queue
-                queue.extend(links)
+            links = get_links(current_url, web_crawl_strategy)
+            queue.extend(links)
 
         except Exception as e:
-            logger.error("WEB_SCRAPE_ERROR", error=e)
+            upsert_website_status(bot_id, current_url, "FAILED")
+            import traceback
+
+            traceback.print_exc()
+            SilentException.capture_exception(
+                e, url=current_url, bot_id=bot_id, token=token
+            )
 
         # Mark the URL as visited
         visited_urls.add(current_url)
@@ -156,39 +150,19 @@ def scrape_website(url: str, bot_id: str, max_pages: int) -> int:
 
 
 @shared_task(enable_trace=True)
-def web_crawl(url, bot_id: str):
+def web_crawl(url, bot_id: str, token: str):
     try:
-        # setting = ChatbotSettings.get_chatbot_setting(bot_id)
+        web_crawl_strategy = WEB_CRAWL_STRATEGY
         setting = ChatbotSettingCRUD.get_chatbot_setting(bot_id)
-
         if setting is None:
             setting = ChatbotSettingCRUD.create_chatbot_setting(
                 max_pages_to_crawl=max_pages_to_crawl, chatbot_id=bot_id
             )
 
-        logger.info(f"chatbot_settings: {setting.max_pages_to_crawl}")
         create_website_data_source(chatbot_id=bot_id, status="PENDING", url=url)
 
-        scrape_website(url, bot_id, setting.max_pages_to_crawl or max_pages_to_crawl)
-    except Exception as e:
-        logger.error(
-            "WEB_SCRAPING_FAILED", info=f"Failed to scrape website {url}.", error=e
+        scrape_website(
+            url, bot_id, setting.max_pages_to_crawl, token, web_crawl_strategy
         )
-        traceback.print_exc()
-
-
-@shared_task
-def resume_failed_website_scrape(website_data_source_id: str):
-    """Resumes a failed website scrape.
-
-    Args:
-      website_data_source_id: The ID of the website data source to resume scraping.
-    """
-
-    # Get the website data source.
-    website_data_source = get_website_data_source_by_id(website_data_source_id)
-
-    # Get the URL of the website to scrape.
-    url = website_data_source.url
-
-    scrape_website(url, website_data_source.bot_id, max_pages_to_crawl)
+    except Exception as e:
+        SilentException.capture_exception(e, url=url, bot_id=bot_id, token=token)

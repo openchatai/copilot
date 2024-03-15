@@ -11,15 +11,10 @@ from models.repository.action_repo import (
 from models.repository.copilot_repo import get_total_chatbots, get_chatbots_batch
 from routes.action import action_vector_service
 from shared.models.opencopilot_db.chatbot import Chatbot
-from utils.get_logger import CustomLogger
-from utils.llm_consts import initialize_qdrant_client
+from utils.get_logger import SilentException
 from utils.swagger_parser import SwaggerParser
 from utils.llm_consts import SHARED_FOLDER
 import requests
-
-# Initialize Qdrant Client and other global variables
-client = initialize_qdrant_client()
-logger = CustomLogger(module_name=__name__)
 
 
 @shared_task
@@ -30,13 +25,9 @@ def index_actions(batch_size: int = 100):
     :param batch_size: Size of each batch for processing chatbots.
     """
     total_files: int = get_total_chatbots()
-    logger.info(
-        f"Starting indexing process for {total_files} chatbots in batches of {batch_size}"
-    )
     for offset in range(0, total_files, batch_size):
         batch: Iterable[Chatbot] = get_chatbots_batch(offset, batch_size)
         process_swagger_files_batch(batch)
-        logger.info(f"Processed a batch of chatbots from offset {offset}")
 
 
 def process_swagger_files_batch(chatbots: Iterable[Chatbot]):
@@ -47,7 +38,6 @@ def process_swagger_files_batch(chatbots: Iterable[Chatbot]):
     """
     for chatbot in chatbots:
         if str(chatbot.swagger_url) == "remove.this.filed.after.migration":
-            logger.info(f"No swagger file found for bot {chatbot.id}, skipping ...")
             continue
         process_swagger_file(chatbot)
 
@@ -98,17 +88,9 @@ def process_swagger_file(chatbot: Chatbot):
             if not action_exists_in_rds(bot_id, action.operation_id):
                 create_action(chatbot_id=bot_id, data=action)
                 action_vector_service.create_action(action)
-        logger.info(
-            f"Successfully processed Swagger file for bot {bot_id} with {num_actions} actions"
-        )
 
     except Exception as e:
-        logger.error(
-            "swagger_parsing_failed",
-            bot_id=bot_id,
-            swagger_url=swagger_url,
-            error=e
-        )
+        SilentException.capture_exception(e)
 
 
 def action_exists_in_rds(bot_id: str, operation_id: str) -> bool:

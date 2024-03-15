@@ -1,0 +1,218 @@
+---
+title: "Responding with UI"
+description: "Learn how to respond to user input with a UI."
+---
+
+The copilot offer the ability to respond with highly customizable UIs. This way you can create a more interactive experience for your users.
+
+
+These UIs can be used for a variety of purposes, such as:
+
+- Displaying information in a more user-friendly way
+- Collecting user input
+- Providing a more interactive experience for the user (from simple buttons to complex forms)
+- Showing progress or status updates, videos, images, and more
+- Toggle dark mode, change language, and other settings.
+
+## Example
+
+We will create a simple copilot that have access to real time weather data and display it in a UI.
+
+- After creating the copilot, create a new action called `getTheWeather`, make sure the action type is `GET`, and pass the following URL:
+    ```
+    https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperat[…]m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m
+    ```
+
+
+You should have seomthing like this image:
+
+    ![getTheWeather](/images/weather.png)
+
+
+- Now, embed the copilot using our <a href="/widget/embed#as-a-react-component">React component </a> :
+
+    ```jsx
+    import { CopilotWidget, Root } from "@openchatai/copilot-widget";
+    import { GetWetherDataRenderer } from "./components/WeatherRenderer";
+
+    function App() {
+    return (
+        <div className="max-w-sm h-full">
+        <Root
+            options={{
+            apiUrl: "https://api.opencopilot.so/backend",
+            token: "DYeTrnA9l3RXvrEK",
+            defaultOpen: true,
+            initialMessage: "Hello",
+            socketUrl: "https://api.opencopilot.so",
+            components: [
+                {
+                key: "getTheWeather", // This key should match the key of the action (getTheWeather) from the dashboard
+                component: GetWetherDataRenderer,
+                },
+            ],
+            language: "en",
+            }}
+        >
+            <CopilotWidget />
+        </Root>
+        </div>
+    );
+    }
+
+    export default App;
+    ```
+
+- Create a new file called `WeatherRenderer.js` and add the following code:
+
+    ```jsx
+    import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+    } from "@/components/ui/card";
+    import { ComponentProps } from "@openchatai/copilot-widget";
+    import { ResponsiveLine } from "@nivo/line";
+
+    interface WeatherInfo {
+    latitude: number;
+    longitude: number;
+    generationtime_ms: number;
+    utc_offset_seconds: number;
+    timezone: string;
+    timezone_abbreviation: string;
+    elevation: number;
+    current_units: {
+        time: string;
+        interval: string;
+        temperature_2m: string;
+        wind_speed_10m: string;
+    };
+    current: {
+        time: string;
+        interval: number;
+        temperature_2m: number;
+        wind_speed_10m: number;
+    };
+    hourly_units: {
+        time: string;
+        temperature_2m: string;
+        relative_humidity_2m: string;
+        wind_speed_10m: string;
+    };
+    hourly: {
+        time: string[];
+        temperature_2m: number[];
+        relative_humidity_2m: number[];
+        wind_speed_10m: number[];
+    };
+    }
+
+    type Props = ComponentProps<WeatherInfo>;
+
+    export function GetWetherDataRenderer(props: Props) {
+    const {
+        data: { current, current_units, hourly },
+    } = props;
+    return (
+        <Card className="max-w-sm p-3">
+        <CardHeader className="flex flex-row items-center">
+            <div className="grid gap-0.5">
+            <CardTitle className="text-xl">Partly Cloudy</CardTitle>
+            <CardDescription>
+                {current.temperature_2m}
+                {current_units.temperature_2m} Wind {current.wind_speed_10m}{" "}
+                {current_units.wind_speed_10m}
+            </CardDescription>
+            </div>
+        </CardHeader>
+        <CardContent>
+
+            <div className="hourly-forecast">
+            <div
+                className="w-full"
+                style={{
+                height: "150px",
+                marginTop: "1rem",
+                }}
+            >
+                <ResponsiveLine
+                data={[
+                    {
+                    id: "temperature",
+                    color: "hsl(0, 70%, 50%)",
+                    data: hourly.time.map((time, index) => ({
+                        x: time,
+                        y: hourly.temperature_2m[index],
+                    })),
+                    },
+                    {
+                    id: "humidity",
+                    color: "hsl(120, 70%, 50%)",
+                    data: hourly.time.map((time, index) => ({
+                        x: time,
+                        y: hourly.relative_humidity_2m[index],
+                    })),
+                    },
+                    {
+                    id: "wind",
+                    color: "hsl(240, 70%, 50%)",
+                    data: hourly.time.map((time, index) => ({
+                        x: time,
+                        y: hourly.wind_speed_10m[index],
+                    })),
+                    },
+                ]}
+                yScale={{
+                    type: "linear",
+                    min: "auto",
+                    max: "auto",
+                    stacked: true,
+                    reverse: false,
+                }}
+                axisBottom={{
+                    tickSize: 5,
+                    tickPadding: 5,
+                    tickRotation: 0,
+                    legend: "transportation",
+                    legendOffset: 36,
+                    legendPosition: "middle",
+                    truncateTickAt: 0,
+                }}
+                axisLeft={{
+                    tickSize: 5,
+                    tickPadding: 5,
+                    tickRotation: 0,
+                    legend: "count",
+                    legendOffset: -40,
+                    legendPosition: "middle",
+                    truncateTickAt: 0,
+                }}
+                />
+            </div>
+            </div>
+        </CardContent>
+        </Card>
+    );
+    }
+    ```
+
+This file contain the UI that will be displayed to the user. It's a simple card that display the current weather and a graph that show the hourly forecast, you have a lot of flexibility to create the UI that you want, just make sure the `GetWetherDataRenderer` function return a valid JSX.
+Also, notice that the UI will consume the data that the copilot action will return, so make sure to define the type of the data that the action will return in the `Props` type.
+
+
+- Make sure that component you created is being defined in the copilot options:
+    
+    ```jsx
+    components: [
+            {
+              key: "getTheWeather",
+              component: GetWetherDataRenderer,
+            },
+          ],
+    ```
+- Now, when we try to chat with the copilot and ask for the weather, we will get a UI that display the current weather and the hourly forecast.
+
+    <img src="/images/gen-ui-example.png" alt="getTheWeather" width="500"/>

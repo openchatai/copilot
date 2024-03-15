@@ -1,16 +1,11 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
-export default function useMountedState(): () => boolean {
-  const mountedRef = useRef<boolean>(false);
-  const get = useCallback(() => mountedRef.current, []);
-
+export function useMountedState() {
+  const isMounted = useRef(true);
   useEffect(() => {
-    mountedRef.current = true;
-
     return () => {
-      mountedRef.current = false;
+      isMounted.current = false;
     };
   }, []);
-
-  return get;
+  return () => isMounted.current;
 }

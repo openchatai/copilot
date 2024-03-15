@@ -1,0 +1,11 @@
+{
+    "data": [
+        {
+            "id": 4173,
+            "name": "After-project survey",
+            "surveyProcess": "email",
+            "schedule": "0 days after the project end date",
+            "smartQuestionsMuted": false
+        }
+    ]
+}

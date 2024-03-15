@@ -1,0 +1,23 @@
+{
+    "data": [
+        {
+            "reviewId": 1091006,
+            "companyId": 376685,
+            "projectId": 4607832,
+            "displayName": "Heather H.",
+            "city": "",
+            "state": "",
+            "reviewedAt": "2021-03-24T14:20:01-04:00",
+            "lastActivityAt": "2023-03-29T12:25:07-04:00",
+            "url": "https://sandbox.www.guildquality.com/pro/Lorem-Build-and-Remodel?review=1091006",
+            "rating": 5,
+            "comment": "I had such a great experience with Lorem - They were so strong in communication and I definitely had some neighbors comment on their work. Definitely would recommend them to any customer looking to get work done.",
+            "additionalQuestions": [
+                {
+                    "question": "Problem Resolution",
+                    "comment": "We did have a small problem on communication"
+                }
+            ]
+        }
+    ]
+}

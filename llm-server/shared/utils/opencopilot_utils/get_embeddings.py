@@ -4,10 +4,7 @@ from functools import lru_cache
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.embeddings.ollama import OllamaEmbeddings
 from .embedding_type import EmbeddingProvider
-from utils.get_logger import CustomLogger
-
-
-logger = CustomLogger(module_name=__name__)
+from utils.get_logger import SilentException
 
 LOCAL_IP = os.getenv("LOCAL_IP", "host.docker.internal")
 
@@ -29,7 +26,6 @@ def get_embeddings():
         )
 
     elif embedding_provider == EmbeddingProvider.openchat.value:
-        logger.info("Got ollama embedding provider", provider=embedding_provider)
         return OllamaEmbeddings(base_url=f"{LOCAL_IP}:11434", model="openchat")
 
     elif (

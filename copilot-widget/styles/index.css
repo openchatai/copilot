@@ -3,11 +3,9 @@
 @tailwind base;
 
 svg {
-  width: 1em;
-  height: 1em;
   vector-effect: non-scaling-stroke;
-  stroke-width: 1.5;
 }
+
 @keyframes fade-in-bottom {
   0% {
     transform: translateY(50px);
@@ -60,11 +58,6 @@ svg {
   animation: fade-in 1.2s cubic-bezier(0.39, 0.575, 0.565, 1) both;
 }
 
-.PopoverContent {
-  transform-origin: var(--radix-popover-content-transform-origin);
-  animation: scaleIn 0.5s ease-out;
-}
-
 @keyframes scaleIn {
   from {
     opacity: 0;
@@ -75,19 +68,6 @@ svg {
     opacity: 1;
     transform: scale(1);
   }
-}
-
-.PopoverContent {
-  animation-duration: 0.6s;
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.PopoverContent[data-side="top"] {
-  animation-name: slideUp;
-}
-
-.PopoverContent[data-side="bottom"] {
-  animation-name: slideDown;
 }
 
 @keyframes slideDown {
@@ -147,9 +127,11 @@ svg {
 .scale-out-br {
   animation: scale-out-br 0.5s ease-in-out forwards;
 }
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 @keyframes text-blur-out {
   0% {
     filter: blur(0.01);

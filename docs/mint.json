@@ -50,25 +50,47 @@
       "group": "Copilot widget",
       "pages": [
         "widget/embed",
-        "widget/styling"
+        "widget/styling",
+        "widget/not-gen-ui"
+      ]
+    },
+    {
+      "group": "System actions",
+      "pages": [
+        "resources/human-handoff"
       ]
     },
     {
       "group": "Managing copilots via API",
       "pages": [
+        "api-notes",
         "api-reference/endpoint/get",
-        "api-reference/endpoint/create",
-        "api-reference/endpoint/validate-get",
-        "api-reference/endpoint/send",
-        "api-reference/endpoint/update",
         "api-reference/endpoint/delete"
       ]
     },
     {
-      "group": "Flows APIs",
+      "group": "Actions",
       "pages": [
-        "api-reference/endpoint/workflow/create_workflow",
-        "api-reference/endpoint/workflow/run_workflow"
+        "api-reference/endpoint/delete-all-actions",
+        "api-reference/endpoint/import-actions-from-swagger"
+      ]
+    },
+    {
+      "group": "Knowledge Base",
+      "pages": [
+        "api-reference/endpoint/ingest-knowldge"
+      ]
+    },
+    {
+      "group": "Chat API",
+      "pages": [
+        "api-reference/endpoint/chat-init"
+      ]
+    },
+    {
+      "group": "Resources",
+      "pages": [
+        "resources/ci-cd-actions"
       ]
     }
   ],

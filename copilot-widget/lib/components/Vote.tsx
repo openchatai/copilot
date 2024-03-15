@@ -13,7 +13,7 @@ export function Vote({ messageId }: { messageId: number }) {
   const userVoted = isUpvoted || isDownvoted;
   const { get } = useLang();
   return (
-    <div className="flex items-center justify-end w-full gap-px [&>button]:p-1">
+    <div className="flex items-center justify-end gap-px [&>button]:p-1">
       {userVoted ? (
         <span className="text-xs text-blur-out text-emerald-500">
           {get("thank-you")}

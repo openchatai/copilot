@@ -1,6 +1,6 @@
 // https://github.com/streamich/react-use/blob/master/src/useAsyncFn.ts
 import { DependencyList, useCallback, useRef, useState } from "react";
-import useMountedState from "./useMountedState";
+import { useMountedState } from "./useMountedState";
 import { FunctionReturningPromise, PromiseType } from "@lib/types/helpers";
 
 export type AsyncState<T> =

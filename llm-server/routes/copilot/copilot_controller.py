@@ -17,10 +17,13 @@ from models.repository.copilot_repo import (
     store_copilot_global_variables,
 )
 from models.repository.powerup_repo import create_powerups_bulk
+from shared.models.opencopilot_db.chatbot import Chatbot
 from routes._swagger.reindex_service import migrate_actions
-from utils.get_logger import CustomLogger
+from utils.get_logger import SilentException
+from workers.notification_proxy import (
+    send_copilot_created_follow_up_email,
+)
 
-logger = CustomLogger(module_name=__name__)
 copilot = Blueprint("copilot", __name__)
 
 UPLOAD_FOLDER = "shared_data"
@@ -35,11 +38,13 @@ def index():
 @copilot.route("/", methods=["POST"])
 def create_new_copilot():
     chatbot = create_copilot(
+        user_id="guest",
         name=request.form.get("name", "My First Copilot"),
         swagger_url="remove.this.filed.after.migration",
         prompt_message=request.form.get(
             "prompt_message", ChatBotInitialPromptEnum.AI_COPILOT_INITIAL_PROMPT
         ),
+        type=request.form.get("type", "copilot"),
         website=request.form.get("website", "https://example.com"),
     )
 
@@ -84,11 +89,14 @@ def get_copilot(copilot_id):
 
 
 @copilot.route("/<string:copilot_id>", methods=["DELETE"])
-def delete_bot(copilot_id):
+def delete_bot(user, copilot_id):
     session = SessionLocal()
     try:
         # Find the bot
         bot = find_or_fail_by_bot_id(copilot_id)
+
+        if user.id != int(bot.user_id):
+            return jsonify({"error": "That does not seem right."}), 403
 
         # This should be soft delete but for now, we are doing hard delete
         session.delete(bot)
@@ -112,13 +120,6 @@ def general_settings_update(copilot_id):
         find_one_or_fail_by_id(copilot_id)
 
         data = request.json
-
-        logger.info(
-            "Updating Copilot",
-            incident="update_copilot",
-            data=data,
-            bot_id=copilot_id,
-        )
         # Call update_copilot with the provided data
         updated_copilot = update_copilot(
             copilot_id=copilot_id,
@@ -190,17 +191,17 @@ def get_global_variables(copilot_id):
         return jsonify({"error": "An error occurred", "details": str(e)}), 500
 
 
-@copilot.route("/migrate/actions", methods=["POST"])
-def migrate():
-    auth_header = request.headers.get("Authorization")
-    if auth_header:
-        token = auth_header.split(" ")[1]
+# @copilot.route("/migrate/actions", methods=["POST"])
+# def migrate():
+#     auth_header = request.headers.get("Authorization")
+#     if auth_header:
+#         token = auth_header.split(" ")[1]
 
-        if token == os.getenv("BASIC_AUTH_KEY"):
-            migrate_actions()
-            return jsonify({"message": "job started"}), HTTPStatus.OK
+#         if token == os.getenv("BASIC_AUTH_KEY"):
+#             migrate_actions()
+#             return jsonify({"message": "job started"}), HTTPStatus.OK
 
-    return (
-        jsonify({"message": "Authorization Failed!"}),
-        HTTPStatus.NETWORK_AUTHENTICATION_REQUIRED,
-    )
+#     return (
+#         jsonify({"message": "Authorization Failed!"}),
+#         HTTPStatus.NETWORK_AUTHENTICATION_REQUIRED,
+#     )

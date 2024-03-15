@@ -1,7 +1,7 @@
 {
   "name": "@openchatai/copilot-widget",
   "private": false,
-  "version": "2.5.4",
+  "version": "2.8.7",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -20,7 +20,6 @@
   "devDependencies": {
     "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/react-slot": "^1.0.2",
-    "@radix-ui/react-tooltip": "^1.0.7",
     "@tailwindcss/typography": "^0.5.10",
     "@types/node": "^20.11.14",
     "@types/react": "^18.2.48",
@@ -39,13 +38,12 @@
     "prettier": "^2.8.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-loader-spinner": "^5.4.5",
     "react-markdown": "^8.0.7",
     "react-shadow": "^20.4.0",
     "react-textarea-autosize": "^8.5.3",
-    "release-it": "^17.0.3",
+    "release-it": "^17.1.1",
     "remark-gfm": "^3.0.1",
-    "socket.io-client": "^4.7.4",
+    "socket.io-client": "^4.7.5",
     "swr": "^2.2.4",
     "tailwind-merge": "^1.14.0",
     "tailwind-scrollbar": "^3.0.5",
@@ -79,6 +77,11 @@
     }
   },
   "dependencies": {
+    "@openchatai/copilot-widget": "^2.8.1",
+    "@rjsf/core": "^5.17.1",
+    "@rjsf/utils": "^5.17.1",
+    "@rjsf/validator-ajv8": "^5.17.1",
+    "immer": "^10.0.3",
     "lucide-react": "^0.298.0"
   }
 }

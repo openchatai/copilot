@@ -1,11 +1,36 @@
 from flask import jsonify, Blueprint, request, Response
+from shared.utils.opencopilot_utils import get_vector_store
+from shared.utils.opencopilot_utils.interfaces import StoreOptions
 
 from models.repository.datasource_repo import (
+    delete_knowldge_base_item_from_db,
     get_all_pdf_datasource_by_bot_id,
     get_all_website_datasource_by_bot_id,
+    qdrant_delete_knowledgebase_item_by_link_and_bot_id,
 )
 
 datasource_workflow = Blueprint("datasource", __name__)
+
+from pydantic import BaseModel, Field
+
+
+class DeleteItemRequest(BaseModel):
+    link: str = Field(..., description="The link of the item to delete")
+    item_id: str = Field(..., description="The ID of the item to delete")
+
+
+@datasource_workflow.route("/b/<bot_id>", methods=["DELETE"])
+def delete_knowldge_base_item(bot_id: str):
+    payload = DeleteItemRequest(**request.json)
+    link = payload.link
+    item_id = payload.item_id
+
+    try:
+        qdrant_delete_knowledgebase_item_by_link_and_bot_id(link, bot_id)
+        delete_knowldge_base_item_from_db(item_id)
+        return jsonify({"message": "Item deleted successfully."}), 200
+    except Exception as e:
+        return jsonify({"message": "Failed to delete item"}), 400
 
 
 @datasource_workflow.route("/b/<bot_id>", methods=["GET"])

@@ -1,0 +1,59 @@
+---
+title: "Human handoff"
+description: "Learn how the copilot can handoff the conversation to a human agent."
+---
+
+Currently, human handoff is in beta and only available for a few customers. If you are interested in using this feature, please contact us at mo@opencopilot.so, and we will be happy to help you.
+
+
+## What is this?
+One of the most important features of the Copilot is the ability to handoff the conversation to a human agent. This is useful when the Copilot is unable to understand the user's request or when the user requests to speak to a human agent, we reialzed that most of the time angry customers are looking for a human agent to talk to and solve their problems.
+
+
+## How does it work?
+
+Once this system action is installed on your copilot, a `handoff` event could happen in 2 ways:
+
+- When the user explicitly asks to talk to a human agent.
+- When the copilot is unable to understand the user's request or felt that the user is angry and dissatisfied.
+
+## How to detect `handoff` event?
+
+**You can detect and handle the `handoff` event in two ways:**
+
+- **Option 1:** By using `onHandoff` callback function:
+
+  This function will give you the flexibility to handle the `handoff` event in your own way, common case is to direct the user to some sort of ticketing system or a live chat system.
+
+  ```javascript
+    // add this in the chat widget options object
+    onHandoff(handoffPayload) {
+            console.log("Handoff", handoffPayload);
+    }
+  ```
+
+- **Option 2:** By using <a href="/widget/not-gen-ui">"respond with UI"</a> feature:
+
+  You can use the "respond with UI" feature to handle the `handoff` event by rendering a custom UI to the user. for example, you can render a from to collect the user's contact information and the nature of the problem.
+
+  ```javascript
+    // add this in the chat widget options object
+    components: [
+          {
+            key: "HANDOFF", // static
+            component: (props: ComponentProps<HandoffPayloadType>) => {
+              return props.data.summery;
+            },
+          },
+        ],
+  ```
+
+## What does the `handoff` event payload look like?
+The `handoff` event payload will contain the following information:
+
+```json
+{
+  "summery": "full summery of the conversation, it can be used by the human agent to understand the context of the conversation faster",
+  "sentiment": "neutral|angry|happy",
+}
+```

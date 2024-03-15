@@ -1,15 +1,13 @@
-import { Locale } from "./types";
+import { TranslatableMessages } from "./types";
 
-const enLocale: Locale = {
-  ok: "Ok",
+export const enLocale: TranslatableMessages = {
+  ok: "OK",
   agree: "Agree",
   cancel: "Cancel",
-  "yes-exit": "Yes, Exit",
-  "yes-reset": "Yes, Reset",
-  "no-cancel": "No, Cancel",
+  "yes-exit": "Exit",
+  "yes-reset": "Reset",
+  "no-cancel": "Cancel",
   "are-you-sure": "Are you sure?",
-  recording: "Recording",
-  "thank-you": "Thank you",
+  recording: "Recording...",
+  "thank-you": "Thanks!",
 };
-
-export default enLocale;

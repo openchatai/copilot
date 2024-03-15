@@ -1,5 +1,5 @@
 import { type LangType, getStr } from "@lib/locales";
-import { createSafeContext } from "./create-safe-context";
+import { createSafeContext } from "./createSafeContext";
 import { useConfigData } from "./ConfigData";
 
 const [useLang, SafeLanguageProvider] = createSafeContext<{
@@ -9,7 +9,6 @@ const [useLang, SafeLanguageProvider] = createSafeContext<{
 
 function LanguageProvider({ children }: { children: React.ReactNode }) {
   const config = useConfigData();
-  console.log(config);
   return (
     <SafeLanguageProvider
       value={{

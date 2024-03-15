@@ -5,21 +5,21 @@ from qdrant_client import models
 from typing import Dict, List, Optional
 import operator
 from copy import deepcopy
+from utils.llm_consts import ENABLE_NEURAL_SEARCH
+from pydantic import BaseModel
 
 client = initialize_qdrant_client()
 embedding = get_embeddings()
 
 
 # Data structure (you might want to define a custom class/dataclass)
-class Item:
+class Item(BaseModel):
+    id: str
     title: str
     heading_text: str
     heading_id: str
-
-    def __init__(self, title: str, heading_text: str, heading_id: str):
-        self.title = title
-        self.heading_text = heading_text
-        self.heading_id = heading_id
+    token: str
+    url: str
 
 
 # Function to add vectors to Qdrant
@@ -64,7 +64,10 @@ def add_cmdbar_data(items: List[Item], metadata: Dict[str, str]) -> None:
 
 # Function to search with weights
 def weighted_search(
-    query: str, title_weight: float = 0.7, description_weight: float = 0.3
+    chatbot_id: str,
+    query: str,
+    title_weight: float = 0.7,
+    description_weight: float = 0.3,
 ) -> List[models.ScoredPoint]:
     query_embedding = embedding.embed_query(query)
 
@@ -72,15 +75,33 @@ def weighted_search(
     title_results = client.search(
         collection_name=VectorCollections.neural_search,
         query_vector=models.NamedVector(name="title", vector=query_embedding),
+        query_filter=models.Filter(
+            must=[
+                models.FieldCondition(
+                    key="metadata.bot_id",
+                    match=models.MatchValue(value=str(chatbot_id)),
+                )
+            ]
+        ),
+        limit=20,
         with_payload=True,
-        with_vector=False,
+        with_vectors=False,
     )
 
     description_results = client.search(
         collection_name=VectorCollections.neural_search,
         query_vector=models.NamedVector(name="description", vector=query_embedding),
+        query_filter=models.Filter(
+            must=[
+                models.FieldCondition(
+                    key="metadata.bot_id",
+                    match=models.MatchValue(value=chatbot_id),
+                )
+            ]
+        ),
+        limit=20,
         with_payload=True,
-        with_vector=False,
+        with_vectors=False,
     )
 
     # Build a lookup for description results
