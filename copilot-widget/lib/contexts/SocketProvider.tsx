@@ -2,10 +2,10 @@ import { Socket } from "socket.io-client";
 import { ReactNode, useCallback, useEffect, useMemo, useReducer } from "react";
 import { createSocketClient } from "@lib/utils/createSocket";
 import { useConfigData } from "./ConfigData";
-import { useSessionId } from "@lib/hooks/useSessionId";
 import { createSafeContext } from "./createSafeContext";
 import { useWidgetState } from "./WidgetState";
 import { produce } from "immer";
+import { useAxiosInstance } from "./axiosInstance";
 
 type SocketState = {
   state: "stale" | "connected" | "retrying" | "disconnected" | "error";
@@ -59,7 +59,7 @@ function SocketProvider({ children }: { children: ReactNode }) {
   });
 
   const options = useConfigData();
-  const { sessionId } = useSessionId(options.token);
+  const { sessionId } = useAxiosInstance();
   const [open] = useWidgetState();
   const socket = useMemo(
     () =>

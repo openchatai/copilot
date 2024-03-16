@@ -42,15 +42,15 @@ function Root({ children, options, containerProps }: RootProps) {
       }}
     >
       <ConfigDataProvider data={options}>
-        <LanguageProvider>
-          <WidgetState>
-            <SocketProvider>
-              <MessageHandlerProvider>
-                <AxiosProvider>{children}</AxiosProvider>
-              </MessageHandlerProvider>
-            </SocketProvider>
-          </WidgetState>
-        </LanguageProvider>
+        <AxiosProvider>
+          <LanguageProvider>
+            <WidgetState>
+              <SocketProvider>
+                <MessageHandlerProvider>{children}</MessageHandlerProvider>
+              </SocketProvider>
+            </WidgetState>
+          </LanguageProvider>
+        </AxiosProvider>
       </ConfigDataProvider>
       <style>{css}</style>
     </root.div>
