@@ -1,6 +1,6 @@
 from sqlalchemy.exc import NoResultFound
 from flask import jsonify
-from ...shared.models.opencopilot_db.chat_history import ChatSessions
+from shared.models.opencopilot_db.chat_history import ChatSessions
 from shared.models.opencopilot_db.chatbot import Chatbot, engine
 from sqlalchemy.orm import sessionmaker
 
