@@ -3,15 +3,21 @@ import uuid
 from shared.models.opencopilot_db.database_setup import Base, engine
 from sqlalchemy import Column, String, DateTime, JSON, Text
 from dataclasses import dataclass
-from sqlalchemy import ForeignKey
-from enum import Enum
-from sqlalchemy.orm import Session
-from typing import List
+from sqlalchemy import Index
 
 
 @dataclass
 class Action(Base):
     __tablename__ = "actions"
+    __table_args__ = (
+        Index("idx_bot_id", "bot_id"),
+        Index("idx_name", "name"),
+        Index("idx_status", "status"),
+        Index("idx_created_at", "created_at"),
+        Index("idx_updated_at", "updated_at"),
+        Index("idx_deleted_at", "deleted_at"),
+        Index("idx_bot_status", "bot_id", "status"),
+    )
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     bot_id = Column(String(36), nullable=False)

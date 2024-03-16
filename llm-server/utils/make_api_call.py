@@ -2,9 +2,9 @@ from typing import Any, Dict
 import csv
 from io import StringIO
 import json
-import aiohttp
 from copilot_exceptions.api_call_failed_exception import APICallFailedException
 from utils.get_logger import SilentException
+import httpx
 
 
 def replace_url_placeholders(url: str, values_dict: Dict[str, Any]) -> str:
@@ -50,56 +50,43 @@ async def make_api_request(
         extra_params = {}
     response = None
     try:
-        query_params = serialize_booleans({**query_params, **extra_params})
+        query_params = {**query_params, **extra_params}
         endpoint = replace_url_placeholders(endpoint, path_params)
 
         url: str = endpoint
-        # Create a session and configure it with headers
-        async with aiohttp.ClientSession() as session:
-            # Add the "Content-Type" header with the value "application/json" to the headers
+        async with httpx.AsyncClient() as client:
             headers["Content-Type"] = "application/json"
-            # headers.pop("X-Copilot", None)
 
             if headers:
-                session.headers.update(headers)
+                client.headers.update(headers)
 
-            # Perform the HTTP request based on the request type
             if method == "GET":
-                async with session.get(url, params=query_params, timeout=30) as resp:
-                    response = await resp.text()
+                response = await client.get(url, params=query_params, timeout=30)
             elif method == "POST":
-                async with session.post(
+                response = await client.post(
                     url, json=body_schema, params=query_params, timeout=30
-                ) as resp:
-                    response = await resp.text()
+                )
             elif method == "PUT":
-                async with session.put(
+                response = await client.put(
                     url, json=body_schema, params=query_params, timeout=30
-                ) as resp:
-                    response = await resp.text()
+                )
             elif method == "PATCH":
-                async with session.patch(
+                response = await client.patch(
                     url, json=body_schema, params=query_params, timeout=30
-                ) as resp:
-                    response = await resp.text()
+                )
             elif method == "DELETE":
-                async with session.delete(url, params=query_params, timeout=30) as resp:
-                    response = await resp.text()
+                response = await client.delete(url, params=query_params, timeout=30)
             else:
                 raise ValueError("Invalid request type. Use GET, POST, PUT, or DELETE.")
 
-            # Check if the response is CSV
-            if "text/csv" in resp.headers["Content-Type"]:
-                # Parse CSV data
-                response = list(csv.DictReader(StringIO(response)))
-            elif "application/json" in resp.headers["Content-Type"]:
-                # Parse JSON data
-                response = await resp.json()
+            if "text/csv" in response.headers["Content-Type"]:
+                response_data = list(csv.DictReader(StringIO(response.text)))
+            elif "application/json" in response.headers["Content-Type"]:
+                response_data = response.json()
             else:
-                # For other content types, return a structured response
-                response = {
-                    "content_type": resp.headers["Content-Type"],
-                    "response_text": response,
+                response_data = {
+                    "content_type": response.headers["Content-Type"],
+                    "response_text": response.text,
                 }
 
         return {
@@ -108,11 +95,10 @@ async def make_api_request(
             "body": body_schema,
             "path_param": path_params,
             "query_param": query_params,
-            "response": response,
+            "response": response_data,
             "error": None,
         }
-
-    except aiohttp.ClientError as e:
+    except httpx.HTTPError as e:
         SilentException.capture_exception(e)
 
         raise APICallFailedException(
