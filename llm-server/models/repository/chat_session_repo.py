@@ -1,52 +1,117 @@
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
-from werkzeug.exceptions import NotFound
-from ...shared.models.opencopilot_db.chat_history import SessionSummary
+from sqlalchemy.exc import NoResultFound
+from flask import jsonify
+from ...shared.models.opencopilot_db.chat_history import ChatSessions
+from shared.models.opencopilot_db.chatbot import Chatbot, engine
+from sqlalchemy.orm import sessionmaker
+
+# Create a Session factory
+SessionLocal = sessionmaker(bind=engine)
 
 
-def create_session_summary(db_session: Session, session_id: str, summary: str = ""):
+def create_session_summary(session_id: str, summary: str = ""):
     try:
-        new_summary = SessionSummary(session_id=session_id, summary=summary)
-        db_session.add(new_summary)
-        db_session.commit()
-        return new_summary
-    except SQLAlchemyError as e:
-        db_session.rollback()
-        raise e
+        with SessionLocal() as db:
+            session_summary = ChatSessions(id=session_id, summary=summary)
+            db.add(session_summary)
+            db.commit()
+            db.refresh(session_summary)
+            return session_summary
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
-def get_session_summary(db_session: Session, session_id: str):
-    return db_session.query(SessionSummary).filter_by(session_id=session_id).first()
+def get_session_summary(session_id: str):
+    try:
+        with SessionLocal() as db:
+            session_summary = (
+                db.query(ChatSessions).filter(ChatSessions.id == session_id).first()
+            )
+            if not session_summary:
+                return (
+                    jsonify(
+                        {
+                            "error": f"Session summary not found for session ID: {session_id}"
+                        }
+                    ),
+                    404,
+                )
+            return session_summary
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
-def get_session_summary_or_fail(db_session: Session, session_id: str):
-    summary = get_session_summary(db_session, session_id)
-    if not summary:
-        raise NotFound(
-            description=f"No SessionSummary found with session_id: {session_id}"
-        )
-    return summary
+def get_all_session_summaries():
+    try:
+        with SessionLocal() as db:
+            session_summaries = db.query(ChatSessions).all()
+            return session_summaries
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
-def update_session_summary(db_session: Session, session_id: str, summary: str = ""):
-    session_summary = get_session_summary(db_session, session_id)
-    if session_summary:
-        session_summary.summary = summary
-        db_session.commit()
-        return session_summary
-    else:
-        raise NotFound(
-            description=f"No SessionSummary found with session_id: {session_id}"
-        )
+def update_session_summary(session_id: str, updated_summary: str):
+    try:
+        with SessionLocal() as db:
+            session_summary = (
+                db.query(ChatSessions).filter(ChatSessions.id == session_id).first()
+            )
+            if not session_summary:
+                return (
+                    jsonify(
+                        {
+                            "error": f"Session summary not found for session ID: {session_id}"
+                        }
+                    ),
+                    404,
+                )
+            session_summary.summary = updated_summary
+            db.commit()
+            db.refresh(session_summary)
+            return session_summary
+    except Exception as e:
+        db.rollback()
+        return jsonify({"error": str(e)}), 500
 
 
-def delete_session_summary(db_session: Session, session_id: str):
-    session_summary = get_session_summary(db_session, session_id)
-    if session_summary:
-        db_session.delete(session_summary)
-        db_session.commit()
-        return True
-    else:
-        raise NotFound(
-            description=f"No SessionSummary found with session_id: {session_id}"
-        )
+def delete_session_summary(session_id: str):
+    try:
+        with SessionLocal() as db:
+            session_summary = (
+                db.query(ChatSessions).filter(ChatSessions.id == session_id).first()
+            )
+            if not session_summary:
+                return (
+                    jsonify(
+                        {
+                            "error": f"Session summary not found for session ID: {session_id}"
+                        }
+                    ),
+                    404,
+                )
+            db.delete(session_summary)
+            db.commit()
+            return jsonify(
+                {"message": f"Session summary deleted for session ID: {session_id}"}
+            )
+    except Exception as e:
+        db.rollback()
+        return jsonify({"error": str(e)}), 500
+
+
+def find_one_or_fail_by_id(bot_id: str) -> Chatbot:
+    """
+    Finds a Chatbot instance by its ID. Raises an exception if the Chatbot is not found.
+    Args:
+        bot_id (str): The unique identifier of the Chatbot.
+    Returns:
+        Chatbot: The found Chatbot instance.
+    Raises:
+        ValueError: If no Chatbot is found with the provided ID.
+        Exception: If any other exception occurs during the database operation.
+    """
+    try:
+        with SessionLocal() as session:
+            bot = session.query(Chatbot).filter(Chatbot.id == str(bot_id)).one()
+            return bot
+    except NoResultFound:
+        return jsonify({"error": f"No Chatbot found with id: {bot_id}"}), 404
