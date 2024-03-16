@@ -12,6 +12,7 @@ from routes.flow.utils.document_similarity_dto import DocumentSimilarityDTO
 from utils.get_chat_model import get_chat_model
 from utils.llm_consts import VectorCollections
 
+
 def is_it_informative_or_actionable(
     chat_history: List[BaseMessage],
     current_message: str,

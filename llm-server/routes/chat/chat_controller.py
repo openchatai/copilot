@@ -10,6 +10,7 @@ from models.repository.chat_history_repo import (
     get_analytics,
     most_called_actions_by_bot,
 )
+from models.repository.chat_session_repo import create_session_summary
 from models.repository.chat_intent_repo import (
     create_chat_intent,
     get_chat_intent_by_session_id,
@@ -122,6 +123,7 @@ def init_chat():
     if session_id:
         chats, _ = get_all_chat_history_by_session_id_with_total(session_id, 200, 0)
         history = sqlalchemy_objs_to_json_array(chats) or []
+        create_session_summary(session_id)  # Create a new session summary row
 
     if not bot_token:
         return (
@@ -443,13 +445,6 @@ JSON Format Example:
 
 @chat_workflow.route("/submit/<bot_id>", methods=["POST"])
 async def submit_ui_form(bot_id: str):
-    request = await request.json()
-    operation_id = request.get("operation_id")
-
-    payload = request.get("payload")
-
-    # make api call
-
     return jsonify({"message": "Form submitted successfully"}), 200
 
 
