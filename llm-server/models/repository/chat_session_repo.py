@@ -17,7 +17,8 @@ def create_session_summary(session_id: str, summary: str = ""):
             db.refresh(session_summary)
             return session_summary
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print(f"Error creating session summary: {e}")
+        return jsonify({"error": "Internal server error"}), 500
 
 
 def get_session_summary(session_id: str):
@@ -37,7 +38,8 @@ def get_session_summary(session_id: str):
                 )
             return session_summary
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print(f"Error retrieving session summary: {e}")
+        return jsonify({"error": "Internal server error"}), 500
 
 
 def get_all_session_summaries():
@@ -46,7 +48,8 @@ def get_all_session_summaries():
             session_summaries = db.query(ChatSessions).all()
             return session_summaries
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print(f"Error retrieving all session summaries: {e}")
+        return jsonify({"error": "Internal server error"}), 500
 
 
 def update_session_summary(session_id: str, updated_summary: str):
@@ -70,7 +73,8 @@ def update_session_summary(session_id: str, updated_summary: str):
             return session_summary
     except Exception as e:
         db.rollback()
-        return jsonify({"error": "Something went wrong"}), 500
+        print(f"Error updating session summary: {e}")
+        return jsonify({"error": "Internal server error"}), 500
 
 
 def delete_session_summary(session_id: str):
@@ -95,7 +99,8 @@ def delete_session_summary(session_id: str):
             )
     except Exception as e:
         db.rollback()
-        return jsonify({"error": "Something went wrong"}), 500
+        print(f"Error deleting session summary: {e}")
+        return jsonify({"error": "Internal server error"}), 500
 
 
 def find_one_or_fail_by_id(bot_id: str) -> Chatbot:
@@ -109,9 +114,11 @@ def find_one_or_fail_by_id(bot_id: str) -> Chatbot:
         ValueError: If no Chatbot is found with the provided ID.
         Exception: If any other exception occurs during the database operation.
     """
+def find_one_or_fail_by_id(bot_id: str) -> Chatbot:
     try:
         with SessionLocal() as session:
             bot = session.query(Chatbot).filter(Chatbot.id == str(bot_id)).one()
             return bot
     except NoResultFound:
-        return jsonify({"error": f"No Chatbot found with id: {bot_id}"}), 404
+        print(f"No Chatbot found with id: {bot_id}")
+        return jsonify({"error": "Chatbot not found"}), 404
