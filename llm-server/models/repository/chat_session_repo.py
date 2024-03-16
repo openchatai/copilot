@@ -70,7 +70,7 @@ def update_session_summary(session_id: str, updated_summary: str):
             return session_summary
     except Exception as e:
         db.rollback()
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Something went wrong"}), 500
 
 
 def delete_session_summary(session_id: str):
@@ -95,7 +95,7 @@ def delete_session_summary(session_id: str):
             )
     except Exception as e:
         db.rollback()
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Something went wrong"}), 500
 
 
 def find_one_or_fail_by_id(bot_id: str) -> Chatbot:
