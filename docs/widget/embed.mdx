@@ -1,5 +1,5 @@
 ---
-title: "How to embed the widget"
+title: "Embed the Copilot in your app"
 description: "Learn how to embed the copilot in your app"
 ---
 the chat widget enables you to interact with the Copilot from your dashboard and see the changes in realtime.
@@ -7,11 +7,9 @@ OpenCopilot is a react web app that you can embed in your app.
 
 there are several ways you can integrate the Copilot Chat widget into your application/webpage
 <CardGroup cols={2}>
-<Card title="As a JavaScript File" href='#using-simple-js-script-recommended' icon="js">
-</Card>
-<Card title='As a React Component (via npm)' href='#as-a-react-component' icon='react'>
-</Card>
-  </CardGroup>
+  <Card title="As a JavaScript File" href='#using-simple-js-script-recommended' icon="js"> </Card>
+  <Card title='As a React Component (via npm)' href='#as-a-react-component' icon='react'></Card>
+</CardGroup>
 
 ### Using simple js script (recommended)
 
@@ -27,9 +25,9 @@ there are several ways you can integrate the Copilot Chat widget into your appli
    ```html
    <script>
      const options = {
-        apiUrl: "https://api.opencopilot.so/backend" // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:8888/backend
-        socketUrl: "https://api.opencopilot.so" // your socket server, usually it's http://localhost:8888/socket
-        initialMessage: "Hey! happy to help.", // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
+        apiUrl: "https://api.opencopilot.so/backend"
+        socketUrl: "https://api.opencopilot.so"
+        initialMessage: "Hey! happy to help.", 
         token: "your_copilot_token_goes_here", // you can get your token from the dashboard
         triggerSelector: "#triggerSelector", // the selector of the element that will trigger the copilot when clicked
         headers: {
@@ -48,7 +46,6 @@ there are several ways you can integrate the Copilot Chat widget into your appli
               width: "400px",
             },
         } 
-
       }
       window.addEventListener("DOMContentLoaded", ()=>initAiCoPilot(options)); // window.onload
    </script>
@@ -79,12 +76,12 @@ there are several ways you can integrate the Copilot Chat widget into your appli
 2. Use the Component inside your application
 
 ```jsx
-import { CopilotWidget,Root } from "@openchatai/copilot-widget"; // import the component
-import '@openchatai/copilot-widget/index.css' // the required styles
+import { CopilotWidget,Root } from "@openchatai/copilot-widget"; 
+import '@openchatai/copilot-widget/index.css' 
 const options = {
-  apiUrl: "https://api.opencopilot.so/backend" // your base url where your are hosting OpenCopilot at (the API), usually it's http://localhost:8888/backend
-  socketUrl: "https://api.opencopilot.so" // your socket server, usually it's http://localhost:8888/socket
-  initialMessage: "Hey! happy to help.", // optional: you can pass an array of messages that will be sent to the copilot when it's initialized
+  apiUrl: "https://api.opencopilot.so/backend",
+  socketUrl: "https://api.opencopilot.so", 
+  initialMessage: "Hey! happy to help.",
   token: "your_copilot_token_goes_here", // you can get your token from the dashboard
   defaultOpen: true,
   headers: {
@@ -138,6 +135,15 @@ function Widget(){
     <ResponseField name="socketUrl" type="string">
       The url of the socket url that will be used to send and receive messages
     </ResponseField>
+    <ResponseField name="components" type="Object">
+      List of components that will be used to render any UI component. <a href="/widget/not-gen-ui">learn more about responding with UI</a>
+    </ResponseField>
+    <ResponseField name="debug" type="boolean">
+      If true, the copilot will log all the messages and events to the console and to the chat ui (default: false)
+    </ResponseField>
+    <ResponseField name="onHandoff" type="function">
+      A function that will be called when the user is handed off to a human agent. read more about [handoff](/resources/human-handoff)
+    </ResponseField>
   </Expandable>
 </ResponseField>
 
@@ -152,7 +158,10 @@ function Widget(){
 | `apiUrl`          | the url of the copilot api.                                                                               | `string`                |
 | `headers`         | An object of headers that will be sent with every request (can be used to authenticate your api requests) | `Record<string,string>` |
 | `containerProps`  | An object of props that will be passed to the container div                                               | `Record<string,string>` |
-| `socketUrl`       | The url of the socket url that will be used to send and receive messages                               | `string`                |
+| `socketUrl`       | The url of the socket url that will be used to send and receive messages                               | `string`                   |
+| `components`      | List of components that will be used to render any UI component. [learn more about responding with UI](/widget/not-gen-ui) | `string` |
+| `debug`           | If true, the copilot will log all the messages and events to the console and to the chat ui (default: false) | `boolean`               |
+| `onHandoff`       | A function that will be called when the user is handed off to a human agent. read more about [handoff](/resources/human-handoff) | `function`              |
 
 ## FAQ
 
