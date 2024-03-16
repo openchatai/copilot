@@ -1,30 +1,38 @@
 import { AxiosInstance } from "axios";
 import { ReactNode, useMemo } from "react";
 import { useConfigData } from "./ConfigData";
-import { useSessionId } from "@lib/hooks/useSessionId";
 import { createAxiosInstance } from "@lib/data/chat";
 import { createSafeContext } from "./createSafeContext";
 
 interface AxiosInstanceProps {
   axiosInstance: AxiosInstance;
+  sessionId: string;
+}
+
+function randomString(length = 10) {
+  return Math.random()
+    .toString(36)
+    .substring(2, length + 2);
 }
 
 const [useAxiosInstance, AxiosSafeProvider] =
   createSafeContext<AxiosInstanceProps>();
 
 function AxiosProvider({ children }: { children: ReactNode }) {
-  const config = useConfigData();
-  const { sessionId } = useSessionId(config?.token || "defaultToken");
+  const { token, apiUrl } = useConfigData();
+  const sessionId = useMemo(() => token + "|" + randomString(), [token]);
+
   const axiosInstance: AxiosInstance = useMemo(() => {
     return createAxiosInstance({
-      botToken: config?.token,
+      botToken: token,
       sessionId,
-      apiUrl: config?.apiUrl,
+      apiUrl: apiUrl,
     });
-  }, [config, sessionId]);
-
+  }, [token, apiUrl, sessionId]);
   return (
-    <AxiosSafeProvider value={{ axiosInstance }}>{children}</AxiosSafeProvider>
+    <AxiosSafeProvider value={{ axiosInstance, sessionId }}>
+      {children}
+    </AxiosSafeProvider>
   );
 }
 

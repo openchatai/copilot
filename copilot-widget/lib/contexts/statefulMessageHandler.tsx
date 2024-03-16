@@ -2,11 +2,11 @@
 import { useEffect, useMemo, useSyncExternalStore } from "react";
 import { ChatController } from "./messageHandler";
 import { createSafeContext } from "./createSafeContext";
-import { useSessionId } from "@lib/hooks/useSessionId";
 import { useConfigData } from "./ConfigData";
 import { useSocket } from "./SocketProvider";
 import { ComponentRegistery } from "./componentRegistery";
 import { useLang } from "..";
+import { useAxiosInstance } from "./axiosInstance";
 
 const [useMessageHandler, MessageHandlerSafeProvider] = createSafeContext<{
   __handler: ChatController;
@@ -14,8 +14,8 @@ const [useMessageHandler, MessageHandlerSafeProvider] = createSafeContext<{
 }>();
 
 function MessageHandlerProvider(props: { children: React.ReactNode }) {
-  const { token, components, onHandoff } = useConfigData();
-  const { sessionId } = useSessionId(token);
+  const { components, onHandoff } = useConfigData();
+  const { sessionId } = useAxiosInstance();
   const { __socket } = useSocket();
 
   const __components = useMemo(
