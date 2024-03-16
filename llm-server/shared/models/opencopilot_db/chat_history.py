@@ -23,6 +23,21 @@ class ChatHistory(Base):
     debug_json = Column(JSON, default={}, nullable=True)
     api_called = Column(Boolean, default=False)
     knowledgebase_called = Column(Boolean, default=False)
+    handoff = Column(Boolean, default=False, name='handoff')
+
+class SessionSummary(Base):
+    __tablename__ = "session_summary"
+    __table_args__ = (
+        Index("idx_session_summary_id", "session_id"),
+    )
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    session_id = Column(String(255), nullable=False, unique=True)
+    summary = Column(String(8192), nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(
+        DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
+    )
 
 
 Base.metadata.create_all(engine)

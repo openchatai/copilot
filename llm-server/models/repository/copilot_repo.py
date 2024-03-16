@@ -324,11 +324,14 @@ def update_copilot(
         session.close()
 
 
-
 def find_copilot_by_id_and_user_id(copilot_id: str, user_id: str):
     with SessionLocal() as session:
         try:
-            chatbot = session.query(Chatbot).filter(Chatbot.id == copilot_id, Chatbot.user_id == user_id).one()
+            chatbot = (
+                session.query(Chatbot)
+                .filter(Chatbot.id == copilot_id, Chatbot.user_id == user_id)
+                .one()
+            )
             return chatbot
         except exc.NoResultFound:
             raise NotFound(description=f"No Chatbot found with token: {copilot_id}")
