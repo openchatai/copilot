@@ -1,6 +1,6 @@
 import { RefObject } from "react";
 
-const useScrollToPercentage = (
+export const useScrollToPercentage = (
   elementRef: RefObject<HTMLElement>
 ): [(percentageX: number, percentageY: number) => void] => {
   const scrollToPercentage = (percentageX: number, percentageY: number) => {
@@ -18,5 +18,3 @@ const useScrollToPercentage = (
 
   return [scrollToPercentage];
 };
-
-export default useScrollToPercentage;

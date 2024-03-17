@@ -1,7 +1,7 @@
 import { AxiosInstance } from "axios";
 import { ReactNode, useMemo } from "react";
 import { useConfigData } from "./ConfigData";
-import { createAxiosInstance } from "@lib/data/chat";
+import { createAxiosInstance } from "@lib/data";
 import { createSafeContext } from "./createSafeContext";
 
 interface AxiosInstanceProps {
@@ -36,5 +36,4 @@ function AxiosProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export { useAxiosInstance, AxiosProvider };

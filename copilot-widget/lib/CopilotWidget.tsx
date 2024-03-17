@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
-import { useWidgetState } from "./contexts/WidgetState";
-import cn from "./utils/cn";
-import ChatScreen from "./screens/ChatScreen";
-import { isServer } from "./utils/isServer.ts";
+import { useWidgetState } from "@lib/contexts";
+import cn from "@lib/utils/cn";
+import { ChatScreen } from "@lib/screens/ChatScreen";
+import { isServer } from "@lib/utils/isServer";
 import { MessageCircle } from "lucide-react";
 
 function useTrigger(selector?: string, toggle?: () => void) {

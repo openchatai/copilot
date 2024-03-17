@@ -1,18 +1,12 @@
 import { produce } from "immer";
 import { Socket } from "socket.io-client";
-import { ComponentRegistery } from "./componentRegistery";
-
-export type UserMessageType = {
-  from: "user";
-  id: string;
-  content: string;
-  timestamp: string;
-  session_id: string;
-  headers: Record<string, string>;
-  bot_token: string;
-  query_params: Record<string, string>;
-  language?: string;
-};
+import { ComponentRegistry } from "./componentRegistry.ts";
+import type {
+  BotMessageType,
+  HandoffPayloadType,
+  MessageType,
+  UserMessageType,
+} from "@lib/types";
 
 function unsafe__decodeJSON<T extends Record<string, any>>(
   jsonString: string
@@ -45,27 +39,6 @@ function unsafe__decodeJSON<T extends Record<string, any>>(
   }
 }
 
-export type BotMessageType<TData = Record<string, unknown>> = {
-  from: "bot";
-  type: string;
-  id: string;
-  data: TData;
-  timestamp: string;
-  responseFor: string; // id of the user message
-  isFailed?: boolean;
-};
-
-export type MessageType = UserMessageType | BotMessageType;
-
-export type ComponentType<DT> = {
-  key: string;
-  data?: DT;
-};
-export type HandoffPayloadType = {
-  summery: string;
-  sentiment: "happy" | "angry" | "neutral";
-}; // sometimes it will be an empty object
-
 export type State = {
   currentUserMessage: null | UserMessageType;
   conversationInfo: null | string;
@@ -86,7 +59,7 @@ const timeoutDuration = 1000 * 3;
 export class ChatController {
   sessionId: string | null = null;
   listeners = new Set<Listener>();
-  components: ComponentRegistery | undefined;
+  components: ComponentRegistry | undefined;
 
   private state: State = {
     currentUserMessage: null,
@@ -99,7 +72,7 @@ export class ChatController {
   constructor(
     sessionId: string,
     messages: MessageType[] = [],
-    components?: ComponentRegistery
+    components?: ComponentRegistry
   ) {
     if (!sessionId) {
       throw new Error("sessionId is not set");
@@ -458,3 +431,4 @@ export class ChatController {
     }
   };
 }
+export { HandoffPayloadType };

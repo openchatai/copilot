@@ -1,7 +1,7 @@
 import { useAxiosInstance } from "@lib/contexts/axiosInstance";
-import useAsyncFn from "./useAsyncFn";
+import { useAsyncFn } from "./useAsyncFn";
 
-function useUpvote(id: string, onSuccess?: () => void) {
+export function useUpvote(id: string, onSuccess?: () => void) {
   const axios = useAxiosInstance();
   return useAsyncFn(
     async () =>
@@ -12,7 +12,7 @@ function useUpvote(id: string, onSuccess?: () => void) {
   );
 }
 
-function useDownvote(id: string, onSuccess?: () => void) {
+export function useDownvote(id: string, onSuccess?: () => void) {
   const axios = useAxiosInstance();
   return useAsyncFn(
     async () =>
@@ -22,5 +22,3 @@ function useDownvote(id: string, onSuccess?: () => void) {
     [axios, id, onSuccess]
   );
 }
-
-export { useUpvote, useDownvote };

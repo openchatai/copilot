@@ -1,7 +1,7 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import type { ComponentProps } from "../contexts/componentRegistery";
-import { BotMessageWrapper } from "../components/Messages";
+import type { ComponentProps } from "@lib/types";
+import { BotMessageWrapper } from "@lib/components";
 
 type Props = ComponentProps<{
   message: string;

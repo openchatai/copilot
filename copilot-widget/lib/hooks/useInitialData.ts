@@ -1,5 +1,5 @@
-import { useAxiosInstance } from "@lib/contexts/axiosInstance";
-import { getInitialData } from "@lib/data/chat";
+import { useAxiosInstance } from "@lib/contexts";
+import { getInitialData } from "@lib/data";
 import useSWR from "swr";
 
 export function useInitialData() {

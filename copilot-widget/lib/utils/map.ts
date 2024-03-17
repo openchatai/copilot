@@ -11,6 +11,7 @@ export function Map<T>({ data, render, fallback }: MapProps<T>) {
   if (typeof render !== "function") {
     throw new Error("render function is required");
   }
+
   if (data.length === 0) {
     return fallback || null;
   }

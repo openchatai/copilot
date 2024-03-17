@@ -1,3 +1,3 @@
 export type TranslatableMessages = {
-    [key: string]: string;
+  [key: string]: string;
 };
