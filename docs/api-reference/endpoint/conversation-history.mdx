@@ -1,0 +1,74 @@
+---
+title: "Conversations"
+api: "GET https://api.opencopilot.so/backend/conversations/:bot_id"
+description: "Retrieve paginated conversations, including if the conversatin was a handoff and the sentiment with the summary."
+---
+
+<Warning>
+This endpoint is protected by the same JWT that the user uses to call other APIs. The response will include data for the specified chatbot, along with other metadata information.
+</Warning>
+
+
+This endpoint allows you to retrieve all conversations for a specific Copilot ID. The response includes the conversation id, sentiment, and reason for handoff (if applicable).
+
+The endpoint is paginated, and you can specify the `offset` and `limit` parameters to control the amount of data returned.
+
+<RequestExample>
+```bash Example Request
+curl --location 'https://api.opencopilot.so/backend/conversations/:bot_id' \
+  --header 'Authorization: Bearer TOKEN' \ 
+  --header 'Content-Type: application/json' 
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+[
+    {
+        "conversation_id": "0AIxwcy7etYCp6W7|0wy1xg1smm",
+        "created_at": "Sun, 17 Mar 2024 21:45:35 GMT",
+        "handoff_sentiment": null,
+        "handoff_summary": null,
+        "was_handoff": false
+    },
+    {
+        "conversation_id": "0AIxwcy7etYCp6W7|6m5624efga",
+        "created_at": "Sun, 17 Mar 2024 20:46:17 GMT",
+        "handoff_sentiment": null,
+        "handoff_summary": null,
+        "was_handoff": false
+    },
+    {
+        "conversation_id": "0AIxwcy7etYCp6W7|w2fl8rfr8l",
+        "created_at": "Sun, 17 Mar 2024 20:45:04 GMT",
+        "handoff_sentiment": null,
+        "handoff_summary": null,
+        "was_handoff": false
+    },
+    {
+        "conversation_id": "0AIxwcy7etYCp6W7|w80lgs35p3",
+        "created_at": "Sun, 17 Mar 2024 20:33:43 GMT",
+        "handoff_sentiment": null,
+        "handoff_summary": null,
+        "was_handoff": false
+    }
+]
+```
+</ResponseExample>
+
+The response includes the following fields:
+
+- `conversation_id`: The unique identifier for the conversation.
+- `created_at`: The date and time the conversation was created.
+- `handoff_sentiment`: The sentiment of the conversation at the time of handoff.
+- `handoff_summary`: A summary of the conversation at the time of handoff.
+- `was_handoff`: A boolean value indicating whether the conversation was handed off to a human agent.
+
+You can use the `offset` and `limit` parameters to control the pagination of the response. For example, to retrieve the first 10 messages, you can use the following request:
+
+<RequestExample>
+```bash Example Request
+curl --location 'https://api.opencopilot.so/backend/conversations/:bot_id?offset=0&limit=10' \
+  --header 'Authorization: Bearer TOKEN'
+```
+</RequestExample>

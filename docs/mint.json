@@ -86,9 +86,10 @@
       ]
     },
     {
-      "group": "DataLake",
+      "group": "History",
       "pages": [
-        "api-reference/endpoint/datalake"
+        "api-reference/endpoint/conversation-history",
+        "api-reference/endpoint/conversation-messages"
       ]
     },
     {
