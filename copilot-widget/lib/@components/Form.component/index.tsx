@@ -1,6 +1,6 @@
 import validator from "@rjsf/validator-ajv8";
 import Form from "./rjfs";
-import type { ComponentProps } from "../../contexts/componentRegistery";
+import type { ComponentProps } from "@lib/types";
 
 type Props = ComponentProps<{
   schema: any;

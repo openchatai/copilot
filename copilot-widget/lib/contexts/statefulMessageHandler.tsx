@@ -1,16 +1,14 @@
-/* eslint-disable react-refresh/only-export-components */
-import { useEffect, useMemo, useSyncExternalStore } from "react";
+import { useEffect, useMemo } from "react";
 import { ChatController } from "./messageHandler";
 import { createSafeContext } from "./createSafeContext";
 import { useConfigData } from "./ConfigData";
 import { useSocket } from "./SocketProvider";
-import { ComponentRegistery } from "./componentRegistery";
-import { useLang } from "..";
+import { ComponentRegistry } from "./componentRegistry.ts";
 import { useAxiosInstance } from "./axiosInstance";
 
 const [useMessageHandler, MessageHandlerSafeProvider] = createSafeContext<{
   __handler: ChatController;
-  __components: ComponentRegistery;
+  __components: ComponentRegistry;
 }>();
 
 function MessageHandlerProvider(props: { children: React.ReactNode }) {
@@ -19,7 +17,7 @@ function MessageHandlerProvider(props: { children: React.ReactNode }) {
   const { __socket } = useSocket();
 
   const __components = useMemo(
-    () => new ComponentRegistery({ components }),
+    () => new ComponentRegistry({ components }),
     [components]
   );
 
@@ -56,44 +54,4 @@ function MessageHandlerProvider(props: { children: React.ReactNode }) {
   );
 }
 
-function useChatState() {
-  const { __handler } = useMessageHandler();
-  return useSyncExternalStore(__handler.subscribe, __handler.getSnapshot);
-}
-
-function useChatLoading() {
-  const { __handler } = useMessageHandler();
-  return useSyncExternalStore(__handler.subscribe, __handler.isLoading);
-}
-
-function useSendMessage() {
-  const { __handler } = useMessageHandler();
-  const { headers, token, queryParams } = useConfigData();
-  const { lang } = useLang();
-  const socket = useSocket();
-
-  function send(content: string) {
-    __handler.handleTextMessage(
-      {
-        headers: headers ?? {},
-        query_params: queryParams ?? {},
-        content,
-        bot_token: token,
-        language: lang,
-      },
-      socket.__socket
-    );
-  }
-
-  return {
-    send,
-  };
-}
-
-export {
-  useMessageHandler,
-  MessageHandlerProvider,
-  useChatState,
-  useSendMessage,
-  useChatLoading,
-};
+export { useMessageHandler, MessageHandlerProvider };

@@ -1,10 +1,15 @@
 import TextareaAutosize from "react-textarea-autosize";
-import { SendHorizonal, AlertTriangle, RotateCcw } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { AlertTriangle, RotateCcw, SendHorizonal } from "lucide-react";
+import { useRef, useState } from "react";
 import { isEmpty } from "@lib/utils/utils";
-import { useDocumentDirection } from "@lib/hooks/useDocumentDirection";
+import {
+  useCanSend,
+  useChatState,
+  useDocumentDirection,
+  useInitialData,
+  useSendMessage,
+} from "@lib/hooks";
 import { VoiceRecorder } from "./VoiceRecorder";
-import { useInitialData } from "@lib/hooks/useInitialData";
 import {
   Dialog,
   DialogClose,
@@ -13,20 +18,14 @@ import {
   DialogTrigger,
 } from "./Dialog";
 import { Button } from "./Button";
-import { useLang } from "@lib/contexts/LocalesProvider";
-import {
-  useChatLoading,
-  useChatState,
-  useMessageHandler,
-  useSendMessage,
-} from "@lib/contexts/statefulMessageHandler";
-import { useSocket } from "@lib/contexts/SocketProvider";
+import { useLang, useMessageHandler } from "@lib/contexts";
 import cn from "@lib/utils/cn";
 
 function MessageSuggestions() {
   const { data } = useInitialData();
   const { messages } = useChatState();
   const { send } = useSendMessage();
+
   return (
     <>
       {isEmpty(messages) && !isEmpty(data?.initial_questions) && (
@@ -47,14 +46,16 @@ function MessageSuggestions() {
     </>
   );
 }
+
 function ResetButtonWithConfirmation() {
   const { __handler: mh } = useMessageHandler();
   const [open, setOpen] = useState(false);
   const { get } = useLang();
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
-        <RotateCcw className="size-[1em]"/>
+        <RotateCcw className="size-[1em]" />
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -83,26 +84,13 @@ function ResetButtonWithConfirmation() {
   );
 }
 
-function useCanSend({ input }: { input: string }) {
-  const isLoading = useChatLoading();
-  const { state } = useSocket();
-  const canSend =
-    input.trim().length > 0 && !isLoading && state.state === "connected";
-
-  const cantSendReason = useMemo(() => {
-    if (isLoading) return "loading";
-    if (state.state !== "connected") return "disconnected";
-    return "empty";
-  }, [isLoading, state.state]) as "loading" | "disconnected" | "empty";
-
-  return { canSend, cantSendReason };
-}
-function ChatInputFooter() {
+export function ChatInputFooter() {
   const [input, setInput] = useState("");
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const { send } = useSendMessage();
   const { direction } = useDocumentDirection();
   const { canSend } = useCanSend({ input });
+
   const handleTextareaChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
@@ -116,6 +104,7 @@ function ChatInputFooter() {
       send(input);
     }
   }
+
   return (
     <footer className="p-2 flex w-full flex-col gap-2">
       <MessageSuggestions />
@@ -164,5 +153,3 @@ function ChatInputFooter() {
     </footer>
   );
 }
-
-export default ChatInputFooter;

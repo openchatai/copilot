@@ -39,7 +39,7 @@ export type MediaAudioTrackConstraints = Pick<
  * @details `recordingTime`: Number of seconds that the recording has gone on. This is updated every second
  * @details `mediaRecorder`: The current mediaRecorder in use
  */
-const useAudioRecorder: (
+export const useAudioRecorder: (
   audioTrackConstraints?: MediaAudioTrackConstraints,
   onNotAllowedOrFound?: (exception: DOMException) => any,
   mediaRecorderOptions?: MediaRecorderOptions
@@ -150,5 +150,3 @@ const useAudioRecorder: (
     mediaRecorder,
   };
 };
-
-export default useAudioRecorder;

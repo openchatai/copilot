@@ -1,19 +1,28 @@
-type TS = Date | number;
-
-export type BotResponse = {
-  id: string | number;
-  timestamp: TS;
+export type BotMessageType<TData = Record<string, unknown>> = {
   from: "bot";
-  type: "text";
-  response: {
-    text: string;
-  };
-};
-export type UserMessage = {
-  id: string | number;
-  timestamp: TS;
-  from: "user";
-  content: string;
+  type: string;
+  id: string;
+  data: TData;
+  timestamp: string;
+  responseFor: string; // id of the user message
+  isFailed?: boolean;
 };
 
-export type Message = BotResponse | UserMessage;
+export type UserMessageType = {
+  from: "user";
+  id: string;
+  content: string;
+  timestamp: string;
+  session_id: string;
+  headers: Record<string, string>;
+  bot_token: string;
+  query_params: Record<string, string>;
+  language?: string;
+};
+
+export type MessageType = UserMessageType | BotMessageType;
+
+export type HandoffPayloadType = {
+  summary: string;
+  sentiment: "happy" | "angry" | "neutral";
+}; // sometimes it will be an empty object

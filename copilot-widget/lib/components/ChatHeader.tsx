@@ -1,4 +1,4 @@
-import { useWidgetState } from "../contexts/WidgetState";
+import { useConfigData, useLang, useWidgetState } from "@lib/contexts";
 import { AlertTriangle, X } from "lucide-react";
 import {
   Dialog,
@@ -8,9 +8,7 @@ import {
   DialogTrigger,
 } from "./Dialog";
 import { Button } from "./Button";
-import { useInitialData } from "@lib/hooks/useInitialData";
-import { useLang } from "@lib/contexts/LocalesProvider";
-import { useConfigData } from "@lib/contexts/ConfigData.tsx";
+import { useInitialData } from "@lib/hooks";
 
 function WarnBeforeCloseDialog({ onClose }: { onClose: () => void }) {
   const { get } = useLang();
@@ -42,7 +40,7 @@ function WarnBeforeCloseDialog({ onClose }: { onClose: () => void }) {
   );
 }
 
-export default function ChatHeader() {
+export function ChatHeader() {
   const [, , SetState] = useWidgetState();
   const { data } = useInitialData();
   const config = useConfigData();
@@ -63,7 +61,11 @@ export default function ChatHeader() {
           <h1 className="font-semibold text-sm">
             {data?.bot_name || "OpenCopilot"}
           </h1>
-          {debug && <span className="py-0.5 px-1 bg-primary font-semibold text-[10px] rounded-lg text-white">DEBUG</span>}
+          {debug && (
+            <span className="py-0.5 px-1 bg-primary font-semibold text-[10px] rounded-lg text-white">
+              DEBUG
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-3">
           {config?.warnBeforeClose === false ? (

@@ -1,15 +1,16 @@
 import React from "react";
-import ConfigDataProvider, {
+import ConfigDataProvider from "@lib/contexts";
+import WidgetState, {
+  AxiosProvider,
   ConfigDataContextType,
-} from "./contexts/ConfigData";
-import WidgetState from "./contexts/WidgetState";
-import { AxiosProvider } from "./contexts/axiosInstance";
+  LanguageProvider,
+  MessageHandlerProvider,
+  SocketProvider,
+} from "@lib/contexts";
 import root from "react-shadow";
+import { get } from "@lib/utils/pkg";
 import css from "../styles/index.css?inline";
-import { LanguageProvider } from "./contexts/LocalesProvider";
-import { get } from "./utils/pkg";
-import { SocketProvider } from "./contexts/SocketProvider";
-import { MessageHandlerProvider } from "./contexts/statefulMessageHandler";
+
 const version = get("version");
 
 const cssColors = {

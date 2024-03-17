@@ -1,4 +1,4 @@
-import { TranslatableMessages } from "./types";
+import { TranslatableMessages } from "@lib/types";
 
 export const deLocale: TranslatableMessages = {
   ok: "OK",

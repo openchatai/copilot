@@ -1,7 +1,7 @@
 // https://github.com/streamich/react-use/blob/master/src/useAsyncFn.ts
 import { DependencyList, useCallback, useRef, useState } from "react";
 import { useMountedState } from "./useMountedState";
-import { FunctionReturningPromise, PromiseType } from "@lib/types/helpers";
+import { FunctionReturningPromise, PromiseType } from "@lib/types";
 
 export type AsyncState<T> =
   | {
@@ -32,7 +32,7 @@ export type AsyncFnReturn<
   T extends FunctionReturningPromise = FunctionReturningPromise
 > = [StateFromFunctionReturningPromise<T>, T];
 
-export default function useAsyncFn<T extends FunctionReturningPromise>(
+export function useAsyncFn<T extends FunctionReturningPromise>(
   fn: T,
   deps: DependencyList = [],
   initialState: StateFromFunctionReturningPromise<T> = { loading: false }
