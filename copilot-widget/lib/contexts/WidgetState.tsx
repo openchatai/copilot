@@ -8,7 +8,7 @@ type StateContextType = ReturnType<typeof useToggle>;
 const [useWidgetState, WidgetStateSafeProvider] =
   createSafeContext<StateContextType>();
 
-export default function WidgetState({ children }: { children: ReactNode }) {
+export function WidgetState({ children }: { children: ReactNode }) {
   const { defaultOpen } = useConfigData();
   const data = useToggle(defaultOpen ?? false);
 

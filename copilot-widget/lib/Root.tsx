@@ -1,11 +1,12 @@
 import React from "react";
-import ConfigDataProvider from "@lib/contexts";
-import WidgetState, {
+import {
+  ConfigDataProvider,
   AxiosProvider,
   ConfigDataContextType,
   LanguageProvider,
   MessageHandlerProvider,
   SocketProvider,
+  WidgetState,
 } from "@lib/contexts";
 import root from "react-shadow";
 import { get } from "@lib/utils/pkg";
