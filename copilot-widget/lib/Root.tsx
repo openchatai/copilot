@@ -8,16 +8,10 @@ import {
   SocketProvider,
   WidgetState,
 } from "@lib/contexts";
-import root from "react-shadow";
 import { get } from "@lib/utils/pkg";
-import css from "../styles/index.css?inline";
+import "../styles/index.css";
 
 const version = get("version");
-
-const cssColors = {
-  "--opencopilot-primary-clr": "hsl(200 18% 46%)",
-  "--opencopilot-accent-clr": "hsl(300, 7%, 97%)",
-};
 
 type RootProps = {
   children: React.ReactNode;
@@ -32,30 +26,17 @@ function Root({ children, options, containerProps }: RootProps) {
   const { style, ...containerProp } = containerProps || {};
 
   return (
-    <root.div
-      {...containerProp}
-      data-version={version}
-      style={{
-        width: "100%",
-        height: "100%",
-        pointerEvents: "none",
-        ...cssColors,
-        ...style,
-      }}
-    >
-      <ConfigDataProvider data={options}>
-        <AxiosProvider>
-          <LanguageProvider>
-            <WidgetState>
-              <SocketProvider>
-                <MessageHandlerProvider>{children}</MessageHandlerProvider>
-              </SocketProvider>
-            </WidgetState>
-          </LanguageProvider>
-        </AxiosProvider>
-      </ConfigDataProvider>
-      <style>{css}</style>
-    </root.div>
+    <ConfigDataProvider data={options}>
+      <AxiosProvider>
+        <LanguageProvider>
+          <WidgetState>
+            <SocketProvider>
+              <MessageHandlerProvider>{children}</MessageHandlerProvider>
+            </SocketProvider>
+          </WidgetState>
+        </LanguageProvider>
+      </AxiosProvider>
+    </ConfigDataProvider>
   );
 }
 
