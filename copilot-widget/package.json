@@ -15,7 +15,8 @@
     "update-dashboard-pilot": "pnpm build:embed && mv ./dist-embed/*.js ../dashboard/public/pilot.js"
   },
   "peerDependencies": {
-    "react": "^18.x"
+    "react": "^18.x",
+    "styled-components": "^6.1.8"
   },
   "devDependencies": {
     "@radix-ui/react-popover": "^1.0.7",
@@ -44,6 +45,7 @@
     "release-it": "^17.1.1",
     "remark-gfm": "^3.0.1",
     "socket.io-client": "^4.7.5",
+    "styled-components": "^6.1.8",
     "swr": "^2.2.4",
     "tailwind-merge": "^1.14.0",
     "tailwind-scrollbar": "^3.0.5",
