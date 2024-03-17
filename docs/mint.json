@@ -36,7 +36,10 @@
   "navigation": [
     {
       "group": "Getting started",
-      "pages": ["introduction", "authorization"]
+      "pages": [
+        "introduction",
+        "authorization"
+      ]
     },
     {
       "group": "Flows",
@@ -82,6 +85,12 @@
       ]
     },
     {
+      "group": "DataLake",
+      "pages": [
+        "api-reference/endpoint/datalake"
+      ]
+    },
+    {
       "group": "Chat API",
       "pages": [
         "api-reference/endpoint/chat-init"
@@ -98,7 +107,6 @@
     "github": "https://github.com/openchatai"
   },
   "api": {
-    "playground": {
-    }
+    "playground": {}
   }
 }
