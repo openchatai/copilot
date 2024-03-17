@@ -1,4 +1,4 @@
-export { BotMessageWrapper } from "./components/BotMessageWrapper";
+export { BotMessageWrapper, BotMessage } from "./components";
 export { default as Root } from "./Root";
 export { CopilotWidget } from "./CopilotWidget";
 
