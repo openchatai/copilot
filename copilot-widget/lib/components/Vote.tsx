@@ -1,7 +1,7 @@
-import { useLang } from "@lib/contexts/LocalesProvider";
-import { useDownvote, useUpvote } from "@lib/hooks/useVote";
+import { useLang } from "@lib/contexts";
+import { useDownvote, useUpvote } from "@lib/hooks";
 import cn from "@lib/utils/cn";
-import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { ThumbsDown, ThumbsUp } from "lucide-react";
 
 const SIZE = 26;
 
@@ -11,7 +11,9 @@ export function Vote({ messageId }: { messageId: number }) {
   const isUpvoted = !!asyncUpvoteState.value?.data.message;
   const isDownvoted = !!asyncDownvoteState.value?.data.message;
   const userVoted = isUpvoted || isDownvoted;
+
   const { get } = useLang();
+
   return (
     <div className="flex items-center justify-end gap-px [&>button]:p-1">
       {userVoted ? (

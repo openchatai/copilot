@@ -64,6 +64,7 @@ const DialogOverlay = forwardRef<
     />
   );
 });
+
 DialogOverlay.displayName = "DialogOverlay";
 
 const DialogContent = forwardRef<
@@ -88,6 +89,7 @@ const DialogContent = forwardRef<
     )
   );
 });
+
 DialogContent.displayName = "DialogContent";
 
 const DialogClose = forwardRef<
@@ -127,6 +129,7 @@ const DialogHeader = forwardRef<
     />
   );
 });
+
 DialogHeader.displayName = "DialogHeader";
 
 export {

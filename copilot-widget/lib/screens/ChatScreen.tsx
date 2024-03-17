@@ -1,17 +1,16 @@
-import ChatHeader from "../components/ChatHeader";
-import { ComponentType, useEffect, useRef } from "react";
-import { BotInitialMessage, UserMessage } from "../components/Messages";
-import useScrollToPercentage from "../hooks/useScrollTo";
-import ChatInputFooter from "../components/ChatInputFooter";
-import { useConfigData } from "../contexts/ConfigData";
-import { Map } from "../utils/map";
 import {
-  useChatState,
-  useMessageHandler,
-} from "@lib/contexts/statefulMessageHandler";
-import { BotMessageType } from "@lib/contexts/messageHandler";
+  BotMessage,
+  ChatHeader,
+  ChatInputFooter,
+  InitialBotMessage,
+  UserMessage,
+} from "@lib/components";
+import { useEffect, useRef } from "react";
+import { useChatState, useScrollToPercentage } from "@lib/hooks";
+import { useConfigData, useMessageHandler } from "@lib/contexts";
+import { Map } from "@lib/utils/map";
 
-export default function ChatScreen() {
+export function ChatScreen() {
   const scrollElementRef = useRef(null);
   const [setPos] = useScrollToPercentage(scrollElementRef);
   const { messages } = useChatState();
@@ -21,12 +20,10 @@ export default function ChatScreen() {
 
   useEffect(() => {
     setPos(0, 100);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     setPos(0, 100);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages.length]);
 
   const LoadingComponent = __components.getComponent("LOADING", config.debug);
@@ -39,30 +36,14 @@ export default function ChatScreen() {
         className="flex-1 w-full flex flex-col overflow-x-hidden shrink-0 relative overflow-auto scrollbar-thin scroll-smooth"
       >
         <div className="flex flex-1 w-full min-h-fit mt-auto flex-col py-2 max-h-full items-center gap-1 last:fade-in-right">
-          {initialMessage && <BotInitialMessage message={initialMessage} />}
+          {initialMessage && <InitialBotMessage message={initialMessage} />}
+
           <Map
             data={messages}
             render={(message, index) => {
               if (message.from === "bot") {
-                const component = __components.getComponent(
-                  message.type,
-                  config.debug
-                );
-                if (!component) {
-                  return null;
-                }
-                const Component = component as ComponentType<{
-                  data: BotMessageType["data"];
-                  id: string;
-                }>;
-
                 return (
-                  <Component
-                    {...message}
-                    data={message.data ?? {}}
-                    id={message.id}
-                    key={index}
-                  />
+                  <BotMessage key={index} index={index} message={message} />
                 );
               } else if (message.from === "user") {
                 return (
@@ -75,6 +56,7 @@ export default function ChatScreen() {
               }
             }}
           />
+
           {LoadingComponent && <LoadingComponent />}
         </div>
       </main>

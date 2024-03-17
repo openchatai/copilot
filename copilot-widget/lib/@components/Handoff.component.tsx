@@ -1,12 +1,12 @@
-import { ComponentProps, HandoffPayloadType } from "..";
+import type { ComponentProps, HandoffPayloadType } from "@lib/types";
 
 type Props = ComponentProps<HandoffPayloadType>;
 
-export function HandoffComponentRenderer(props: Props) {
+export function Handoff(props: Props) {
   return (
     <div className="w-full">
       <span>{props.data.sentiment}</span>
-      <span>{props.data.summery}</span>
+      <span>{props.data.summary}</span>
     </div>
   );
 }

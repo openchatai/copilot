@@ -1,9 +1,8 @@
 import { MicIcon, Square } from "lucide-react";
-import { useAxiosInstance } from "@lib/contexts/axiosInstance";
+import { useAxiosInstance } from "@lib/contexts";
 import { now } from "@lib/utils/time";
 import { useEffect } from "react";
-import useAudioRecorder from "@lib/hooks/useAudioRecord";
-import { useLang } from "@lib/contexts/LocalesProvider";
+import { useAudioRecorder } from "@lib/hooks";
 import cn from "@lib/utils/cn";
 
 export function VoiceRecorder({
@@ -14,17 +13,11 @@ export function VoiceRecorder({
   disabled?: boolean;
 }) {
   const { axiosInstance } = useAxiosInstance();
-  const { get } = useLang();
-  const {
-    startRecording,
-    stopRecording,
-    isRecording,
-    recordingTime,
-    recordingBlob,
-  } = useAudioRecorder({
-    noiseSuppression: true,
-    echoCancellation: true,
-  });
+  const { startRecording, stopRecording, isRecording, recordingBlob } =
+    useAudioRecorder({
+      noiseSuppression: true,
+      echoCancellation: true,
+    });
   useEffect(() => {
     async function transcribe() {
       if (recordingBlob && !isRecording) {
@@ -43,6 +36,7 @@ export function VoiceRecorder({
     }
     transcribe();
   }, [recordingBlob]);
+
   async function handleClick() {
     if (isRecording) {
       stopRecording();

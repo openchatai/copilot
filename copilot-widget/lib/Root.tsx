@@ -1,15 +1,17 @@
 import React from "react";
-import ConfigDataProvider, {
+import {
+  ConfigDataProvider,
+  AxiosProvider,
   ConfigDataContextType,
-} from "./contexts/ConfigData";
-import WidgetState from "./contexts/WidgetState";
-import { AxiosProvider } from "./contexts/axiosInstance";
+  LanguageProvider,
+  MessageHandlerProvider,
+  SocketProvider,
+  WidgetState,
+} from "@lib/contexts";
 import root from "react-shadow";
+import { get } from "@lib/utils/pkg";
 import css from "../styles/index.css?inline";
-import { LanguageProvider } from "./contexts/LocalesProvider";
-import { get } from "./utils/pkg";
-import { SocketProvider } from "./contexts/SocketProvider";
-import { MessageHandlerProvider } from "./contexts/statefulMessageHandler";
+
 const version = get("version");
 
 const cssColors = {
@@ -42,15 +44,15 @@ function Root({ children, options, containerProps }: RootProps) {
       }}
     >
       <ConfigDataProvider data={options}>
-        <LanguageProvider>
-          <WidgetState>
-            <SocketProvider>
-              <MessageHandlerProvider>
-                <AxiosProvider>{children}</AxiosProvider>
-              </MessageHandlerProvider>
-            </SocketProvider>
-          </WidgetState>
-        </LanguageProvider>
+        <AxiosProvider>
+          <LanguageProvider>
+            <WidgetState>
+              <SocketProvider>
+                <MessageHandlerProvider>{children}</MessageHandlerProvider>
+              </SocketProvider>
+            </WidgetState>
+          </LanguageProvider>
+        </AxiosProvider>
       </ConfigDataProvider>
       <style>{css}</style>
     </root.div>

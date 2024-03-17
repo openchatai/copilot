@@ -1,6 +1,6 @@
-import { ComponentType } from "@lib/contexts/componentRegistery";
-import { HandoffPayloadType } from "@lib/contexts/messageHandler";
+import type { HandoffPayloadType } from "./messageTypes";
 import type { LangType } from "@lib/locales";
+import type { ComponentType } from "./components";
 
 export type Options = {
   token: string;

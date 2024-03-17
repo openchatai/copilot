@@ -10,7 +10,7 @@ export type ConfigDataContextType = Omit<
 const [useConfigData, ConfigDataSafeProvider] =
   createSafeContext<ConfigDataContextType>();
 
-export default function ConfigDataProvider({
+export function ConfigDataProvider({
   children,
   data,
 }: {
