@@ -47,6 +47,20 @@ Once this system action is installed on your copilot, a `handoff` event could ha
           },
         ],
   ```
+## I want to use my own UI to handle the `handoff` event, how can I do that?
+The same as defining a UI component you will do the same instead, the only difference is that you will use the `HANDOFF` key to define the UI component that will be rendered when the `handoff` event is triggered.
+
+```javascript
+  // add this in the chat widget options object
+  components: [
+        {
+          key: "HANDOFF", // static
+          component: (props: ComponentProps<HandoffPayloadType>) => {
+            return props.data.summery;
+          },
+        },
+      ],
+```
 
 ## What does the `handoff` event payload look like?
 The `handoff` event payload will contain the following information:

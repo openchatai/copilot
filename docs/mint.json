@@ -51,7 +51,8 @@
       "pages": [
         "widget/embed",
         "widget/styling",
-        "widget/not-gen-ui"
+        "widget/not-gen-ui",
+        "widget/helper-exports"
       ]
     },
     {
