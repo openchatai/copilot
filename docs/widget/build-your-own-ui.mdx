@@ -70,10 +70,156 @@ export default OpencopilotCustomWidget;
 5. So we will ge to the [dashboard](https://cloud.opencopilot.so/) to setup some actions and then we will be able to execute them from the chat interface.
    Click on the Copilot you just created and then click on the `Actions` tab.
 
-use any API you want to use, for example we will use dummy data returned by jsonplaceholder. 
+use any API you want to use, for example we will use dummy data returned by jsonplaceholder.
 
 <Note>
   In this demo we are testing the UI handling, so we will not go into the
   details of creating actions.
 </Note>
 
+6. The trick behind UI response is that you know excatly what the shape of the data will be returned by the copilot,
+   so we are going to set key which is the action name and a value which is the UI component that will handle the response.
+
+```tsx
+import type { ComponentType } from "@openchatai/copilot-widget";
+const components: ComponentType[] = [];
+```
+
+let's add this to the options object.
+
+```tsx
+const options: Options = {
+  token: "YOUR_TOKEN",
+  apiUrl: "https://api.opencopilot.so/backend",
+  socketUrl: "https://api.opencopilot.so",
+  initialMessage: "Hello, I need help!",
+  triggerSelector: "",
+  defaultOpen: true,
+  components,
+};
+```
+
+7. Let's review our action api response and see what we can do with it.
+- [GET todos api](https://jsonplaceholder.typicode.com/todos) 
+```json
+[{
+  "userId": 1,
+  "id": 1,
+  "title": "delectus aut autem",
+  "completed": false
+}]
+```
+
+- [GET todo by id](https://jsonplaceholder.typicode.com/todos/{{todo_id}})
+```json
+{
+  "userId": 1,
+  "id": 1,
+  "title": "delectus aut autem",
+  "completed": false
+}
+```
+
+8. Let's start with the first action, we will create a component that will handle the response of the first action.
+
+```tsx
+import { ComponentType,ComponentProps } from "@openchatai/copilot-widget";
+
+const components: ComponentType[] = [
+  {
+    key: "getAllTodos",
+    component: (
+      props: ComponentProps<
+        {
+          userId: number;
+          id: number;
+          title: string;
+          completed: boolean;
+        }[]
+      >
+    ) => {
+      return (
+        <div className="w-full p-4">
+          <Card className="">
+            <CardHeader>
+              <CardTitle>Todos</CardTitle>
+              <CardDescription>Found {props.data.length} Todos</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>UserId</TableHead>
+                    <TableHead>Id</TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Completed</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {props.data.map((todo) => (
+                    <TableRow key={todo.id}>
+                      <TableCell>{todo.userId}</TableCell>
+                      <TableCell>{todo.id}</TableCell>
+                      <TableCell>{todo.title}</TableCell>
+                      <TableCell>{todo.completed ? "Yes" : "No"}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    },
+  },
+];
+
+```
+
+9. Let's complete the second action, which is to get a todo by id.
+just add this to components object
+
+```tsx
+  {
+    key: "getTodoById",
+    component: (
+      props: ComponentProps<{
+        userId: number;
+        id: number;
+        title: string;
+        completed: boolean;
+      }>
+    ) => {
+      return (
+        <div className="w-full p-4">
+          <Card className="">
+            <CardHeader>
+              <CardTitle>Todo</CardTitle>
+              <CardDescription>Found a Todo</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>UserId</TableHead>
+                    <TableHead>Id</TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Completed</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>{props.data.userId}</TableCell>
+                    <TableCell>{props.data.id}</TableCell>
+                    <TableCell>{props.data.title}</TableCell>
+                    <TableCell>{props.data.completed ? "Yes" : "No"}</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    },
+  },
+```
