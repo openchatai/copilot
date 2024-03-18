@@ -2,4 +2,78 @@
 title: "Step By step on how to build your own chat UI."
 description: "A step by step guide on how to build your own chat UI using React."
 ---
-Under construction. Please check back later.
+
+1. Ok Let's start by creating simple Copilot on [opencopilotCloud](https://cloud.opencopilot.so)
+
+2. Install `@openchatai/copilot-widget` in a pre-existing React app.
+
+```bash
+npm install @openchatai/copilot-widget
+```
+
+3. Let's import `Root` & `CopilotWidget`
+
+```tsx
+import { Root, CopilotWidget } from "@openchatai/copilot-widget";
+```
+
+As we have said before `Root` holds the widget state and message handling logic, and `CopilotWidget` is the chat UI component.
+
+4. `Root` Wrapper requires some options to be passed to it.
+
+```tsx
+import type { Options } from "@openchatai/copilot-widget";
+// these are the required options for now.
+const options: Options = {
+  token: "YOUR_TOKEN", // head to https://cloud.opencopilot.so to get your token.
+  apiUrl: "https://api.opencopilot.so/backend",
+  socketUrl: "https://api.opencopilot.so",
+  initialMessage: "Hello, I need help!",
+  triggerSelector: "",
+  defaultOpen: true,
+};
+```
+
+5. Now we have the Widget on the screen(it is fluid and it will take the width&height of the parent container).
+   So far we have
+
+```tsx
+import React from "react";
+import { Root, CopilotWidget } from "@openchatai/copilot-widget";
+import type { Options } from "@openchatai/copilot-widget";
+
+const options: Options = {
+  token: "YOUR_TOKEN", // head to https://cloud.opencopilot.so to get your token.
+  apiUrl: "https://api.opencopilot.so/backend",
+  socketUrl: "https://api.opencopilot.so",
+  initialMessage: "Hello, I need help!",
+  triggerSelector: "",
+  defaultOpen: true,
+};
+
+function OpencopilotCustomWidget() {
+  return (
+    <Root options={options}>
+      <CopilotWidget />
+    </Root>
+  );
+}
+
+export default OpencopilotCustomWidget;
+```
+
+<Note>
+  The whole idea about opencopilt is to allow users to execute businuss actions
+  and return the result to the user in a chat like interface.
+</Note>
+
+5. So we will ge to the [dashboard](https://cloud.opencopilot.so/) to setup some actions and then we will be able to execute them from the chat interface.
+   Click on the Copilot you just created and then click on the `Actions` tab.
+
+use any API you want to use, for example we will use dummy data returned by jsonplaceholder. 
+
+<Note>
+  In this demo we are testing the UI handling, so we will not go into the
+  details of creating actions.
+</Note>
+
