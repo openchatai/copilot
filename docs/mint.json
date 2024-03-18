@@ -55,7 +55,8 @@
         "widget/embed",
         "widget/styling",
         "widget/not-gen-ui",
-        "widget/helper-exports"
+        "widget/helper-exports",
+        "widget/build-your-own-ui"
       ]
     },
     {
