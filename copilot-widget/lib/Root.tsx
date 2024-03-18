@@ -8,7 +8,6 @@ import {
   SocketProvider,
   WidgetState,
 } from "@lib/contexts";
-import "../styles/index.css";
 
 type RootProps = {
   children: React.ReactNode;

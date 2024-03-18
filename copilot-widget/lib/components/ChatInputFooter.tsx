@@ -1,4 +1,3 @@
-import TextareaAutosize from "react-textarea-autosize";
 import { AlertTriangle, RotateCcw, SendHorizonal } from "lucide-react";
 import { useRef, useState } from "react";
 import { isEmpty } from "@lib/utils/utils";
@@ -114,7 +113,7 @@ export function ChatInputFooter() {
         )}
       >
         <div className="flex-1">
-          <TextareaAutosize
+          <textarea
             dir="auto"
             ref={textAreaRef}
             autoFocus={true}
@@ -124,11 +123,10 @@ export function ChatInputFooter() {
                 handleInputSubmit();
               }
             }}
-            maxRows={4}
             rows={1}
             value={input}
             onChange={handleTextareaChange}
-            className=" w-full resize-none bg-transparent focus-visible:outline-none border-none focus:outline-none focus:border-none scrollbar-thin leading-tight whitespace-pre-wrap py-1.5 px-4 placeholder:align-middle overflow-auto outline-none text-accent2 text-[14px] placeholder:text-xs font-normal"
+            className="w-full resize-none bg-transparent h-full leading-tight focus-visible:outline-none border-none focus:outline-none focus:border-none whitespace-pre-wrap py-1.5 px-3 align-middle overflow-auto outline-none text-xs font-medium"
           />
         </div>
         <div
