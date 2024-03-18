@@ -12,10 +12,6 @@ import {
 type RootProps = {
   children: React.ReactNode;
   options: ConfigDataContextType;
-  containerProps?: React.DetailedHTMLProps<
-    React.HTMLAttributes<HTMLDivElement>,
-    HTMLDivElement
-  >;
 };
 
 function Root({ children, options }: RootProps) {
