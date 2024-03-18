@@ -52,3 +52,15 @@ const {send} = useSendMessage();
   );
 };
 ```
+- `Root` 
+if you are going to build your own UI for the widget you will need to wrap your component with `Root` to get the widget context. 
+
+it accepts the following props 
+    - `options` of type `ConfigDataContextType`.
+    - `children` to render the widget UI.
+
+- `CopilotWidget` 
+it is the widget UI where the `Root` component should be wrapped with. 
+it accepts the following props 
+    - `triggerSelector` (optional) to define the trigger element to open/close the widget.
+      if not provided an icon will appear on the left side of the screen to open/close the widget.
