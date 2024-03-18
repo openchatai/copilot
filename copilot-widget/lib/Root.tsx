@@ -8,10 +8,7 @@ import {
   SocketProvider,
   WidgetState,
 } from "@lib/contexts";
-import { get } from "@lib/utils/pkg";
 import "../styles/index.css";
-
-const version = get("version");
 
 type RootProps = {
   children: React.ReactNode;
@@ -22,9 +19,7 @@ type RootProps = {
   >;
 };
 
-function Root({ children, options, containerProps }: RootProps) {
-  const { style, ...containerProp } = containerProps || {};
-
+function Root({ children, options }: RootProps) {
   return (
     <ConfigDataProvider data={options}>
       <AxiosProvider>
