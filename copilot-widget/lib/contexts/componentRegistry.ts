@@ -56,7 +56,9 @@ export class ComponentRegistry {
   }
 
   private get(key: string) {
-    const c = this.components.find((c) => c.key === key);
+    const c = this.components.find(
+      (c) => c.key.toUpperCase() === key.toUpperCase()
+    );
     if (c) return c;
     return null;
   }

@@ -403,8 +403,9 @@ export class ChatController {
       return;
     }
 
-    const handle = (msg: string) => {
-      const parsedResponse = JSON.parse(msg) as HandoffPayloadType;
+    const handle = (msg: string | object) => {
+      const parsedResponse: HandoffPayloadType =
+        typeof msg === "object" ? msg : JSON.parse(msg);
       externalCallback?.(parsedResponse);
       this.internalHandleHandoff(parsedResponse);
     };
