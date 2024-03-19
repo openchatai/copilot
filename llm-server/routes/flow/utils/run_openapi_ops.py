@@ -51,7 +51,7 @@ async def run_actions(
                 api_request_data[operation_id] = api_payload.__dict__
 
                 api_response = await make_api_request(
-                    headers=headers, **api_payload.__dict__
+                    headers=headers, extra_params={}, **api_payload.__dict__
                 )
 
                 """ 
