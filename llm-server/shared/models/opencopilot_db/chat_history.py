@@ -32,7 +32,6 @@ class ChatHistory(Base):
     debug_json = Column(JSON, default={}, nullable=True)
     api_called = Column(Boolean, default=False)
     knowledgebase_called = Column(Boolean, default=False)
-    handoff = Column(Boolean, default=False, name="handoff")
 
 
 class ChatSessions(Base):
