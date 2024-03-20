@@ -1,0 +1,26 @@
+---
+title: "Ingest knowledge from URLs"
+api: "POST https://api.opencopilot.so/backend/knowledgebase/ingest/urls"
+description: "Ingest knowledge from URLs into the copilot."
+---
+
+Endpoint for ingesting knowledge from url (alpha):
+
+<Warning>
+**Important**: This endpoint is in alpha and may change in the future. Please report any issues or feedback to the [issue tracker](https://github.com/openchatai/OpenCopilot/issues/new/choose).
+</Warning>
+
+
+# Ingest Knowledge
+Knowledge is any information that the copilot can use to answer questions. as for now, the copilot can ingest knowledge in the following formats:
+
+- Website: when you provide a URL, the copilot will scrape the content of the website recursively and ingest the content into its knowledge base, you can also provide a list of URLs to scrape.
+
+<RequestExample>
+```bash
+curl --location 'https://api.opencopilot.so/backend/knowledgebase/ingest/urls' \
+--header 'Authorization: Bearer <token>' \
+--form 'bot_id="bcfd9096-b947-49fb-888c-232858de7ca0"' \
+--form 'urls="https://en.wikipedia.org/wiki/Utopia"'
+```
+</RequestExample>

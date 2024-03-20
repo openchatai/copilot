@@ -1,0 +1,48 @@
+---
+title: "Delete Knowledge Base"
+api: "DELETE https://api.opencopilot.so/backend/knowledgebase/b/:bot_id"
+description: "Delete knowledgebase by links"
+---
+
+<Warning>
+**Important**: Ensure that you have the necessary permissions before attempting to delete a knowledge base. This action cannot be undone.
+</Warning>
+
+### Request Body
+
+- **Content Type**: application/json
+
+#### Attributes
+
+- `links` (array of strings, required): A list of URLs linked to the knowledge base. These URLs will be deleted along with the knowledge base.
+
+### Request Example
+
+```bash
+curl --location --request DELETE 'https://api.opencopilot.so/backend/knowledgebase/b/:bot_id' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer <token>' \
+--data '{
+    "links": ["https://en.wikipedia.org/wiki/Utopia", "https://en.wikipedia.org/wiki/Utopian_and_dystopian_fiction"]
+}'
+```
+
+<ParamField path="bot_id" name="bot_id" type="string">
+  Bot Id
+</ParamField>
+
+### Response Example
+
+```json
+{
+    "message": "Knowledge base and associated links have been successfully deleted."
+}
+```
+
+#### Error Responses
+
+- **404 Not Found**: If the specified knowledge base is not found.
+- **401 Unauthorized**: If the request lacks valid authentication credentials.
+- **403 Forbidden**: If the user does not have the necessary permissions to delete the knowledge base.
+- **500 Internal Server Error**: If the server encountered an unexpected condition.
+```
