@@ -1,0 +1,57 @@
+---
+title: "Get Knowledge from Data Source"
+api: "GET https://api.opencopilot.so/backend/knowledgebase/datasource/:bot_id"
+description: "Retrieve knowledge from a specific data source for a given bot."
+---
+
+# Get Knowledge from Data Source
+
+This endpoint allows you to retrieve knowledge from a specific data source for a given bot. You can specify the `limit` and `offset` parameters to control the number of results and the starting point for the results.
+
+<Warning>
+**Important**: This endpoint requires authentication. You must include a valid `Authorization` header with a Bearer token in the request.
+</Warning>
+
+<RequestExample>
+```bash
+curl --location --request GET 'https://api.opencopilot.so/backend/knowledgebase/datasource/:bot_id?limit=:limit&offset=:offset' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9' \
+```
+</RequestExample>
+
+<ParamField param path="param" name="bot_id" type="string" required>
+The unique identifier for the bot you want to fetch records from. This is a required parameter.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="10">
+The maximum number of documents to return in the response. If not provided, the default value is 10.
+</ParamField>
+
+<ParamField query="offset" type="integer" default="0">
+The number of documents to skip before returning the results. Used for pagination. If not provided, the default value is 0.
+</ParamField>
+
+
+<ResponseExample>
+
+```json Response
+{
+    "pdf_sources": [],
+    "web_sources": [
+        {
+            "chatbot_id": "Tue, 19 Mar 2024 23:14:09 GMT",
+            "source": "https://en.wikipedia.org/wiki/Utopia_(disambiguation)",
+            "status": "SUCCESS",
+            "updated_at": null
+        },
+        {
+            "chatbot_id": "Tue, 19 Mar 2024 23:14:01 GMT",
+            "source": "https://en.wikipedia.org/wiki/Utopia_(More)",
+            "status": "SUCCESS",
+            "updated_at": null
+        }
+    ]
+}
+```
+
+</ResponseExample>

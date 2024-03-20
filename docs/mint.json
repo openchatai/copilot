@@ -84,7 +84,8 @@
       "pages": [
         "api-reference/endpoint/ingest-knowldge-from-file",
         "api-reference/endpoint/ingest-knowledgebase-from-url",
-        "api-reference/endpoint/delete-bulk-knowledgebase"
+        "api-reference/endpoint/delete-bulk-knowledgebase",
+        "api-reference/endpoint/list-data-sources"
       ]
     },
     {
