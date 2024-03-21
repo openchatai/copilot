@@ -1,0 +1,29 @@
+stages:
+  - update_knowledgebase
+
+update_knowledgebase:
+  stage: update_knowledgebase
+  script:
+    - |
+      # Delete existing knowledge base
+      curl --location --request DELETE 'http://localhost:8888/backend/knowledgebase/b/e46e751d-2f36-4ba4-a26c-f8bb3c54b02b' \
+        --header 'Content-Type: application/json' \
+        --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5' \
+        --data '{
+        "links": ["https://en.wikipedia.org/wiki/Utopia", "https://en.wikipedia.org/wiki/Utopian_and_dystopian_fiction"]
+      }'
+
+      # Ingest URLs
+      curl --location 'http://localhost:8888/backend/knowledgebase/ingest/urls' \
+        --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9tqXD4' \
+        --form 'bot_id="bcfd9096-b947-49fb-888c-232858de7ca0"' \
+        --form 'urls="https://en.wikipedia.org/wiki/Utopia"'
+
+      # Ingest files
+      curl --location 'http://localhost:8888/backend/knowledgebase/ingest/files' \
+        --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9' \
+        --form 'files=@"postman-cloud:///1eee6393-a599-4da0-890f-533c80664711"' \
+        --form 'bot_id="bcfd9096-b947-49fb-888c-232858de7ca0"'
+  only:
+    - main
+  image: curlimages/curl:latest

@@ -1,0 +1,28 @@
+---
+title: "Ingest knowledge from files" 
+api: "POST https://api.opencopilot.so/backend/knowledgebase/ingest/files"
+description: "Ingest knowledge from files into the copilot."
+---
+
+# Ingest Knowledge
+Knowledge is any information that the copilot can use to answer questions. as for now, the copilot can ingest knowledge in the following formats:
+
+- Website: Refer <a href="/api-reference/endpoint/ingest-knowledgebase-from-url">Web Crawl</a> section for more details.
+- Files: you can provide a list of files to ingest, the copilot will ingest the content of the files into its knowledge base, currently, the copilot supports the following file types:
+  - PDF
+  - Markdown
+  - CSV
+
+<Warning>
+**Important**: This endpoint is in alpha and may change in the future. Please report any issues or feedback to the [issue tracker](https://github.com/openchatai/OpenCopilot/issues/new/choose).
+</Warning>
+
+
+<RequestExample>
+```bash 
+curl --location 'https://api.opencopilot.so/backend/knowledgebase/ingest/files' \
+--header 'Authorization: Bearer <token>' \
+--form 'files=@"postman-cloud:///1eee6393-a599-4da0-890f-533c80664711"' \
+--form 'bot_id="bcfd9096-b947-49fb-888c-232858de7ca0"'
+```
+</RequestExample>
