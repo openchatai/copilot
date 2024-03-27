@@ -141,6 +141,6 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 
 ## Analytics
 
-This product collects anonymous usage data to help improve your experience. You can opt-out by setting `ENABLE_EXTERNAL_API_LOGGING=no` in your environment variables.
+This product collects anonymous usage data to help improve your experience. You can opt out by setting `ENABLE_EXTERNAL_API_LOGGING=no` in your environment variables.
 
 
