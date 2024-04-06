@@ -1,8 +1,13 @@
 ---
 title: "Delete all actions"
-api: "DELETE https://api.opencopilot.so/backend/actions/bot/:id"
+api: "DELETE https://api-v2.opencopilot.so/backend/actions/bot/:id"
 description: "Delete all actions from a copilot by ID"
 ---
+
+<Warning>
+This endpoint points to the (v2) version of the API. The (v2) version of the API is the latest version and is recommended for all new development. Please update your code to use the (v2) version of the API.
+</Warning>
+
 
 ### Body
 
@@ -29,7 +34,7 @@ description: "Delete all actions from a copilot by ID"
 <RequestExample>
 
 ```bash Example Request
-curl --location --request DELETE 'https://api.opencopilot.so/backend/actions/bot/:id' \
+curl --location --request DELETE 'https://api-v2.opencopilot.so/backend/actions/bot/:id' \
 --header 'Accept: application/json' \
 --header 'Authorization : Bearer YOUR_TOKEN'
 ```

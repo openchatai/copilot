@@ -1,8 +1,13 @@
 ---
 title: "Import actions"
-api: "PUT https://api.opencopilot.so/backend/actions/bot/:id/import-from-swagger"
+api: "PUT https://api-v2.opencopilot.so/backend/actions/bot/:id/import-from-swagger"
 description: "Import actions from a Swagger file to a copilot by ID"
 ---
+
+<Warning>
+This endpoint points to the (v2) version of the API. The (v2) version of the API is the latest version and is recommended for all new development. Please update your code to use the (v2) version of the API.
+</Warning>
+
 
 ### Body
 
@@ -30,7 +35,7 @@ description: "Import actions from a Swagger file to a copilot by ID"
 <RequestExample>
 
 ```bash Example Request
-curl --location --request PUT 'https://api.opencopilot.so/backend/actions/bot/:id/import-from-swagger' \
+curl --location --request PUT 'https://api-v2.opencopilot.so/backend/actions/bot/:id/import-from-swagger' \
 --header 'Accept: application/json' \
 --header 'Authorization : Bearer YOUR_TOKEN' \
 --form 'file=@"/Users/gharbat/Desktop/swagger.json"'

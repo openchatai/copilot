@@ -1,8 +1,12 @@
 ---
 title: "Get All Copilots"
-api: "GET https://api.opencopilot.so/backend/copilot"
+api: "GET https://api-v2.opencopilot.so/backend/copilot"
 description: "Get a list of all copilots in the database."
 ---
+
+<Warning>
+This endpoint points to the (v2) version of the API. The (v2) version of the API is the latest version and is recommended for all new development. Please update your code to use the (v2) version of the API.
+</Warning>
 
 ### Response
 
@@ -68,7 +72,7 @@ Array of JSON objects
 <RequestExample>
 
 ```bash Example Request
-curl --location --request GET 'https://api.opencopilot.so/backend/copilot/' \
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/copilot/' \
 --header 'Accept: application/json' \
 --header 'Authorization : Bearer YOU_API_KEY'
 ```
