@@ -4,6 +4,11 @@ api: "GET https://api.opencopilot.so/backend/chat/init"
 description: "This endpoint will initiate a chat with your copilot, it will the copilot name, metdata, and other info."
 ---
 
+<Warning>
+This endpoint points to the (v2) version of the API. The (v2) version of the API is the latest version and is recommended for all new development. Please update your code to use the (v2) version of the API.
+</Warning>
+
+
 ### Body
 
 
@@ -30,11 +35,10 @@ description: "This endpoint will initiate a chat with your copilot, it will the 
   </Expandable>
 </ResponseField>
 
-
 <RequestExample>
 
 ```bash Example Request
-curl --location 'https://api.opencopilot.so/backend/chat/init' \
+curl --location 'https://api-v2.opencopilot.so/backend/chat/init' \
   --header 'X-Bot-Token: BOT_TOKEN' \
   --header 'X-Session-Id: SESSION_ID' \
 ```
