@@ -15,22 +15,26 @@ function unsafe__decodeJSON<T extends Record<string, any>>(
     const parsed = JSON.parse(jsonString);
     if (typeof parsed === "object" && parsed !== null) {
       // Recursively parse nested JSON strings or arrays
-      Object.keys(parsed).forEach((key) => {
-        const value = parsed[key];
-        if (typeof value === "string") {
-          if (
-            typeof value === "string" &&
-            ((value.startsWith("{") && value.endsWith("}")) ||
-              (value.startsWith("[") && value.endsWith("]")))
-          ) {
-            try {
-              parsed[key] = JSON.parse(value);
-            } catch (e) {
-              // Ignore errors for invalid JSON strings
+      const parseNestedJSON = (obj: Record<string, any>) => {
+        Object.keys(obj).forEach((key) => {
+          const value = obj[key];
+          if (typeof value === "string") {
+            if (
+              (value.startsWith("{") && value.endsWith("}")) ||
+              (value.startsWith("[") && value.endsWith("]"))
+            ) {
+              try {
+                obj[key] = JSON.parse(value);
+              } catch (e) {
+                // Ignore errors for invalid JSON strings
+              }
             }
+          } else if (typeof value === "object" && value !== null) {
+            parseNestedJSON(value);
           }
-        }
-      });
+        });
+      };
+      parseNestedJSON(parsed);
       return parsed as T;
     }
     return null;
@@ -356,6 +360,7 @@ export class ChatController {
           name: string;
         };
     const handle = (msg: string) => {
+      console.log(msg);
       const parsedResponse = unsafe__decodeJSON(msg) as ResponseObject;
       this.setValueImmer((draft) => {
         let message: BotMessageType | null = null;

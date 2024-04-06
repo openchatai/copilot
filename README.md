@@ -1,7 +1,7 @@
 
-| Get 1:1 support, Join the community (NEW!!) | 1 Click install | 
-|:-:|:-:|
-| [![](https://dcbadge.vercel.app/api/server/yjEgCgvefr)](https://discord.gg/yjEgCgvefr)| [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/openchatai/opencopilot)
+Get 1:1 support, Join the community (NEW!!)
+
+ [![](https://dcbadge.vercel.app/api/server/yjEgCgvefr)](https://discord.gg/yjEgCgvefr)
  
 
 > [!TIP]
@@ -141,6 +141,6 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 
 ## Analytics
 
-This product collects anonymous usage data to help improve your experience. You can opt-out by setting `ENABLE_EXTERNAL_API_LOGGING=no` in your environment variables.
+This product collects anonymous usage data to help improve your experience. You can opt out by setting `ENABLE_EXTERNAL_API_LOGGING=no` in your environment variables.
 
 
