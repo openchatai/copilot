@@ -9,7 +9,7 @@ anyio==3.7.1
 asgiref==3.7.2
 async-timeout==4.0.3
 asyncio==3.4.3
-attrs==23.1.0
+attrs==23.2.0
 backoff==2.2.1
 bcrypt==4.1.2
 beautifulsoup4==4.12.2
