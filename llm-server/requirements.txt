@@ -58,7 +58,7 @@ huggingface-hub==0.17.3
 humanfriendly==10.0
 Hypercorn==0.15.0
 hyperframe==6.0.1
-idna==3.4
+idna==3.7
 importlib-metadata==6.8.0
 importlib-resources==6.1.1
 iniconfig==2.0.0
