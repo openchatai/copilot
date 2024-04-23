@@ -16,7 +16,7 @@ there are several ways you can integrate the Copilot Chat widget into your appli
 
 1. by using CDN script into your html file.
    ```html
-   <script src="https://unpkg.com/@openchatai/copilot-widget@latest/dist-embed/pilot.js"></script>
+   <script src="https://unpkg.com/@openchatai/widget@latest/dist-embed/pilot.js"></script>
    ```
    this will automatically register a new function called `initAiCoPilot` on the global window object.
 
@@ -58,17 +58,17 @@ there are several ways you can integrate the Copilot Chat widget into your appli
    <Tabs>
      <Tab title="npm">
      ```bash
-      npm install @openchatai/copilot-widget 
+      npm install @openchatai/widget 
       ```
       </Tab>
      <Tab title="yarn">
      ```bash
-      yarn add @openchatai/copilot-widget 
+      yarn add @openchatai/widget 
       ```
       </Tab>
      <Tab title="pnpm">
      ```bash 
-     pnpm add @openchatai/copilot-widget 
+     pnpm add @openchatai/widget 
      ```
      </Tab>
    </Tabs>
@@ -76,8 +76,7 @@ there are several ways you can integrate the Copilot Chat widget into your appli
 2. Use the Component inside your application
 
 ```jsx
-import { CopilotWidget,Root } from "@openchatai/copilot-widget"; 
-import '@openchatai/copilot-widget/index.css' 
+import { CopilotWidget,Root } from "@openchatai/widget"; 
 const options = {
   apiUrl: "https://api.opencopilot.so/backend",
   socketUrl: "https://api.opencopilot.so", 

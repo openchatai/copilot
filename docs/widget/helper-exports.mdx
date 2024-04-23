@@ -1,13 +1,13 @@
 ---
 title: "Helper exports"
-description: "Learn how to extend the Copilot widget UI by using useful utilities exported from `@openchatai/copilot-widget`."
+description: "Learn how to extend the Copilot widget UI by using useful utilities exported from `@openchatai/widget`."
 ---
 
 - By default the UI response is rendered without bot icons or any meta murcup 
 by using `BotMessageWrapper` that wraps the ui response will get the job done. 
 
 ``` tsx
-import { BotMessageWrapper } from "@openchatai/copilot-widget";
+import { BotMessageWrapper } from "@openchatai/widget";
 ```
 - Use the `ComponentProps<"YOUR_DATA_TYPE_RETURNED_FROM_THE_API">` generic type to define props for the custom component that will be used to render the UI response. This extends the `BotMessageType` to include the data type returned from the API.
 
@@ -38,7 +38,7 @@ const WeatherInfo: React.FC<Props> = ({ data }) => {
     - `useWidgetState` to get the current state of the widget (open or close), you can even close the widget.
     - `useSendMessage` to trigger a message from the widget. 
 ```tsx
-import {useSendMessage} from "@openchatai/copilot-widget";
+import {useSendMessage} from "@openchatai/widget";
 ```
 ``` tsx
 const WeatherInfo: React.FC<Props> = ({ data }) => {
