@@ -37,6 +37,7 @@
     {
       "group": "Getting started",
       "icon": "book",
+      "iconType": "light",
       "pages": [
         "introduction"
       ]
