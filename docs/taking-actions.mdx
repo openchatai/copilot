@@ -1,0 +1,73 @@
+---
+title: "Taking actions"
+description: "Open can take actions to solve the customer's problems. It can call your backend to update records, create new records, and much more."
+---
+
+
+Sometimes, the customer problem can't be solved by responding with simple text, and the customer question might reqire retrieving data from the backend or perforing some updates to the data. In these cases, Open can take actions to solve the customer's problem. It can call your backend do that.
+
+## Define a new action
+Actions in a sense are simple API calls that the AI will do whenever the customer question/problem requires it. You can define a new action in the dashboard using the UI, or you can define it using swagger (OpenAPI standard) files.
+
+<CardGroup cols={2}>
+  <Card title="Using the UI" href='#define-a-new-action-using-the-ui' icon="table-columns"></Card>
+  <Card title='Using swagger' href='#define-a-new-action-using-swagger' icon='react'></Card>
+</CardGroup>
+
+
+
+### Define a new action using the UI
+// @todo video
+1 - Go to the dashboard and click on the `Actions` tab
+
+2 - Click on the `New Action` button
+
+3 - Enter the name of the action and the description
+
+4 - Click on the `Add` button
+
+5 - Click on the `Save` button
+
+
+### Define a new action using swagger
+
+Using swagger is easier when you have a lot of APIs or actions, but it's also more flexible. You can define your actions using swagger files, which are machine-readable documents that describe and document RESTful APIs. It makes it easier for developers to understand and interact with web services. Open will validate this file and suggest recommended actions. If your APIs require authorization or authentication, you can still pass your tokens using one of the copilot options ([learn more about authorization](authorization)).
+
+- **From the dashboard**: you can upload your swagger file and Open will validate it and suggest actions.
+- **Or you can use the API to programmatically** upload and validate your swagger file ([learn more](/api-reference/endpoint/import-actions-from-swagger))
+
+
+
+<Info>
+You can aslo use CI/CD to automatically upload your swagger file to Open and validate it. [Learn more](/resources/ci-cd-actions)
+</Info>
+
+
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="How can I authorize my backend API calls?">
+    <p>
+    If your API requires authorization, you can pass your tokens using the `Authorization` header. You can also use the API to programmatically pass your tokens. [Learn more](/authorization)
+    </p>
+
+  </Accordion>
+
+  <Accordion title="What if my API have parameters?">
+    <p>
+      If the parameter/path/query is not fixed, Open will use AI to undeerstand the user request and generate the parameters/path/query value
+    </p>
+  </Accordion>
+
+  <Accordion title="How can I debug my actions/API calls?">
+    <p>
+      You can use the `debug` option to enable debugging in Open. This will log all the messages and events to the console and to the chat UI. You can also use the API to programmatically enable debugging. [Learn more](@todo)
+    </p>
+  </Accordion>
+
+  <Accordion title="What is a system action?">
+    <p>
+      A system action is an action that is built-in to Open. It is a pre-defined action that Open will perform when a user asks a question. For example, `handoff` is a system action that Open will perform when a user is handed off to a human agent. 
+    </p>
+  </Accordion>
+</AccordionGroup>
