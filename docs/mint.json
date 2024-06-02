@@ -42,15 +42,7 @@
       ]
     },
     {
-      "group": "Flows",
-      "pages": [
-        "flows",
-        "create-flow"
-      ],
-      "icon": "rectangle-code"
-    },
-    {
-      "group": "Copilot widget",
+      "group": "Web Support",
       "pages": [
         "widget/embed",
         "widget/styling",
@@ -59,8 +51,18 @@
       ]
     },
     {
-      "group": "System actions",
+      "group": "Phone Support",
       "pages": [
+        "widget/embed",
+        "widget/styling",
+        "widget/not-gen-ui",
+        "widget/helper-exports"
+      ]
+    },
+    {
+      "group": "Actions",
+      "pages": [
+        "taking-actions",
         "resources/human-handoff"
       ]
     },
