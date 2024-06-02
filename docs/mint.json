@@ -36,33 +36,42 @@
   "navigation": [
     {
       "group": "Getting started",
+      "icon": "book",
       "pages": [
-        "introduction",
-        "authorization"
+        "introduction"
       ]
     },
     {
       "group": "Web Support",
+      "icon": "sun",
       "pages": [
         "widget/embed",
         "widget/styling",
         "widget/not-gen-ui",
+        "authorization",
         "widget/helper-exports"
       ]
     },
     {
       "group": "Phone Support",
+      "icon": "phone",
       "pages": [
-        "widget/embed",
-        "widget/styling",
-        "widget/not-gen-ui",
-        "widget/helper-exports"
+        "phone/new"
+      ]
+    },
+    {
+      "group": "Email Support",
+      "icon": "envelope",
+      "pages": [
+        "email/new"
       ]
     },
     {
       "group": "Actions",
+      "icon": "bolt",
       "pages": [
         "taking-actions",
+        "authorization",
         "resources/human-handoff"
       ]
     },

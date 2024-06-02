@@ -17,9 +17,31 @@ Once this system action is installed on your copilot, a `handoff` event could ha
 - When the user explicitly asks to talk to a human agent.
 - When the copilot is unable to understand the user's request or felt that the user is angry and dissatisfied.
 
-## How to detect `handoff` event?
 
-**You can detect and handle the `handoff` event in two ways:**
+
+------
+## Handoff on the phone
+When the AI is not able to understand the user's request or when the user requests to speak to a human agent, The AI can transfer the call to anouther number that is managed by a human.
+
+- From the phone channel edit the desired phone number.
+- On the `handoff` input, enter the number of the human agent.
+- Click on the `Save` button.
+
+The conversaation will also be marked as `handoff` and will be assigned to the human agent in the inbox (based on the type of issue and the human agent's availability).
+
+------
+
+## Handoff on the email
+When the AI is not able to understand the user's request or when the user requests to speak to a human agent, The AI will assign the conversation to a human agent automatically based on the type of issue and the human agent's availability.
+
+------
+
+
+## Handoff on the web UI
+
+The copilot can handoff the conversation to a human agent on the web UI. This is useful when the copilot is unable to understand the user's request or when the user requests to speak to a human agent, we reialzed that most of the time angry customers are looking for a human agent to talk to and solve their problems.
+
+#### How to detect `handoff` event?
 
 - **Option 1:** By using `onHandoff` callback function:
 
@@ -47,7 +69,7 @@ Once this system action is installed on your copilot, a `handoff` event could ha
           },
         ],
   ```
-## I want to use my own UI to handle the `handoff` event, how can I do that?
+#### I want to use my own UI to handle the `handoff` event, how can I do that?
 The same as defining a UI component you will do the same instead, the only difference is that you will use the `HANDOFF` key to define the UI component that will be rendered when the `handoff` event is triggered.
 
 ```javascript
@@ -62,7 +84,7 @@ The same as defining a UI component you will do the same instead, the only diffe
       ],
 ```
 
-## What does the `handoff` event payload look like?
+#### What does the `handoff` event payload look like?
 The `handoff` event payload will contain the following information:
 
 ```json

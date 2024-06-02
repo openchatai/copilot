@@ -60,7 +60,7 @@ icon: "book"
         <Card
         title="Human handoff"
         icon="stars"
-        href="https://opencopilot.so/roadmap"
+        href="resources/human-handoff"
     >
         Learn how to use Open to hand off to a human agent when the AI is not able to handle the request.
     </Card>
@@ -74,74 +74,4 @@ icon: "book"
     </Card>
 
 </CardGroup>
-
-
-
-
-## Setting up
-
-You can self-host OpenCopilot in a relatively easy way, please make sure you have the following requirements:
-
-- Docker engine and docker compose installed
-- Clone the repository
-
-```bash
-git clone https://github.com/openchatai/opencopilot.git
-```
-
-- Update your llm-server/.env with your OPENAI_API_KEY
-
-```dotenv
-OPENAI_API_KEY=YOUR_KEY_GOES_HERE
-```
-
-- Run the installation script
-
-```bash
-make install
-```
-Then your OpenCopilot dashboard will be accessible at https://api.opencopilot.so
-
-
-----
-
-You also can see the complete list of commands using `make help`
-```
-➜  OpenCopilot git:(main) make help
-Usage: make [target]
-
-Available Targets:
-
-  install            - Install and set up the Docker environment
-  db-setup           - Set up the database (fresh migration with seeding)
-  down               - Stop and remove all containers
-  exec-backend      - Access the backend container's shell
-  exec-dashboard    - Access the dashboard container's shell
-  exec-llm-server   - Access the llm-server container's shell
-  restart            - Restart all containers
-  logs               - Show container logs
-
-  help               - Display this help message
-```
-
-## Crawling Web Pages
-
-By default, when passing in a URL to create a new DataSource for a Copilot, 15 pages will be indexed. The configuration for this is located in the `opencopilot/llm-server/utils/llm_consts.py` file:
-
-```python
-max_pages_to_crawl = int(os.getenv("MAX_PAGES_TO_CRAWL", "15"))
-```
-
-To increase the max pages to crawl, you can change the configuration file. However, this will create uncommitted changes in your working copy which you will need to stash in order to `git pull` for future updates. Another way to increase the max pages to crawl is to set an environment variable:
-
-```bash
-export MAX_PAGES_TO_CRAWL="50"
-```
------
-
-Complete list of links:
-
-- https://api.opencopilot.so/backend -> backend APIs (create, update, delete and validate copilots)
-- https://api.opencopilot.so or https://api.opencopilot.so/dashbaord -> dashboard (UI to do the same)
-
 
