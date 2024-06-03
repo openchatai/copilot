@@ -1,6 +1,6 @@
 ---
 title: "Conversations"
-api: "GET https://api.opencopilot.so/backend/conversations/:bot_id"
+api: "GET https://api-v2.opencopilot.so/backend/conversations/:bot_id"
 description: "Retrieve paginated conversations, including if the conversatin was a handoff and the sentiment with the summary."
 ---
 
@@ -9,13 +9,17 @@ This endpoint is protected by the same JWT that the user uses to call other APIs
 </Warning>
 
 
+<Warning>
+This endpoint points to the (v2) version of the API. The (v2) version of the API is the latest version and is recommended for all new development. Please update your code to use the (v2) version of the API.
+</Warning>
+
 This endpoint allows you to retrieve all conversations for a specific Copilot ID. The response includes the conversation id, sentiment, and reason for handoff (if applicable).
 
 The endpoint is paginated, and you can specify the `offset` and `limit` parameters to control the amount of data returned.
 
 <RequestExample>
 ```bash Example Request
-curl --location 'https://api.opencopilot.so/backend/conversations/:bot_id' \
+curl --location 'https://api-v2.opencopilot.so/backend/conversations/:bot_id' \
   --header 'Authorization: Bearer TOKEN' \ 
   --header 'Content-Type: application/json' 
 ```
