@@ -60,14 +60,15 @@ curl --location 'https://api-v2.opencopilot.so/backend/chat/:copilot_id' \
 ```
 </ResponseExample>
 
-The request includes the following optional query parameters:
+**The request includes the following optional query parameters:**
 - `page`: The page number to retrieve (default is 1).
 - `limit`: The number of items to retrieve per page (default is 10).
 - `sortBy`: The field to sort by (default is `created_at`).
 - `sortDirection`: The direction to sort (default is `ASC`) (`ASC` or `DESC`).
 
+----
 
-The response includes the following fields:
+**The response includes the following fields:**
 
 - `id`: The unique identifier for the conversation.
 - `created_at`: The date and time the conversation was created.
