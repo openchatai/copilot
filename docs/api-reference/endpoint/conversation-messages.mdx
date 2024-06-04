@@ -1,6 +1,6 @@
 ---
 title: "Messages"
-api: "GET https://api.opencopilot.so/backend/conversations/:bot_id/messages/:conversation_id"
+api: "GET https://api-v2.opencopilot.so/backend/conversations/:bot_id/messages/:conversation_id"
 description: "Retrieve all messages for a specific conversation."
 ---
 
@@ -19,7 +19,7 @@ The endpoint is paginated, and you can specify the `offset` and `limit` paramete
 
 <RequestExample>
 ```bash Example Request
-curl --location 'https://api.opencopilot.so/backend/conversations/:bot_id' \
+curl --location 'https://api-v2.opencopilot.so/backend/conversations/:bot_id' \
   --header 'Authorization: Bearer TOKEN' \ 
   --header 'Content-Type: application/json' 
 ```
@@ -59,6 +59,6 @@ The response includes the following fields:
 You can use the `offset` and `limit` parameters to control the pagination of the response. For example, to retrieve the first 10 messages, you can use the following request:
 
 ```bash Example Request
-curl --location 'https://api.opencopilot.so/backend/conversations/:bot_id/messages/:conversation_id?offset=0&limit=10' \
+curl --location 'https://api-v2.opencopilot.so/backend/conversations/:bot_id/messages/:conversation_id?offset=0&limit=10' \
   --header 'Authorization: Bearer TOKEN'
 ```
