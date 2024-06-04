@@ -1,7 +1,7 @@
 ---
-title: "Conversations"
-api: "GET https://api-v2.opencopilot.so/backend/conversations/:bot_id"
-description: "Retrieve paginated conversations, including if the conversatin was a handoff and the sentiment with the summary."
+title: "Chat Conversations"
+api: "GET https://api-v2.opencopilot.so/backend/chat/:copilot_id"
+description: "Retrieve paginated chat conversations, including if the conversatin was a handoff and the sentiment with the summary."
 ---
 
 <Warning>
@@ -15,11 +15,11 @@ This endpoint points to the (v2) version of the API. The (v2) version of the API
 
 This endpoint allows you to retrieve all conversations for a specific Copilot ID. The response includes the conversation id, sentiment, and reason for handoff (if applicable).
 
-The endpoint is paginated, and you can specify the `offset` and `limit` parameters to control the amount of data returned.
+The endpoint is paginated, and you can specify the `page` and `limit` query parameters to control the amount of data returned.
 
 <RequestExample>
 ```bash Example Request
-curl --location 'https://api-v2.opencopilot.so/backend/conversations/:bot_id' \
+curl --location 'https://api-v2.opencopilot.so/backend/chat/stats/:copilot_id?sortBy=created_at&sortDirection=ASC' \
   --header 'Authorization: Bearer TOKEN' \ 
   --header 'Content-Type: application/json' 
 ```
@@ -28,49 +28,55 @@ curl --location 'https://api-v2.opencopilot.so/backend/conversations/:bot_id' \
 <ResponseExample>
 ```json Response
 [
-    {
-        "conversation_id": "0AIxwcy7etYCp6W7|0wy1xg1smm",
-        "created_at": "Sun, 17 Mar 2024 21:45:35 GMT",
-        "handoff_sentiment": null,
-        "handoff_summary": null,
-        "was_handoff": false
+  {
+    "id": "string",
+    "copilot_id": "string",
+    "assignee_id": 0,
+    "channel": "string",
+    "status": 0,
+    "last_message_at": "2024-06-04T07:10:38.748Z",
+    "last_message": "string",
+    "is_notification_enabled": true,
+    "handoff": true,
+    "summary": "string",
+    "short_token": "string",
+    "classification": "string",
+    "handoff_sentiment": {},
+    "email_thread_id": "string",
+    "email": "string",
+    "meta": {
+      "title": "string",
+      "whatsappToNumber": "string",
+      "recordingUrl": "string",
+      "title_generation_type": {},
+      "summary": "string",
+      "phoneNumber": "string"
     },
-    {
-        "conversation_id": "0AIxwcy7etYCp6W7|6m5624efga",
-        "created_at": "Sun, 17 Mar 2024 20:46:17 GMT",
-        "handoff_sentiment": null,
-        "handoff_summary": null,
-        "was_handoff": false
-    },
-    {
-        "conversation_id": "0AIxwcy7etYCp6W7|w2fl8rfr8l",
-        "created_at": "Sun, 17 Mar 2024 20:45:04 GMT",
-        "handoff_sentiment": null,
-        "handoff_summary": null,
-        "was_handoff": false
-    },
-    {
-        "conversation_id": "0AIxwcy7etYCp6W7|w80lgs35p3",
-        "created_at": "Sun, 17 Mar 2024 20:33:43 GMT",
-        "handoff_sentiment": null,
-        "handoff_summary": null,
-        "was_handoff": false
-    }
+    "mobileNumber": "string",
+    "updated_at": "2024-06-04T07:10:38.748Z",
+    "created_at": "2024-06-04T07:10:38.748Z"
+  }
 ]
 ```
 </ResponseExample>
 
 The response includes the following fields:
 
-- `conversation_id`: The unique identifier for the conversation.
+- `id`: The unique identifier for the conversation.
 - `created_at`: The date and time the conversation was created.
 - `handoff_sentiment`: The sentiment of the conversation at the time of handoff.
 - `handoff_summary`: A summary of the conversation at the time of handoff.
-- `was_handoff`: A boolean value indicating whether the conversation was handed off to a human agent.
+- `handoff`: A boolean value indicating whether the conversation was handed off to a human agent.
+- `classification`: The classification of the conversation (based on the user's provided categories and tags).
+- `summary`: A summary of the conversation.
+- `short_token`: A short token that can be used to identify the conversation.
+- `status`: The status of the conversation (0 for active, 1 for resolved, 2 for cloesd).
+- `is_notification_enabled`: A boolean value indicating whether notifications are enabled for the conversation.
+- `last_message_at`: The date and time of the last message in the conversation.
+- `last_message`: The last message in the conversation.
+- `meta`: Metadata about the conversation (such as title, recording URL, and phone number).
+- `mobileNumber`: The mobile number associated with the conversation (in case of phone-based conversations).
+- `email`: The email associated with the conversation.
+- `email_thread_id`: The ID of the email thread associated with the conversation (in case of email-based conversations).
 
 You can use the `offset` and `limit` parameters to control the pagination of the response. For example, to retrieve the first 10 messages, you can use the following request:
-
-```bash Example Request
-curl --location 'https://api.opencopilot.so/backend/conversations/:bot_id?offset=0&limit=10' \
-  --header 'Authorization: Bearer TOKEN'
-```
