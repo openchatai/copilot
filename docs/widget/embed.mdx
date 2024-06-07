@@ -30,8 +30,8 @@ There are several ways you can integrate the Copilot Chat widget into your appli
    ```html
    <script>
      const options = {
-        apiUrl: "https://api.opencopilot.so/backend"
-        socketUrl: "https://api.opencopilot.so"
+        apiUrl: "https://api-v2.opencopilot.so/backend",
+        socketUrl: "https://api-v2.opencopilot.so",
         initialMessage: "Hey! happy to help.", 
         token: "your_copilot_token_goes_here", // you can get your token from the dashboard
         triggerSelector: "#triggerSelector", // the selector of the element that will trigger the copilot when clicked
@@ -83,8 +83,8 @@ There are several ways you can integrate the Copilot Chat widget into your appli
 ```jsx
 import { CopilotWidget,Root } from "@openchatai/widget"; 
 const options = {
-  apiUrl: "https://api.opencopilot.so/backend",
-  socketUrl: "https://api.opencopilot.so", 
+  apiUrl: "https://api-v2.opencopilot.so/backend",
+  socketUrl: "https://api-v2.opencopilot.so", 
   initialMessage: "Hey! happy to help.",
   token: "your_copilot_token_goes_here", // you can get your token from the dashboard
   defaultOpen: true,

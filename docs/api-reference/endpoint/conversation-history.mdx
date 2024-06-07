@@ -29,28 +29,19 @@ curl --location 'https://api-v2.opencopilot.so/backend/chat/:organization_id' \
 ```json Response
 [
   {
-    "id": "string",
-    "copilot_id": "string",
-    "assignee_id": 0,
-    "channel": "string",
-    "status": 0,
-    "last_message_at": "2024-06-04T07:10:38.748Z",
-    "last_message": "string",
-    "is_notification_enabled": true,
+    "id": "5003584a-be1f-4754-a0c7-703f48589e03",
+    "copilot_id": "4ef0737b-976a-450e-8188-4f1f5a1a1b0b",
+    "created_at": "2024-06-03T11:57:48.000Z",
+    "channel": "web",
+    "summary": "The customer is dissatisfied with the product and is looking for a refund.",
+    "classification": "REFUND_REQUEST",
+    "assignee_id": "copilot",
     "handoff": true,
-    "summary": "string",
-    "classification": "string",
-    "handoff_sentiment": {},
-    "meta": {
-      "title": "string",
-      "whatsappToNumber": "string",
-      "recordingUrl": "string",
-      "title_generation_type": {},
-      "summary": "string",
-      "phoneNumber": "string"
-    },
-    "updated_at": "2024-06-04T07:10:38.748Z",
-    "created_at": "2024-06-04T07:10:38.748Z"
+    "handoff_sentiment": "neutral",
+    "status": "OPEN",
+    "meta": null,
+    "action_called": 1,
+    "total_messages": 9
   }
 ]
 ```
@@ -66,18 +57,16 @@ curl --location 'https://api-v2.opencopilot.so/backend/chat/:organization_id' \
 
 **The response includes the following fields:**
 
-- `id`: The unique identifier for the conversation.
-- `copilot_id`: The unique identifier for the organization associated with the conversation.
+- `id`: The unique identifier for the chat conversation.
+- `copilot_id`: The unique identifier for the organization (copilot) associated with the conversation.
 - `created_at`: The date and time the conversation was created.
+- `channel`: The channel on which the conversation was created (`whatsapp`, `email`, `web`, or `phone`).
+- `summary`: A summary of the conversation (only avaliable for conversations that is marked as `handoff`).
+- `classification`: The classification of the conversation (based on the user's provided categories and tags).
+- `assignee_id`: The ID of the assignee for the conversation (will be `copilot` for conversations that are not assigned to a human, otherwise will be the ID of the assignee).
 - `handoff_sentiment`: The sentiment of the conversation at the time of handoff.
 - `handoff_summary`: A summary of the conversation at the time of handoff.
 - `handoff`: A boolean value indicating whether the conversation was handed off to a human agent.
-- `classification`: The classification of the conversation (based on the user's provided categories and tags).
-- `summary`: A summary of the conversation.
-- `status`: The status of the conversation (0 for active, 1 for resolved, 2 for cloesd).
-- `is_notification_enabled`: A boolean value indicating whether notifications are enabled for the conversation.
-- `last_message_at`: The date and time of the last message in the conversation.
-- `last_message`: The last message in the conversation.
+- `status`: The status of the conversation (open, resolved, or closed).
 - `meta`: Metadata about the conversation (such as title, recording URL, and phone number).
-- `email`: The email associated with the conversation.
 
