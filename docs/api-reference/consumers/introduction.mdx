@@ -1,0 +1,36 @@
+---
+title: "Introduction to consumer APIs"
+description: "Some of the APIs in the consumer APIs section allow you to create, list, and delete consumers."
+icon: "user"
+---
+
+
+## What is a consumer?
+
+A consumer is a user that can interact with the chatbot, phone AI or email AI, a single consumer might have multiple conversations across different channels.
+
+
+## How do I create a consumer?
+
+You can create a consumer in your organization in two ways:
+
+#### 1. Using the API
+We have a simple public API that allows you to manage consumers in your organization, you can use the API to create, list, and delete consumers.
+
+#### 2. Using the widget
+Whenever you embed the copilot widget in your application, you can use the widget options to create a consumer, read more about this option in the [widget documentation](/widget/embed).
+
+
+### Adding custom data to a consumer
+
+We support attaching a phone, email or a name to a consumer, however, you can also add any custom data you want to associate with the consumer. This data will be returned in the response and can be used for any purpose you want, just make sure it's a valid JSON string object.
+The custom data is just a simple JSON object, you can add any key-value pairs you want to it, for example:
+
+```json
+{
+  "priority": "high",
+  "department": "sales"
+}
+```
+
+You can use the API or the widget to add custom data to a consumer.

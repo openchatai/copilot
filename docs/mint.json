@@ -108,7 +108,17 @@
       ]
     },
     {
-      "group": "Chat API",
+      "group": "Consumers",
+      "pages": [
+        "api-reference/consumers/introduction",
+        "api-reference/consumers/create",
+        "api-reference/consumers/delete",
+        "api-reference/consumers/list",
+        "api-reference/consumers/update"
+      ]
+    },
+    {
+      "group": "Chat API", 
       "pages": [
         "api-reference/endpoint/chat-init"
       ]

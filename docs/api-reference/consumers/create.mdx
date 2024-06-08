@@ -1,0 +1,66 @@
+---
+title: "Create Consumer"
+api: "POST https://api-v2.opencopilot.so/backend/consumers/:organization_id"
+description: "Create a new consumer for a specific Organization ID."
+---
+
+<Warning>
+This endpoint is protected by the same JWT that the user uses to call other APIs. The response will include data for the specified chatbot, along with other metadata information.
+</Warning>
+
+
+You can create a new consumer in your organization at Open by calling this endpoint, a consumer is a user that can interact with the chatbot, phone AI or email AI, a single consumer might have multiple conversations across different channels.
+
+
+
+<ParamField path="organization_id" type="string" required>
+  The unique identifier for the copilot (organization) you want to create a consumer for. This is a required parameter.
+</ParamField>
+
+<ParamField body="copilot_id" type="string" default="uuid" required>
+  The unique identifier for the copilot_id (organization_id) you want to create a consumer for. This is a required parameter.
+</ParamField>
+
+<ParamField body="email" type="string" default="string">
+  The email address of the consumer. 
+</ParamField>
+
+<ParamField body="name" type="string" default="string">
+  The name of the consumer. 
+</ParamField>
+
+<ParamField body="phone_number" type="string" default="string">
+  The phone number of the consumer. 
+</ParamField>
+
+<ParamField body="custom_data" type="object" default="{}">
+  An object containing any custom data you want to associate with the consumer. 
+</ParamField>
+
+
+<RequestExample>
+```bash Example Request
+curl --location 'https://api-v2.opencopilot.so/backend/consumers/:organization_id' \
+  --header 'Authorization: Bearer TOKEN' \ 
+  --header 'Content-Type: application/json' 
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+  "copilot_id": "6486fa96-80ac-4654-bf71-f793893e8fef",
+  "email": "hello@gmail.com",
+  "name": "string",
+  "phone_number": "string",
+  "custom_data": "{}",
+  "created_at": null,
+  "updated_at": null,
+  "id": "82e95723-245b-47c0-9cf2-2dd3d3914a40"
+}
+```
+</ResponseExample>
+
+<Info>
+You can pass any custom data you want to associate with the consumer. This data will be returned in the response and can be used for any purpose you want, just make sure it's a valid JSON string object.
+</Info>
