@@ -1,7 +1,7 @@
 ---
-title: "Create Consumer"
-api: "POST https://api-v2.opencopilot.so/backend/consumers/:organization_id"
-description: "Create a new consumer for a specific Organization ID."
+title: "Create contact"
+api: "POST https://api-v2.opencopilot.so/backend/contact/:organization_id"
+description: "Create a new contact for a specific Organization ID."
 ---
 
 <Warning>
@@ -9,38 +9,38 @@ This endpoint is protected by the same JWT that the user uses to call other APIs
 </Warning>
 
 
-You can create a new consumer in your organization at Open by calling this endpoint, a consumer is a user that can interact with the chatbot, phone AI or email AI, a single consumer might have multiple conversations across different channels.
+You can create a new contact in your organization at Open by calling this endpoint, a contact is a user that can interact with the chatbot, phone AI or email AI, a single contact might have multiple conversations across different channels.
 
 
 
 <ParamField path="organization_id" type="string" required>
-  The unique identifier for the copilot (organization) you want to create a consumer for. This is a required parameter.
+  The unique identifier for the copilot (organization) you want to create a contact for. This is a required parameter.
 </ParamField>
 
 <ParamField body="copilot_id" type="string" default="uuid" required>
-  The unique identifier for the copilot_id (organization_id) you want to create a consumer for. This is a required parameter.
+  The unique identifier for the copilot_id (organization_id) you want to create a contact for. This is a required parameter.
 </ParamField>
 
 <ParamField body="email" type="string" default="string">
-  The email address of the consumer. 
+  The email address of the contact. 
 </ParamField>
 
 <ParamField body="name" type="string" default="string">
-  The name of the consumer. 
+  The name of the contact. 
 </ParamField>
 
 <ParamField body="phone_number" type="string" default="string">
-  The phone number of the consumer. 
+  The phone number of the contact. 
 </ParamField>
 
 <ParamField body="custom_data" type="object" default="{}">
-  An object containing any custom data you want to associate with the consumer. 
+  An object containing any custom data you want to associate with the contact. 
 </ParamField>
 
 
 <RequestExample>
 ```bash Example Request
-curl --location 'https://api-v2.opencopilot.so/backend/consumers/:organization_id' \
+curl --location 'https://api-v2.opencopilot.so/backend/contact/:organization_id' \
   --header 'Authorization: Bearer TOKEN' \ 
   --header 'Content-Type: application/json' 
 ```
@@ -62,5 +62,5 @@ curl --location 'https://api-v2.opencopilot.so/backend/consumers/:organization_i
 </ResponseExample>
 
 <Info>
-You can pass any custom data you want to associate with the consumer. This data will be returned in the response and can be used for any purpose you want, just make sure it's a valid JSON string object.
+You can pass any custom data you want to associate with the contact. This data will be returned in the response and can be used for any purpose you want, just make sure it's a valid JSON string object.
 </Info>

@@ -1,0 +1,47 @@
+---
+title: "Introduction to contact APIs"
+description: "Some of the APIs in the contact APIs section allow you to create, list, and delete contacts."
+icon: "user"
+---
+
+
+## What is a contact?
+
+A contact is a user that can interact with the chatbot, phone AI or email AI, a single contact might have multiple conversations across different channels.
+
+
+## How do I create a contact?
+
+You can create a contact in your organization in two ways:
+
+#### 1. Using the API
+We have a simple public API that allows you to manage contacts in your organization, you can use the API to create, list, and delete contacts.
+
+#### 2. Using the widget
+Whenever you embed the copilot widget in your application, you can use the widget options to create a contact, read more about this option in the [widget documentation](/widget/embed#identifying-chat-users-consumers).
+
+
+### Adding custom data to a contact
+
+We support attaching a phone, email or a name to a contact, however, you can also add any custom data you want to associate with the contact. This data will be returned in the response and can be used for any purpose you want, just make sure it's a valid JSON string object.
+The custom data is just a simple JSON object, you can add any key-value pairs you want to it, for example:
+
+```jsx
+const widgetOptions = {
+  initialMessage: "Hello! How can I help you?",
+  token: "your_copilot_token_goes_here",
+  user: {
+    name: "your_user_name",
+    email: "your_user_email",
+    avatar: "your_user_avatar_url",
+    phone: "your_user_phone",
+    customData: {
+      // any custom data you want to send to the copilot backend 
+      "key1": "value1",
+      "balance": 100,
+      "age": 25,
+    }
+  },
+```
+
+You can use the API or the widget to add custom data to a contact.

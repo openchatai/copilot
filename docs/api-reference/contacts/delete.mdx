@@ -1,0 +1,42 @@
+---
+title: "Delete a contact"
+api: "DELETE https://api-v2.opencopilot.so/backend/contact/:organization_id/:contact_id"
+description: "Delete a contact for a specific Organization ID."
+---
+
+<Warning>
+This endpoint is protected by the same JWT that the user uses to call other APIs. The response will include data for the specified chatbot, along with other metadata information.
+</Warning>
+
+
+You can delete a contact in your organization at Open by calling this endpoint, a contact is a user that can interact with the chatbot, phone AI or email AI, a single contact might have multiple conversations across different channels.
+
+<Warning>
+**Important**: Deleting a contact will **not** delete any conversations that the contact has had with the copilot. You will need to manually delete any conversations that you want to delete.
+</Warning>
+
+
+<ParamField path="organization_id" type="string" required>
+  The unique identifier for the copilot (organization) you want to create a contact for. This is a required parameter.
+</ParamField>
+
+<ParamField path="contact_id" type="string" required>
+  The unique identifier for the contact you want to delete. This is a required parameter.
+</ParamField>
+
+
+<RequestExample>
+```bash Example Request
+curl --location 'https://api-v2.opencopilot.so/backend/contact/:organization_id/:contact_id' \
+  --header 'Authorization: Bearer TOKEN' \ 
+  --header 'Content-Type: application/json' 
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+  "message": "contact deleted successfully"
+}
+```
+</ResponseExample>
