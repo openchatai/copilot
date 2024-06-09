@@ -73,7 +73,8 @@
       "pages": [
         "taking-actions",
         "authorization",
-        "resources/human-handoff"
+        "resources/human-handoff",
+        "resources/autopilot-topics"
       ]
     },
     {
