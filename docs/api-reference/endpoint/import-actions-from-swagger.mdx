@@ -9,6 +9,20 @@ This endpoint points to the (v2) version of the API. The (v2) version of the API
 </Warning>
 
 
+### OpenAPI Specification (Swagger)
+
+This endpoint supports the [OpenAPI V3 Specification (Swagger)](https://swagger.io/specification/). We have introduced some new fields to the OpenAPI specification that are custom to Open. These fields are:
+
+- **`x-open-execute-after`: `string[]`**  
+  This field is useful when you want to execute other operation(s) before the current operation/action. it takes an array of operation IDs. The AI will execute the operations in the order they are listed in the array.
+
+**Example:**
+
+Suppose you have an action with the operation ID `deleteUserCourses`. Before performing this action, you want to force the AI to list all the courses the user has and then delete them.
+
+You can achieve this by adding `['listUserCourses']` to the `x-open-execute-after` field. The AI will first execute the `listUserCourses` operation and then proceed to execute the `deleteUserCourses` operation.
+
+
 ### Body
 
 <ParamField path="id" type="string">
