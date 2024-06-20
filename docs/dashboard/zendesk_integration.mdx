@@ -1,0 +1,59 @@
+---
+title: "Zendesk"
+icon: "pager"
+description: "Native integration with Zendesk to allow your copilot to hand chats over to your Zendesk support agents."
+---
+
+The Zendesk integration allows you to pass control of chat sessions to Zendesk users, allowing you to use your existing Zendesk setup to manage chat sessions as tickets using your existing workflows.
+
+When the integration is enabled, any [handoff event](../resources/human-handoff) will automatically create a ticket in the Agent Workspace. Human support agents can then use the ticket to chat with the contact in real time.
+
+# Configuration
+
+To enable Zendesk integration, find the **Integrations** section in the **Settings** page, and click **Connect with Zendesk**. From this dialog, you can set your API credentials and any handoff preferences.
+
+This integration uses [Sunshine Conversations APIs](https://docs.smooch.io/guide/). To connect with Zendesk, you must complete the following:
+
+1. Create a webhook
+2. Create an API key
+
+Refer to the instructions on how to create both the webhook and the API key in the [Sunshine documentation](https://support.zendesk.com/hc/en-us/articles/4576083789850-Creating-conversations-integrations-in-Admin-Center#topic_oqh_5y2_nvb).
+However, pay attention to the following:
+
+- When configuring the webhook, use the URL provided in the OpenCopilot dashboard and check the boxes for _all_ event types and data to include in webhook events
+- When creating the API key, make sure to create it from the **Conversations API** section in the Zendesk Admin Center to ensure that it has the required permission scope (`app` scope is required)
+
+# Ticket Metadata
+
+You can set ticket metadata to control ticket tags, group, custom fields, and more.
+
+When initializing the widget, any fields you specify for the user (e.g. name, email) will be automatically included in the created ticket. You can also include arbitrary ticket metadata in the `customData` object of the user.
+It is worth noting that the ticket metadata can be used to set custom field values, as well as a few system fields, as documented [here](https://docs.smooch.io/guide/switchboard/#metadata-sent-to-zendesk).
+
+## Example
+
+When configuring your web widget, pass any Zendesk metadata in `user.customData` as follows:
+
+```js
+const options = {
+  apiUrl: "https://api-v2.opencopilot.so/backend",
+  socketUrl: "https://api-v2.opencopilot.so",
+  initialMessage: "Hey! happy to help.",
+  token: "your_copilot_token_goes_here",
+  user: {
+    name: "Widget User's Name",
+    email: "widget.user.email@example.com",
+    avatar: "https://link.to.avatar/",
+    phone: "1234567890",
+    customData: {
+      // Any custom data you want to send to the copilot backend
+      key1: "value1",
+
+      // Any Zendesk metadata
+      "dataCapture.ticketField.3584154321651": "Some value",
+      "dataCapture.ticketField.765484654312": "User-specific value",
+      "dataCapture.systemField.tags": "my_tag1,my_tag2",
+    },
+  },
+};
+```

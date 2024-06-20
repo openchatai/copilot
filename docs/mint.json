@@ -38,9 +38,7 @@
       "group": "Getting started",
       "icon": "book",
       "iconType": "light",
-      "pages": [
-        "introduction"
-      ]
+      "pages": ["introduction"]
     },
     {
       "group": "Web Support",
@@ -56,16 +54,12 @@
     {
       "group": "Phone Support",
       "icon": "phone",
-      "pages": [
-        "phone/new"
-      ]
+      "pages": ["phone/new"]
     },
     {
       "group": "Email Support",
       "icon": "envelope",
-      "pages": [
-        "email/new"
-      ]
+      "pages": ["email/new"]
     },
     {
       "group": "Actions",
@@ -119,16 +113,16 @@
       ]
     },
     {
-      "group": "Chat API", 
-      "pages": [
-        "api-reference/endpoint/chat-init"
-      ]
+      "group": "Chat API",
+      "pages": ["api-reference/endpoint/chat-init"]
+    },
+    {
+      "group": "Native Integrations",
+      "pages": ["dashboard/zendesk_integration"]
     },
     {
       "group": "Resources",
-      "pages": [
-        "resources/ci-cd-actions"
-      ]
+      "pages": ["resources/ci-cd-actions"]
     }
   ],
   "footerSocials": {
