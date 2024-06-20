@@ -34,8 +34,10 @@ If the message has already been voted on, it will be downvoted and the other way
 <RequestExample>
 
 ```bash Example Request
-curl --location --request POST 'https://api-v2.opencopilot.so/backend/chat/vote/:message_id' \
---header 'X-Bot-Token : YOUR_TOKEN'
+url -X 'POST' \
+  'https://api-v2.opencopilot.so/backend/chat/vote/:message_id' \
+  -H 'accept: application/json' \
+  -H 'X-Bot-Token: token'
 ```
 
 </RequestExample>
