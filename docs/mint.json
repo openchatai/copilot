@@ -119,6 +119,13 @@
       ]
     },
     {
+      "group": "Votes & RLHF", 
+      "pages": [
+        "votes/rlhf",
+        "api-reference/endpoint/votes-add"
+      ]
+    },
+    {
       "group": "Chat API", 
       "pages": [
         "api-reference/endpoint/chat-init"
