@@ -1,0 +1,53 @@
+---
+title: "Up/down vote AI response"
+api: "POST https://api-v2.opencopilot.so/backend/chat/vote/:message_id"
+---
+
+
+This endpoint allows you to upvote or downvote an AI response. It is used to calculate the quality of the AI response and to provide feedback on the AI response.
+
+If the message has already been voted on, it will be downvoted and the other way around.
+
+
+### Body
+
+<ParamField path="message_id" type="integer">
+  The ID of the message to vote on
+</ParamField>
+
+### Headers
+
+<ParamField path="header" name="Accept" type="string">
+  application/json
+</ParamField>
+
+<ParamField path="header" name="X-Bot-Token" type="string">
+  The bot token (to not be confused with the Auth token or the copilot/organization ID) -- you can get this from the dashboard -> settings -> Token
+</ParamField>
+
+### Response
+
+<ResponseField name="message" type="string">
+  Indicates whether the call was successful.
+</ResponseField>
+
+<RequestExample>
+
+```bash Example Request
+url -X 'POST' \
+  'https://api-v2.opencopilot.so/backend/chat/vote/:message_id' \
+  -H 'accept: application/json' \
+  -H 'X-Bot-Token: token'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Response
+{
+    "message": "Vote counted successfully"
+}
+```
+
+</ResponseExample>

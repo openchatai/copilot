@@ -1,0 +1,25 @@
+---
+title: "What is RLHF?"
+---
+
+When your users are interacting with your chatbot, phone, or email support, they have the option to vote (👍, 👎) on the quality of the AI response to their query.
+
+We store these votes in a database and use them to calculate the quality of the AI response. Additionally, in some cases, we give our dashboard users a way to put a human in the loop and provide feedback on the AI response.
+
+This practice is called [RLHF](https://en.wikipedia.org/wiki/Reinforcement_learning_from_human_feedback) and is a new way to improve the quality of AI responses. 
+
+## Is it available?
+
+At the moment, the RLHF feature is only available to a few users. We are working on making it available to everyone.
+
+## What can I do for now?
+
+You can still use the votes endpoint to vote on the quality of the AI response, and you can use the history endpoints to see the history of votes.
+
+
+## From where I can get the message ID?
+
+You will need the message id in order to vote on. You have two options:
+
+1. In the chat widget, after every AI response you will get a socket event with the name `vote`. The event will contain the message ID of the last AI response.
+2. Or you can use the `history` endpoint to get the history of votes and find the message ID of the last AI response.
