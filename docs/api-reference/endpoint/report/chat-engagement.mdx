@@ -1,0 +1,64 @@
+---
+title: "Get Chat Engagement"
+api: "GET https://api-v2.opencopilot.so/backend/reports/chats/engagement"
+description: "Retrieve chat engagement metrics for a specified period and copilot"
+---
+
+This endpoint provides chat engagement metrics, including the total number of chats, the number of engaged chats, and the engagement rate. It helps assess how effectively the copilot is interacting with users.
+
+### Query Parameters
+
+<ParamField query="startDate" type="string" format="date">
+  The start date for the report period (ISO 8601 format)
+</ParamField>
+
+<ParamField query="endDate" type="string" format="date">
+  The end date for the report period (ISO 8601 format)
+</ParamField>
+
+<ParamField query="copilot_id" type="string">
+  The ID of the copilot to filter the results
+</ParamField>
+
+<ParamField query="channel" type="string">
+  The channel to filter the results (e.g., "web", "mobile")
+</ParamField>
+
+<ParamField query="status" type="string">
+  The status of the chat sessions to include
+</ParamField>
+
+### Response
+
+<ResponseField name="totalChats" type="number">
+  The total number of chat sessions in the specified period
+</ResponseField>
+
+<ResponseField name="engagedChats" type="number">
+  The number of chat sessions where there was at least one message exchange
+</ResponseField>
+
+<ResponseField name="engagementRate" type="number">
+  The ratio of engaged chats to total chats, expressed as a decimal (0 to 1)
+</ResponseField>
+
+<RequestExample>
+
+```bash Example Request
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/chats/engagement?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z&copilot_id=abc123' \
+--header 'Authorization: Bearer YOUR_API_KEY'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Response
+{
+  "totalChats": 1000,
+  "engagedChats": 850,
+  "engagementRate": 0.85
+}
+```
+
+</ResponseExample>

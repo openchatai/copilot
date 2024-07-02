@@ -1,0 +1,64 @@
+---
+title: "Get Missed Chats"
+api: "GET https://api-v2.opencopilot.so/backend/reports/chats/missed"
+description: "Retrieve the count of missed chats based on specified criteria"
+---
+
+### Query Parameters
+
+<ParamField query="startDate" type="string" format="date-time">
+  The start date for the date range filter (ISO 8601 format)
+</ParamField>
+
+<ParamField query="endDate" type="string" format="date-time">
+  The end date for the date range filter (ISO 8601 format)
+</ParamField>
+
+<ParamField query="copilot_id" type="string">
+  The ID of the copilot to filter chats
+</ParamField>
+
+<ParamField query="channel" type="string">
+  The channel to filter chats (e.g., "web", "mobile")
+</ParamField>
+
+<ParamField query="status" type="string">
+  The status to filter chats
+</ParamField>
+
+<ParamField query="limit" type="number">
+  The maximum number of results to return
+</ParamField>
+
+<ParamField query="offset" type="number">
+  The number of results to skip before starting to return data
+</ParamField>
+
+<ParamField query="sortOrder" type="string">
+  The sort order for the results (either "asc" or "desc")
+</ParamField>
+
+### Response
+
+<ResponseField name="count" type="number">
+  The number of missed chats based on the specified criteria
+</ResponseField>
+
+<RequestExample>
+
+```bash Example Request
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/chats/missed?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z&copilot_id=abc123' \
+--header 'Authorization: Bearer YOUR_TOKEN'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Response
+{
+  "count": 42
+}
+```
+
+</ResponseExample>

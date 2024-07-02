@@ -1,0 +1,64 @@
+---
+title: "Get Chat Availability"
+api: "GET https://api-v2.opencopilot.so/backend/reports/chats/availability"
+description: "Retrieve the chat availability percentage for a specified time period"
+---
+
+### Query Parameters
+
+<ParamField query="startDate" type="string" required>
+  The start date for the report period (ISO 8601 format)
+</ParamField>
+
+<ParamField query="endDate" type="string" required>
+  The end date for the report period (ISO 8601 format)
+</ParamField>
+
+<ParamField query="copilot_id" type="string">
+  The ID of the copilot to filter results
+</ParamField>
+
+<ParamField query="channel" type="string">
+  The channel to filter results (e.g., "web", "mobile")
+</ParamField>
+
+<ParamField query="status" type="string">
+  The status to filter results (e.g., "open", "closed")
+</ParamField>
+
+<ParamField query="limit" type="number">
+  The maximum number of results to return
+</ParamField>
+
+<ParamField query="offset" type="number">
+  The number of results to skip before starting to return
+</ParamField>
+
+<ParamField query="sortOrder" type="string">
+  The order to sort the results ("asc" or "desc")
+</ParamField>
+
+### Response
+
+<ResponseField name="availability" type="number">
+  The availability percentage as a decimal between 0 and 1
+</ResponseField>
+
+<RequestExample>
+
+```bash Example Request
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/chats/availability?startDate=2023-01-01T00:00:00Z&endDate=2023-01-31T23:59:59Z&copilot_id=123456' \
+--header 'Authorization: Bearer YOUR_API_KEY'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Response
+{
+  "availability": 0.985
+}
+```
+
+</ResponseExample>

@@ -1,0 +1,78 @@
+---
+title: "Get Agent Performance"
+api: "GET https://api-v2.opencopilot.so/backend/reports/agents/performance"
+description: "Retrieve performance metrics for agents based on chat sessions"
+---
+
+This endpoint provides performance metrics for agents, including the total number of chats handled and the average duration of their chat sessions.
+
+### Query Parameters
+
+<ParamField query="startDate" type="string" format="date-time" optional>
+  The start date for the report period (ISO 8601 format)
+</ParamField>
+
+<ParamField query="endDate" type="string" format="date-time" optional>
+  The end date for the report period (ISO 8601 format)
+</ParamField>
+
+<ParamField query="copilot_id" type="string" optional>
+  Filter results by a specific copilot ID
+</ParamField>
+
+<ParamField query="limit" type="number" optional>
+  Limit the number of results returned
+</ParamField>
+
+<ParamField query="offset" type="number" optional>
+  Number of results to skip for pagination
+</ParamField>
+
+<ParamField query="sortOrder" type="string" optional>
+  Sort order for the results (asc or desc)
+</ParamField>
+
+### Response
+
+<ResponseField name="agentId" type="number">
+  The unique identifier of the agent
+</ResponseField>
+
+<ResponseField name="totalChats" type="number">
+  The total number of chats handled by the agent
+</ResponseField>
+
+<ResponseField name="avgDuration" type="number">
+  The average duration of chat sessions for the agent (in seconds)
+</ResponseField>
+
+<RequestExample>
+
+```bash Example Request
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/agents/performance?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z&copilot_id=abc123' \
+--header 'Authorization: Bearer YOUR_API_KEY'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Response
+[
+  {
+    "agentId": 1,
+    "totalChats": 150,
+    "avgDuration": 420.5
+  },
+  {
+    "agentId": 2,
+    "totalChats": 120,
+    "avgDuration": 380.2
+  }
+]
+```
+
+</ResponseExample>
+
+
+This documentation provides a comprehensive overview of the agent performance endpoint, including its purpose, query parameters, response structure, and examples of both the request and response.

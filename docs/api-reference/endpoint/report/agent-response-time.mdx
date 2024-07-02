@@ -1,0 +1,81 @@
+---
+title: "Get Agent Response Times"
+api: "GET https://api-v2.opencopilot.so/backend/reports/agents/response-times"
+description: "Retrieve average response times for agents in chat sessions"
+---
+
+This endpoint provides data on the average response times for agents in chat sessions. It helps analyze how quickly agents are responding to customer messages, which is crucial for assessing customer service efficiency.
+
+### Query Parameters
+
+<ParamField query="startDate" type="string" format="date-time">
+  The start date for the date range to analyze (ISO 8601 format)
+</ParamField>
+
+<ParamField query="endDate" type="string" format="date-time">
+  The end date for the date range to analyze (ISO 8601 format)
+</ParamField>
+
+<ParamField query="chatbot_id" type="string">
+  Filter results by a specific chatbot ID
+</ParamField>
+
+<ParamField query="session_id" type="string">
+  Filter results by a specific session ID
+</ParamField>
+
+<ParamField query="limit" type="number">
+  Limit the number of results returned
+</ParamField>
+
+<ParamField query="offset" type="number">
+  Number of results to skip (for pagination)
+</ParamField>
+
+<ParamField query="sortOrder" type="string">
+  Sort order for the results (asc or desc)
+</ParamField>
+
+### Response
+
+<ResponseField name="sessionId" type="string">
+  The unique identifier of the chat session
+</ResponseField>
+
+<ResponseField name="avgResponseTime" type="number">
+  The average response time for the agent in this session, in seconds
+</ResponseField>
+
+<RequestExample>
+
+```bash Example Request
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/agents/response-times?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z&chatbot_id=abc123' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer YOUR_TOKEN'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Response
+[
+  {
+    "sessionId": "session123",
+    "avgResponseTime": 45.5
+  },
+  {
+    "sessionId": "session456",
+    "avgResponseTime": 32.1
+  },
+  {
+    "sessionId": "session789",
+    "avgResponseTime": 60.3
+  }
+]
+```
+
+</ResponseExample>
+```
+
+This documentation provides a comprehensive overview of the "agents/response-times" endpoint, including its purpose, query parameters, response structure, and examples of both the request and response. The description explains that this endpoint is used to analyze agent response times, which is important for assessing customer service efficiency.

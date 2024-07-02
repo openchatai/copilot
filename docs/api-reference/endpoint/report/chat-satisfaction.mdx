@@ -1,0 +1,57 @@
+---
+title: "Get Chat Satisfaction"
+api: "GET https://api-v2.opencopilot.so/backend/reports/chats/satisfaction"
+description: "Retrieve the average satisfaction score for chat sessions"
+---
+
+This endpoint returns the average satisfaction score for chat sessions based on the provided query parameters.
+
+### Query Parameters
+
+<ParamField query="startDate" type="string" format="date-time">
+  The start date for the date range filter (ISO 8601 format)
+</ParamField>
+
+<ParamField query="endDate" type="string" format="date-time">
+  The end date for the date range filter (ISO 8601 format)
+</ParamField>
+
+<ParamField query="copilot_id" type="string">
+  The ID of the copilot to filter the results
+</ParamField>
+
+<ParamField query="limit" type="number">
+  The maximum number of results to return
+</ParamField>
+
+<ParamField query="offset" type="number">
+  The number of results to skip before starting to return data
+</ParamField>
+
+<ParamField query="sortOrder" type="string">
+  The sort order for the results (asc or desc)
+</ParamField>
+
+### Response
+
+<ResponseField name="averageSatisfaction" type="number">
+  The average satisfaction score for the chat sessions
+</ResponseField>
+
+<RequestExample>
+
+```bash Example Request
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/chats/satisfaction?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z&copilot_id=abc123'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Response
+{
+  "averageSatisfaction": 4.5
+}
+```
+
+</ResponseExample>

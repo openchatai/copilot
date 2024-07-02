@@ -130,6 +130,23 @@
     {
       "group": "Resources",
       "pages": ["resources/ci-cd-actions"]
+    },
+    {
+      "group": "Reports",
+      "pages": [
+        "api-reference/endpoint/report/total-chats",
+        "api-reference/endpoint/report/chat-engagement",
+        "api-reference/endpoint/report/missed-chat",
+        "api-reference/endpoint/report/chat-satisfaction",
+        "api-reference/endpoint/report/chat-availability",
+        "api-reference/endpoint/report/chat-duration",
+        "api-reference/endpoint/report/agent-performance",
+        "api-reference/endpoint/report/agent-response-time",
+        "api-reference/endpoint/report/staffing-prediction",
+        "api-reference/endpoint/report/agent-activity",
+        "api-reference/endpoint/report/top-customer-question",
+        "api-reference/endpoint/report/insights-alerts"
+      ]
     }
   ],
   "footerSocials": {

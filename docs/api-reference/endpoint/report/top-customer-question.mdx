@@ -1,0 +1,90 @@
+---
+title: "Get Top Customer Questions"
+api: "GET https://api-v2.opencopilot.so/backend/reports/insights/top-customer-questions"
+description: "Retrieve the most frequently asked questions by customers"
+---
+
+This endpoint provides insights into the most common questions or topics that customers are inquiring about. It analyzes the chat history to identify and rank the most frequent customer queries.
+
+### Query Parameters
+
+<ParamField query="startDate" type="string">
+  The start date for the date range to analyze (format: YYYY-MM-DD)
+</ParamField>
+
+<ParamField query="endDate" type="string">
+  The end date for the date range to analyze (format: YYYY-MM-DD)
+</ParamField>
+
+<ParamField query="limit" type="number">
+  The maximum number of top questions to return (default: 10)
+</ParamField>
+
+<ParamField query="chatbot_id" type="string">
+  Optional: Filter results for a specific chatbot
+</ParamField>
+
+<ParamField query="session_id" type="string">
+  Optional: Filter results for a specific chat session
+</ParamField>
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication
+</ParamField>
+
+### Response
+
+<ResponseField name="questions" type="array">
+  An array of the top customer questions
+</ResponseField>
+
+<ResponseField name="questions[].question" type="string">
+  The text of the customer's question
+</ResponseField>
+
+<ResponseField name="questions[].count" type="number">
+  The number of times this question was asked
+</ResponseField>
+
+<RequestExample>
+
+```bash Example Request
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/insights/top-customer-questions?startDate=2023-01-01&endDate=2023-12-31&limit=5' \
+--header 'Authorization: Bearer YOUR_TOKEN'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Response
+{
+  "questions": [
+    {
+      "question": "How do I reset my password?",
+      "count": 156
+    },
+    {
+      "question": "What are your business hours?",
+      "count": 132
+    },
+    {
+      "question": "How long does shipping take?",
+      "count": 98
+    },
+    {
+      "question": "Do you offer refunds?",
+      "count": 87
+    },
+    {
+      "question": "How can I track my order?",
+      "count": 76
+    }
+  ]
+}
+```
+
+</ResponseExample>
+```

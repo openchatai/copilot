@@ -1,0 +1,83 @@
+---
+title: "Get Staffing Prediction"
+api: "GET https://api-v2.opencopilot.so/backend/reports/agents/staffing-prediction"
+description: "Retrieve a prediction for staffing needs based on historical chat data"
+---
+
+This endpoint provides a staffing prediction based on historical chat data. It analyzes the number of chats per hour to help optimize agent allocation and improve response times.
+
+### Query Parameters
+
+<ParamField query="startDate" type="string" format="date-time" optional>
+  The start date for the date range to analyze (ISO 8601 format)
+</ParamField>
+
+<ParamField query="endDate" type="string" format="date-time" optional>
+  The end date for the date range to analyze (ISO 8601 format)
+</ParamField>
+
+<ParamField query="copilot_id" type="string" optional>
+  Filter results for a specific copilot
+</ParamField>
+
+<ParamField query="channel" type="string" optional>
+  Filter results by channel (e.g., "web", "mobile")
+</ParamField>
+
+<ParamField query="status" type="string" optional>
+  Filter results by session status
+</ParamField>
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication
+</ParamField>
+
+### Response
+
+<ResponseField name="hourlyChats" type="array">
+  An array of objects representing the chat volume for each hour
+  <Expandable title="properties">
+    <ResponseField name="hour" type="number">
+      The hour of the day (0-23)
+    </ResponseField>
+    <ResponseField name="chatCount" type="number">
+      The number of chats during that hour
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Example Request
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/agents/staffing-prediction?startDate=2023-01-01T00:00:00Z&endDate=2023-01-31T23:59:59Z&copilot_id=abc123' \
+--header 'Authorization: Bearer YOUR_TOKEN'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Response
+{
+  "hourlyChats": [
+    {
+      "hour": 0,
+      "chatCount": 15
+    },
+    {
+      "hour": 1,
+      "chatCount": 10
+    },
+    // ... (data for hours 2-22)
+    {
+      "hour": 23,
+      "chatCount": 20
+    }
+  ]
+}
+```
+
+</ResponseExample>
+```

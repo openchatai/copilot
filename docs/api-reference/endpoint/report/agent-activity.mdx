@@ -1,0 +1,82 @@
+---
+title: "Get Agent Activity"
+api: "GET https://api-v2.opencopilot.so/backend/reports/agents/activity"
+description: "Retrieve activity data for agents, including their active and open sessions within a specified time range."
+---
+
+This endpoint provides insights into agent activity, showing the number of active sessions and open sessions for each agent. It helps in monitoring agent workload and performance.
+
+### Query Parameters
+
+<ParamField query="startDate" type="string" format="date-time" optional>
+  The start date for the report period (ISO 8601 format). If not provided, defaults to the earliest possible date.
+</ParamField>
+
+<ParamField query="endDate" type="string" format="date-time" optional>
+  The end date for the report period (ISO 8601 format). If not provided, defaults to the current date and time.
+</ParamField>
+
+<ParamField query="copilot_id" type="string" optional>
+  Filter results for a specific copilot by ID.
+</ParamField>
+
+<ParamField query="limit" type="number" optional>
+  The maximum number of results to return. Defaults to the server's configured limit.
+</ParamField>
+
+<ParamField query="offset" type="number" optional>
+  The number of results to skip before starting to return data. Used for pagination.
+</ParamField>
+
+<ParamField query="sortOrder" type="string" optional>
+  The order to sort the results. Can be either 'asc' for ascending or 'desc' for descending.
+</ParamField>
+
+### Response
+
+<ResponseField name="agentId" type="number">
+  The unique identifier of the agent.
+</ResponseField>
+
+<ResponseField name="activeSessions" type="number">
+  The total number of active sessions handled by the agent within the specified time range.
+</ResponseField>
+
+<ResponseField name="openSessions" type="number">
+  The number of currently open sessions assigned to the agent.
+</ResponseField>
+
+### Example Request
+
+```bash
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/agents/activity?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z&copilot_id=abc123' \
+--header 'Authorization: Bearer YOUR_API_KEY'
+```
+
+### Example Response
+
+```json
+[
+  {
+    "agentId": 1,
+    "activeSessions": 150,
+    "openSessions": 5
+  },
+  {
+    "agentId": 2,
+    "activeSessions": 120,
+    "openSessions": 3
+  },
+  {
+    "agentId": 3,
+    "activeSessions": 180,
+    "openSessions": 7
+  }
+]
+```
+
+This endpoint is useful for:
+- Monitoring agent workload and performance
+- Identifying agents who may need assistance or have capacity for more work
+- Analyzing patterns in agent activity over time
+```

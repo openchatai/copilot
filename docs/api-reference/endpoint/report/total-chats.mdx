@@ -1,0 +1,67 @@
+---
+title: "Get Total Chats"
+api: "GET https://api-v2.opencopilot.so/backend/reports/chats/total"
+description: "Retrieve the total number of chat sessions based on specified criteria"
+---
+
+This endpoint returns the total count of chat sessions that match the given query parameters. It can be used to analyze chat volume over time, filtered by various attributes such as copilot ID, channel, and status.
+
+### Query Parameters
+
+<ParamField query="startDate" type="string" format="date-time">
+  The start date for the date range filter (ISO 8601 format)
+</ParamField>
+
+<ParamField query="endDate" type="string" format="date-time">
+  The end date for the date range filter (ISO 8601 format)
+</ParamField>
+
+<ParamField query="copilot_id" type="string">
+  Filter by the specific copilot ID
+</ParamField>
+
+<ParamField query="channel" type="string">
+  Filter by the chat channel (e.g., "web", "mobile")
+</ParamField>
+
+<ParamField query="status" type="string">
+  Filter by the chat session status
+</ParamField>
+
+<ParamField query="limit" type="number">
+  The maximum number of results to return
+</ParamField>
+
+<ParamField query="offset" type="number">
+  The number of results to skip before starting to return data
+</ParamField>
+
+<ParamField query="sortOrder" type="string">
+  The sort order for the results ("asc" or "desc")
+</ParamField>
+
+### Response
+
+<ResponseField name="totalChats" type="number">
+  The total number of chat sessions matching the specified criteria
+</ResponseField>
+
+<RequestExample>
+
+```bash Example Request
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/chats/total?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z&copilot_id=abc123' \
+--header 'Authorization: Bearer YOUR_API_KEY'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Response
+{
+  "totalChats": 1250
+}
+```
+
+</ResponseExample>
+```

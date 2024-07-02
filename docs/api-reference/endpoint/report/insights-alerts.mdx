@@ -1,0 +1,123 @@
+---
+title: "Get Alerts"
+api: "GET https://api-v2.opencopilot.so/backend/reports/insights/alerts"
+description: "Retrieve alerts based on predefined thresholds for chat sessions"
+---
+
+This endpoint provides insights into potential issues or anomalies in chat sessions by generating alerts based on predefined thresholds. It helps identify situations that may require immediate attention, such as long wait times for customers.
+
+### Query Parameters
+
+<ParamField query="startDate" type="string" format="date-time" optional>
+  The start date for the date range to fetch alerts (ISO 8601 format)
+</ParamField>
+
+<ParamField query="endDate" type="string" format="date-time" optional>
+  The end date for the date range to fetch alerts (ISO 8601 format)
+</ParamField>
+
+<ParamField query="copilot_id" type="string" optional>
+  Filter alerts for a specific copilot
+</ParamField>
+
+<ParamField query="limit" type="number" optional>
+  Limit the number of alerts returned
+</ParamField>
+
+<ParamField query="offset" type="number" optional>
+  Number of alerts to skip for pagination
+</ParamField>
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication
+</ParamField>
+
+### Response
+
+<ResponseField name="alerts" type="array">
+  <ResponseField name="type" type="string">
+    The type of alert (e.g., "LongWaitTime")
+  </ResponseField>
+  <ResponseField name="sessionId" type="string">
+    The ID of the chat session that triggered the alert
+  </ResponseField>
+  <ResponseField name="waitTime" type="number">
+    The wait time in milliseconds (for LongWaitTime alerts)
+  </ResponseField>
+</ResponseField>
+
+### Response Examples
+
+<CodeGroup>
+```json 200 OK
+{
+  "alerts": [
+    {
+      "type": "LongWaitTime",
+      "sessionId": "5f3e9c1b-7c1d-4e3f-8f9a-1a2b3c4d5e6f",
+      "waitTime": 1200000
+    },
+    {
+      "type": "LongWaitTime",
+      "sessionId": "6a7b8c9d-0e1f-2g3h-4i5j-6k7l8m9n0o1p",
+      "waitTime": 900000
+    }
+  ]
+}
+```
+</CodeGroup>
+
+### Error Responses
+
+<CodeGroup>
+```json 401 Unauthorized
+{
+  "error": "Unauthorized",
+  "message": "Invalid or missing authentication token"
+}
+```
+
+```json 400 Bad Request
+{
+  "error": "Bad Request",
+  "message": "Invalid date format for startDate or endDate"
+}
+```
+</CodeGroup>
+
+This endpoint allows you to retrieve alerts for chat sessions based on predefined thresholds. Currently, it focuses on identifying long wait times for customers, but it can be extended to include other types of alerts in the future. The alerts provide valuable insights into potential issues that may require immediate attention from your support team.
+
+<RequestExample>
+
+```bash cURL
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/insights/alerts?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z&copilot_id=abc123' \
+--header 'Authorization: Bearer YOUR_TOKEN_HERE'
+```
+
+```javascript Node.js
+const axios = require('axios');
+
+const options = {
+  method: 'GET',
+  url: 'https://api-v2.opencopilot.so/backend/reports/insights/alerts',
+  params: {
+    startDate: '2023-01-01T00:00:00Z',
+    endDate: '2023-12-31T23:59:59Z',
+    copilot_id: 'abc123'
+  },
+  headers: {
+    'Authorization': 'Bearer YOUR_TOKEN_HERE'
+  }
+};
+
+axios.request(options).then(function (response) {
+  console.log(response.data);
+}).catch(function (error) {
+  console.error(error);
+});
+```
+
+</RequestExample>
+```

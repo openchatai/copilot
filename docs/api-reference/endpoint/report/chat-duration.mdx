@@ -1,0 +1,51 @@
+---
+title: "Get Chat Duration"
+api: "GET https://api-v2.opencopilot.so/backend/reports/chats/duration"
+description: "Retrieve the average duration of chat sessions based on specified criteria"
+---
+
+### Query Parameters
+
+<ParamField query="startDate" type="string" format="date-time" optional>
+  The start date for the date range filter (ISO 8601 format)
+</ParamField>
+
+<ParamField query="endDate" type="string" format="date-time" optional>
+  The end date for the date range filter (ISO 8601 format)
+</ParamField>
+
+<ParamField query="copilot_id" type="string" optional>
+  Filter results by a specific copilot ID
+</ParamField>
+
+<ParamField query="channel" type="string" optional>
+  Filter results by a specific session channel
+</ParamField>
+
+<ParamField query="status" type="string" optional>
+  Filter results by a specific session status
+</ParamField>
+
+### Response
+
+<ResponseField name="averageDuration" type="number">
+  The average duration of chat sessions in seconds
+</ResponseField>
+
+### Example Request
+
+```bash
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/chats/duration?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z&copilot_id=abc123'
+```
+
+### Example Response
+
+```json
+{
+  "averageDuration": 300.5
+}
+```
+
+This endpoint calculates the average duration of chat sessions based on the provided query parameters. It uses the difference between the `created_at` and `updated_at` timestamps of each session to determine the duration. The result is returned as an average in seconds.
+
+If no query parameters are provided, it will calculate the average duration for all chat sessions in the database. You can use the query parameters to filter the results by date range, copilot ID, channel, and status.
