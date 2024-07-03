@@ -1,8 +1,14 @@
 ---
 title: "Get Missed Chats"
-api: "GET https://api-v2.opencopilot.so/backend/reports/chats/missed"
+api: "GET https://api-v2.opencopilot.so/reports/{copilotId}/chats/missed"
 description: "Retrieve the count of missed chats based on specified criteria"
 ---
+
+### Path Parameters
+
+<ParamField path="copilotId" type="string" required>
+  The ID of the copilot to filter chats
+</ParamField>
 
 ### Query Parameters
 
@@ -14,30 +20,6 @@ description: "Retrieve the count of missed chats based on specified criteria"
   The end date for the date range filter (ISO 8601 format)
 </ParamField>
 
-<ParamField query="copilot_id" type="string">
-  The ID of the copilot to filter chats
-</ParamField>
-
-<ParamField query="channel" type="string">
-  The channel to filter chats (e.g., "web", "mobile")
-</ParamField>
-
-<ParamField query="status" type="string">
-  The status to filter chats
-</ParamField>
-
-<ParamField query="limit" type="number">
-  The maximum number of results to return
-</ParamField>
-
-<ParamField query="offset" type="number">
-  The number of results to skip before starting to return data
-</ParamField>
-
-<ParamField query="sortOrder" type="string">
-  The sort order for the results (either "asc" or "desc")
-</ParamField>
-
 ### Response
 
 <ResponseField name="count" type="number">
@@ -47,7 +29,7 @@ description: "Retrieve the count of missed chats based on specified criteria"
 <RequestExample>
 
 ```bash Example Request
-curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/chats/missed?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z&copilot_id=abc123' \
+curl --location --request GET 'https://api-v2.opencopilot.so/reports/abc123/chats/missed?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z' \
 --header 'Authorization: Bearer YOUR_TOKEN'
 ```
 

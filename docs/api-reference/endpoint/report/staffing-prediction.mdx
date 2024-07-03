@@ -1,10 +1,16 @@
 ---
 title: "Get Staffing Prediction"
-api: "GET https://api-v2.opencopilot.so/backend/reports/agents/staffing-prediction"
+api: "GET https://api-v2.opencopilot.so/reports/{copilotId}/agents/staffing-prediction"
 description: "Retrieve a prediction for staffing needs based on historical chat data"
 ---
 
 This endpoint provides a staffing prediction based on historical chat data. It analyzes the number of chats per hour to help optimize agent allocation and improve response times.
+
+### Path Parameters
+
+<ParamField path="copilotId" type="string" required>
+  The ID of the copilot
+</ParamField>
 
 ### Query Parameters
 
@@ -14,24 +20,6 @@ This endpoint provides a staffing prediction based on historical chat data. It a
 
 <ParamField query="endDate" type="string" format="date-time" optional>
   The end date for the date range to analyze (ISO 8601 format)
-</ParamField>
-
-<ParamField query="copilot_id" type="string" optional>
-  Filter results for a specific copilot
-</ParamField>
-
-<ParamField query="channel" type="string" optional>
-  Filter results by channel (e.g., "web", "mobile")
-</ParamField>
-
-<ParamField query="status" type="string" optional>
-  Filter results by session status
-</ParamField>
-
-### Headers
-
-<ParamField header="Authorization" type="string" required>
-  Bearer token for authentication
 </ParamField>
 
 ### Response
@@ -51,7 +39,7 @@ This endpoint provides a staffing prediction based on historical chat data. It a
 <RequestExample>
 
 ```bash Example Request
-curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/agents/staffing-prediction?startDate=2023-01-01T00:00:00Z&endDate=2023-01-31T23:59:59Z&copilot_id=abc123' \
+curl --location --request GET 'https://api-v2.opencopilot.so/reports/abc123/agents/staffing-prediction?startDate=2023-01-01T00:00:00Z&endDate=2023-01-31T23:59:59Z' \
 --header 'Authorization: Bearer YOUR_TOKEN'
 ```
 
@@ -70,7 +58,6 @@ curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/age
       "hour": 1,
       "chatCount": 10
     },
-    // ... (data for hours 2-22)
     {
       "hour": 23,
       "chatCount": 20
@@ -80,7 +67,3 @@ curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/age
 ```
 
 </ResponseExample>
-```
-
-
-The purpose of this function is to provide a basic understanding of chat volume patterns throughout the day. This information can be used to make staffing decisions, such as determining how many chat agents might be needed during different hours of the day.

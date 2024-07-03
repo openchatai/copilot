@@ -144,7 +144,6 @@
         "api-reference/endpoint/report/agent-response-time",
         "api-reference/endpoint/report/staffing-prediction",
         "api-reference/endpoint/report/agent-activity",
-        "api-reference/endpoint/report/top-customer-question",
         "api-reference/endpoint/report/insights-alerts"
       ]
     }

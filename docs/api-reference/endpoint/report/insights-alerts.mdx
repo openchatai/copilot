@@ -1,10 +1,8 @@
 ---
 title: "Get Alerts"
-api: "GET https://api-v2.opencopilot.so/backend/reports/insights/alerts"
+api: "GET https://api-v2.opencopilot.so/reports/:copilotId/insights/alerts"
 description: "Retrieve alerts based on predefined thresholds for chat sessions"
 ---
-
-This endpoint provides insights into potential issues or anomalies in chat sessions by generating alerts based on predefined thresholds. It helps identify situations that may require immediate attention, such as long wait times for customers.
 
 ### Query Parameters
 
@@ -16,22 +14,10 @@ This endpoint provides insights into potential issues or anomalies in chat sessi
   The end date for the date range to fetch alerts (ISO 8601 format)
 </ParamField>
 
-<ParamField query="copilot_id" type="string" optional>
-  Filter alerts for a specific copilot
-</ParamField>
+### Path Parameters
 
-<ParamField query="limit" type="number" optional>
-  Limit the number of alerts returned
-</ParamField>
-
-<ParamField query="offset" type="number" optional>
-  Number of alerts to skip for pagination
-</ParamField>
-
-### Headers
-
-<ParamField header="Authorization" type="string" required>
-  Bearer token for authentication
+<ParamField path="copilotId" type="string" required>
+  The ID of the copilot
 </ParamField>
 
 ### Response
@@ -87,12 +73,10 @@ This endpoint provides insights into potential issues or anomalies in chat sessi
 ```
 </CodeGroup>
 
-This endpoint allows you to retrieve alerts for chat sessions based on predefined thresholds. Currently, it focuses on identifying long wait times for customers, but it can be extended to include other types of alerts in the future. The alerts provide valuable insights into potential issues that may require immediate attention from your support team.
-
 <RequestExample>
 
 ```bash cURL
-curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/insights/alerts?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z&copilot_id=abc123' \
+curl --location --request GET 'https://api-v2.opencopilot.so/reports/abc123/insights/alerts?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z' \
 --header 'Authorization: Bearer YOUR_TOKEN_HERE'
 ```
 
@@ -101,11 +85,10 @@ const axios = require('axios');
 
 const options = {
   method: 'GET',
-  url: 'https://api-v2.opencopilot.so/backend/reports/insights/alerts',
+  url: 'https://api-v2.opencopilot.so/reports/abc123/insights/alerts',
   params: {
     startDate: '2023-01-01T00:00:00Z',
-    endDate: '2023-12-31T23:59:59Z',
-    copilot_id: 'abc123'
+    endDate: '2023-12-31T23:59:59Z'
   },
   headers: {
     'Authorization': 'Bearer YOUR_TOKEN_HERE'
@@ -120,4 +103,3 @@ axios.request(options).then(function (response) {
 ```
 
 </RequestExample>
-```

@@ -1,8 +1,14 @@
 ---
 title: "Get Chat Duration"
-api: "GET https://api-v2.opencopilot.so/backend/reports/chats/duration"
+api: "GET https://api-v2.opencopilot.so/reports/{copilotId}/chats/duration"
 description: "Retrieve the average duration of chat sessions based on specified criteria"
 ---
+
+### Path Parameters
+
+<ParamField path="copilotId" type="string" required>
+  The ID of the copilot
+</ParamField>
 
 ### Query Parameters
 
@@ -14,15 +20,11 @@ description: "Retrieve the average duration of chat sessions based on specified 
   The end date for the date range filter (ISO 8601 format)
 </ParamField>
 
-<ParamField query="copilot_id" type="string" optional>
-  Filter results by a specific copilot ID
-</ParamField>
-
 <ParamField query="channel" type="string" optional>
   Filter results by a specific session channel
 </ParamField>
 
-<ParamField query="status" type="string" optional>
+<ParamField query="status" type="number" optional>
   Filter results by a specific session status
 </ParamField>
 
@@ -35,7 +37,7 @@ description: "Retrieve the average duration of chat sessions based on specified 
 ### Example Request
 
 ```bash
-curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/chats/duration?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z&copilot_id=abc123'
+curl --location --request GET 'https://api-v2.opencopilot.so/reports/abc123/chats/duration?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z&channel=web&status=1'
 ```
 
 ### Example Response
@@ -48,4 +50,4 @@ curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/cha
 
 This endpoint calculates the average duration of chat sessions based on the provided query parameters. It uses the difference between the `created_at` and `updated_at` timestamps of each session to determine the duration. The result is returned as an average in seconds.
 
-If no query parameters are provided, it will calculate the average duration for all chat sessions in the database. You can use the query parameters to filter the results by date range, copilot ID, channel, and status.
+If no query parameters are provided, it will calculate the average duration for all chat sessions for the specified copilot. You can use the query parameters to filter the results by date range, channel, and status.

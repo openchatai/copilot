@@ -1,10 +1,16 @@
 ---
 title: "Get Agent Performance"
-api: "GET https://api-v2.opencopilot.so/backend/reports/agents/performance"
+api: "GET /reports/:copilotId/agents/performance"
 description: "Retrieve performance metrics for agents based on chat sessions"
 ---
 
 This endpoint provides performance metrics for agents, including the total number of chats handled and the average duration of their chat sessions.
+
+### Path Parameters
+
+<ParamField path="copilotId" type="string" required>
+  The unique identifier of the copilot
+</ParamField>
 
 ### Query Parameters
 
@@ -14,22 +20,6 @@ This endpoint provides performance metrics for agents, including the total numbe
 
 <ParamField query="endDate" type="string" format="date-time" optional>
   The end date for the report period (ISO 8601 format)
-</ParamField>
-
-<ParamField query="copilot_id" type="string" optional>
-  Filter results by a specific copilot ID
-</ParamField>
-
-<ParamField query="limit" type="number" optional>
-  Limit the number of results returned
-</ParamField>
-
-<ParamField query="offset" type="number" optional>
-  Number of results to skip for pagination
-</ParamField>
-
-<ParamField query="sortOrder" type="string" optional>
-  Sort order for the results (asc or desc)
 </ParamField>
 
 ### Response
@@ -49,7 +39,7 @@ This endpoint provides performance metrics for agents, including the total numbe
 <RequestExample>
 
 ```bash Example Request
-curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/agents/performance?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z&copilot_id=abc123' \
+curl --location --request GET 'https://api.example.com/reports/abc123/agents/performance?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z' \
 --header 'Authorization: Bearer YOUR_API_KEY'
 ```
 
@@ -73,6 +63,3 @@ curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/age
 ```
 
 </ResponseExample>
-
-
-This documentation provides a comprehensive overview of the agent performance endpoint, including its purpose, query parameters, response structure, and examples of both the request and response.
