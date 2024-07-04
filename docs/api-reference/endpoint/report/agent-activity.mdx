@@ -1,0 +1,66 @@
+---
+title: "Get Agent Activity"
+api: "GET https://api-v2.opencopilot.so/reports/{copilotId}/agents/activity"
+description: "Retrieve activity data for agents, including their active and open sessions within a specified time range."
+---
+
+This endpoint provides insights into agent activity, showing the number of active sessions and open sessions for each agent. It helps in monitoring agent workload and performance.
+
+### Path Parameters
+
+<ParamField path="copilotId" type="string" required>
+  The unique identifier of the copilot.
+</ParamField>
+
+### Query Parameters
+
+<ParamField query="startDate" type="string" format="date-time" optional>
+  The start date for the report period (ISO 8601 format).
+</ParamField>
+
+<ParamField query="endDate" type="string" format="date-time" optional>
+  The end date for the report period (ISO 8601 format).
+</ParamField>
+
+### Response
+
+<ResponseField name="agentId" type="number">
+  The unique identifier of the agent.
+</ResponseField>
+
+<ResponseField name="activeSessions" type="number">
+  The total number of active sessions handled by the agent within the specified time range.
+</ResponseField>
+
+<ResponseField name="openSessions" type="number">
+  The number of currently open sessions assigned to the agent.
+</ResponseField>
+
+### Example Request
+
+```bash
+curl --location --request GET 'https://api-v2.opencopilot.so/reports/abc123/agents/activity?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z' \
+--header 'Authorization: Bearer YOUR_API_KEY'
+```
+
+### Example Response
+
+```json
+[
+  {
+    "agentId": 1,
+    "activeSessions": 150,
+    "openSessions": 5
+  },
+  {
+    "agentId": 2,
+    "activeSessions": 120,
+    "openSessions": 3
+  },
+  {
+    "agentId": 3,
+    "activeSessions": 180,
+    "openSessions": 7
+  }
+]
+```

@@ -1,0 +1,47 @@
+---
+title: "Get Agent Response Times"
+api: "GET https://api-v2.opencopilot.so/reports/:copilotId/agents/response-times"
+description: "Retrieve average response times for agents in chat sessions"
+---
+
+This endpoint provides data on the average response times for agents in chat sessions. It helps analyze how quickly agents are responding to customer messages, which is crucial for assessing customer service efficiency.
+
+### Path Parameters
+
+<ParamField path="copilotId" type="string" required>
+  The unique identifier of the copilot
+</ParamField>
+
+### Query Parameters
+
+<ParamField query="startDate" type="string" format="date-time">
+  The start date for the date range to analyze (ISO 8601 format)
+</ParamField>
+
+<ParamField query="endDate" type="string" format="date-time">
+  The end date for the date range to analyze (ISO 8601 format)
+</ParamField>
+
+### Response
+
+The response structure will depend on the implementation of the `getAgentResponseTimes` method in the `ReportsService`.
+
+<RequestExample>
+
+```bash Example Request
+curl --location --request GET 'https://api-v2.opencopilot.so/reports/copilot123/agents/response-times?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer YOUR_TOKEN'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Response
+{
+  // Response structure will depend on the implementation
+}
+```
+
+</ResponseExample>
