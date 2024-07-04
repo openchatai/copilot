@@ -72,6 +72,10 @@
       ]
     },
     {
+      "group": "Native Integrations",
+      "pages": ["dashboard/zendesk_integration"]
+    },
+    {
       "group": "Managing copilots via API",
       "pages": [
         "api-notes",
@@ -117,19 +121,11 @@
       "pages": ["api-reference/endpoint/chat-init"]
     },
     {
-      "group": "Native Integrations",
-      "pages": ["dashboard/zendesk_integration"]
-    },
-    {
       "group": "Votes & RLHF", 
       "pages": [
         "votes/rlhf",
         "api-reference/endpoint/votes-add"
       ]
-    },
-    {
-      "group": "Resources",
-      "pages": ["resources/ci-cd-actions"]
     },
     {
       "group": "Reports",
@@ -146,6 +142,10 @@
         "api-reference/endpoint/report/agent-activity",
         "api-reference/endpoint/report/insights-alerts"
       ]
+    },
+    {
+      "group": "Resources",
+      "pages": ["resources/ci-cd-actions"]
     }
   ],
   "footerSocials": {
