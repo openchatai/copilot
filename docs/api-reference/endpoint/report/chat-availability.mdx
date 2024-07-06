@@ -1,7 +1,7 @@
 ---
 title: "Get Chat Availability"
 api: "GET https://api-v2.opencopilot.so/reports/{copilotId}/chats/availability"
-description: "Retrieve the chat availability percentage for a specified time period"
+description: "Retrieve the chat availability statistics for a specified time period"
 ---
 
 ### Path Parameters
@@ -12,18 +12,50 @@ description: "Retrieve the chat availability percentage for a specified time per
 
 ### Query Parameters
 
-<ParamField query="startDate" type="string">
+<ParamField query="startDate" type="string" required>
   The start date for the report period (ISO 8601 format)
 </ParamField>
 
-<ParamField query="endDate" type="string">
+<ParamField query="endDate" type="string" required>
   The end date for the report period (ISO 8601 format)
+</ParamField>
+
+<ParamField query="channel" type="string" optional>
+  The specific channel to filter results (if applicable)
 </ParamField>
 
 ### Response
 
-<ResponseField name="availability" type="number">
-  The availability percentage as a decimal between 0 and 1
+<ResponseField name="availabilityPercentage" type="number">
+  The availability percentage as a number between 0 and 100
+</ResponseField>
+
+<ResponseField name="downTimes" type="array">
+  An array of objects representing periods of downtime
+</ResponseField>
+
+<ResponseField name="downTimes[].startTime" type="string">
+  The start time of the downtime period (ISO 8601 format)
+</ResponseField>
+
+<ResponseField name="downTimes[].endTime" type="string">
+  The end time of the downtime period (ISO 8601 format)
+</ResponseField>
+
+<ResponseField name="downTimes[].duration" type="number">
+  The duration of the downtime period in milliseconds
+</ResponseField>
+
+<ResponseField name="downTimes[].sessionId" type="string">
+  The session ID associated with the downtime period
+</ResponseField>
+
+<ResponseField name="totalDownTime" type="number">
+  The total downtime in milliseconds for the specified period
+</ResponseField>
+
+<ResponseField name="totalTime" type="number">
+  The total time in milliseconds for the specified period
 </ResponseField>
 
 <RequestExample>
@@ -39,8 +71,46 @@ curl --location --request GET 'https://api-v2.opencopilot.so/reports/123456/chat
 
 ```json Response
 {
-  "availability": 0.985
+  "availabilityPercentage": 98.5,
+  "downTimes": [
+    {
+      "startTime": "2023-01-15T10:30:00Z",
+      "endTime": "2023-01-15T11:00:00Z",
+      "duration": 1800000,
+      "sessionId": "session123"
+    },
+    {
+      "startTime": "2023-01-20T14:45:00Z",
+      "endTime": "2023-01-20T15:00:00Z",
+      "duration": 900000,
+      "sessionId": "session456"
+    }
+  ],
+  "totalDownTime": 2700000,
+  "totalTime": 2678400000
 }
 ```
 
 </ResponseExample>
+
+
+### Calculation Method
+
+The chat availability is calculated using the following method:
+
+1. **Message Gap Analysis**: The system analyzes the time gaps between consecutive messages within the specified date range.
+
+2. **Downtime Threshold**: A gap of more than 2 minutes between messages is considered as potential downtime.
+
+3. **Downtime Calculation**: For each gap exceeding 2 minutes, the downtime is calculated as:
+   ```
+   Downtime = (Time between messages) - 2 minutes
+   ```
+
+4. **Total Downtime**: The system sums up all individual downtimes to get the total downtime.
+
+5. **Availability Percentage**: The availability percentage is calculated as:
+   ```
+   Availability % = ((Total Time - Total Downtime) / Total Time) * 100
+   ```
+   Where Total Time is the duration between the specified start and end dates.

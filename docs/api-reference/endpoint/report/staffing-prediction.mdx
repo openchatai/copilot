@@ -4,7 +4,7 @@ api: "GET https://api-v2.opencopilot.so/reports/{copilotId}/agents/staffing-pred
 description: "Retrieve a prediction for staffing needs based on historical chat data"
 ---
 
-This endpoint provides a staffing prediction based on historical chat data. It analyzes the number of chats per hour to help optimize agent allocation and improve response times.
+This endpoint provides a staffing prediction based on historical chat data. It analyzes the number of chats per hour and the number of chats that required human intervention to help optimize agent allocation and improve response times.
 
 ### Path Parameters
 
@@ -25,13 +25,16 @@ This endpoint provides a staffing prediction based on historical chat data. It a
 ### Response
 
 <ResponseField name="hourlyChats" type="array">
-  An array of objects representing the chat volume for each hour
+  An array of objects representing the chat volume and human intervention for each hour
   <Expandable title="properties">
     <ResponseField name="hour" type="number">
       The hour of the day (0-23)
     </ResponseField>
     <ResponseField name="chatCount" type="number">
-      The number of chats during that hour
+      The total number of chats during that hour
+    </ResponseField>
+    <ResponseField name="humanHandledCount" type="number">
+      The number of chats that required human intervention during that hour
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -39,7 +42,7 @@ This endpoint provides a staffing prediction based on historical chat data. It a
 <RequestExample>
 
 ```bash Example Request
-curl --location --request GET 'https://api-v2.opencopilot.so/reports/abc123/agents/staffing-prediction?startDate=2023-01-01T00:00:00Z&endDate=2023-01-31T23:59:59Z' \
+curl --location --request GET 'https://api-v2.opencopilot.so/reports/{copilotId}/agents/staffing-prediction?startDate=2023-01-01T00:00:00Z&endDate=2023-01-31T23:59:59Z' \
 --header 'Authorization: Bearer YOUR_TOKEN'
 ```
 
@@ -52,18 +55,46 @@ curl --location --request GET 'https://api-v2.opencopilot.so/reports/abc123/agen
   "hourlyChats": [
     {
       "hour": 0,
-      "chatCount": 15
+      "chatCount": 15,
+      "humanHandledCount": 3
     },
     {
       "hour": 1,
-      "chatCount": 10
+      "chatCount": 10,
+      "humanHandledCount": 2
     },
     {
       "hour": 23,
-      "chatCount": 20
+      "chatCount": 20,
+      "humanHandledCount": 5
     }
   ]
 }
 ```
 
 </ResponseExample>
+
+
+## How It Works
+
+The feature analyzes historical chat data for a specific Copilot and generates an hourly breakdown of chat activity. It provides the following information for each hour of the day:
+
+1. Total number of chats
+2. Number of chats that required human intervention
+
+## Using the Feature
+
+To use this feature, you need to provide:
+
+1. The Copilot ID you want to analyze
+2. Optional date range for the analysis (start date and end date)
+
+If no date range is specified, the feature will analyze all available historical data.
+
+## Output
+
+The feature returns an array of hourly data points. Each data point includes:
+
+- Hour of the day (0-23)
+- Total number of chats for that hour
+- Number of chats that required human handling
