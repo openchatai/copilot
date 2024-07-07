@@ -87,6 +87,7 @@
     {
       "group": "Actions",
       "pages": [
+        "taking-actions",
         "api-reference/endpoint/delete-all-actions",
         "api-reference/endpoint/import-actions-from-swagger"
       ]
