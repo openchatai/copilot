@@ -1,6 +1,6 @@
 ---
 title: "Get Staffing Prediction"
-api: "GET https://api-v2.opencopilot.so/reports/{copilotId}/agents/staffing-prediction"
+api: "GET https://api-v2.opencopilot.so/reports/{orgId}/agents/staffing-prediction"
 description: "Retrieve a prediction for staffing needs based on historical chat data"
 ---
 
@@ -8,8 +8,8 @@ This endpoint provides a staffing prediction based on historical chat data. It a
 
 ### Path Parameters
 
-<ParamField path="copilotId" type="string" required>
-  The ID of the copilot
+<ParamField path="orgId" type="string" required>
+  The ID of the organization
 </ParamField>
 
 ### Query Parameters
@@ -24,16 +24,16 @@ This endpoint provides a staffing prediction based on historical chat data. It a
 
 ### Response
 
-<ResponseField name="hourlyChats" type="array">
+<ResponseField name="hourly_chats" type="array">
   An array of objects representing the chat volume and human intervention for each hour
   <Expandable title="properties">
     <ResponseField name="hour" type="number">
       The hour of the day (0-23)
     </ResponseField>
-    <ResponseField name="chatCount" type="number">
+    <ResponseField name="chat_count" type="number">
       The total number of chats during that hour
     </ResponseField>
-    <ResponseField name="humanHandledCount" type="number">
+    <ResponseField name="human_handled_count" type="number">
       The number of chats that required human intervention during that hour
     </ResponseField>
   </Expandable>
@@ -42,7 +42,7 @@ This endpoint provides a staffing prediction based on historical chat data. It a
 <RequestExample>
 
 ```bash Example Request
-curl --location --request GET 'https://api-v2.opencopilot.so/reports/{copilotId}/agents/staffing-prediction?startDate=2023-01-01T00:00:00Z&endDate=2023-01-31T23:59:59Z' \
+curl --location --request GET 'https://api-v2.opencopilot.so/reports/{orgId}/agents/staffing-prediction?startDate=2023-01-01T00:00:00Z&endDate=2023-01-31T23:59:59Z' \
 --header 'Authorization: Bearer YOUR_TOKEN'
 ```
 
@@ -52,21 +52,21 @@ curl --location --request GET 'https://api-v2.opencopilot.so/reports/{copilotId}
 
 ```json Response
 {
-  "hourlyChats": [
+  "hourly_chats": [
     {
       "hour": 0,
-      "chatCount": 15,
-      "humanHandledCount": 3
+      "chat_count": 15,
+      "human_handled_count": 3
     },
     {
       "hour": 1,
-      "chatCount": 10,
-      "humanHandledCount": 2
+      "chat_count": 10,
+      "human_handled_count": 2
     },
     {
       "hour": 23,
-      "chatCount": 20,
-      "humanHandledCount": 5
+      "chat_count": 20,
+      "human_handled_count": 5
     }
   ]
 }
@@ -77,7 +77,7 @@ curl --location --request GET 'https://api-v2.opencopilot.so/reports/{copilotId}
 
 ## How It Works
 
-The feature analyzes historical chat data for a specific Copilot and generates an hourly breakdown of chat activity. It provides the following information for each hour of the day:
+The feature analyzes historical chat data for a specific organization and generates an hourly breakdown of chat activity. It provides the following information for each hour of the day:
 
 1. Total number of chats
 2. Number of chats that required human intervention
@@ -86,7 +86,7 @@ The feature analyzes historical chat data for a specific Copilot and generates a
 
 To use this feature, you need to provide:
 
-1. The Copilot ID you want to analyze
+1. The organization ID you want to analyze
 2. Optional date range for the analysis (start date and end date)
 
 If no date range is specified, the feature will analyze all available historical data.

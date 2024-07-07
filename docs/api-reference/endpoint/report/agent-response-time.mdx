@@ -1,6 +1,6 @@
 ---
 title: "Get Agent Response Times"
-api: "GET https://api-v2.opencopilot.so/reports/:copilotId/agents/response-times"
+api: "GET https://api-v2.opencopilot.so/reports/:orgId/agents/response-times"
 description: "Retrieve average response times for agents in chat sessions"
 ---
 
@@ -8,8 +8,8 @@ This endpoint provides data on the average response times for agents in chat ses
 
 ### Path Parameters
 
-<ParamField path="copilotId" type="string" required>
-  The unique identifier of the copilot
+<ParamField path="orgId" type="string" required>
+  The unique identifier of the organization
 </ParamField>
 
 ### Query Parameters
@@ -29,7 +29,7 @@ The response structure will depend on the implementation of the `getAgentRespons
 <RequestExample>
 
 ```bash Example Request
-curl --location --request GET 'https://api-v2.opencopilot.so/reports/copilot123/agents/response-times?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z' \
+curl --location --request GET 'https://api-v2.opencopilot.so/reports/org123/agents/response-times?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z' \
 --header 'Accept: application/json' \
 --header 'Authorization: Bearer YOUR_TOKEN'
 ```
@@ -41,20 +41,18 @@ curl --location --request GET 'https://api-v2.opencopilot.so/reports/copilot123/
 ```json Response
 [
   {
-    sessionId: "session123",
-    avgResponseTime: 15.5
+    "session_id": "session123",
+    "avg_response_time": 15.5
   },
   {
-    sessionId: "session456",
-    avgResponseTime: 8.2
+    "session_id": "session456",
+    "avg_response_time": 8.2
   },
   {
-    sessionId: "session789",
-    avgResponseTime: 22.7
+    "session_id": "session789",
+    "avg_response_time": 22.7
   }
 ]
 ```
 
 </ResponseExample>
-
-

@@ -1,15 +1,15 @@
 ---
 title: "Get Chat Engagement"
-api: "GET https://api-v2.opencopilot.so/reports/{copilotId}/chats/engagement"
-description: "Retrieve chat engagement metrics for a specified period and copilot"
+api: "GET https://api-v2.opencopilot.so/reports/{orgId}/chats/engagement"
+description: "Retrieve chat engagement metrics for a specified period and organization"
 ---
 
 This endpoint provides chat engagement metrics, including the total number of chats, the number of engaged chats, and the engagement rate.
 
 ### Path Parameters
 
-<ParamField path="copilotId" type="string" required>
-  The ID of the copilot to filter the results
+<ParamField path="orgId" type="string" required>
+  The ID of the organization to filter the results
 </ParamField>
 
 ### Query Parameters
@@ -32,15 +32,15 @@ This endpoint provides chat engagement metrics, including the total number of ch
 
 ### Response
 
-<ResponseField name="totalChats" type="number">
+<ResponseField name="total_chats" type="number">
   The total number of chat sessions in the specified period
 </ResponseField>
 
-<ResponseField name="engagedChats" type="number">
+<ResponseField name="engaged_chats" type="number">
   The number of chat sessions where there was at least one message exchange
 </ResponseField>
 
-<ResponseField name="engagementRate" type="number">
+<ResponseField name="engagement_rate" type="number">
   The ratio of engaged chats to total chats, expressed as a decimal (0 to 1)
 </ResponseField>
 
@@ -57,9 +57,9 @@ curl --location --request GET 'https://api-v2.opencopilot.so/reports/abc123/chat
 
 ```json Response
 {
-  "totalChats": 1000,
-  "engagedChats": 850,
-  "engagementRate": 0.85
+  "total_chats": 1000,
+  "engaged_chats": 850,
+  "engagement_rate": 0.85
 }
 ```
 

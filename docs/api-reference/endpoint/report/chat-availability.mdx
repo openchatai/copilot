@@ -1,13 +1,13 @@
 ---
 title: "Get Chat Availability"
-api: "GET https://api-v2.opencopilot.so/reports/{copilotId}/chats/availability"
+api: "GET https://api-v2.opencopilot.so/reports/{orgId}/chats/availability"
 description: "Retrieve the chat availability statistics for a specified time period"
 ---
 
 ### Path Parameters
 
-<ParamField path="copilotId" type="string" required>
-  The ID of the copilot to retrieve chat availability for
+<ParamField path="orgId" type="string" required>
+  The ID of the organization to retrieve chat availability for
 </ParamField>
 
 ### Query Parameters
@@ -26,35 +26,35 @@ description: "Retrieve the chat availability statistics for a specified time per
 
 ### Response
 
-<ResponseField name="availabilityPercentage" type="number">
+<ResponseField name="availability_percentage" type="number">
   The availability percentage as a number between 0 and 100
 </ResponseField>
 
-<ResponseField name="downTimes" type="array">
+<ResponseField name="down_times" type="array">
   An array of objects representing periods of downtime
 </ResponseField>
 
-<ResponseField name="downTimes[].startTime" type="string">
+<ResponseField name="down_times[].start_time" type="string">
   The start time of the downtime period (ISO 8601 format)
 </ResponseField>
 
-<ResponseField name="downTimes[].endTime" type="string">
+<ResponseField name="down_times[].end_time" type="string">
   The end time of the downtime period (ISO 8601 format)
 </ResponseField>
 
-<ResponseField name="downTimes[].duration" type="number">
+<ResponseField name="down_times[].duration" type="number">
   The duration of the downtime period in milliseconds
 </ResponseField>
 
-<ResponseField name="downTimes[].sessionId" type="string">
+<ResponseField name="down_times[].session_id" type="string">
   The session ID associated with the downtime period
 </ResponseField>
 
-<ResponseField name="totalDownTime" type="number">
+<ResponseField name="total_down_time" type="number">
   The total downtime in milliseconds for the specified period
 </ResponseField>
 
-<ResponseField name="totalTime" type="number">
+<ResponseField name="total_time" type="number">
   The total time in milliseconds for the specified period
 </ResponseField>
 
@@ -71,23 +71,23 @@ curl --location --request GET 'https://api-v2.opencopilot.so/reports/123456/chat
 
 ```json Response
 {
-  "availabilityPercentage": 98.5,
-  "downTimes": [
+  "availability_percentage": 98.5,
+  "down_times": [
     {
-      "startTime": "2023-01-15T10:30:00Z",
-      "endTime": "2023-01-15T11:00:00Z",
+      "start_time": "2023-01-15T10:30:00Z",
+      "end_time": "2023-01-15T11:00:00Z",
       "duration": 1800000,
-      "sessionId": "session123"
+      "session_id": "session123"
     },
     {
-      "startTime": "2023-01-20T14:45:00Z",
-      "endTime": "2023-01-20T15:00:00Z",
+      "start_time": "2023-01-20T14:45:00Z",
+      "end_time": "2023-01-20T15:00:00Z",
       "duration": 900000,
-      "sessionId": "session456"
+      "session_id": "session456"
     }
   ],
-  "totalDownTime": 2700000,
-  "totalTime": 2678400000
+  "total_down_time": 2700000,
+  "total_time": 2678400000
 }
 ```
 

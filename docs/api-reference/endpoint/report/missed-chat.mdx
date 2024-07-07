@@ -1,13 +1,13 @@
 ---
 title: "Get Missed Chats"
-api: "GET https://api-v2.opencopilot.so/reports/{copilotId}/chats/missed"
+api: "GET https://api-v2.opencopilot.so/reports/{orgId}/chats/missed"
 description: "Retrieve the count of missed chats based on specified criteria"
 ---
 
 ### Path Parameters
 
-<ParamField path="copilotId" type="string" required>
-  The ID of the copilot to filter chats
+<ParamField path="orgId" type="string" required>
+  The ID of the organization to filter chats
 </ParamField>
 
 ### Query Parameters

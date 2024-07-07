@@ -1,6 +1,6 @@
 ---
 title: "Get Chat Satisfaction"
-api: "GET https://api-v2.opencopilot.so/reports/{copilotId}/chats/satisfaction"
+api: "GET https://api-v2.opencopilot.so/reports/{orgId}/chats/satisfaction"
 description: "Retrieve the average satisfaction score for chat sessions"
 ---
 
@@ -8,8 +8,8 @@ This endpoint returns the average satisfaction score for chat sessions based on 
 
 ### Path Parameters
 
-<ParamField path="copilotId" type="string" required>
-  The ID of the copilot to filter the results
+<ParamField path="orgId" type="string" required>
+  The ID of the organization to filter the results
 </ParamField>
 
 ### Query Parameters
@@ -24,7 +24,7 @@ This endpoint returns the average satisfaction score for chat sessions based on 
 
 ### Response
 
-<ResponseField name="averageSatisfaction" type="number">
+<ResponseField name="average_satisfaction" type="number">
   The average satisfaction score for the chat sessions
 </ResponseField>
 
@@ -40,7 +40,7 @@ curl --location --request GET 'https://api-v2.opencopilot.so/reports/abc123/chat
 
 ```json Response
 {
-  "averageSatisfaction": 4.5
+  "average_satisfaction": 4.5
 }
 ```
 

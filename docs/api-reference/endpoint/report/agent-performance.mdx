@@ -1,6 +1,6 @@
 ---
 title: "Get Agent Performance"
-api: "GET /reports/:copilotId/agents/performance"
+api: "GET /reports/:orgId/agents/performance"
 description: "Retrieve performance metrics for agents based on chat sessions"
 ---
 
@@ -8,8 +8,8 @@ This endpoint provides performance metrics for agents, including the total numbe
 
 ### Path Parameters
 
-<ParamField path="copilotId" type="string" required>
-  The unique identifier of the copilot
+<ParamField path="orgId" type="string" required>
+  The unique identifier of the organization
 </ParamField>
 
 ### Query Parameters
@@ -24,15 +24,15 @@ This endpoint provides performance metrics for agents, including the total numbe
 
 ### Response
 
-<ResponseField name="agentId" type="number">
+<ResponseField name="agent_id" type="number">
   The unique identifier of the agent
 </ResponseField>
 
-<ResponseField name="totalChats" type="number">
+<ResponseField name="total_chats" type="number">
   The total number of chats handled by the agent
 </ResponseField>
 
-<ResponseField name="avgDuration" type="number">
+<ResponseField name="avg_duration" type="number">
   The average duration of chat sessions for the agent (in seconds)
 </ResponseField>
 
@@ -50,14 +50,14 @@ curl --location --request GET 'https://api.example.com/reports/abc123/agents/per
 ```json Response
 [
   {
-    "agentId": 1,
-    "totalChats": 150,
-    "avgDuration": 420.5
+    "agent_id": 1,
+    "total_chats": 150,
+    "avg_duration": 420.5
   },
   {
-    "agentId": 2,
-    "totalChats": 120,
-    "avgDuration": 380.2
+    "agent_id": 2,
+    "total_chats": 120,
+    "avg_duration": 380.2
   }
 ]
 ```
