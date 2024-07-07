@@ -7,11 +7,11 @@
   },
   "favicon": "/favicon.png",
   "colors": {
-    "primary": "#0069ED",
-    "light": "#4D9CFF",
-    "dark": "#0050B4"
+    "primary": "#4717a6",
+    "light": "#c95951",
+    "dark": "#c95951"
   },
-  "backgroundImage": "/images/docs-bg.pnh",
+  "backgroundImage": "/images/docs-bg.png",
   "topbarLinks": [
     {
       "name": "GitHub",
