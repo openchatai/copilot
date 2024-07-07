@@ -44,3 +44,23 @@ curl --location --request GET 'https://api-v2.opencopilot.so/reports/abc123/chat
 ```
 
 </ResponseExample>
+
+### When is a chat considered missed?
+
+A chat is considered missed when:
+
+1. AI Autopilot OFF:
+   - A user initiates a chat
+   - No human agent responds within a set time frame
+   - The chat is automatically closed as unresolved
+
+2. AI Autopilot ON:
+   - A user initiates a chat
+   - The AI attempts to handle the query but fails to resolve it
+   - No human agent intervenes to assist
+   - The chat is automatically closed as unresolved
+
+In both cases, the key factors are:
+- The chat session is closed
+- The issue remains unresolved
+- There is no last message, indicating no successful interaction

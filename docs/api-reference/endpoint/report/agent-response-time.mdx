@@ -39,9 +39,22 @@ curl --location --request GET 'https://api-v2.opencopilot.so/reports/copilot123/
 <ResponseExample>
 
 ```json Response
-{
-  // Response structure will depend on the implementation
-}
+[
+  {
+    sessionId: "session123",
+    avgResponseTime: 15.5
+  },
+  {
+    sessionId: "session456",
+    avgResponseTime: 8.2
+  },
+  {
+    sessionId: "session789",
+    avgResponseTime: 22.7
+  }
+]
 ```
 
 </ResponseExample>
+
+
