@@ -1,6 +1,6 @@
 ---
 title: "Get Total Chats"
-api: "GET https://api-v2.opencopilot.so/reports/{copilotId}/chats/total"
+api: "GET https://api-v2.opencopilot.so/reports/{orgId}/chats/total"
 description: "Retrieve the total number of chat sessions based on specified criteria"
 ---
 
@@ -8,8 +8,8 @@ This endpoint returns the total count of chat sessions that match the given quer
 
 ### Path Parameters
 
-<ParamField path="copilotId" type="string" required>
-  The ID of the copilot
+<ParamField path="orgId" type="string" required>
+  The ID of the organization
 </ParamField>
 
 ### Query Parameters
@@ -32,7 +32,7 @@ This endpoint returns the total count of chat sessions that match the given quer
 
 ### Response
 
-<ResponseField name="totalChats" type="number">
+<ResponseField name="total_chats" type="number">
   The total number of chat sessions matching the specified criteria
 </ResponseField>
 
@@ -49,7 +49,7 @@ curl --location --request GET 'https://api-v2.opencopilot.so/reports/abc123/chat
 
 ```json Response
 {
-  "totalChats": 1250
+  "total_chats": 1250
 }
 ```
 

@@ -1,6 +1,6 @@
 ---
 title: "Get Alerts"
-api: "GET https://api-v2.opencopilot.so/reports/:copilotId/insights/alerts"
+api: "GET https://api-v2.opencopilot.so/reports/:orgId/insights/alerts"
 description: "Retrieve alerts based on predefined thresholds for chat sessions"
 ---
 
@@ -16,8 +16,8 @@ description: "Retrieve alerts based on predefined thresholds for chat sessions"
 
 ### Path Parameters
 
-<ParamField path="copilotId" type="string" required>
-  The ID of the copilot
+<ParamField path="orgId" type="string" required>
+  The ID of the organization
 </ParamField>
 
 ### Response
@@ -26,10 +26,10 @@ description: "Retrieve alerts based on predefined thresholds for chat sessions"
   <ResponseField name="type" type="string">
     The type of alert (e.g., "LongWaitTime")
   </ResponseField>
-  <ResponseField name="sessionId" type="string">
+  <ResponseField name="session_id" type="string">
     The ID of the chat session that triggered the alert
   </ResponseField>
-  <ResponseField name="waitTime" type="number">
+  <ResponseField name="wait_time" type="number">
     The wait time in milliseconds (for LongWaitTime alerts)
   </ResponseField>
 </ResponseField>
@@ -42,13 +42,13 @@ description: "Retrieve alerts based on predefined thresholds for chat sessions"
   "alerts": [
     {
       "type": "LongWaitTime",
-      "sessionId": "5f3e9c1b-7c1d-4e3f-8f9a-1a2b3c4d5e6f",
-      "waitTime": 1200000
+      "session_id": "5f3e9c1b-7c1d-4e3f-8f9a-1a2b3c4d5e6f",
+      "wait_time": 1200000
     },
     {
       "type": "LongWaitTime",
-      "sessionId": "6a7b8c9d-0e1f-2g3h-4i5j-6k7l8m9n0o1p",
-      "waitTime": 900000
+      "session_id": "6a7b8c9d-0e1f-2g3h-4i5j-6k7l8m9n0o1p",
+      "wait_time": 900000
     }
   ]
 }

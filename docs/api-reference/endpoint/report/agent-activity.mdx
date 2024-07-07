@@ -1,6 +1,6 @@
 ---
 title: "Get Agent Activity"
-api: "GET https://api-v2.opencopilot.so/reports/{copilotId}/agents/activity"
+api: "GET https://api-v2.opencopilot.so/reports/{orgId}/agents/activity"
 description: "Retrieve activity data for agents, including their active and open sessions within a specified time range."
 ---
 
@@ -8,8 +8,8 @@ This endpoint provides insights into agent activity, showing the number of activ
 
 ### Path Parameters
 
-<ParamField path="copilotId" type="string" required>
-  The unique identifier of the copilot.
+<ParamField path="orgId" type="string" required>
+  The unique identifier of the organization.
 </ParamField>
 
 ### Query Parameters
@@ -24,15 +24,15 @@ This endpoint provides insights into agent activity, showing the number of activ
 
 ### Response
 
-<ResponseField name="agentId" type="number">
+<ResponseField name="agent_id" type="number">
   The unique identifier of the agent.
 </ResponseField>
 
-<ResponseField name="activeSessions" type="number">
+<ResponseField name="active_sessions" type="number">
   The total number of active sessions handled by the agent within the specified time range.
 </ResponseField>
 
-<ResponseField name="openSessions" type="number">
+<ResponseField name="open_sessions" type="number">
   The number of currently open sessions assigned to the agent.
 </ResponseField>
 
@@ -48,19 +48,19 @@ curl --location --request GET 'https://api-v2.opencopilot.so/reports/abc123/agen
 ```json
 [
   {
-    "agentId": 1,
-    "activeSessions": 150,
-    "openSessions": 5
+    "agent_id": 1,
+    "active_sessions": 150,
+    "open_sessions": 5
   },
   {
-    "agentId": 2,
-    "activeSessions": 120,
-    "openSessions": 3
+    "agent_id": 2,
+    "active_sessions": 120,
+    "open_sessions": 3
   },
   {
-    "agentId": 3,
-    "activeSessions": 180,
-    "openSessions": 7
+    "agent_id": 3,
+    "active_sessions": 180,
+    "open_sessions": 7
   }
 ]
 ```
