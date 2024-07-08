@@ -1,6 +1,6 @@
 ---
 title: "Get Agent Activity"
-api: "GET https://api-v2.opencopilot.so/reports/{orgId}/agents/activity"
+api: "GET https://api-v2.opencopilot.so/backend/reports/{orgId}/agents/activity"
 description: "Retrieve activity data for agents, including their active and open sessions within a specified time range."
 ---
 
@@ -39,7 +39,7 @@ This endpoint provides insights into agent activity, showing the number of activ
 ### Example Request
 
 ```bash
-curl --location --request GET 'https://api-v2.opencopilot.so/reports/abc123/agents/activity?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z' \
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/agents/activity?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z' \
 --header 'Authorization: Bearer YOUR_API_KEY'
 ```
 

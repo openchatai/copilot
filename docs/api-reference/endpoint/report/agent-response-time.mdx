@@ -1,6 +1,6 @@
 ---
 title: "Get Agent Response Times"
-api: "GET https://api-v2.opencopilot.so/reports/:orgId/agents/response-times"
+api: "GET https://api-v2.opencopilot.so/backend/reports/:orgId/agents/response-times"
 description: "Retrieve average response times for agents in chat sessions"
 ---
 
@@ -29,7 +29,7 @@ The response structure will depend on the implementation of the `getAgentRespons
 <RequestExample>
 
 ```bash Example Request
-curl --location --request GET 'https://api-v2.opencopilot.so/reports/org123/agents/response-times?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z' \
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/org123/agents/response-times?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z' \
 --header 'Accept: application/json' \
 --header 'Authorization: Bearer YOUR_TOKEN'
 ```

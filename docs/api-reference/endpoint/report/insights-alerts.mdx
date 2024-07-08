@@ -1,6 +1,6 @@
 ---
 title: "Get Alerts"
-api: "GET https://api-v2.opencopilot.so/reports/:orgId/insights/alerts"
+api: "GET https://api-v2.opencopilot.so/backend/reports/:orgId/insights/alerts"
 description: "Retrieve alerts based on predefined thresholds for chat sessions"
 ---
 
@@ -76,7 +76,7 @@ description: "Retrieve alerts based on predefined thresholds for chat sessions"
 <RequestExample>
 
 ```bash cURL
-curl --location --request GET 'https://api-v2.opencopilot.so/reports/abc123/insights/alerts?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z' \
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/insights/alerts?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z' \
 --header 'Authorization: Bearer YOUR_TOKEN_HERE'
 ```
 
@@ -85,7 +85,7 @@ const axios = require('axios');
 
 const options = {
   method: 'GET',
-  url: 'https://api-v2.opencopilot.so/reports/abc123/insights/alerts',
+  url: 'https://api-v2.opencopilot.so/backend/reports/insights/alerts',
   params: {
     startDate: '2023-01-01T00:00:00Z',
     endDate: '2023-12-31T23:59:59Z'

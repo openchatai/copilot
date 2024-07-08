@@ -1,6 +1,6 @@
 ---
 title: "Get Chat Satisfaction"
-api: "GET https://api-v2.opencopilot.so/reports/{orgId}/chats/satisfaction"
+api: "GET https://api-v2.opencopilot.so/backend/reports/{orgId}/chats/satisfaction"
 description: "Retrieve the average satisfaction score for chat sessions"
 ---
 
@@ -31,7 +31,7 @@ This endpoint returns the average satisfaction score for chat sessions based on 
 <RequestExample>
 
 ```bash Example Request
-curl --location --request GET 'https://api-v2.opencopilot.so/reports/abc123/chats/satisfaction?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z'
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/chats/satisfaction?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z'
 ```
 
 </RequestExample>

@@ -1,6 +1,6 @@
 ---
 title: "Get Staffing Prediction"
-api: "GET https://api-v2.opencopilot.so/reports/{orgId}/agents/staffing-prediction"
+api: "GET https://api-v2.opencopilot.so/backend/reports/{orgId}/agents/staffing-prediction"
 description: "Retrieve a prediction for staffing needs based on historical chat data"
 ---
 
@@ -42,7 +42,7 @@ This endpoint provides a staffing prediction based on historical chat data. It a
 <RequestExample>
 
 ```bash Example Request
-curl --location --request GET 'https://api-v2.opencopilot.so/reports/{orgId}/agents/staffing-prediction?startDate=2023-01-01T00:00:00Z&endDate=2023-01-31T23:59:59Z' \
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/{orgId}/agents/staffing-prediction?startDate=2023-01-01T00:00:00Z&endDate=2023-01-31T23:59:59Z' \
 --header 'Authorization: Bearer YOUR_TOKEN'
 ```
 

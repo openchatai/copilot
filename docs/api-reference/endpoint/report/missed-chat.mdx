@@ -1,6 +1,6 @@
 ---
 title: "Get Missed Chats"
-api: "GET https://api-v2.opencopilot.so/reports/{orgId}/chats/missed"
+api: "GET https://api-v2.opencopilot.so/backend/reports/{orgId}/chats/missed"
 description: "Retrieve the count of missed chats based on specified criteria"
 ---
 
@@ -29,7 +29,7 @@ description: "Retrieve the count of missed chats based on specified criteria"
 <RequestExample>
 
 ```bash Example Request
-curl --location --request GET 'https://api-v2.opencopilot.so/reports/abc123/chats/missed?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z' \
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/chats/missed?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z' \
 --header 'Authorization: Bearer YOUR_TOKEN'
 ```
 
