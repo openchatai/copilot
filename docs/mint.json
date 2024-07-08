@@ -58,6 +58,11 @@
       "pages": ["phone/new"]
     },
     {
+      "group": "Sending Emails",
+      "icon": "envelope",
+      "pages": ["email/email_api"]
+    },
+    {
       "group": "Email Support",
       "icon": "envelope",
       "pages": ["email/new"]
@@ -123,11 +128,8 @@
       "pages": ["api-reference/endpoint/chat-init"]
     },
     {
-      "group": "Votes & RLHF", 
-      "pages": [
-        "votes/rlhf",
-        "api-reference/endpoint/votes-add"
-      ]
+      "group": "Votes & RLHF",
+      "pages": ["votes/rlhf", "api-reference/endpoint/votes-add"]
     },
     {
       "group": "Reports",

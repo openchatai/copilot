@@ -1,0 +1,55 @@
+---
+title: "Send an Email"
+api: "POST http://example.com/backend/email/{org_id}/send"
+description: "Send emails to your contacts, possibly after a specified time delay."
+---
+
+<Note>
+  To send emails using the API, you must first verify the domain you want to
+  send emails from. You can add and verify custom domains in the settings.
+</Note>
+
+## Path Parameters
+
+<ParamField path="orgId" type="string" required>
+  Your copilot/organization ID.
+</ParamField>
+
+## Body
+
+<ParamField body="from_email" type="string" required>
+  The email to send from. This email's domain name must be added and verified.
+  Otherwise, the request will fail with a 400 status code.
+</ParamField>
+
+<ParamField body="to_email" type="string" required>
+  The email to send to.
+</ParamField>
+
+<ParamField body="email_subject" type="string" required>
+  Subject of the email.
+</ParamField>
+
+<ParamField body="email_body" type="string" required>
+  Body of the email in HTML format.
+</ParamField>
+
+<ParamField body="email_sender_name" type="string">
+  Display name of the email sender.
+</ParamField>
+
+<ParamField body="delay_in_minutes" type="string">
+  How much time (in minutes) to wait before sending the email.
+</ParamField>
+
+### Body Example
+
+```json
+{
+  "from_email": "anything@myverifieddomain.com",
+  "to_email": "customer@gmail.com",
+  "email_subject": "Hello!",
+  "email_body": "<h1>Thanks for signing up!</h1>",
+  "delay_in_minutes": 30
+}
+```
