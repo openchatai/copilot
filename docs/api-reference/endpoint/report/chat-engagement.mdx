@@ -1,6 +1,6 @@
 ---
 title: "Get Chat Engagement"
-api: "GET https://api-v2.opencopilot.so/reports/{orgId}/chats/engagement"
+api: "GET https://api-v2.opencopilot.so/backend/reports/{orgId}/chats/engagement"
 description: "Retrieve chat engagement metrics for a specified period and organization"
 ---
 
@@ -47,7 +47,7 @@ This endpoint provides chat engagement metrics, including the total number of ch
 <RequestExample>
 
 ```bash Example Request
-curl --location --request GET 'https://api-v2.opencopilot.so/reports/abc123/chats/engagement?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z&channel=web&status=1' \
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/chats/engagement?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z&channel=web&status=1' \
 --header 'Authorization: Bearer YOUR_API_KEY'
 ```
 

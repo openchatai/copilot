@@ -1,6 +1,6 @@
 ---
 title: "Get Total Chats"
-api: "GET https://api-v2.opencopilot.so/reports/{orgId}/chats/total"
+api: "GET https://api-v2.opencopilot.so/backend/reports/{orgId}/chats/total"
 description: "Retrieve the total number of chat sessions based on specified criteria"
 ---
 
@@ -39,7 +39,7 @@ This endpoint returns the total count of chat sessions that match the given quer
 <RequestExample>
 
 ```bash Example Request
-curl --location --request GET 'https://api-v2.opencopilot.so/reports/abc123/chats/total?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z&channel=web&status=1' \
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/chats/total?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z&channel=web&status=1' \
 --header 'Authorization: Bearer YOUR_API_KEY'
 ```
 

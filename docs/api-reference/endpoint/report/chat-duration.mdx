@@ -1,6 +1,6 @@
 ---
 title: "Get Chat Duration"
-api: "GET https://api-v2.opencopilot.so/reports/{orgId}/chats/duration"
+api: "GET https://api-v2.opencopilot.so/backend/reports/{orgId}/chats/duration"
 description: "Retrieve the average duration of chat sessions based on specified criteria"
 ---
 
@@ -37,7 +37,7 @@ description: "Retrieve the average duration of chat sessions based on specified 
 ### Example Request
 
 ```bash
-curl --location --request GET 'https://api-v2.opencopilot.so/reports/abc123/chats/duration?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z&channel=web&status=1'
+curl --location --request GET 'https://api-v2.opencopilot.so/backend/reports/chats/duration?startDate=2023-01-01T00:00:00Z&endDate=2023-12-31T23:59:59Z&channel=web&status=1'
 ```
 
 ### Example Response
