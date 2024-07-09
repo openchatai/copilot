@@ -6,6 +6,12 @@ description: "Retrieve the total number of chat sessions based on specified crit
 
 This endpoint returns the total count of chat sessions that match the given query parameters. It can be used to analyze chat volume over time, filtered by various attributes such as channel and status.
 
+## Authentication
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication
+</ParamField>
+
 ### Path Parameters
 
 <ParamField path="orgId" type="string" required>

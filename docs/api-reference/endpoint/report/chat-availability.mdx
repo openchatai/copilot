@@ -4,6 +4,12 @@ api: "GET https://api-v2.opencopilot.so/backend/reports/{orgId}/chats/availabili
 description: "Retrieve the chat availability statistics for a specified time period"
 ---
 
+## Authentication
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication
+</ParamField>
+
 ### Path Parameters
 
 <ParamField path="orgId" type="string" required>
