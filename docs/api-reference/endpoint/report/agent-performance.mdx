@@ -6,6 +6,12 @@ description: "Retrieve performance metrics for agents based on chat sessions"
 
 This endpoint provides performance metrics for agents, including the total number of chats handled and their average duration. Performance in this context refers to the quantity of chats an agent manages and how quickly they resolve them.
 
+## Authentication
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication
+</ParamField>
+
 ### Path Parameters
 
 <ParamField path="orgId" type="string" required>

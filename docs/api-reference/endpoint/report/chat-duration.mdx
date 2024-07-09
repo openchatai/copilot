@@ -4,6 +4,12 @@ api: "GET https://api-v2.opencopilot.so/backend/reports/{orgId}/chats/duration"
 description: "Retrieve the average duration of chat sessions based on specified criteria"
 ---
 
+## Authentication
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication
+</ParamField>
+
 ### Path Parameters
 
 <ParamField path="orgId" type="string" required>

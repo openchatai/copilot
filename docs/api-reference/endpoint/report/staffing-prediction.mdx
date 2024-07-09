@@ -6,6 +6,12 @@ description: "Retrieve a prediction for staffing needs based on historical chat 
 
 This endpoint provides a staffing prediction based on historical chat data. It analyzes the number of chats per hour and the number of chats that required human intervention to help optimize agent allocation and improve response times.
 
+## Authentication
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication
+</ParamField>
+
 ### Path Parameters
 
 <ParamField path="orgId" type="string" required>
