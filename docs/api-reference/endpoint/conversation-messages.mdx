@@ -1,6 +1,6 @@
 ---
 title: "Get Messages"
-api: "GET https://api-v2.opencopilot.so/backend/conversations/{bot_id}/messages/{conversation_id}"
+api: "GET https://api-v2.opencopilot.so/backend/chat/sessions/{sessionId}/chats"
 description: "Retrieve all messages for a specific conversation."
 ---
 
@@ -10,11 +10,7 @@ The endpoint is paginated, and you can specify the `offset` and `limit` paramete
 
 ### Path Parameters
 
-<ParamField path="bot_id" type="string" required>
-  The ID of the bot for which to retrieve messages.
-</ParamField>
-
-<ParamField path="conversation_id" type="string" required>
+<ParamField path="sessionId" type="string" required>
   The ID of the conversation for which to retrieve messages.
 </ParamField>
 
