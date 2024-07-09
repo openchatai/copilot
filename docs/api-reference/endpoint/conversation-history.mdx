@@ -1,31 +1,107 @@
 ---
-title: "Chat Conversations"
-api: "GET https://api-v2.opencopilot.so/backend/chat/:organization_id"
-description: "Retrieve paginated chat conversations, including if the conversatin was a handoff and the sentiment with the summary."
+title: "Get Chat Conversations"
+api: "GET https://api-v2.opencopilot.so/backend/chat/{organization_id}"
+description: "Retrieve paginated chat conversations, including handoff status and sentiment summary."
 ---
-
-<Warning>
-This endpoint is protected by the same JWT that the user uses to call other APIs. The response will include data for the specified chatbot, along with other metadata information.
-</Warning>
-
-
-<Warning>
-This endpoint points to the (v2) version of the API. The (v2) version of the API is the latest version and is recommended for all new development. Please update your code to use the (v2) version of the API.
-</Warning>
 
 This endpoint allows you to retrieve all conversations for a specific Organization ID. The response includes the conversation id, sentiment, and reason for handoff (if applicable).
 
-The endpoint is paginated, and you can specify the `page` and `limit` query parameters to control the amount of data returned.
+## Authentication
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="organization_id" type="string" required>
+  The unique identifier of the organization
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="page" type="integer" default="1">
+  The page number to retrieve
+</ParamField>
+
+<ParamField query="limit" type="integer" default="10">
+  The number of items to retrieve per page
+</ParamField>
+
+<ParamField query="sortBy" type="string" default="created_at">
+  The field to sort by
+</ParamField>
+
+<ParamField query="sortDirection" type="string" default="ASC">
+  The direction to sort (ASC or DESC)
+</ParamField>
+
+## Response
+
+<ResponseField name="id" type="string">
+  The unique identifier for the chat conversation
+</ResponseField>
+
+<ResponseField name="copilot_id" type="string">
+  The unique identifier for the organization (copilot) associated with the conversation
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  The date and time the conversation was created
+</ResponseField>
+
+<ResponseField name="channel" type="string">
+  The channel on which the conversation was created (whatsapp, email, web, or phone)
+</ResponseField>
+
+<ResponseField name="summary" type="string">
+  A summary of the conversation (only available for conversations marked as handoff)
+</ResponseField>
+
+<ResponseField name="classification" type="string">
+  The classification of the conversation (based on the user's provided categories and tags)
+</ResponseField>
+
+<ResponseField name="assignee_id" type="string">
+  The ID of the assignee for the conversation
+</ResponseField>
+
+<ResponseField name="handoff" type="boolean">
+  Indicates whether the conversation was handed off to a human agent
+</ResponseField>
+
+<ResponseField name="handoff_sentiment" type="string">
+  The sentiment of the conversation at the time of handoff
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  The status of the conversation (open, resolved, or closed)
+</ResponseField>
+
+<ResponseField name="meta" type="object">
+  Metadata about the conversation (such as title, recording URL, and phone number)
+</ResponseField>
+
+<ResponseField name="action_called" type="integer">
+  The number of actions called during the conversation
+</ResponseField>
+
+<ResponseField name="total_messages" type="integer">
+  The total number of messages in the conversation
+</ResponseField>
 
 <RequestExample>
+
 ```bash Example Request
-curl --location 'https://api-v2.opencopilot.so/backend/chat/:organization_id' \
-  --header 'Authorization: Bearer TOKEN' \ 
-  --header 'Content-Type: application/json' 
+curl --location 'https://api-v2.opencopilot.so/backend/chat/your-organization-id' \
+--header 'Authorization: Bearer YOUR_TOKEN' \
+--header 'Content-Type: application/json'
 ```
+
 </RequestExample>
 
 <ResponseExample>
+
 ```json Response
 [
   {
@@ -45,28 +121,5 @@ curl --location 'https://api-v2.opencopilot.so/backend/chat/:organization_id' \
   }
 ]
 ```
+
 </ResponseExample>
-
-**The request includes the following optional query parameters:**
-- `page`: The page number to retrieve (default is 1).
-- `limit`: The number of items to retrieve per page (default is 10).
-- `sortBy`: The field to sort by (default is `created_at`).
-- `sortDirection`: The direction to sort (default is `ASC`) (`ASC` or `DESC`).
-
-----
-
-**The response includes the following fields:**
-
-- `id`: The unique identifier for the chat conversation.
-- `copilot_id`: The unique identifier for the organization (copilot) associated with the conversation.
-- `created_at`: The date and time the conversation was created.
-- `channel`: The channel on which the conversation was created (`whatsapp`, `email`, `web`, or `phone`).
-- `summary`: A summary of the conversation (only avaliable for conversations that is marked as `handoff`).
-- `classification`: The classification of the conversation (based on the user's provided categories and tags).
-- `assignee_id`: The ID of the assignee for the conversation (will be `copilot` for conversations that are not assigned to a human, otherwise will be the ID of the assignee).
-- `handoff_sentiment`: The sentiment of the conversation at the time of handoff.
-- `handoff_summary`: A summary of the conversation at the time of handoff.
-- `handoff`: A boolean value indicating whether the conversation was handed off to a human agent.
-- `status`: The status of the conversation (open, resolved, or closed).
-- `meta`: Metadata about the conversation (such as title, recording URL, and phone number).
-

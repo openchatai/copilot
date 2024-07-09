@@ -1,8 +1,84 @@
 ---
-title: "Messages"
-api: "GET https://api-v2.opencopilot.so/backend/conversations/:bot_id/messages/:conversation_id"
+title: "Get Messages"
+api: "GET https://api-v2.opencopilot.so/backend/chat/sessions/{sessionId}/chats"
 description: "Retrieve all messages for a specific conversation."
 ---
+
+This endpoint retrieves all messages for a specific conversation. You can use the `conversation_id` parameter to specify the conversation for which you want to retrieve messages. To get the `conversation_id`, use the get conversations endpoint.
+
+The endpoint is paginated, and you can specify the `offset` and `limit` parameters to control the amount of data returned.
+
+### Path Parameters
+
+<ParamField path="sessionId" type="string" required>
+  The ID of the conversation for which to retrieve messages.
+</ParamField>
+
+### Query Parameters
+
+<ParamField query="offset" type="integer" default="0">
+  The number of items to skip before starting to collect the result set.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="50">
+  The maximum number of items to return.
+</ParamField>
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication.
+</ParamField>
+
+<RequestExample>
+```bash Example Request
+curl --location 'https://api-v2.opencopilot.so/backend/conversations/{bot_id}/messages/{conversation_id}?offset=0&limit=10' \
+--header 'Authorization: Bearer YOUR_TOKEN'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+[
+  {
+    "action_called": false,
+    "client_extra_params": {},
+    "from": "copilot",
+    "knowldgebase_called": false,
+    "message": "Hello! How can I assist you today?"
+  },
+  {
+    "action_called": false,
+    "client_extra_params": {},
+    "from": "user",
+    "knowldgebase_called": false,
+    "message": "hey"
+  }
+]
+```
+</ResponseExample>
+
+### Response Fields
+
+<ResponseField name="action_called" type="boolean">
+  Indicates whether an action was called to handle the message.
+</ResponseField>
+
+<ResponseField name="client_extra_params" type="object">
+  Additional parameters that the client can send to the bot.
+</ResponseField>
+
+<ResponseField name="from" type="string">
+  The sender of the message. Can be 'copilot' or 'user'.
+</ResponseField>
+
+<ResponseField name="knowldgebase_called" type="boolean">
+  Indicates whether the knowledge base was called to handle the message.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  The message text.
+</ResponseField>
 
 <Warning>
 This endpoint is protected by the same JWT that the user uses to call other APIs. The response will include data for the specified chatbot, along with other metadata information.
@@ -11,54 +87,3 @@ This endpoint is protected by the same JWT that the user uses to call other APIs
 <Warning>
 This endpoint points to the (v2) version of the API. The (v2) version of the API is the latest version and is recommended for all new development. Please update your code to use the (v2) version of the API.
 </Warning>
-
-
-This endpoint retrieves all messages for a specific conversation. You can use the `conversation_id` parameter to specify the conversation for which you want to retrieve messages, to the conversation_id parameter, use get conversations endpoint to get the conversation_id.
-
-The endpoint is paginated, and you can specify the `offset` and `limit` parameters to control the amount of data returned.
-
-<RequestExample>
-```bash Example Request
-curl --location 'https://api-v2.opencopilot.so/backend/conversations/:bot_id' \
-  --header 'Authorization: Bearer TOKEN' \ 
-  --header 'Content-Type: application/json' 
-```
-</RequestExample>
-
-<ResponseExample>
-```json Response
-[
-    {
-        "action_called": false,
-        "client_extra_params": {},
-        "from": "copilot",
-        "knowldgebase_called": false,
-        "message": "Hello! How can I assist you today?"
-    },
-    {
-        "action_called": false,
-        "client_extra_params": {},
-        "from": "user",
-        "knowldgebase_called": false,
-        "message": "hey"
-    }
-]
-```
-</ResponseExample>
-
-The response includes the following fields:
-
-- `action_called`: A boolean value that indicates whether the action was called to handle the message.
-- `client_extra_params`: An object that contains additional parameters that the client can send to the bot.
-- `from`: A string that indicates the sender of the message. The value can be `copilot` or `user`.
-- `knowldgebase_called`: A boolean value that indicates whether the knowledge base was called to handle the message.
-- `message`: A string that contains the message text.
-
-
-
-You can use the `offset` and `limit` parameters to control the pagination of the response. For example, to retrieve the first 10 messages, you can use the following request:
-
-```bash Example Request
-curl --location 'https://api-v2.opencopilot.so/backend/conversations/:bot_id/messages/:conversation_id?offset=0&limit=10' \
-  --header 'Authorization: Bearer TOKEN'
-```
