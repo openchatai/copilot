@@ -1,0 +1,16 @@
+---
+title: "Unsubscribe Contacts"
+---
+
+Your contacts must be able to unsubscribe/opt out of receiving emails from you. Open enables this in two ways:
+
+- An API for generating links that your contacts can click to unsubscribe
+- An API for unsubscribing contacts from within your apps
+
+## Unsubscribe Link
+
+You can call [this endpoint](./unsubscribe_url_api) to generate a link that you can put in the body of any email, or anywhere in your application. You can generate this link using the contact's email, or their contact ID.
+
+## Unsubscribe via API call from your apps
+
+In case you want your contacts to unsubscribe in a way other than clicking a link and being redirected to Open, you can directly call [this endpoint](./unsubscribe_directly_api) to mark a contact as unsubscribed from all email.

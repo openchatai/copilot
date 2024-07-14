@@ -1,0 +1,26 @@
+---
+title: "Gen an Unsubscribe Link"
+api: "GET https://api-v2.opencopilot.so/backend/email/{org_id}/unsubscribe/url"
+description: "Create a link that your contact can click to unsubscribe."
+---
+
+## Path Parameters
+
+<ParamField path="orgId" type="string" required>
+  Your copilot/organization ID.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="contactId" type="string">
+  The contact's ID.
+</ParamField>
+
+<ParamField query="contactEmail" type="string">
+  The contact's ID.
+</ParamField>
+
+<Note>
+  You must provide either the `contactId` or the `contactEmail` query parameter.
+  Otherwise, there is no way for Open to identify the contact.
+</Note>

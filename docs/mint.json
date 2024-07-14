@@ -121,7 +121,12 @@
     {
       "group": "Sending Emails",
       "icon": "envelope",
-      "pages": ["email/email_api"]
+      "pages": [
+        "email/email_api",
+        "email/unsubscribe_api",
+        "email/unsubscribe_directly_api",
+        "email/unsubscribe_url_api"
+      ]
     },
     {
       "group": "Chat API",
