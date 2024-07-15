@@ -51,6 +51,12 @@ It's possible to repeat the same contact email in the array with different `dela
   Display name of the email sender.
 </ParamField>
 
+<ParamField body="email_is_transactional" type="boolean">
+  Whether the email is transactional. If set to `false`, Open will check if the
+  contact has [unsubscribed/opted out](./unsubscribe_api) of receiving marketing
+  emails before sending the email. Defaults to `true`.
+</ParamField>
+
   <ParamField body="delay_in_minutes" type="string">
     How much time (in minutes) to wait before sending the email.
   </ParamField>

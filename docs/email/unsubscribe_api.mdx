@@ -2,7 +2,11 @@
 title: "Unsubscribe Contacts"
 ---
 
-Your contacts must be able to unsubscribe/opt out of receiving emails from you. Open enables this in two ways:
+Your contacts must be able to unsubscribe/opt out of receiving marketing emails.
+
+You can set the `email_is_transactional` field when sending an email to specify its type. If a contact has unsubscribed, and the `email_is_transactional` attribute is set to `false`, the contact will _not_ receive the email.
+
+Open enables opting out contacts in two ways:
 
 - An API for generating links that your contacts can click to unsubscribe
 - An API for unsubscribing contacts from within your apps
