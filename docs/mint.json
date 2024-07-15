@@ -5,6 +5,10 @@
     "dark": "/logo/dark.png",
     "light": "/logo/light.png"
   },
+  "modeToggle": {
+    "default": "light",
+    "isHidden": false
+  },
   "favicon": "/favicon.png",
   "colors": {
     "primary": "#4717a6",
