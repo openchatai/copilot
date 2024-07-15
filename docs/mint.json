@@ -78,6 +78,7 @@
     },
     {
       "group": "Managing copilots via API",
+      "icon": "code",
       "pages": [
         "api-notes",
         "api-reference/endpoint/get",
@@ -86,6 +87,7 @@
     },
     {
       "group": "Actions",
+      "icon": "bolt",
       "pages": [
         "taking-actions",
         "api-reference/endpoint/delete-all-actions",
@@ -94,6 +96,7 @@
     },
     {
       "group": "Knowledge Base",
+      "icon": "book",
       "pages": [
         "api-reference/endpoint/ingest-knowldge-from-file",
         "api-reference/endpoint/ingest-knowledgebase-from-url",
@@ -103,6 +106,7 @@
     },
     {
       "group": "History",
+      "icon": "history",
       "pages": [
         "api-reference/endpoint/conversation-history",
         "api-reference/endpoint/conversation-messages"
@@ -110,6 +114,7 @@
     },
     {
       "group": "Contacts",
+      "icon": "users",
       "pages": [
         "api-reference/contacts/introduction",
         "api-reference/contacts/create",
@@ -130,14 +135,17 @@
     },
     {
       "group": "Chat API",
+      "icon": "chat",
       "pages": ["api-reference/endpoint/chat-init"]
     },
     {
       "group": "Votes & RLHF",
+      "icon": "vote",
       "pages": ["votes/rlhf", "api-reference/endpoint/votes-add"]
     },
     {
       "group": "Reports",
+      "icon": "chart-bar",
       "pages": [
         "api-reference/endpoint/report/total-chats",
         "api-reference/endpoint/report/chat-engagement",
