@@ -4,13 +4,13 @@ description: "Learn how to embed the widget in your app"
 icon: "rocketchat"
 ---
 
-<img src="/widget/example.png" alt="copilot widget demo" />
+<img src="/widget/example.png" alt="Widget demo" />
 
 
 
-The chat widget enables you to interact with the Copilot from your dashboard and see the changes in real-time. Open is a React web app that you can embed in your web app.
+The chat widget enables you to interact with the AI customer support chatbot from your dashboard and see the changes in real-time. Open is a React web app that you can embed in your web app.
 
-There are several ways you can integrate the Copilot Chat widget into your application/webpage.
+There are several ways you can integrate the chat widget into your application/webpage.
 
 
 <CardGroup cols={2}>
@@ -20,23 +20,21 @@ There are several ways you can integrate the Copilot Chat widget into your appli
 
 ### Using simple js script
 
-1. By using CDN script into your html file.
+1. By using CDN script into your HTML file.
    ```html
    <script src="https://unpkg.com/@openchatai/widget@latest/dist-embed/pilot.js"></script>
    ```
-   this will automatically register a new function called `initAiCoPilot` on the global window object.
+   This will automatically register a new function called `initOpenWidget` on the global window object.
 
-2. Init the copilot (when document fully loads) by calling the `initAiCoPilot` function and passing the required options.
-    There are plenty of options that you can pass to the copilot, you can find them [here](#options)
+2. Init the widget (when document fully loads) by calling the `initOpenWidget` function and passing the required options.
+    There are plenty of options that you can pass to the widget, you can find them [here](#options)
    ```html
    <script>
      const options = {
-        apiUrl: "https://api-v2.opencopilot.so/backend",
-        socketUrl: "https://api-v2.opencopilot.so",
-        initialMessage: "Hey! happy to help.", 
-        token: "your_copilot_token_goes_here", // you can get your token from the dashboard
+        initialMessages: ["Hey! happy to help."], 
+        token: "your_organization_token_goes_here", // Settings -> Metadata -> Token
       }
-      window.addEventListener("DOMContentLoaded", ()=>initAiCoPilot(options)); // window.onload
+      window.addEventListener("DOMContentLoaded", ()=> initOpenWidget(options)); // window.onload
    </script>
    ```
 
@@ -65,17 +63,15 @@ There are several ways you can integrate the Copilot Chat widget into your appli
 2. Use the Component inside your application
 
 ```jsx
-import { CopilotWidget,Root } from "@openchatai/widget"; 
+import { OpenWidget, Root } from "@openchatai/widget"; 
 const options = {
-  apiUrl: "https://api-v2.opencopilot.so/backend",
-  socketUrl: "https://api-v2.opencopilot.so", 
-  initialMessage: "Hey! happy to help.",
-  token: "your_copilot_token_goes_here", // you can get your token from the dashboard
+  initialMessage: ["Hey! happy to help."],
+  token: "your_organization_token_goes_here", // Settings -> Metadata -> Token
 }
 function Widget(){
   return (
     <Root options={options}>
-    <CopilotWidget />
+      <OpenWidget />
     </Root>
   )
 }
@@ -87,23 +83,23 @@ The chat widget is highly customizable, here is a list of all the available opti
 
 <ResponseField name="Options" type="Object">
   <Expandable title="properties">
-    <ResponseField name="initialMessage" type="string">
-      The message that will be first present when the copilot is initialized
+    <ResponseField name="initialMessage" type="array">
+      The message that will be first present when the widget is initialized
     </ResponseField>
     <ResponseField name="token" type="string">
-      Your copilot token
+      Your organization token
     </ResponseField>
     <ResponseField name="triggerSelector" type="string">
-      The selector of the element that will trigger the copilot when clicked, if not set, a default trigger will be added to the root element (will show on bottom right of the screen)
+      The selector of the element that will trigger the widget when clicked, if not set, a default trigger will be added to the root element (will show on bottom right of the screen)
     </ResponseField>
     <ResponseField name="apiUrl" type="string">
-      The backend url of the copilot api (default: https://api-v2.opencopilot.so/backend), you can use your own backend if you have one (open source or self hosted)
+      The backend url of the widget api (default: https://api-v2.opencopilot.so/backend), you can use your own backend if you have one (open source or self hosted)
     </ResponseField>
     <ResponseField name="headers" type="Object">
       An object of headers that will be sent with every request to your backend (can be used to authenticate your api requests)
     </ResponseField>
     <ResponseField name="containerProps" type="Object">
-      An object of props that will be passed to the container div, it's helpful if you want to style the copilot widget <a href="/widget/styling">learn more about styling the chat widget</a>
+      An object of props that will be passed to the container div, it's helpful if you want to style the widget <a href="/widget/styling">learn more about styling the chat widget</a>
     </ResponseField>
     <ResponseField name="socketUrl" type="string">
       The url of the socket url that will be used to send and receive messages, it's helpful if you want to use your own socket server (open source or self hosted)
@@ -112,14 +108,36 @@ The chat widget is highly customizable, here is a list of all the available opti
       List of components that will be used to render any UI component. <a href="/widget/not-gen-ui">learn more about responding with UI</a>
     </ResponseField>
     <ResponseField name="debug" type="boolean">
-      If true, the copilot will log all the messages and events to the console and to the chat ui (default: false)
+      If true, the widget will log all the messages and events to the console and to the chat ui (default: false)
     </ResponseField>
     <ResponseField name="onHandoff" type="function">
       A function that will be called when the user is handed off to a human agent. read more about [handoff](/resources/human-handoff)
     </ResponseField>
     <ResponseField name="defaultOpen" type="boolean">
-      If true, the copilot/chat will be opened by default (default: false) and the triggerSelector will not be added to the root element
+      If true, the widget/chat will be opened by default (default: false) and the triggerSelector will not be added to the root element
     </ResponseField>
+
+    <ResponseField name="user" type="object">
+      The user object that will be used to identify the user/contact of the chat. read more about [identifying chat users/contacts](#identifying-chat-userscontacts)
+      <Expandable title="properties">
+        <ResponseField name="name" type="string">
+          The name of the user
+        </ResponseField>
+        <ResponseField name="email" type="string">
+          The email of the user
+        </ResponseField>
+        <ResponseField name="avatar" type="string">
+          The avatar of the user
+        </ResponseField>
+        <ResponseField name="phone" type="string">
+          The phone number of the user
+        </ResponseField>
+        <ResponseField name="customData" type="object">
+          Any custom data that you want to send to the backend
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  
   </Expandable>
 </ResponseField>
 
@@ -132,17 +150,15 @@ To start identifying the user/contact, you can pass the `user` object as an opti
 
 ```jsx
 const options = {
-  apiUrl: "https://api-v2.opencopilot.so/backend",
-  socketUrl: "https://api-v2.opencopilot.so",
-  initialMessage: "Hey! happy to help.", 
-  token: "your_copilot_token_goes_here",
+  initialMessages: ["Hey! happy to help."], 
+  token: "your_organization_token_goes_here", // Settings -> Metadata -> Token
   user: {
     name: "your_user_name",
     email: "your_user_email",
     avatar: "your_user_avatar_url",
     phone: "your_user_phone",
     customData: {
-      // any custom data you want to send to the copilot backend 
+      // any custom data you want to send to the Open backend
       "key1": "value1",
     }
   },
@@ -154,14 +170,14 @@ Read more about the contact APIs <a href="/api-reference/contacts/introduction">
 ## FAQ
 
 <AccordionGroup>
-  <Accordion title="The copilot widget is not showing up">
+  <Accordion title="The widget is not showing up">
     Make sure that the `triggerSelector` is correct and the element exists in
-    the dom,instead you can set `defaultOpen` to `true` to make the copilot open by default.
+    the dom,instead you can set `defaultOpen` to `true` to make the widget open by default.
     if that did not work, please [open an issue on our GitHub repo](https://github.com/openchatai/OpenCopilot/issues/new)
   </Accordion>
 
-  <Accordion title="The copilot widget is so small">
-    The copilot widget is responsive and it's width is set to 100% by default of the container, you can change that by passing the
+  <Accordion title="The widget is so small">
+    The widget is responsive and it's width is set to 100% by default of the container, you can change that by passing the
     `containerProps` option and setting the width to whatever you want.
   </Accordion>
 </AccordionGroup>
