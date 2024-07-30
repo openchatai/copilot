@@ -57,9 +57,6 @@ It's possible to repeat the same contact email in the array with different `dela
   emails before sending the email. Defaults to `true`.
 </ParamField>
 
-  <ParamField body="delay_in_minutes" type="string">
-    How much time (in minutes) to wait before sending the email.
-  </ParamField>
 </Expandable>
 </ParamField>
 
@@ -76,6 +73,10 @@ It's possible to repeat the same contact email in the array with different `dela
 <ParamField body="fallback_email_sender_name" type="string">
   Display name of the email sender in case none is provided for the contact
   within the `recipients` array.
+</ParamField>
+
+<ParamField body="delay_in_minutes" type="string">
+  How much time (in minutes) to wait before sending the emails.
 </ParamField>
 
 ### Body Example
