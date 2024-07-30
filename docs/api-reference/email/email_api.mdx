@@ -78,26 +78,3 @@ It's possible to repeat the same contact email in the array with different `dela
 <ParamField body="delay_in_minutes" type="string">
   How much time (in minutes) to wait before sending the emails.
 </ParamField>
-
-### Body Example
-
-```json
-{
-  "from_email": "somename@your.verified.domain",
-  "recipients": [
-    {
-      "to_email": "raph@example.com",
-      "email_body": "BODY",
-      "email_subject": "SUBJECT",
-      "email_sender_name": "SENDER NAME",
-      "delay_in_minutes": 2
-    },
-    {
-      "to_email": "sal@example.com"
-    }
-  ],
-  "fallback_email_subject": "FALLBACK SUBJECT",
-  "fallback_email_sender_name": "FALLBACK SENDER NAME",
-  "fallback_email_body": "FALLBACK BODY"
-}
-```
