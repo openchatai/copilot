@@ -43,7 +43,9 @@
       "group": "Getting started",
       "icon": "book",
       "iconType": "light",
-      "pages": ["introduction"]
+      "pages": [
+        "introduction"
+      ]
     },
     {
       "group": "Web Support",
@@ -59,12 +61,16 @@
     {
       "group": "Phone Support",
       "icon": "phone",
-      "pages": ["phone/new"]
+      "pages": [
+        "phone/new"
+      ]
     },
     {
       "group": "Email Support",
       "icon": "envelope",
-      "pages": ["email/new"]
+      "pages": [
+        "email/new"
+      ]
     },
     {
       "group": "Actions",
@@ -78,10 +84,12 @@
     },
     {
       "group": "Native Integrations",
-      "pages": ["dashboard/zendesk_integration"]
+      "pages": [
+        "dashboard/zendesk_integration"
+      ]
     },
     {
-      "group": "Managing copilots via API",
+      "group": "Managing Organizations",
       "icon": "code",
       "pages": [
         "api-notes",
@@ -131,21 +139,26 @@
       "group": "Sending Emails",
       "icon": "envelope",
       "pages": [
-        "email/email_api",
-        "email/unsubscribe_api",
-        "email/unsubscribe_directly_api",
-        "email/unsubscribe_url_api"
+        "api-reference/email/email_api",
+        "api-reference/email/unsubscribe_api",
+        "api-reference/email/unsubscribe_directly_api",
+        "api-reference/email/unsubscribe_url_api"
       ]
     },
     {
       "group": "Chat API",
       "icon": "chat",
-      "pages": ["api-reference/endpoint/chat-init"]
+      "pages": [
+        "api-reference/endpoint/chat-init"
+      ]
     },
     {
       "group": "Votes & RLHF",
       "icon": "vote",
-      "pages": ["votes/rlhf", "api-reference/endpoint/votes-add"]
+      "pages": [
+        "votes/rlhf",
+        "api-reference/endpoint/votes-add"
+      ]
     },
     {
       "group": "Reports",
@@ -166,7 +179,9 @@
     },
     {
       "group": "Resources",
-      "pages": ["resources/ci-cd-actions"]
+      "pages": [
+        "resources/ci-cd-actions"
+      ]
     }
   ],
   "footerSocials": {
@@ -174,5 +189,11 @@
   },
   "api": {
     "playground": {}
-  }
+  },
+  "tabs": [
+    {
+      "name": "API References",
+      "url": "api-reference"
+    }
+  ]
 }
