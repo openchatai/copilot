@@ -67,13 +67,6 @@
       ]
     },
     {
-      "group": "Email Support",
-      "icon": "envelope",
-      "pages": [
-        "email/new"
-      ]
-    },
-    {
       "group": "Actions",
       "icon": "bolt",
       "pages": [
