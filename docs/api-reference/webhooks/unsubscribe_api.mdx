@@ -1,0 +1,142 @@
+---
+title: "Events typs"
+description: "List of the support webhook types"
+icon: "globe"
+---
+
+
+`conversation.started`
+
+This event is triggered when a new conversation is started, regardless of the channel.
+
+<Accordion title="Sample Payload">
+```json
+ {
+    event: "conversation.started";
+    organization_id: string;
+    data: {
+        conversation_id: string;
+        assignee: 
+            | {
+                type: "AI";
+                name: string;
+            } 
+            | {
+                id: string;
+                type: "human";
+                name: string;
+                avatar_url: string;
+            };
+        contact: {
+            id: string;
+            name: string;
+            enriched_data: {
+                address: string;
+                phone_number: string;
+                email: string;
+            };
+            custom_objects: {
+                custom_object_1: string;
+                custom_object_2: string;
+            };
+        };
+        channel: "web" | "email" | "phone";
+        first_message: string;
+        language: string;
+        timestamp: string;
+    };
+};
+```
+</Accordion>
+
+-----
+
+
+`conversation.closed`
+
+This event is triggered when a conversation is closed, a conversation can be marked as resolved or not resolved, and can be closed by a human or an AI.
+
+<Accordion title="Sample Payload">
+```json
+{
+    event: "conversation.closed";
+    organization_id: string;
+    data: {
+        conversation_id: string;
+        timestamp: string;
+        customer_id: string;
+        resolution_status: "resolved" | "not_resolved";
+        resolved_by: 
+            | {
+                type: "AI";
+                name: string;
+            } 
+            | {
+                id: string;
+                type: "human";
+                name: string;
+                avatar_url: string;
+            };
+    };
+    is_from_third_party: boolean;
+    third_party_name: "zendesk" | "intercom";
+    summary: string;
+    contact_reason: string;
+    user_sentiment: string;
+};
+```
+</Accordion>
+-----
+
+
+`conversation.handoff_to_human`
+
+This event is triggered when a conversation is handed off to a human agent, notice that a handoff event can happne for multiple reasons, for example, a human agent can decide to take over the conversation, or the AI decides to handoff the conversation to a human agent.
+
+<Accordion title="Sample Payload">
+```json
+{
+    event: "conversation.handoff_to_human";
+    organization_id: string;
+    data: {
+        conversation_id: string;
+        timestamp: string;
+        customer_id: string;
+        reason: 
+            | "customer_asked_for_human_help"
+            | "ai_decided_to_handoff_due_to_sentiment_analysis"
+            | "ai_is_forbidden_from_handling_this_topic"
+            | "human_agent_decided_to_take_over"
+            | "ai_decided_to_handoff_because_the_user_left";
+        summary: string;
+        contact_reason: string;
+        user_sentiment: string;
+        was_handedoff_to_third_party: boolean;
+        third_party_name: "zendesk" | "intercom";
+    };
+};
+```
+</Accordion>
+
+-----
+
+`conversation.third_party_agent_response`
+
+When a third-party software agent responds to a previously handed-off conversation, Open will notify you. In some configurations, Open might also initiate the handoff to a third-party agent, such as Zendesk or Intercom. Even while the third-party agent handles the conversation, Open continues to monitor and send events to your webhooks.
+
+
+<Accordion title="Sample Payload">
+```json
+{
+    event: "conversation.third_party_agent_response";
+    organization_id: string;
+    data: {
+        conversation_id: string;
+        timestamp: string;
+        customer_id: string;
+        third_party_name: "zendesk" | "intercom";
+        time_since_handoff: number;
+    };
+};
+```
+</Accordion>

@@ -172,8 +172,17 @@
       "pages": [
         "resources/ci-cd-actions"
       ]
+    },
+
+    {
+      "group": "Webhooks",
+      "pages": [
+        "api-reference/webhooks/unsubscribe_api"
+      ]
     }
   ],
+
+
   "footerSocials": {
     "github": "https://github.com/openchatai"
   },
