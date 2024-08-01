@@ -177,7 +177,7 @@
     {
       "group": "Webhooks",
       "pages": [
-        "api-reference/webhooks/events"
+        "api-reference/webhooks/types"
       ]
     }
   ],
