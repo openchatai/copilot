@@ -177,7 +177,7 @@
     {
       "group": "Webhooks",
       "pages": [
-        "api-reference/webhooks/unsubscribe_api"
+        "api-reference/webhooks/events"
       ]
     }
   ],
