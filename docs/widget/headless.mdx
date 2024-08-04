@@ -1,0 +1,209 @@
+---
+title: "Headless Widget (Custom UI)"
+description: "Learn How to use the widget primitives to build your own ui to match your design system."
+---
+
+## `WidgetRoot` Component
+
+It serves as a provider component that shares configuration data and chat functionalities with its child components. This allows for centralized management of widget options and state across the application.
+
+```tsx 
+import { WidgetRoot } from "@openchatai/widget";
+
+const widgetOptions = {
+    token: 'your-auth-token',
+    initialMessage: ['Welcome to our service!'],
+}
+
+// just an example
+function Widget(){
+    return (
+        <div></div>
+    )
+}
+
+function App() {
+  return (
+    <WidgetRoot options={widgetOptions}>
+        <Widget />
+    </WidgetRoot>
+  );
+}
+```
+### Widget Root options
+
+``` ts
+type WidgetOptions = {
+  token: string;
+  headers?: Record<string, string>;
+  queryParams?: Record<string, string>;
+  initialMessage: string[];
+  triggerSelector?: string;
+  apiUrl?: string;
+  socketUrl?: string;
+  defaultOpen?: boolean;
+  debug?: boolean;
+  warnBeforeClose?: boolean;
+  onClose?: () => void;
+  organizationName?: string;
+  onHandoff?: (handout: HandoffPayloadType) => void;
+  user?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    customData?: Record<string, string>;
+    avatarUrl?: string;
+  };
+  bot?: {
+    name?: string;
+    avatarUrl?: string;
+  };
+  components?: {
+    key: string;
+    component: React.ElementType;
+  }[]
+};
+```
+
+## `useChat` Hook
+
+It provides an interface for managing chat sessions, sending messages, handling incoming messages, and maintaining chat state within the widget.
+
+#### Return Value
+The `useChat` hook returns an object with the following properties and functions:
+<ResponseField name="ReturnType" type="object">
+  <ResponseField name="state" type="object">
+    <ResponseField name="lastUpdated" type="number">The timestamp of the last update to the chat state.</ResponseField>
+    <ResponseField name="messages" type="array">An array of message objects representing the chat history.</ResponseField>
+  </ResponseField>
+  <ResponseField name="session" type="object">The current chat session object.</ResponseField>
+  <ResponseField name="recreateSession" type="function">A function that recreates the chat session.</ResponseField>
+  <ResponseField name="clearSession" type="function">A function that clears the chat session.</ResponseField>
+  <ResponseField name="sendMessage" type="function">A function that sends a message to the chat server.</ResponseField>
+  <ResponseField name="noMessages" type="boolean">A boolean value indicating whether there are no messages in the chat history.</ResponseField>
+  <ResponseField name="initialData" type="object">The initial data object returned by the useSWR hook.</ResponseField>
+  <ResponseField name="info" type="ReactNode">A React node representing additional information about the chat session.</ResponseField>
+  <ResponseField name="events" type="TypedEventTarget">a type safe event target object that dispatches custom events related to the chat session.</ResponseField>
+  <ResponseField name="hookState" type="HookState">The current state of the chat hook.</ResponseField>
+  <ResponseField name="settings" type="object">The current settings object for the chat hook.</ResponseField>
+  <ResponseField name="setSettings" type="function">A function that updates the settings object for the chat hook.</ResponseField>
+  <ResponseField name="axiosInstance" type="object">The Axios instance object used for making HTTP requests.</ResponseField>
+</ResponseField>
+
+
+## `useConfigData` Hook
+it returns the configuration data shared by the `WidgetRoot` component.
+
+```tsx
+import { useConfigData } from "@openchatai/widget";
+
+function Widget() {
+  const configData = useConfigData();
+  return (
+    <div>
+      <h1>{configData.organizationName}</h1>
+    </div>
+  );
+}
+```
+
+
+## Voting Hooks
+
+### `useUpvote` , `useDownvote` Hooks
+are used to up or down vote a message 
+it takes Message's `serverId` and optional `onSuccess` callback function as arguments.
+
+```tsx
+import { useUpvote, useDownvote, ComponentProps } from "@openchatai/widget";
+
+export type CustomBotTextResponseProps = ComponentProps<{
+    message: string
+}>;
+
+function CustomBotResponse({serverId,...props}:CustomBotTextResponseProps) {
+  const [upvoteState, upvote] = useUpvote(serverId.toString());
+  const [downvoteState, downvote] = useDownvote(serverId.toString());
+  return (
+    <div>
+      <button onClick={() => upvote()}>Upvote</button>
+      <button onClick={() => downvote()}>Downvote</button>
+    </div>
+  );
+}
+```
+
+## Components
+
+### `BotMessage` Component
+
+this component is responsible for selecting the appropriate component to render based on the message type.
+Let's render the messages to see how can to use it.
+
+```tsx
+import { BotMessage, useChat } from "@openchatai/widget";
+
+function ChatScreen() {
+  const { state} = useChat();
+  return <>
+  {state.messages.map((message, i) => {
+    if (message.type === "FROM_USER") {
+      return (
+        <div key={i}>
+          {message.content}
+        </div>
+      );
+    } else if (message.type === "FROM_BOT") {
+      return (
+          <BotMessage message={message} index={i} key={i} />
+      );
+    }
+    return null;
+  })}
+</>
+}
+
+```
+#### But how this component work ? 
+Here's the code of the `BotMessage` component.
+
+```tsx
+import { BotMessageType, ComponentRegistry, useConfigData } from "@openchatai/widget";
+import { ComponentType, useMemo } from "react";
+
+function BotMessage({
+    message,
+    index,
+}: {
+    message: BotMessageType;
+    index: number;
+}) {
+    const config = useConfigData();
+
+    const components = useMemo(() => (
+        new ComponentRegistry({
+            components: config.components
+        })
+    ), [config])
+
+    const component = components.getComponent(message.component, config.debug);
+
+    if (!component) {
+        return null;
+    }
+
+    const Component = component as ComponentType<{
+        data: BotMessageType["data"];
+        id: string;
+    }>;
+
+    return (
+        <Component
+            {...message}
+            data={message.data ?? {}}
+            id={message.id}
+            key={index}
+        />
+    );
+}
+```

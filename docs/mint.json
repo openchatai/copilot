@@ -53,10 +53,10 @@
       "icon": "sun",
       "pages": [
         "widget/embed",
-        "widget/styling",
         "widget/not-gen-ui",
         "authorization",
-        "widget/helper-exports"
+        "widget/hooks",
+        "widget/headless"
       ]
     },
     {

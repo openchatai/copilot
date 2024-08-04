@@ -1,0 +1,165 @@
+---
+title: "Hooks"
+description: "Learn how to use the widget hooks to build your own UI to match your design system."
+---
+
+
+## useUpvote
+
+### Purpose
+The `useUpvote` hook is used to send an upvote for a specific chat message.
+
+
+### Usage
+```typescript
+const [upvoteState, upvote] = useUpvote(messageId, onSuccessCallback);
+```
+
+### Parameters
+- `id` (string): The unique identifier of the chat message to be upvoted.
+- `onSuccess` (optional function): A callback function to be executed after a successful upvote.
+
+
+### Returns
+An array containing:
+1. `upvoteState`: An object representing the current state of the upvote operation (loading, error, value).
+2. `upvote`: A function to trigger the upvote action.
+
+
+### Implementation Details
+- Sends a POST request to `/chat/vote/${id}` using the `axiosInstance` from the ChatProvider.
+- Returns a message confirming the upvote action.
+
+
+## useDownvote
+
+
+### Usage
+```typescript
+const [downvoteState, downvote] = useDownvote(messageId, onSuccessCallback);
+```
+
+
+### Parameters
+- `id` (string): The unique identifier of the chat message to be downvoted.
+- `onSuccess` (optional function): A callback function to be executed after a successful downvote.
+
+### Returns
+An array containing:
+1. `downvoteState`: An object representing the current state of the downvote operation (loading, error, value).
+2. `downvote`: A function to trigger the downvote action.
+
+
+### Implementation Details
+- Uses `useAsyncFn` to manage the asynchronous DELETE request.
+- Sends a DELETE request to `/chat/vote/${id}` using the `axiosInstance` from the ChatProvider.
+- Returns a message confirming the downvote action.
+
+
+## Common Features
+Both hooks:
+- Utilize the `useChat` hook to access the `axiosInstance` for making API requests.
+- Leverage `useAsyncFn` for efficient handling of asynchronous operations, including loading states and error handling.
+- Accept an optional `onSuccess` callback for custom actions after successful operations.
+- Are memoized based on their dependencies (`axiosInstance`, `id`, and `onSuccess`) to prevent unnecessary re-renders.
+
+
+## Example Usage
+
+```tsx
+import React from 'react';
+
+function ChatMessage({ serverId }) {
+  const [upvoteState, upvote] = useUpvote(serverId, () => console.log('Upvoted!'));
+  const [downvoteState, downvote] = useDownvote(serverId, () => console.log('Downvoted!'));
+
+  return (
+    <div>
+      <button onClick={upvote} disabled={upvoteState.loading}>
+        {upvoteState.loading ? 'Upvoting...' : 'Upvote'}
+      </button>
+      <button onClick={downvote} disabled={downvoteState.loading}>
+        {downvoteState.loading ? 'Downvoting...' : 'Downvote'}
+      </button>
+      {upvoteState.error && <p>Error upvoting: {upvoteState.error.message}</p>}
+      {downvoteState.error && <p>Error downvoting: {downvoteState.error.message}</p>}
+    </div>
+  );
+}
+```
+
+
+# useChat Hook
+
+The `useChat` hook manages chat functionality, including sending and receiving messages, handling session management, and interacting with a socket connection.
+
+
+## Usage
+
+```typescript
+const chatInterface = useChat({
+  apiUrl,
+  socketUrl,
+  botToken,
+  defaultHookSettings,
+  onHandoff,
+  onSessionDestroy
+});
+```
+
+
+
+## Return Value
+
+The `useChat` hook returns an object with the following properties and methods:
+
+### Properties
+
+1. `state` (object): The current state of the chat.
+   - `lastUpdated` (number | null): Timestamp of the last update.
+   - `messages` (Array<MessageType>): Array of chat messages.
+
+2. `session` (ChatSession | null): The current chat session or null if no session exists.
+
+3. `noMessages` (boolean): True if there are no messages in the chat.
+
+4. `initialData` (object): Initial data for the chat, including FAQ, history, initial questions, and logo.
+
+5. `info` (ReactNode | null): Information about the current state of the chat, often related to socket connection status.
+
+6. `events` (TypedEventTarget): Event emitter for various chat events.
+
+7. `hookState` (string): Current state of the hook ('loading', 'error', or 'idle').
+
+8. `settings` (object): Current settings for the chat.
+   - `persistSession` (boolean): Whether the session is being persisted.
+   - `useSoundEffects` (boolean): Whether sound effects are enabled.
+
+9. `axiosInstance` (AxiosInstance): Axios instance configured for making API calls.
+
+### Methods
+
+1. `recreateSession()`: Clears the current session and creates a new one.
+
+2. `clearSession()`: Clears the current session and all messages.
+
+3. `sendMessage(messageData: object)`: Sends a new message to the chat.
+   - `messageData.content.text` (string): The text content of the message.
+   - `messageData.headers` (optional object): Additional headers for the message.
+   - `messageData.user` (optional object): User information.
+   - `messageData.query_params` (optional object): Additional query parameters.
+
+4. `setSettings(newSettings: object)`: Updates the chat settings.
+
+## Functionality
+
+- Manages the chat state, including messages and session information.
+- Handles WebSocket connections for real-time communication.
+- Provides methods for sending messages and managing the chat session.
+- Offers event handling for various chat events (new messages, handoffs, etc.).
+- Integrates with a backend API for data persistence and retrieval.
+- Supports customizable settings for session persistence and sound effects.
+- Handles initial data loading, including chat history and FAQ.
+- Provides real-time status updates about the chat and socket connection.
+
+This hook encapsulates the core functionality needed for implementing a chat interface, making it easier to integrate chat capabilities into a React application.
