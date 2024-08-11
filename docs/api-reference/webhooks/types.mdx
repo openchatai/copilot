@@ -11,41 +11,37 @@ This event is triggered when a new conversation is started, regardless of the ch
 
 <Accordion title="Sample Payload">
 ```json
- {
+{
     event: "conversation.started";
     organization_id: string;
     data: {
         conversation_id: string;
-        assignee: 
-            | {
-                type: "AI";
-                name: string;
-            } 
-            | {
-                id: string;
-                type: "human";
-                name: string;
-                avatar_url: string;
-            };
-        contact: {
-            id: string;
+        assignee:
+        | {
+            type: "AI";
             name: string;
-            enriched_data: {
-                address: string;
-                phone_number: string;
-                email: string;
+        }
+        | {
+            id: string;
+            type: "human";
+            name: string;
+            avatar_url: string;
+        };
+        contact: {
+            id?: string;
+            name?: string;
+            enriched_data?: {
+                address?: string | null;
+                phone_number?: string;
+                email?: string;
             };
-            custom_objects: {
-                custom_object_1: string;
-                custom_object_2: string;
-            };
+            custom_objects?: object;
         };
         channel: "web" | "email" | "phone";
         first_message: string;
-        language: string;
         timestamp: string;
     };
-};
+}
 ```
 </Accordion>
 
@@ -62,28 +58,27 @@ This event is triggered when a conversation is closed, a conversation can be mar
     event: "conversation.closed";
     organization_id: string;
     data: {
-        conversation_id: string;
+        conversation_id?: string;
         timestamp: string;
-        customer_id: string;
+        contact_id?: string;
         resolution_status: "resolved" | "not_resolved";
-        resolved_by: 
-            | {
-                type: "AI";
-                name: string;
-            } 
-            | {
-                id: string;
-                type: "human";
-                name: string;
-                avatar_url: string;
-            };
+        resolved_by:
+        | {
+            type: "AI";
+            name: string;
+        }
+        | {
+            id: number;
+            type: "human";
+            email: string;
+        };
     };
     is_from_third_party: boolean;
-    third_party_name: "zendesk" | "intercom";
-    summary: string;
-    contact_reason: string;
-    user_sentiment: string;
-};
+    third_party_name: "zendesk" | "intercom" | null;
+    summary: string | null | undefined;
+    contact_reason: string | null | undefined;
+    user_sentiment: string | null | undefined;
+}
 ```
 </Accordion>
 -----
@@ -99,22 +94,21 @@ This event is triggered when a conversation is handed off to a human agent. Note
     event: "conversation.handoff_to_human";
     organization_id: string;
     data: {
-        conversation_id: string;
+        conversation_id: string | null | undefined;
         timestamp: string;
-        customer_id: string;
-        reason: 
-            | "customer_asked_for_human_help"
-            | "ai_decided_to_handoff_due_to_sentiment_analysis"
-            | "ai_is_forbidden_from_handling_this_topic"
-            | "human_agent_decided_to_take_over"
-            | "ai_decided_to_handoff_because_the_user_left";
+        customer_id: string | null | undefined;
+        reason:
+        | "ai_decided_to_handoff_the_conversation" 
+        | "ai_is_forbidden_from_handling_this_topic" 
+        | "human_agent_decided_to_take_over" 
+        | "ai_decided_to_handoff_because_the_user_left";
         summary: string;
-        contact_reason: string;
-        user_sentiment: string;
-        was_handedoff_to_third_party: boolean;
-        third_party_name: "zendesk" | "intercom";
+        contact_reason?: string;
+        user_sentiment?: string;
+        was_handedoff_to_third_party?: boolean;
+        third_party_name?: "zendesk" | "intercom" | null;
     };
-};
+}
 ```
 </Accordion>
 
@@ -131,11 +125,11 @@ When a third-party software agent responds to a previously handed-off conversati
     event: "conversation.third_party_agent_response";
     organization_id: string;
     data: {
-        conversation_id: string;
+        conversation_id: string | null | undefined;
         timestamp: string;
-        customer_id: string;
+        customer_id: string | null | undefined;
         third_party_name: "zendesk" | "intercom";
-        time_since_handoff: number;
+        response: string;
     };
 };
 ```
