@@ -4,7 +4,6 @@ description: "List of the supported webhook types"
 icon: "globe"
 ---
 
-
 `conversation.started`
 
 This event is triggered when a new conversation is started, regardless of the channel.
@@ -45,8 +44,7 @@ This event is triggered when a new conversation is started, regardless of the ch
 ```
 </Accordion>
 
------
-
+---
 
 `conversation.closed`
 
@@ -83,7 +81,6 @@ This event is triggered when a conversation is closed, a conversation can be mar
 </Accordion>
 -----
 
-
 `conversation.handoff_to_human`
 
 This event is triggered when a conversation is handed off to a human agent. Note that a handoff event can happen for multiple reasons; for example, a human agent might decide to take over the conversation, or the AI might decide to hand off the conversation to a human agent.
@@ -107,17 +104,21 @@ This event is triggered when a conversation is handed off to a human agent. Note
         user_sentiment?: string;
         was_handedoff_to_third_party?: boolean;
         third_party_name?: "zendesk" | "intercom" | null;
+        integration_metadata?: {
+           sunshine?: {
+             sunshine_conversation_id: string;
+           };
+        };
     };
 }
 ```
 </Accordion>
 
------
+---
 
 `conversation.third_party_agent_response`
 
 When a third-party software agent responds to a previously handed-off conversation, Open will notify you. In some configurations, Open might also initiate the handoff to a third-party agent, such as Zendesk or Intercom. Even while the third-party agent handles the conversation, Open continues to monitor and send events to your webhooks.
-
 
 <Accordion title="Sample Payload">
 ```json
