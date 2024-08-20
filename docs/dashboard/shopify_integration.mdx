@@ -1,0 +1,77 @@
+---
+title: 'Shopify'
+icon: 'shopify'
+description: 'Give your AI Support Agent the power to solve the most recurring L2 and L3 tickets in your store.'
+---
+
+The Shopify integration **allows your customers to ask the AI Support Agent to do the following**:
+
+- **Create order returns** and approve them
+- **Issue refunds** on demand for:
+  - `unfulfilled` items only in the order
+  - `returned` items only in the order
+  - `returned` and `unfulfilled` items in the order
+- **Auto-refund** `returned` items as soon as the return is `closed`
+- **Query details** about the store and its products, etc etc
+
+## Prerequisites
+
+- Auto-archival of orders must be disabled, otherwise the archived orders will not be queryable.
+  To disable auto-archival, go to **Settings** > **General** > **Order processing** and uncheck **Automatically archive the order**.
+- Include a pre-paid shipping label with orders to avoid disputes over return shipping costs.
+  Our AI Support Agent automates return requests approval, but does not handle logistics.
+- Inspecting returned items and restocking is the responsibility of the store.
+
+## Installation
+
+In your store's dashboard:
+
+1. Go to **Settings** > **Apps and sales channels** > **Develop apps**. Or type _\"Build custom apps\"_ in the **Search** bar.
+2. Click **Create an app**.
+3. Give it a name (e.g. Open) and click **Create app**.
+4. Click **Overview** > **Configure admin API Scopes**. Or **Configuration** > **Admin API integration** > **Configure**.
+5. Check the following scopes:
+   - `write_orders`
+   - `read_orders`
+   - `write_returns`
+   - `read_returns`
+   - `read_products`
+6. Click **Save**.
+7. Go to **API Credentials** > **Access tokens** and click **Install app**. Confirm by clicking **Install** in the confirmation dialog.
+8. Now, you'll see the **Admin API access token** section. Click **Reveal token once** to reveal the `token` and save it somewhere safe.
+   If you lose the `token` you'll need to **Uninstall app** then **Install** again.
+9. Copy your `Shopify domain`, which is the domain of your store (e.g. example.myshopify.com).
+   This can be found in the top left corner of the **Settings** section.
+10. Go to your **Open** account, then navigate to **Settings** > **Integrations** > **Connect with Shopify**.
+    Input your `Shopify domain` and your `token`, configure your settings and click **Save**.
+
+## Configuration
+
+### `returnsThresholdDays`
+
+Number of days since order creation. Orders older than the window cannot be returned.
+
+### `autoRefundAfterReturns`
+
+Whether to issue refunds automatically for the returned items once the return is closed.
+
+## How it works
+
+### Returns
+
+- When a customer requests a return, the AI Support Agent will require the customer to provide the `orderNumber`, `email` and `returnReason`.
+  - The `email` is used for validation (compared against the `email` associated with the order).
+- All `fulfilled` items will be included in the return. Partial returns (or exchanges) are not supported yet.
+- Orders older than the `returnsThresholdDays` cannot be returned.
+- Valid return requests will be approved automatically by the AI Support Agent.
+- Notifications are enabled by default.
+
+### Refunds
+
+- Refunds will be processed through the same **gateway** used for the original payment.
+- When a customer returns items of an order and the store receives the items and closes the return,
+  if the `autoRefundAfterReturns` setting is enabled, the AI Support Agent will automatically issue refunds for the returned items only.
+- If a customer requests a refund, the AI Support Agent will prompt the customer to provide the `orderNumber`, `email` and `refundTarget`.
+  - The `email` is used for validation (compared against the `email` associated with the order).
+  - The `refundTarget` can be either `returned` or `unfulfilled` or both.
+- Notifications are enabled by default.

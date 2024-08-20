@@ -79,7 +79,8 @@
     {
       "group": "Native Integrations",
       "pages": [
-        "dashboard/zendesk_integration"
+        "dashboard/zendesk_integration",
+        "dashboard/shopify_integration"
       ]
     },
     {
