@@ -11,35 +11,35 @@ This event is triggered when a new conversation is started, regardless of the ch
 <Accordion title="Sample Payload">
 ```json
 {
-    event: "conversation.started";
-    organization_id: string;
-    data: {
-        conversation_id: string;
-        assignee:
-        | {
-            type: "AI";
-            name: string;
-        }
-        | {
-            id: string;
-            type: "human";
-            name: string;
-            avatar_url: string;
-        };
-        contact: {
-            id?: string;
-            name?: string;
-            enriched_data?: {
-                address?: string | null;
-                phone_number?: string;
-                email?: string;
-            };
-            custom_objects?: object;
-        };
-        channel: "web" | "email" | "phone";
-        first_message: string;
-        timestamp: string;
+  event: 'conversation.started';
+  organization_id: string;
+  data: {
+    conversation_id: string;
+    assignee:
+    | {
+      type: 'AI';
+      name: string;
+    }
+    | {
+      id: string;
+      type: 'human';
+      name: string;
+      avatar_url: string;
     };
+    contact: {
+      id?: string;
+      name?: string;
+      enriched_data?: {
+        address?: string | null;
+        phone_number?: string;
+        email?: string;
+      };
+      custom_objects?: object;
+    };
+    channel: 'web' | 'email' | 'phone';
+    first_message: string;
+    timestamp: string;
+  };
 }
 ```
 </Accordion>
@@ -60,7 +60,8 @@ This event is triggered when a conversation is closed, a conversation can be mar
         timestamp: string;
         contact_id?: string;
         resolution_status: "resolved" | "not_resolved";
-        resolved_by:
+        resolution_type?: "light" | "hard" | "auto_handoff";
+        closed_by:
         | {
             type: "AI";
             name: string;
@@ -70,12 +71,14 @@ This event is triggered when a conversation is closed, a conversation can be mar
             type: "human";
             email: string;
         };
-    };
-    is_from_third_party: boolean;
-    third_party_name: "zendesk" | "intercom" | null;
-    summary: string | null | undefined;
-    contact_reason: string | null | undefined;
-    user_sentiment: string | null | undefined;
+        is_from_third_party: boolean;
+        third_party_name: "zendesk" | "intercom" | null;
+        summary: string | null | undefined;
+        contact_reason: string | null | undefined;
+        user_sentiment: string | null | undefined;
+        language: string | null | undefined;
+        message_count: number;
+    }[];
 }
 ```
 </Accordion>
@@ -109,7 +112,9 @@ This event is triggered when a conversation is handed off to a human agent. Note
              sunshine_conversation_id: string;
            };
         };
-    };
+        language: string | null | undefined;
+        message_count: number;
+    }[];
 }
 ```
 </Accordion>
@@ -123,15 +128,18 @@ When a third-party software agent responds to a previously handed-off conversati
 <Accordion title="Sample Payload">
 ```json
 {
-    event: "conversation.third_party_agent_response";
-    organization_id: string;
-    data: {
-        conversation_id: string | null | undefined;
-        timestamp: string;
-        customer_id: string | null | undefined;
-        third_party_name: "zendesk" | "intercom";
-        response: string;
-    };
-};
+  event: 'conversation.third_party_agent_response';
+  organization_id: string;
+  data: {
+    conversation_id: string | null | undefined;
+    timestamp: string;
+    customer_id: string | null | undefined;
+    third_party_name: 'zendesk' | 'intercom';
+    response: string;
+    message_count: number;
+    language: string;
+  };
+}
 ```
 </Accordion>
+
