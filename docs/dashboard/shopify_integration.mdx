@@ -23,9 +23,7 @@ The Shopify integration **allows your customers to ask the AI Support Agent to d
     autoPlay
     muted
     loop
-    playsInline
     controls
-    className="w-full aspect-video"
     src="/videos/shopify/disable-auto-archival.mp4"
   />
 
@@ -38,8 +36,15 @@ The Shopify integration **allows your customers to ask the AI Support Agent to d
 In your store's dashboard:
 
 1. Go to **Settings** > **Apps and sales channels** > **Develop apps**. Or type _\"Build custom apps\"_ in the **Search** bar.
-2. Click **Create an app**.
+2. Click **Allow custom app development** and confirm, then click **Create an app**.
 3. Give it a name (e.g. Open) and click **Create app**.
+   <video
+     autoPlay
+     muted
+     loop
+     controls
+     src="/videos/shopify/init-custom-app.mp4"
+   />
 4. Click **Overview** > **Configure admin API Scopes**. Or **Configuration** > **Admin API integration** > **Configure**.
 5. Check the following scopes:
    - `write_orders`
@@ -48,11 +53,25 @@ In your store's dashboard:
    - `read_returns`
    - `read_products`
 6. Click **Save**.
+   <video
+     autoPlay
+     muted
+     loop
+     controls
+     src="/videos/shopify/configure-scopes.mp4"
+   />
 7. Go to **API Credentials** > **Access tokens** and click **Install app**. Confirm by clicking **Install** in the confirmation dialog.
 8. Now, you'll see the **Admin API access token** section. Click **Reveal token once** to reveal the `token` and save it somewhere safe.
    If you lose the `token` you'll need to **Uninstall app** then **Install** again.
 9. Copy your `Shopify domain`, which is the domain of your store (e.g. example.myshopify.com).
    This can be found in the top left corner of the **Settings** section.
+   <video
+     autoPlay
+     muted
+     loop
+     controls
+     src="/videos/shopify/install-custom-app.mp4"
+   />
 10. Go to your **Open** account, then navigate to **Settings** > **Integrations** > **Connect with Shopify**.
     Input your `Shopify domain` and your `token`, configure your settings and click **Save**.
 
