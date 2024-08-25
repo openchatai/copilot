@@ -1,0 +1,51 @@
+---
+title: 'Delete phone number'
+api: 'DELETE https://api-v2.opencopilot.so/backend/voice-channel/phone-number/:phone_number_id'
+description: 'This endpoint allows you to delete a phone number from your organization'
+---
+
+<Warning>
+  This endpoint is protected by the same JWT that the user uses to call other
+  APIs. The response will include data for the specified chatbot, along with
+  other metadata information.
+</Warning>
+
+<ParamField path="phone_number_id" type="string" required>
+  The unique identifier for the phone number you would like to delete from your organization
+</ParamField>
+
+
+
+<RequestExample>
+```bash
+curl --location --request DELETE 'https://api-v2.opencopilot.so/backend/phone-number/:phone_number_id' \
+  --header 'Authorization: Bearer TOKEN' \
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+[
+{
+    "id": "1112234",
+        "organization_id": "999888123",
+        "provider_id": "091274",
+        "phone_number": "+14155690123",
+        "name": "My AI phone agent that calms down customers",
+        "base_prompt": "You are phone voice assistant. Always provice a short, to the point, and clear response. Do not engage in conversation with the user. Always ask the user to configure their account on Open CoPilot.",
+        "initial_message": "Hello, this phone is being managed by Open, how can I help you today?",
+        "handoff_phone_number": "+15103435446",
+        "created_at": "2024-08-24T12:01:59.000Z"
+},
+{    "id": "123987",
+        "organization_id": "999888123",
+        "provider_id": "091274",
+        "phone_number": "+14155690907",
+        "name": "My AI phone agent that compliments customers",
+        "base_prompt": "You are phone voice assistant. Always provice a short, to the point, and clear response. Do not engage in conversation with the user. Always ask the user to configure their account on Open CoPilot.",
+        "initial_message": "Hello, this phone is being managed by Open, how can I help you today?",
+        "handoff_phone_number": "+15103435446",
+        "created_at": "2024-08-24T12:01:59.000Z"}
+]
+```
+</ResponseExample>

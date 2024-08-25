@@ -62,9 +62,7 @@
     {
       "group": "Phone Support",
       "icon": "phone",
-      "pages": [
-        "phone/new"
-      ]
+      "pages": ["phone/phone-support", "phone/ai-phone-agent", "phone/human-phone-agent"]
     },
     {
       "group": "Actions",
@@ -118,6 +116,16 @@
         "api-reference/contacts/delete",
         "api-reference/contacts/list",
         "api-reference/contacts/update"
+      ]
+    },
+    {
+      "group": "Phone",
+      "icon": "phone",
+      "pages": [
+        "api-reference/phone/buy",
+        "api-reference/phone/get-all-phones",
+        "api-reference/phone/delete",
+        "api-reference/phone/update"
       ]
     },
     {
