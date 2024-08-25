@@ -43,10 +43,7 @@
       "group": "Getting started",
       "icon": "book",
       "iconType": "light",
-      "pages": [
-        "introduction",
-        "dashboard/pricing"
-      ]
+      "pages": ["introduction", "dashboard/pricing"]
     },
     {
       "group": "Web Support",
@@ -62,9 +59,7 @@
     {
       "group": "Phone Support",
       "icon": "phone",
-      "pages": [
-        "phone/new"
-      ]
+      "pages": ["phone/new"]
     },
     {
       "group": "Actions",
@@ -84,22 +79,9 @@
       ]
     },
     {
-      "group": "Managing Organizations",
-      "icon": "code",
-      "pages": [
-        "api-notes",
-        "api-reference/endpoint/get",
-        "api-reference/endpoint/delete"
-      ]
-    },
-    {
       "group": "Actions",
       "icon": "bolt",
-      "pages": [
-        "taking-actions",
-        "api-reference/endpoint/delete-all-actions",
-        "api-reference/endpoint/import-actions-from-swagger"
-      ]
+      "pages": ["taking-actions"]
     },
     {
       "group": "History",
@@ -133,17 +115,12 @@
     {
       "group": "Chat API",
       "icon": "chat",
-      "pages": [
-        "api-reference/endpoint/chat-init"
-      ]
+      "pages": ["api-reference/endpoint/chat-init"]
     },
     {
       "group": "Votes & RLHF",
       "icon": "vote",
-      "pages": [
-        "votes/rlhf",
-        "api-reference/endpoint/votes-add"
-      ]
+      "pages": ["votes/rlhf", "api-reference/endpoint/votes-add"]
     },
     {
       "group": "Reports",
@@ -164,19 +141,14 @@
     },
     {
       "group": "Resources",
-      "pages": [
-        "resources/ci-cd-actions"
-      ]
+      "pages": ["resources/ci-cd-actions"]
     },
 
     {
       "group": "Webhooks",
-      "pages": [
-        "api-reference/webhooks/types"
-      ]
+      "pages": ["api-reference/webhooks/types"]
     }
   ],
-
 
   "footerSocials": {
     "github": "https://github.com/openchatai"
@@ -186,8 +158,9 @@
   },
   "tabs": [
     {
-      "name": "API References",
-      "url": "api-reference"
+      "name": "API Reference",
+      "url": "api-reference",
+      "openapi": "https://pbf26x74-8080.euw.devtunnels.ms/api-json"
     }
   ]
 }
