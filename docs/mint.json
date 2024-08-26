@@ -84,14 +84,6 @@
       "pages": ["taking-actions"]
     },
     {
-      "group": "History",
-      "icon": "history",
-      "pages": [
-        "api-reference/endpoint/conversation-history",
-        "api-reference/endpoint/conversation-messages"
-      ]
-    },
-    {
       "group": "Contacts",
       "icon": "users",
       "pages": [
@@ -153,6 +145,7 @@
   "footerSocials": {
     "github": "https://github.com/openchatai"
   },
+  "openapi": "http://localhost:8080/api-json",
   "api": {
     "playground": {}
   },
