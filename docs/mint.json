@@ -97,12 +97,7 @@
     {
       "group": "Sending Emails",
       "icon": "envelope",
-      "pages": [
-        "api-reference/email/email_api",
-        "api-reference/email/unsubscribe_api",
-        "api-reference/email/unsubscribe_directly_api",
-        "api-reference/email/unsubscribe_url_api"
-      ]
+      "pages": ["api-reference/email/email_api"]
     },
     {
       "group": "Chat API",
