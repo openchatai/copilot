@@ -1,14 +1,9 @@
 ---
 title: 'Update phone number'
 api: 'PUT https://api-v2.opencopilot.so/backend/voice-channel/phone-number/:phone_number_id'
+authMethod: 'bearer'
 description: 'This endpoint allows you to update a phone number from your organization'
 ---
-
-<Warning>
-  This endpoint is protected by the same JWT that the user uses to call other
-  APIs. The response will include data for the specified chatbot, along with
-  other metadata information.
-</Warning>
 
 <ParamField path="phone_number_id" type="string" required>
   The unique identifier for the phone number you would like to update from your
@@ -38,17 +33,3 @@ description: 'This endpoint allows you to update a phone number from your organi
   The initial message is the first thing that the AI phone agent says when
   answering the phone call.
 </ParamField>
-
-<RequestExample>
-```bash
-curl --location --request PUT 'https://api-v2.opencopilot.so/backend/phone-number/:phone_number_id' \
-  --header 'Authorization: Bearer TOKEN' \
-   --header 'Content-Type: application/json' \
-  --data-raw '{
-    "name": "My cool phone",
-    "base_prompt": "You are an AI phone agent that compliments customers whenever you find a chance",
-    "handoff_phone_number": "+1XXXXXXXXX",
-    "initial_message": "Hello! How can I help you today?"
-  }'
-```
-</RequestExample>

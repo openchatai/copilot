@@ -1,14 +1,9 @@
 ---
 title: 'Buy AI phone number'
 api: 'POST https://api-v2.opencopilot.so/backend/voice-channel/phone-number/buy'
-description: 'This endpoint allows you to buy a new phone number for a specific organization. The phone number can be used for various telecommunication purposes within the organization.'
+authMethod: 'bearer'
+description: 'This endpoint allows you to purchase a new phone number for your organization, enabling AI-driven communication. The phone number can be used to automatically answer calls, handle customer complaints, and respond to questions efficiently, leveraging AI to enhance customer support and streamline interactions.'
 ---
-
-<Warning>
-  This endpoint is protected by the same JWT that the user uses to call other
-  APIs. The response will include data for the specified chatbot, along with
-  other metadata information.
-</Warning>
 
 <ParamField body="organization_id" type="string" required>
   The unique identifier for the copilot (organization) you want to create an AI
@@ -24,17 +19,3 @@ description: 'This endpoint allows you to buy a new phone number for a specific 
   The name to associate with the purchased phone number. If not provided, a
   default name will be used.
 </ParamField>
-
-<RequestExample>
-```bash
-curl --location --request POST 'https://api-v2.opencopilot.so/backend/phone-number/buy' \
-  --header 'Authorization: Bearer TOKEN' \
-  --header 'Content-Type: application/json' \
-  --data-raw '{
-    "area_code": "123",
-    "organization_id": "org_456",
-    "name": "My AI phone agent that compliments customers"
-  }'
-```
-</RequestExample>
-
