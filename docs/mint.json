@@ -112,7 +112,7 @@
   "api": {
     "playground": {}
   },
-  "openapi": "https://pbf26x74-8080.euw.devtunnels.ms/api-json",
+  "openapi": "https://api-v2.opencopilot.so/api-json",
   "tabs": [
     {
       "name": "API Reference",
