@@ -68,7 +68,9 @@
         "taking-actions",
         "authorization",
         "resources/human-handoff",
-        "resources/autopilot-topics"
+        "resources/autopilot-topics",
+        "api-reference/endpoint/delete-all-actions",
+        "api-reference/endpoint/import-actions-from-swagger"
       ]
     },
     {
@@ -77,11 +79,6 @@
         "dashboard/zendesk_integration",
         "dashboard/shopify_integration"
       ]
-    },
-    {
-      "group": "Actions",
-      "icon": "bolt",
-      "pages": ["taking-actions"]
     },
     {
       "group": "Contacts",
@@ -95,42 +92,14 @@
       ]
     },
     {
-      "group": "Sending Emails",
+      "group": "Email",
       "icon": "envelope",
       "pages": ["api-reference/email/email_api"]
-    },
-    {
-      "group": "Chat API",
-      "icon": "chat",
-      "pages": ["api-reference/endpoint/chat-init"]
-    },
-    {
-      "group": "Votes & RLHF",
-      "icon": "vote",
-      "pages": ["votes/rlhf", "api-reference/endpoint/votes-add"]
-    },
-    {
-      "group": "Reports",
-      "icon": "chart-bar",
-      "pages": [
-        "api-reference/endpoint/report/total-chats",
-        "api-reference/endpoint/report/chat-engagement",
-        "api-reference/endpoint/report/missed-chat",
-        "api-reference/endpoint/report/chat-satisfaction",
-        "api-reference/endpoint/report/chat-availability",
-        "api-reference/endpoint/report/chat-duration",
-        "api-reference/endpoint/report/agent-performance",
-        "api-reference/endpoint/report/agent-response-time",
-        "api-reference/endpoint/report/staffing-prediction",
-        "api-reference/endpoint/report/agent-activity",
-        "api-reference/endpoint/report/insights-alerts"
-      ]
     },
     {
       "group": "Resources",
       "pages": ["resources/ci-cd-actions"]
     },
-
     {
       "group": "Webhooks",
       "pages": ["api-reference/webhooks/types"]
@@ -140,15 +109,14 @@
   "footerSocials": {
     "github": "https://github.com/openchatai"
   },
-  "openapi": "http://localhost:8080/api-json",
   "api": {
     "playground": {}
   },
+  "openapi": "https://pbf26x74-8080.euw.devtunnels.ms/api-json",
   "tabs": [
     {
       "name": "API Reference",
-      "url": "api-reference",
-      "openapi": "https://pbf26x74-8080.euw.devtunnels.ms/api-json"
+      "url": "api-reference"
     }
   ]
 }
