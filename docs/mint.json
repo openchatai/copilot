@@ -92,16 +92,6 @@
       ]
     },
     {
-      "group": "Phone",
-      "icon": "phone",
-      "pages": [
-        "api-reference/phone/buy",
-        "api-reference/phone/get-all-phones",
-        "api-reference/phone/delete",
-        "api-reference/phone/update"
-      ]
-    },
-    {
       "group": "Email",
       "icon": "envelope",
       "pages": ["api-reference/email/email_api"]
