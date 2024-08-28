@@ -9,7 +9,7 @@ icon: "globe"
 This event is triggered when a new conversation is started, regardless of the channel.
 
 <Accordion title="Sample Payload">
-```json
+```typescript
 {
   event: 'conversation.started';
   organization_id: string;
@@ -51,7 +51,7 @@ This event is triggered when a new conversation is started, regardless of the ch
 This event is triggered when a conversation is closed, a conversation can be marked as resolved or not resolved, and can be closed by a human or an AI.
 
 <Accordion title="Sample Payload">
-```json
+```typescript
 {
     event: "conversation.closed";
     organization_id: string;
@@ -89,7 +89,7 @@ This event is triggered when a conversation is closed, a conversation can be mar
 This event is triggered when a conversation is handed off to a human agent. Note that a handoff event can happen for multiple reasons; for example, a human agent might decide to take over the conversation, or the AI might decide to hand off the conversation to a human agent.
 
 <Accordion title="Sample Payload">
-```json
+```typescript
 {
     event: "conversation.handoff_to_human";
     organization_id: string;
@@ -126,7 +126,8 @@ This event is triggered when a conversation is handed off to a human agent. Note
 When a third-party software agent responds to a previously handed-off conversation, Open will notify you. In some configurations, Open might also initiate the handoff to a third-party agent, such as Zendesk or Intercom. Even while the third-party agent handles the conversation, Open continues to monitor and send events to your webhooks.
 
 <Accordion title="Sample Payload">
-```json
+
+```typescript
 {
   event: 'conversation.third_party_agent_response';
   organization_id: string;

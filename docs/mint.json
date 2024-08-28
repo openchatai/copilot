@@ -43,10 +43,7 @@
       "group": "Getting started",
       "icon": "book",
       "iconType": "light",
-      "pages": [
-        "introduction",
-        "dashboard/pricing"
-      ]
+      "pages": ["introduction", "dashboard/pricing"]
     },
     {
       "group": "Web Support",
@@ -71,7 +68,9 @@
         "taking-actions",
         "authorization",
         "resources/human-handoff",
-        "resources/autopilot-topics"
+        "resources/autopilot-topics",
+        "api-reference/endpoint/delete-all-actions",
+        "api-reference/endpoint/import-actions-from-swagger"
       ]
     },
     {
@@ -79,32 +78,6 @@
       "pages": [
         "dashboard/zendesk_integration",
         "dashboard/shopify_integration"
-      ]
-    },
-    {
-      "group": "Managing Organizations",
-      "icon": "code",
-      "pages": [
-        "api-notes",
-        "api-reference/endpoint/get",
-        "api-reference/endpoint/delete"
-      ]
-    },
-    {
-      "group": "Actions",
-      "icon": "bolt",
-      "pages": [
-        "taking-actions",
-        "api-reference/endpoint/delete-all-actions",
-        "api-reference/endpoint/import-actions-from-swagger"
-      ]
-    },
-    {
-      "group": "History",
-      "icon": "history",
-      "pages": [
-        "api-reference/endpoint/conversation-history",
-        "api-reference/endpoint/conversation-messages"
       ]
     },
     {
@@ -129,62 +102,19 @@
       ]
     },
     {
-      "group": "Sending Emails",
+      "group": "Email",
       "icon": "envelope",
-      "pages": [
-        "api-reference/email/email_api",
-        "api-reference/email/unsubscribe_api",
-        "api-reference/email/unsubscribe_directly_api",
-        "api-reference/email/unsubscribe_url_api"
-      ]
-    },
-    {
-      "group": "Chat API",
-      "icon": "chat",
-      "pages": [
-        "api-reference/endpoint/chat-init"
-      ]
-    },
-    {
-      "group": "Votes & RLHF",
-      "icon": "vote",
-      "pages": [
-        "votes/rlhf",
-        "api-reference/endpoint/votes-add"
-      ]
-    },
-    {
-      "group": "Reports",
-      "icon": "chart-bar",
-      "pages": [
-        "api-reference/endpoint/report/total-chats",
-        "api-reference/endpoint/report/chat-engagement",
-        "api-reference/endpoint/report/missed-chat",
-        "api-reference/endpoint/report/chat-satisfaction",
-        "api-reference/endpoint/report/chat-availability",
-        "api-reference/endpoint/report/chat-duration",
-        "api-reference/endpoint/report/agent-performance",
-        "api-reference/endpoint/report/agent-response-time",
-        "api-reference/endpoint/report/staffing-prediction",
-        "api-reference/endpoint/report/agent-activity",
-        "api-reference/endpoint/report/insights-alerts"
-      ]
+      "pages": ["api-reference/email/email_api"]
     },
     {
       "group": "Resources",
-      "pages": [
-        "resources/ci-cd-actions"
-      ]
+      "pages": ["resources/ci-cd-actions"]
     },
-
     {
       "group": "Webhooks",
-      "pages": [
-        "api-reference/webhooks/types"
-      ]
+      "pages": ["api-reference/webhooks/types"]
     }
   ],
-
 
   "footerSocials": {
     "github": "https://github.com/openchatai"
@@ -192,9 +122,10 @@
   "api": {
     "playground": {}
   },
+  "openapi": "https://api-v2.opencopilot.so/api-json",
   "tabs": [
     {
-      "name": "API References",
+      "name": "API Reference",
       "url": "api-reference"
     }
   ]
