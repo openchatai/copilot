@@ -1,7 +1,7 @@
 ---
-title: "Event Types"
-description: "List of the supported webhook types"
-icon: "globe"
+title: 'Event Types'
+description: 'List of the supported webhook types'
+icon: 'globe'
 ---
 
 `conversation.started`
@@ -149,7 +149,7 @@ When a third-party software agent responds to a previously handed-off conversati
 This event is triggered when an incoming call is initiated, providing details about the call’s origin, state, and participants.
 
 <Accordion title="Sample Payload">
-```json
+```typescript
 {
     event: "phone.incoming_call_started";
     organization_id: string;
@@ -174,7 +174,7 @@ This event is triggered when an incoming call is initiated, providing details ab
 This event is triggered when an outgoing call is initiated, providing details about the call’s origin, state, and participants.
 
 <Accordion title="Sample Payload">
-```json
+```typescript
 {
     event: "phone.outgoing_call_started";
     organization_id: string;
@@ -192,16 +192,15 @@ This event is triggered when an outgoing call is initiated, providing details ab
 ```
 </Accordion>
 
-------
-
 ---
+
 
 `phone.incoming_call_ended`
 
 This event is triggered when an incoming call ends, providing details about the call’s origin, state, and participants.
 
 <Accordion title="Sample Payload">
-```json
+```typescript
 {
     event: "phone.incoming_call_ended";
     organization_id: string;
@@ -226,7 +225,7 @@ This event is triggered when an incoming call ends, providing details about the 
 This event is triggered when an outgoing call ends, providing details about the call’s origin, state, and participants.
 
 <Accordion title="Sample Payload">
-```json
+```typescript
 {
     event: "phone.outgoing_call_ended";
     organization_id: string;
