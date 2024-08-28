@@ -142,4 +142,104 @@ When a third-party software agent responds to a previously handed-off conversati
 }
 ```
 </Accordion>
+-----
 
+`phone.incoming_call_started`
+
+This event is triggered when an incoming call is initiated, providing details about the call’s origin, state, and participants.
+
+<Accordion title="Sample Payload">
+```json
+{
+    event: "phone.incoming_call_started";
+    organization_id: string;
+    data: {
+    type: 'AI' | 'human_agent';
+    id: string;
+    direction: 'Incoming';
+    call_state: string; 
+    call_timestamp: Date;
+    duration: number | null; 
+    caller: { name: string | null; number: string }; 
+    called: { name: string | null; number: string };
+  };
+}
+```
+</Accordion>
+
+---
+
+`phone.outgoing_call_started`
+
+This event is triggered when an outgoing call is initiated, providing details about the call’s origin, state, and participants.
+
+<Accordion title="Sample Payload">
+```json
+{
+    event: "phone.outgoing_call_started";
+    organization_id: string;
+    data: {
+    type: 'human_agent';
+    id: string;
+    direction: 'Outgoing';
+    call_state: string; 
+    call_timestamp: Date;
+    duration: number | null; 
+    caller: { name: string | null; number: string }; 
+    called: { name: string | null; number: string };
+  };
+}
+```
+</Accordion>
+
+------
+
+---
+
+`phone.incoming_call_ended`
+
+This event is triggered when an incoming call ends, providing details about the call’s origin, state, and participants.
+
+<Accordion title="Sample Payload">
+```json
+{
+    event: "phone.incoming_call_ended";
+    organization_id: string;
+    data: {
+    type: 'AI' | 'human_agent';
+    id: string;
+    direction: 'Incoming';
+    call_state: string; 
+    call_timestamp: Date;
+    duration: number | null; 
+    caller: { name: string | null; number: string }; 
+    called: { name: string | null; number: string };
+  };
+}
+```
+</Accordion>
+
+---
+
+`phone.outgoing_call_ended`
+
+This event is triggered when an outgoing call ends, providing details about the call’s origin, state, and participants.
+
+<Accordion title="Sample Payload">
+```json
+{
+    event: "phone.outgoing_call_ended";
+    organization_id: string;
+    data: {
+    type: 'human_agent';
+    id: string;
+    direction: 'Outgoing';
+    call_state: string; 
+    call_timestamp: Date;
+    duration: number | null; 
+    caller: { name: string | null; number: string }; 
+    called: { name: string | null; number: string };
+  };
+}
+```
+</Accordion>
