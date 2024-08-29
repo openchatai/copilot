@@ -59,7 +59,11 @@
     {
       "group": "Phone Support",
       "icon": "phone",
-      "pages": ["phone/phone-support", "phone/ai-phone-agent", "phone/human-phone-agent"]
+      "pages": [
+        "phone/phone-support",
+        "phone/ai-phone-agent",
+        "phone/human-phone-agent"
+      ]
     },
     {
       "group": "Actions",
@@ -97,8 +101,8 @@
       "pages": [
         "api-reference/phone/buy",
         "api-reference/phone/get-all-phones",
-        "api-reference/phone/delete",
-        "api-reference/phone/update"
+        "api-reference/phone/update",
+        "api-reference/phone/delete"
       ]
     },
     {
