@@ -92,11 +92,20 @@ Create your first AI phone agent in the dashboard and start automating your cust
   <Step title="Navigate to the AI phone calling product">
     It is available in the top navigation bar (The App Switcher).
   </Step>
-  <Step title="Buy a phone number">
-    To use AI phone calling, you need to buy a phone number. You can buy a phone number from the dashboard, or you can use the API to buy a phone number. By default, phone numbers will be bought from the US number pool. Email us at [mo@open.cx](mailto:mo@open.cx) if you want to buy a phone number from a different country.
+  <Step title="Create AI phone agent">
+    This will also create a phone number for you. You can buy a phone number from the dashboard, or you can use the API to buy a phone number. By default, phone numbers will be bought from the US number pool. Email us at [mo@open.cx](mailto:mo@open.cx) if you want to buy a phone number from a different country.
   </Step>
   <Step title="Configure your phone agent">
-    Click on the phone number you just bought and configure your phone agent (such as name, initial message, etc.).
+    In this step, you will configure your phone agent (such as name, initial message, etc.). One notable option here is the handoff number. This number will be used to hand off the call to a human agent when needed. Read more about handoffs [here](/resources/human-handoff).
+    <img src="/images/phone-step-1.png" style={{ borderRadius: '8px' }} />
+  </Step>
+  <Step title="Configure AI agent voice and emotional recognition">
+    In this step, you will configure the voice and emotional recognition of your AI agent. You can also configure the language of your AI agent.
+    <img src="/images/phone-step-2.png" style={{ borderRadius: '8px' }} />
+  </Step>
+  <Step title="Configure AI agent character">
+    This is the most important step. You will basically describe in plain English how your AI agent should behave.
+    <img src="/images/phone-step-3.png" style={{ borderRadius: '8px' }} />
   </Step>
 </Steps>
 
@@ -106,8 +115,25 @@ Some key concepts and terminology you need to know when using AI phone calling:
 
 <AccordionGroup>
   <Accordion title="What is the base prompt?">
-    The base prompt is the initial message that will be sent to the AI agent when it is first created. It is used to set the tone and provide a welcome message for the agent.
-  </Accordion>
+  In the context of an AI phone agent, a system prompt would be a set of guidelines or instructions that define how the AI should interact with users over the phone. It would establish the tone, behavior, and priorities the AI should maintain throughout the call. Here’s an example of what a system prompt might look like for an AI phone agent:
+
+**System Prompt for AI Phone Agent:**
+
+- **Role and Objective:** You are an AI phone agent designed to handle customer support inquiries efficiently and empathetically. Your primary goal is to resolve issues while ensuring the customer feels heard and supported.
+  
+- **Tone and Communication Style:** Speak clearly, confidently, and with a friendly, professional tone. Always maintain a calm and patient demeanor, even if the customer is upset. Use simple, easy-to-understand language.
+
+- **Behavior and Interaction:**
+  - **Active Listening:** Always acknowledge the customer’s concerns and repeat or paraphrase key points to show understanding.
+  - **Problem-Solving:** Offer clear, step-by-step guidance to resolve the issue. If unable to resolve the problem immediately, provide a timeline for when a solution will be available.
+  - **Empathy:** Express empathy where appropriate, such as saying, “I understand how frustrating this must be for you.”
+  - **Escalation:** If the issue cannot be resolved by the AI, smoothly transition the call to a human agent, providing them with a summary of the situation.
+
+- **Privacy and Security:** Ensure that all customer data is handled securely. Never share personal information unless the customer has been properly authenticated.
+
+- **Language and Localization:** Adapt to the language preferences of the caller. If the caller speaks a different language, offer assistance in that language if possible or suggest a transfer to a specialized agent.
+
+</Accordion>
   <Accordion title="What is the initial message?">
     This is the message that the AI will first say to the customer, something like "Hello, how can I help you today?"
   </Accordion>
