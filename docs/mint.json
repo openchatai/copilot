@@ -50,7 +50,7 @@
       "pages": ["introduction", "dashboard/pricing"]
     },
     {
-      "group": "Web Support",
+      "group": "AI Web Support",
       "icon": "sun",
       "pages": [
         "widget/embed",
@@ -61,16 +61,16 @@
       ]
     },
     {
-      "group": "Phone Support",
+      "group": "AI Phone Support",
       "icon": "phone",
       "pages": [
-        "phone/phone-support",
-        "phone/ai-phone-agent",
+        "phone/phone-calling",
+        "resources/human-handoff",
         "phone/human-phone-agent"
       ]
     },
     {
-      "group": "Actions",
+      "group": "AI Actions",
       "icon": "bolt",
       "pages": [
         "taking-actions",
@@ -89,6 +89,12 @@
       ]
     },
     {
+      "group": "Knowledge Integrations",
+      "pages": [
+        "kbase"
+      ]
+    },
+    {
       "group": "Contacts",
       "icon": "users",
       "pages": [
@@ -100,7 +106,7 @@
       ]
     },
     {
-      "group": "Phone",
+      "group": "AI Phone Agents",
       "icon": "phone",
       "pages": [
         "api-reference/phone/buy",
@@ -110,7 +116,7 @@
       ]
     },
     {
-      "group": "Email",
+      "group": "AI Email",
       "icon": "envelope",
       "pages": ["api-reference/email/email_api"]
     },
