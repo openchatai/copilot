@@ -100,8 +100,8 @@
       "icon": "phone",
       "pages": [
         "api-reference/phone/buy",
-        "api-reference/phone/get-all-phones",
         "api-reference/phone/update",
+        "api-reference/phone/get-all-phones",
         "api-reference/phone/delete"
       ]
     },
