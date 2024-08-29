@@ -8,46 +8,61 @@ icon: "book"
 
 ## Getting Started
 
+Get started with Open eco system, we provide very simple 
+
 <CardGroup cols={2}>
     <Card
         title="Inbox"
         icon="inbox"
         href="inbox/intro"
+        color="#f7b245" 
+        iconType="solid"
     >
        A single place to manage support requests from web, phone, and email.
     </Card>
     <Card
-        title="Web Support"
+        title="AI Web Support"
         icon="sun"
         href="/widget/embed"
+        color="#f7b245"
+        iconType="solid"
     >
         Use our web support to create a chatbot for your website.
     </Card>
     <Card
-        title="Phone Support"
+        title="AI Phone Support"
         icon="phone"
         href="phone/new"
+        color="#f7b245"
+        iconType="solid"
     >
-        Use our phone support AI agent to handle customer support on the phone.
+        Use our phone support AI agent to handle customer support on the phone (inbound & outbound).
     </Card>
     <Card
-        title="Email Support"
+        title="AI Email Support"
         icon="envelope"
         href="email/new"
+        color="#f7b245"
+        iconType="solid"
     >
-        Use our email support AI agent to handle customer support via email.
+        Use our email support AI agent to handle customer support via email (inbound & outbound).
     </Card>
     <Card
-        title="Taking Action with Open"
+        title="AI Actions"
         icon="bolt"
         href="taking-actions"
+        color="#f7b245"
+        iconType="solid"
     >
-       Learn how Open can perform actions and automate your support.
+       Learn you can make the AI do actions and automate your support.
     </Card>
     <Card
         title="Knowledge Base"
         icon="book"
         href="/kbase"
+        color="#f7b245"
+        iconType="solid"
+
     >
         Feed the AI with your knowledge base, such as FAQs, documentation, web pages, and more.
     </Card>
@@ -55,6 +70,8 @@ icon: "book"
         title="Human Handoff"
         icon="stars"
         href="resources/human-handoff"
+        color="#f7b245"
+        iconType="solid"
     >
         Learn how to use Open to hand off to a human agent when the AI is not able to handle the request.
     </Card>
@@ -62,7 +79,230 @@ icon: "book"
         title="Sending Emails"
         icon="at"
         href="resources/human-handoff"
+        color="#f7b245"
+        iconType="solid"
     >
         Send emails to your contacts, possibly after a specified time delay.
+    </Card>
+</CardGroup>
+
+
+-------
+
+
+## AI phone calls
+
+Open provide a simple interface to manage AI phone agents on scale. You can create and manage multiple agents, define sequences, and assign them to contacts. You can also define actions to be performed by the agents.
+
+<CardGroup cols={2}>
+    <Card
+        title="Introduction"
+        icon="phone"
+        href="inbox/intro"
+        color="#ff6eeb" 
+        iconType="solid"
+    >
+       What is AI phone calls?
+    </Card>
+
+    <Card
+        title="How to create an agent"
+        icon="inbox"
+        href="inbox/intro"
+        color="#ff6eeb"
+        iconType="solid"
+    >
+       Learn how to create an AI phone agent.
+    </Card>
+
+    <Card
+        title="Adding actions"
+        icon="user"
+        href="/widget/embed"
+        color="#ff6eeb"
+        iconType="solid"
+    >
+       Learn how to add actions to your AI agent to perfomred during calls.
+    </Card>
+
+    <Card
+        title="Outbound calls"
+        icon="bolt"
+        href="phone/new"
+        color="#ff6eeb"
+        iconType="solid"
+    >
+        How to make outbound calls to your customers and some consdierations.
+    </Card>
+    <Card
+        title="Inbound calls"
+        icon="message"
+        href="email/new"
+        color="#ff6eeb"
+        iconType="solid"
+    >
+        How to take inbound calls to be answered by your AI agent.
+    </Card>
+    <Card
+        title="Webhooks"
+        icon="sequence"
+        href="taking-actions"
+        color="#ff6eeb"
+        iconType="solid"
+    >
+        Listen to events from your AI agents and perform actions based on them.
+    </Card>
+</CardGroup>
+
+-------
+
+## Integrations
+
+### Support platforms
+Do you still have humans? in this case, Open can be used to route all issues that the AI is not able to handle to your existing support platform (still, we offer very good incentives to use Open instead of your existing support platform).
+
+<CardGroup cols={2}>
+    <Card
+        title="Zendesk"
+        icon="phone"
+        href="inbox/intro"
+        color="#00a0f0"
+        iconType="solid"
+    >
+       When enabled, all issues that the AI is not able to handle are routed to Zendesk.
+    </Card>
+
+</CardGroup>
+
+
+### Knoweldege base platforms
+You can use these integrations to teach and train your AI agents on your knowledge base. This can be used to improve the quality of your support.
+
+<CardGroup cols={2}>
+    <Card
+        title="Zendesk"
+        icon="phone"
+        href="inbox/intro"
+        color="#00a0f0"
+        iconType="solid"
+    >
+       When enabled, all issues that the AI is not able to handle are routed to Zendesk.
+    </Card>
+
+</CardGroup>
+
+-------
+
+## Developers APIs
+
+Open provides top of the line APIs for developers to build on top of our platform.
+
+<CardGroup cols={2}>
+    <Card
+        title="AI phone calls"
+        icon="phone"
+        href="inbox/intro"
+        iconType="solid"
+    >
+       Programmatically make calls to your customers using our human-like AI phone support.
+    </Card>
+
+    <Card
+        title="Inbox"
+        icon="inbox"
+        href="inbox/intro"
+        iconType="solid"
+    >
+       List and manage support requests and conversations from web, phone, and email channels in a single place.
+    </Card>
+
+    <Card
+        title="Contacts & AI encrichment"
+        icon="user"
+        href="/widget/embed"
+        iconType="solid"
+    >
+        Manage your contacts and enrich them with our +200 million users database
+    </Card>
+
+    <Card
+        title="AI Actions"
+        icon="bolt"
+        href="phone/new"
+        iconType="solid"
+    >
+        Define actions to be available for your AI agents to perform (channel agnostic)
+    </Card>
+    <Card
+        title="AI Chat"
+        icon="message"
+        href="email/new" 
+        iconType="solid"
+    >
+        Build state of the art AI chat experince that is faster than anything on the market w/actions, knowledge base, and more.
+    </Card>
+    <Card
+        title="AI Sequences"
+        icon="sequence"
+        href="taking-actions"
+        iconType="solid"
+    >
+       Build and manage your outbound AI sequences (phone, email, etc) with a single API.
+    </Card>
+    <Card
+        title="Knowledge Base"
+        icon="book"
+        href="/kbase"
+        iconType="solid"
+    >
+        Manage your knowledge base, such as FAQs, documentation, web pages, and more.
+    </Card>
+</CardGroup>
+
+------
+
+## SDKs
+
+Open provides SDKs for many languages to build on top of our platform.
+
+<CardGroup cols={2}>
+    <Card
+        title="Python"
+        icon="phone"
+        href="inbox/intro"
+        color="#CC42F9"
+        iconType="solid"
+    >
+       Programmatically make calls to your customers using our human-like AI phone support.
+    </Card>
+
+    <Card
+        title="TypeScript"
+        icon="inbox"
+        href="inbox/intro"
+        color="#CC42F9"
+        iconType="solid"
+    >
+       List and manage support requests and conversations from web, phone, and email channels in a single place.
+    </Card>
+
+    <Card
+        title="Java"
+        icon="user"
+        href="/widget/embed"
+        color="#CC42F9"
+        iconType="solid"
+    >
+        Manage your contacts and enrich them with our +200 million users database
+    </Card>
+
+    <Card
+        title="Go"
+        icon="bolt"
+        href="phone/new"
+        color="#CC42F9"
+        iconType="solid"
+    >
+        Define actions to be available for your AI agents to perform (channel agnostic)
     </Card>
 </CardGroup>
