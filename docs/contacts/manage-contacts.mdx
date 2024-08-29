@@ -1,0 +1,83 @@
+---
+title: "Manage Contacts"
+description: "Learn how to manage your contacts and enrich them with our +200 million users database"
+icon: "user"
+---
+
+<img src="/images/contacts.png" style={{ borderRadius: '8px' }} />
+
+## Terminology
+
+<CardGroup cols={2}>
+    <Card title="What is a contact?" icon="user" color="#f7b245" iconType="solid" href="#what-is-a-contact"></Card>
+</CardGroup>
+
+## Create a contact
+
+<CardGroup cols={3}>
+    <Card title="Using the API" icon="code" color="#f7b245" iconType="solid" href="#1-using-the-api"></Card>
+    <Card title="Using the widget" icon="code" color="#f7b245" iconType="solid" href="/widget/embed#identifying-chat-users-contacts"></Card>
+    <Card title="From emails" icon="inbox" color="#f7b245" iconType="solid" href="#3-from-emails"></Card>
+    <Card title="From phone calls" icon="phone" color="#f7b245" iconType="solid" href="#4-from-phone-calls"></Card>
+</CardGroup>
+
+## Advanced Topics
+
+<CardGroup cols={3}>
+    <Card title="Attach custom data to a contact" icon="code" color="#f7b245" iconType="solid" href="#adding-custom-data-to-a-contact"></Card>
+</CardGroup>
+
+----
+
+### What is a contact?
+
+A contact is a user that can interact with the chatbot, phone AI, or email AI. A single contact might have multiple conversations across different channels.
+
+----
+
+### How do I create a contact?
+
+You can create a contact in your organization in two ways:
+
+#### 1. Using the API
+
+We have a simple public API that allows you to manage contacts in your organization. You can use the API to [create a contact](/api-reference/contacts/create).
+
+#### 2. Using the widget
+
+Whenever you embed the copilot widget in your application, you can use the widget options to create a contact. Read more about this option in the [widget documentation](/widget/embed#identifying-chat-users-contacts).
+
+#### 3. From emails
+
+When you send emails using our APIs, OpenCopilot will automatically create a contact for you (if it doesn't exist yet) and assign it to the conversation.
+
+#### 4. From phone calls
+
+When you receive (or initiate) a phone call using our APIs, OpenCopilot will automatically create a contact for you (if it doesn't exist yet) and assign it to the conversation.
+
+----
+
+### Adding custom data to a contact
+
+We support attaching a phone number, email, or name to a contact. However, you can also add any custom data you want to associate with the contact. This data will be returned in the response and can be used for any purpose you want. Just make sure it's a valid JSON string object. The custom data is a simple JSON object. You can add any key-value pairs you want to it, for example:
+
+```jsx
+const widgetOptions = {
+  initialMessage: "Hello! How can I help you?",
+  token: "your_copilot_token_goes_here",
+  user: {
+    name: "your_user_name",
+    email: "your_user_email",
+    avatar: "your_user_avatar_url",
+    phone: "your_user_phone",
+    customData: {
+      // any custom data you want to send to the copilot backend 
+      "key1": "value1",
+      "balance": 100,
+      "age": 25,
+    }
+  },
+```
+You can use the API or the widget to add custom data to a contact.
+
+
