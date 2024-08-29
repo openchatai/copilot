@@ -1,0 +1,40 @@
+---
+title: "AI Outbound Phone Calls"
+description: "Learn how to make outbound calls to your customers and some considerations."
+icon: "bolt"
+---
+
+## Outbound calls
+
+<Warning>This feature is available only via the API</Warning>
+
+Open provides a simple interface to make outbound calls to your customers. You can make calls to any phone number, and you can also specify a delay before the call is made.
+
+### How to make an outbound call
+
+
+To make an outbound call, you need to provide the following information:
+
+- **To**: The phone number to call.
+- **Delay**: The delay before the call is made (in seconds).
+- **Phone agent ID**: The ID of the phone agent to use for the call.
+
+You can make an outbound call using the API. Here's an example request:
+
+```bash
+curl --location --request POST 'https://api.open.cx/phone/outbound' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "to": "+15555555555",
+    "delay": 60,
+    "phone_agent_id": "your_phone_agent_id"
+}
+```
+
+### Some considerations:
+
+- Outbound AI calling is regulated in many countries. For example, in the US, you are required by law to have consent from the customer before making an outbound call. Make sure to comply with local regulations.
+- Outbound calls are highly monitored from our side, so please do not abuse the feature, or you may get permanently banned from the platform.
+- The delay parameter is optional, and if not provided, the call will be made immediately.
+
+

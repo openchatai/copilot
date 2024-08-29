@@ -1,6 +1,6 @@
 ---
 title: "Taking Actions"
-description: "Open can take actions to solve the customer's problems. It can call your backend to update records, create new records, and much more."
+description: "Our AI can take actions to solve the customer's problems. It can call your backend to update records, create new records, and much more."
 icon: "bolt"
 ---
 
@@ -34,18 +34,76 @@ Using Swagger is easier when you have a lot of APIs or actions, but it's also mo
 You can also use CI/CD to automatically upload your Swagger file to Open and validate it. [Learn more](/resources/ci-cd-actions)
 </Info>
 
+
+## Supported channels
+
+Once you have your actions defined, you can use them in the following channels:
+
+<CardGroup cols={2}>
+    <Card
+        title="Web"
+        icon="message"
+        color="#f7b245"
+        iconType="solid"
+    >
+       The standard chat widget
+    </Card>
+
+    <Card
+        title="Phone"
+        icon="phone"
+        color="#f7b245"
+        iconType="solid"
+    >
+       The AI can use these actions during the call
+    </Card>
+
+    <Card
+        title="Email"
+        icon="envelope"
+        color="#f7b245"
+        iconType="solid"
+    >
+       The AI can use these actions in the email
+    </Card>
+</CardGroup>
+
+## Available APIs
+
+Open provides top-of-the-line APIs for developers to build on top of our platform, including actions APIs.
+
+<CardGroup cols={2}>
+    <Card
+        title="Delete all actions"
+        icon="trash"
+        href="api-reference/endpoint/delete-all-actions"
+        color="#f7b245"
+        iconType="solid"
+    >
+    </Card>
+
+    <Card
+        title="Import actions from Swagger"
+        icon="upload"
+        href="api-reference/endpoint/import-actions-from-swagger"
+        color="#f7b245"
+        iconType="solid"
+    >
+    </Card>
+</CardGroup>
+
 ## Frequently Asked Questions
 
 <AccordionGroup>
   <Accordion title="How can I authorize my backend API calls?">
     <p>
-    If your API requires authorization, you can pass your tokens using the `Authorization` header. You can also use the API to programmatically pass your tokens. [Learn more](/authorization)
+      If your API requires authorization, you can pass your tokens using the `Authorization` header. You can also use the API to programmatically pass your tokens. [Learn more](/authorization)
     </p>
   </Accordion>
 
   <Accordion title="What if my API has parameters?">
     <p>
-      If the parameter/path/query is not fixed, Open will use AI to understand the user request and generate the parameters/path/query value.
+      If the parameter/path/query is not fixed, Open will use AI to understand the user's request and generate the parameters/path/query value.
     </p>
   </Accordion>
 
@@ -57,7 +115,7 @@ You can also use CI/CD to automatically upload your Swagger file to Open and val
 
   <Accordion title="What is a system action?">
     <p>
-      A system action is an action that is built-in to Open. It is a pre-defined action that Open will perform when a user asks a question. For example, `handoff` is a system action that Open will perform when a user is handed off to a human agent.
+      A system action is an action that is built into Open. It is a predefined action that Open will perform when a user asks a question. For example, `handoff` is a system action that Open will perform when a user is handed off to a human agent.
     </p>
   </Accordion>
 </AccordionGroup>

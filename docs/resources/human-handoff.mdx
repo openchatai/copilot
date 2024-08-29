@@ -1,25 +1,106 @@
 ---
 title: "Human Handoff"
-description: "Learn how the AI can handoff the conversation to a human agent when needed."
+description: "Learn how the AI can hand off the conversation to a human agent when needed."
 icon: "hand-holding-heart"
 ---
 
-<Info>
-Currently, human handoff is in beta and only available for a few customers. If you are interested in using this feature, please contact us at mo@opencopilot.so, and we will be happy to help you.
-</Info>
+## Terminology
 
-## What is This?
+<CardGroup cols={2}>
+    <Card
+        title="What is handoff?"
+        icon="hand-holding-heart"
+        color="#f7b245"
+        iconType="solid"
+        href="#what-is-this"
+    >
+    </Card>
+
+    <Card
+        title="How does it work?"
+        icon="gear"
+        color="#f7b245"
+        iconType="solid"
+        href="#how-does-it-work"
+    >
+    </Card>
+
+    <Card
+        title="How does it show up in the Inbox?"
+        icon="inbox"
+        color="#f7b245"
+        iconType="solid"
+        href="#how-it-will-show-up-in-the-inbox"
+    >
+    </Card>
+</CardGroup>
+
+## Handoff per Channel
+
+<CardGroup cols={2}>
+    <Card
+        title="Web Chat"
+        icon="comments"
+        color="#f7b245"
+        iconType="solid"
+        href="#handoff-on-the-web-ui"
+        
+    >
+    </Card>
+
+    <Card
+        title="Phone Calls"
+        icon="phone"
+        color="#f7b245"
+        iconType="solid"
+        href="#handoff-on-the-phone"
+    >
+    </Card>
+
+    <Card
+        title="Emails"
+        icon="envelope"
+        color="#f7b245"
+        iconType="solid"
+        href="#handoff-on-the-email"
+    >
+    </Card>
+</CardGroup>
+
+## Advanced Topics
+
+<CardGroup cols={2}>
+    <Card
+        title="`Handoff` Event"
+        icon="code"
+        color="#f7b245"
+        iconType="solid"
+        href="#how-to-detect-handoff-event"
+    >
+    </Card>
+
+    <Card
+        title="Override the Default Handoff UI"
+        icon="code"
+        color="#f7b245"
+        iconType="solid"
+        href="#i-want-to-override-the-default-handoff-ui"
+    >
+    </Card>
+</CardGroup>
+
+### What is This?
 
 One of the most important features of the Copilot is the ability to handoff the conversation to a human agent. This is useful when the Copilot is unable to understand the user's request or when the user requests to speak to a human agent. We realized that most of the time, angry customers are looking for a human agent to talk to and solve their problems.
 
-## How Does It Work?
+### How Does It Work?
 
 Once this system action is installed on your Copilot, a `handoff` event could happen in two ways:
 
 - When the user explicitly asks to talk to a human agent.
 - When the Copilot is unable to understand the user's request or feels that the user is angry and dissatisfied.
 
-## How It Will Show Up in the Inbox?
+### How It Will Show Up in the Inbox?
 
 Two ways:
 

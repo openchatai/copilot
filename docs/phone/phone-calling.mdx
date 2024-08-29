@@ -1,0 +1,193 @@
+---
+title: "Introduction to AI Phone Calling"
+description: "Open provides a complete and powerful AI phone calling solution that can be used to automate your customer support and customer communications."
+icon: "phone"
+---
+
+## Features
+
+<CardGroup cols={2}>
+    <Card
+        title="Feels like a human"
+        icon="user"
+        color="#e76e50"
+        iconType="solid"
+    >
+        AI phone calls are human-like and can answer questions in a conversational manner.
+    </Card>
+    <Card
+        title="Low latency"
+        icon="bolt"
+        color="#e76e50"
+        iconType="solid"
+    >
+        AI phone calls have low latency and support real-time conversations.
+    </Card>
+    <Card
+        title="Goal-oriented"
+        icon="bullseye"
+        color="#e76e50"
+        iconType="solid"
+    >
+        Phone agents can be programmed to achieve specific goals or perform specific actions.
+    </Card>
+    <Card
+        title="Connected to your data"
+        icon="database"
+        color="#e76e50"
+        iconType="solid"
+    >
+        Phone agents can be connected to your data and can access your customers' data during the call.
+    </Card>
+    <Card
+        title="Trainable and coachable"
+        icon="pencil"
+        color="#e76e50"
+        iconType="solid"
+    >
+        Phone agents can be trained and updated with new data and actions, just like a human agent.
+    </Card>
+    <Card
+        title="Can take actions"
+        icon="bolt"
+        color="#e76e50"
+        iconType="solid"
+    >
+        Phone agents can take actions, such as sending messages, making calls, or updating data.
+    </Card>
+    <Card 
+        title="Centralized in the inbox"
+        icon="inbox"
+        color="#e76e50"
+        iconType="solid"
+    >
+        All calls are automatically summarized, transcribed, and sent to your inbox.
+    </Card>
+    <Card 
+        title="Inbound and outbound calls"
+        icon="phone"
+        color="#e76e50"
+        iconType="solid"
+    >
+        Inbound and outbound calls are supported.
+    </Card>
+    <Card
+        title="Multiple languages"
+        icon="globe"
+        color="#e76e50"
+        iconType="solid"
+    >
+        Phone agents can be programmed to speak multiple languages.
+    </Card>
+</CardGroup>
+
+## Quick Start
+
+Create your first AI phone agent in the dashboard and start automating your customer support.
+
+<Steps>
+  <Step title="Login to Open">
+    You can log in to Open using your email and password.
+  </Step>
+  <Step title="Navigate to the AI phone calling product">
+    It is available in the top navigation bar (The App Switcher).
+  </Step>
+  <Step title="Create AI phone agent">
+    This will also create a phone number for you. You can buy a phone number from the dashboard, or you can use the API to buy a phone number. By default, phone numbers will be bought from the US number pool. Email us at [mo@open.cx](mailto:mo@open.cx) if you want to buy a phone number from a different country.
+  </Step>
+  <Step title="Configure your phone agent">
+    In this step, you will configure your phone agent (such as name, initial message, etc.). One notable option here is the handoff number. This number will be used to hand off the call to a human agent when needed. Read more about handoffs [here](/resources/human-handoff).
+    <img src="/images/phone-step-1.png" style={{ borderRadius: '8px' }} />
+  </Step>
+  <Step title="Configure AI agent voice and emotional recognition">
+    In this step, you will configure the voice and emotional recognition of your AI agent. You can also configure the language of your AI agent.
+    <img src="/images/phone-step-2.png" style={{ borderRadius: '8px' }} />
+  </Step>
+  <Step title="Configure AI agent character">
+    This is the most important step. You will basically describe in plain English how your AI agent should behave.
+    <img src="/images/phone-step-3.png" style={{ borderRadius: '8px' }} />
+  </Step>
+</Steps>
+
+## Concepts and Terminology
+
+Some key concepts and terminology you need to know when using AI phone calling:
+
+<AccordionGroup>
+  <Accordion title="What is the base prompt?">
+  In the context of an AI phone agent, a system prompt would be a set of guidelines or instructions that define how the AI should interact with users over the phone. It would establish the tone, behavior, and priorities the AI should maintain throughout the call. Here’s an example of what a system prompt might look like for an AI phone agent:
+
+**System Prompt for AI Phone Agent:**
+
+- **Role and Objective:** You are an AI phone agent designed to handle customer support inquiries efficiently and empathetically. Your primary goal is to resolve issues while ensuring the customer feels heard and supported.
+  
+- **Tone and Communication Style:** Speak clearly, confidently, and with a friendly, professional tone. Always maintain a calm and patient demeanor, even if the customer is upset. Use simple, easy-to-understand language.
+
+- **Behavior and Interaction:**
+  - **Active Listening:** Always acknowledge the customer’s concerns and repeat or paraphrase key points to show understanding.
+  - **Problem-Solving:** Offer clear, step-by-step guidance to resolve the issue. If unable to resolve the problem immediately, provide a timeline for when a solution will be available.
+  - **Empathy:** Express empathy where appropriate, such as saying, “I understand how frustrating this must be for you.”
+  - **Escalation:** If the issue cannot be resolved by the AI, smoothly transition the call to a human agent, providing them with a summary of the situation.
+
+- **Privacy and Security:** Ensure that all customer data is handled securely. Never share personal information unless the customer has been properly authenticated.
+
+- **Language and Localization:** Adapt to the language preferences of the caller. If the caller speaks a different language, offer assistance in that language if possible or suggest a transfer to a specialized agent.
+
+</Accordion>
+  <Accordion title="What is the initial message?">
+    This is the message that the AI will first say to the customer, something like "Hello, how can I help you today?"
+  </Accordion>
+  <Accordion title="What are the supported languages?">
+    We support English, Spanish, French, German, Italian, Portuguese, Dutch, Swedish, Danish, Norwegian, Finnish, Russian, Polish, Czech, Hungarian, Romanian, Turkish, and Chinese.
+  </Accordion>
+  <Accordion title="How much is the latency?">
+    The latency is the time it takes for the AI to respond to a customer's message. It depends on the voice and the language used. The latency can be as low as 500ms or as high as 3000ms.
+  </Accordion>
+</AccordionGroup>
+
+## Available APIs
+
+Open provides top-of-the-line APIs for developers to build on top of our platform, including phone call APIs.
+
+<CardGroup cols={2}>
+    <Card
+        title="Create a phone agent"
+        icon="phone"
+        href="phone/phone-calling"
+        iconType="solid"
+    >
+        Buy a US phone number from our platform and link it to an empty phone agent.
+    </Card>
+    <Card
+        title="Make an outbound call"
+        icon="phone"
+        href="phone/phone-calling"
+        iconType="solid"
+    >
+        Programmatically make calls to your customers using our human-like AI phone support.
+    </Card>
+    <Card 
+        title="Update a phone agent"
+        icon="pencil"
+        href="phone/phone-calling"
+        iconType="solid"
+    >
+        Update a phone agent's name, initial message, and more.
+    </Card>
+    <Card 
+        title="List phone agents"
+        icon="list"
+        href="phone/phone-calling"
+        iconType="solid"
+    >
+        List all phone agents in your account.
+    </Card>
+    <Card 
+        title="Delete a phone agent"
+        icon="trash"
+        href="phone/phone-calling"
+        iconType="solid"
+    >
+        Delete a phone agent.
+    </Card>
+</CardGroup>
