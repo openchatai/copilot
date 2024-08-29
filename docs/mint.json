@@ -1,6 +1,10 @@
 {
   "$schema": "https://mintlify.com/schema.json",
   "name": "OpenCopilot Docs",
+  "feedback": {
+    "thumbsRating": true,
+    "suggestEdit": true
+  } ,
   "logo": {
     "dark": "/logo/dark.png",
     "light": "/logo/light.png"
