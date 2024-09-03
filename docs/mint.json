@@ -4,7 +4,7 @@
   "feedback": {
     "thumbsRating": true,
     "suggestEdit": true
-  } ,
+  },
   "logo": {
     "dark": "/logo/dark.png",
     "light": "/logo/light.png"
@@ -90,9 +90,7 @@
     },
     {
       "group": "Knowledge Integrations",
-      "pages": [
-        "kbase"
-      ]
+      "pages": ["kbase"]
     },
     {
       "group": "Contacts",
@@ -113,6 +111,15 @@
         "api-reference/phone/update",
         "api-reference/phone/get-all-phones",
         "api-reference/phone/delete"
+      ]
+    },
+    {
+      "group": "Chat Sessions",
+      "pages": [
+        "api-reference/chat-sessions/create",
+        "api-reference/chat-sessions/get",
+        "api-reference/chat-sessions/list",
+        "api-reference/chat-sessions/update"
       ]
     },
     {
