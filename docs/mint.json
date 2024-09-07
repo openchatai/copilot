@@ -119,7 +119,9 @@
         "api-reference/chat-sessions/create",
         "api-reference/chat-sessions/get",
         "api-reference/chat-sessions/list",
-        "api-reference/chat-sessions/update"
+        "api-reference/chat-sessions/update",
+        "api-reference/chat-sessions/send",
+        "api-reference/chat-sessions/list_history"
       ]
     },
     {
@@ -143,7 +145,7 @@
   "api": {
     "playground": {}
   },
-  "openapi": "https://api-v2.opencopilot.so/api-json",
+  "openapi": "https://pbf26x74-8080.euw.devtunnels.ms/api-json",
   "tabs": [
     {
       "name": "API Reference",
