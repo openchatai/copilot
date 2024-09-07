@@ -145,7 +145,7 @@
   "api": {
     "playground": {}
   },
-  "openapi": "https://pbf26x74-8080.euw.devtunnels.ms/api-json",
+  "openapi": "https://api.open.cx/api-json",
   "tabs": [
     {
       "name": "API Reference",
