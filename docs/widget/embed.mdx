@@ -101,7 +101,9 @@ There are several ways you can integrate the chat widget into your application/w
 2. Use the Component inside your application
 
 ```jsx
-import { OpenWidget, Root } from "@openchatai/widget"; 
+import { Widget, WidgetRoot, WidgetPopover } from "@openchatai/widget"; 
+import "@openchatai/widget/dist/style.css";
+
 const options = {
   /** ## Basic and required options ## */
   token: "your_organization_token_goes_here", // (required) Settings -> Metadata -> Token
@@ -142,13 +144,14 @@ const options = {
   // onHandoff: ({ handoff }) => { // A function that will be called when the user is handed off to a human agent. read more about [handoff](/resources/human-handoff)
   //   console.log("handoff", handoff)
   // },
-
 }
+
 function Widget(){
   return (
-    <Root options={options}>
-      <InitOpenScript />
-    </Root>
+    <WidgetRoot options={options}>
+      <Widget /> // the inline chat widget
+      <WidgetPopover /> // optional, if you want to use the popover
+    </WidgetRoot>
   )
 }
 ```
