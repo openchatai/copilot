@@ -132,7 +132,10 @@
     },
     {
       "group": "Resources",
-      "pages": ["resources/ci-cd-actions"]
+      "pages": [
+        "resources/ci-cd-actions",
+        "guides/how-to-increase-ai-automation"
+      ]
     },
     {
       "group": "Webhooks",
