@@ -57,8 +57,8 @@ Any conversation not resolved by the AI agent will be automatically handed off t
 
 ## How Resolutions Are Marked as Resolved
 
-- Our AI agent will ask the customer if the conversation is resolved. If the customer says yes, the AI agent will mark the conversation as resolved. If the customer says no, the AI agent will mark the conversation as unresolved.
-- If the customer does not provide an answer, the AI will wait for 1 day before using another AI agent to judge if the conversation is resolved or not.
+- Our AI agent will ask the customer if the conversation is resolved. If the customer says yes, the AI agent will mark the conversation as resolved. If the customer says no, the AI agent will mark the conversation as handoff and will automatically hand off the conversation to a human agent.
+- If the customer does not provide an answer, the AI will wait for 1 day, if the no further help is requested, we will close the conversation and mark it as relsoved
 
 **Examples:**
 
@@ -71,25 +71,18 @@ Any conversation not resolved by the AI agent will be automatically handed off t
    - AI: "Is your issue resolved?"
    - Customer does not respond.
    - AI waits for 1 days.
-   - AI uses another AI agent to analyze the conversation and determine if the issue is resolved.
+   - If no further help is requested, we will close the conversation and mark it as relsoved
 
 3. **Example 3: Negative Response**
    - AI: "Is your issue resolved?"
    - Customer: "No, it isn't."
    - AI: Marks the conversation as unresolved and escalates to a human agent.
 
-4. **Example 4: Auto handoff after no immediate response**
-   - AI: "Is your issue resolved?"
-   - Customer does not respond.
-   - AI waits for 1 days.
-   - AI uses another AI agent to analyze the conversation and determine if the issue is resolved.
-   - AI: Marks the conversation as unresolved and escalates to a human agent automatically.
-
 -------
 
 ## What are in-progress tickets?
 
-When a user leaves a chat, phone, or email conversation without confirming whether the AI agent resolved the issue, the ticket is marked as Undecided (still in progress). We wait for 1 day before using another AI agent to assess whether the issue was resolved. If it was resolved, it will be billed. If not, the ticket is automatically handed off to a human agent, and we will not get paid for it.​
+When a user leaves a chat, phone, or email conversation without confirming whether the AI agent resolved the issue, the ticket is marked as Undecided (still in progress).  If the customer does not request further help, we will close the conversation and mark it as relsoved.
 
 
 ------
