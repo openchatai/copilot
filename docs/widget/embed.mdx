@@ -45,34 +45,11 @@ There are several ways you can integrate the chat widget into your application/w
             // any custom data you want to send to the Open backend, for example:
             "key1": "value1",
           }
-        },
+        }
 
-        /** ## Styling options (optional) ## */
-        //containerProps: {
-        //  // Any props that you want to pass to the container div, it's helpful if you want to style the widget
-        //  style: {
-        //    width: "100%",
-        //    backgroundColor: "red",
-        //  }
-        // },
-
-        // defaultOpen: true, // (optional) If true, the widget/chat will be opened by default (default: false) and the triggerSelector will not be added to the root element
-        // triggerSelector: "#my-trigger", // (optional) The selector of the element that will trigger the widget when clicked, if not set, a default trigger will be added to the root element (will show on bottom right of the screen)
-
-        /** ## Advanced options for developers (optional) ## */
-        // headers: { // An object of headers that will be sent with every request to your backend (can be used to authenticate your api requests)
-        //   "Authorization": "Bearer your_api_token",
-        // },
-        // components: { // List of components that will be used to render any UI component. read more about [responding with UI](#responding-with-ui)
-        //   "action-name-from-dashboard": MyCustomChatUI,
-        // },
-        // debug: true, // (optional) If true, the widget will log all the messages and events to the console and to the chat ui (default: false)
-        // onHandoff: ({ handoff }) => { // A function that will be called when the user is handed off to a human agent. read more about [handoff](/resources/human-handoff)
-        //   console.log("handoff", handoff)
-        // },
-
+        // This widget supports AMAZING features and options. See the options documentation for more details.
       }
-      window.addEventListener("DOMContentLoaded", ()=> InitOpenScript(options)); // window.onload
+      window.addEventListener("DOMContentLoaded", ()=> initOpenScript(options)); // window.onload
    </script>
    ```
 
@@ -121,29 +98,7 @@ const options = {
     }
   },
 
-  /** ## Styling options (optional) ## */
-  //containerProps: {
-  //  // Any props that you want to pass to the container div, it's helpful if you want to style the widget
-  //  style: {
-  //    width: "100%",
-  //    backgroundColor: "red",
-  //  }
-  // },
-
-  // defaultOpen: true, // (optional) If true, the widget/chat will be opened by default (default: false) and the triggerSelector will not be added to the root element
-  // triggerSelector: "#my-trigger", // (optional) The selector of the element that will trigger the widget when clicked, if not set, a default trigger will be added to the root element (will show on bottom right of the screen)
-
-  /** ## Advanced options for developers (optional) ## */
-  // headers: { // An object of headers that will be sent with every request to your backend (can be used to authenticate your api requests)
-  //   "Authorization": "Bearer your_api_token",
-  // },
-  // components: { // List of components that will be used to render any UI component. read more about [responding with UI](#responding-with-ui)
-  //   "action-name-from-dashboard": MyCustomChatUI,
-  // },
-  // debug: true, // (optional) If true, the widget will log all the messages and events to the console and to the chat ui (default: false)
-  // onHandoff: ({ handoff }) => { // A function that will be called when the user is handed off to a human agent. read more about [handoff](/resources/human-handoff)
-  //   console.log("handoff", handoff)
-  // },
+  // This widget supports AMAZING features and options. See the options documentation for more details.
 }
 
 function Widget(){
