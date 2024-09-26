@@ -86,7 +86,7 @@
       "pages": [
         "dashboard/zendesk_integration",
         "dashboard/shopify_integration",
-        "dashboard/zapier_integration"
+        "dashboard/zapier-integration"
       ]
     },
     {
