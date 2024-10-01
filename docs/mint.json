@@ -135,7 +135,8 @@
       "group": "Resources",
       "pages": [
         "resources/ci-cd-actions",
-        "guides/how-to-increase-ai-automation"
+        "guides/how-to-increase-ai-automation",
+        "resources/guaranteed-delivery"
       ]
     },
     {
