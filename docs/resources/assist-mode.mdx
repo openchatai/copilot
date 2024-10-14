@@ -1,0 +1,68 @@
+---
+title: "Assist Mode"
+icon: "heart"
+description: "See the AI response/plan before sending it to the contact."
+---
+
+
+
+<img src="/images/assist-mode.png" style={{ borderRadius: '8px' }} />
+
+The **Assist Mode** in Open.cx is designed to give users control over AI responses by allowing them to review and approve the responses/plans before they are sent or executed. This feature is particularly useful when you want to leverage the AI's capabilities but prefer to have human oversight to ensure accuracy, tone, or additional customizations. Assist Mode is currently only available for the **Email channel**.
+
+### Key Benefits
+- **Human Oversight**: Users can review AI-generated responses/plan before they are sent or execute.
+- **Control**: The user has the option to either execute the AI response or overwrite it.
+- **Efficiency**: Speeds up the response process by having AI draft responses that a human can then review.
+- **Flexibility**: Ideal for situations where fully automated AI responses are not desirable, but AI capabilities are still beneficial.
+
+### How It Works
+1. **AI Response Proposal**:
+   - When an incoming email is received, the AI generates a suggested response based on the content of the inquiry.
+   - The AI response appears in the **Assist Mode panel**, where the user can review it before it is sent.
+
+2. **User Action Options**:
+   - **Execute**: The user can approve the AI's proposed response and send it as-is.
+   - **Overwrite**: If the user disagrees with or wants to modify the AI response, they can choose to overwrite it with their own custom response.
+
+3. **Viewing Responses**:
+   - All AI-generated responses are visible in real-time in the assist mode, allowing the user to make informed decisions on whether to send or adjust the message.
+
+4. **Inspect Mode**:
+   - The user can access **Inspect Mode**, which allows them to monitor the interaction between the AI agent and the customer in real-time. If the user replies to the session, the AI will hand over the conversation, and the user will exit Inspect Mode.
+
+5. **AI Plan Visualization**:
+   - The AI provides a clear plan outlining the steps it's proposing to address the user's query. The user can review this plan before choosing to execute or overwrite the response.
+   - Example of a typical AI plan:
+     ```json
+     {
+       "plan": [
+         "1. Verify the account's status and identify the reason for suspension.",
+         "2. Instruct the agent on how to communicate the reason to the customer.",
+         "3. Guide the agent through the steps to resolve the issue (e.g., verifying documents or paying outstanding fees)."
+       ]
+     }
+     ```
+
+### Use Cases
+- **Customer Support**: Agents can review AI-drafted responses for customer inquiries, making sure the tone and details align with company policies before sending them.
+- **Sensitive Communications**: Perfect for industries or teams that need careful wording or compliance checks before responding to customer emails.
+- **Training and Quality Control**: Enables team leaders to monitor AI responses and train team members on best practices for customer communication.
+
+### Limitations
+- **Email-Only**: As of now, Assist Mode is only available for the email channel. Support for other channels (e.g., chat, phone) is in development.
+
+### Configuration
+This feature is only available via invitations. To enable Assist Mode, contact us at mo@open.cx.
+
+### Best Practices
+- **Review AI Suggestions Thoroughly**: Always review AI suggestions to ensure they align with your company’s tone, policies, and desired customer experience.
+- **Leverage the Plan**: Use the AI plan to guide your decision-making and make any necessary adjustments to improve the customer support experience.
+- **Monitor Inspect Mode**: Regularly monitor Inspect Mode to ensure the AI is providing accurate and useful responses for customer inquiries.
+
+### Future Enhancements
+- **Multi-Channel Support**: Plans are underway to extend Assist Mode to other communication channels such as chat and phone.
+- **Customizable AI Plans**: In future versions, users will be able to customize the AI's plan generation based on specific business rules and workflows.
+
+### Conclusion
+The Assist Mode in Open.cx is a powerful feature that allows you to maintain human oversight over AI-generated responses, providing a balance between automation and manual control. It significantly improves response times while still ensuring quality and accuracy in customer communications.
