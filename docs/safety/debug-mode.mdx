@@ -1,0 +1,45 @@
+---
+title: "Debug Mode"
+icon: "circle-info"
+description: "Understand why the AI said what it said."
+---
+
+When the AI provides an answer, there’s usually a reason behind it. This feature allows you to see the underlying data the AI used to form its response.
+
+## How to use this feature?
+
+<Steps>
+  <Step title="Filter sessions">
+    Filter sessions by the AI agent. This will display a list of all ongoing conversations where the AI is active.
+    <video
+    autoPlay
+    muted
+    loop
+    playsInline
+    className="w-full aspect-video rounded-lg"
+    src="/images/filter.mp4">
+    </video>
+  </Step>
+  <Step title="Click on the debug button">
+    Clicking this will open a popup showing the data the AI used to answer the question.
+    <video
+    autoPlay
+    muted
+    loop
+    playsInline
+    className="w-full aspect-video rounded-lg"
+    src="/images/debug-mode.mp4">
+    </video>
+  </Step>
+  <Step title="Actions, Knowledge, and Keywords">
+    - **Actions**: These represent the steps the AI took to formulate its response.  
+    - **Knowledge**: This shows the data or knowledge the AI relied on to answer the question.  
+    - **Keywords**: These are the search terms or keywords the AI used in its hybrid search process.
+  </Step>
+</Steps>
+
+## How to enable debug mode on the widget?
+For development purposes, you can enable debug mode on the widget by passing the `debug` prop to the `initOpenScript` function. This way, the widget will log all the messages and events to the console and to the chat ui (default: false)
+
+
+Read more <a href="/widget/embed#available-options">here</a>

@@ -132,6 +132,11 @@
       "pages": ["api-reference/email/email_api"]
     },
     {
+      "group": "AI Safety",
+      "icon": "shield-check",
+      "pages": ["safety/introduction", "safety/inspect-mode", "safety/debug-mode"]
+    },
+    {
       "group": "Resources",
       "pages": [
         "resources/ci-cd-actions",
