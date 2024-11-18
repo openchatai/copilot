@@ -159,6 +159,7 @@
         "safety/inspect-mode",
         "safety/debug-mode",
         "safety/pii-redaction",
+        "safety/unapproved-topics",
         "resources/assist-mode"
       ]
     },
