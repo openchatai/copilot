@@ -47,7 +47,7 @@
       "group": "Getting started",
       "icon": "book",
       "iconType": "light",
-      "pages": ["introduction", "dashboard/pricing"]
+      "pages": ["introduction"]
     },
     {
       "group": "AI Web Support",
