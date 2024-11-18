@@ -1,0 +1,157 @@
+---
+title: "PII Redaction"
+description: "Automatically protect sensitive information in conversations"
+icon: "user-shield"
+---
+
+## What's This?
+
+Our PII (Personally Identifiable Information) redaction system automatically removes sensitive data from conversations to protect privacy and ensure compliance.
+
+<Note>
+Data is retained for 30 days after session closure before automatic redaction begins. This period is customizable for your organization.
+</Note>
+
+## What Gets Protected
+
+<CardGroup cols={2}>
+  <Card title="Financial Data" icon="credit-card">
+    - Credit card numbers
+    - Bank accounts
+    - IBAN numbers
+    - Transaction details
+  </Card>
+  
+  <Card title="Personal Info" icon="user">
+    - Full names
+    - Birth dates
+    - ID numbers
+    - Social security
+  </Card>
+  
+  <Card title="Contact Details" icon="address-book">
+    - Email addresses
+    - Phone numbers
+    - Physical addresses
+    - Postal codes
+  </Card>
+  
+  <Card title="Business Data" icon="building">
+    - VAT numbers
+    - Company IDs
+    - License numbers
+    - Tax references
+  </Card>
+</CardGroup>
+
+## Important Notes
+
+<AccordionGroup>
+  <Accordion title="Permanent Process">
+    - Redaction cannot be reversed
+    - Configure settings before closing sessions
+    - Changes affect future redactions only
+  </Accordion>
+  
+  <Accordion title="Common Examples">
+    - Credit Cards: XXXX-XXXX-XXXX-1234
+    - Email: user@domain.com
+    - Phone: +1 (555) 123-4567
+    - Date: 23/04/1990
+  </Accordion>
+</AccordionGroup>
+
+## Supported Countries
+
+### 🇳🇱 Netherlands
+
+<CardGroup cols={3}>
+  <Card title="Personal" icon="id-card">
+    - BSN (Social Security)
+    - Phone Numbers
+    - Postal Codes
+  </Card>
+  <Card title="Financial" icon="euro-sign">
+    - IBAN
+    - BTW (VAT)
+    - KvK Numbers
+  </Card>
+  <Card title="Vehicle" icon="car">
+    - License Plates
+    - Registration Numbers
+  </Card>
+</CardGroup>
+
+### 🇧🇪 Belgium
+
+<CardGroup cols={3}>
+  <Card title="Identity" icon="passport">
+    - National Registry
+    - SIS Cards
+    - Phone Numbers
+  </Card>
+  <Card title="Business" icon="building">
+    - VAT Numbers
+    - Company Numbers
+    - KBO/BCE IDs
+  </Card>
+  <Card title="Banking" icon="bank">
+    - IBAN
+    - Account Numbers
+  </Card>
+</CardGroup>
+
+### 🇩🇪 Germany
+
+<CardGroup cols={3}>
+  <Card title="Government" icon="landmark">
+    - Tax ID
+    - ID Card Numbers
+    - Social Security
+  </Card>
+  <Card title="Financial" icon="euro-sign">
+    - IBAN
+    - Tax Numbers
+  </Card>
+  <Card title="Vehicle" icon="car">
+    - License Plates
+    - Vehicle IDs
+  </Card>
+</CardGroup>
+
+### 🇫🇷 France
+
+<CardGroup cols={3}>
+  <Card title="Identity" icon="id-card">
+    - Social Security (NIR)
+    - Carte Vitale
+  </Card>
+  <Card title="Business" icon="building">
+    - SIRET Numbers
+    - VAT Numbers
+  </Card>
+  <Card title="Vehicle" icon="car">
+    - License Plates
+    - Registration IDs
+  </Card>
+</CardGroup>
+
+## Configuration
+
+<Steps>
+  <Step title="Set Retention Period">
+    Choose how long to keep original data (default: 30 days)
+  </Step>
+  
+  <Step title="Choose Data Types">
+    Select which types of information to redact
+  </Step>
+  
+  <Step title="Configure Patterns">
+    Add custom patterns for your organization
+  </Step>
+</Steps>
+
+<Card title="Need Help?" icon="question" color="#0091FF">
+  Contact our security team at [security@open.cx](mailto:security@open.cx) for custom redaction rules or compliance questions.
+</Card> 

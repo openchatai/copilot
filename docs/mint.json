@@ -154,7 +154,13 @@
     {
       "group": "AI Safety",
       "icon": "shield-check",
-      "pages": ["safety/introduction", "safety/inspect-mode", "safety/debug-mode", "resources/assist-mode"]
+      "pages": [
+        "safety/introduction",
+        "safety/inspect-mode",
+        "safety/debug-mode",
+        "safety/pii-redaction",
+        "resources/assist-mode"
+      ]
     },
     {
       "group": "Resources",
