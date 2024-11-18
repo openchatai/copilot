@@ -1,219 +1,156 @@
 ---
-title: "Responding with UI"
-description: "Learn how to respond to user input with a UI."
+title: "UI Responses"
+description: "Learn how to make your AI show beautiful custom interfaces"
 icon: "code"
 ---
 
-The copilot offer the ability to respond with highly customizable UIs. This way you can create a more interactive experience for your users.
+## What's This About?
 
+Instead of just showing text responses, your AI can display beautiful custom UIs like:
+- Forms to collect information
+- Charts and graphs
+- Product cards
+- Settings toggles
+- And much more!
 
-These UIs can be used for a variety of purposes, such as:
+## Quick Example: Weather Display
 
-- Displaying information in a more user-friendly way
-- Collecting user input
-- Providing a more interactive experience for the user (from simple buttons to complex forms)
-- Showing progress or status updates, videos, images, and more
-- Toggle dark mode, change language, and other settings.
+Let's create a simple weather display UI. We'll build an AI that shows weather data in a nice card with a graph.
 
-## Example
-
-We will create a simple copilot that have access to real time weather data and display it in a UI.
-
-- After creating the copilot, create a new action called `getTheWeather`, make sure the action type is `GET`, and pass the following URL:
+<Steps>
+  <Step title="Create the Weather Action">
+    1. Go to your dashboard
+    2. Create a new action called `getTheWeather`
+    3. Set it as a `GET` request
+    4. Use this URL:
     ```
-    https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperat[…]m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m
+    https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m
     ```
+  </Step>
 
-
-You should have seomthing like this image:
-
-    ![getTheWeather](/images/weather.png)
-
-
-- Now, embed the copilot using our <a href="/widget/embed#as-a-react-component">React component </a> :
+  <Step title="Add the Widget to Your App">
+    Add this code to your React app:
 
     ```jsx
     import { CopilotWidget, Root } from "@openchatai/widget";
-    import { GetWetherDataRenderer } from "./components/WeatherRenderer";
+    import { WeatherDisplay } from "./WeatherDisplay";
 
     function App() {
-    return (
+      return (
         <div className="max-w-sm h-full">
-        <Root
+          <Root
             options={{
-            apiUrl: "https://api.opencopilot.so/backend",
-            token: "DYeTrnA9l3RXvrEK",
-            defaultOpen: true,
-            initialMessage: "Hello",
-            socketUrl: "https://api.opencopilot.so",
-            components: [
+              apiUrl: "https://api.opencopilot.so/backend",
+              token: "YOUR_TOKEN",
+              defaultOpen: true,
+              initialMessage: "Hello",
+              socketUrl: "https://api.opencopilot.so",
+              components: [
                 {
-                key: "getTheWeather", // This key should match the key of the action (getTheWeather) from the dashboard
-                component: GetWetherDataRenderer,
+                  key: "getTheWeather",  // Must match your action name
+                  component: WeatherDisplay,
                 },
-            ],
-            language: "en",
+              ],
+              language: "en",
             }}
-        >
+          >
             <CopilotWidget />
-        </Root>
+          </Root>
         </div>
-    );
+      );
     }
 
     export default App;
     ```
+  </Step>
 
-- Create a new file called `WeatherRenderer.tsx` and add the following code:
+  <Step title="Create the Weather Display">
+    Create a new file called `WeatherDisplay.tsx`:
 
     ```jsx
-    import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-    } from "@/components/ui/card";
+    import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
     import { ComponentProps } from "@openchatai/widget";
     import { ResponsiveLine } from "@nivo/line";
 
-    interface WeatherInfo {
-    latitude: number;
-    longitude: number;
-    generationtime_ms: number;
-    utc_offset_seconds: number;
-    timezone: string;
-    timezone_abbreviation: string;
-    elevation: number;
-    current_units: {
-        time: string;
-        interval: string;
-        temperature_2m: string;
-        wind_speed_10m: string;
-    };
-    current: {
-        time: string;
-        interval: number;
+    // This matches the data from the weather API
+    type WeatherData = {
+      current: {
         temperature_2m: number;
         wind_speed_10m: number;
-    };
-    hourly_units: {
-        time: string;
+      };
+      current_units: {
         temperature_2m: string;
-        relative_humidity_2m: string;
         wind_speed_10m: string;
-    };
-    hourly: {
+      };
+      hourly: {
         time: string[];
         temperature_2m: number[];
         relative_humidity_2m: number[];
         wind_speed_10m: number[];
-    };
+      };
     }
 
-    type Props = ComponentProps<WeatherInfo>;
-
-    export function GetWetherDataRenderer(props: Props) {
-    const {
-        data: { current, current_units, hourly },
-    } = props;
-    return (
-        <Card className="max-w-sm p-3">
-        <CardHeader className="flex flex-row items-center">
-            <div className="grid gap-0.5">
-            <CardTitle className="text-xl">Partly Cloudy</CardTitle>
-            <CardDescription>
-                {current.temperature_2m}
-                {current_units.temperature_2m} Wind {current.wind_speed_10m}{" "}
-                {current_units.wind_speed_10m}
-            </CardDescription>
-            </div>
-        </CardHeader>
-        <CardContent>
-
-            <div className="hourly-forecast">
-            <div
-                className="w-full"
-                style={{
-                height: "150px",
-                marginTop: "1rem",
-                }}
-            >
-                <ResponsiveLine
+    export function WeatherDisplay(props: ComponentProps<WeatherData>) {
+      const { data } = props;
+      
+      return (
+        <Card className="p-3">
+          <CardHeader>
+            <CardTitle>
+              {data.current.temperature_2m}°C
+              Wind: {data.current.wind_speed_10m} km/h
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div style={{ height: "150px" }}>
+              <ResponsiveLine
                 data={[
-                    {
+                  {
                     id: "temperature",
-                    color: "hsl(0, 70%, 50%)",
-                    data: hourly.time.map((time, index) => ({
-                        x: time,
-                        y: hourly.temperature_2m[index],
+                    data: data.hourly.time.map((time, i) => ({
+                      x: time,
+                      y: data.hourly.temperature_2m[i],
                     })),
-                    },
-                    {
-                    id: "humidity",
-                    color: "hsl(120, 70%, 50%)",
-                    data: hourly.time.map((time, index) => ({
-                        x: time,
-                        y: hourly.relative_humidity_2m[index],
-                    })),
-                    },
-                    {
-                    id: "wind",
-                    color: "hsl(240, 70%, 50%)",
-                    data: hourly.time.map((time, index) => ({
-                        x: time,
-                        y: hourly.wind_speed_10m[index],
-                    })),
-                    },
+                  }
                 ]}
-                yScale={{
-                    type: "linear",
-                    min: "auto",
-                    max: "auto",
-                    stacked: true,
-                    reverse: false,
-                }}
-                axisBottom={{
-                    tickSize: 5,
-                    tickPadding: 5,
-                    tickRotation: 0,
-                    legend: "transportation",
-                    legendOffset: 36,
-                    legendPosition: "middle",
-                    truncateTickAt: 0,
-                }}
-                axisLeft={{
-                    tickSize: 5,
-                    tickPadding: 5,
-                    tickRotation: 0,
-                    legend: "count",
-                    legendOffset: -40,
-                    legendPosition: "middle",
-                    truncateTickAt: 0,
-                }}
-                />
+                margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+                yScale={{ type: "linear" }}
+                axisBottom={{ tickRotation: -45 }}
+              />
             </div>
-            </div>
-        </CardContent>
+          </CardContent>
         </Card>
-    );
+      );
     }
     ```
+  </Step>
+</Steps>
 
-This file contain the UI that will be displayed to the user. It's a simple card that display the current weather and a graph that show the hourly forecast, you have a lot of flexibility to create the UI that you want, just make sure the `GetWetherDataRenderer` function return a valid JSX.
-Also, notice that the UI will consume the data that the copilot action will return, so make sure to define the type of the data that the action will return in the `Props` type.
+## How It Works
 
+1. When someone asks about the weather, your AI calls the `getTheWeather` action
+2. The action gets data from the weather API
+3. Our widget finds the matching component (`WeatherDisplay`)
+4. The component shows the weather data in a nice UI
 
-- Make sure that component you created is being defined in the copilot options:
-    
-    ```jsx
-    components: [
-            {
-              key: "getTheWeather",
-              component: GetWetherDataRenderer,
-            },
-          ],
-    ```
-- Now, when we try to chat with the copilot and ask for the weather, we will get a UI that display the current weather and the hourly forecast.
+That's it! Now when users ask about the weather, they'll see a beautiful card with current conditions and a temperature graph.
 
-    <img src="/images/gen-ui-example.png" alt="getTheWeather" width="500"/>
+<Note>
+Remember to:
+- Match your component's `key` with your action name
+- Make sure your component can handle the data structure from your action
+- Use shadcn/ui components for consistent styling
+</Note>
+
+## What You Can Build
+
+You can create UIs for many purposes:
+- Product displays
+- Booking forms
+- Data visualizations
+- Settings panels
+- And much more!
+
+Just create an action that returns the data you need, and a component to display it how you want.
+
+Need help? check out more examples in our [GitHub repo](https://github.com/openchatai/widget).

@@ -1,45 +1,78 @@
 ---
-title: "Debug Mode"
-icon: "circle-info"
-description: "Understand why the AI said what it said."
+title: "Understanding AI Decisions"
+icon: "magnifying-glass"
+description: "See exactly why the AI responded the way it did"
 ---
 
-When the AI provides an answer, there’s usually a reason behind it. This feature allows you to see the underlying data the AI used to form its response.
+## What's This?
 
-## How to use this feature?
+Debug mode shows you the thinking behind AI responses - what information it used, why it made certain choices, and how it formed its answers.
+
+## Why It's Useful
+
+<CardGroup cols={2}>
+  <Card title="Transparency" icon="glasses">
+    See exactly what information the AI used
+  </Card>
+  <Card title="Training" icon="book">
+    Identify knowledge gaps and improvement areas
+  </Card>
+  <Card title="Quality" icon="star">
+    Ensure responses meet your standards
+  </Card>
+  <Card title="Trust" icon="heart">
+    Build confidence in AI decisions
+  </Card>
+</CardGroup>
+
+## How to Use Debug Mode
 
 <Steps>
-  <Step title="Filter sessions">
-    Filter sessions by the AI agent. This will display a list of all ongoing conversations where the AI is active.
+  <Step title="Find the Conversation">
+    Filter to see AI conversations
     <video
-    autoPlay
-    muted
-    loop
-    playsInline
-    className="w-full aspect-video rounded-lg"
-    src="/images/filter.mp4">
-    </video>
+      autoPlay
+      muted
+      loop
+      playsInline
+      className="w-full aspect-video rounded-lg"
+      src="/images/filter.mp4"
+    />
   </Step>
-  <Step title="Click on the debug button">
-    Clicking this will open a popup showing the data the AI used to answer the question.
+  
+  <Step title="View AI's Reasoning">
+    Click the debug icon to see details
     <video
-    autoPlay
-    muted
-    loop
-    playsInline
-    className="w-full aspect-video rounded-lg"
-    src="/images/debug-mode.mp4">
-    </video>
+      autoPlay
+      muted
+      loop
+      playsInline
+      className="w-full aspect-video rounded-lg"
+      src="/images/debug-mode.mp4"
+    />
   </Step>
-  <Step title="Actions, Knowledge, and Keywords">
-    - **Actions**: These represent the steps the AI took to formulate its response.  
-    - **Knowledge**: This shows the data or knowledge the AI relied on to answer the question.  
-    - **Keywords**: These are the search terms or keywords the AI used in its hybrid search process.
+  
+  <Step title="Analyze the Components">
+    Review three key areas:
+    - **Actions**: Steps the AI took
+    - **Knowledge**: Information sources used
+    - **Keywords**: Search terms utilized
   </Step>
 </Steps>
 
-## How to enable debug mode on the widget?
-For development purposes, you can enable debug mode on the widget by passing the `debug` prop to the `initOpenScript` function. This way, the widget will log all the messages and events to the console and to the chat ui (default: false)
+## Developer Mode
 
+Need debug info in your widget? Enable it like this:
 
-Read more <a href="/widget/embed#available-options">here</a>
+```javascript
+initOpenScript({
+  // Other options...
+  debug: true  // Enables console logs and UI debugging
+})
+```
+
+<Note>
+Debug mode in widgets is great for development but should be disabled in production
+</Note>
+
+Learn more about [widget configuration options](/widget/embed#available-options)

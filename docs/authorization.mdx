@@ -1,37 +1,56 @@
 ---
 title: "Authentication"
-description: "Learn how to authenticate the copilot's API calls to your backend"
+description: "How to secure your API calls"
 icon: "shield-halved"
 ---
 
-Sometimes, your APIs might have some endpoints that require authentication. For example, you might want to restrict access to certain endpoints to only users that are logged in, and in order for the copilot to
-know who is logged in, you need to send some sort of token with your copilot requests.
+## What's This About?
 
-Currently, we support simple JWT authentication, and API tokens.
+When your AI needs to access secure parts of your system (like user data or private APIs), it needs the right permissions. This guide shows you how to set that up.
 
-## Dynamic Authentication via the widget
+## Two Ways to Add Authentication
 
-When you embed the copilot in your app, you can pass the authentication token to the copilot by using the `headers` prop.
+### 1. From Your App (Dynamic Auth)
+
+If you're using our widget in your app, you can pass authentication tokens directly:
 
 ```javascript
-    initAiCoPilot({
-        ...
-        headers: {
-            Authorization: "Bearer your_auth_token_goes_here",
-            AnyToken: "AnyValue"
-        },
-        ...
-    });
+initAiCoPilot({
+    // Other settings...
+    headers: {
+        // Add any auth headers you need
+        "Authorization": "Bearer your-token-here",
+        "API-Key": "your-api-key",
+        // Add as many headers as you need
+    }
+});
 ```
 
-as you see, as long as you pass the token in the `headers` prop, the copilot will send it with every request it makes to your API.
+This is great when:
+- Your users need to be logged in
+- Each user has their own permissions
+- You're using JWT tokens or API keys
 
+### 2. From Our Dashboard (Static Auth)
 
-## Authentication via the backend (from the dashboard)
-This option is useful if you want to use the copilot in a public website, and you don't want to expose your authentication token to the public, or if you want to use the copilot in a mobile app, and you don't want to hardcode the authentication token in the app.
-It's also very useful for testing purposes.
+If you need to set up authentication that's the same for everyone:
 
-In order to use this option, you need to go to the dashboard, and navigate to the "Copilot Settings" tab, and then scroll down to the "Global variables/headers" section.
+<Steps>
+  <Step title="Go to Settings">
+    Open your copilot dashboard and find "Copilot Settings"
+  </Step>
+  
+  <Step title="Find Headers Section">
+    Scroll down to "Global variables/headers"
+  </Step>
+  
+  <Step title="Add Your Headers">
+    Add any authentication headers you need:
+    - API keys
+    - Access tokens
+    - Custom headers
+  </Step>
+</Steps>
 
 <video
     autoPlay
@@ -41,3 +60,44 @@ In order to use this option, you need to go to the dashboard, and navigate to th
     className="w-full aspect-video"
     src="images/auth.mp4"
 ></video>
+
+This is perfect when:
+- You're using the AI on a public website
+- You don't want to expose tokens in your frontend code
+- You need the same authentication for all users
+- You're testing things out
+
+## Security & Storage
+
+<Note>
+**Important Security Information:**
+- Headers passed through the widget (`initAiCoPilot`) are never stored in our system
+- Only headers configured in the dashboard are stored, and these are encrypted in our database
+- We follow industry-standard encryption practices to protect your sensitive data
+</Note>
+
+<CardGroup cols={2}>
+  <Card title="Widget Headers" icon="shield-xmark">
+    - Not stored anywhere
+    - Used only during runtime
+    - Perfect for user-specific tokens
+  </Card>
+  <Card title="Dashboard Headers" icon="shield-check">
+    - Encrypted in our database
+    - Safely stored and managed
+    - Ideal for system-wide tokens
+  </Card>
+</CardGroup>
+
+## Quick Tips
+
+<CardGroup cols={2}>
+  <Card title="Security First" icon="shield-check">
+    Never put sensitive tokens in your frontend code if you can avoid it
+  </Card>
+  <Card title="Test It Out" icon="vial">
+    Always test your authentication with a few API calls before going live
+  </Card>
+</CardGroup>
+
+Need help? Join our [Slack community](https://slack.opencopilot.so) for support!

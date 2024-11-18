@@ -1,40 +1,118 @@
 ---
-title: "AI Outbound Phone Calls"
-description: "Learn how to make outbound calls to your customers and some considerations."
-icon: "bolt"
+title: "AI Outbound Calls"
+description: "Make intelligent outbound calls at scale with our AI phone agents"
+icon: "phone-arrow-up-right"
 ---
 
-## Outbound calls
+## Overview
 
-<Warning>This feature is available only via the API</Warning>
+Our AI outbound calling system allows you to automate customer communications while maintaining a natural, personalized experience. Make single calls or orchestrate bulk calling campaigns with our powerful sequence feature.
 
-Open provides a simple interface to make outbound calls to your customers. You can make calls to any phone number, and you can also specify a delay before the call is made.
+<CardGroup cols={2}>
+  <Card title="Single Calls" icon="phone" color="#0091FF">
+    Perfect for follow-ups, appointment confirmations, or customer service callbacks.
+  </Card>
+  <Card title="Bulk Sequences" icon="phone-volume" color="#0091FF">
+    Automate large-scale calling campaigns with customizable sequences and intelligent routing.
+  </Card>
+</CardGroup>
 
-### How to make an outbound call
+## AI Voice Models
 
+<CardGroup cols={2}>
+  <Card title="Oppie-Vox" icon="microphone" color="#0091FF">
+    Our standard voice model offering:
+    - Excellent response time for English
+    - Good response time for other languages
+    - Highly programmable
+    - Minimal AI hallucinations
+    - **Cost:** $0.07/minute
+  </Card>
+  <Card title="Oppie-Vox-Turbo (Beta)" icon="microphone-lines" color="#FF6B6B">
+    Our premium voice model offering:
+    - Exceptional response time in all languages
+    - Ultra-realistic speech patterns
+    - Native/local accent support
+    - Enhanced natural conversation flow
+    - **Cost:** Contact sales
+    <Note>Currently in beta - limited availability</Note>
+  </Card>
+</CardGroup>
 
-To make an outbound call, you need to provide the following information:
+## Key Features
 
-- **To**: The phone number to call.
-- **Delay**: The delay before the call is made (in seconds).
-- **Phone agent ID**: The ID of the phone agent to use for the call.
+<CardGroup cols={2}>
+  <Card title="Smart Data Collection" icon="database">
+    Automatically collect and store customer information during calls for personalized future interactions.
+  </Card>
+  <Card title="API Integration" icon="bolt">
+    AI agents can make API calls, fetch data, and perform actions in real-time during conversations.
+  </Card>
+  <Card title="Knowledge Base Access" icon="book">
+    Access your knowledge base during calls to provide accurate, consistent information.
+  </Card>
+  <Card title="Human Handoff" icon="user">
+    Seamlessly transfer calls to human agents when needed, with full context preservation.
+  </Card>
+  <Card title="Multi-language Support" icon="language">
+    Make calls in multiple languages with native-speaking AI voices.
+  </Card>
+  <Card title="Call Analytics" icon="chart-line">
+    Detailed analytics and reporting for all your calling campaigns.
+  </Card>
+</CardGroup>
 
-You can make an outbound call using the API. Here's an example request:
+## Sequence Feature
 
-```bash
-curl --location --request POST 'https://api.open.cx/phone/outbound' \
---header 'Content-Type: application/json' \
---data-raw '{
-    "to": "+15555555555",
-    "delay": 60,
-    "phone_agent_id": "your_phone_agent_id"
-}
-```
+Our sequence feature allows you to create sophisticated outbound calling campaigns:
 
-### Some considerations:
+<Steps>
+  <Step title="Create Your Sequence">
+    Define your target audience and campaign parameters:
+    - Upload contact lists
+    - Set calling schedules
+    - Define retry attempts
+  </Step>
+  <Step title="Customize AI Behavior">
+    Configure how your AI agent should:
+    - Handle different scenarios
+    - Collect specific information
+    - Respond to common questions
+  </Step>
+  <Step title="Monitor & Optimize">
+    Track your campaign performance:
+    - Real-time success rates
+    - Call recordings and transcripts
+    - AI resolution metrics
+  </Step>
+</Steps>
 
-- Outbound AI calling is regulated in many countries. For example, in the US, you are required by law to have consent from the customer before making an outbound call. Make sure to comply with local regulations.
-- Outbound calls are highly monitored from our side, so please do not abuse the feature, or you may get permanently banned from the platform.
-- The delay parameter is optional, and if not provided, the call will be made immediately.
+## Use Cases
+
+<AccordionGroup>
+  <Accordion title="Appointment Reminders">
+    Send automated appointment reminders with the ability to confirm, reschedule, or cancel appointments in real-time.
+  </Accordion>
+  <Accordion title="Customer Surveys">
+    Conduct voice surveys with natural conversation flow and real-time response recording.
+  </Accordion>
+  <Accordion title="Follow-up Calls">
+    Automated follow-ups after purchases, service interactions, or support tickets.
+  </Accordion>
+  <Accordion title="Lead Qualification">
+    Initial screening and qualification of sales leads with intelligent routing to sales teams.
+  </Accordion>
+</AccordionGroup>
+
+## Getting Started
+
+1. [Buy a phone number](/api-reference/phone/buy) for your AI agent
+2. Configure your AI agent's voice and behavior
+3. Upload your contacts or integrate with your CRM
+4. Start making calls!
+
+<Card title="Ready to start making calls?" icon="phone-arrow-up-right" color="#0091FF">
+  Check out our [API documentation](/api-reference/phone/make_outbound_call) for detailed implementation guides, or contact our sales team to discuss your specific needs.
+</Card>
 
 

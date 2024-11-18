@@ -65,6 +65,7 @@
       "icon": "phone",
       "pages": [
         "phone/phone-calling",
+        "phone/outbound-calls",
         "resources/human-handoff",
         "phone/human-phone-agent"
       ]
@@ -82,16 +83,35 @@
       ]
     },
     {
-      "group": "Native Integrations",
+      "group": "Integrations",
+      "icon": "plug",
       "pages": [
-        "dashboard/zendesk_integration",
-        "dashboard/shopify_integration",
-        "dashboard/zapier_integration"
+        "integrations/overview",
+        {
+          "group": "Knowledgebase",
+          "pages": [
+            "integrations/shopify",
+            "integrations/zendesk",
+            "integrations/gmail",
+            "integrations/notion",
+            "integrations/confluence",
+            "integrations/website",
+            "integrations/zendesk-tickets",
+            "integrations/intercom",
+            "integrations/google-drive",
+            "integrations/dropbox"
+          ]
+        },
+        {
+          "group": "Native Integrations",
+          "pages": [
+            "dashboard/zendesk_integration",
+            "dashboard/shopify_integration",
+            "dashboard/jira_integration",
+            "dashboard/zapier_integration"
+          ]
+        }
       ]
-    },
-    {
-      "group": "Knowledge Integrations",
-      "pages": ["kbase"]
     },
     {
       "group": "Contacts",

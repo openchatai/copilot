@@ -1,210 +1,196 @@
 ---
-title: "Headless Widget (Custom UI)"
-description: "Learn How to use the widget primitives to build your own ui to match your design system."
-icon: "circle"
+title: "React Hooks & Components"
+description: "Build custom UIs with our React hooks and components"
+icon: "react"
 ---
 
-## `WidgetRoot` Component
+## What's This About?
 
-It serves as a provider component that shares configuration data and chat functionalities with its child components. This allows for centralized management of widget options and state across the application.
+Want to build your own custom chat UI? We provide React hooks and components that make it easy to:
+- Create custom chat interfaces
+- Manage chat state
+- Handle messages and responses
+- Build your own UI components
 
-```tsx 
+## Basic Setup
+
+First, wrap your app with our `WidgetRoot` provider:
+
+```tsx
 import { WidgetRoot } from "@openchatai/widget";
-
-const widgetOptions = {
-    token: 'your-auth-token',
-    initialMessage: ['Welcome to our service!'],
-}
-
-// just an example
-function Widget(){
-    return (
-        <div></div>
-    )
-}
 
 function App() {
   return (
-    <WidgetRoot options={widgetOptions}>
-        <Widget />
+    <WidgetRoot 
+      options={{
+        token: 'your-token',
+        initialMessage: 'Welcome!',
+        // More options below...
+      }}
+    >
+      <YourCustomChat />
     </WidgetRoot>
   );
 }
 ```
-### Widget Root options
 
-``` ts
+### Available Options
+
+```typescript
 type WidgetOptions = {
-  token: string;
-  headers?: Record<string, string>;
-  queryParams?: Record<string, string>;
-  initialMessage: string[];
-  triggerSelector?: string;
-  apiUrl?: string;
-  socketUrl?: string;
-  defaultOpen?: boolean;
-  debug?: boolean;
-  warnBeforeClose?: boolean;
-  onClose?: () => void;
-  organizationName?: string;
-  onHandoff?: (handout: HandoffPayloadType) => void;
+  // Required
+  token: string,                    // Your authentication token
+  
+  // Optional
+  initialMessage?: string[],        // First messages to show
+  apiUrl?: string,                  // Custom API URL
+  socketUrl?: string,               // Custom WebSocket URL
+  defaultOpen?: boolean,            // Open chat by default
+  debug?: boolean,                  // Enable debug mode
+  
+  // Customization
+  organizationName?: string,        // Your company name
+  headers?: Record<string, string>, // Custom headers
+  
+  // Callbacks
+  onClose?: () => void,            // Called when chat closes
+  onHandoff?: (data: HandoffData) => void, // Called on human handoff
+  
+  // User info
   user?: {
-    name?: string;
-    email?: string;
-    phone?: string;
-    customData?: Record<string, string>;
-    avatarUrl?: string;
-  };
+    name?: string,
+    email?: string,
+    phone?: string,
+    avatarUrl?: string,
+    customData?: Record<string, string>,
+  },
+  
+  // Bot customization
   bot?: {
-    name?: string;
-    avatarUrl?: string;
-  };
+    name?: string,
+    avatarUrl?: string,
+  },
+  
+  // Custom components
   components?: {
-    key: string;
-    component: React.ElementType;
+    key: string,
+    component: React.ElementType
   }[]
-};
+}
 ```
 
-## `useChat` Hook
+## Useful Hooks
 
-It provides an interface for managing chat sessions, sending messages, handling incoming messages, and maintaining chat state within the widget.
+### 1. useChat Hook
 
-#### Return Value
-The `useChat` hook returns an object with the following properties and functions:
-<ResponseField name="ReturnType" type="object">
-  <ResponseField name="state" type="object">
-    <ResponseField name="lastUpdated" type="number">The timestamp of the last update to the chat state.</ResponseField>
-    <ResponseField name="messages" type="array">An array of message objects representing the chat history.</ResponseField>
-  </ResponseField>
-  <ResponseField name="session" type="object">The current chat session object.</ResponseField>
-  <ResponseField name="recreateSession" type="function">A function that recreates the chat session.</ResponseField>
-  <ResponseField name="clearSession" type="function">A function that clears the chat session.</ResponseField>
-  <ResponseField name="sendMessage" type="function">A function that sends a message to the chat server.</ResponseField>
-  <ResponseField name="noMessages" type="boolean">A boolean value indicating whether there are no messages in the chat history.</ResponseField>
-  <ResponseField name="initialData" type="object">The initial data object returned by the useSWR hook.</ResponseField>
-  <ResponseField name="info" type="ReactNode">A React node representing additional information about the chat session.</ResponseField>
-  <ResponseField name="events" type="TypedEventTarget">a type safe event target object that dispatches custom events related to the chat session.</ResponseField>
-  <ResponseField name="hookState" type="HookState">The current state of the chat hook.</ResponseField>
-  <ResponseField name="settings" type="object">The current settings object for the chat hook.</ResponseField>
-  <ResponseField name="setSettings" type="function">A function that updates the settings object for the chat hook.</ResponseField>
-  <ResponseField name="axiosInstance" type="object">The Axios instance object used for making HTTP requests.</ResponseField>
-</ResponseField>
+The main hook for chat functionality:
 
+```tsx
+import { useChat } from "@openchatai/widget";
 
-## `useConfigData` Hook
-it returns the configuration data shared by the `WidgetRoot` component.
+function CustomChat() {
+  const { 
+    sendMessage,      // Send a message
+    state,           // Current chat state
+    clearSession,    // Clear chat history
+    recreateSession, // Start new session
+  } = useChat();
+
+  return (
+    <div>
+      {state.messages.map((msg) => (
+        <div key={msg.id}>{msg.content}</div>
+      ))}
+      <button onClick={() => sendMessage("Hello!")}>
+        Send Message
+      </button>
+    </div>
+  );
+}
+```
+
+### 2. useConfigData Hook
+
+Access your widget configuration:
 
 ```tsx
 import { useConfigData } from "@openchatai/widget";
 
-function Widget() {
-  const configData = useConfigData();
+function ChatHeader() {
+  const config = useConfigData();
+  
+  return (
+    <header>
+      Welcome to {config.organizationName}!
+    </header>
+  );
+}
+```
+
+### 3. Message Rating Hooks
+
+Add thumbs up/down to messages:
+
+```tsx
+import { useUpvote, useDownvote } from "@openchatai/widget";
+
+function MessageRating({ messageId }) {
+  const [upvoteState, upvote] = useUpvote(messageId);
+  const [downvoteState, downvote] = useDownvote(messageId);
+  
   return (
     <div>
-      <h1>{configData.organizationName}</h1>
+      <button onClick={upvote}>👍</button>
+      <button onClick={downvote}>👎</button>
     </div>
   );
 }
 ```
 
+## Custom Message Components
 
-## Voting Hooks
-
-### `useUpvote` , `useDownvote` Hooks
-are used to up or down vote a message 
-it takes Message's `serverId` and optional `onSuccess` callback function as arguments.
+You can create custom components for different message types:
 
 ```tsx
-import { useUpvote, useDownvote, ComponentProps } from "@openchatai/widget";
+import { BotMessage, ComponentProps } from "@openchatai/widget";
 
-export type CustomBotTextResponseProps = ComponentProps<{
-    message: string
-}>;
-
-function CustomBotResponse({serverId,...props}:CustomBotTextResponseProps) {
-  const [upvoteState, upvote] = useUpvote(serverId.toString());
-  const [downvoteState, downvote] = useDownvote(serverId.toString());
+// Custom component for weather data
+function WeatherDisplay({ data }: ComponentProps<WeatherData>) {
   return (
     <div>
-      <button onClick={() => upvote()}>Upvote</button>
-      <button onClick={() => downvote()}>Downvote</button>
+      <h3>Current Weather</h3>
+      <p>{data.temperature}°C</p>
+    </div>
+  );
+}
+
+// Use in your chat
+function ChatMessages() {
+  const { state } = useChat();
+  
+  return (
+    <div>
+      {state.messages.map((message, i) => (
+        message.type === "FROM_BOT" ? (
+          <BotMessage 
+            message={message} 
+            index={i} 
+            key={i} 
+          />
+        ) : (
+          <UserMessage message={message} key={i} />
+        )
+      ))}
     </div>
   );
 }
 ```
 
-## Components
+<Note>
+Remember to:
+- Always wrap your app with `WidgetRoot`
+- Handle loading and error states
+- Consider mobile responsiveness
+</Note>
 
-### `BotMessage` Component
-
-this component is responsible for selecting the appropriate component to render based on the message type.
-Let's render the messages to see how can to use it.
-
-```tsx
-import { BotMessage, useChat } from "@openchatai/widget";
-
-function ChatScreen() {
-  const { state} = useChat();
-  return <>
-  {state.messages.map((message, i) => {
-    if (message.type === "FROM_USER") {
-      return (
-        <div key={i}>
-          {message.content}
-        </div>
-      );
-    } else if (message.type === "FROM_BOT") {
-      return (
-          <BotMessage message={message} index={i} key={i} />
-      );
-    }
-    return null;
-  })}
-</>
-}
-
-```
-#### But how this component work ? 
-Here's the code of the `BotMessage` component.
-
-```tsx
-import { BotMessageType, ComponentRegistry, useConfigData } from "@openchatai/widget";
-import { ComponentType, useMemo } from "react";
-
-function BotMessage({
-    message,
-    index,
-}: {
-    message: BotMessageType;
-    index: number;
-}) {
-    const config = useConfigData();
-
-    const components = useMemo(() => (
-        new ComponentRegistry({
-            components: config.components
-        })
-    ), [config])
-
-    const component = components.getComponent(message.component, config.debug);
-
-    if (!component) {
-        return null;
-    }
-
-    const Component = component as ComponentType<{
-        data: BotMessageType["data"];
-        id: string;
-    }>;
-
-    return (
-        <Component
-            {...message}
-            data={message.data ?? {}}
-            id={message.id}
-            key={index}
-        />
-    );
-}
-```
+Need help? Check out our [example repo](https://github.com/openchatai/opencopilot/tree/main/examples) or join our [Slack community](https://slack.opencopilot.so)!
