@@ -119,9 +119,9 @@
       "pages": [
         "api-reference/contacts/introduction",
         "api-reference/contacts/create",
-        "api-reference/contacts/delete",
         "api-reference/contacts/list",
-        "api-reference/contacts/update"
+        "api-reference/contacts/update",
+        "api-reference/contacts/delete"
       ]
     },
     {
@@ -149,6 +149,17 @@
       "group": "AI Email",
       "icon": "envelope",
       "pages": ["api-reference/email/email_api"]
+    },
+    {
+      "group": "Sequencing",
+      "pages": [
+        "api-reference/sequencing/create",
+        "api-reference/sequencing/get",
+        "api-reference/sequencing/update",
+        "api-reference/sequencing/start",
+        "api-reference/sequencing/cancel",
+        "api-reference/sequencing/add-contacts-to-sequence"
+      ]
     },
     {
       "group": "AI Safety",
