@@ -128,10 +128,9 @@
       "group": "AI Phone Agents",
       "icon": "phone",
       "pages": [
-        "api-reference/phone/buy",
+        "api-reference/phone/create",
+        "api-reference/phone/list",
         "api-reference/phone/update",
-        "api-reference/phone/get-all-phones",
-        "api-reference/phone/make_outbound_call",
         "api-reference/phone/delete"
       ]
     },
