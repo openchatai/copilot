@@ -155,10 +155,7 @@
       "pages": [
         "api-reference/sequencing/create",
         "api-reference/sequencing/get",
-        "api-reference/sequencing/update",
-        "api-reference/sequencing/start",
-        "api-reference/sequencing/cancel",
-        "api-reference/sequencing/add-contacts-to-sequence"
+        "api-reference/sequencing/update"
       ]
     },
     {
