@@ -11,6 +11,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "mintlify": "^4.0.208"
+    "mintlify": "^4.0.299"
   }
 }
